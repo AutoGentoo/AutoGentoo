@@ -1,0 +1,13 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Name=AutoGentoo
+Comment=Gentoo Installer
+Exec=gksudo python2 main.py >> /AutoGentoo.log
+Icon=/home/atadmin/AutoGentoo_Graphical/img/optional.png
+Path=.
+Terminal=True
+Type=Application
+Categories=Utility;Application;
+GenericName[en_US.utf-8]=Gentoo Installer

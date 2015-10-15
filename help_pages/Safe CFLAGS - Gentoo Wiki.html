@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<!-- saved from url=(0040)https://wiki.gentoo.org/wiki/Safe_CFLAGS -->
+<html lang="en" dir="ltr" class="client-js"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script type="text/javascript" async="" defer="" src="./Safe CFLAGS - Gentoo Wiki_files/piwik.js"></script>
+<meta charset="UTF-8">
+<title>Safe CFLAGS - Gentoo Wiki</title>
+<meta name="generator" content="MediaWiki 1.25.2-gentoo">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#54487a">
+<link rel="ExportRDF" type="application/rdf+xml" title="Safe CFLAGS" href="https://wiki.gentoo.org/index.php?title=Special:ExportRDF/Safe_CFLAGS&xmlmime=rdf">
+<link rel="shortcut icon" href="https://wiki.gentoo.org/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="https://wiki.gentoo.org/opensearch_desc.php" title="Gentoo Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="https://wiki.gentoo.org/api.php?action=rsd">
+<link rel="alternate" hreflang="x-default" href="./Safe CFLAGS - Gentoo Wiki_files/Safe CFLAGS - Gentoo Wiki.html">
+<link rel="copyright" href="http://creativecommons.org/licenses/by-sa/3.0/">
+<link rel="alternate" type="application/atom+xml" title="Gentoo Wiki Atom feed" href="https://wiki.gentoo.org/index.php?title=Special:RecentChanges&feed=atom">
+<link rel="stylesheet" href="https://wiki.gentoo.org/load.php?debug=false&lang=en&modules=ext.geshi.language.bash%7Cext.rtlcite%7Cext.uls.nojs%7Cmediawiki.legacy.commonPrint%2Cshared%7Cmediawiki.sectionAnchor%7Cmediawiki.skinning.content.externallinks%7Cmediawiki.skinning.interface%7Cmediawiki.ui.button%7Cskins.tyrian.styles&only=styles&skin=tyrian&*">
+<link rel="stylesheet" href="https://1b9a50f4f9de4348cd9f-e703bc50ba0aa66772a874f8c7698be7.ssl.cf5.rackcdn.com/bootstrap.min.css">
+<link rel="stylesheet" href="https://1b9a50f4f9de4348cd9f-e703bc50ba0aa66772a874f8c7698be7.ssl.cf5.rackcdn.com/tyrian.min.css"><style>
+.qtip{position:absolute;left:-28000px;top:-28000px;display:none;max-width:280px;min-width:50px;font-size:10.5px;line-height:12px;direction:ltr;box-shadow:none;padding:0}.qtip-content{position:relative;padding:5px 9px;overflow:hidden;text-align:left;word-wrap:break-word}.qtip-titlebar{position:relative;padding:5px 35px 5px 10px;overflow:hidden;border-width:0 0 1px;font-weight:bold}.qtip-titlebar + .qtip-content{border-top-width:0 !important} .qtip-close{position:absolute;right:-9px;top:-9px;z-index:11; cursor:pointer;outline:medium none;border:1px solid transparent}.qtip-titlebar .qtip-close{right:4px;top:50%;margin-top:-9px}* html .qtip-titlebar .qtip-close{top:16px} .qtip-titlebar .ui-icon,.qtip-icon .ui-icon{display:block;text-indent:-1000em;direction:ltr}.qtip-icon,.qtip-icon .ui-icon{-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;text-decoration:none}.qtip-icon .ui-icon{width:18px;height:14px;line-height:14px;text-align:center;text-indent:0;font:normal bold 10px/13px Tahoma,sans-serif;color:inherit;background:transparent none no-repeat -100em -100em} .qtip-focus{} .qtip-hover{} .qtip-default{border:1px solid #F1D031;background-color:#FFFFA3;color:#555}.qtip-default .qtip-titlebar{background-color:#FFEF93}.qtip-default .qtip-icon{border-color:#CCC;background:#F1F1F1;color:#777}.qtip-default .qtip-titlebar .qtip-close{border-color:#AAA;color:#111}.qtip-shadow{-webkit-box-shadow:1px 1px 3px 1px rgba(0,0,0,0.15);-moz-box-shadow:1px 1px 3px 1px rgba(0,0,0,0.15);box-shadow:1px 1px 3px 1px rgba(0,0,0,0.15)} .qtip-rounded,.qtip-tipsy,.qtip-bootstrap{-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px}.qtip-rounded .qtip-titlebar{-moz-border-radius:4px 4px 0 0;-webkit-border-radius:4px 4px 0 0;border-radius:4px 4px 0 0} .qtip-youtube{-moz-border-radius:2px;-webkit-border-radius:2px;border-radius:2px;-webkit-box-shadow:0 0 3px #333;-moz-box-shadow:0 0 3px #333;box-shadow:0 0 3px #333;color:white;border:0 solid transparent;background:#4A4A4A;background-image:-webkit-gradient(linear,left top,left bottom,color-stop(0,#4A4A4A),color-stop(100%,black));background-image:-webkit-linear-gradient(top,#4A4A4A 0,black 100%);background-image:-moz-linear-gradient(top,#4A4A4A 0,black 100%);background-image:-ms-linear-gradient(top,#4A4A4A 0,black 100%);background-image:-o-linear-gradient(top,#4A4A4A 0,black 100%)}.qtip-youtube .qtip-titlebar{background-color:#4A4A4A;background-color:rgba(0,0,0,0)}.qtip-youtube .qtip-content{padding:.75em;font:12px arial,sans-serif;filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr=#4a4a4a,EndColorStr=#000000);-ms-filter:"progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr=#4a4a4a,EndColorStr=#000000);"}.qtip-youtube .qtip-icon{border-color:#222}.qtip-youtube .qtip-titlebar .ui-state-hover{border-color:#303030} .qtip-jtools{background:#232323;background:rgba(0,0,0,0.7);background-image:-webkit-gradient(linear,left top,left bottom,from(#717171),to(#232323));background-image:-moz-linear-gradient(top,#717171,#232323);background-image:-webkit-linear-gradient(top,#717171,#232323);background-image:-ms-linear-gradient(top,#717171,#232323);background-image:-o-linear-gradient(top,#717171,#232323);border:2px solid #ddd;border:2px solid rgba(241,241,241,1);-moz-border-radius:2px;-webkit-border-radius:2px;border-radius:2px;-webkit-box-shadow:0 0 12px #333;-moz-box-shadow:0 0 12px #333;box-shadow:0 0 12px #333} .qtip-jtools .qtip-titlebar{background-color:transparent;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#717171,endColorstr=#4A4A4A);-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#717171,endColorstr=#4A4A4A)"}.qtip-jtools .qtip-content{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4A4A4A,endColorstr=#232323);-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#4A4A4A,endColorstr=#232323)"}.qtip-jtools .qtip-titlebar,.qtip-jtools .qtip-content{background:transparent;color:white;border:0 dashed transparent}.qtip-jtools .qtip-icon{border-color:#555}.qtip-jtools .qtip-titlebar .ui-state-hover{border-color:#333} .qtip-cluetip{-webkit-box-shadow:4px 4px 5px rgba(0,0,0,0.4);-moz-box-shadow:4px 4px 5px rgba(0,0,0,0.4);box-shadow:4px 4px 5px rgba(0,0,0,0.4);background-color:#D9D9C2;color:#111;border:0 dashed transparent}.qtip-cluetip .qtip-titlebar{background-color:#87876A;color:white;border:0 dashed transparent}.qtip-cluetip .qtip-icon{border-color:#808064}.qtip-cluetip .qtip-titlebar .ui-state-hover{border-color:#696952;color:#696952} .qtip-tipsy{background:black;background:rgba(0,0,0,.87);color:white;border:0 solid transparent;font-size:11px;font-family:'Lucida Grande',sans-serif;font-weight:bold;line-height:16px;text-shadow:0 1px black}.qtip-tipsy .qtip-titlebar{padding:6px 35px 0 10px;background-color:transparent}.qtip-tipsy .qtip-content{padding:6px 10px}.qtip-tipsy .qtip-icon{border-color:#222;text-shadow:none}.qtip-tipsy .qtip-titlebar .ui-state-hover{border-color:#303030} .qtip-tipped{border:3px solid #959FA9;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;background-color:#F9F9F9;color:#454545;font-weight:normal;font-family:serif}.qtip-tipped .qtip-titlebar{border-bottom-width:0;color:white;background:#3A79B8;background-image:-webkit-gradient(linear,left top,left bottom,from(#3A79B8),to(#2E629D));background-image:-webkit-linear-gradient(top,#3A79B8,#2E629D);background-image:-moz-linear-gradient(top,#3A79B8,#2E629D);background-image:-ms-linear-gradient(top,#3A79B8,#2E629D);background-image:-o-linear-gradient(top,#3A79B8,#2E629D);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#3A79B8,endColorstr=#2E629D);-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#3A79B8,endColorstr=#2E629D)"}.qtip-tipped .qtip-icon{border:2px solid #285589;background:#285589}.qtip-tipped .qtip-icon .ui-icon{background-color:#FBFBFB;color:#555} .qtip-bootstrap{ font-size:14px;line-height:20px;color:#333333; padding:1px;background-color:#ffffff;border:1px solid #ccc;border:1px solid rgba(0,0,0,0.2);-webkit-border-radius:6px;-moz-border-radius:6px;border-radius:6px;-webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);-moz-box-shadow:0 5px 10px rgba(0,0,0,0.2);box-shadow:0 5px 10px rgba(0,0,0,0.2);-webkit-background-clip:padding-box;-moz-background-clip:padding;background-clip:padding-box}.qtip-bootstrap .qtip-titlebar{ padding:8px 14px;margin:0;font-size:14px;font-weight:normal;line-height:18px;background-color:#f7f7f7;border-bottom:1px solid #ebebeb;-webkit-border-radius:5px 5px 0 0;-moz-border-radius:5px 5px 0 0;border-radius:5px 5px 0 0}.qtip-bootstrap .qtip-titlebar .qtip-close{ right:11px;top:45%;border-style:none}.qtip-bootstrap .qtip-content{ padding:9px 14px}.qtip-bootstrap .qtip-icon{ background:transparent}.qtip-bootstrap .qtip-icon .ui-icon{ width:auto;height:auto; float:right;font-size:20px;font-weight:bold;line-height:18px;color:#000000;text-shadow:0 1px 0 #ffffff;opacity:0.2;filter:alpha(opacity=20)}.qtip-bootstrap .qtip-icon .ui-icon:hover{ color:#000000;text-decoration:none;cursor:pointer;opacity:0.4;filter:alpha(opacity=40)} .qtip:not(.ie9haxors) div.qtip-content,.qtip:not(.ie9haxors) div.qtip-titlebar{filter:none;-ms-filter:none}.qtip .qtip-tip{margin:0 auto;overflow:hidden;z-index:10} x:-o-prefocus,.qtip .qtip-tip{visibility:hidden}.qtip .qtip-tip,.qtip .qtip-tip .qtip-vml,.qtip .qtip-tip canvas{position:absolute;color:#123456;background:transparent;border:0 dashed transparent}.qtip .qtip-tip canvas{top:0;left:0}.qtip .qtip-tip .qtip-vml{behavior:url("//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/jquery/#default#VML");display:inline-block;visibility:visible}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:24eb10b3387e339d0f52933c20e94359 */
+div.smwtt{color:#000000} span.smwttpersist span.smwttcontent{color:#888888;font-style:italic;font-size:90%} span.smwttinline span.smwttcontent{display:none;speak:none} span.smwtticon{display:none} span.smwttactivepersist{cursor:help;color:#0000C8} span.smwttactiveinline{color:#BB7700;text-decoration:none} img.smwttimg{padding-right:5px;padding-left:4px} .smwttcontent{display:none} .smwtticon{padding:14px 12px 0 0;white-space:nowrap;margin-bottom:-1px} .smwtticon.info{display:inline-block;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABmJLR0QAQACXAOIX6M4XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1woNCAQvupvvrgAAAgpJREFUKBUFwTtME3EAwOHf3f961+vd9Sh9HEVINUrFhAbRmCgGo9FodCFMLhomJ6MmJsbF1Z2ExMHBUQc3BmOigyERB0ElQHgECRYECrRC26OPa3t+nwQAAI7aO/K458yJeK8qOA74dY/1hbWdxZWJsVUoeAAKAImh2NDdR/duD54cdRLRdMQydB84KJaPzufyyx+6Tr+Zej/2jr1vBUHiin3j/pPnwzcvPMv0OKlb/YlAT4cupR1d0lRNNWwrmUhEB+tmSl7/vTktMiNPhy9dvviyM2FYnZEgpRp8WS3htaC/W2du64iWLAUl1RgoY84qiiJdU03TKFR9vv+tIZQGsiTojqg0WrDtwlHVR7PscCDAVaXoEV3KN+hCELUVVBFgNBOkXZd5NVPhoC6TL0J2v8FhnbiCUBtlX2WzInB1jZiuEQ4KfhVgrR7ErUO+UsMlgCwUT6FRW9YU2TdMXbIsjbglmD+EPQ9iYQFo1Go6Xq3c8hveolze2/hY3M6u2IaGHRI4JpxthyRVHAPCIQXbDFLcyi6WcuufhLs2lXMxsy0tkk51tDkdYVU6ZkosbFXxAwF290vN6amfM0uf374oTI5/lQAAYfddP5e58/BBuivel4qF4k0f/uy7u0sbubn5ifHX7srkLNCUAAAAQtFUW/LUQLI9HHGaPv6/Yj63s/pju1LYPAQA+A8p2cUweh5dZAAAAABJRU5ErkJggg==) no-repeat left bottom;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/util/../../images/info.png?2015-07-07T07:55:00Z) no-repeat left bottom!ie}.smwtticon.service{display:inline-block;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABmJLR0QAQACXAOIX6M4XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1woNCAQvupvvrgAAAgpJREFUKBUFwTtME3EAwOHf3f961+vd9Sh9HEVINUrFhAbRmCgGo9FodCFMLhomJ6MmJsbF1Z2ExMHBUQc3BmOigyERB0ElQHgECRYECrRC26OPa3t+nwQAAI7aO/K458yJeK8qOA74dY/1hbWdxZWJsVUoeAAKAImh2NDdR/duD54cdRLRdMQydB84KJaPzufyyx+6Tr+Zej/2jr1vBUHiin3j/pPnwzcvPMv0OKlb/YlAT4cupR1d0lRNNWwrmUhEB+tmSl7/vTktMiNPhy9dvviyM2FYnZEgpRp8WS3htaC/W2du64iWLAUl1RgoY84qiiJdU03TKFR9vv+tIZQGsiTojqg0WrDtwlHVR7PscCDAVaXoEV3KN+hCELUVVBFgNBOkXZd5NVPhoC6TL0J2v8FhnbiCUBtlX2WzInB1jZiuEQ4KfhVgrR7ErUO+UsMlgCwUT6FRW9YU2TdMXbIsjbglmD+EPQ9iYQFo1Go6Xq3c8hveolze2/hY3M6u2IaGHRI4JpxthyRVHAPCIQXbDFLcyi6WcuufhLs2lXMxsy0tkk51tDkdYVU6ZkosbFXxAwF290vN6amfM0uf374oTI5/lQAAYfddP5e58/BBuivel4qF4k0f/uy7u0sbubn5ifHX7srkLNCUAAAAQtFUW/LUQLI9HHGaPv6/Yj63s/pju1LYPAQA+A8p2cUweh5dZAAAAABJRU5ErkJggg==) no-repeat left bottom;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/util/../../images/info.png?2015-07-07T07:55:00Z) no-repeat left bottom!ie}.smwtticon.warning{display:inline-block;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAZ1JREFUKFOVy79rE3EcxvH39+7y8/q9pF4S0xi0mEiaMxV68Yxg8PeiVyhV6iCIQhErHUScFJxcHAX/Azf/AgWXWlsUhyrYioMiqKgoiEgrJTH3cSuldvE9Pg8vkw3Nt6lfHuZ68g9fnv/k2/pPRDDWD098bD1gTO4cdS+NNowp38ZhQ2tgZgQSWo3kDgyPpU/esSuHd4fnK6o1lERtCuIp0tmGO73sHavevf8B8Y7uaDT7pwMXvSmwEkbgNHeFb1eLPH22wNJKnka7enxAG+1/wKxPpq+SuuaeOKSzuSQxq0vGjZML99vj+xJXDmoKa2DOx0znOVUcL7fNrXl8v0OtZhIEv1GFFLUJt3XW43TRJAZgGBal/lbsjN0sZeENIkuEoQUsAq/RQcZpHjEnzpUpA/DqAld/zOjVqOdJFO2RuXlPhuo5efBwUKJou0S9gvx6HO/cG+OmiGD1FdSU3tZNyNdPAFQd4cbFHvUty8jnCOhhl6JYfZBJ4JY1+1IeObc770S6ChClQCvhxaKwEAEISqE+vuf7XkCJCP/TX7cEexPi9whUAAAAAElFTkSuQmCC) no-repeat left bottom;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/util/../../images/warning.png?2015-07-07T07:55:00Z) no-repeat left bottom!ie}.smwtticon.note{display:inline-block;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAgtJREFUeNokUctqU1EUXefk5iY3D2MrSWOamyq9jYO2BovUR41O1Iykov6Bc6WDDh36A4oKnYkORZBCoA6KI1GrEKhoFWOo1qhJk6Z539c57sTB5gzOWns9NpMA3KCK0s0TsHwiBsW3qPi0OYerbmP89IaVnFvtMn/dmEginU5DITyYLSA4y40embp3MDWVVoNhgKvot1sob699/OqdvM0MY32AVTrZWZhhfnEsk85HEikOxoERnbYwBLxeGNH4jK/wdq1W1Bd7h8fySnlei4WT0ZV4ROWivQt4A+AzV0DrIV8/AtQA9Onjyt7G6spmOJHhb6IXrkbCnqOyuw+YNL0aTRPSpOnVidgE7A70Q/7x+pf315Wgph1TpAVBOcApktUBnN7/t9/AoBT6REAl8f3dBcW07R1pdSGkSvaJIBzIWpHUWkRqDrNAWENFIWJBZafWKZgjbWghDZIRgUK7Hx4PugNzXSK1wZmLVq0CO5ot8kw2Vyg70U+M/Eu7D0lWPLm78GSXKEOD7JlAu4rvTVWwmPGc/frzF63S5kIgv7SeOGCp0usHUmfAhAtW3SIdga2ffZTnl++nZk/dYlJKkDBePXtyOfb56cO4W5rUWH9YQEcEsI2U+9u48WD63KVlY0K3hpeWjgMxqr+snr9zslL5do3t/ThLnYXsUKLIY8YLj22+Y441gOKfAAMAeeDgUIIDAXwAAAAASUVORK5CYII=) no-repeat left bottom;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/util/../../images/note.png?2015-07-07T07:55:00Z) no-repeat left bottom!ie}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:2842631892aff6dabad24e143bdb88d2 */
+span.smwbuiltin,span.smwttactiveinline span.smwbuiltin{font-style:italic} div.smwpre{font-family:monospace;padding:1em;border:1px dashed #2f6fab;color:black;background-color:#f9f9f9;line-height:1.1em;margin-bottom:0.5em;margin-top:0.5em;white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;word-break:break-word;margin-right:5px} #smwfootbr{clear:both} span.smwsortkey{display:none} a.sortheader:hover{text-decoration:none} div.smwtimeline{border:1px solid #AAAAAA;background-color:#F9F9F9;  }span.smwtlevent,span.smwtlband,span.smwtlsize,span.smwtlposition{display:none;speak:none}span.smwtlcomment{font-style:italic;padding:5px} div.smwfact{clear:both;background-color:#F9F9F9;padding:5px;margin-top:1em;border:1px solid #AAAAAA;font-size:95%;min-height:23px; }div.smwfact td,div.smwfact tr,div.smwfact table{background-color:#F9F9F9}.smwfactboxhead{font-size:110%;font-weight:bold;float:left;margin-bottom:2px;max-width:90%}table.smwfacttable{border-top:1px dotted #AAAAAA;width:100%;clear:both}td.smwpropname,th.smwpropname,td.smwspecname{text-align:right;vertical-align:top;padding-right:1em}td.smwprops,td.smwspecs{vertical-align:top;width:75%}div.smwhr hr{background-color:#DDDDDD;color:#DDDDDD} span.smwwarning{color:#888888;font-style:italic;font-size:90%} span.smwsearchicon{padding-right:16px;margin-right:2px;color:#888888;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAABC1BMVEU+S114jayTpb6Im7eMn7qhsceBlbOYqcKXp8GDl7N2i6rJ0uCYqcJogKB9kq+KnLipt81qgKF8kK9qgKF4jayntstheJpsgqOSo75RaIxWbpCIm7fAy9tlfJ5keptedZdHXX5bcpWBlbOersajssmVp79lfJ5thKN2i6phd5lTa45GW3lPZ4plfJ5le5xRaYxbcpV3jKt2i6pWbpBKYoVOZolSao2HmrZ4jaxTa45JYYRJYYSHmrZedZdFWnhTa45ieZtVbZCzv9Lm6/Ha4Onp7fKks8rb4uvf5e3h5u7X3um2wtXQ2OTAy9vW3efl6fCmtcrJ0uDGz96jssm5xdaruc6uu8+9yNnt8PXd7KeZAAAAQnRSTlMACfbevtlP8sRPTv2lFfRF2Cz1A7jZLdG4HFbm/q8vBAxjxO/syrHaxk0EByM4NyUrutRNBAI6xeJdADjU4QFO3NoNTLabAAAAeElEQVQIHQXBvQ7BUACA0e+7P020EQsDC4NBYrZJ38BTewcmg8XGomnjRso50QlUuSkA1p9TenF2+oRUH7/DzMoChJJH3n2bEpDS0CS7kAVCntd9txhjBFzp7he86h03qqp6kb2qbm8qABy06Y0A8FjHcTkIANCqf7L2G5qa4UzTAAAAAElFTkSuQmCC) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/searchgray_iconsmall.png?2015-07-07T07:55:00Z) center right no-repeat!ie}#bodyContent span.smwsearch a{padding-right:14px;margin-right:2px;color:#888888;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAABC1BMVEU+S114jayTpb6Im7eMn7qhsceBlbOYqcKXp8GDl7N2i6rJ0uCYqcJogKB9kq+KnLipt81qgKF8kK9qgKF4jayntstheJpsgqOSo75RaIxWbpCIm7fAy9tlfJ5keptedZdHXX5bcpWBlbOersajssmVp79lfJ5thKN2i6phd5lTa45GW3lPZ4plfJ5le5xRaYxbcpV3jKt2i6pWbpBKYoVOZolSao2HmrZ4jaxTa45JYYRJYYSHmrZedZdFWnhTa45ieZtVbZCzv9Lm6/Ha4Onp7fKks8rb4uvf5e3h5u7X3um2wtXQ2OTAy9vW3efl6fCmtcrJ0uDGz96jssm5xdaruc6uu8+9yNnt8PXd7KeZAAAAQnRSTlMACfbevtlP8sRPTv2lFfRF2Cz1A7jZLdG4HFbm/q8vBAxjxO/syrHaxk0EByM4NyUrutRNBAI6xeJdADjU4QFO3NoNTLabAAAAeElEQVQIHQXBvQ7BUACA0e+7P020EQsDC4NBYrZJ38BTewcmg8XGomnjRso50QlUuSkA1p9TenF2+oRUH7/DzMoChJJH3n2bEpDS0CS7kAVCntd9txhjBFzp7he86h03qqp6kb2qbm8qABy06Y0A8FjHcTkIANCqf7L2G5qa4UzTAAAAAElFTkSuQmCC) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/searchgray_iconsmall.png?2015-07-07T07:55:00Z) center right no-repeat!ie;background-size:10px 10px}#bodyContent span.smwsearch a:hover{text-decoration:none;color:#0000FF;padding-right:16px;margin-right:0px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAALySURBVDgRlcFraNVlHMDx7+95nv/zP+d/LnObeVtz2uyCrRUVDAIHMbIXltUgKRYR7kWvupjYDSEkgkgoKCiJfGeRzqw0CvYuahBWyrZWuWihuWNrZ+e2c87OZf//U1DB8EXU52P27XuV9takiiVS95ZjV+xdjK3uxbO0sFi15ewnlBYO1pZqP9YbTZQSLmeUOF1eNs+fj219QXdt1i2rfXwPlpxKho3qbpme3B7+/N2wUoyKCJcz9VB2ZFfdcKDtxh7p3hiRiMFSDfKFJjadwF/fd+V8pfhmYXK83ynJgLCSKanU47Et18qmDsc1axXtAlPzEekOS7XhSK3SmNt6uuemJnc2K5VDog0rmaptvWXtmgRBLKJNBL/h8DyhPRBqScGKI31dB2c8c2exsHhIW8tKZtmm/MBGFIohZ2oRQaDYkFYECgLAOjBa0ajVk8VSGc+3rGSa+Us18XQ8bIREgSKIC74G5aAdsEAjjCgXioXSYgVTX0bE8Q+zMD0xVs2V7tKtCepNiJRQB1JAClgjwskvvuXCzOypWn2ZeLiEA5wD58DkZs69fO7UyYGBPQ/FYxoi51D8JRBhNl/i05FRWlpaLtzReZbOxiSzRcNcCXIVMErL2E+fffSYNe61/t33pUxbEgeIwOmpGY6/fQxj4mzrTe/vyUz0zzflLU/CeSOgcRhRiqhZPzx+/OjEr998tXdDd2dfPBHT1flc4eL0Lyc6OzeeXt9WHu52Xw5etTk9UP0+f2szsg87XMEhGP4kWiNEXxczmQfERQSpBIXMHKVcka1XO/QP76/rvr9rsOf2IezIu3f/PpY/8lvRewTIGv4mImjPw/MtnvXwYhbtB9jqefzKxaMfj+R74+u6nrh+1xDN8MiO7Gj+8ELZDhv+lcOJRhtTuZRt7Hn9xQ/do88MPnnz0BAPyns73ziRf8fwH/lWu9mF5acPHvggevalXU+137QN9fn4PYb/wfN0M1cKn3tl/7FNbVt6tk9L39k/AH8KLAsrDQkDAAAAAElFTkSuQmCC) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/search_icon.png?2015-07-07T07:55:00Z) center right no-repeat!ie;background-size:13px 13px}#bodyContent span.swmfactboxheadbrowse a{padding-right:16px;margin-right:2px;color:#000000;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAA5FBMVEUAAADb3uv///+gqcBJYqGTmq24v9KJkamboLBtfqOnrbuSmqyqr7yVnK3o6e3n6OrKzdaWna7O0NWMlKiQl6qWm6yRma3DxczEyM+Olqyeo7J+iaamq7qZoLGMlKrg4eiYobqFjqfBxMyQl6hXbaGXnK+hprmcobPEx9BZbaGkqriIkayjp7d1g6iztsSytsZzf6GcobSaobjq6++Umq5abZ6aoLJre6NqeqJ7hqfg4umvtsp0g6h9iaff4el3hKVld6aUoL6wt8meo7SXnbCUm66Jkqnq6+64usRfcqOxs8Dm5+teFG05AAAAAXRSTlMAQObYZgAAAH9JREFUeF4dymMSRDEABOGZ5HFt27Zt3v8+m833r6saSqDl6aSC0ELhXN7r80egVBYZRmOMJ5LAIV0lsy55LRRRKlNYbs0SrDfQpBCybUgh2EXvH4aOPgZDtRkjtY0nmM7m5HtJrtYbYLvb07Z5PJ2hXMybad4fEtrz5TifL4AfAxMLmJTt7hwAAAAASUVORK5CYII=) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/browse_iconsmall.png?2015-07-07T07:55:00Z) center right no-repeat!ie;background-size:13px 13px}#bodyContent span.swmfactboxheadbrowse a:hover{text-decoration:none;color:#0000FF;padding-right:18px;margin-right:0px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAA81BMVEUAAADByOQOLn7///8BInfg5O2xuthsf7ODk8CmqbEnQ4slQYoYNYJqea6BhZaSlJ9kbo5fc6xld62/v8Fnea6BhZdbb6lKY6axsrWIjJe/wMQ6UZOCkMVoeq6Gk79BWZpBWJqCkr4uSo8mRI8PLnqio6plcppIXp+LjprFxsgmQYMrRo4nRJI6TX+ytLyKl8xseah7ir9cbqUDJXeJl8xWbLBue6xPZaeYm6V+hqCLl841S34MLXwsSZJVaasSMYBcaYZUZphLYqBsfrFKYaB3iLcwS5EvSpFjeK1neq4zTpE2ToxQaKlSXoIMKW9idKyur7PDoCJEAAAAAXRSTlMAQObYZgAAAJtJREFUGFdlT8USg1AQ292HQ93d3d3dvf//NYWBHhhyS2ZiAAYCnpC7GoU/al5XsjPs9V9fk8tEPn8q+AlH6jGDxxMrwnQmm8N8oVjShXLljXhS1ANio9kCaK+7yIQ9aUeB4XgyhdkcGZOWA44kxnC0hZ3OeXHDcSTyurJwCg6LGXom7WKFmrVXRb1Ztcawu20YyI+nbbrznP3+D9crFuL3dLY6AAAAAElFTkSuQmCC) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/browse_icon.png?2015-07-07T07:55:00Z) center right no-repeat!ie;background-size:15px 15px}#bodyContent span.smwbrowse a{padding-right:14px;margin-right:2px;color:#888888;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAA5FBMVEUAAADb3uv///+gqcBJYqGTmq24v9KJkamboLBtfqOnrbuSmqyqr7yVnK3o6e3n6OrKzdaWna7O0NWMlKiQl6qWm6yRma3DxczEyM+Olqyeo7J+iaamq7qZoLGMlKrg4eiYobqFjqfBxMyQl6hXbaGXnK+hprmcobPEx9BZbaGkqriIkayjp7d1g6iztsSytsZzf6GcobSaobjq6++Umq5abZ6aoLJre6NqeqJ7hqfg4umvtsp0g6h9iaff4el3hKVld6aUoL6wt8meo7SXnbCUm66Jkqnq6+64usRfcqOxs8Dm5+teFG05AAAAAXRSTlMAQObYZgAAAH9JREFUeF4dymMSRDEABOGZ5HFt27Zt3v8+m833r6saSqDl6aSC0ELhXN7r80egVBYZRmOMJ5LAIV0lsy55LRRRKlNYbs0SrDfQpBCybUgh2EXvH4aOPgZDtRkjtY0nmM7m5HtJrtYbYLvb07Z5PJ2hXMybad4fEtrz5TifL4AfAxMLmJTt7hwAAAAASUVORK5CYII=) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/browse_iconsmall.png?2015-07-07T07:55:00Z) center right no-repeat!ie;background-size:10px 10px}#bodyContent span.smwbrowse a:hover{text-decoration:none;color:#0000FF;padding-right:16px;margin-right:0px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAA81BMVEUAAADByOQOLn7///8BInfg5O2xuthsf7ODk8CmqbEnQ4slQYoYNYJqea6BhZaSlJ9kbo5fc6xld62/v8Fnea6BhZdbb6lKY6axsrWIjJe/wMQ6UZOCkMVoeq6Gk79BWZpBWJqCkr4uSo8mRI8PLnqio6plcppIXp+LjprFxsgmQYMrRo4nRJI6TX+ytLyKl8xseah7ir9cbqUDJXeJl8xWbLBue6xPZaeYm6V+hqCLl841S34MLXwsSZJVaasSMYBcaYZUZphLYqBsfrFKYaB3iLcwS5EvSpFjeK1neq4zTpE2ToxQaKlSXoIMKW9idKyur7PDoCJEAAAAAXRSTlMAQObYZgAAAJtJREFUGFdlT8USg1AQ292HQ93d3d3dvf//NYWBHhhyS2ZiAAYCnpC7GoU/al5XsjPs9V9fk8tEPn8q+AlH6jGDxxMrwnQmm8N8oVjShXLljXhS1ANio9kCaK+7yIQ9aUeB4XgyhdkcGZOWA44kxnC0hZ3OeXHDcSTyurJwCg6LGXom7WKFmrVXRb1Ztcawu20YyI+nbbrznP3+D9crFuL3dLY6AAAAAElFTkSuQmCC) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/browse_icon.png?2015-07-07T07:55:00Z) center right no-repeat!ie;background-size:13px 13px}#bodyContent span.smwmap a{padding-right:20px;color:#888888;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAANkE3LLaAgAAAzBJREFUOBGlwTtsGwUAgOH/zufHOe9zHBzsJM6DhpRUCWmjCiolKgOiS6VKrWBghSUswEAlJjYGRlQECypQhoIEAqlNuwSiJhSqkJAqbR40pnbjR/w6+x72+Xw+itgqMfF98D8JPCn2thwfDZ9/cXro7LOjfSflgLetpBoP1u9llm7/kbqirn+wyX/pmLz4wvsfXV9PplW30XBcu+m4dtNxrUbTNcyGu7r2sH72jc8/hHmJJwUm3pu79OUvVcO03ZJad1PpirtxL+3e2Uy5v24k3b1EwVWrlltW6+75hS++hgseHvPwjyPv9L72yuyNhddPhTXDIpEqki/p6GaDoOzlsKgjCCJOs4VmWBwd7T+2eDerGwdLqxKPdcltb710cnwgmVHJl3R2EjkkSaTVclG6g9hNh/HhPrySh939Am3BAPPHn7l4tfDuZQ+86RVD8scdbb6wLHvJ5quoWo1sQaOq1ckVdAajCqeOD2M3HBwHDgsGubwp7z3MbYn+8Z6oKAjDK+sJvrm+gVeSmBqP4TgumztZDrIauUONRKpMOqfRdFoUSzXUqondap3wBMJzMURhIRDwismMymC/wpn5CSaPRCiWDXp7giCIfHJllWLZJBLqolypc215i2yxui02/T7d5/PYlWqNnk6ZzZ00uw/yyD4fF85MMTsdY2RAQdOaJA+q5EsmZr2BZdv4vP6qx8nphtw/8qrfHwjrhoUousSjvcT6u7h5a4fFn7fJ5U062/y4Lgz1K+wk8rQQ+HN365IEa7aZ6f4+Mn3uaPJRlopmMRZXiD3dgW40qNUddMnCrNsc5FRUrYZhNUhnD0v1/a9uioBkZVcWq6WD0lg8Qme7TKVqIXqgL9TO2GAIBBerYeP3SeylcgRkmcz24lUwyx4gAM1uvZgkEp898fzkiNinyKzcSVBSTSLhDtqDPsJKO0NRhZCisPLTd3fVxLXPgLwHaAESzYqhZrfVztBQPBobaotGFGYmY4S62wkGZXqVbvb2s+6NHy7fytz/9lPgPpAR+JcE9AIDIE6MHzs9N3/65ZmZqeeeQhCkR+m8/vvab3vLSz8u62rqNvAXkAFqfwOkPI+h92xJFAAAAABJRU5ErkJggg==) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/world.png?2015-07-07T07:55:00Z) center right no-repeat!ie}#bodyContent span.smwmap a:hover{padding-right:20px;color:#0000FF;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAANkE3LLaAgAAAzBJREFUOBGlwTtsGwUAgOH/zufHOe9zHBzsJM6DhpRUCWmjCiolKgOiS6VKrWBghSUswEAlJjYGRlQECypQhoIEAqlNuwSiJhSqkJAqbR40pnbjR/w6+x72+Xw+itgqMfF98D8JPCn2thwfDZ9/cXro7LOjfSflgLetpBoP1u9llm7/kbqirn+wyX/pmLz4wvsfXV9PplW30XBcu+m4dtNxrUbTNcyGu7r2sH72jc8/hHmJJwUm3pu79OUvVcO03ZJad1PpirtxL+3e2Uy5v24k3b1EwVWrlltW6+75hS++hgseHvPwjyPv9L72yuyNhddPhTXDIpEqki/p6GaDoOzlsKgjCCJOs4VmWBwd7T+2eDerGwdLqxKPdcltb710cnwgmVHJl3R2EjkkSaTVclG6g9hNh/HhPrySh939Am3BAPPHn7l4tfDuZQ+86RVD8scdbb6wLHvJ5quoWo1sQaOq1ckVdAajCqeOD2M3HBwHDgsGubwp7z3MbYn+8Z6oKAjDK+sJvrm+gVeSmBqP4TgumztZDrIauUONRKpMOqfRdFoUSzXUqondap3wBMJzMURhIRDwismMymC/wpn5CSaPRCiWDXp7giCIfHJllWLZJBLqolypc215i2yxui02/T7d5/PYlWqNnk6ZzZ00uw/yyD4fF85MMTsdY2RAQdOaJA+q5EsmZr2BZdv4vP6qx8nphtw/8qrfHwjrhoUousSjvcT6u7h5a4fFn7fJ5U062/y4Lgz1K+wk8rQQ+HN365IEa7aZ6f4+Mn3uaPJRlopmMRZXiD3dgW40qNUddMnCrNsc5FRUrYZhNUhnD0v1/a9uioBkZVcWq6WD0lg8Qme7TKVqIXqgL9TO2GAIBBerYeP3SeylcgRkmcz24lUwyx4gAM1uvZgkEp898fzkiNinyKzcSVBSTSLhDtqDPsJKO0NRhZCisPLTd3fVxLXPgLwHaAESzYqhZrfVztBQPBobaotGFGYmY4S62wkGZXqVbvb2s+6NHy7fytz/9lPgPpAR+JcE9AIDIE6MHzs9N3/65ZmZqeeeQhCkR+m8/vvab3vLSz8u62rqNvAXkAFqfwOkPI+h92xJFAAAAABJRU5ErkJggg==) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/world.png?2015-07-07T07:55:00Z) center right no-repeat!ie}.smwrdflink{float:right;font-size:small;padding:2px 0 0 0}.concept-documenation{border-top:1px dotted #AAAAAA}#bodyContent span.rdflink{float:right}#bodyContent span.rdflink a{padding-right:15px;color:#888888;background:url(data:image/gif;base64,R0lGODlhEQASAIQeAIWjzhpTo0h1tvH0+SpeqUh1tWeMwjlqr+Hp89Ld7cLR5rPG4RpSo8PS53aYyDhpr5Wv1FiBvO/z+KS62uDo8ileqWaMwXWXx7LF4KO62pSu1FeAu9Hc7P///wtHnQtHnSH+FUNyZWF0ZWQgd2l0aCBUaGUgR0lNUAAh+QQBAAAfACwAAAAAEQASAAAFU+AnjuQneKhQriclpSvJSC/qxaNX2/hn/6pY6udRAX03k82Y6dROJKjI01H8VknfDoXNbbmkougEBC+DZDES1aHAcChKZ9nzza89HbGefvfSDh8hADs=) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/rdf_flyer.18.gif?2015-07-07T07:55:00Z) center right no-repeat!ie;background-size:10px 10px}#bodyContent span.rdflink a:hover{text-decoration:none;color:#0000FF;padding-right:15px;margin-right:0px;background:url(data:image/gif;base64,R0lGODlhEQASAIQeAIWjzhpTo0h1tvH0+SpeqUh1tWeMwjlqr+Hp89Ld7cLR5rPG4RpSo8PS53aYyDhpr5Wv1FiBvO/z+KS62uDo8ileqWaMwXWXx7LF4KO62pSu1FeAu9Hc7P///wtHnQtHnSH+FUNyZWF0ZWQgd2l0aCBUaGUgR0lNUAAh+QQBAAAfACwAAAAAEQASAAAFU+AnjuQneKhQriclpSvJSC/qxaNX2/hn/6pY6udRAX03k82Y6dROJKjI01H8VknfDoXNbbmkougEBC+DZDES1aHAcChKZ9nzza89HbGefvfSDh8hADs=) center right no-repeat;background:url(//wiki.gentoo.org/extensions/SemanticMediaWiki/resources/smw/../images/rdf_flyer.18.gif?2015-07-07T07:55:00Z) center right no-repeat!ie;background-size:10px 10px} table.smwb-factbox{border-left:8px solid #DDDDDD;width:100% }tr.smwb-title{font-size:200%;background-color:#DDDDDD;line-height:1.5}tr.smwb-title td{padding-left:5px;border-bottom:2px solid white}tr.smwb-propvalue{width:100%;background-color:#EEEEEE}tr.smwb-propvalue th{text-align:right;vertical-align:top;font-weight:bold;font-size:120%;background-color:#DDDDDD;padding:0.2em 0.6em;border-bottom:2px solid white;border-top:2px solid white}tr.smwb-propvalue td{padding-left:0.4em;background-color:#EEEEEE;border:0px solid white;border-bottom:2px solid white;border-top:2px solid white;width:90%}tr.smwb-center{background-color:#DDDDDD}span.smwb-value{} table.smwb-ifactbox{border-right:8px solid #DDDDDD;width:100% }tr.smwb-ititle{font-size:200%;background-color:#DDDDDD;line-height:1.5}tr.smwb-ititle td{padding-left:5px;border-bottom:2px solid white}tr.smwb-ipropvalue{width:100%;background-color:#EEEEEE;text-align:right}tr.smwb-ipropvalue th{text-align:left;font-weight:bold;font-size:120%;background-color:#DDDDDD;padding:0.2em 0.6em;border-bottom:3px solid white;border-top:3px solid white}tr.smwb-ipropvalue td{background-color:#EEEEEE;border-bottom:3px solid white;border-top:3px solid white;padding-right:1em;width:90%}span.smwb-ivalue{} .smw-spinner .text{padding-left:2.1em;font-size:12px;vertical-align:middle} .smw-spinner.left.mw-small-spinner{background-position:left;vertical-align:middle;display:inline-block;padding:0px !important} .smw-spinner.center.mw-small-spinner{vertical-align:middle;display:inline-block;padding:0px !important} table.smw-ask-query .smw-ask-query-condition{width:100%}table.smw-ask-query .smw-ask-query-printout{width:100%}.smw-form-horizontalrule{margin-bottom:10px}.smw-form-select,.smw-form-input{padding:1px 1px}.smw-form-checkbox{vertical-align:middle;cursor:pointer}label.smw-form-checkbox{vertical-align:middle;cursor:pointer}.smw-editpage-help{background-color:#F0F0F0;border:1px solid silver; padding:1em 1em 1.5em 1em;margin-bottom:2em}.smw-column-header{font-weight:bold;font-size:1.17em;line-height:1.6;margin-top:0.3em;margin-bottom:0;padding-bottom:0;color:black;overflow:hidden;padding-top:.5em}.smw-column{float:left;word-wrap:break-word}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:bf7c407b25e565a9555363da6247c4eb */</style><style>
+.uls-menu a{cursor:pointer}.uls-menu.callout .caret-before{border-top:20px solid transparent;border-right:20px solid #C9C9C9;border-bottom:20px solid transparent;display:inline-block;left:-21px;top:30px;position:absolute}.uls-menu.callout .caret-after{border-top:20px solid transparent;border-right:20px solid #FCFCFC;border-bottom:20px solid transparent;display:inline-block;left:-20px;top:30px;position:absolute}.uls-ui-languages button{width:23%;text-overflow:ellipsis;margin-right:4%}button.uls-more-languages{width:auto}.settings-title{font-size:11pt}.settings-text{color:#555555;font-size:9pt}div.display-settings-block:hover .settings-text{color:#252525}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:22d1681fa868b4ff4fbcb1ec1e58a9ea */</style><style>
+.cite-accessibility-label{position:absolute !important; top:-99999px;clip:rect(1px 1px 1px 1px); clip:rect(1px,1px,1px,1px);padding:0 !important;border:0 !important;height:1px !important;width:1px !important;overflow:hidden}.mw-cite-backlink,.cite-accessibility-label{-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none} ol.references li:target,sup.reference:target{background-color:#def; background-color:rgba(0,127,255,0.133)}@media print{.mw-cite-backlink{display:none}}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:2970940d33044e6aa6a620ce3c93c662 */
+.uls-trigger{background:transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAAQCAMAAADQzfSkAAABqlBMVEX////f3/+Ov+/n5+fp6enp6eno6Ojp6enn5+ff39/q6urp6enp6enp6enq6urp6en////q6urr6+upv+rU1NTJycnR0dEaGhrp6enT4/SEuuK9vb3l5eU2ktCxsbFdXV1paWmzwc9ITFDo6OhaWlpsbGxtbW2BipSZpK/X19d2dnZ8hI2/v79PT09gZm2CgoLIyMjD0eGksL1JTVHM2+spKywnKCkcHBzAzt3I1+cxMzZxcXFkZGSvr69WW2C8vLyFjphqcXiLlZ8dHh4gISLa2trQ3/Dc3NzZ2dl7e3uioqIfHyBCRko9QEPh4eFgYGDGxsZoaGiPj4/Ly8uRm6a6yNcbGxuSnKfL2uqVn6scHR20tLR/f3+Kioq4uLienp54gIipqanA2e+71u9GSk5yeoKgoKCAgIB0dHRLS0tlZWWDg4PBwcHFxcWxvsxkanGapbCKlJ7O4fNXo9hQn9bM3/OPmaRfZWve3t6mpqbR0dG+vr6JiYnKyspPVFl1s99+fn5srdzm5ubNzc1BREh2s99xsN7S0tIxMzUiIyQ2OTt/iJFwcHBbYWc3S28lAAAAF3RSTlMACBAg7P3LiTYIX6LmmDzeAYMnDN+1MJx17ncAAAEQSURBVHheddBTb0VREIbhVduYWVuHRm3btm3bNv9zJ2v3IE36Xk3yZG4+xkMKw0BREYwJMzkcO38MY37tG6AmYN48YZFxwsbeiys6y/02rT1Wa4TxwoYgpx4adLMbfRubs9tk0cJuYK8ACv1/Xy5LLlIYS5bf2FTUUlJapptiqKwyuOfJEsjq4M3j+YBPYc02X6utTWnvQEwk6wJRNxn29Pb1D2iIg0bEJMaHYWTU6RyfABPZ5BTa7xBxxo2YzPgcPPGFRb4Ey2Qrq2vrXlRk6xampDK+a94/ODw6PjGfkp2dX1y6ZOvVNWKavsutqt6HbGZ5QCqdMUmSnlXqhY6M12CZtKcaUnhtsKz/Tc5m7AfjN0jzWIipawAAAABJRU5ErkJggg==) no-repeat scroll left center;background:transparent url(//wiki.gentoo.org/extensions/UniversalLanguageSelector/resources/css/../../lib/jquery.uls/images/icon-language.png?2015-08-15T14:15:00Z) no-repeat scroll left center!ie;background-image:-webkit-linear-gradient(transparent,transparent),url(data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2227%22%20height%3D%2216%22%3E%3Cpath%20fill%3D%22%23D3E3F4%22%20d%3D%22M0%200h11.876v16h-11.876v-16z%22%2F%3E%3Cpath%20fill%3D%22%23E9E9E9%22%20d%3D%22M12.819%200v15.969h10.755c1.085-2.578%201.837-4.991%203.062-8.591l-3.062-7.378h-10.755z%22%2F%3E%3Cpath%20fill%3D%22%23434343%22%20d%3D%22M14.828%204.146c.32.023.639.035.951.035.471%200%20.922-.016%201.354-.046l.023-.258.034-.367.081-.711.033-.333.873.058c-.073.577-.133%201.091-.179%201.542%201.116-.119%202.233-.331%203.349-.637l.092.809c-1.078.271-2.251.472-3.521.602-.05.463-.082.968-.098%201.514.524-.187%201.14-.313%201.847-.378.064-.207.136-.461.213-.763l.865.201c-.027.123-.088.315-.184.579.814.104%201.461.34%201.938.711.681.542%201.021%201.252%201.021%202.128%200%20.963-.406%201.746-1.221%202.351-.635.47-1.505.784-2.609.94l-.505-.779c.968-.104%201.739-.337%202.317-.7.733-.458%201.101-1.066%201.101-1.823%200-.772-.341-1.363-1.021-1.772-.345-.21-.764-.344-1.256-.401-.604%201.422-1.4%202.598-2.387%203.527.035.352.102.715.201%201.09l-.849.314-.126-.773c-.654.462-1.27.693-1.847.693-.696%200-1.044-.407-1.044-1.222%200-1.104.591-2.103%201.771-2.993.227-.165.532-.352.918-.562.012-.524.046-1.128.104-1.812-.585.046-1.143.069-1.675.069l-.493-.011-.071-.822m2.127%203.384c-.268.161-.545.392-.831.694-.612.619-.94%201.226-.986%201.817l-.017.121.017.138c0%20.252.112.378.339.378.492%200%201.02-.258%201.582-.773-.057-.613-.092-1.404-.104-2.375m2.455-.884c-.57.08-1.111.226-1.623.436%200%20.883.018%201.581.052%202.093.634-.707%201.158-1.55%201.571-2.529%22%2F%3E%3Cpath%20fill%3D%22%231A1A1A%22%20d%3D%22M8.517%2011.735l-.734-2.409h-3.69l-.734%202.409h-2.313l3.573-10.165h2.625l3.587%2010.165h-2.314m-1.246-4.21c-.679-2.183-1.062-3.418-1.149-3.704-.083-.286-.143-.512-.18-.678-.153.59-.589%202.051-1.309%204.382h2.638%22%2F%3E%3Cpath%20fill%3D%22%23BCBCBC%22%20d%3D%22M12.817%2013.5v2.5h10.757l.98-2.5h-11.737z%22%2F%3E%3Cpath%20fill%3D%22%233692D0%22%20d%3D%22M.011%2013.511h3.569l2.367-3.116%202.367%203.116h3.57v2.484h-11.873v-2.484z%22%2F%3E%3C%2Fsvg%3E);background-image:-webkit-linear-gradient(transparent,transparent),url(//wiki.gentoo.org/extensions/UniversalLanguageSelector/resources/css/../../lib/jquery.uls/images/icon-language.svg?2015-08-15T14:15:00Z)!ie;background-image:linear-gradient(transparent,transparent),url(data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2227%22%20height%3D%2216%22%3E%3Cpath%20fill%3D%22%23D3E3F4%22%20d%3D%22M0%200h11.876v16h-11.876v-16z%22%2F%3E%3Cpath%20fill%3D%22%23E9E9E9%22%20d%3D%22M12.819%200v15.969h10.755c1.085-2.578%201.837-4.991%203.062-8.591l-3.062-7.378h-10.755z%22%2F%3E%3Cpath%20fill%3D%22%23434343%22%20d%3D%22M14.828%204.146c.32.023.639.035.951.035.471%200%20.922-.016%201.354-.046l.023-.258.034-.367.081-.711.033-.333.873.058c-.073.577-.133%201.091-.179%201.542%201.116-.119%202.233-.331%203.349-.637l.092.809c-1.078.271-2.251.472-3.521.602-.05.463-.082.968-.098%201.514.524-.187%201.14-.313%201.847-.378.064-.207.136-.461.213-.763l.865.201c-.027.123-.088.315-.184.579.814.104%201.461.34%201.938.711.681.542%201.021%201.252%201.021%202.128%200%20.963-.406%201.746-1.221%202.351-.635.47-1.505.784-2.609.94l-.505-.779c.968-.104%201.739-.337%202.317-.7.733-.458%201.101-1.066%201.101-1.823%200-.772-.341-1.363-1.021-1.772-.345-.21-.764-.344-1.256-.401-.604%201.422-1.4%202.598-2.387%203.527.035.352.102.715.201%201.09l-.849.314-.126-.773c-.654.462-1.27.693-1.847.693-.696%200-1.044-.407-1.044-1.222%200-1.104.591-2.103%201.771-2.993.227-.165.532-.352.918-.562.012-.524.046-1.128.104-1.812-.585.046-1.143.069-1.675.069l-.493-.011-.071-.822m2.127%203.384c-.268.161-.545.392-.831.694-.612.619-.94%201.226-.986%201.817l-.017.121.017.138c0%20.252.112.378.339.378.492%200%201.02-.258%201.582-.773-.057-.613-.092-1.404-.104-2.375m2.455-.884c-.57.08-1.111.226-1.623.436%200%20.883.018%201.581.052%202.093.634-.707%201.158-1.55%201.571-2.529%22%2F%3E%3Cpath%20fill%3D%22%231A1A1A%22%20d%3D%22M8.517%2011.735l-.734-2.409h-3.69l-.734%202.409h-2.313l3.573-10.165h2.625l3.587%2010.165h-2.314m-1.246-4.21c-.679-2.183-1.062-3.418-1.149-3.704-.083-.286-.143-.512-.18-.678-.153.59-.589%202.051-1.309%204.382h2.638%22%2F%3E%3Cpath%20fill%3D%22%23BCBCBC%22%20d%3D%22M12.817%2013.5v2.5h10.757l.98-2.5h-11.737z%22%2F%3E%3Cpath%20fill%3D%22%233692D0%22%20d%3D%22M.011%2013.511h3.569l2.367-3.116%202.367%203.116h3.57v2.484h-11.873v-2.484z%22%2F%3E%3C%2Fsvg%3E);background-image:linear-gradient(transparent,transparent),url(//wiki.gentoo.org/extensions/UniversalLanguageSelector/resources/css/../../lib/jquery.uls/images/icon-language.svg?2015-08-15T14:15:00Z)!ie;padding-left:30px}#pt-uls a.uls-trigger{padding-left:30px; line-height:1}   x:-o-prefocus,body.rtl li#pt-uls{ direction:ltr}#uls-settings-block{border-top:1px solid #C9C9C9;background:#f8f8f8;background:-webkit-gradient(linear,left top,left bottom,from(#FBFBFB),to(#F0F0F0));background:-webkit-linear-gradient(top,#FBFBFB,#F0F0F0);background:-moz-linear-gradient(top,#FBFBFB,#F0F0F0);background:-o-linear-gradient(top,#FBFBFB,#F0F0F0);background:linear-gradient(#FBFBFB,#F0F0F0);padding-left:10px;line-height:1.2em;border-radius:0 0 5px 5px}#uls-settings-block div.display-settings-block,#uls-settings-block div.input-settings-block{display:inline-block;margin:8px 15px;color:#565656}#uls-settings-block div.display-settings-block:hover,#uls-settings-block div.input-settings-block:hover{color:#252525}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:1e3ef7a086b2ab3a3d78b667a261b437 */
+.mw-collapsible-toggle{float:right;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}  .mw-content-ltr .mw-collapsible-toggle,.mw-content-rtl .mw-content-ltr .mw-collapsible-toggle{float:right} .mw-content-rtl .mw-collapsible-toggle,.mw-content-ltr .mw-content-rtl .mw-collapsible-toggle{float:left}.mw-customtoggle,.mw-collapsible-toggle{cursor:pointer} caption .mw-collapsible-toggle,.mw-content-ltr caption .mw-collapsible-toggle,.mw-content-rtl caption .mw-collapsible-toggle,.mw-content-rtl .mw-content-ltr caption .mw-collapsible-toggle,.mw-content-ltr .mw-content-rtl caption .mw-collapsible-toggle{float:none} li .mw-collapsible-toggle,.mw-content-ltr li .mw-collapsible-toggle,.mw-content-rtl li .mw-collapsible-toggle,.mw-content-rtl .mw-content-ltr li .mw-collapsible-toggle,.mw-content-ltr .mw-content-rtl li .mw-collapsible-toggle{float:none} .mw-collapsible-toggle-li{list-style:none}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:e1ffd603cbaaa5f1a36e0d13fe843535 */
+.suggestions{overflow:hidden;position:absolute;top:0;left:0;width:0;border:none;z-index:1099;padding:0;margin:-1px 0 0 0}.suggestions-special{position:relative;background-color:white;cursor:pointer;border:solid 1px #aaaaaa;padding:0;margin:0;margin-top:-2px;display:none;padding:0.25em 0.25em;line-height:1.25em}.suggestions-results{background-color:white;cursor:pointer;border:solid 1px #aaaaaa;padding:0;margin:0}.suggestions-result{color:black;margin:0;line-height:1.5em;padding:0.01em 0.25em;text-align:left; overflow:hidden;-o-text-overflow:ellipsis; text-overflow:ellipsis;white-space:nowrap}.suggestions-result-current{background-color:#4C59A6;color:white}.suggestions-special .special-label{color:gray;text-align:left}.suggestions-special .special-query{color:black;font-style:italic;text-align:left}.suggestions-special .special-hover{background-color:silver}.suggestions-result-current .special-label,.suggestions-result-current .special-query{color:white}.highlight{font-weight:bold}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:f8d0c6895ce3ae14434c16b8fca59432 */
+.postedit-container{margin:0 auto;position:fixed;top:0;height:0;left:50%;z-index:1000;font-size:13px}.postedit-container:hover{cursor:pointer}.postedit{position:relative;top:0.6em;left:-50%;padding:.6em 3.6em .6em 1.1em;line-height:1.5625em;color:#626465;background-color:#f4f4f4;border:1px solid #dcd9d9;text-shadow:0 0.0625em 0 rgba(255,255,255,0.5);border-radius:5px;box-shadow:0 2px 5px 0 #ccc;-webkit-transition:all 0.25s ease-in-out;-moz-transition:all 0.25s ease-in-out;-ms-transition:all 0.25s ease-in-out;-o-transition:all 0.25s ease-in-out;transition:all 0.25s ease-in-out}.skin-monobook .postedit{top:6em !important}.postedit-faded{opacity:0}.postedit-icon{padding-left:41px;  line-height:25px;background-repeat:no-repeat;background-position:8px 50%}.postedit-icon-checkmark{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABblBMVEUAAAD///////9PfTf///80aRdTgjn///9Feij///////////9Rfzf///////////9PfjZRgDh1o1xOfTb///////+bwYqLtnj///////9PfTa82K////9WhT6YxIL///9QgDdTgzr////////j7uDl7eLq8efi693k7OH///////9UhjuBr2rp9uRUhjr///9YljVKgir///9WiTlYjT3////9/v57vFlbkT5PjC9dlD/5/fhuq09stUTs9uhxuElctCpfnT1huDFloEZloUZmpENmvDZpvDxpvTxqvjxrvT5rvT9rwTxsqktswD5uwkBvuUdxw0NztFBztU9ztVBzwkp0tlJ1xkd2t1R3uVR4w1F4xk54x014yE15uVZ5v1R5xVB6v1R7yFJ8wVh9xVl9yFR9yVd9ylN+xVh+yFd/x1l/yFeAylmEx1+Ny2uY0Hqe04Wj1Ymv3Ze33qLD47TJ5L3O6cPU7Mrq9eb2+/Q4j37OAAAAQHRSTlMAAQIEBAUFBQwPFB4fJCUoKiosQEhJS01RUlZZXmdydXaChYuSlJSWmJmoq6uur8LExcvM19fg5ejt8fX2+Pr7SljgewAAAKpJREFUGBkFwQNCAwAAAMDLtl3LtrG4rWXbtvX77gAgZ6grFwC0bhwNVgKgdPZx8b0dgLi+s7Wn0VoAqpfOI9+BNADZI7fLrz2pSEwGHZuH+78lSK8ZLkLezF3ooyUG3VPXq2USei9WngeyoG195yBYWDF3E/2pAhl1e9Gr8bGT+bfOFCC2fnvh4X7rcqIAQNNu+HT6sxkAjceTL/2ZAIhv+PorBwBJxfkA//dFHSCBy/UTAAAAAElFTkSuQmCC);background-image:url(/resources/src/mediawiki.action/images/green-checkmark.png?2015-08-10T21:21:40Z)!ie;background-position:left}.postedit-close{position:absolute;padding:0 .8em;right:0;top:0;font-size:1.25em;font-weight:bold;line-height:2.3em;color:black;text-shadow:0 0.0625em 0 white;text-decoration:none;opacity:0.2;filter:alpha(opacity=20)}.postedit-close:hover{color:black;text-decoration:none;opacity:0.4;filter:alpha(opacity=40)}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:4af7dd747def6e0f4fee8bc31d6e8a22 */</style><style>
+.suggestions a.mw-searchSuggest-link,.suggestions a.mw-searchSuggest-link:hover,.suggestions a.mw-searchSuggest-link:active,.suggestions a.mw-searchSuggest-link:focus{color:black;text-decoration:none}.suggestions-result-current a.mw-searchSuggest-link,.suggestions-result-current a.mw-searchSuggest-link:hover,.suggestions-result-current a.mw-searchSuggest-link:active,.suggestions-result-current a.mw-searchSuggest-link:focus{color:white}.suggestions a.mw-searchSuggest-link .special-query{ overflow:hidden;-o-text-overflow:ellipsis; text-overflow:ellipsis;white-space:nowrap}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:ae3fa4570b5ac0c6cf7b3776c8ae4d6f */</style><meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="https://wiki.gentoo.org/load.php?debug=false&lang=en&modules=site&only=styles&skin=tyrian&*">
+<style>a:lang(ar),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}
+/* cache key: gentoo-wiki:resourceloader:filter:minify-css:7:6e3c17e7e84fb927a06cb5abfc9d3047 */</style>
+<script src="./Safe CFLAGS - Gentoo Wiki_files/load.php"></script><script src="./Safe CFLAGS - Gentoo Wiki_files/load(1).php"></script>
+<script>if(window.mw){
+mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Safe_CFLAGS","wgTitle":"Safe CFLAGS","wgCurRevisionId":355310,"wgRevisionId":355310,"wgArticleId":1992,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Processors"],"wgBreakFrames":false,"wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgMonthNamesShort":["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"wgRelevantPageName":"Safe_CFLAGS","wgRelevantArticleId":1992,"wgIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[],"sfgAutocompleteValues":[],"sfgAutocompleteOnAllChars":false,"sfgFieldProperties":[],"sfgCargoFields":[],"sfgDependentFields":[],"sfgShowOnSelect":[],"sfgScriptPath":"/extensions/SemanticForms","edgValues":null,"sfgEDSettings":null,"wgULSAcceptLanguageList":["en-us","en"],"wgULSCurrentAutonym":"English","wgWikiEditorEnabledModules":{"toolbar":true,"dialogs":true,"hidesig":true,"preview":true,"publish":false}});
+}</script><script>if(window.mw){
+mw.loader.implement("user.options",function($,jQuery){mw.user.options.set({"variant":"en"});});mw.loader.implement("user.tokens",function($,jQuery){mw.user.tokens.set({"editToken":"+\\","patrolToken":"+\\","watchToken":"+\\"});});
+/* cache key: gentoo-wiki:resourceloader:filter:minify-js:7:a5c52c063dc436c1ca7c9f456936a5e9 */
+}</script>
+<script>if(window.mw){
+mw.loader.load(["ext.smw.style","mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.legacy.ajax","ext.uls.init"]);
+}</script><script src="./Safe CFLAGS - Gentoo Wiki_files/load(2).php"></script><script src="./Safe CFLAGS - Gentoo Wiki_files/load(3).php"></script>
+</head>
+<body class="mediawiki ltr sitedir-ltr ns-0 ns-subject page-Safe_CFLAGS skin-tyrian action-view">
+	<div class="mw-jump sr-only">
+		Jump to:		<a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#top">content</a>
+	</div>
+	<header>
+		<div class="site-title">
+			<div class="container">
+				<div class="row">
+					<div class="site-title-buttons">
+						<div class="btn-group btn-group-sm">
+							<a href="http://get.gentoo.org/" role="button" class="btn get-gentoo"><span class="fa fa-download"></span> <strong>Get Gentoo!</strong></a>
+							<div class="btn-group btn-group-sm">
+								<a class="btn gentoo-org-sites dropdown-toggle" data-toggle="dropdown" data-target="#" href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#more-gentoo">
+									<span class="glyphicon glyphicon-globe"></span> gentoo.org sites <span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu">
+									<li><a href="http://www.gentoo.org/" title="Main Gentoo website"><span class="fa fa-home fa-fw"></span> gentoo.org</a></li>
+									<li><a href="http://wiki.gentoo.org/" title="Find and contribute documentation"><span class="fa fa-file-text fa-fw"></span> Wiki</a></li>
+									<li><a href="https://bugs.gentoo.org/" title="Report issues and find common issues"><span class="fa fa-bug fa-fw"></span> Bugs</a></li>
+									<li><a href="http://forums.gentoo.org/" title="Discuss with the community"><span class="fa fa-comments-o fa-fw"></span> Forums</a></li>
+									<li><a href="http://packages.gentoo.org/" title="Find software for your Gentoo"><span class="fa fa-hdd-o fa-fw"></span> Packages</a></li>
+									<li class="divider"></li>
+									<li><a href="http://overlays.gentoo.org/" title="Collaborate on maintaining packages"><span class="fa fa-code-fork fa-fw"></span> Overlays</a></li>
+									<li><a href="http://planet.gentoo.org/" title="Find out what&#39;s going on in the developer community"><span class="fa fa-rss fa-fw"></span> Planet</a></li>
+									<li><a href="http://archives.gentoo.org/" title="Read up on past discussions"><span class="fa fa-archive fa-fw"></span> Archives</a></li>
+									<li><a href="http://sources.gentoo.org/" title="Browse our source code"><span class="fa fa-code fa-fw"></span> Sources</a></li>
+									<li class="divider"></li>
+									<li><a href="http://infra-status.gentoo.org/" title="Get updates on the services provided by Gentoo"><span class="fa fa-tasks fa-fw"></span> Infra Status</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="logo">
+						<a href="https://wiki.gentoo.org/" title="Back to the homepage" clss="site-logo"><img src="./Safe CFLAGS - Gentoo Wiki_files/site-logo.png" data-at2x="https://1b9a50f4f9de4348cd9f-e703bc50ba0aa66772a874f8c7698be7.ssl.cf5.rackcdn.com/site-logo@2x.png" alt="Gentoo Linux Logo"></a>
+						<span class="site-label">Wiki</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<nav class="tyrian-navbar" role="navigation">
+			<div class="container">
+				<div class="row">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+					</div>
+					<div class="collapse navbar-collapse navbar-main-collapse">
+						<ul class="nav navbar-nav">
+							<li id="n-mainpage-description"><a href="https://wiki.gentoo.org/wiki/Main_Page" title="Visit the main page [alt-shift-z]" accesskey="z">Main page</a></li><li id="n-recentchanges"><a href="https://wiki.gentoo.org/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [alt-shift-r]" accesskey="r">Recent changes</a></li><li id="n-help"><a href="https://wiki.gentoo.org/wiki/Special:MyLanguage/Help:Contents" title="The place to find out">Help</a></li>			<li class="dropdown">
+				<a href="https://wiki.gentoo.org/wiki/Gentoo_Wiki:Menu-Gentoo" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Gentoo <span class="caret"></span></a>
+				<ul class="dropdown-menu" role="menu">
+		<li id="n-Gentoo-Projects"><a href="https://wiki.gentoo.org/wiki/Project:Gentoo">Gentoo Projects</a></li>				</ul>
+			</li>
+					<li class="dropdown">
+				<a href="https://wiki.gentoo.org/wiki/Gentoo_Wiki:Menu-Documentation" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Documentation <span class="caret"></span></a>
+				<ul class="dropdown-menu" role="menu">
+		<li id="n-Gentoo-Handbook"><a href="https://wiki.gentoo.org/wiki/Handbook:Main_Page">Gentoo Handbook</a></li><li id="n-Gentoo-FAQ"><a href="https://wiki.gentoo.org/wiki/FAQ">Gentoo FAQ</a></li><li id="n-Featured-Documents"><a href="https://wiki.gentoo.org/wiki/Project:Documentation/Overview">Featured Documents</a></li><li role="presentation" class="divider"></li><li role="presentation" class="dropdown-header">Topics</li><li id="n-Core-system"><a href="https://wiki.gentoo.org/wiki/Category:Core_system">Core system</a></li><li id="n-Hardware"><a href="https://wiki.gentoo.org/wiki/Category:Hardware">Hardware</a></li><li id="n-Software"><a href="https://wiki.gentoo.org/wiki/Category:Software">Software</a></li><li id="n-Desktop"><a href="https://wiki.gentoo.org/wiki/Category:Desktop">Desktop</a></li><li id="n-Server-.26-Security"><a href="https://wiki.gentoo.org/wiki/Category:Server_and_Security">Server &amp; Security</a></li><li id="n-Project-.26-Community"><a href="https://wiki.gentoo.org/wiki/Category:Project_and_Community">Project &amp; Community</a></li>				</ul>
+			</li>
+								</ul>
+						<ul class="nav navbar-nav navbar-right hidden-xs">
+									<li class="dropdown">
+			<a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-cog"></i> Tools <span class="caret"></span></a>
+			<ul class="dropdown-menu" role="menu">
+				<li id="t-whatlinkshere"><a href="https://wiki.gentoo.org/wiki/Special:WhatLinksHere/Safe_CFLAGS" title="A list of all wiki pages that link here [alt-shift-j]" accesskey="j">What links here</a></li><li id="t-recentchangeslinked"><a href="https://wiki.gentoo.org/wiki/Special:RecentChangesLinked/Safe_CFLAGS" title="Recent changes in pages linked from this page [alt-shift-k]" accesskey="k">Related changes</a></li><li id="t-specialpages"><a href="https://wiki.gentoo.org/wiki/Special:SpecialPages" title="A list of all special pages [alt-shift-q]" accesskey="q">Special pages</a></li><li id="t-print"><a href="https://wiki.gentoo.org/index.php?title=Safe_CFLAGS&printable=yes" rel="alternate" title="Printable version of this page [alt-shift-p]" accesskey="p">Printable version</a></li><li id="t-permalink"><a href="https://wiki.gentoo.org/index.php?title=Safe_CFLAGS&oldid=355310" title="Permanent link to this revision of the page">Permanent link</a></li><li id="t-info"><a href="https://wiki.gentoo.org/index.php?title=Safe_CFLAGS&action=info" title="More information about this page">Page information</a></li><li id="t-smwbrowselink"><a href="https://wiki.gentoo.org/wiki/Special:Browse/Safe_CFLAGS" rel="smw-browse">Browse properties</a></li>			</ul>
+		</li>
+			<li class="dropdown">
+			<a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+				<span class="glyphicon glyphicon-user" aria-label="Personal tools"></span>
+				User				<span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu" role="menu">
+				<li id="pt-createaccount"><a href="https://wiki.gentoo.org/index.php?title=Special:UserLogin&returnto=Safe+CFLAGS&type=signup" title="You are encouraged to create an account and log in; however, it is not mandatory">Create account</a></li><li id="pt-login"><a href="https://wiki.gentoo.org/index.php?title=Special:UserLogin&returnto=Safe+CFLAGS" title="You are encouraged to log in; however, it is not mandatory [alt-shift-o]" accesskey="o">Log in</a></li>			</ul>
+		</li>
+								</ul>
+					</div>
+				</div>
+			</div>
+		</nav>
+		
+		<nav class="navbar navbar-grey navbar-stick" id="wiki-actions" role="navigation">
+			<div class="container"><div class="row">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#gw-toolbar">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+				</div>
+				<div class="collapse navbar-collapse" id="gw-toolbar">
+					<ul class="nav navbar-nav">
+					<li id="ca-nstab-main" class="selected active"><a href="./Safe CFLAGS - Gentoo Wiki_files/Safe CFLAGS - Gentoo Wiki.html" title="View the content page [alt-shift-c]" accesskey="c">Page</a></li><li id="ca-talk"><a href="https://wiki.gentoo.org/wiki/Talk:Safe_CFLAGS" title="Discussion about the content page [alt-shift-t]" accesskey="t">Discussion</a></li>					</ul>
+							<form action="https://wiki.gentoo.org/index.php" id="searchform" class="navbar-form navbar-right" role="search">
+			<input type="hidden" name="title" value="Special:Search">
+
+				<div class="input-group">
+					<input type="search" name="search" placeholder="Search" title="Search Gentoo Wiki [alt-shift-f]" accesskey="f" id="searchInput" class="form-control" autocomplete="off">					<div class="input-group-btn"><input type="submit" name="go" value="Go" title="Go to a page with this exact name if exists" id="searchGoButton" class="searchButton btn btn-default"><input type="submit" name="fulltext" value="Search" title="Search the pages for this text" id="mw-searchButton" class="searchButton btn btn-default"></div>
+				</div>
+		</form>
+						<ul class="nav navbar-nav navbar-right hidden-xs">
+					<li id="ca-viewsource"><a href="https://wiki.gentoo.org/index.php?title=Safe_CFLAGS&action=edit" title="This page is protected.
+You can view its source [alt-shift-e]" accesskey="e">View source</a></li><li class="dropdown">
+						<a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">more <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+					<li id="ca-history"><a href="https://wiki.gentoo.org/index.php?title=Safe_CFLAGS&action=history" title="Past revisions of this page [alt-shift-h]" accesskey="h">History</a></li>							</ul>
+						</li>
+					</ul>
+				</div>
+			</div></div>
+		</nav>
+		</header>
+	
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<div id="content" class="mw-body" role="main">
+						<a id="top"></a>
+						
+						<h1 id="firstHeading" class="first-header" lang="en">
+							<span dir="auto">Safe CFLAGS</span>
+						</h1>
+
+						<div id="bodyContent" class="mw-body-content">
+							<div id="siteSub">From Gentoo Wiki</div>
+							<div id="contentSub">
+															</div>
+																					<div id="jump-to-nav" class="mw-jump">
+								Jump to:								<a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#column-one">navigation</a>, 								<a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#searchInput">search</a>
+							</div>
+
+							<!-- start content -->
+							<div id="mw-content-text" lang="en" dir="ltr" class="mw-content-ltr"><div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2><span class="toctoggle">&nbsp;[<a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#" id="togglelink">hide</a>]&nbsp;</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Finding_the_CPU"><span class="tocnumber">1</span> <span class="toctext">Finding the CPU</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Find_CPU-specific_options"><span class="tocnumber">2</span> <span class="toctext">Find CPU-specific options</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#x86.2Famd64"><span class="tocnumber">3</span> <span class="toctext">x86/amd64</span></a>
+<ul>
+<li class="toclevel-2 tocsection-4"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel"><span class="tocnumber">3.1</span> <span class="toctext">Intel</span></a>
+<ul>
+<li class="toclevel-3 tocsection-5"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Haswell"><span class="tocnumber">3.1.1</span> <span class="toctext">Haswell</span></a>
+<ul>
+<li class="toclevel-4 tocsection-6"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Core_i3.2Fi5.2Fi7_.26_Xeon_E3.2FE5.2FE7_.2AV2"><span class="tocnumber">3.1.1.1</span> <span class="toctext">Core i3/i5/i7 &amp; Xeon E3/E5/E7 *V2</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-7"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Ivy_Bridge"><span class="tocnumber">3.1.2</span> <span class="toctext">Ivy Bridge</span></a>
+<ul>
+<li class="toclevel-4 tocsection-8"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Core_i3.2Fi5.2Fi7_.26_Xeon_E3.2FE5.2FE7_.2AV1"><span class="tocnumber">3.1.2.1</span> <span class="toctext">Core i3/i5/i7 &amp; Xeon E3/E5/E7 *V1</span></a></li>
+<li class="toclevel-4 tocsection-9"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Pentium"><span class="tocnumber">3.1.2.2</span> <span class="toctext">Pentium</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-10"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Sandy_Bridge"><span class="tocnumber">3.1.3</span> <span class="toctext">Sandy Bridge</span></a>
+<ul>
+<li class="toclevel-4 tocsection-11"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Core_i3.2Fi5.2Fi7_.26_Xeon_E3.2FE5.2FE7"><span class="tocnumber">3.1.3.1</span> <span class="toctext">Core i3/i5/i7 &amp; Xeon E3/E5/E7</span></a></li>
+<li class="toclevel-4 tocsection-12"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Pentium_2"><span class="tocnumber">3.1.3.2</span> <span class="toctext">Pentium</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-13"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Nehalem.2FWestmere"><span class="tocnumber">3.1.4</span> <span class="toctext">Nehalem/Westmere</span></a>
+<ul>
+<li class="toclevel-4 tocsection-14"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Core_i3.2Fi5.2Fi7"><span class="tocnumber">3.1.4.1</span> <span class="toctext">Core i3/i5/i7</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-15"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Intel_Core"><span class="tocnumber">3.1.5</span> <span class="toctext">Intel Core</span></a></li>
+<li class="toclevel-3 tocsection-16"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Older_microarchitecture"><span class="tocnumber">3.1.6</span> <span class="toctext">Older microarchitecture</span></a>
+<ul>
+<li class="toclevel-4 tocsection-17"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Pentium_M_.28Dothan.29"><span class="tocnumber">3.1.6.1</span> <span class="toctext">Pentium M (Dothan)</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-18"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#AMD"><span class="tocnumber">3.2</span> <span class="toctext">AMD</span></a>
+<ul>
+<li class="toclevel-3 tocsection-19"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#A4.2FA6.2FA8-XXXX_.2F_XXXXM"><span class="tocnumber">3.2.1</span> <span class="toctext">A4/A6/A8-XXXX / XXXXM</span></a></li>
+<li class="toclevel-3 tocsection-20"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#FX-XXXX"><span class="tocnumber">3.2.2</span> <span class="toctext">FX-XXXX</span></a></li>
+<li class="toclevel-3 tocsection-21"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Geode_LX"><span class="tocnumber">3.2.3</span> <span class="toctext">Geode  LX</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-22"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#arm"><span class="tocnumber">4</span> <span class="toctext">arm</span></a>
+<ul>
+<li class="toclevel-2 tocsection-23"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Cortex-A"><span class="tocnumber">4.1</span> <span class="toctext">Cortex-A</span></a>
+<ul>
+<li class="toclevel-3 tocsection-24"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#ARMv7-A.2FCortex-A9_MPCore"><span class="tocnumber">4.1.1</span> <span class="toctext">ARMv7-A/Cortex-A9 MPCore</span></a>
+<ul>
+<li class="toclevel-4 tocsection-25"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#with_optional_VFPv3_FPU"><span class="tocnumber">4.1.1.1</span> <span class="toctext">with optional VFPv3 FPU</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-26"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#ARM11"><span class="tocnumber">4.2</span> <span class="toctext">ARM11</span></a>
+<ul>
+<li class="toclevel-3 tocsection-27"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#ARMv6.2FARM1176JZF-S"><span class="tocnumber">4.2.1</span> <span class="toctext">ARMv6/ARM1176JZF-S</span></a></li>
+<li class="toclevel-3 tocsection-28"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#ARMv6.2FARM1136JF-S"><span class="tocnumber">4.2.2</span> <span class="toctext">ARMv6/ARM1136JF-S</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-29"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#ppc.2Fppc64"><span class="tocnumber">5</span> <span class="toctext">ppc/ppc64</span></a>
+<ul>
+<li class="toclevel-2 tocsection-30"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#POWER8"><span class="tocnumber">5.1</span> <span class="toctext">POWER8</span></a></li>
+<li class="toclevel-2 tocsection-31"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Cell"><span class="tocnumber">5.2</span> <span class="toctext">Cell</span></a></li>
+<li class="toclevel-2 tocsection-32"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#G4"><span class="tocnumber">5.3</span> <span class="toctext">G4</span></a>
+<ul>
+<li class="toclevel-3 tocsection-33"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#PPC_7447A"><span class="tocnumber">5.3.1</span> <span class="toctext">PPC 7447A</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-34"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#G3_.28PPC_7XX.29"><span class="tocnumber">5.4</span> <span class="toctext">G3 (PPC 7XX)</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-35"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#m68k"><span class="tocnumber">6</span> <span class="toctext">m68k</span></a></li>
+<li class="toclevel-1 tocsection-36"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Not_in_the_list.3F"><span class="tocnumber">7</span> <span class="toctext">Not in the list?</span></a></li>
+<li class="toclevel-1 tocsection-37"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#References"><span class="tocnumber">8</span> <span class="toctext">References</span></a></li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="Finding_the_CPU">Finding the CPU</span></h2>
+<p>To identify the model of the CPU, take a look inside <span style="font-family: monospace; font-size: 95%">/proc/cpuinfo</span> for the "cpu family" and "model" numbers like so:
+</p>
+<div class="cmd-box"><div><code style="color: #4E9A06; font-weight: bold;">user $</code><span class="tripleclick-separator"></span><code>grep -m1 -A3 "vendor_id" /proc/cpuinfo</code></div></div>
+<p>Once this information is found match the CPU to one listed on this page in order to find out the suggested "safe" <var>CFLAGS</var>.
+</p><p>Below is a list of <a href="https://wiki.gentoo.org/wiki/CFLAGS" title="CFLAGS">CFLAGS</a> which are to be considered "safe" for the given processors. These are the settings that should be used, especially when unsure which CFLAGS the processor needs.
+</p>
+<h2><span class="mw-headline" id="Find_CPU-specific_options">Find CPU-specific options</span></h2>
+<p>At first, create two files and set language to English for get <span style="font-family: monospace; font-size: 90%;">sed</span> working:
+</p>
+<div class="cmd-box"><div><code style="color: #4E9A06; font-weight: bold;">user $</code><span class="tripleclick-separator"></span><code>touch native.cc march.cc
+</code></div><div><code style="color: #4E9A06; font-weight: bold;">user $</code><span class="tripleclick-separator"></span><code>LANG="en"
+</code></div></div>
+<p>Compile the first file:
+</p>
+<div class="cmd-box"><div><code style="color: #4E9A06; font-weight: bold;">user $</code><span class="tripleclick-separator"></span><code>gcc -fverbose-asm -march=native native.cc -S
+</code></div></div>
+<p>Get march, which <span style="font-family: monospace; font-size: 90%;">gcc</span> will choose:
+</p>
+<div class="cmd-box"><div><code style="color: #4E9A06; font-weight: bold;">user $</code><span class="tripleclick-separator"></span><code>grep march native.s
+</code></div></div>
+<p>Options passed: <code>-D_GNU_SOURCE native.cc -march=core-avx-i -mcx16 -msahf</code>
+</p><p>Now compile a second file:
+</p>
+<div class="cmd-box"><div><code style="color: #4E9A06; font-weight: bold;">user $</code><span class="tripleclick-separator"></span><code>gcc -fverbose-asm -march=core-avx-i march.cc -S
+</code></div></div>
+<p>Now clean the <span style="font-family: monospace; font-size: 95%">*.s</span> files for an easy comparisons:
+</p>
+<div class="cmd-box"><div><code style="color: #4E9A06; font-weight: bold;">user $</code><span class="tripleclick-separator"></span><code>sed -i 1,/options\ enabled/d march.s
+</code></div><div><code style="color: #4E9A06; font-weight: bold;">user $</code><span class="tripleclick-separator"></span><code>sed -i 1,/options\ enabled/d native.s
+</code></div></div>
+<p><b>When you not set LANG on an localized system, you have now empty files.</b>
+</p><p>Compare both <span style="font-family: monospace; font-size: 95%">*.s</span> files:
+</p>
+<div class="cmd-box"><div><code style="color: #4E9A06; font-weight: bold;">user $</code><span class="tripleclick-separator"></span><code>diff march.s native.s
+</code></div></div>
+<p>Output empty? You found your -march=, use it. In other cases:
+</p>
+<pre>20,25c20,23
+&lt; # -maccumulate-outgoing-args -maes -malign-stringops -mavx
+&lt; # -mavx256-split-unaligned-load -mavx256-split-unaligned-store -mcx16
+&lt; # -mf16c -mfancy-math-387 -mfp-ret-in-387 -mfsgsbase -mfxsr -mglibc
+&lt; # -mieee-fp -mlong-double-80 -mmmx -mpclmul -mpopcnt -mpush-args -mrdrnd
+&lt; # -mred-zone -msahf -msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -mssse3
+&lt; # -mtls-direct-seg-refs -mxsave -mxsaveopt
+---
+&gt; # -maccumulate-outgoing-args -malign-stringops -mcx16 -mfancy-math-387
+&gt; # -mfp-ret-in-387 -mfsgsbase -mfxsr -mglibc -mieee-fp -mlong-double-80
+&gt; # -mmmx -mpclmul -mpopcnt -mpush-args -mred-zone -msahf -msse -msse2 -msse3
+&gt; # -msse4 -msse4.1 -msse4.2 -mssse3 -mtls-direct-seg-refs
+</pre>
+<p>Now guess, which switches -march=core-avx-i enable and -march=native not: <i>-maes -mavx</i> and some more. Now we build march.cc again with this two switches disabled:
+</p>
+<pre>gcc -fverbose-asm -march=core-avx-i -mno-aes -mno-avx march.cc -S
+sed -i 1,/options\ enabled/d march.s
+diff march.s native.s
+
+&lt; # -mmmx -mpclmul -mpopcnt -mpush-args -mrdrnd -mred-zone -msahf -msse
+&lt; # -msse2 -msse3 -msse4 -msse4.1 -msse4.2 -mssse3 -mtls-direct-seg-refs
+---
+&gt; # -mmmx -mpclmul -mpopcnt -mpush-args -mred-zone -msahf -msse -msse2 -msse3
+&gt; # -msse4 -msse4.1 -msse4.2 -mssse3 -mtls-direct-seg-refs
+</pre>
+<p>One switch we need to disable too: -mrdrnd
+</p><p>Finally set CFLAGS:
+</p>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CFLAGS</span>=<span class="st0">"-march=core-avx-i -mno-avx -mno-aes -mno-rdrnd -O2 -pipe"</span></pre></div></div></pre>
+<h2><span class="mw-headline" id="x86.2Famd64">x86/amd64</span></h2>
+<h3><span class="mw-headline" id="Intel">Intel</span></h3>
+<h4><span class="mw-headline" id="Haswell">Haswell</span></h4>
+<h5><span class="mw-headline" id="Core_i3.2Fi5.2Fi7_.26_Xeon_E3.2FE5.2FE7_.2AV2">Core i3/i5/i7 &amp; Xeon E3/E5/E7 *V2</span></h5>
+<pre>vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 60
+model name	: Intel(R) Xeon(R) CPU E3-1271 v3 @ 3.60GHz
+…
+model          &nbsp;: 60
+model name     &nbsp;: Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"x86_64-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-march=core-avx2 -O2 -pipe"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<div class="alert alert-info gw-box" style="padding-top: 8px; padding-bottom: 8px;"><strong>Note</strong><br><i>core-avx2</i> march support was introduced with <a rel="nofollow" class="external text" href="https://gcc.gnu.org/gcc-4.7/changes.html">GCC 4.7</a>. If you have an earlier version of GCC, use <i>-march=native</i> or find <a rel="nofollow" class="external text" href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#Find_cpu-specific_options">cpu-specific</a> options manually.</div>
+<h4><span class="mw-headline" id="Ivy_Bridge">Ivy Bridge</span></h4>
+<h5><span class="mw-headline" id="Core_i3.2Fi5.2Fi7_.26_Xeon_E3.2FE5.2FE7_.2AV1">Core i3/i5/i7 &amp; Xeon E3/E5/E7 *V1</span></h5>
+<pre>vendor_id      &nbsp;: GenuineIntel
+cpu family     &nbsp;: 6
+model          &nbsp;: 58
+model name     &nbsp;: Intel(R) Core(TM) i7-3610QM CPU @ 2.30GHz 
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"x86_64-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-march=core-avx-i -O2 -pipe"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h5><span class="mw-headline" id="Pentium">Pentium</span></h5>
+<pre>vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 58
+model name	: Intel(R) Pentium(R) CPU G2020 @ 2.90GHz
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"x86_64-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-march=core-avx-i -mno-avx -mno-aes -mno-rdrnd -O2 -pipe"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h4><span class="mw-headline" id="Sandy_Bridge">Sandy Bridge</span></h4>
+<h5><span class="mw-headline" id="Core_i3.2Fi5.2Fi7_.26_Xeon_E3.2FE5.2FE7">Core i3/i5/i7 &amp; Xeon E3/E5/E7</span></h5>
+<pre>vendor_id	: GenuineIntel
+cpu family	: 6
+…
+model		: 42
+model name	: Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
+…
+model		: 45
+model name	: Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz
+… 
+model		: 42
+model name	: Intel(R) Xeon(R) CPU E31245 @ 3.30GHz
+… 
+model          &nbsp;: 45
+model name     &nbsp;: Intel(R) Xeon(R) CPU E5-2407 0 @ 2.20GHz
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"x86_64-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-march=corei7-avx -O2 -pipe"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h5><span class="mw-headline" id="Pentium_2">Pentium</span></h5>
+<pre>vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 42
+model name	: Intel(R) Pentium(R) CPU B960 @ 2.20GHz
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"x86_64-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-march=corei7-avx -mno-avx -mno-aes -mno-rdrnd -O2 -pipe"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h4><span class="mw-headline" id="Nehalem.2FWestmere">Nehalem/Westmere</span></h4>
+<h5><span class="mw-headline" id="Core_i3.2Fi5.2Fi7">Core i3/i5/i7</span></h5>
+<pre>vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 42
+model name	: Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"x86_64-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-march=corei7 -O2 -pipe"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h4><span class="mw-headline" id="Intel_Core">Intel Core</span></h4>
+<pre>vendor_id      &nbsp;: GenuineIntel
+cpu family     &nbsp;: 6
+…
+model		: 15
+model name	: Intel(R) Core(TM)2 Duo CPU     T7500  @ 2.20GHz
+…
+model          &nbsp;: 15
+model name     &nbsp;: Intel(R) Xeon(R) CPU            3040  @ 1.86GHz
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"x86_64-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-march=core2 -O2 -pipe"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h4><span class="mw-headline" id="Older_microarchitecture">Older microarchitecture</span></h4>
+<h5><span class="mw-headline" id="Pentium_M_.28Dothan.29">Pentium M (Dothan)</span></h5>
+<pre>vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 13
+model name	: Intel(R) Pentium(R) M processor 2.13GHz
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"i686-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-O2 -march=pentium-m -pipe -fomit-frame-pointer"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h3><span class="mw-headline" id="AMD">AMD</span></h3>
+<h4><span class="mw-headline" id="A4.2FA6.2FA8-XXXX_.2F_XXXXM">A4/A6/A8-XXXX / XXXXM</span></h4>
+<pre>vendor_id	: AuthenticAMD
+cpu family	: 18
+model		: 1
+model name	: AMD A8-3500M APU with Radeon(tm) HD Graphics
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"x86_64-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-O2 -march=amdfam10 -mcx16 -mpopcnt -pipe"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h4><span class="mw-headline" id="FX-XXXX">FX-XXXX</span></h4>
+<pre>vendor_id	: AuthenticAMD
+cpu family	: 21
+model		: 1
+model name	: AMD FX(tm)-8150 Eight-Core Processor
+</pre>
+<p>Make sure and check the number listed by <code>model</code> on your system, the -march flag should be bdverX where X is the model number.
+</p><p>Due to the FPU design of the Bulldozer architecture, -mprefer-avx128 gives better FPU preformance at the cost of precision.
+</p><p>The -mvzeroupper switch will give much less of a preformance penalty when using both SSE and AVX, it isn't much of a performance boost for most apps, but can provide a significant improvement when used with stuff like media-video/ffmpeg, net-misc/bfgminer or some apps in games-emulation that have some sections coded in assembly.
+</p>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"x86_64-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-O2 -march=bdver1 -mprefer-avx128 -mvzeroupper -pipe"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h4><span class="mw-headline" id="Geode_LX">Geode  LX</span></h4>
+<pre>vendor_id	: AuthenticAMD
+cpu family	: 5
+model		: 10
+model name	: Geode(TM) Integrated Processor by AMD PCS
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"i486-pc-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-Os -pipe -march=geode -mmmx -m3dnow -fno-align-jumps -fno-align-functions -fno-align-labels -fno-align-loops -fomit-frame-pointer"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h2><span class="mw-headline" id="arm">arm</span></h2>
+<div class="alert alert-info gw-box" style="padding-top: 8px; padding-bottom: 8px;"><strong>Note</strong><br>To identify the respective ARM core of the SoC on your board, <a rel="nofollow" class="external text" href="https://en.wikipedia.org/wiki/List_of_ARM_microarchitectures">List of ARM microarchitectures</a>  and <a rel="nofollow" class="external text" href="https://en.wikipedia.org/wiki/List_of_applications_of_ARM_cores">List of applications of ARM cores</a> on Wikipedia may help.</div>
+<h3><span class="mw-headline" id="Cortex-A">Cortex-A</span></h3>
+<h4><span class="mw-headline" id="ARMv7-A.2FCortex-A9_MPCore">ARMv7-A/Cortex-A9 MPCore</span></h4>
+<h5><span class="mw-headline" id="with_optional_VFPv3_FPU">with optional VFPv3 FPU</span></h5>
+<pre>processor      &nbsp;: 0
+model name     &nbsp;: ARMv7 Processor rev 0 (v7l)
+BogoMIPS       &nbsp;: 2.00
+Features       &nbsp;: half thumb fastmult vfp edsp vfpv3 vfpv3d16 tls 
+CPU implementer&nbsp;: 0x41
+CPU architecture: 7
+CPU variant    &nbsp;: 0x1
+CPU part       &nbsp;: 0xc09
+CPU revision   &nbsp;: 0
+
+processor      &nbsp;: 1
+model name     &nbsp;: ARMv7 Processor rev 0 (v7l)
+BogoMIPS       &nbsp;: 2.00
+Features       &nbsp;: half thumb fastmult vfp edsp vfpv3 vfpv3d16 tls 
+CPU implementer&nbsp;: 0x41
+CPU architecture: 7
+CPU variant    &nbsp;: 0x1
+CPU part       &nbsp;: 0xc09
+CPU revision   &nbsp;: 0
+
+Hardware       &nbsp;: NVIDIA Tegra SoC (Flattened Device Tree)
+Revision       &nbsp;: 0000
+Serial         &nbsp;: 0000000000000000
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"armv7a-hardfloat-linux-gnueabi"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-O2 -march=armv7-a -mtune=cortex-a9 -mfpu=vfpv3-d16 -mfloat-abi=hard -pipe -fomit-frame-pointer"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<div class="alert alert-info gw-box" style="padding-top: 8px; padding-bottom: 8px;"><strong>Note</strong><br>This ARM core (equipped with the optional vfpv3d16 FPU but missing the NEON extension) is used in the Toshiba AC100/Dynabook AZ/Compal Paz00 Board.</div>
+<h3><span class="mw-headline" id="ARM11">ARM11</span></h3>
+<h4><span class="mw-headline" id="ARMv6.2FARM1176JZF-S">ARMv6/ARM1176JZF-S</span></h4>
+<h4><span class="mw-headline" id="ARMv6.2FARM1136JF-S">ARMv6/ARM1136JF-S</span></h4>
+<pre>Processor      &nbsp;: ARMv6-compatible processor rev 5 (v6l)
+BogoMIPS       &nbsp;: 791.34
+Features       &nbsp;: swp half thumb fastmult vfp edsp java 
+CPU implementer&nbsp;: 0x41
+CPU architecture: 6TEJ
+CPU variant    &nbsp;: 0x1
+CPU part       &nbsp;: 0xb36
+CPU revision   &nbsp;: 5
+
+Hardware       &nbsp;: IMAPX200
+Revision       &nbsp;: 0000
+Serial         &nbsp;: 0000000000000000
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"armv6j-hardfloat-linux-gnueabi"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-Os -march=armv6j -mcpu=arm1136jf-s -mfpu=vfp -mfloat-abi=hard -pipe -fomit-frame-pointer"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h2><span class="mw-headline" id="ppc.2Fppc64">ppc/ppc64</span></h2>
+<div class="alert alert-info gw-box" style="padding-top: 8px; padding-bottom: 8px;"><strong>Note</strong><br><code>-march=native</code> almost never works on PowerPC.</div>
+<h3><span class="mw-headline" id="POWER8">POWER8</span></h3>
+<pre>processor      &nbsp;: 0
+cpu            &nbsp;: POWER8E (raw), altivec supported
+clock          &nbsp;: 3026.000000MHz
+revision       &nbsp;: 2.1 (pvr 004b 0201)
+
+timebase       &nbsp;: 512000000
+platform       &nbsp;: pSeries
+model          &nbsp;: IBM pSeries (emulated by qemu)
+machine        &nbsp;: CHRP IBM pSeries (emulated by qemu)
+</pre>
+<div class="alert alert-info gw-box" style="padding-top: 8px; padding-bottom: 8px;"><strong>Note</strong><br>Currently Gentoo does not support POWER8, but safe CFLAGS for it would look like the following.</div>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"powerpc64le-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-mcpu=power8 -mtune=power8 -O2 -pipe -mabi=elfv2 -mabi=altivec -maltivec"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h3><span class="mw-headline" id="Cell">Cell</span></h3>
+<pre>processor	: 0
+cpu		: Cell Broadband Engine, altivec supported
+clock		: 3192.000000MHz
+revision	: 5.1 (pvr 0070 0501)
+
+processor	: 1
+cpu		: Cell Broadband Engine, altivec supported
+clock		: 3192.000000MHz
+revision	: 5.1 (pvr 0070 0501)
+
+timebase	: 79800000
+platform	: PS3
+model		: SonyPS3
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"powerpc-unknown-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-mcpu=cell -mtune=cell -O2 -pipe -mabi=altivec -maltivec"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<div class="alert alert-info gw-box" style="padding-top: 8px; padding-bottom: 8px;"><strong>Note</strong><br>One GCC toolchain can't support PPU and SPU simultaneously, so it's best to let the PPU toolchain rely on AltiVec.<br>This CPU type is used in the PS3.</div>
+<h3><span class="mw-headline" id="G4">G4</span></h3>
+<h4><span class="mw-headline" id="PPC_7447A">PPC 7447A</span></h4>
+<pre>processor	: 0
+cpu		: 7447A, altivec supported
+clock		: 1666.666000MHz
+revision	: 1.5 (pvr 8003 0105)
+bogomips	: 33.28
+timebase	: 8320000
+platform	: PowerMac
+model		: PowerBook5,9
+machine		: PowerBook5,9
+motherboard	: PowerBook5,9 MacRISC3 Power Macintosh 
+detected as	: 287 (PowerBook G4 17")
+pmac flags	: 00000018
+L2 cache	: 512K unified
+pmac-generation	: NewWorld
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"powerpc-unknown-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-mcpu=7450 -mtune=7450 -O2 -maltivec -mabi=altivec -fno-strict-aliasing -pipe"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h3><span class="mw-headline" id="G3_.28PPC_7XX.29">G3 (PPC 7XX)</span></h3>
+<pre>processor      &nbsp;: 0
+cpu            &nbsp;: 740/750
+clock          &nbsp;: 400.000000MHz
+revision       &nbsp;: 131.0 (pvr 0008 8300)
+bogomips       &nbsp;: 49.93
+timebase       &nbsp;: 24966218
+platform       &nbsp;: PowerMac
+model          &nbsp;: PowerBook3,1
+machine        &nbsp;: PowerBook3,1
+motherboard    &nbsp;: PowerBook3,1 MacRISC2 MacRISC Power Macintosh
+detected as    &nbsp;: 70 (PowerBook Pismo)
+pmac flags     &nbsp;: 0000001f
+L2 cache       &nbsp;: 1024K unified
+pmac-generation&nbsp;: NewWorld
+</pre>
+<div class="box-caption"><span class="label" style="margin-right: .5em; background-color: #54487A">FILE</span> <strong><code style="border: none; background: none; color: #54487A; margin-right: .5em;">/etc/portage/make.conf</code></strong><strong></strong></div><pre class="captioned"><div dir="ltr" class="mw-geshi mw-code mw-content-ltr"><div class="bash source-bash"><pre class="de1"><span class="re2">CHOST</span>=<span class="st0">"powerpc-unknown-linux-gnu"</span>
+<span class="re2">CFLAGS</span>=<span class="st0">"-mcpu=750 -Os -pipe -fno-strict-aliasing"</span>
+<span class="re2">CXXFLAGS</span>=<span class="st0">"<span class="es3">${CFLAGS}</span>"</span></pre></div></div></pre>
+<h2><span class="mw-headline" id="m68k">m68k</span></h2>
+<h2><span class="mw-headline" id="Not_in_the_list.3F">Not in the list?</span></h2>
+<p>Try the following command to see if you will see something useful.
+</p><p>You will get something like below...
+</p><p>Notice the -march reply?
+</p><p>Get this info from Distcc  Wiki Page<sup id="cite_ref-Distcc_1-0" class="reference"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#cite_note-Distcc-1">[1]</a></sup>
+</p>
+<div class="cmd-box"><div><code style="color: #ef2929; font-weight: bold;">root #</code><span class="tripleclick-separator"></span><code>gcc -march=native -E -v - &lt;/dev/null 2&gt;&amp;1 | grep cc1</code></div><pre> /mnt/livecd/usr/x86_64-pc-linux-gnu/gcc-bin/4.7.3/../../../libexec/gcc/x86_64-pc-linux-gnu/4.7.3/cc1 -E -quiet -v -iprefix /mnt/livecd/usr/x86_64-pc-linux-gnu/gcc-bin/4.7.3/../../../lib/gcc/x86_64-pc-linux-gnu/4.7.3/ - 
+-march=corei7-avx -mcx16 -msahf -mno-movbe -maes -mpclmul -mpopcnt -mno-abm -mno-lwp -mno-fma -mno-fma4 -mno-xop -mno-bmi -mno-bmi2 -mno-tbm -mavx -mno-avx2 -msse4.2 -msse4.1 -mno-lzcnt -mno-rdrnd -mno-f16c -mno-fsgsbase --param l1-cache-size=32 --param l1-cache-line-size=64 --param l2-cache-size=10240 -mtune=corei7-avx
+</pre></div>
+<h2><span class="mw-headline" id="References">References</span></h2>
+<ol class="references">
+<li id="cite_note-Distcc-1"><span class="mw-cite-backlink"><a href="https://wiki.gentoo.org/wiki/Safe_CFLAGS#cite_ref-Distcc_1-0"><span class="cite-accessibility-label">Jump up </span>↑</a></span> <span class="reference-text"><a href="https://wiki.gentoo.org/wiki/Distcc" title="Distcc">Distcc</a>,Distcc</span>
+</li>
+</ol>
+
+<!-- 
+NewPP limit report
+CPU time usage: 0.584 seconds
+Real time usage: 0.606 seconds
+Preprocessor visited node count: 2177/1000000
+Preprocessor generated node count: 4012/1000000
+Post‐expand include size: 30782/2097152 bytes
+Template argument size: 11466/2097152 bytes
+Highest expansion depth: 10/40
+Expensive parser function count: 0/100
+-->
+
+<!-- 
+Transclusion expansion time report (%,ms,calls,template)
+100.00%  512.223      1 - -total
+ 76.25%  390.565     18 - Template:FileBox
+ 73.90%  378.530     18 - Template:PreBox
+ 12.45%   63.747      7 - Template:Cmd
+ 11.39%   58.366      8 - Template:GenericCmd
+  3.33%   17.078      6 - Template:Note
+  2.69%   13.754     10 - Template:GenericCmd/Line
+  2.18%   11.185      1 - Template:RootCmd
+  2.10%   10.733      6 - Template:Note/core
+  0.75%    3.828      3 - Template:Path
+-->
+
+<!-- Saved in parser cache with key gentoo-wiki:pcache:idhash:1992-0!*!0!!en!*!* and timestamp 20150831100857 and revision id 355310
+ -->
+</div><div class="printfooter">
+Retrieved from "<a dir="ltr" href="http://wiki.gentoo.org/index.php?title=Safe_CFLAGS&oldid=355310">http://wiki.gentoo.org/index.php?title=Safe_CFLAGS&amp;oldid=355310</a>"</div>
+															<div id="catlinks" class="catlinks"><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="https://wiki.gentoo.org/wiki/Special:Categories" title="Special:Categories">Category</a>: <ul><li><a href="https://wiki.gentoo.org/wiki/Category:Processors" title="Category:Processors">Processors</a></li></ul></div></div>														<!-- end content -->
+
+													</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+			<footer>
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-12 col-md-offset-2 col-md-7">
+											<div class="spacer"></div>
+						<ul id="f-list">
+																							<li id="lastmod"> This page was last modified on 20 August 2015, at 17:40.</li>
+																															<li id="privacy"><a href="https://wiki.gentoo.org/wiki/Gentoo_Wiki:Privacy_policy" title="Gentoo Wiki:Privacy policy">Privacy policy</a></li>
+																							<li id="about"><a href="https://wiki.gentoo.org/wiki/Gentoo_Wiki:About" title="Gentoo Wiki:About">About Gentoo Wiki</a></li>
+																							<li id="disclaimer"><a href="https://wiki.gentoo.org/wiki/Gentoo_Wiki:General_disclaimer" title="Gentoo Wiki:General disclaimer">Disclaimers</a></li>
+													</ul>
+									</div>
+				<div class="col-xs-12 col-md-3">
+					<!-- No questions or comments, the Wiki has enough information on how to contact us. -->
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-3 col-md-2">
+					<ul class="footerlinks three-icons">
+						<li><a href="http://twitter.com/gentoo" title="@Gentoo on Twitter"><span class="fa fa-twitter fa-fw"></span></a></li>
+						<li><a href="https://plus.google.com/+Gentoo" title="+Gentoo on Google+"><span class="fa fa-google-plus fa-fw"></span></a></li>
+						<li><a href="https://www.facebook.com/gentoo.org" title="Gentoo on Facebook"><span class="fa fa-facebook fa-fw"></span></a></li>
+					</ul>
+				</div>
+				<div class="col-xs-9 col-md-9">
+					<strong>© 2001–2015 Gentoo Foundation, Inc.</strong><br>
+					<small>
+						Gentoo is a trademark of the Gentoo Foundation, Inc.
+						The contents of this document, unless otherwise expressly stated, are licensed under the
+						<a href="http://creativecommons.org/licenses/by-sa/3.0/" rel="license">CC-BY-SA-3.0</a> license.
+						The <a href="http://www.gentoo.org/main/en/name-logo.xml">Gentoo Name and Logo Usage Guidelines</a> apply.
+					</small>
+				</div>
+			</div>
+		</div>
+	</footer>
+	
+		<script src="./Safe CFLAGS - Gentoo Wiki_files/bootstrap.min.js"></script>
+		<script src="./Safe CFLAGS - Gentoo Wiki_files/retina.min.js"></script>
+		<script>if(window.jQuery)jQuery.ready();</script><script>if(window.mw){
+mw.loader.state({"site":"loading","user":"ready","user.groups":"ready"});
+}</script>
+<script>if(window.mw){
+mw.loader.load(["ext.smw.tooltips","ext.cite","mediawiki.toc","mediawiki.action.view.postEdit","mediawiki.user","mediawiki.hidpi","mediawiki.page.ready","mediawiki.searchSuggest","ext.uls.pt"],null,true);
+}</script>
+<script>if(window.mw){
+document.write("\u003Cscript src=\"//wiki.gentoo.org/load.php?debug=false\u0026amp;lang=en\u0026amp;modules=site\u0026amp;only=scripts\u0026amp;skin=tyrian\u0026amp;*\"\u003E\u003C/script\u003E");
+}</script><script src="./Safe CFLAGS - Gentoo Wiki_files/load(4).php"></script>
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['setDocumentTitle', "Safe CFLAGS"]);
+  _paq.push(['setIgnoreClasses', 'image']);
+  _paq.push(['trackPageView']);
+  _paq.push(['disableCookies']);
+  _paq.push(['enableLinkTracking']);
+  
+  (function() {
+    var u="//piwik.gentoo.org//";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 1]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript>&lt;p&gt;&lt;img src="//piwik.gentoo.org//piwik.php?idsite=1" style="border:0;" alt="" /&gt;&lt;/p&gt;</noscript><script>if(window.mw){
+mw.config.set({"wgBackendResponseTime":725});
+}</script><div class="suggestions" style="display: none; font-size: 14px;"><div class="suggestions-results"></div><div class="suggestions-special"></div></div><script id="hiddenlpsubmitdiv" style="display: none;"></script><script>try{for(var lastpass_iter=0; lastpass_iter < document.forms.length; lastpass_iter++){ var lastpass_f = document.forms[lastpass_iter]; if(typeof(lastpass_f.lpsubmitorig2)=="undefined"){ lastpass_f.lpsubmitorig2 = lastpass_f.submit; if (typeof(lastpass_f.lpsubmitorig2)=='object'){ continue;}lastpass_f.submit = function(){ var form=this; var customEvent = document.createEvent("Event"); customEvent.initEvent("lpCustomEvent", true, true); var d = document.getElementById("hiddenlpsubmitdiv"); if (d) {for(var i = 0; i < document.forms.length; i++){ if(document.forms[i]==form){ if (typeof(d.innerText) != 'undefined') { d.innerText=i.toString(); } else { d.textContent=i.toString(); } } } d.dispatchEvent(customEvent); }form.lpsubmitorig2(); } } }}catch(e){}</script></body></html>
