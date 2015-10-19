@@ -57,7 +57,6 @@ class defaults:
 	optimize = False
 #Builder deals with gtk ui configurations for each screen or window
 class builder:
-	os.chdir("/AutoGentoo_Graphical")
 	disk_type = diskType("/dev/sda")
 	main = Gtk.Builder()
 	main.add_from_file("gtk/stepMain.ui")
