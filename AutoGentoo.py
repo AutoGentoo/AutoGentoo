@@ -31,6 +31,9 @@ from stepInstall import install
 import ctypes
 FileNotFoundError = IOError
 
+#Change directory to /usr/lib/autogentoo
+os.chdir("/usr/lib/autogentoo")
+
 global input
 input = raw_input
 
