@@ -27,7 +27,6 @@ import os, sys, time, subprocess, platform
 from multiprocessing import Process
 from gi.repository import Gtk, Vte, GObject, Gdk, GLib, GdkPixbuf, Pango
 from stepPart import part, disk, diskType, find_free_space 
-from stepInstall import install
 import ctypes
 FileNotFoundError = IOError
 
@@ -63,7 +62,7 @@ class builder:
 	main = Gtk.Builder()
 	main.add_from_file("gtk/stepMain.ui")
 	main_window = main.get_object("main")
-	main_window.set_icon_from_file('gtk/Gentoo-logo_main.png')
+	main_window.set_icon_from_file('gtk/Gentoo-logo.png')
 	current = main
 	current_step = 1
 	

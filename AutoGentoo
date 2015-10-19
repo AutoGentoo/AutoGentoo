@@ -22,7 +22,7 @@
 #  
 #  
 
-import os
+import os, sys
 class color:
 	ESC_SEQ="\x1b["
 	END=("%s39;49;00m" % (ESC_SEQ))
@@ -34,7 +34,8 @@ class color:
 	CYAN=("%s36;01m" % (ESC_SEQ))
 	BOLD=("\033[1m")
 
-os.chdir("/usr/lib/autogentoo")
+os.chdir("/usr/lib/autogentoo/")
+sys.path.append(".")
 from AutoGentoo import *
 print ("%sStarting AutoGentoo%s" % (color.BOLD, color.END))
 main()
