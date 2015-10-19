@@ -21,6 +21,7 @@
 #  MA 02110-1301, USA.
 #  
 #  
+import os
 
 class color:
 	ESC_SEQ="\x1b["
