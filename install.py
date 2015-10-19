@@ -42,12 +42,10 @@ def main():
 		exit(1)
 	print ("Installing Autogentoo...")
 	print ("Creating directory /usr/lib/autogentoo")
-	if os.path.exists("/usr/lib/autogentoo"):
-		os.system("rm -rf /usr/lib/autogentoo")
+	os.system("rm -rf /usr/lib/autogentoo/")
 	os.system("mkdir /usr/lib/autogentoo")
 	print ("Entering directory %s" % os.path.abspath(os.path.dirname(__file__)))
 	os.chdir(os.path.abspath(os.path.dirname(__file__)))
-	
 	print ("Copying Contents from root directory")
 	os.system("cp -R * /usr/lib/autogentoo")
 	print ("Creating %sautogentoo%s command" % (color.BOLD, color.END))
