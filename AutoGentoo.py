@@ -3,11 +3,12 @@
 #
 #  AutoGentoo.py
 #  
+#  <Graphical gentoo installer>
 #  Copyright 2015 Andrei Tumbar <atadmin@Kronos>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
+#  the Free Software Foundation; either version 3 of the License, or
 #  (at your option) any later version.
 #  
 #  This program is distributed in the hope that it will be useful,
@@ -22,35 +23,39 @@
 #  
 #  
 
-import os
-import subprocess
-import sys
-from gi.repository import Gtk, Vte, GObject, Gdk, GLib, GdkPixbuf
-import platform
-from stepPart import part, disk, diskType, partition_main, find_free_space
+import os, sys, time, subprocess, platform
+from multiprocessing import Process
+from gi.repository import Gtk, Vte, GObject, Gdk, GLib, GdkPixbuf, Pango
+from stepPart import part, disk, diskType, find_free_space 
 from stepInstall import install
+import ctypes
 FileNotFoundError = IOError
+
+global input
+input = raw_input
 
 global top_level
 class defaults:
 	#Variable to find the install type
 	#Will be set to default value of 'default'
 	install_type = "default"
-	
 	#Sets whether the system will update when installing
 	#install_type 'default' requires updates to be installed
 	update = True
 	default_unit = "m"
+	original_unit = "m"
+	original_size = 0
 	current_root_size_unit = "m"
 	root_passwd = ""
 	hostname = ""
 	username = ""
 	user_passwd = ""
 	user_passwd_cfm = ""
+	driver_cpu_selected = 0
+	optimize = False
 #Builder deals with gtk ui configurations for each screen or window
 class builder:
-	# /dev/sda doesn't matter here
-	# This will be recalculated everytime the + partition is pressed
+	os.chdir("/AutoGentoo_Graphical")
 	disk_type = diskType("/dev/sda")
 	main = Gtk.Builder()
 	main.add_from_file("gtk/stepMain.ui")
@@ -84,6 +89,104 @@ class builder:
 	make_table = adv_part.get_object("change_part_table_win")
 	edit_part = adv_part.get_object("change_part_win")
 	add_package_win = var.get_object("add_package")
+	
+	#Install Window Configuration
+	install = Gtk.Builder()
+	install.add_from_file("gtk/stepInstall.ui")
+class gpu():
+	vendor = ""
+	product_full = ""
+	product_id = ""
+	product = ""
+	vendor_class = ""
+	driver_version = ""
+	working_driver_version = ""
+	version_list = ["352.41", "349.16", "340.76", "394.125", "71.86.15", "96.43.23", "173.14.39"]
+	def __init__(self):
+		gpu.vendor = ""
+		gpu.product_full = ""
+		gpu.product_id = ""
+		gpu.product = ""
+		gpu.vendor = str(subprocess.check_output("lshw -class display | grep vendor", shell=True))
+		gpu.vendor = gpu.vendor[15:]
+		gpu.vendor = gpu.vendor.replace("\n", "")
+		gpu.product_full = str(subprocess.check_output("lshw -class display | grep product", shell=True))
+		gpu.product_full = gpu.product_full[16:]
+		gpu.product_id_temp = []
+		current_char = ""
+		current_char_num = -1
+		while current_char != "[":
+			current_char_num += 1
+			current_char = gpu.product_full[current_char_num]
+			gpu.product_id_temp.append(current_char)
+		gpu.product_id = str1 = str(''.join(gpu.product_id_temp))
+		gpu.product_id = gpu.product_id.replace(" ", "")
+		gpu.product_id = gpu.product_id.replace("[", "")
+		gpu.product = gpu.product_full.replace("%s" % gpu.product_id, "")
+		gpu.product = gpu.product.replace("[", "")
+		gpu.product = gpu.product.replace("]", "")
+		gpu.product = gpu.product.replace("\n", "")
+		gpu.product = gpu.product.replace(" ", "", 1)
+		print ("Found %s gpu" % gpu.vendor)
+		print ("Model: %s\nIdentification: %s" % (gpu.product, gpu.product_id))
+		if gpu.vendor.find("NVIDIA") != -1:
+			gpu.vendor_class = "nvidia"
+		else:
+			gpu.vendor_class = "radeon"
+		if gpu.vendor_class == "nvidia":
+			version_list = gpu.version_list
+			find_supported = 1
+			current_version = -1
+			while find_supported != 0:
+				current_version += 1
+				find_supported = os.system("cat ./graphics/nvidia/nvidia-%s.supported_cards | grep -i '%s' > /dev/null" % (version_list[current_version], gpu.product))
+			print ("Found supported version %s" % version_list[current_version])
+			gpu.driver_version = version_list[current_version]
+			gpu.working_driver_version = gpu.driver_version
+		elif gpu.vendor_class == "radeon":
+			gpu.driver_version = "x11-drivers/radeon-ucode"
+			print ("Found supported version %s" % gpu.driver_version)
+			gpu.working_driver_version = gpu.driver_version
+class get_arch:
+	stage3_location = ""
+	architecture = ""
+	stage3name = ""
+	def __init__(self):
+		#Finds current arch
+		arch = platform.machine()
+		#Since the platform.machine() function display as
+		#x86_64 and so on I must change it to amd64
+		#This is for the stage3 download and finding its location
+		if arch == "x86_64":
+			arch = "amd64"
+		elif arch == "PA-RISC":
+			arch = "hppa"
+		elif arch == "Itanium":
+			arch = "ia64"
+		elif arch == "i686":
+			arch = "x86"
+		try:
+			with open ("latest-stage3.txt", "r") as file:
+				#This sends the latest stage3 file location to line
+				line = file.read()
+		except FileNotFoundError:
+			findlatest = os.system("ls | grep 'latest-stage3.txt'")
+			if findlatest != "latest-stage3.txt":
+				getlatest = os.system("wget -q distfiles.gentoo.org/releases/%s/autobuilds/latest-stage3.txt" % (arch))
+			try:
+				with open ("latest-stage3.txt", "r") as file:
+					line = file.read()
+			except FileNotFoundError:
+				#If we cant see the file the function will exit
+				print("You are disconnected from the internet")
+				print("AutoGentoo may not work properly!")
+				return 1
+		
+		get_arch.stage3_location = line[63:101]
+		get_arch.architecture = arch
+		get_arch.stage3name = line[72:101]
+		#Removes old file
+		os.system("rm -rf latest-stage3.txt")
 def get_newpart():
 	if builder.disk_type == "gpt":
 		#GPT
@@ -91,7 +194,12 @@ def get_newpart():
 	else:
 		#MBR
 		builder.dialog_new_part = builder.adv_part.get_object("dialog-new-part-mbr")
+class old_sel:
+	gpu_driver = ""
 get_newpart()
+class makeopts:
+	use_flags = ""
+	cflags = ""
 class current:
 	size = 0
 	start = 0
@@ -111,6 +219,7 @@ class systype:
 	ins_custom = True
 	gendev = ""
 	rootSize = 0
+	gpu_type = ""
 class currentpart:
 	size = 0
 	label = 0
@@ -123,6 +232,22 @@ class currentpart:
 	unit = "M"
 	start = 0
 	end = 0
+class get_emerge:
+	emerge_list = []
+	def calculation_process(self):
+		os.system("echo -ne 'Calculating Atom List")
+		while True:
+			os.system("echo -ne .")
+			os.system("sleep .5s")
+			os.system("echo -ne .")
+			os.system("sleep .5s")
+			os.system("echo -ne .")
+			os.system("sleep .5s")
+			os.system("echo -ne '\r\r\r   '")
+			os.system("sleep .5s")
+	def __init__(self, atom):
+		
+		os.system("emerge -qp %s >> temp_emerge" % atom)
 class temp:
 	part = []
 	point = []
@@ -205,12 +330,84 @@ class widget:
 	password_strength = builder.user.get_object("password_strength")
 	password_ok = builder.user.get_object("password_ok")
 	password_error_label = builder.user.get_object("password_error_label")
+	main_unit = builder.adv_part.get_object("main_unit")
+	gpu_type_info = builder.var.get_object("gpu_type_info")
+	gpu_version_info = builder.var.get_object("gpu_version_info")
+	gpu_version_change_nvidia = builder.var.get_object("gpu_version_change_nvidia")
+	start_part = builder.adv_part.get_object("start_part")
+	end_part = builder.adv_part.get_object("end_part")
+	radeon_drivers = builder.var.get_object("radeon_drivers")
+	gpu_grid = builder.var.get_object("gpu_grid")
+	driver_warning = builder.var.get_object("driver_warning")
+	optimize_warning = builder.var.get_object("optimize_warning")
+	add_packages = builder.var.get_object("add_packages")
+	cflags_window = builder.var.get_object("cflags_window")
+	custom_cflags = builder.var.get_object("custom_cflags")
+	custom_cflags_button = builder.var.get_object("custom_cflags_button")
+	custom_cflags_buffer = builder.var.get_object("custom_cflags_buffer")
+	install_info = builder.install.get_object("install_info")
+	install_top_level = builder.install.get_object("top_level")
+	scrollwindow_terminal = builder.install.get_object("scrollwindow_terminal")
+	terminal = Vte.Terminal()
+	terminal.spawn_sync(Vte.PtyFlags.DEFAULT, os.environ['HOME'], ["/usr/bin/autogentoolog"], [], GLib.SpawnFlags.DO_NOT_REAP_CHILD, None, None)
+	scrollwindow_terminal.add(terminal)
 class mounts:
 	part = []
 	mount_point = []
 	fstype = []
+class config:
+	localegen = """# /etc/locale.gen: list all of the locales you want to have on your system
+#
+# The format of each line:
+# <locale> <charmap>
+#
+# Where <locale> is a locale located in /usr/share/i18n/locales/ and
+# where <charmap> is a charmap located in /usr/share/i18n/charmaps/.
+#
+# All blank lines and lines starting with # are ignored.
+#
+# For the default list of supported combinations, see the file:
+# /usr/share/i18n/SUPPORTED
+#
+# Whenever glibc is emerged, the locales listed here will be automatically
+# rebuilt for you.  After updating this file, you can simply run `locale-gen`
+# yourself instead of re-emerging glibc.
+
+en_US ISO-8859-1"
+en_US.UTF-8 UTF-8"
+ja_JP.EUC-JP EUC-JP"
+ja_JP.UTF-8 UTF-8"
+ja_JP EUC-JP"
+en_HK ISO-8859-1"
+en_PH ISO-8859-1"
+de_DE ISO-8859-1"
+de_DE@euro ISO-8859-15"
+es_MX ISO-8859-1"
+fa_IR UTF-8"
+fr_FR ISO-8859-1"
+fr_FR@euro ISO-8859-15"
+it_IT ISO-8859-1"""
+	makeconf = """# These settings were set by the catalyst build script that automatically
+# built this stage.
+# Please consult /usr/share/portage/config/make.conf.example for a more
+# detailed example.
+CFLAGS='%s'
+CXXFLAGS='${CFLAGS}'
+# WARNING: Changing your CHOST is not something that should be done lightly.
+# Please consult http://www.gentoo.org/doc/en/change-chost.xml before changing.
+CHOST='x86_64-pc-linux-gnu'
+# These are the USE flags that were used in addition to what is provided by the
+# profile used for building.
+USE='%s'
+VIDEO_CARDS='%s'
+INPUT_DEVICES='evdev synaptics'
+PORTDIR='/usr/portage'
+DISTDIR='${PORTDIR}/distfiles'
+PKGDIR='${PORTDIR}/packages'
+PORTDIR_OVERLAY=/usr/local/portage""" % (makeopts.cflags, makeopts.use_flags, gpu.vendor_class)
 class install:
 	def __init__(self):
+		cr = "chroot /mnt/gentoo/ /bin/bash -c"
 		print ("Checking for mounted devices...")
 		disk_type = diskType("%s" % systype.gendev)
 		os.system("mount | grep '%s' > mountinfo.txt" % systype.gendev)
@@ -226,7 +423,7 @@ class install:
 			while b != "o":
 				a += 1
 				b = current_line[a]
-				temp.append[b]
+				temp.append(b)
 			current_part = temp
 			mounts.part.append(current_part)
 			current_line = current_line[b]
@@ -237,7 +434,7 @@ class install:
 			while b != "t":
 				a += 1
 				b = current_line[a]
-				temp.append[b]
+				temp.append(b)
 			current_mount = temp
 			mounts.mount_point.append(current_mount)
 			current_line = current_line[b]
@@ -248,7 +445,7 @@ class install:
 			while b != "(":
 				a += 1
 				b = current_line[a]
-				temp.append[b]
+				temp.append(b)
 			current_type = temp
 			mounts.mount_point.append(current_type)
 		if len(mounts) != 0:
@@ -256,7 +453,7 @@ class install:
 			current_print = -1
 			while current_print != len(mounts):
 				current_print += 1
-				print ("%s on %s as %s" % (mounts.part[current_print], mounts.mount_point[current_print], mounts.fstype[current_print]))
+				print ("%s on %s as an %s filesystem" % (mounts.part[current_print], mounts.mount_point[current_print], mounts.fstype[current_print]))
 		elif len(mounts) == 0 and install_type == "default":
 			print ("No mounted parts found!")
 			print ("Detected default install type")
@@ -272,9 +469,9 @@ class install:
 			os.system("parted -s %s mkpart %s ext2 1 128" % (systype.gendev, arg2))
 			os.system("parted %s set 1 lba off" % systype.gendev)
 			if disk_type == "gpt":
-				os.system("parted %s set 1 bios_grub on" % systype.gendev)
+				os.system("parted -s %s set 1 bios_grub on" % systype.gendev)
 			else:
-				os.system("parted %s set 1 boot on" % systype.gendev)
+				os.system("parted -s %s set 1 boot on" % systype.gendev)
 			print ("Creating / partition...")
 			if defaults.current_root_size_unit == "g":
 				os.system("parted -s %s unit gB mkpart %s ext4 %d %s" % (systype.gendev, arg2, int(round(129/1024, 0)), int(round((systype.sizeRoot-129/1024), 0))))
@@ -289,6 +486,32 @@ class install:
 			os.system("mkdir -p /mnt/gentoo/boot")
 			os.system("mount %s1 /mnt/gentoo/boot" % systype.gendev)
 			print ("Done!")
+		##Step TWO##
+		#Download stage3
+		os.system("wget -q --directory-prefix=/mnt/gentoo/ distfiles.gentoo.org/releases/%s/autobuilds/%s" % (get_arch.architecture,get_arch.stage3_location))
+		#Extract stage3
+		os.system("tar xjpvf /mnt/gentoo/%s -C /mnt/gentoo/ >> AutoGentoo.log" % (get_arch.stage3name))
+		##Step Three##
+		os.system("cp -L /etc/resolv.conf /mnt/gentoo/etc 2> AutoGentoo.log")
+		os.system("%s 'emerge-webrsync' >> AutoGentoo.log 2>&1" % (cr))
+		os.system("%s 'emerge --sync' >> AutoGentoo.log" % (cr))
+		if systype.profile_num == 1:
+			systype.profile = "default/linux/amd64/13.0/desktop"
+		elif systype.profile_num == 2:
+			systype.profile = "default/linux/amd64/13.0/desktop/gnome/systemd"
+		elif systype.profile_num == 3:
+			systype.profile = "default/linux/amd64/13.0/desktop/kde"
+		elif systype.profile_num == 4:
+			systype.profile = "default/linux/amd64/13.0/desktop/plasma"
+		elif systype.profile_num == 5:
+			systype.profile = "default/linux/amd64/13.0/"
+		os.system("%s 'eselect profile set %s'" % (cr, systype.profile))
+		os.system("rm -rf /mnt/gentoo/etc/locale.gen")
+		os.system("rm -rf /mnt/gentoo/etc/portage/make.conf")
+		locale_gen_file = open("/mnt/gentoo/etc/locale.gen", "w+")
+		locale_gen_file.write(config.localegen)
+		make_conf_file = open("/mnt/gentoo/etc/portage/make.conf", "w+")
+		make_conf_file.write(config.makeconf)
 def do_part_first(disk_num):
 	find_disk = "%s%s" % ("/dev/sd", disk.alphabet[disk_num])
 	part(find_disk, "m")
@@ -303,14 +526,14 @@ def do_part_first(disk_num):
 		try:
 			try:
 				if find_free_space.get_free_true[global_num_current] != 1:
-					widget.partitions.append(["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%sb" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%sb" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%sb" % (part.end[current_part_num], part.end_unit[current_part_num])])
+					widget.partitions.append(["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
 			except:
 				pass
 			if find_free_space.get_free_true[global_num_current] == 1:
 				current_free += 1
 				current_part_num -= 1
 				try:
-					widget.partitions.append(["Free Space", "", "%s%sb" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%sb" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%sb" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
+					widget.partitions.append(["Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
 				except IndexError:
 					pass
 		except:
@@ -320,27 +543,39 @@ def do_part_first(disk_num):
 	widget.scrollable_treelist.add(widget.treeview)
 	widget.scrollable_treelist.set_size_request(715, 250)
 	widget.scrollable_treelist.show_all()
-	current_disk = 0
-	disk(current_disk)
-	try:
-		del temp
-	except:
-		pass
+	disk(0)
+	curr_remove = -1
+	while curr_remove != len(disk.disks):
+		curr_remove += 1
+		widget.set_disk.remove(0)
 	temp = []
 	current_disk_num = -1
-	while len(temp) != len(disk.size):
-		temp.append ("item")
+	print ("\n Number of Disks:", len(disk.disks))
+	while len(temp) != len(disk.disks):
 		current_disk_num += 1
+		temp.append("%s" % current_disk_num)
 		disk(current_disk_num)
 		widget.set_disk.insert(current_disk_num, "%d" % (current_disk_num), disk.disk_name)
-		widget.set_disk.set_active(0)
+	widget.set_disk.set_active(disk_num)
 def do_part(disk_num):
-	os.system("echo -ne Doing Part...   ")
+	print("Doing Part...")
+	if disk_num == -1:
+		print ("No disk selected")
+		return
 	widget.loading_spinner.set_visible(True)
 	widget.loading_spinner.start()
 	widget.recalculating.set_visible(True)
 	global_num_current = -1
 	find_disk = "%s%s" % ("/dev/sd", disk.alphabet[disk_num])
+	get_disk = os.system("parted -s %s p > /dev/null" % find_disk)
+	if get_disk != 0:
+		print ("This disk has been removed")
+		widget.loading_spinner.set_visible(False)
+		widget.recalculating.set_visible(False)
+		widget.loading_spinner.stop()
+		widget.set_disk.set_active(disk_num-1)
+		widget.set_disk.remove(disk_num)
+		return
 	widget.partitions.clear()
 	part(find_disk, "m")
 	current_free = -1
@@ -354,28 +589,35 @@ def do_part(disk_num):
 		try:
 			try:
 				if find_free_space.get_free_true[global_num_current] != 1:
-					widget.partitions.append(["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%sb" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%sb" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%sb" % (part.end[current_part_num], part.end_unit[current_part_num])])
+					widget.partitions.append(["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
 			except IndexError:
 				pass
 			if find_free_space.get_free_true[global_num_current] == 1:
 				current_free += 1
 				current_part_num -= 1
 				try:
-					widget.partitions.append(["Free Space", "", "%s%sb" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%sb" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%sb" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
+					widget.partitions.append(["Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
 				except IndexError:
 					pass
 		except IndexError:
 			widget.scrollable_treelist.show_all()
 			break
 	current_part_num = -1
+	print part.partsizes
+	curr_dtype = diskType(find_disk)
 	while True:
 		current_part_num += 1
 		try:
-			if part.partsizes[current_part_num] >= 128 and part.partunits[current_part_num] == "M" and part.primary[current_part_num] == 1:
-				grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
-				widget.grub_device.insert(0, "1", "%s" % grub_part)
-			if current_part_num == len(part.partnums):
-				break
+			if part.partsizes[current_part_num] > 100 and part.partunits[current_part_num] == "M":
+				print ("Grub requirments passed first")
+				if curr_dtype != "gpt" and part.primary[current_part_num] == 1:
+					print ("Grub requirments passed second (mbr)")
+					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
+					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
+				elif curr_dtype == "gpt":
+					print ("Grub requirments passed second (gpt)")
+					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
+					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
 		except IndexError:
 			break
 	widget.gentoo_dev_info.set_text("Gentoo Device (%s)" % (diskType(find_disk)))
@@ -385,7 +627,8 @@ def do_part(disk_num):
 	os.system("rm -rf freespaceinfo_2.txt")
 	os.system("rm -rf freespaceinfo.txt")
 	os.system("rm -rf typeinfo.txt")
-	os.system("echo Done!")
+	os.system("rm -rf partinfo.txt")
+	print ("Done!")
 def do_part_unit(disk_num, unit):
 	global_num_current = -1
 	find_disk = "%s%s" % ("/dev/sd", disk.alphabet[disk_num])
@@ -401,17 +644,17 @@ def do_part_unit(disk_num, unit):
 		global_num_current += 1
 		try:
 			try:
-				print "%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%sb" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%sb" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%sb" % (part.end[current_part_num], part.end_unit[current_part_num])
+				print ("%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num]))
 				if find_free_space.get_free_true[global_num_current] != 1:
-					widget.partitions.append(["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%sb" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%sb" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%sb" % (part.end[current_part_num], part.end_unit[current_part_num])])
+					widget.partitions.append(["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
 			except IndexError:
 				pass
 			if find_free_space.get_free_true[global_num_current] == 1:
 				current_free += 1
 				current_part_num -= 1
 				try:
-					print ("Free Space", "", "%s%sb" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%sb" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%sb" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free]))
-					widget.partitions.append(["Free Space", "", "%s%sb" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%sb" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%sb" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
+					print ("Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free]))
+					widget.partitions.append(["Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
 				except IndexError:
 					pass
 		except IndexError:
@@ -428,6 +671,21 @@ def do_part_unit(disk_num, unit):
 				break
 		except IndexError:
 			break
+def do_disk():
+	get_sel = widget.set_disk.get_active()
+	disk(0)
+	curr_remove = -1
+	while curr_remove != len(disk.disks):
+		curr_remove += 1
+		widget.set_disk.remove(0)
+	temp = []
+	current_disk_num = -1
+	while len(temp) != len(disk.disks):
+		current_disk_num += 1
+		temp.append("%s" % current_disk_num)
+		disk(current_disk_num)
+		widget.set_disk.insert(current_disk_num, "%d" % (current_disk_num), disk.disk_name)
+	widget.set_disk.set_active(get_sel)
 def Nextmain(button):
 	top_level = builder.main.get_object("top_level")
 	builder.main_window.remove(top_level)
@@ -440,17 +698,12 @@ def Nextask_part(button):
 	if defaults.install_type == "custom":
 		toplevel_window = builder.adv_part.get_object("top_level")
 		do_part_first(0)
-		
 	else:
 		toplevel_window = builder.rootPart.get_object("top_level")
 		current_disk = 0
 		disk(current_disk)
 		widget.part_size.set_upper(disk.size[current_disk]*1024)
 		current_disk_num = -1
-		try:
-			del temp
-		except:
-			pass
 		temp = []
 		while len(temp) != len(disk.size):
 			temp.append ("item")
@@ -488,6 +741,15 @@ def Nextadv_part(button):
 	else:
 		widget.install_desktop.set_active(True)
 		widget.install_desktop.set_sensitive(True)
+	gpu()
+	widget.gpu_type_info.set_markup("GPU Vendor: <b>%s</b>" % gpu.vendor)
+	widget.gpu_version_info.set_markup("  %s\n<small>Latest Version: %s</small>" % (gpu.product, gpu.driver_version))
+	if gpu.vendor != "NVIDIA Corporation":
+		widget.gpu_grid.remove(widget.gpu_version_change_nvidia)
+		widget.gpu_grid.pack_end(widget.radeon_drivers, True, True, 0)
+	else:
+		defaults.driver_cpu_selected = 1
+		widget.gpu_version_change_nvidia.set_active(gpu.version_list.index(gpu.driver_version))
 	widget.desktop_manager.remove(0)
 	widget.desktop_manager.remove(0)
 	builder.main_window.add(toplevel_window)
@@ -539,7 +801,7 @@ def Backuser(button):
 		toplevel_window = builder.rootPart.get_object("top_level")
 	toplevel_window.reparent(builder.main_window)
 	builder.main_window.add(toplevel_window)
-#Major install Variables (part_ask)
+#All functions that handle signals from glade
 def state_update(button):
 	defaults.update = button.get_active()
 	print ("Install Type: %s Updates: %s" % (defaults.install_type, defaults.update))
@@ -570,6 +832,7 @@ def change_disk_root(combo):
 		global current_root_disk
 		current_root_disk = disk_num
 		systype.gendev = current_disk
+		print (defaults.current_root_size_unit)
 		if defaults.current_root_size_unit == "m":
 			if disk.unit[disk_num] == "G":
 				widget.part_size.set_upper(disk.size[disk_num]*1024)
@@ -626,6 +889,8 @@ def set_gentoo_device(combo):
 		id_num = int(id_num)
 		print("Disk: %s" % disk, id_num)
 		global main_disk
+		global main_disk_num
+		main_disk_num = id_num
 		main_disk = disk[:8]
 		systype.gendev = main_disk
 		builder.disk_type = diskType(main_disk)
@@ -634,22 +899,22 @@ def set_gentoo_device(combo):
 		widget.add_part.set_sensitive(False)
 		widget.change_part.set_sensitive(False)
 		widget.remove_part.set_sensitive(False)
+		widget.main_unit.set_active(1)
 def set_grub_device(combo):
 	tree_iter = combo.get_active_iter()
 	if tree_iter != None:
 		model = combo.get_model()
-		grub_partiton, id_num = model[tree_iter][:2]
-		id_num = int(id_num)
-		print("Grub Partition: %s" % grub_partiton, id_num)
+		grub_partiton, part_num = model[tree_iter][:2]
+		part_num = str(part_num)
+		print("Grub Partition: %s" % grub_partiton, part_num)
 def do_part_button(button):
 	num = widget.set_disk.get_active()
 	do_part(num)
+	do_disk()
 def newpart(button):
 	widget.part_label.set_text("")
 	widget.mount_point1.set_text("")
 	widget.mount_point2.set_text("")
-	widget.partition_create_place_beginning.set_active(True)
-	widget.partition_create_place_beginning1.set_active(True)
 	widget.partition_edit_format_checkbutton.set_active(False)
 	widget.partition_edit_format_checkbutton1.set_active(False)
 	widget.format_type.set_active(-1)
@@ -661,33 +926,26 @@ def newpart(button):
 	builder.disk_type = diskType(find_disk)
 	get_newpart()
 	current.size = str(current.size)
-	current.size = current.size.replace("b", "")
-	unit_num_current = current.size.find("M")
-	if unit_num_current >= 0:
-		current.unit = "M"
-		current.size = current.size.replace("M", "")
-	else:
-		unit_num_current = current.size.find("G")
-		if unit_num_current >= 0:
-			current.unit = "G"
-			current.size = current.size.replace("G", "")
-		else:
-			unit_num_current = current.size.find("K")
-			if unit_num_current >= 0:
-				current_size = current.size.replace("K", "")
-				current.unit = "K"
-			else:
-				current.unit = "G"
-				current.size = current.size.replace("T", "")
-				current.size = float(current.size)
-				current.size = current.size*1024
+	current.size = current.size.replace("B", "")
+	current.size = current.size.replace("i", "")
+	defaults.original_size = current.size
+	current.unit = current.size[-1]
+	print current.size
+	current.size = current.size[:-1]
 	current.size = float(current.size)
 	adj_size = round(current.size, 0)
 	widget.part_size_adj.set_upper(int(adj_size))
 	widget.part_size_adj.set_value(int(adj_size))
-	
 	currentpart.end = widget.partitions.get_value(treeiter, 5)
 	currentpart.start = widget.partitions.get_value(treeiter, 4)
+	start = float(currentpart.start[:-3])+1
+	end = float(currentpart.end[:-3])-1
+	widget.end_part.set_upper(int(round(float(end), 0)))
+	widget.end_part.set_lower(int(round(float(start)+1, 0)))
+	widget.start_part.set_lower(int(round(float(start), 0)))
+	widget.start_part.set_upper(int(round(float(end)-1, 0)))
+	widget.start_part.set_value(int(round(float(start), 0)))
+	widget.end_part.set_value(int(round(float(end), 0)))
 	builder.dialog_new_part.show_all()
 def remove_part(button):
 	builder.are_you_sure.show_all()
@@ -704,23 +962,23 @@ def change_unit(combo):
 	if tree_iter != None:
 		model = combo.get_model()
 		new_part_unit, id_unit = model[tree_iter][:2]
-		id_unit = int(id_unit)
-		print("Current Unit: %s" % new_part_unit, id_unit)
-		if id_unit == 1:
+		id_unit = str(id_unit)
+		print("Current Unit: %s %s" % (new_part_unit, id_unit))
+		if id_unit == "m":
 			if current.unit == "M":
 				pass
 			elif current.unit == "K":
 				current_size = int(round(float(current.size/1024), 0))
 			elif current.unit == "G":
 				current_size = int(round(float(current.size*1024), 0))
-		elif id_unit == 2:
+		elif id_unit == "k":
 			if current.unit == "M":
 				current_size = int(round(float(current.size*1024), 0))
 			elif current.unit == "K":
 				pass
 			elif current.unit == "G":
 				current_size = int(round(float((current.size*1024)*1024), 0))
-		elif id_unit == 3:
+		elif id_unit == "g":
 			if current.unit == "M":
 				current_size = int(round(float(current.size/1024), 0))
 			elif current.unit == "K":
@@ -795,6 +1053,9 @@ def format_part(button):
 	if mount_point != "" or mount_point != " ":
 		try:
 			if mount_point[0] == "/":
+				mkdir = os.system("find %s" % mount_point)
+				if mkdir != 0 :
+					os.system("mkdir %s" % mount_point)
 				os.system("mount %s %s" % (main_selection, mount_point))
 		except IndexError:
 			pass
@@ -833,20 +1094,23 @@ def set_logical(button):
 		state = "off"
 	print("Logical:", state)
 	print ("currentpart.primary = %s" % currentpart.primary)
-def set_beginning(button):
-	if button.get_active():
-		state = "on"
-		print ("Creating Partition at Beginning of free space")
-		currentpart.start_of_free = True
-	else:
-		state = "off"
-def set_end(button):
-	if button.get_active():
-		state = "on"
-		print ("Creating Partition at End of free space")
-		currentpart.start_of_free = False
-	else:
-		state = "off"
+def size_in(*arg):
+	size = arg[0].get_value()
+	print ("Size:", size)
+	start = widget.start_part.get_value()
+	widget.end_part.set_value(start+size)
+def start_in(*arg):
+	size = arg[0].get_value()
+	print ("Start:", size)
+	start = widget.start_part.get_value()
+	end = widget.end_part.get_value()
+	widget.part_size_adj.set_value(end-start)
+def end_in(*arg):
+	size = arg[0].get_value()
+	print ("End:", size)
+	end = widget.end_part.get_value()
+	start = widget.start_part.get_value()
+	widget.part_size_adj.set_value(end-start)
 def part_format_type(combo):
 	tree_iter = combo.get_active_iter()
 	if tree_iter != None:
@@ -868,16 +1132,16 @@ def mount_point(entry):
 	print (currentpart.mount_point)
 def get_start(size):
 	end = currentpart.end
-	end_unit = end[-2]
-	end = end.replace("b", "")
+	end_unit = end[-3]
+	end = end.replace("iB", "")
 	end = end.replace(end_unit, "")
 	end = float(end)
 	start = end-size
 	return start
 def get_end(size):
 	start = currentpart.start
-	start_unit = start[-2]
-	start = start.replace("b", "")
+	start_unit = start[-3]
+	start = start.replace("iB", "")
 	start = start.replace(start_unit, "")
 	start = float(start)
 	end = start+size
@@ -903,6 +1167,24 @@ def make_table(button):
 	num = widget.set_disk.get_active()
 	do_part(num)
 	builder.make_table.hide()
+def convert_unit(input_unit, output_unit):
+	input_id = 0
+	output_id = 0
+	if input_unit == "K":
+		input_id = 1
+	elif input_unit == "M":
+		input_id = 2
+	elif input_unit == "G":
+		input_id = 3
+	if output_unit == "K":
+		output_id = 1
+	elif output_unit == "M":
+		output_id = 2
+	elif output_unit == "G":
+		output_id = 3
+	if output_id == input_id:
+		print ("Unit does not need converting!")
+		return input_unit
 def mk_part(button):
 	disk_type = diskType(main_disk)
 	arg1 = main_disk
@@ -921,13 +1203,13 @@ def mk_part(button):
 	if currentpart.start_of_free == False:
 		curr_start = get_start(currentpart.size)
 		curr_end = str(currentpart.end)
-		curr_end = curr_end.replace("%sb" % currentpart.unit, "")
+		curr_end = curr_end.replace("%siB" % currentpart.unit, "")
 		curr_end = float(curr_end)-1
 		curr_end = round(curr_end, 0)
 		curr_end = int(curr_end)
 	else:
 		curr_start = str(currentpart.start)
-		curr_start = curr_start.replace("%sb" % currentpart.unit, "")
+		curr_start = curr_start.replace("%siB" % currentpart.unit, "")
 		curr_start = float(curr_start)-1
 		if curr_start < 0:
 			curr_start = 0
@@ -943,14 +1225,14 @@ def mk_part(button):
 		else:
 			arg2 = "extended"
 	arg3 = currentpart.fstype
-	arg4 = int(round(curr_start, 0))+1
-	arg5 = int(round(curr_end, 0))-1
-	if arg4 < 1:
-		arg4 = 1
-	print ("parted -s %s mkpart %s %s %s %s" % (arg1, arg2, arg3, arg4, arg5))
-	status = os.system("parted -s %s mkpart %s %s %s %s" % (arg1, arg2, arg3, arg4, arg5))
+	arg4 = int(widget.start_part.get_value())
+	arg5 = int(widget.end_part.get_value())
+	print ("parted -s %s unit %siB mkpart %s %s %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg2, arg3, arg4, arg5))
+	status = os.system("parted -s %s unit %siB mkpart %s %s %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg2, arg3, arg4, arg5))
 	if status != 0 and disk_type != "gpt":
-		status = os.system("parted -s %s mkpart logical %s %s %s" % (arg1, arg3, arg4, arg5))
+		status = os.system("parted -s %s unit %siB mkpart logical %s %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg3, arg4, arg5))
+		if status != 0:
+			status = os.system("parted -s %s unit %siB mkpart extended %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg4, arg5))
 	if status != 0 and arg3 == "FAT (16 or 32 depending on size)":
 		if current.size > 2:
 			if current.unit == "G":
@@ -968,8 +1250,8 @@ def mk_part(button):
 			else:
 				arg3 = "fat32"
 		current_part_num_before = part.partnums
-		print ("parted -s %s mkpart %s %s %s %s" % (arg1, arg2, arg3, arg4, arg5))
-		status = os.system("parted -s %s mkpart %s %s %s %s" % (arg1, arg2, arg3, arg4, arg5))
+		print ("parted -s %s unit %siB mkpart %s %s %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg2, arg3, arg4, arg5))
+		status = os.system("parted -s %s unit %siB mkpart %s %s %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg2, arg3, arg4, arg5))
 	try:
 		if currentpart.mountpoint != "" or currentpart.mountpoint != " " and currentpart.mountpoint[0] != "/":
 			find_root_mount = os.system("mount | grep '/mnt/gentoo'")
@@ -1003,6 +1285,7 @@ def mk_part(button):
 					os.system("mount %s%s %s" % (main_disk, temp.part, temp.mount_point))
 	except IndexError:
 		pass
+	time.sleep(5)
 	do_part(num)
 	builder.dialog_new_part.hide()
 def desktop_environment(combo):
@@ -1023,14 +1306,19 @@ def desktop_environment(combo):
 		widget.memory_bar.set_max_value(systype.memtotal)
 		if systype.profile_num == 1:
 			systype.usedmem = 110
+			makeopts.use_flags = "X -gnome -kde gtk gtk3 qt qt5 sse sse2"
 		elif systype.profile_num == 2:
 			systype.usedmem = 245
+			makeopts.use_flags = "X gnome -kde gtk gtk3 qt -qt5 sse sse2"
 		elif systype.profile_num == 3:
 			systype.usedmem = 303
+			makeopts.use_flags = "X -gnome kde gtk gtk3 qt qt5 sse sse2"
 		elif systype.profile_num == 4:
 			systype.usedmem = 354
+			makeopts.use_flags = "X -gnome kde gtk gtk3 qt qt5 sse sse2"
 		elif systype.profile_num == 5:
 			systype.usedmem = 0
+			makeopts.use_flags = "sse sse2"
 		widget.memory_bar.set_max_value(systype.memtotal)
 		widget.memory_bar.set_value(systype.usedmem)
 		umem = float(systype.usedmem)
@@ -1092,6 +1380,7 @@ def install_de_install(button):
 	print ("Install Desktop Manager: %s" % systype.de_ins)
 def install_custom_packages(button):
 	systype.ins_custom = widget.enable_custom_packages.get_active()
+	widget.add_packages.set_sensitive(button.get_active())
 	print ("Install Custom Packages: %s" % systype.ins_custom)
 def add_package(button):
 	widget.scrollable_treelist.set_vexpand(True)
@@ -1199,13 +1488,84 @@ def do_install(button):
 		do_return = 1
 	if do_return == 1:
 		return
+	print ("Installing System...")
+	top_level = builder.user.get_object("top_level")
+	builder.main_window.remove(top_level)
+	toplevel_window = builder.install.get_object("top_level")
+	toplevel_window.reparent(builder.main_window)
+	if defaults.install_type == "custom":
+		widget.install_info.set_text("Checking for mounted devices...")
 	else:
-		print ("Installing System...")
+		widget.install_info.set_text("Mounting Required block devices...")
+	builder.main_window.add(toplevel_window)
 def setRoot(adjustment):
 	systype.rootSize = int(round(adjustment.get_value(), 0))
 	print ("Root Partition Size: %s" % systype.rootSize)
+def change_unit_adv(combo):
+	tree_iter = combo.get_active_iter()
+	if tree_iter != None:
+		global main_unit
+		model = combo.get_model()
+		main_unit, id_num = model[tree_iter][:2]
+		id_num = str(id_num)
+		do_part_unit(main_disk_num, id_num) 
+		print("Selected Unit: %s" % main_unit, id_num)
+def change_nvidia(combo):
+	tree_iter = combo.get_active_iter()
+	if tree_iter != None:
+		model = combo.get_model()
+		full_name, gpu.driver_version = model[tree_iter][:2]
+		gpu.driver_version = str(gpu.driver_version)
+		print("Selected Driver: %s" % full_name, gpu.driver_version)
+def driver_warning(combo):
+	tree_iter = combo.get_active_iter()
+	if tree_iter != None:
+		model = combo.get_model()
+		full_name, gpu.driver_version = model[tree_iter][:2]
+		gpu.driver_version = str(gpu.driver_version)
+		if gpu.driver_version == gpu.working_driver_version:
+			return
+	if defaults.driver_cpu_selected == 0:
+		widget.driver_warning.show_all()
+	else:
+		defaults.driver_cpu_selected = 0
+def driver_decline(button):
+	defaults.driver_cpu_selected == 1
+	widget.gpu_version_change_nvidia.set_active(gpu.version_list.index(gpu.working_driver_version))
+	widget.driver_warning.hide()
+def driver_accept(button):
+	widget.driver_warning.hide()
+def optimize_use(button):
+	defaults.optimize = button.get_active()
+	print ("Optimize: %s" % defaults.optimize)
+	if button.get_active() == True:
+		makeopts.cflags = "-march=native -O2 -pipe"
+	else:
+		makeopts.cflags = ""
+	widget.optimize_warning.set_visible(button.get_active())
+	widget.custom_cflags_button.set_visible(button.get_active())
+def open_cflags(button):
+	widget.custom_cflags_buffer.set_text(makeopts.cflags)
+	widget.cflags_window.show()
+def save_cflags(button):
+	start_iter = widget.custom_cflags_buffer.get_start_iter()
+	end_iter = widget.custom_cflags_buffer.get_end_iter()
+	makeopts.cflags = widget.custom_cflags_buffer.get_text(start_iter, end_iter, True)
+	widget.cflags_window.hide()
+def quit_cflags(*arg):
+	widget.cflags_window.hide()
+def cflag_help(button):
+	os.system("google-chrome-stable https://wiki.gentoo.org/wiki/Safe_CFLAGS")
+def show_terminal(button):
+	if button.get_active():
+		widget.terminal_window.show_all()
+	else:
+		widget.terminal_window.hide()
+def shutdown(*args):
+	Gtk.main_quit()
 main_handlers = {
 	"exit": Gtk.main_quit,
+	"shutdown": shutdown,
 	"Next": Nextmain
 	}
 part_ask_handlers = {
@@ -1226,6 +1586,7 @@ part_advanced_handlers = {
 	"Back": Backadv_part,
 	"grub_device": set_grub_device,
 	"change_unit": change_unit,
+	"change_unit_adv": change_unit_adv,
 	"cancel": close,
 	"close_sure": close_sure,
 	"close_table": close_table,
@@ -1236,8 +1597,9 @@ part_advanced_handlers = {
 	"mount_point_change": mount_point_change,
 	"set_primary": set_primary,
 	"set_logical": set_logical,
-	"set_beginning": set_beginning,
-	"set_end": set_end,
+	"size_in": size_in,
+	"start_in": start_in,
+	"end_in": end_in,
 	"format_type": part_format_type,
 	"state_format": state_format,
 	"mount_point": mount_point,
@@ -1261,7 +1623,17 @@ var_handlers = {
 	"pkg_name": pkg_name,
 	"add_package_cfm": add_package_cfm,
 	"close_new_pkg": close_new_pkg,
-	"add_pkg_main": add_pkg}
+	"add_pkg_main": add_pkg,
+	"change_nvidia": change_nvidia,
+	"driver_warning": driver_warning,
+	"driver_decline": driver_decline,
+	"driver_accept": driver_accept,
+	"optimize_use": optimize_use,
+	"save_cflags": save_cflags,
+	"quit_cflags": quit_cflags,
+	"open_cflags": open_cflags,
+	"cflag_help": cflag_help,
+	}
 rootPart_handlers = {
 	"Next": Nextroot,
 	"Back": Backroot,
@@ -1279,6 +1651,9 @@ user_handlers = {
 	"user_passwd_cfm": user_passwd_cfm,
 	"install": do_install,
 	}
+install_handlers = {
+	"show_terminal": show_terminal,
+	}
 class main():
 	def __init__(self):
 		widget.select.connect("changed", part_selected)
@@ -1289,5 +1664,6 @@ class main():
 		builder.adv_part.connect_signals(part_advanced_handlers)
 		builder.var.connect_signals(var_handlers)
 		builder.user.connect_signals(user_handlers)
+		builder.install.connect_signals(install_handlers)
 		builder.main_window.show_all()
 		Gtk.main()
