@@ -619,7 +619,7 @@ def do_part(disk_num):
 					print ("Grub requirments passed second (gpt)")
 					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
 					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
-			elif part.partsizes[current_part_num] > .001 and part.partunits[current_part_num] == "G":
+			elif part.partsizes[current_part_num] >= .001 and part.partunits[current_part_num] == "G":
 				print ("Grub requirments passed first")
 				if curr_dtype != "gpt" and part.primary[current_part_num] == 1:
 					print ("Grub requirments passed second (mbr)")
@@ -629,7 +629,7 @@ def do_part(disk_num):
 					print ("Grub requirments passed second (gpt)")
 					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
 					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
-			elif part.partsizes[current_part_num] > 100000 and part.partunits[current_part_num] == "K":
+			elif part.partsizes[current_part_num] >= 100000 and part.partunits[current_part_num] == "K":
 				print ("Grub requirments passed first")
 				if curr_dtype != "gpt" and part.primary[current_part_num] == 1:
 					print ("Grub requirments passed second (mbr)")

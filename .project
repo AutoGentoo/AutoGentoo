@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Graphical</name>
-	<comment></comment>
+	<name>AutoGentoo-Graphical</name>
+	<comment>Graphical Installer for Gentoo</comment>
 	<projects>
 	</projects>
 	<buildSpec>
