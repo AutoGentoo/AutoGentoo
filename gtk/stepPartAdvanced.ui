@@ -372,6 +372,22 @@ to remove this partition&lt;/small&gt;</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
+  <object class="GtkListStore" id="partition_list">
+    <columns>
+      <!-- column-name Partition -->
+      <column type="gchararray"/>
+      <!-- column-name Filesystem -->
+      <column type="gchararray"/>
+      <!-- column-name Size -->
+      <column type="gchararray"/>
+      <!-- column-name Mount -->
+      <column type="gchararray"/>
+      <!-- column-name Start -->
+      <column type="gchararray"/>
+      <!-- column-name End -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkScrolledWindow" id="partition_list_window">
     <property name="height_request">250</property>
     <property name="visible">True</property>
@@ -481,18 +497,31 @@ to remove this partition&lt;/small&gt;</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkScrolledWindow" id="scrolledwindow1">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="shadow_type">in</property>
-                <child>
-                  <placeholder/>
-                </child>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
-              </packing>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
             </child>
           </object>
           <packing>

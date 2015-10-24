@@ -61,7 +61,7 @@ class builder:
 	main = Gtk.Builder()
 	main.add_from_file("gtk/stepMain.ui")
 	main_window = main.get_object("main")
-	main_window.set_icon_from_file('gtk/Gentoo-logo.png')
+	main_window.set_icon_from_file('img/optional.png')
 	current = main
 	current_step = 1
 	

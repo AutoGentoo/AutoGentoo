@@ -161,7 +161,7 @@ class part:
 			print ("done")
 			part.mounts.append(MOUNTPOINT)
 			part.format_types.append(FSTYPE)
-			part.partsizes.append(format_units(unit, SIZE))
+			part.partsizes.append(format_units_size(unit, SIZE))
 			part.partunits.append(unit)
 			part.start.append(format_units(unit, START))
 			part.start_unit.append(unit)
@@ -189,10 +189,20 @@ def get_value(string, start_num, exit_mark=' '):
 	temp = temp.replace(exit_mark, "")
 	return_val = [temp, num]
 	return return_val
-def format_units(unit, input_float, demical=2):
+def format_units_size(unit, input_float, demical=2):
 	unit = unit.lower()
 	unit_list = ["k", "m", "g", "t"]
 	unit_values = [1024, 1048576, 1073741824, 1099511627776]
+	if unit in unit_list:
+		listnum = unit_list.index(unit)
+		temp_float = float(input_float)
+		temp_float = temp_float/unit_values[listnum]
+		input_float = str(round(temp_float, demical))
+		return input_float
+def format_units(unit, input_float, demical=2):
+	unit = unit.lower()
+	unit_list = ["k", "m", "g", "t"]
+	unit_values = [1, 1024, 1048576, 1073741824]
 	if unit in unit_list:
 		listnum = unit_list.index(unit)
 		temp_float = float(input_float)
@@ -223,7 +233,7 @@ class disk:
 		disk.unit = []
 		disk.main_disk_from_disk = 0
 		disk.disk_name = ""
-		os.system('lsblk -o KNAME,TYPE,SIZE,MODEL | grep -i """disk""" > disks.txt')
+		os.system('lsblk -o KNAME,TYPE,SIZE,MODEL | grep -i "disk" > disks.txt')
 		disknum = sum(1 for line in open('disks.txt'))
 		os.system("rm -rf disks.txt")
 		number = []
@@ -363,4 +373,3 @@ def diskType(current_disk):
 	disk_type = diskline[17:dtypeend]
 	os.system("rm -rf diskinfo.txt")
 	return disk_type
-#part("/dev/sda", "m")
