@@ -26,7 +26,7 @@
 import os, sys, time, subprocess, platform
 from multiprocessing import Process
 from gi.repository import Gtk, Vte, GObject, Gdk, GLib, GdkPixbuf, Pango
-from stepPart import part, disk, diskType, find_free_space 
+from stepPart import *
 import ctypes
 FileNotFoundError = IOError
 
@@ -258,7 +258,7 @@ class widget:
 	check_update = builder.ask_part.get_object("check_updates")
 	part_size = builder.rootPart.get_object("partSize")
 	set_disk = builder.adv_part.get_object("gentoo_device")
-	partitions = Gtk.ListStore(str, str, str, str, str, str)
+	partitions = Gtk.TreeStore(str, str, str, str, str, str)
 	partition_grid = builder.adv_part.get_object("part_grid")
 	root_disk = builder.rootPart.get_object("rootDisk")
 	treeview = Gtk.TreeView.new_with_model(partitions)
@@ -266,6 +266,8 @@ class widget:
 		renderer = Gtk.CellRendererText()
 		column = Gtk.TreeViewColumn(column_title, renderer, text=i)
 		treeview.append_column(column)
+		if i == "Partition":
+			treeview.set_expander_column(column)
 	scrollable_treelist = Gtk.ScrolledWindow()
 	select = treeview.get_selection()
 	grub_device = builder.adv_part.get_object("grub_device")
@@ -352,6 +354,7 @@ class widget:
 	terminal = Vte.Terminal()
 	terminal.spawn_sync(Vte.PtyFlags.DEFAULT, os.environ['HOME'], ["/usr/bin/autogentoolog"], [], GLib.SpawnFlags.DO_NOT_REAP_CHILD, None, None)
 	scrollwindow_terminal.add(terminal)
+	partition_create_type_logical = builder.adv_part.get_object("partition_create_type_logical")
 class mounts:
 	part = []
 	mount_point = []
@@ -521,13 +524,15 @@ def do_part_first(disk_num):
 	global_num_current = -1
 	current_part_num = -1
 	current_free = -1
+	iters = []
 	while True:
 		current_part_num += 1
 		global_num_current += 1
 		try:
 			try:
 				if find_free_space.get_free_true[global_num_current] != 1:
-					widget.partitions.append(["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
+					curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[current_part_num]), ["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
+					iters.append(curr_iter)
 			except:
 				pass
 			if find_free_space.get_free_true[global_num_current] == 1:
@@ -551,7 +556,7 @@ def do_part_first(disk_num):
 		widget.set_disk.remove(0)
 	temp = []
 	current_disk_num = -1
-	print ("\n Number of Disks:", len(disk.disks))
+	print "\n Number of Disks: %s" % len(disk.disks)
 	while len(temp) != len(disk.disks):
 		current_disk_num += 1
 		temp.append("%s" % current_disk_num)
@@ -584,20 +589,29 @@ def do_part(disk_num):
 	current_part_num = -1
 	model = widget.grub_device.get_model()
 	model.clear()
+	iters = []
+	print part.parent
 	while True:
 		current_part_num += 1
 		global_num_current += 1
 		try:
 			try:
 				if find_free_space.get_free_true[global_num_current] != 1:
-					widget.partitions.append(["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
+					print ("%s%s" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num]))
+					curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[current_part_num]), ["%s%s" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
+					iters.append(curr_iter)
 			except IndexError:
 				pass
 			if find_free_space.get_free_true[global_num_current] == 1:
 				current_free += 1
 				current_part_num -= 1
 				try:
-					widget.partitions.append(["Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
+					#if part.parent[current_part_num] == None:
+					#	full_part = None
+					#else:
+					#	full_part = "%s%s" % (find_disk, part.parent[current_part_num])
+					
+					curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[current_part_num]), ["Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
 				except IndexError:
 					pass
 		except IndexError:
@@ -609,7 +623,7 @@ def do_part(disk_num):
 	while True:
 		current_part_num += 1
 		try:
-			if part.partsizes[current_part_num] > 100 and part.partunits[current_part_num] == "M":
+			if part.partsizes[current_part_num] > 100 and part.partunits[current_part_num] == "m":
 				print ("Grub requirments passed first")
 				if curr_dtype != "gpt" and part.primary[current_part_num] == 1:
 					print ("Grub requirments passed second (mbr)")
@@ -619,7 +633,7 @@ def do_part(disk_num):
 					print ("Grub requirments passed second (gpt)")
 					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
 					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
-			elif part.partsizes[current_part_num] >= .001 and part.partunits[current_part_num] == "G":
+			elif part.partsizes[current_part_num] >= .001 and part.partunits[current_part_num] == "g":
 				print ("Grub requirments passed first")
 				if curr_dtype != "gpt" and part.primary[current_part_num] == 1:
 					print ("Grub requirments passed second (mbr)")
@@ -629,7 +643,7 @@ def do_part(disk_num):
 					print ("Grub requirments passed second (gpt)")
 					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
 					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
-			elif part.partsizes[current_part_num] >= 100000 and part.partunits[current_part_num] == "K":
+			elif part.partsizes[current_part_num] >= 100000 and part.partunits[current_part_num] == "k":
 				print ("Grub requirments passed first")
 				if curr_dtype != "gpt" and part.primary[current_part_num] == 1:
 					print ("Grub requirments passed second (mbr)")
@@ -649,6 +663,7 @@ def do_part(disk_num):
 	os.system("rm -rf freespaceinfo.txt")
 	os.system("rm -rf typeinfo.txt")
 	os.system("rm -rf partinfo.txt")
+	widget.treeview.expand_all()
 	print ("Done!")
 def do_part_unit(disk_num, unit):
 	global_num_current = -1
@@ -660,14 +675,16 @@ def do_part_unit(disk_num, unit):
 	current_part_num = -1
 	model = widget.grub_device.get_model()
 	model.clear()
+	iters = []
 	while True:
 		current_part_num += 1
 		global_num_current += 1
 		try:
 			try:
-				print ("%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num]))
+				print ("%s%s" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num]))
 				if find_free_space.get_free_true[global_num_current] != 1:
-					widget.partitions.append(["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
+					curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[current_part_num]), ["%s%s" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
+					iters.append(curr_iter)
 			except IndexError:
 				pass
 			if find_free_space.get_free_true[global_num_current] == 1:
@@ -675,7 +692,7 @@ def do_part_unit(disk_num, unit):
 				current_part_num -= 1
 				try:
 					print ("Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free]))
-					widget.partitions.append(["Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
+					curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[current_part_num]), ["Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
 				except IndexError:
 					pass
 		except IndexError:
@@ -692,6 +709,7 @@ def do_part_unit(disk_num, unit):
 				break
 		except IndexError:
 			break
+	widget.treeview.expand_all()
 def do_disk():
 	get_sel = widget.set_disk.get_active()
 	disk(0)
@@ -702,6 +720,7 @@ def do_disk():
 	temp = []
 	current_disk_num = -1
 	while len(temp) != len(disk.disks):
+		temp.append("item")
 		current_disk_num += 1
 		temp.append("%s" % current_disk_num)
 		disk(current_disk_num)

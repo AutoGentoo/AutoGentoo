@@ -48,12 +48,15 @@ class part:
 	end_frees = []
 	end_unit_frees = []
 	primary = []
+	parent = []
+	extended = False
 	partnum = 0
+	startnum = 0
 	def __init__(self, disk, unit):
 		os.system("echo -n 'Clearing old values...'")
 		part.mounts = []
 		part.format_types = []
-		part.partnums = []
+		part.partnums = [] # Number of Partition (Used for order)
 		part.partsizes = []
 		part.partunits = []
 		part.start = []
@@ -61,132 +64,110 @@ class part:
 		part.end = []
 		part.end_unit = []
 		part.primary = []
+		part.parent = []
+		extended = False
 		part.partnum = 0
 		os.system("echo 'Done'")
-		os.system("parted -s %s unit %siB print > partinfo.txt" % (disk, unit))
-		partnum = sum(1 for line in open('partinfo.txt', "r").readlines())
-		partnum -= 8
-		check_extended = os.system("cat partinfo.txt | grep extended > /dev/null")
-		os.system("rm -rf partinfo.txt")
-		os.system("lsblk -o KNAME,SIZE,TYPE | grep part | grep %s > partinfo.txt" % disk[5:8])
-		try_unit = os.system("parted -s /dev/%s unit %siB print > partinfo_main.txt" % (disk[5:8], unit))
-		if try_unit != 0:
-			print ("Unit %siB not found by parted!" % global_unit)
-			exit (1)
-		find_part_info = open("partinfo_main.txt", "r").readlines()
-		find_part_info = find_part_info[7:]
+		os.system("partx -l %s > partnum" % (disk))
+		partnum = open('partnum', "r").readlines()
+		os.system("rm -rf partnum")
+		partnum = int(len(partnum))
+		#Extended: number of the extended partition, 0 if None
+		extended = 0
+		# Check if there is an extended partition
+		if os.system("partx -o NR,TYPE %s | grep '0x5' > /dev/null" % disk) == 0:
+			extended = subprocess.check_output("partx -r -o NR,TYPE %s | grep '0x5'" % disk, shell=True)
+			extended = str(extended.decode("UTF-8"))
+			extended = int(extended.replace(" 0x5", ""))
 		if partnum == 1:
 			print ("Found %d Partition" % partnum)
 		else:
 			print ("Found %d Partitions" % partnum)
-		current_num = -1
-		while len(part.partnums) != partnum:
-			current_num += 1
-			#Editing the parted partition line
-			current_part = find_part_info[current_num]
-			#Partition Numbers
-			temp_num_str = str(current_num)
-			current_part_num = current_part[0:5]
-			current_part_num = current_part_num.decode("UTF-8")
-			current_part_num = current_part_num.replace(" ", "")
-			current_part_num = int(current_part_num)
-			part.partnums.append(current_part_num)
-			print ("Scanning partition %s%s" % (disk, part.partnums[current_num]))
-			#Removing Spaces and newlines
-			current_part = current_part.decode("UTF-8")
-			current_part = current_part.replace("\n", "")
-			current_part = current_part.replace(" ", "")
-			#Remove partition number from string
-			current_part = current_part[1:]
-			find_primary = os.system("echo '%s' | grep primary > /dev/null" % current_part)
-			if find_primary != 0:
+		
+		#Getting the Order of Partnums
+		os.system("echo -n 'Finding Partitions...'")
+		os.system("partprobe -s | grep %s > partnums" % disk)
+		print ("done")
+		partnum_file = open("partnums", "r").read()
+		os.system("rm -rf partnums")
+		partnum_file = partnum_file.replace("\n", "")
+		partnum_file = partnum_file[partnum_file.index("partitions"):].replace("partitions ", "")
+		extended_start = partnum_file.find("<") #Getting Start of the extended partition
+		extended_end = partnum_file.find(">") #Getting end of the extended partition
+		extended_val = partnum_file[extended_start+1:extended_end]
+		extended_val = extended_val.split(" ")
+		if extended_start != -1:
+			extended = extended_start - 2
+			extended = partnum_file[extended]
+			part.extended = True
+		else:
+			extended = -1
+			part.extended = False
+		partnum_file = partnum_file.replace("<", "")
+		partnum_file = partnum_file.replace(">", "")
+		partnum_file = partnum_file.replace("partitions", "")
+		part.partnums = partnum_file.split(" ")
+		current_check = 0
+		while current_check != len(part.partnums):
+			if part.partnums[current_check] in extended_val:
+				part.parent.append("%s%s" % (disk, extended))
 				part.primary.append(0)
 			else:
-				part.primary.append(1)
-			#Mount Points
-			try:
-				find_mount = subprocess.check_output("lsblk %s%s -o MOUNTPOINT | grep -v MOUNTPOINT" % (disk, part.partnums[current_num]), shell=True)
-			except subprocess.CalledProcessError:
-				find_mount = " "
+				part.parent.append(None)
+				if part.partnums[current_check] != extended:
+					part.primary.append(1)
+				else:
+					part.primary.append(0)
+			current_check += 1
+		current_num = 0
+		if part.partnums[0] == "":
+			part.partnums = []
+		while current_num != len(part.partnums):
+			os.system("echo -n 'Scanning Partition %s%s...'"  % (disk, part.partnums[current_num]))
+			current_cmd = str(subprocess.check_output("partx -P -b -o SIZE,START,END %s%s" % (disk, part.partnums[current_num]), shell=True).decode("UTF-8"))
+			value = []
+			curr_char_num = 0
+			curr_char = ""
+			temp = ""
+			#SIZE
+			temp = get_value(current_cmd, curr_char_num)
+			value.append(temp[0])
+			#START
+			temp = get_value(current_cmd, temp[1])
+			value.append(temp[0])
+			#END
+			temp = get_value(current_cmd, temp[1], '\n')
+			value.append(temp[0])
+			#MOUNTPOINT and FSTYPE section
+			check_exit = os.system("lsblk -P -o FSTYPE,MOUNTPOINT %s%s > /dev/null" % (disk, part.partnums[current_num]))
+			if check_exit != 0:
+				value.append('FSTYPE="extended"')
+				value.append('MOUNTPOINT=""')
 			else:
-				find_mount = subprocess.check_output("lsblk %s%s -o MOUNTPOINT | grep -v MOUNTPOINT" % (disk, part.partnums[current_num]), shell=True)
-			find_mount = find_mount.decode("UTF-8")
-			find_mount = find_mount.replace("\n", "")
-			find_mount = str(find_mount.replace(" ", ""))
-			#Changing swap mount display
-			if find_mount == "[SWAP]":
-				find_mount = "swap"
-			part.mounts.append(find_mount)
-			#Getting essential Partition Information
-			current_char_num = -1
-			current_char = ""
-			temp_array =[]
-			#Part START
-			while current_char != "B":
-				current_char_num += 1
-				current_char = current_part[current_char_num]
-				temp_array.append(current_char)
-			#Removing the unit from the float array
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			#Creating a string from array
-			temp = str1 = ''.join(temp_array)
-			#Adding Values to array
-			part.start.append(float(temp))
-			part.start_unit.append(str(current_part[current_char_num-2]))
-			current_part = current_part[current_char_num+1:]
-			#Reset the variables
-			current_char_num = -1
-			current_char = ""
-			temp_array = []
-			#Part END
-			while current_char != "B":
-				current_char_num += 1
-				current_char = current_part[current_char_num]
-				temp_array.append(current_char)
-			#Removing the unit from the float array
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			#Creating a string from array
-			temp = str1 = ''.join(temp_array)
-			#Adding Values to array
-			part.end.append(float(temp))
-			part.end_unit.append(str(current_part[current_char_num-2]))
-			current_part = current_part[current_char_num+1:]
-			#Reset the variables
-			current_char_num = -1
-			current_char = ""
-			temp_array = []
-			while current_char != "B":
-				current_char_num += 1
-				current_char = current_part[current_char_num]
-				temp_array.append(current_char)
-			#Removing the unit from the float array
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			#Creating a string from array
-			temp = str1 = ''.join(temp_array)
-			#Adding Values to array
-			part.partsizes.append(float(temp))
-			part.partunits.append(str(current_part[current_char_num-2]))
-			current_part = current_part[current_char_num+1:]
-			try:
-				current_fs_type = str(subprocess.check_output("lsblk %s%s -o FSTYPE | grep -v FSTYPE" % (disk, part.partnums[current_num]), shell=True))
-			except subprocess.CalledProcessError:
-				current_fs_type = "extended"
-			else:
-				current_fs_type = str(subprocess.check_output("lsblk %s%s -o FSTYPE | grep -v FSTYPE" % (disk, part.partnums[current_num]), shell=True))
-			if current_fs_type == "\n":
-				current_fs_type = "extended"
-			partition_type = current_fs_type.replace("\n", "")
-			part.format_types.append(str(partition_type))
-		os.system("rm -rf partinfomaininfo.txt")
-		os.system("rm -rf mountinfo.txt")
-		os.system("rm -rf partinfo_main.txt")
-		os.system("rm -rf partinfo.txt")
+				current_cmd = str(subprocess.check_output("lsblk -P -o FSTYPE,MOUNTPOINT %s%s" % (disk, part.partnums[current_num]), shell=True).decode("UTF-8"))
+				#FSTYPE
+				temp = get_value(current_cmd, 0, ' ')
+				value.append(temp[0])
+				#MOUNPOINT
+				temp = get_value(current_cmd, temp[1], '\n')
+				value.append(temp[0])
+			curr_exec = 0
+			while True:
+				try:
+					exec("%s" % value[curr_exec])
+				except:
+					break
+				curr_exec += 1
+			print ("done")
+			part.mounts.append(MOUNTPOINT)
+			part.format_types.append(FSTYPE)
+			part.partsizes.append(format_units(unit, SIZE))
+			part.partunits.append(unit)
+			part.start.append(format_units(unit, START))
+			part.start_unit.append(unit)
+			part.end.append(format_units(unit, END))
+			part.end_unit.append(unit)
+			current_num += 1
 		part.mounts_frees = part.mounts
 		part.format_types_frees = part.format_types
 		part.partnums_frees = part.partnums
@@ -196,6 +177,35 @@ class part:
 		part.start_unit_frees = part.start_unit
 		part.end_frees = part.end
 		part.end_unit_frees = part.end_unit
+		
+def get_value(string, start_num, exit_mark=' '):
+	curr_char = ""
+	temp = ""
+	num = start_num
+	while curr_char != exit_mark:
+		curr_char = string[num]
+		temp += curr_char
+		num += 1
+	temp = temp.replace(exit_mark, "")
+	return_val = [temp, num]
+	return return_val
+def format_units(unit, input_float, demical=2):
+	unit = unit.lower()
+	unit_list = ["k", "m", "g", "t"]
+	unit_values = [1024, 1048576, 1073741824, 1099511627776]
+	if unit in unit_list:
+		listnum = unit_list.index(unit)
+		temp_float = float(input_float)
+		temp_float = temp_float/unit_values[listnum]
+		input_float = str(round(temp_float, demical))
+		return input_float
+def get_iter(gtk_treestore, iters, string, column=0):
+	if string == None:
+		return None
+	current_row = 0
+	while gtk_treestore.get_value(iters[current_row], column) != string:
+		current_row += 1
+	return gtk_treestore.get_iter(gtk_treestore.get_path(iters[current_row]))
 class disk:
 	alphabet = ["a", "b", "c", "d", "e", "f", "g", "h",
 		"i", "j", "k", "l", "m", "n", "n", "o", "p", "q", "r", "s", "t",
@@ -216,14 +226,12 @@ class disk:
 		os.system('lsblk -o KNAME,TYPE,SIZE,MODEL | grep -i """disk""" > disks.txt')
 		disknum = sum(1 for line in open('disks.txt'))
 		os.system("rm -rf disks.txt")
-		print "Disknum", disknum
 		number = []
 		number.append(disknum)
 		placeholder = disknum
 		while len(number) != disknum:
 			placeholder -= 1
 			number.append(placeholder)
-		print ("Number", number)
 		current_num = 0
 		while len(disk.disks) != disknum:
 			current_num += 1
@@ -231,7 +239,6 @@ class disk:
 			disk.sd_disks.append("sd%s" % disk.alphabet[current_disk-1])
 			disk.disks.append("/dev/sd%s" % disk.alphabet[current_disk-1])
 			if len(disk.disks) == disknum:
-				print ("Breaking")
 				break
 		current_num = 0
 		while len(disk.size) != disknum:
@@ -276,8 +283,8 @@ class find_free_space:
 		find_free_space.free_size = []
 		find_free_space.free_size_unit = []
 		find_free_space.get_free_true = []
-		os.system("parted -s %s unit %siB print free | grep -i free > freespaceinfo.txt" % (current_disk, current_unit))
 		os.system("parted -s %s unit %siB print free > freespaceinfo_2.txt" % (current_disk, current_unit))
+		os.system("cat freespaceinfo_2.txt | grep -i free > freespaceinfo.txt")
 		find_part_free = open("freespaceinfo_2.txt", "r").readlines()
 		find_part_free = find_part_free[7:]
 		current_free_find_line = -1
@@ -356,3 +363,4 @@ def diskType(current_disk):
 	disk_type = diskline[17:dtypeend]
 	os.system("rm -rf diskinfo.txt")
 	return disk_type
+#part("/dev/sda", "m")
