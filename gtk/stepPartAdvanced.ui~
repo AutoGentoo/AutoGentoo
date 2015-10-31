@@ -723,7 +723,6 @@ to remove this partition&lt;/small&gt;</property>
                 <property name="receives_default">True</property>
                 <property name="halign">end</property>
                 <property name="hexpand">True</property>
-                <property name="relief">none</property>
                 <signal name="clicked" handler="Next" swapped="no"/>
                 <style>
                   <class name="round"/>

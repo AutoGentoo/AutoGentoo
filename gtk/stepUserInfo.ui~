@@ -394,10 +394,6 @@
                 <property name="hexpand">True</property>
                 <property name="relief">none</property>
                 <signal name="clicked" handler="Back" swapped="no"/>
-                <style>
-                  <class name="round"/>
-                  <class name="back"/>
-                </style>
               </object>
               <packing>
                 <property name="left_attach">0</property>

@@ -708,7 +708,6 @@ or is not the latest driver for your graphics card.
                 <property name="receives_default">True</property>
                 <property name="halign">end</property>
                 <property name="hexpand">True</property>
-                <property name="relief">none</property>
                 <signal name="clicked" handler="Next" swapped="no"/>
               </object>
               <packing>

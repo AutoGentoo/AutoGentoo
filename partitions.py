@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  AutoGentoo
+#  partitions.py
 #  
-#  Copyright 2015 Andrei Tumbar <atadmin@Kronos>
+#  Copyright 2015 Andrei Tumbar <atadmin@Helios>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,20 +22,31 @@
 #  
 #  
 
-import os, sys
-class color:
-	ESC_SEQ="\x1b["
-	END=("%s39;49;00m" % (ESC_SEQ))
-	RED=("%s31;01m" % (ESC_SEQ))
-	GREEN=("%s32;01m" % (ESC_SEQ))
-	YELLOW=("%s33;01m" % (ESC_SEQ))
-	BLUE=("%s34;01m" % (ESC_SEQ))
-	MAGENTA=("%s35;01m" % (ESC_SEQ))
-	CYAN=("%s36;01m" % (ESC_SEQ))
-	BOLD=("\033[1m")
+from reparted import *
+from reparted.device import probe_standard_devices
+import sys
+class devices:
+	def __init__(self, print_device=None, disk_property="model"):
+		paths = []
+		self.disks = {}
+		disk = []
+		y = probe_standard_devices() # Defined such that 'probe_standard_devices()' isn't initialized twice
+		for x in range(0, len(y)):
+			paths.append(y[x].path)
+		for x in paths: 
+			self.disks[x] = Device(x)
+			disk.append(Disk(self.disks[x]))
+		for x in range(0, len(disk[0].partitions())): print disk[0].partitions()[x].geom
+def main(argv):
+	try:
+		devices(argv[1], argv[2])
+	except IndexError:
+		try:
+			devices(argv[1])
+		except IndexError:
+			devices()
+	return 0
 
-os.chdir(os.path.dirname(__file__))
-sys.path.append(".")
-from AutoGentoo import *
-print ("%sStarting AutoGentoo%s" % (color.BOLD, color.END))
-main()
+if __name__ == '__main__':
+	main(sys.argv)
+

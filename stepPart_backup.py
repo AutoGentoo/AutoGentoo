@@ -54,7 +54,7 @@ class part:
 	extended = False
 	partnum = 0
 	startnum = 0
-	def __init__(self, disk_path, unit):
+	def __init__(self, disk, unit):
 		os.system("echo -n 'Clearing old values...'")
 		part.mounts = []
 		part.format_types = []
@@ -70,14 +70,106 @@ class part:
 		extended = False
 		part.partnum = 0
 		os.system("echo 'Done'")
-		os.system("echo -n 'Scanning disk %s...'" % disk_path)
-		curr_disk = disk.path_to_device[disk_path]
-		#Detect partitions
-		partitions = curr_disk.partitions()
-		#Partition number
-		for x in range(len(partitions)): part.partnums.append(partitions[x].num)
-		#Start and end
+		os.system("partx -l %s > partnum" % (disk))
+		partnum = open('partnum', "r").readlines()
+		os.system("rm -rf partnum")
+		partnum = int(len(partnum))
+		#Extended: number of the extended partition, 0 if None
+		extended = 0
+		# Check if there is an extended partition
+		if os.system("partx -o NR,TYPE %s | grep '0x5' > /dev/null" % disk) == 0:
+			extended = subprocess.check_output("partx -r -o NR,TYPE %s | grep '0x5'" % disk, shell=True)
+			extended = str(extended.decode("UTF-8"))
+			extended = int(extended.replace(" 0x5", ""))
+		if partnum == 1:
+			print ("Found %d Partition" % partnum)
+		else:
+			print ("Found %d Partitions" % partnum)
 		
+		#Getting the Order of Partnums
+		os.system("echo -n 'Finding Partitions...'")
+		os.system("partprobe -s | grep %s > partnums" % disk)
+		print ("done")
+		partnum_file = open("partnums", "r").read()
+		os.system("rm -rf partnums")
+		partnum_file = partnum_file.replace("\n", "")
+		partnum_file = partnum_file[partnum_file.index("partitions"):].replace("partitions ", "")
+		extended_start = partnum_file.find("<") #Getting Start of the extended partition
+		extended_end = partnum_file.find(">") #Getting end of the extended partition
+		extended_val = partnum_file[extended_start+1:extended_end]
+		extended_val = extended_val.split(" ")
+		if extended_start != -1:
+			extended = extended_start - 2
+			extended = partnum_file[extended]
+			part.extended = True
+		else:
+			extended = -1
+			part.extended = False
+		partnum_file = partnum_file.replace("<", "")
+		partnum_file = partnum_file.replace(">", "")
+		partnum_file = partnum_file.replace("partitions", "")
+		part.partnums = partnum_file.split(" ")
+		current_check = 0
+		while current_check != len(part.partnums):
+			if part.partnums[current_check] in extended_val:
+				part.parent.append("%s%s" % (disk, extended))
+				part.primary.append(0)
+			else:
+				part.parent.append(None)
+				if part.partnums[current_check] != extended:
+					part.primary.append(1)
+				else:
+					part.primary.append(0)
+			current_check += 1
+		current_num = 0
+		if part.partnums[0] == "":
+			part.partnums = []
+		while current_num != len(part.partnums):
+			os.system("echo -n 'Scanning Partition %s%s...'"  % (disk, part.partnums[current_num]))
+			current_cmd = str(subprocess.check_output("partx -P -b -o SIZE,START,END %s%s" % (disk, part.partnums[current_num]), shell=True).decode("UTF-8"))
+			value = []
+			curr_char_num = 0
+			curr_char = ""
+			temp = ""
+			#SIZE
+			temp = get_value(current_cmd, curr_char_num)
+			value.append(temp[0])
+			#START
+			temp = get_value(current_cmd, temp[1])
+			value.append(temp[0])
+			#END
+			temp = get_value(current_cmd, temp[1], '\n')
+			value.append(temp[0])
+			#MOUNTPOINT and FSTYPE section
+			check_exit = os.system("lsblk -P -o FSTYPE,MOUNTPOINT %s%s > /dev/null" % (disk, part.partnums[current_num]))
+			if check_exit != 0:
+				value.append('FSTYPE="extended"')
+				value.append('MOUNTPOINT=""')
+			else:
+				current_cmd = str(subprocess.check_output("lsblk -P -o FSTYPE,MOUNTPOINT %s%s" % (disk, part.partnums[current_num]), shell=True).decode("UTF-8"))
+				#FSTYPE
+				temp = get_value(current_cmd, 0, ' ')
+				value.append(temp[0])
+				#MOUNPOINT
+				temp = get_value(current_cmd, temp[1], '\n')
+				value.append(temp[0])
+			curr_exec = 0
+			while True:
+				try:
+					exec("%s" % value[curr_exec])
+				except:
+					break
+				curr_exec += 1
+			print ("done")
+			part.mounts.append(MOUNTPOINT)
+			part.format_types.append(FSTYPE)
+			part.partsizes.append(format_units_size(unit, SIZE))
+			part.partunits.append(unit)
+			part.start.append(format_units(unit, START))
+			part.start_unit.append(unit)
+			part.end.append(format_units(unit, END))
+			part.end_unit.append(unit)
+			current_num += 1
 		part.mounts_frees = part.mounts
 		part.format_types_frees = part.format_types
 		part.partnums_frees = part.partnums
@@ -129,7 +221,6 @@ def get_iter(gtk_treestore, iters, string, column=0):
 class disk:
 	devices = []
 	path_to_device = {}
-	path_to_disk = {}
 	disks = []
 	sd_disks = []
 	size = []
@@ -141,27 +232,24 @@ class disk:
 		disk.sd_disks = []
 		disk.size = []
 		disk.unit = []
-		disk.path_to_disk = []
+		disk.disk_name = ""
 		disk.path_to_device = {}
 		
 		#Probe for Devices
 		disk.devices = probe_standard_devices()
-		print disk.devices
 		
 		# Add device paths
 		for x in range(0, len(disk.devices)):
-			disk.disks.append(disk.devices[x].path)
+			disks.disks.append(disk.devices[x].path)
 		
 		#Dictionary, path: device
-		for x in disk.disks:
-			disk.path_to_device[x] = Device(x)
-			disk.path_to_disk.append(disk.path_to_device[x])
+		for x in disk.devices: disk.path_to_device[x] = Device(x)
 		
 		#Add other disk information
 		for x in disk.disks: x.replace("/dev/", "")
-		for x in range(0, len(disk.disks)): disk.size.append(float(str(disk.devices[x].size).replace("MB", "")))
+		for x in disk.disks: disk.size.append(str(disk.devices[x].size).replace("MB", ""))
 		for x in disk.disks: disk.unit.append("M")
-		disk.disk_name = disk.devices[disk_num].model
+		disk.disk_name = disk.devices[disk.disks[disk_num]].model
 		
 class find_free_space:
 	free_parts = []
@@ -248,4 +336,16 @@ class find_free_space:
 			find_free_space.free_size.append(float(temp))
 			find_free_space.free_size_unit.append(str(current_line[current_char_num-2]))
 def diskType(current_disk):
-	return Disk(Device(current_disk)).type_name
+	try_parted = os.system("parted -s %s print >> diskinfo.txt" % (current_disk))
+	if try_parted != 0:
+		print ("Please run as root")
+		exit(1)
+	disktype = open("diskinfo.txt", "r").readlines()
+	diskline = disktype[3]
+	dtypelen = len(diskline)
+	dtypelen = int(dtypelen)
+	dtypeend = dtypelen - 1
+	dtypeend = int(dtypeend)
+	disk_type = diskline[17:dtypeend]
+	os.system("rm -rf diskinfo.txt")
+	return disk_type

@@ -61,6 +61,7 @@ class builder:
 	main = Gtk.Builder()
 	main.add_from_file("gtk/stepMain.ui")
 	main_window = main.get_object("main")
+	main_window.set_name("main1")
 	main_window.set_icon_from_file('img/optional.png')
 	current = main
 	current_step = 1
@@ -68,6 +69,16 @@ class builder:
 	#Partition Window Configuration
 	ask_part = Gtk.Builder()
 	ask_part.add_from_file("gtk/stepPartAsk.ui")
+	css = open('gtk/style.css')
+	css_data = css.read()
+	css.close()
+	style_provider = Gtk.CssProvider()
+	
+	style_provider.load_from_data(css_data)
+	Gtk.StyleContext.add_provider_for_screen(
+		Gdk.Screen.get_default(), style_provider,
+		Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+	)
 	
 	#Advanced Partitions Window Configuration
 	adv_part = Gtk.Builder()
@@ -262,7 +273,7 @@ class widget:
 	partition_grid = builder.adv_part.get_object("part_grid")
 	root_disk = builder.rootPart.get_object("rootDisk")
 	treeview = Gtk.TreeView.new_with_model(partitions)
-	for i, column_title in enumerate(["Partition", "Filesystem", "Size", "Mount Point", "Start", "End"]):
+	for i, column_title in enumerate(["Partition", "Filesystem", "Partition Type" "Size", "Mount Point", "Start", "End"]):
 		renderer = Gtk.CellRendererText()
 		column = Gtk.TreeViewColumn(column_title, renderer, text=i)
 		treeview.append_column(column)
@@ -278,10 +289,6 @@ class widget:
 	mount_point_change = ""
 	gentoo_dev_info = builder.adv_part.get_object("gentoo_device_info")
 	part_label = builder.adv_part.get_object("part_label")
-	mount_point1 = builder.adv_part.get_object("mount_point1")
-	mount_point2 = builder.adv_part.get_object("mount_point2")
-	partition_create_place_beginning = builder.adv_part.get_object("partition_create_place_beginning")
-	partition_create_place_beginning1 = builder.adv_part.get_object("partition_create_place_beginning1")
 	format_type = builder.adv_part.get_object("format_type")
 	format_type1 = builder.adv_part.get_object("format_type1")
 	partition_edit_format_checkbutton = builder.adv_part.get_object("partition_edit_format_checkbutton")
@@ -517,7 +524,7 @@ class install:
 		make_conf_file = open("/mnt/gentoo/etc/portage/make.conf", "w+")
 		make_conf_file.write(config.makeconf)
 def do_part_first(disk_num):
-	find_disk = "%s%s" % ("/dev/sd", disk.alphabet[disk_num])
+	find_disk = disk.disks[disk_num]
 	part(find_disk, "m")
 	current_free = -1
 	find_free_space(find_disk, "m")
@@ -598,7 +605,15 @@ def do_part(disk_num):
 			try:
 				if find_free_space.get_free_true[global_num_current] != 1:
 					print ("%s%s" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num]))
-					curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[current_part_num]), ["%s%s" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
+					curr_iter = widget.partitions.append(\
+					get_iter(widget.partitions, iters, part.parent[current_part_num]), \ #Parent
+					["%s%s" % (find_disk, part.partnums[current_part_num]), \ #Path
+					part.format_types[current_part_num], \ #fs_type
+					part.type[current_part_num].lower(), \ # partition type ie: extended
+					"%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), \ # size
+					part.mounts[current_part_num], \ #Mountpoint
+					"%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), \ # start
+					"%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])]) # end
 					iters.append(curr_iter)
 			except IndexError:
 				pass
@@ -1469,7 +1484,6 @@ def root_passwd(entry):
 		widget.root_strength.set_visible(True)
 	else:
 		widget.root_strength.set_visible(False)
-	print ("Password: %s" % defaults.root_passwd)
 def hostname(entry):
 	defaults.hostname = entry.get_text()
 	if len(defaults.hostname) != 0:
@@ -1477,7 +1491,6 @@ def hostname(entry):
 		widget.hostname_error_label.set_visible(False)
 	else:
 		widget.hostname_ok.set_visible(False)
-	print ("Hostname: %s" % defaults.hostname)
 def username(entry):
 	defaults.username = entry.get_text()
 	if len(defaults.username) != 0:
@@ -1485,7 +1498,6 @@ def username(entry):
 		widget.username_error_label.set_visible(False)
 	else:
 		widget.username_ok.set_visible(False)
-	print ("Username: %s" % defaults.username)
 def user_passwd(entry):
 	defaults.user_passwd = entry.get_text()
 	if len(defaults.user_passwd) > 0 and len(defaults.user_passwd) < 5:
@@ -1498,7 +1510,6 @@ def user_passwd(entry):
 		widget.password_strength.set_visible(True)
 	else:
 		widget.password_strength.set_visible(False)
-	print ("User Password: %s" % defaults.user_passwd)
 def user_passwd_cfm(entry):
 	defaults.user_passwd_cfm = entry.get_text()
 	if defaults.user_passwd_cfm == defaults.user_passwd:
@@ -1506,7 +1517,6 @@ def user_passwd_cfm(entry):
 		widget.password_error_label.set_visible(False)
 	else:
 		widget.password_ok.set_visible(False)
-	print ("User Password Confirm: %s" % defaults.user_passwd_cfm)
 def do_install(button):
 	do_return = 0
 	if len(defaults.root_passwd) == 0:

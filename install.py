@@ -42,7 +42,8 @@ def main():
 		exit(1)
 	print ("Installing Autogentoo...")
 	print ("Creating directory /usr/lib/autogentoo")
-	os.system("rm -rf /usr/lib/autogentoo/")
+	if os.path.exists("/usr/lib/autogentoo"):
+		os.system("rm -rf /usr/lib/autogentoo/")
 	os.system("mkdir /usr/lib/autogentoo")
 	print ("Entering directory %s" % os.path.abspath(os.path.dirname(__file__)))
 	os.chdir(os.path.abspath(os.path.dirname(__file__)))
@@ -53,7 +54,10 @@ def main():
 		os.system("rm -rf /usr/bin/autogentoo")
 	os.system("cp -R AutoGentoo /usr/bin/autogentoo")
 	os.system("chmod 744 /usr/bin/autogentoo")
-	print ("Done") 
+	if os.path.exists("/usr/share/applications/AutoGentoo.desktop"):
+		os.system("rm -rf /usr/share/applications/AutoGentoo.desktop")
+	os.system("cp AutoGentoo.desktop /usr/share/applications/")
+	print ("Done")
 	return 0
 
 if __name__ == '__main__':

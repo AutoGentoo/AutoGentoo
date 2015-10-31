@@ -2,6 +2,16 @@
 <!-- Generated with glade 3.19.0 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
+  <object class="GtkImage" id="install_image">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">drive-harddisk-symbolic</property>
+  </object>
+  <object class="GtkImage" id="try_image">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">drive-optical-symbolic</property>
+  </object>
   <object class="GtkWindow" id="main">
     <property name="width_request">727</property>
     <property name="height_request">450</property>
@@ -96,6 +106,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="margin_left">141</property>
+                <property name="image">try_image</property>
                 <property name="relief">none</property>
                 <signal name="clicked" handler="exit" swapped="no"/>
                 <style>
@@ -118,6 +129,7 @@
                 <property name="halign">center</property>
                 <property name="margin_left">142</property>
                 <property name="hexpand">True</property>
+                <property name="image">install_image</property>
                 <property name="relief">none</property>
                 <signal name="clicked" handler="Next" swapped="no"/>
                 <style>
