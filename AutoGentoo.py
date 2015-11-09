@@ -1106,7 +1106,11 @@ def mk_part(button):
 			arg2 = widget.logical.get_label()
 	else:
 		arg2 = current.label
-	arg3 = current.fileSystem
+	if arg2 == "Extended":
+		arg2 = "extended"
+		arg3 = ""
+	else:
+		arg3 = current.fileSystem
 	arg4 = int(widget.start_part.get_value())
 	arg5 = int(widget.end_part.get_value())
 	os.system("parted -s %s unit MiB mkpart %s %s %s %s" % (arg1, arg2, arg3, arg4, arg5))
