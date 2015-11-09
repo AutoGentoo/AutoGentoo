@@ -5,11 +5,21 @@ GtkButton.round {
 	background: #FFF;
 	border-radius: 50%;
 	border-style: none;
+	transition: .4s ease-in-out;
 }
 GtkButton.round:hover,
 GtkButton.round:prelight {
 	background-color: #000;
-	transition: .5s ease-in-out;
+}
+Gtk.Button.cancel {
+	background: #FFF url("gtk/icons/window-close.png") no-repeat center;
+}
+Gtk.Button.ok {
+	background: #FFF url("gtk/icons/object-select.png") no-repeat center;
+}
+GtkButton.control {
+	border-radius: 50%;
+	border-style: none;
 }
 GtkButton.back {
 	background: #FFF url("gtk/icons/go-previous.png") no-repeat center;

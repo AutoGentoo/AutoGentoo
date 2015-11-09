@@ -54,7 +54,7 @@ class defaults:
 	user_passwd = ""
 	user_passwd_cfm = ""
 	driver_cpu_selected = 0
-	optimize = False
+	optimize = False 
 #Builder deals with gtk ui configurations for each screen or window
 class builder:
 	disk_type = diskType("/dev/sda")
@@ -73,7 +73,6 @@ class builder:
 	css_data = css.read()
 	css.close()
 	style_provider = Gtk.CssProvider()
-	
 	style_provider.load_from_data(css_data)
 	Gtk.StyleContext.add_provider_for_screen(
 		Gdk.Screen.get_default(), style_provider,
@@ -212,14 +211,7 @@ get_newpart()
 class makeopts:
 	use_flags = ""
 	cflags = ""
-class current:
-	size = 0
-	start = 0
-	end = 0
-	unit = ""
 class systype:
-	fstype = ""
-	fs_id = 0
 	memtotal = 0
 	profile = ""
 	profile_num = 0
@@ -232,7 +224,8 @@ class systype:
 	gendev = ""
 	rootSize = 0
 	gpu_type = ""
-class currentpart:
+class current:
+	part = ""
 	size = 0
 	label = 0
 	primary = True
@@ -269,11 +262,11 @@ class widget:
 	check_update = builder.ask_part.get_object("check_updates")
 	part_size = builder.rootPart.get_object("partSize")
 	set_disk = builder.adv_part.get_object("gentoo_device")
-	partitions = Gtk.TreeStore(str, str, str, str, str, str)
+	partitions = Gtk.TreeStore(str, str, str, str, str, str, str)
 	partition_grid = builder.adv_part.get_object("part_grid")
 	root_disk = builder.rootPart.get_object("rootDisk")
 	treeview = Gtk.TreeView.new_with_model(partitions)
-	for i, column_title in enumerate(["Partition", "Filesystem", "Partition Type" "Size", "Mount Point", "Start", "End"]):
+	for i, column_title in enumerate(["Partition", "Filesystem", "Partition Type", "Size", "Mount Point", "Start", "End"]):
 		renderer = Gtk.CellRendererText()
 		column = Gtk.TreeViewColumn(column_title, renderer, text=i)
 		treeview.append_column(column)
@@ -298,7 +291,6 @@ class widget:
 	table_type = builder.adv_part.get_object("table_type")
 	format_type_change = builder.adv_part.get_object("format_type_change")
 	mount_point_change = builder.adv_part.get_object("mount_point_change")
-	formating = builder.adv_part.get_object("formating")
 	loading_spinner = builder.adv_part.get_object("loading_spinner")
 	loading_spinner.set_visible(False)
 	recalculating = builder.adv_part.get_object("recalculating")
@@ -361,7 +353,9 @@ class widget:
 	terminal = Vte.Terminal()
 	terminal.spawn_sync(Vte.PtyFlags.DEFAULT, os.environ['HOME'], ["/usr/bin/autogentoolog"], [], GLib.SpawnFlags.DO_NOT_REAP_CHILD, None, None)
 	scrollwindow_terminal.add(terminal)
-	partition_create_type_logical = builder.adv_part.get_object("partition_create_type_logical")
+	logical = builder.adv_part.get_object("partition_create_type_logical")
+	primary = builder.adv_part.get_object("partition_create_type_primary")
+	format_iter = builder.adv_part.get_object("format_iter")
 class mounts:
 	part = []
 	mount_point = []
@@ -523,65 +517,51 @@ class install:
 		locale_gen_file.write(config.localegen)
 		make_conf_file = open("/mnt/gentoo/etc/portage/make.conf", "w+")
 		make_conf_file.write(config.makeconf)
-def do_part_first(disk_num):
+def do_part_first(disk_num, unit="MiB"):
+	disk()
 	find_disk = disk.disks[disk_num]
-	part(find_disk, "m")
-	current_free = -1
-	find_free_space(find_disk, "m")
-	global_num_current = -1
-	current_part_num = -1
-	current_free = -1
+	part(find_disk, "MiB")
 	iters = []
-	while True:
-		current_part_num += 1
-		global_num_current += 1
-		try:
-			try:
-				if find_free_space.get_free_true[global_num_current] != 1:
-					curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[current_part_num]), ["%s%d" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
-					iters.append(curr_iter)
-			except:
-				pass
-			if find_free_space.get_free_true[global_num_current] == 1:
-				current_free += 1
-				current_part_num -= 1
-				try:
-					widget.partitions.append(["Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
-				except IndexError:
-					pass
-		except:
-			break
+	print (len(widget.treeview))
+	for x in range(0, len(part.paths)):
+		curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[x]), 
+			[part.paths[x], 
+			part.fileSystem[x], 
+			part.type[x], 
+			"%s%s" % (part.size[x], unit),
+			part.mounts[x], 
+			"%s%s" % (part.start[x], unit), 
+			"%s%s" % (part.end[x], unit)])
+		iters.append(curr_iter)
 	widget.scrollable_treelist.set_vexpand(True)
 	widget.partition_grid.attach(widget.scrollable_treelist, 0, 0, 1, 1)
 	widget.scrollable_treelist.add(widget.treeview)
 	widget.scrollable_treelist.set_size_request(715, 250)
 	widget.scrollable_treelist.show_all()
-	disk(0)
+	disk()
 	curr_remove = -1
 	while curr_remove != len(disk.disks):
 		curr_remove += 1
 		widget.set_disk.remove(0)
-	temp = []
-	current_disk_num = -1
 	print "\n Number of Disks: %s" % len(disk.disks)
-	while len(temp) != len(disk.disks):
-		current_disk_num += 1
-		temp.append("%s" % current_disk_num)
-		disk(current_disk_num)
-		widget.set_disk.insert(current_disk_num, "%d" % (current_disk_num), disk.disk_name)
+	for x in range(0, len(disk.disks)):
+		disk()
+		widget.set_disk.insert(x, str(x), disk.disks[x])
 	widget.set_disk.set_active(disk_num)
-def do_part(disk_num):
+def do_part(disk_num, unit="MiB"):
 	print("Doing Part...")
-	if disk_num == -1:
+	if disk == None:
 		print ("No disk selected")
 		return
+	#Show the loading bar
+	widget.recalculating.set_label("Recalculating Partitions...")
 	widget.loading_spinner.set_visible(True)
 	widget.loading_spinner.start()
 	widget.recalculating.set_visible(True)
-	global_num_current = -1
-	find_disk = "%s%s" % ("/dev/sd", disk.alphabet[disk_num])
-	get_disk = os.system("parted -s %s p > /dev/null" % find_disk)
-	if get_disk != 0:
+	#Check if disk exists
+	disk()
+	find_disk = disk.disks[disk_num]
+	if not os.path.exists(find_disk):
 		print ("This disk has been removed")
 		widget.loading_spinner.set_visible(False)
 		widget.recalculating.set_visible(False)
@@ -589,157 +569,45 @@ def do_part(disk_num):
 		widget.set_disk.set_active(disk_num-1)
 		widget.set_disk.remove(disk_num)
 		return
+	#Clear old partitions
 	widget.partitions.clear()
-	part(find_disk, "m")
-	current_free = -1
-	find_free_space(find_disk, "m")
-	current_part_num = -1
+	part(find_disk, unit)
 	model = widget.grub_device.get_model()
 	model.clear()
 	iters = []
-	print part.parent
-	while True:
-		current_part_num += 1
-		global_num_current += 1
-		try:
-			try:
-				if find_free_space.get_free_true[global_num_current] != 1:
-					print ("%s%s" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num]))
-					curr_iter = widget.partitions.append(\
-					get_iter(widget.partitions, iters, part.parent[current_part_num]), \ #Parent
-					["%s%s" % (find_disk, part.partnums[current_part_num]), \ #Path
-					part.format_types[current_part_num], \ #fs_type
-					part.type[current_part_num].lower(), \ # partition type ie: extended
-					"%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), \ # size
-					part.mounts[current_part_num], \ #Mountpoint
-					"%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), \ # start
-					"%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])]) # end
-					iters.append(curr_iter)
-			except IndexError:
-				pass
-			if find_free_space.get_free_true[global_num_current] == 1:
-				current_free += 1
-				current_part_num -= 1
-				try:
-					#if part.parent[current_part_num] == None:
-					#	full_part = None
-					#else:
-					#	full_part = "%s%s" % (find_disk, part.parent[current_part_num])
-					
-					curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[current_part_num]), ["Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
-				except IndexError:
-					pass
-		except IndexError:
-			widget.scrollable_treelist.show_all()
-			break
-	current_part_num = -1
-	print part.partsizes
-	curr_dtype = diskType(find_disk)
-	while True:
-		current_part_num += 1
-		try:
-			if part.partsizes[current_part_num] > 100 and part.partunits[current_part_num] == "m":
-				print ("Grub requirments passed first")
-				if curr_dtype != "gpt" and part.primary[current_part_num] == 1:
-					print ("Grub requirments passed second (mbr)")
-					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
-					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
-				elif curr_dtype == "gpt":
-					print ("Grub requirments passed second (gpt)")
-					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
-					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
-			elif part.partsizes[current_part_num] >= .001 and part.partunits[current_part_num] == "g":
-				print ("Grub requirments passed first")
-				if curr_dtype != "gpt" and part.primary[current_part_num] == 1:
-					print ("Grub requirments passed second (mbr)")
-					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
-					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
-				elif curr_dtype == "gpt":
-					print ("Grub requirments passed second (gpt)")
-					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
-					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
-			elif part.partsizes[current_part_num] >= 100000 and part.partunits[current_part_num] == "k":
-				print ("Grub requirments passed first")
-				if curr_dtype != "gpt" and part.primary[current_part_num] == 1:
-					print ("Grub requirments passed second (mbr)")
-					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
-					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
-				elif curr_dtype == "gpt":
-					print ("Grub requirments passed second (gpt)")
-					grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
-					widget.grub_device.insert(current_part_num, "%s" % grub_part, "%s (%s)" % (grub_part, part.partsizes[current_part_num]))
-		except IndexError:
-			break
+	for x in range(0, len(part.paths)):
+		curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[x]),
+			[part.paths[x],
+			part.fileSystem[x],
+			part.type[x],
+			"%s%s" % (part.size[x], unit),
+			part.mounts[x],
+			"%s%s" % (part.start[x], unit),
+			"%s%s" % (part.end[x], unit)])
+		iters.append(curr_iter)
+	widget.scrollable_treelist.show_all()
+	for x in part.partitions:
+		if x.type == 0 and x.getLength("MiB") >= 100:
+			print ("Passed")
+			widget.grub_device.insert(int(part.paths.index(x.path)), "%s" % x.path, "%s (%s)" % (x.path, round(x.getLength("MiB"), 2)))
 	widget.gentoo_dev_info.set_text("Gentoo Device (%s)" % (diskType(find_disk)))
 	widget.loading_spinner.set_visible(False)
 	widget.recalculating.set_visible(False)
 	widget.loading_spinner.stop()
-	os.system("rm -rf freespaceinfo_2.txt")
-	os.system("rm -rf freespaceinfo.txt")
-	os.system("rm -rf typeinfo.txt")
-	os.system("rm -rf partinfo.txt")
 	widget.treeview.expand_all()
 	print ("Done!")
-def do_part_unit(disk_num, unit):
-	global_num_current = -1
-	find_disk = "%s%s" % ("/dev/sd", disk.alphabet[disk_num])
-	widget.partitions.clear()
-	part(find_disk, unit)
-	current_free = -1
-	find_free_space(find_disk, unit)
-	current_part_num = -1
-	model = widget.grub_device.get_model()
-	model.clear()
-	iters = []
-	while True:
-		current_part_num += 1
-		global_num_current += 1
-		try:
-			try:
-				print ("%s%s" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num]))
-				if find_free_space.get_free_true[global_num_current] != 1:
-					curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[current_part_num]), ["%s%s" % (find_disk, part.partnums[current_part_num]), part.format_types[current_part_num], "%s%siB" % (part.partsizes[current_part_num], part.partunits[current_part_num]), part.mounts[current_part_num], "%s%siB" % (part.start[current_part_num], part.start_unit[current_part_num]), "%s%siB" % (part.end[current_part_num], part.end_unit[current_part_num])])
-					iters.append(curr_iter)
-			except IndexError:
-				pass
-			if find_free_space.get_free_true[global_num_current] == 1:
-				current_free += 1
-				current_part_num -= 1
-				try:
-					print ("Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free]))
-					curr_iter = widget.partitions.append(get_iter(widget.partitions, iters, part.parent[current_part_num]), ["Free Space", "", "%s%siB" % (find_free_space.free_size[current_free], find_free_space.free_size_unit[current_free]), "", "%s%siB" % (find_free_space.free_start[current_free], find_free_space.free_size_unit[current_free]), "%s%siB" % (find_free_space.free_end[current_free], find_free_space.free_end_unit[current_free])])
-				except IndexError:
-					pass
-		except IndexError:
-			widget.scrollable_treelist.show_all()
-			break
-	current_part_num = -1
-	while True:
-		current_part_num += 1
-		try:
-			if part.partsizes[current_part_num] >= 128 and part.partunits[current_part_num] == "M" and part.primary[current_part_num] == 1:
-				grub_part = "%s%s" % (find_disk, part.partnums[current_part_num])
-				widget.grub_device.insert(0, "1", "%s" % grub_part)
-			if current_part_num == len(part.partnums):
-				break
-		except IndexError:
-			break
-	widget.treeview.expand_all()
 def do_disk():
 	get_sel = widget.set_disk.get_active()
-	disk(0)
+	disk()
 	curr_remove = -1
 	while curr_remove != len(disk.disks):
 		curr_remove += 1
 		widget.set_disk.remove(0)
 	temp = []
 	current_disk_num = -1
-	while len(temp) != len(disk.disks):
-		temp.append("item")
-		current_disk_num += 1
-		temp.append("%s" % current_disk_num)
-		disk(current_disk_num)
-		widget.set_disk.insert(current_disk_num, "%d" % (current_disk_num), disk.disk_name)
+	for x in range(0, len(disk.disks)):
+		disk()
+		widget.set_disk.insert(x, str(x), disk.devices[x].path)
 	widget.set_disk.set_active(get_sel)
 def Nextmain(button):
 	top_level = builder.main.get_object("top_level")
@@ -752,22 +620,19 @@ def Nextask_part(button):
 	builder.main_window.remove(top_level)
 	if defaults.install_type == "custom":
 		toplevel_window = builder.adv_part.get_object("top_level")
+		toplevel_window.reparent(builder.main_window)
+		builder.main_window.add(toplevel_window)
 		do_part_first(0)
 	else:
 		toplevel_window = builder.rootPart.get_object("top_level")
-		current_disk = 0
-		disk(current_disk)
-		widget.part_size.set_upper(disk.size[current_disk]*1024)
-		current_disk_num = -1
-		temp = []
-		while len(temp) != len(disk.size):
-			temp.append ("item")
-			current_disk_num += 1
-			disk(current_disk_num)
-			widget.root_disk.insert(current_disk_num, "%d" % (current_disk_num), disk.disk_name)
+		disk()
+		widget.part_size.set_upper(disk.size[0]*1024)
+		for x in range(0, len(disk.disks)):
+			disk()
+			widget.root_disk.insert(x, str(x), disk.device.path[x])
 			widget.root_disk.set_active(0) 
-	toplevel_window.reparent(builder.main_window)
-	builder.main_window.add(toplevel_window)
+		toplevel_window.reparent(builder.main_window)
+		builder.main_window.add(toplevel_window)
 def Backask_part(button):
 	top_level = builder.ask_part.get_object("top_level")
 	builder.main_window.remove(top_level)
@@ -882,7 +747,7 @@ def change_disk_root(combo):
 		current_disk, disk_num = model[tree_iter][:2]
 		disk_num = int(disk_num)
 		print("Disk: %s" % current_disk, disk_num)
-		disk(disk_num)
+		disk()
 		print disk.unit
 		global current_root_disk
 		current_root_disk = disk_num
@@ -909,11 +774,11 @@ def unit_change_root(combo):
 		id_num = int(id_num)
 		print("Unit: %s" % unit, id_num)
 		if id_num == 1:
-			disk(current_root_disk)
+			disk()
 			widget.part_size.set_upper(disk.size[current_root_disk]*1024)
 			defaults.current_root_size_unit = "m"
 		else:
-			disk(current_root_disk)
+			disk()
 			widget.part_size.set_upper(disk.size[current_root_disk])
 			defaults.current_root_size_unit = "g"
 		widget.part_size.set_value(0)
@@ -925,16 +790,18 @@ def part_selected(selection):
 			widget.add_part.set_sensitive(False)
 			widget.remove_part.set_sensitive(True)
 			widget.change_part.set_sensitive(True)
+			widget.format_iter.set_sensitive(True)
 		else:
+			widget.format_iter.set_sensitive(False)
 			widget.add_part.set_sensitive(True)
 			widget.remove_part.set_sensitive(False)
 			widget.change_part.set_sensitive(False)
 		global main_selection
 		main_selection = str(model[treeiter][0])
 		print "Selected Part:", main_selection
-		current.size = str(widget.partitions.get_value(treeiter, 2))
-		current.start = str(widget.partitions.get_value(treeiter, 4))
-		current.end = str(widget.partitions.get_value(treeiter, 5))
+		current.size = str(widget.partitions.get_value(treeiter, 3))
+		current.start = str(widget.partitions.get_value(treeiter, 5))
+		current.end = str(widget.partitions.get_value(treeiter, 6))
 		print "Size:", current.size, "\n", "Start:", current.start, "\n", "End:", current.end
 def set_gentoo_device(combo):
 	tree_iter = combo.get_active_iter()
@@ -950,6 +817,7 @@ def set_gentoo_device(combo):
 		systype.gendev = main_disk
 		builder.disk_type = diskType(main_disk)
 		get_newpart()
+		print id_num
 		do_part(id_num)
 		widget.add_part.set_sensitive(False)
 		widget.change_part.set_sensitive(False)
@@ -967,6 +835,7 @@ def do_part_button(button):
 	do_part(num)
 	do_disk()
 def newpart(button):
+	#Reset the values in newpart window
 	widget.part_label.set_text("")
 	widget.mount_point1.set_text("")
 	widget.mount_point2.set_text("")
@@ -977,72 +846,62 @@ def newpart(button):
 	widget.mount_point1.set_text("")
 	widget.mount_point2.set_text("")
 	num = widget.set_disk.get_active()
-	find_disk = "%s%s" % ("/dev/sd", disk.alphabet[num])
-	builder.disk_type = diskType(find_disk)
+	#Get the values of the selected free space
+	index = -1
+	for i in widget.partitions:
+		if i == treeiter:
+			break
+		index += 1
+	print index
+	partition = part.partitions[index]
+	current.part = partition
+	start = format_units(partition.geometry.start, "MiB")
+	end = format_units(partition.geometry.end, "MiB")
+	size = partition.getLength("MiB")
+	#Remove the unit from the number
+	start = float(start) + 1
+	end = float(end) - 1
+	
+	#Set the radio button value for logical/primary
+	if partition.type == "free_logical":
+		widget.logical.set_active(True)
+		widget.primary.set_active(False)
+		widget.primary.set_sensitive(False)
+		widget.logical.set_label("Logical")
+	else:
+		widget.logical.set_active(False)
+		widget.primary.set_active(True)
+		widget.primary.set_sensitive(True)
+		if "extended" in part.type:
+			widget.logical.set_label("Logical")
+		else:
+			widget.logical.set_label("Extended")
+	
+	#Set the upper for adjustments
+	widget.part_size_adj.set_upper(size)
+	widget.start_part.set_upper(end)
+	widget.end_part.set_upper(end)
+	#Set the lower for adjustments
+	widget.start_part.set_lower(start)
+	widget.end_part.set_lower(start)
+	#Set Value for adjustments
+	widget.part_size_adj.set_value(size)
+	widget.start_part.set_value(start)
+	widget.end_part.set_value(end)
+	
+	#Display the new window
+	builder.disk_type = diskType(main_disk)
 	get_newpart()
-	current.size = str(current.size)
-	current.size = current.size.replace("B", "")
-	current.size = current.size.replace("i", "")
-	defaults.original_size = current.size
-	current.unit = current.size[-1]
-	print current.size
-	current.size = current.size[:-1]
-	current.size = float(current.size)
-	adj_size = round(current.size, 0)
-	widget.part_size_adj.set_upper(int(adj_size))
-	widget.part_size_adj.set_value(int(adj_size))
-	currentpart.end = widget.partitions.get_value(treeiter, 5)
-	currentpart.start = widget.partitions.get_value(treeiter, 4)
-	start = float(currentpart.start[:-3])+1
-	end = float(currentpart.end[:-3])-1
-	widget.end_part.set_upper(int(round(float(end), 0)))
-	widget.end_part.set_lower(int(round(float(start)+1, 0)))
-	widget.start_part.set_lower(int(round(float(start), 0)))
-	widget.start_part.set_upper(int(round(float(end)-1, 0)))
-	widget.start_part.set_value(int(round(float(start), 0)))
-	widget.end_part.set_value(int(round(float(end), 0)))
 	builder.dialog_new_part.show_all()
 def remove_part(button):
 	builder.are_you_sure.show_all()
 def editpart(button):
 	widget.format_type_change.set_active(-1)
 	widget.mount_point_change.set_text("")
-	widget.formating.set_visible(False)
 	builder.edit_part.show_all()
 def mk_table(button):
 	widget.table_type.set_active(-1)
 	builder.make_table.show_all()
-def change_unit(combo):
-	tree_iter = combo.get_active_iter()
-	if tree_iter != None:
-		model = combo.get_model()
-		new_part_unit, id_unit = model[tree_iter][:2]
-		id_unit = str(id_unit)
-		print("Current Unit: %s %s" % (new_part_unit, id_unit))
-		if id_unit == "m":
-			if current.unit == "M":
-				pass
-			elif current.unit == "K":
-				current_size = int(round(float(current.size/1024), 0))
-			elif current.unit == "G":
-				current_size = int(round(float(current.size*1024), 0))
-		elif id_unit == "k":
-			if current.unit == "M":
-				current_size = int(round(float(current.size*1024), 0))
-			elif current.unit == "K":
-				pass
-			elif current.unit == "G":
-				current_size = int(round(float((current.size*1024)*1024), 0))
-		elif id_unit == "g":
-			if current.unit == "M":
-				current_size = int(round(float(current.size/1024), 0))
-			elif current.unit == "K":
-				current_size = int(round(float((current.size/1024)/1024), 0))
-			elif current.unit == "G":
-				pass
-		widget.part_size_adj.set_upper(current_size)
-		widget.part_size_adj.set_value(current_size)
-		currentpart.unit = current.unit
 def close(button):
 	builder.dialog_new_part.hide()
 def close_sure(button):
@@ -1055,12 +914,9 @@ def part_format_type(combo):
 	tree_iter = combo.get_active_iter()
 	if tree_iter != None:
 		model = combo.get_model()
-		systype.fstype, systype.fs_id = model[tree_iter][:2]
-		systype.fs_id = int(systype.fs_id)
-		print("Format Type: %s" % systype.fstype, systype.fs_id)
+		string, current.fileSystem = model[tree_iter][:2]
+		print("Format Type: %s" % string, current.fileSystem)
 def format_part(button):
-	widget.formating.set_visible(True)
-	widget.formating.start()
 	systype.fs_id = widget.format_type_change.get_active()
 	systype.fs_id += 1
 	print systype.fs_id
@@ -1134,21 +990,21 @@ def mount_point_change(entry):
 def set_primary(button):
 	if button.get_active():
 		state = "on"
-		currentpart.primary = True
+		current.primary = True
 	else:
-		currentpart.primary = False
+		current.primary = False
 		state = "off"
 	print("Primary:", state)
-	print ("currentpart.primary = %s" % currentpart.primary)
+	print ("current.primary = %s" % current.primary)
 def set_logical(button):
 	if button.get_active():
 		state = "on"
-		currentpart.primary = False
+		current.primary = False
 	else:
-		currentpart.primary = True
+		current.primary = True
 		state = "off"
 	print("Logical:", state)
-	print ("currentpart.primary = %s" % currentpart.primary)
+	print ("current.primary = %s" % current.primary)
 def size_in(*arg):
 	size = arg[0].get_value()
 	print ("Size:", size)
@@ -1170,23 +1026,22 @@ def part_format_type(combo):
 	tree_iter = combo.get_active_iter()
 	if tree_iter != None:
 		model = combo.get_model()
-		currentpart.fstype, currentpart.fs_id = model[tree_iter][:2]
-		currentpart.fs_id = int(currentpart.fs_id)
-		print("Format Type: %s" % currentpart.fstype, currentpart.fs_id)
+		current.fstype, current.fileSystem = model[tree_iter][:2]
+		print("Format Type: %s" % current.fstype, current.fileSystem)
 def state_format(button):
 	if button.get_active():
 		state = "on"
 		print ("Formating Partition")
-		currentpart.formatyn = True
+		current.formatyn = True
 	else:
 		state = "off"
 		print ("Not Formating Partition")
-		currentpart.formatyn = False
+		current.formatyn = False
 def mount_point(entry):
-	currentpart.mount_point = entry.get_text()
-	print (currentpart.mount_point)
+	current.mount_point = entry.get_text()
+	print (current.mount_point)
 def get_start(size):
-	end = currentpart.end
+	end = current.end
 	end_unit = end[-3]
 	end = end.replace("iB", "")
 	end = end.replace(end_unit, "")
@@ -1194,7 +1049,7 @@ def get_start(size):
 	start = end-size
 	return start
 def get_end(size):
-	start = currentpart.start
+	start = current.start
 	start_unit = start[-3]
 	start = start.replace("iB", "")
 	start = start.replace(start_unit, "")
@@ -1243,105 +1098,19 @@ def convert_unit(input_unit, output_unit):
 def mk_part(button):
 	disk_type = diskType(main_disk)
 	arg1 = main_disk
-	currentpart.size = widget.part_size_adj.get_value()
-	num = widget.set_disk.get_active()
-	do_part_unit(num, "m")
-	if currentpart.unit == "G":
-		currentpart.size = currentpart.size*1024
-		currentpart.unit = "M"
-		currentpart.size -= 1
-		currentpart.size = round(currentpart.size, 0)
-	elif currentpart.unit == "K":
-		currentpart.size = currentpart.size/1024
-		currentpart.size -= 1
-		currentpart.size = round(currentpart.size, 0)
-	if currentpart.start_of_free == False:
-		curr_start = get_start(currentpart.size)
-		curr_end = str(currentpart.end)
-		curr_end = curr_end.replace("%siB" % currentpart.unit, "")
-		curr_end = float(curr_end)-1
-		curr_end = round(curr_end, 0)
-		curr_end = int(curr_end)
-	else:
-		curr_start = str(currentpart.start)
-		curr_start = curr_start.replace("%siB" % currentpart.unit, "")
-		curr_start = float(curr_start)-1
-		if curr_start < 0:
-			curr_start = 0
-		curr_start = round(curr_start, 0)
-		curr_start = int(curr_start)
-		curr_end = get_end(currentpart.size)
-		
-	if disk_type == "gpt":
-		arg2 = current.label
-	else:
-		if currentpart.primary == True:
+	size = widget.part_size_adj.get_value()
+	if disk_type != "gpt":
+		if current.primary:
 			arg2 = "primary"
 		else:
-			arg2 = "extended"
-	arg3 = currentpart.fstype
+			arg2 = widget.logical.get_label()
+	else:
+		arg2 = current.label
+	arg3 = current.fileSystem
 	arg4 = int(widget.start_part.get_value())
 	arg5 = int(widget.end_part.get_value())
-	print ("parted -s %s unit %siB mkpart %s %s %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg2, arg3, arg4, arg5))
-	status = os.system("parted -s %s unit %siB mkpart %s %s %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg2, arg3, arg4, arg5))
-	if status != 0 and disk_type != "gpt":
-		status = os.system("parted -s %s unit %siB mkpart logical %s %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg3, arg4, arg5))
-		if status != 0:
-			status = os.system("parted -s %s unit %siB mkpart extended %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg4, arg5))
-	if status != 0 and arg3 == "FAT (16 or 32 depending on size)":
-		if current.size > 2:
-			if current.unit == "G":
-				arg3 = "fat32"
-			elif current.unit == "M":
-				if current.size > 2048:
-					arg3 = "fat32"
-				else:
-					arg3 = "fat16"
-			elif current.unit == "K":
-				if current.size > 2048*1024:
-					arg3 = "fat32"
-				else:
-					arg3 = "fat16"
-			else:
-				arg3 = "fat32"
-		current_part_num_before = part.partnums
-		print ("parted -s %s unit %siB mkpart %s %s %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg2, arg3, arg4, arg5))
-		status = os.system("parted -s %s unit %siB mkpart %s %s %s %s" % (arg1, "%s" % currentpart.unit.lower(), arg2, arg3, arg4, arg5))
-	try:
-		if currentpart.mountpoint != "" or currentpart.mountpoint != " " and currentpart.mountpoint[0] != "/":
-			find_root_mount = os.system("mount | grep '/mnt/gentoo'")
-			if find_root_mount != 0 and currentpart.mountpoint == "/":
-				print ("Couldn't find a mounted root partition!")
-				print ("Partition couldn't be mount")
-				do_part(main_disk)
-				current_part_num_after = part.partnums
-				
-				current_check = -1
-				if len(temp.part) != 0 and current_check != len(temp.part):
-					current_check += 1
-					check_sys = os.system("ls %s%s" % (main_disk, temp.part[current_check]))
-					if check_sys != 0:
-						temp.part.remove(current_check)
-						temp.mount_point.remove(current_check)
-				#Current Number
-				cn = 0
-				while current_part_num_after[cn] == current_part_num_before[cn]:
-					cn += 1
-				if current_part_num_after[cn] != current_part_num_before[cn]:
-					temp.part.append("%s%s" % (main_disk, current_part_num_after[cn]))
-					temp.mount_point.append(currentpart.mount_point)
-			else:
-				os.system("mkdir /mnt/gentoo%s" % currentpart.mountpoint)
-				mount_status = os.system("mount %s %s" % (main_selection, currentpart.mountpoint))
-			if currentpart.mountpoint == "/" and len(temp.part) != 0:
-				cp = -1
-				while cp != len(temp.part):
-					cp += 1
-					os.system("mount %s%s %s" % (main_disk, temp.part, temp.mount_point))
-	except IndexError:
-		pass
-	time.sleep(5)
-	do_part(num)
+	os.system("parted -s %s unit MiB mkpart %s %s %s %s" % (arg1, arg2, arg3, arg4, arg5))
+	do_part(disk.disks.index(main_disk))
 	builder.dialog_new_part.hide()
 def desktop_environment(combo):
 	tree_iter = combo.get_active_iter()
@@ -1558,7 +1327,7 @@ def change_unit_adv(combo):
 		model = combo.get_model()
 		main_unit, id_num = model[tree_iter][:2]
 		id_num = str(id_num)
-		do_part_unit(main_disk_num, id_num) 
+		do_part(main_disk_num, id_num) 
 		print("Selected Unit: %s" % main_unit, id_num)
 def change_nvidia(combo):
 	tree_iter = combo.get_active_iter()
@@ -1613,6 +1382,25 @@ def show_terminal(button):
 		widget.terminal_window.hide()
 def shutdown(*args):
 	Gtk.main_quit()
+def fileSystemWrite(path, fstype):
+	programs = {
+		"linux-swap(v1)": "mkswap",
+		"ext2": "mkfs.ext2 -T small -F",
+		"ext3": "mkfs.ext3 -T small -F",
+		"ext4": "mkfs.ext4 -T small -F",
+		"fat32": "mkfs.vfat -F32",
+		"fat16": "mkfs.vfat -F16",
+		"ntfs": "mkfs.ntfs -F"}
+	os.system("%s %s" % (programs[fstype], path))
+def format_iter(*args):
+	path = widget.partitions.get_value(treeiter, 0)
+	widget.recalculating.set_label("Formating partition %s" % path)
+	widget.recalculating.set_visible(True)
+	builder.main_window.show_all()
+	fstype = widget.partitions.get_value(treeiter, 1)
+	builder.main_window.show_all
+	fileSystemWrite(path, fstype)
+	widget.recalculating.set_visible(False)
 main_handlers = {
 	"exit": Gtk.main_quit,
 	"shutdown": shutdown,
@@ -1635,7 +1423,6 @@ part_advanced_handlers = {
 	"Next": Nextadv_part,
 	"Back": Backadv_part,
 	"grub_device": set_grub_device,
-	"change_unit": change_unit,
 	"change_unit_adv": change_unit_adv,
 	"cancel": close,
 	"close_sure": close_sure,
@@ -1658,6 +1445,7 @@ part_advanced_handlers = {
 	"new_table": mk_table,
 	"make_table": make_table,
 	"find_table": find_table,
+	"format_iter": format_iter
 	}
 var_handlers = {
 	"Next": Nextvar,

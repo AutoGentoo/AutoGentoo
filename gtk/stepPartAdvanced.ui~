@@ -889,6 +889,7 @@ to remove this partition&lt;/small&gt;</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="adjustment">end_part</property>
+                    <property name="digits">5</property>
                     <signal name="changed" handler="end_in" swapped="no"/>
                   </object>
                   <packing>

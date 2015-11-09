@@ -22,72 +22,84 @@
 #  
 #  
 
-import os
-import subprocess
 from gi.repository import Gtk, Gdk, GObject
-from reparted import *
-from reparted.device import probe_standard_devices
-
-global global_unit
-global_unit = "m"
+from parted import *
+import os, subprocess, parted, _ped
 class part:
-	mounts = []
-	format_types = []
-	partnums = []
-	partsizes = []
-	partunits = []
-	start = []
-	start_unit = []
-	end = []
-	end_unit = []
-	mounts_frees = []
-	format_types_frees = []
-	partnums_frees = []
-	partsizes_frees = []
-	partunits_frees = []
-	start_frees = []
-	start_unit_frees = []
-	end_frees = []
-	end_unit_frees = []
-	primary = []
-	parent = []
-	extended = False
-	partnum = 0
-	startnum = 0
 	def __init__(self, disk_path, unit):
 		os.system("echo -n 'Clearing old values...'")
+		part.partitions = []
 		part.mounts = []
-		part.format_types = []
-		part.partnums = [] # Number of Partition (Used for order)
-		part.partsizes = []
-		part.partunits = []
+		part.fileSystem = []
+		part.paths = []
+		part.size = []
 		part.start = []
-		part.start_unit = []
 		part.end = []
-		part.end_unit = []
-		part.primary = []
+		part.type = []
 		part.parent = []
-		extended = False
-		part.partnum = 0
+		part.flags = []
+		part.extended = None
 		os.system("echo 'Done'")
-		os.system("echo -n 'Scanning disk %s...'" % disk_path)
-		curr_disk = disk.path_to_device[disk_path]
+		os.system("echo -ne 'Scanning disk %s...\n'" % disk_path)
+		curr_disk = disk.path_to_disk[disk_path]
+		curr_device = disk.path_to_device[disk_path]
 		#Detect partitions
-		partitions = curr_disk.partitions()
-		#Partition number
-		for x in range(len(partitions)): part.partnums.append(partitions[x].num)
-		#Start and end
-		
-		part.mounts_frees = part.mounts
-		part.format_types_frees = part.format_types
-		part.partnums_frees = part.partnums
-		part.partsizes_frees = part.partsizes
-		part.partunits_frees = part.partunits
-		part.start_frees = part.start
-		part.start_unit_frees = part.start_unit
-		part.end_frees = part.end
-		part.end_unit_frees = part.end_unit
-		
+		partitions = getAll(curr_device)
+		part.partitions = partitions
+		for x in range(0, len(partitions)): 
+			if partitions[x].type == 2:
+				part.extended = partitions[x]
+		for x in partitions: 
+			if x.type in [4, 5]:
+				part.paths.append("Free Space")
+			else:
+				part.paths.append(x.path)
+			part.start.append(format_units(float(x.geometry.start), unit))
+			part.end.append(format_units(float(x.geometry.end), unit))
+			part.type.append(getType(x))
+			part.size.append(round(x.getLength(unit), 2))
+			if int(x.type) in [1, 5]:
+				part.parent.append(part.extended.path)
+			else:
+				part.parent.append(None)
+			if not x.fileSystem:
+				part.fileSystem.append(None)
+			else:
+				part.fileSystem.append(x.fileSystem.type)
+			mount = os.system("mount | grep '%s '" % x.path)
+			if mount == 0:
+				mount = str(subprocess.check_output("mount | grep '%s '" % x.path, shell=True))
+				mount = mount.replace(x.path, "")
+				mount = mount.replace(" on ", "")
+				part.mounts.append(get_value(mount, 0)[0])
+			else:
+				part.mounts.append(" ")
+			if x.type not in [4, 5]:
+				part.flags.append(x.getFlagsAsString())
+			else:
+				part.flags.append(" ")
+def getType(part):
+	partTypes = {
+		0: "primary",
+		1: "logical",
+		2: "extended",
+		4: "free_primary",
+		5: "free_logical"}
+	return partTypes[int(part.type)]
+def getAll(device):
+	partitions = []
+	disk = Disk(device)
+	disk.__disk = _ped.Disk(device.getPedDevice())
+	part = disk.__disk.next_partition()
+	while part:
+		if part.type & parted.PARTITION_FREESPACE or \
+			parted.PARTITION_FREESPACE or \
+			parted.PARTITION_METADATA or \
+			parted.PARTITION_PROTECTED:
+				if int(part.type) not in [8, 9]:
+					partitions.append(parted.Partition(disk=disk, PedPartition=part))
+		part = disk.__disk.next_partition(part)
+	return partitions
 def get_value(string, start_num, exit_mark=' '):
 	curr_char = ""
 	temp = ""
@@ -99,26 +111,18 @@ def get_value(string, start_num, exit_mark=' '):
 	temp = temp.replace(exit_mark, "")
 	return_val = [temp, num]
 	return return_val
-def format_units_size(unit, input_float, demical=2):
+def format_units(input_float, unit, sector_size=512, demical=2):
 	unit = unit.lower()
+	input_float = input_float*sector_size
+	unit = unit.replace("ib", "")
 	unit_list = ["k", "m", "g", "t"]
 	unit_values = [1024, 1048576, 1073741824, 1099511627776]
 	if unit in unit_list:
 		listnum = unit_list.index(unit)
 		temp_float = float(input_float)
 		temp_float = temp_float/unit_values[listnum]
-		input_float = str(round(temp_float, demical))
-		return input_float
-def format_units(unit, input_float, demical=2):
-	unit = unit.lower()
-	unit_list = ["k", "m", "g", "t"]
-	unit_values = [1, 1024, 1048576, 1073741824]
-	if unit in unit_list:
-		listnum = unit_list.index(unit)
-		temp_float = float(input_float)
-		temp_float = temp_float/unit_values[listnum]
-		input_float = str(round(temp_float, demical))
-		return input_float
+		ouput_float = str(round(temp_float, demical))
+		return ouput_float
 def get_iter(gtk_treestore, iters, string, column=0):
 	if string == None:
 		return None
@@ -134,19 +138,22 @@ class disk:
 	sd_disks = []
 	size = []
 	unit = []
-	disk_name = ""
-	def __init__(self, disk_num):
+	sector_size = []
+	alphabet = ["a", "b", "c", "d", "e", "f", "g", "h",
+ 		"i", "j", "k", "l", "m", "n", "n", "o", "p", "q", "r", "s", "t",
+ 		"u", "v", "w", "x", "y", "z"]
+	def __init__(self):
 		#Clear disk values
 		disk.disks = []
 		disk.sd_disks = []
 		disk.size = []
 		disk.unit = []
-		disk.path_to_disk = []
+		disk.path_to_disk = {}
 		disk.path_to_device = {}
+		sector_size = []
 		
 		#Probe for Devices
-		disk.devices = probe_standard_devices()
-		print disk.devices
+		disk.devices = parted.getAllDevices()
 		
 		# Add device paths
 		for x in range(0, len(disk.devices)):
@@ -155,97 +162,16 @@ class disk:
 		#Dictionary, path: device
 		for x in disk.disks:
 			disk.path_to_device[x] = Device(x)
-			disk.path_to_disk.append(disk.path_to_device[x])
+			disk.path_to_disk[x] = Disk(disk.path_to_device[x])
 		
 		#Add other disk information
-		for x in disk.disks: x.replace("/dev/", "")
-		for x in range(0, len(disk.disks)): disk.size.append(float(str(disk.devices[x].size).replace("MB", "")))
+		for x in disk.disks: disk.sd_disks.append(x.replace("/dev/", ""))
+		for x in range(0, len(disk.disks)): disk.size.append(float(str(disk.devices[x].length).replace("MB", "")))
 		for x in disk.disks: disk.unit.append("M")
-		disk.disk_name = disk.devices[disk_num].model
-		
-class find_free_space:
-	free_parts = []
-	free_start = []
-	free_start_unit = []
-	free_end = []
-	free_end_unit = []
-	free_size = []
-	free_size_unit = []
-	get_free_true = []
-	def __init__(self, current_disk, current_unit):
-		find_free_space.free_parts = []
-		find_free_space.free_start = []
-		find_free_space.free_start_unit = []
-		find_free_space.free_end = []
-		find_free_space.free_end_unit = []
-		find_free_space.free_size = []
-		find_free_space.free_size_unit = []
-		find_free_space.get_free_true = []
-		os.system("parted -s %s unit %siB print free > freespaceinfo_2.txt" % (current_disk, current_unit))
-		os.system("cat freespaceinfo_2.txt | grep -i free > freespaceinfo.txt")
-		find_part_free = open("freespaceinfo_2.txt", "r").readlines()
-		find_part_free = find_part_free[7:]
-		current_free_find_line = -1
-		while current_free_find_line != len(find_part_free):
-			current_free_find_line += 1
-			try:
-				current_line_free = find_part_free[current_free_find_line]
-			except IndexError:
-				break
-			if current_line_free == "" or current_line_free == " " or current_line_free == "\n":
-				break
-			if current_line_free[0:3] != "   ":
-				find_free_space.get_free_true.append(0)
-			else:
-				find_free_space.get_free_true.append(1)
-		free_info_file = open("freespaceinfo.txt", "r").readlines()
-		number_of_frees = len(free_info_file)
-		current_num = -1
-		while len(find_free_space.free_start) != number_of_frees:
-			current_num += 1
-			current_line = free_info_file[current_num]
-			current_line = current_line.replace("\n", "")
-			current_line = current_line.replace(" ", "")
-			temp_array = []
-			current_char = ""
-			current_char_num = -1
-			while current_char != "B":
-				current_char_num += 1
-				current_char = current_line[current_char_num]
-				temp_array.append(current_char)
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp = str1 = ''.join(temp_array)
-			find_free_space.free_start.append(float(temp))
-			find_free_space.free_start_unit.append(str(current_line[current_char_num-2]))
-			current_line = current_line[current_char_num+1:]
-			temp_array = []
-			current_char = ""
-			current_char_num = -1
-			while current_char != "B":
-				current_char_num += 1
-				current_char = current_line[current_char_num]
-				temp_array.append(current_char)
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp = str1 = ''.join(temp_array)
-			find_free_space.free_end.append(float(temp))
-			find_free_space.free_end_unit.append(str(current_line[current_char_num-2]))
-			current_line = current_line[current_char_num+1:]
-			temp_array = []
-			current_char = ""
-			current_char_num = -1
-			while current_char != "B":
-				current_char_num += 1
-				current_char = current_line[current_char_num]
-				temp_array.append(current_char)
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp_array.remove(temp_array[len(temp_array)-1])
-			temp = str1 = ''.join(temp_array)
-			find_free_space.free_size.append(float(temp))
-			find_free_space.free_size_unit.append(str(current_line[current_char_num-2]))
 def diskType(current_disk):
-	return Disk(Device(current_disk)).type_name
+	return Disk(Device(current_disk)).type
+if __name__ == '__main__':
+	disk()
+	part("/dev/sdb", "MiB")
+	for x in range(0, len(part.paths)):
+		print ("%s	%s	%s	%s	%s	%s	%s" % (part.paths[x], part.fileSystem[x], part.type[x], part.size[x], part.mounts[x], part.start[x], part.end[x]))
