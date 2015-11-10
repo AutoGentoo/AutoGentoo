@@ -397,6 +397,35 @@ to remove this partition&lt;/small&gt;</property>
     <property name="can_focus">False</property>
     <property name="icon_name">edit-clear-rtl-symbolic</property>
   </object>
+  <object class="GtkEntryCompletion" id="mount_point_entry_completion">
+    <property name="model">mount_points</property>
+  </object>
+  <object class="GtkListStore" id="mount_points">
+    <columns>
+      <!-- column-name Directory -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">/</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">/boot</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">/home</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">/opt</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">/usr</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">/var</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkImage" id="ok">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -877,6 +906,7 @@ to remove this partition&lt;/small&gt;</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="adjustment">start_part</property>
+                    <property name="digits">2</property>
                     <signal name="changed" handler="start_in" swapped="no"/>
                   </object>
                   <packing>
@@ -889,6 +919,7 @@ to remove this partition&lt;/small&gt;</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="adjustment">end_part</property>
+                    <property name="digits">2</property>
                     <signal name="changed" handler="end_in" swapped="no"/>
                   </object>
                   <packing>
@@ -921,6 +952,7 @@ to remove this partition&lt;/small&gt;</property>
                     <property name="secondary_icon_activatable">False</property>
                     <property name="adjustment">part_size_adj</property>
                     <property name="climb_rate">1</property>
+                    <property name="digits">2</property>
                     <property name="numeric">True</property>
                     <signal name="changed" handler="size_in" swapped="no"/>
                     <accessibility>
@@ -1125,7 +1157,13 @@ to remove this partition&lt;/small&gt;</property>
                 </items>
                 <child internal-child="entry">
                   <object class="GtkEntry" id="mount_point1">
-                    <property name="can_focus">False</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="shadow_type">none</property>
+                    <property name="caps_lock_warning">False</property>
+                    <property name="placeholder_text" translatable="yes">&lt;directory in /mnt/gentoo&gt;</property>
+                    <property name="completion">mount_point_entry_completion</property>
+                    <signal name="changed" handler="mount_point" swapped="no"/>
                   </object>
                 </child>
               </object>
@@ -1159,6 +1197,7 @@ to remove this partition&lt;/small&gt;</property>
                 <property name="receives_default">True</property>
                 <property name="use_underline">True</property>
                 <property name="use_stock">True</property>
+                <property name="always_show_image">True</property>
                 <signal name="clicked" handler="cancel" swapped="no"/>
               </object>
               <packing>
@@ -1178,6 +1217,7 @@ to remove this partition&lt;/small&gt;</property>
                 <property name="receives_default">True</property>
                 <property name="use_underline">True</property>
                 <property name="use_stock">True</property>
+                <property name="always_show_image">True</property>
                 <signal name="clicked" handler="mk_part" swapped="no"/>
               </object>
               <packing>
@@ -1254,6 +1294,7 @@ to remove this partition&lt;/small&gt;</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="adjustment">start_part</property>
+                    <property name="digits">2</property>
                     <signal name="changed" handler="start_in" swapped="no"/>
                   </object>
                   <packing>
@@ -1266,6 +1307,7 @@ to remove this partition&lt;/small&gt;</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="adjustment">end_part</property>
+                    <property name="digits">2</property>
                     <signal name="changed" handler="end_in" swapped="no"/>
                   </object>
                   <packing>
@@ -1298,6 +1340,7 @@ to remove this partition&lt;/small&gt;</property>
                     <property name="secondary_icon_activatable">False</property>
                     <property name="adjustment">part_size_adj</property>
                     <property name="climb_rate">100</property>
+                    <property name="digits">2</property>
                     <property name="numeric">True</property>
                     <signal name="changed" handler="size_in" swapped="no"/>
                     <accessibility>
@@ -1439,7 +1482,11 @@ to remove this partition&lt;/small&gt;</property>
                 </items>
                 <child internal-child="entry">
                   <object class="GtkEntry" id="mount_point2">
-                    <property name="can_focus">False</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="placeholder_text" translatable="yes">&lt;directory in /mnt/gentoo&gt;</property>
+                    <property name="completion">mount_point_entry_completion</property>
+                    <signal name="changed" handler="mount_point" swapped="no"/>
                   </object>
                 </child>
               </object>
@@ -1492,6 +1539,8 @@ to remove this partition&lt;/small&gt;</property>
                 <property name="receives_default">True</property>
                 <property name="use_underline">True</property>
                 <property name="use_stock">True</property>
+                <property name="yalign">0.52999997138977051</property>
+                <property name="always_show_image">True</property>
                 <signal name="clicked" handler="cancel" swapped="no"/>
               </object>
               <packing>
@@ -1511,6 +1560,7 @@ to remove this partition&lt;/small&gt;</property>
                 <property name="receives_default">True</property>
                 <property name="use_underline">True</property>
                 <property name="use_stock">True</property>
+                <property name="always_show_image">True</property>
                 <signal name="clicked" handler="mk_part" swapped="no"/>
               </object>
               <packing>

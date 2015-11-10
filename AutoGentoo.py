@@ -847,23 +847,13 @@ def newpart(button):
 	widget.mount_point2.set_text("")
 	num = widget.set_disk.get_active()
 	#Get the values of the selected free space
-	index = -1
-	for i in widget.partitions:
-		if i == treeiter:
-			break
-		index += 1
-	print index
-	partition = part.partitions[index]
-	current.part = partition
-	start = format_units(partition.geometry.start, "MiB")
-	end = format_units(partition.geometry.end, "MiB")
-	size = partition.getLength("MiB")
-	#Remove the unit from the number
-	start = float(start) + 1
-	end = float(end) - 1
+	start = float(widget.partitions.get_value(treeiter, 5)[:-3]) + 1
+	end = float(widget.partitions.get_value(treeiter, 6)[:-3]) - 1
+	size = float(widget.partitions.get_value(treeiter, 3)[:-3]) - 1
+	type = widget.partitions.get_value(treeiter, 2)
 	
 	#Set the radio button value for logical/primary
-	if partition.type == "free_logical":
+	if type == "free_logical":
 		widget.logical.set_active(True)
 		widget.primary.set_active(False)
 		widget.primary.set_sensitive(False)
@@ -1111,9 +1101,29 @@ def mk_part(button):
 		arg3 = ""
 	else:
 		arg3 = current.fileSystem
+	if arg3 == "fat":
+		if arg5 - arg4 > 2048:
+			arg3 = "fat32"
+		else:
+			arg3 = "fat16"
 	arg4 = int(widget.start_part.get_value())
 	arg5 = int(widget.end_part.get_value())
+	old = part.paths
 	os.system("parted -s %s unit MiB mkpart %s %s %s %s" % (arg1, arg2, arg3, arg4, arg5))
+	do_part(disk.disks.index(main_disk))
+	new = part.paths
+	path = get_difference(old, new)[0]
+	if widget.partition_edit_format_checkbutton.get_active() or widget.partition_edit_format_checkbutton1.get_active():
+		fileSystemWrite(path, arg3)
+	try:
+		current.mount_point[0]
+	except IndexError:
+		pass
+	else:
+		if current.mount_point[0] == "/":
+			if not os.path.exists("/mnt/gentoo%s" % current.mount_point):
+				os.system("mkdir /mnt/gentoo%s" % current.mount_point)
+			os.system("mount %s /mnt/gentoo%s" % (path, current.mount_point))
 	do_part(disk.disks.index(main_disk))
 	builder.dialog_new_part.hide()
 def desktop_environment(combo):

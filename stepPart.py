@@ -130,6 +130,12 @@ def get_iter(gtk_treestore, iters, string, column=0):
 	while gtk_treestore.get_value(iters[current_row], column) != string:
 		current_row += 1
 	return gtk_treestore.get_iter(gtk_treestore.get_path(iters[current_row]))
+def get_difference(old_list, new_list):
+	return_list = []
+	for x in new_list:
+		if x not in old_list:
+			return_list.append(x)
+	return return_list
 class disk:
 	devices = []
 	path_to_device = {}
