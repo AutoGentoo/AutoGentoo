@@ -165,7 +165,7 @@ set as a  profile.</property>
                 <property name="relief">none</property>
                 <signal name="clicked" handler="Back" swapped="no"/>
                 <style>
-                  <class name="round"/>
+                  <class name="control"/>
                   <class name="back"/>
                 </style>
               </object>
@@ -189,7 +189,7 @@ set as a  profile.</property>
                 <property name="xalign">0.89999997615814209</property>
                 <signal name="clicked" handler="Next" swapped="no"/>
                 <style>
-                  <class name="round"/>
+                  <class name="control"/>
                   <class name="next"/>
                 </style>
               </object>

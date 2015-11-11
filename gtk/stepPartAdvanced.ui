@@ -97,11 +97,6 @@ to remove this partition&lt;/small&gt;</property>
       </object>
     </child>
   </object>
-  <object class="GtkImage" id="cancel">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">window-close-symbolic</property>
-  </object>
   <object class="GtkWindow" id="change_part_table_win">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Change Partition Table</property>
@@ -426,11 +421,6 @@ to remove this partition&lt;/small&gt;</property>
       </row>
     </data>
   </object>
-  <object class="GtkImage" id="ok">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">object-select-symbolic</property>
-  </object>
   <object class="GtkAdjustment" id="part_size_adj">
     <property name="upper">100</property>
     <property name="step_increment">1</property>
@@ -477,6 +467,8 @@ to remove this partition&lt;/small&gt;</property>
     <property name="resizable">False</property>
     <child>
       <object class="GtkBox" id="top_level">
+        <property name="width_request">727</property>
+        <property name="height_request">450</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="margin_left">6</property>
@@ -803,7 +795,7 @@ to remove this partition&lt;/small&gt;</property>
                 <property name="relief">none</property>
                 <signal name="clicked" handler="Back" swapped="no"/>
                 <style>
-                  <class name="round"/>
+                  <class name="control"/>
                   <class name="back"/>
                 </style>
               </object>
@@ -824,7 +816,7 @@ to remove this partition&lt;/small&gt;</property>
                 <property name="relief">none</property>
                 <signal name="clicked" handler="Next" swapped="no"/>
                 <style>
-                  <class name="round"/>
+                  <class name="control"/>
                   <class name="next"/>
                 </style>
               </object>

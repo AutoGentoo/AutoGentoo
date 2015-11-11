@@ -24,14 +24,12 @@
 #  
 
 import os, sys, time, subprocess, platform
-from multiprocessing import Process
 from gi.repository import Gtk, Vte, GObject, Gdk, GLib, GdkPixbuf, Pango
 from stepPart import *
-import ctypes
-FileNotFoundError = IOError
+from HTMLParser import HTMLParser
+from htmlentitydefs import name2codepoint
 
-#Change directory to /usr/lib/autogentoo
-os.chdir("/usr/lib/autogentoo")
+FileNotFoundError = IOError
 
 global input
 input = raw_input
@@ -82,6 +80,23 @@ class builder:
 	#Advanced Partitions Window Configuration
 	adv_part = Gtk.Builder()
 	adv_part.add_from_file("gtk/stepPartAdvanced.ui")
+	dialog_new_part = adv_part.get_object("dialog-new-part-gpt")
+	
+	#Xserver Window Configuration 
+	xserver = Gtk.Builder()
+	xserver.add_from_file("gtk/stepXServer.ui")
+	
+	#Gnome display manager Configuration
+	gnome = Gtk.Builder()
+	gnome.add_from_file("gtk/stepGNOME.ui")
+	
+	#KDE display manager Configuration
+	kde = Gtk.Builder()
+	kde.add_from_file("gtk/stepKDE.ui")
+	
+	#xfce display manager Configuration
+	xfce = Gtk.Builder()
+	xfce.add_from_file("gtk/stepXFCE.ui")
 	
 	#Variables Window Configuration
 	var = Gtk.Builder()
@@ -94,7 +109,6 @@ class builder:
 	#User Info Window Configuration
 	user = Gtk.Builder()
 	user.add_from_file("gtk/stepUserInfo.ui")
-	dialog_new_part = adv_part.get_object("dialog-new-part-gpt")
 	#Newpartition window
 	are_you_sure = adv_part.get_object("are_you_sure_win")
 	make_table = adv_part.get_object("change_part_table_win")
@@ -104,6 +118,25 @@ class builder:
 	#Install Window Configuration
 	install = Gtk.Builder()
 	install.add_from_file("gtk/stepInstall.ui")
+#Change directory to /usr/lib/autogentoo
+os.chdir("/usr/lib/autogentoo")
+
+import os, subprocess
+from HTMLParser import HTMLParser
+from htmlentitydefs import name2codepoint
+
+class hrefParser(HTMLParser):
+	def handle_starttag(self, tag, attrs):
+		for attr in attrs:
+			if attr[0] == "href":
+				self.link = attr[1]
+	def handle_data(self, data):
+		if not data == '\r\n':
+			self.name = data
+class stringParser(HTMLParser):
+	data = []
+	def handle_data(self, data):
+		self.data.append(data)
 class gpu():
 	vendor = ""
 	product_full = ""
@@ -112,7 +145,8 @@ class gpu():
 	vendor_class = ""
 	driver_version = ""
 	working_driver_version = ""
-	version_list = ["352.41", "349.16", "340.76", "394.125", "71.86.15", "96.43.23", "173.14.39"]
+	version_list = []
+	echo_list = []
 	def __init__(self):
 		gpu.vendor = ""
 		gpu.product_full = ""
@@ -145,20 +179,75 @@ class gpu():
 		else:
 			gpu.vendor_class = "radeon"
 		if gpu.vendor_class == "nvidia":
+			get_version = get_nvidia_versions()
+			gpu.version_list = get_version[0]
+			os.system("rm -rf ./graphics/nvidia/nvidia*")
+			get_nvidia_supported()
+			get_echo()
 			version_list = gpu.version_list
-			find_supported = 1
+			find_supported = 1 # Placeholder
 			current_version = -1
 			while find_supported != 0:
 				current_version += 1
 				find_supported = os.system("cat ./graphics/nvidia/nvidia-%s.supported_cards | grep -i '%s' > /dev/null" % (version_list[current_version], gpu.product))
 			print ("Found supported version %s" % version_list[current_version])
+			print ("Echoing version %s" % gpu.echo_list[current_version]) 
 			gpu.driver_version = version_list[current_version]
 			gpu.working_driver_version = gpu.driver_version
 		elif gpu.vendor_class == "radeon":
 			gpu.driver_version = "x11-drivers/radeon-ucode"
 			print ("Found supported version %s" % gpu.driver_version)
 			gpu.working_driver_version = gpu.driver_version
-class get_arch:
+def get_nvidia_versions():
+	os.system("wget -q 'http://www.nvidia.com/object/unix.html'")
+	name_list = []
+	href_list = []
+	return_list = []
+	unix_file = open("unix.html", "r").readlines()
+	for x in unix_file:
+		if x.find("/AMD64/") != -1:
+			amd_line = x
+			break
+	x = unix_file.index(amd_line)
+	parser = hrefParser()
+	for line in range(x, x+7):
+		parser.feed(unix_file[line+1])
+		if parser.link[0] == "/":
+			parser.link = "http://www.nvidia.com%s" % parser.link
+		name_list.append(parser.name)
+		href_list.append(parser.link)
+	return_list.append(name_list)
+	return_list.append(href_list)
+	os.system("rm -rf unix.html") 
+	return return_list
+def get_nvidia_supported():
+	returned = get_nvidia_versions()
+	link_list = returned[1]
+	name_list = returned[0]
+	for x in link_list:
+		os.system("wget -q -O curr_file.html %s" % x)
+		curr_file = open("curr_file.html", "r").readlines()
+		os.system("rm -rf curr_file.html")
+		for y in curr_file:
+			if y.find("tab2_content") != -1:
+				tab_line = curr_file.index(y)
+				break
+		data_line = curr_file[tab_line+1]
+		classdata = stringParser()
+		classdata.feed(data_line)
+		data = '\n'.join(classdata.data)
+		link_num = link_list.index(x)
+		file_name = "nvidia-%s.supported_cards" % name_list[link_num]
+		file = open("graphics/nvidia/%s" % file_name, "w+")
+		file.write(data)
+		file.close()
+def get_echo():
+	for x in gpu.version_list:
+		for y in x:
+			if y == ".":
+				num = x.index(y)
+				gpu.echo_list.append(x[:num])
+				breakclass get_arch:
 	stage3_location = ""
 	architecture = ""
 	stage3name = ""
@@ -211,15 +300,10 @@ get_newpart()
 class makeopts:
 	use_flags = ""
 	cflags = ""
+class xserver:
+	xserver = "none"
+	display_manager = "startx"
 class systype:
-	memtotal = 0
-	profile = ""
-	profile_num = 0
-	usedmem = 0
-	dm_state = ""
-	dm = ""
-	dm_id = 0
-	de_ins = True
 	ins_custom = True
 	gendev = ""
 	rootSize = 0
@@ -622,7 +706,7 @@ def Nextask_part(button):
 		toplevel_window = builder.adv_part.get_object("top_level")
 		toplevel_window.reparent(builder.main_window)
 		builder.main_window.add(toplevel_window)
-		do_part_first(0)
+		do_part_first(1)
 	else:
 		toplevel_window = builder.rootPart.get_object("top_level")
 		disk()
@@ -642,41 +726,19 @@ def Backask_part(button):
 def Nextadv_part(button):
 	top_level = builder.adv_part.get_object("top_level")
 	builder.main_window.remove(top_level)
-	toplevel_window = builder.var.get_object("top_level")
+	toplevel_window = builder.xserver.get_object("top_level")
 	toplevel_window.reparent(builder.main_window)
-	systype.memtotal = subprocess.check_output("cat /proc/meminfo | grep MemTotal", shell=True)
-	systype.memtotal = systype.memtotal[9:]
-	systype.memtotal = systype.memtotal[:-3]
-	systype.memtotal = systype.memtotal.replace(" ", "")
-	systype.memtotal = int(systype.memtotal)
-	systype.memtotal /= 1024
-	systype.memtotal = int(round(systype.memtotal, 0))
-	widget.memory_bar.set_min_value(0)
-	widget.memory_bar.set_max_value(systype.memtotal)
-	widget.memory_label.set_markup("""<small>Total Memory
-	<span color="grey">0 %</span></small>""")
-	if defaults.update != True:
-		widget.install_desktop.set_active(False)
-		widget.install_desktop.set_sensitive(False)
-	else:
-		widget.install_desktop.set_active(True)
-		widget.install_desktop.set_sensitive(True)
-	gpu()
-	widget.gpu_type_info.set_markup("GPU Vendor: <b>%s</b>" % gpu.vendor)
-	widget.gpu_version_info.set_markup("  %s\n<small>Latest Version: %s</small>" % (gpu.product, gpu.driver_version))
-	if gpu.vendor != "NVIDIA Corporation":
-		widget.gpu_grid.remove(widget.gpu_version_change_nvidia)
-		widget.gpu_grid.pack_end(widget.radeon_drivers, True, True, 0)
-	else:
-		defaults.driver_cpu_selected = 1
-		widget.gpu_version_change_nvidia.set_active(gpu.version_list.index(gpu.driver_version))
-	widget.desktop_manager.remove(0)
-	widget.desktop_manager.remove(0)
 	builder.main_window.add(toplevel_window)
 def Backadv_part(button):
 	top_level = builder.adv_part.get_object("top_level")
 	builder.main_window.remove(top_level)
 	toplevel_window = builder.ask_part.get_object("top_level")
+	toplevel_window.reparent(builder.main_window)
+	builder.main_window.add(toplevel_window)
+def Backxserver(button):
+	top_level = builder.xserver.get_object("top_level")
+	builder.main_window.remove(top_level)
+	toplevel_window = builder.adv_part.get_object("top_level")
 	toplevel_window.reparent(builder.main_window)
 	builder.main_window.add(toplevel_window)
 def Nextvar(button):
@@ -722,6 +784,7 @@ def Backuser(button):
 	toplevel_window.reparent(builder.main_window)
 	builder.main_window.add(toplevel_window)
 #All functions that handle signals from glade
+#All the stepAsk_part functions
 def state_update(button):
 	defaults.update = button.get_active()
 	print ("Install Type: %s Updates: %s" % (defaults.install_type, defaults.update))
@@ -740,6 +803,7 @@ def set_custom_install(button):
 		defaults.install_type = "custom"
 		widget.check_update.set_sensitive(True)
 		print ("Install Type: %s Updates: %s" % (defaults.install_type, defaults.update))
+#All the steproot (simple partition detection) functions
 def change_disk_root(combo):
 	tree_iter = combo.get_active_iter()
 	if tree_iter != None:
@@ -782,6 +846,10 @@ def unit_change_root(combo):
 			widget.part_size.set_upper(disk.size[current_root_disk])
 			defaults.current_root_size_unit = "g"
 		widget.part_size.set_value(0)
+def setRoot(adjustment):
+	systype.rootSize = int(round(adjustment.get_value(), 0))
+	print ("Root Partition Size: %s" % systype.rootSize)
+#All the partAdv (Advanced partition detection) functions
 def part_selected(selection):
 	global treeiter
 	model, treeiter = selection.get_selected()
@@ -1126,6 +1194,26 @@ def mk_part(button):
 			os.system("mount %s /mnt/gentoo%s" % (path, current.mount_point))
 	do_part(disk.disks.index(main_disk))
 	builder.dialog_new_part.hide()
+def fileSystemWrite(path, fstype):
+	programs = {
+		"linux-swap(v1)": "mkswap",
+		"ext2": "mkfs.ext2 -T small -F",
+		"ext3": "mkfs.ext3 -T small -F",
+		"ext4": "mkfs.ext4 -T small -F",
+		"fat32": "mkfs.vfat -F32",
+		"fat16": "mkfs.vfat -F16",
+		"ntfs": "mkfs.ntfs -F"}
+	os.system("%s %s" % (programs[fstype], path))
+def format_iter(*args):
+	path = widget.partitions.get_value(treeiter, 0)
+	widget.recalculating.set_label("Formating partition %s" % path)
+	widget.recalculating.set_visible(True)
+	builder.main_window.show_all()
+	fstype = widget.partitions.get_value(treeiter, 1)
+	builder.main_window.show_all
+	fileSystemWrite(path, fstype)
+	widget.recalculating.set_visible(False)
+#All the stepVar functions (advanced gentoo settings)
 def desktop_environment(combo):
 	tree_iter = combo.get_active_iter()
 	if tree_iter != None:
@@ -1267,6 +1355,62 @@ def root_passwd(entry):
 		widget.root_strength.set_visible(True)
 	else:
 		widget.root_strength.set_visible(False)
+def change_unit_adv(combo):
+	tree_iter = combo.get_active_iter()
+	if tree_iter != None:
+		global main_unit
+		model = combo.get_model()
+		main_unit, id_num = model[tree_iter][:2]
+		id_num = str(id_num)
+		do_part(main_disk_num, id_num) 
+		print("Selected Unit: %s" % main_unit, id_num)
+def change_nvidia(combo):
+	tree_iter = combo.get_active_iter()
+	if tree_iter != None:
+		model = combo.get_model()
+		full_name, gpu.driver_version = model[tree_iter][:2]
+		gpu.driver_version = str(gpu.driver_version)
+		print("Selected Driver: %s" % full_name, gpu.driver_version)
+def driver_warning(combo):
+	tree_iter = combo.get_active_iter()
+	if tree_iter != None:
+		model = combo.get_model()
+		full_name, gpu.driver_version = model[tree_iter][:2]
+		gpu.driver_version = str(gpu.driver_version)
+		if gpu.driver_version == gpu.working_driver_version:
+			return
+	if defaults.driver_cpu_selected == 0:
+		widget.driver_warning.show_all()
+	else:
+		defaults.driver_cpu_selected = 0
+def driver_decline(button):
+	defaults.driver_cpu_selected == 1
+	widget.gpu_version_change_nvidia.set_active(gpu.version_list.index(gpu.working_driver_version))
+	widget.driver_warning.hide()
+def driver_accept(button):
+	widget.driver_warning.hide()
+def optimize_use(button):
+	defaults.optimize = button.get_active()
+	print ("Optimize: %s" % defaults.optimize)
+	if button.get_active() == True:
+		makeopts.cflags = "-march=native -O2 -pipe"
+	else:
+		makeopts.cflags = ""
+	widget.optimize_warning.set_visible(button.get_active())
+	widget.custom_cflags_button.set_visible(button.get_active())
+def open_cflags(button):
+	widget.custom_cflags_buffer.set_text(makeopts.cflags)
+	widget.cflags_window.show()
+def save_cflags(button):
+	start_iter = widget.custom_cflags_buffer.get_start_iter()
+	end_iter = widget.custom_cflags_buffer.get_end_iter()
+	makeopts.cflags = widget.custom_cflags_buffer.get_text(start_iter, end_iter, True)
+	widget.cflags_window.hide()
+def quit_cflags(*arg):
+	widget.cflags_window.hide()
+def cflag_help(button):
+	os.system("google-chrome-stable https://wiki.gentoo.org/wiki/Safe_CFLAGS")
+#All the stepUser functions (account and hostname setting)
 def hostname(entry):
 	defaults.hostname = entry.get_text()
 	if len(defaults.hostname) != 0:
@@ -1331,64 +1475,7 @@ def do_install(button):
 	else:
 		widget.install_info.set_text("Mounting Required block devices...")
 	builder.main_window.add(toplevel_window)
-def setRoot(adjustment):
-	systype.rootSize = int(round(adjustment.get_value(), 0))
-	print ("Root Partition Size: %s" % systype.rootSize)
-def change_unit_adv(combo):
-	tree_iter = combo.get_active_iter()
-	if tree_iter != None:
-		global main_unit
-		model = combo.get_model()
-		main_unit, id_num = model[tree_iter][:2]
-		id_num = str(id_num)
-		do_part(main_disk_num, id_num) 
-		print("Selected Unit: %s" % main_unit, id_num)
-def change_nvidia(combo):
-	tree_iter = combo.get_active_iter()
-	if tree_iter != None:
-		model = combo.get_model()
-		full_name, gpu.driver_version = model[tree_iter][:2]
-		gpu.driver_version = str(gpu.driver_version)
-		print("Selected Driver: %s" % full_name, gpu.driver_version)
-def driver_warning(combo):
-	tree_iter = combo.get_active_iter()
-	if tree_iter != None:
-		model = combo.get_model()
-		full_name, gpu.driver_version = model[tree_iter][:2]
-		gpu.driver_version = str(gpu.driver_version)
-		if gpu.driver_version == gpu.working_driver_version:
-			return
-	if defaults.driver_cpu_selected == 0:
-		widget.driver_warning.show_all()
-	else:
-		defaults.driver_cpu_selected = 0
-def driver_decline(button):
-	defaults.driver_cpu_selected == 1
-	widget.gpu_version_change_nvidia.set_active(gpu.version_list.index(gpu.working_driver_version))
-	widget.driver_warning.hide()
-def driver_accept(button):
-	widget.driver_warning.hide()
-def optimize_use(button):
-	defaults.optimize = button.get_active()
-	print ("Optimize: %s" % defaults.optimize)
-	if button.get_active() == True:
-		makeopts.cflags = "-march=native -O2 -pipe"
-	else:
-		makeopts.cflags = ""
-	widget.optimize_warning.set_visible(button.get_active())
-	widget.custom_cflags_button.set_visible(button.get_active())
-def open_cflags(button):
-	widget.custom_cflags_buffer.set_text(makeopts.cflags)
-	widget.cflags_window.show()
-def save_cflags(button):
-	start_iter = widget.custom_cflags_buffer.get_start_iter()
-	end_iter = widget.custom_cflags_buffer.get_end_iter()
-	makeopts.cflags = widget.custom_cflags_buffer.get_text(start_iter, end_iter, True)
-	widget.cflags_window.hide()
-def quit_cflags(*arg):
-	widget.cflags_window.hide()
-def cflag_help(button):
-	os.system("google-chrome-stable https://wiki.gentoo.org/wiki/Safe_CFLAGS")
+#Misc functions
 def show_terminal(button):
 	if button.get_active():
 		widget.terminal_window.show_all()
@@ -1396,25 +1483,55 @@ def show_terminal(button):
 		widget.terminal_window.hide()
 def shutdown(*args):
 	Gtk.main_quit()
-def fileSystemWrite(path, fstype):
-	programs = {
-		"linux-swap(v1)": "mkswap",
-		"ext2": "mkfs.ext2 -T small -F",
-		"ext3": "mkfs.ext3 -T small -F",
-		"ext4": "mkfs.ext4 -T small -F",
-		"fat32": "mkfs.vfat -F32",
-		"fat16": "mkfs.vfat -F16",
-		"ntfs": "mkfs.ntfs -F"}
-	os.system("%s %s" % (programs[fstype], path))
-def format_iter(*args):
-	path = widget.partitions.get_value(treeiter, 0)
-	widget.recalculating.set_label("Formating partition %s" % path)
-	widget.recalculating.set_visible(True)
-	builder.main_window.show_all()
-	fstype = widget.partitions.get_value(treeiter, 1)
-	builder.main_window.show_all
-	fileSystemWrite(path, fstype)
-	widget.recalculating.set_visible(False)
+def goto_xfce(button):
+	xserver.xserver = "xfce"
+	print xserver.xserver
+	top_level = builder.xserver.get_object("top_level")
+	builder.main_window.remove(top_level)
+	toplevel_window = builder.xfce.get_object("top_level")
+	toplevel_window.reparent(builder.main_window)
+	builder.main_window.add(toplevel_window)
+def goto_gnome(button):
+	xserver.xserver = "gnome"
+	print xserver.xserver
+	top_level = builder.xserver.get_object("top_level")
+	builder.main_window.remove(top_level)
+	toplevel_window = builder.gnome.get_object("top_level")
+	toplevel_window.reparent(builder.main_window)
+	builder.main_window.add(toplevel_window)
+def goto_kde(button):
+	xserver.xserver = "kde"
+	print xserver.xserver
+	top_level = builder.xserver.get_object("top_level")
+	builder.main_window.remove(top_level)
+	toplevel_window = builder.kde.get_object("top_level")
+	toplevel_window.reparent(builder.main_window)
+	builder.main_window.add(toplevel_window)
+def goto_none(button):
+	xserver.xserver = "none"
+	print xserver.xserver
+	top_level = builder.xserver.get_object("top_level")
+	builder.main_window.remove(top_level)
+	toplevel_window = builder.user.get_object("top_level")
+	toplevel_window.reparent(builder.main_window)
+	builder.main_window.add(toplevel_window)
+def xdm(button):
+	xserver.display_manager = "xdm"
+	top_level = builder.xfce.get_object("top_level")
+	builder.main_window.remove(top_level)
+	toplevel_window = builder.user.get_object("top_level")
+	toplevel_window.reparent(builder.main_window)
+	builder.main_window.add(toplevel_window)
+def gdm(button):
+	xserver.display_manager = "gdm"
+	
+def kdm(button):
+	xserver.display_manager = "kdm"
+def lightdm(button):
+	xserver.display_manager = "lightdm"
+def startx(button):
+	xserver.display_manager = "startx"
+
 main_handlers = {
 	"exit": Gtk.main_quit,
 	"shutdown": shutdown,
@@ -1486,6 +1603,12 @@ var_handlers = {
 	"open_cflags": open_cflags,
 	"cflag_help": cflag_help,
 	}
+xserver_handlers = {
+	"xfce": goto_xfce,
+	"gnome": goto_gnome,
+	"kde": goto_kde,
+	"none": goto_none,
+	"Back": Backxserver}
 rootPart_handlers = {
 	"Next": Nextroot,
 	"Back": Backroot,
@@ -1512,6 +1635,7 @@ class main():
 		widget.select_pkg.connect("changed", package_select)
 		builder.main.connect_signals(main_handlers)
 		builder.ask_part.connect_signals(part_ask_handlers)
+		builder.xserver.connect_signals(xserver_handlers)
 		builder.rootPart.connect_signals(rootPart_handlers)
 		builder.adv_part.connect_signals(part_advanced_handlers)
 		builder.var.connect_signals(var_handlers)

@@ -1,20 +1,15 @@
 #main1 {
 	background: #FFFFFF;
 }
-GtkButton.round {
-	background: #FFF;
-	border-radius: 50%;
-	border-style: none;
-	transition: .4s ease-in-out;
-}
+/*
 GtkButton.round:hover,
 GtkButton.round:prelight {
 	background-color: #000;
-}
-Gtk.Button.cancel {
+}*/
+GtkButton.cancel {
 	background: #FFF url("gtk/icons/window-close.png") no-repeat center;
 }
-Gtk.Button.ok {
+GtkButton.ok {
 	background: #FFF url("gtk/icons/object-select.png") no-repeat center;
 }
 GtkButton.control {
@@ -24,28 +19,29 @@ GtkButton.control {
 GtkButton.back {
 	background: #FFF url("gtk/icons/go-previous.png") no-repeat center;
 }
-GtkButton.back:hover,
+/*GtkButton.back:hover,
 GtkButton.back:prelight {
 	background: #000 url("gtk/icons/go-previous_invert.png") no-repeat center;
-}
+}*/
 GtkButton.next {
 	background: #FFF url("gtk/icons/go-next.png") no-repeat center;
-}
+}/*
 GtkButton.next:hover,
 GtkButton.next:prelight {
 	background: #000 url("gtk/icons/go-next_invert.png") no-repeat center;
-}
+}*/
 GtkButton.install_gentoo {
 	background: #FFF url("gtk/icons/drive-harddisk.png") no-repeat center;
-}
+}/*
 GtkButton.install_gentoo:hover,
 GtkButton.install_gentoo:prelight {
 	background: #000 url("gtk/icons/drive-harddisk_invert.png") no-repeat center;
-}
+}*/
 GtkButton.try_gentoo {
 	background: #FFF url("gtk/icons/drive-optical.png") no-repeat center;
-}
+}/*
 GtkButton.try_gentoo:hover,
 GtkButton.try_gentoo:prelight {
 	background: #000 url("gtk/icons/drive-optical_invert.png") no-repeat center;
 }
+*/

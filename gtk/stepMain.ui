@@ -99,7 +99,7 @@
                 <property name="relief">none</property>
                 <signal name="clicked" handler="exit" swapped="no"/>
                 <style>
-                  <class name="round"/>
+                  <class name="control"/>
                   <class name="try_gentoo"/>
                 </style>
               </object>
@@ -121,7 +121,7 @@
                 <property name="relief">none</property>
                 <signal name="clicked" handler="Next" swapped="no"/>
                 <style>
-                  <class name="round"/>
+                  <class name="control"/>
                   <class name="install_gentoo"/>
                 </style>
               </object>
