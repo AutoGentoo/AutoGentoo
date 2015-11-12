@@ -121,10 +121,6 @@ class builder:
 #Change directory to /usr/lib/autogentoo
 os.chdir("/usr/lib/autogentoo")
 
-import os, subprocess
-from HTMLParser import HTMLParser
-from htmlentitydefs import name2codepoint
-
 class hrefParser(HTMLParser):
 	def handle_starttag(self, tag, attrs):
 		for attr in attrs:
@@ -247,7 +243,8 @@ def get_echo():
 			if y == ".":
 				num = x.index(y)
 				gpu.echo_list.append(x[:num])
-				breakclass get_arch:
+				break
+class get_arch:
 	stage3_location = ""
 	architecture = ""
 	stage3name = ""
@@ -317,7 +314,7 @@ class current:
 	fstype = "ext2"
 	fs_id = 1
 	formatyn = False
-	mountpoint = ""
+	mount_point = ""
 	unit = "M"
 	start = 0
 	end = 0
@@ -384,9 +381,9 @@ class widget:
 	dm_state = builder.var.get_object("dm_state")
 	install_desktop = builder.var.get_object("install_desktop")
 	enable_custom_packages = builder.var.get_object("enable_custom_packages")
-	packages = Gtk.ListStore(str)
+	packages = Gtk.ListStore(str, str)
 	treeview_pkg = Gtk.TreeView.new_with_model(packages)
-	for i, column_title_pkg in enumerate(["Package"]):
+	for i, column_title_pkg in enumerate(["Package", "USE Flags"]):
 		renderer_pkg = Gtk.CellRendererText()
 		column_pkg = Gtk.TreeViewColumn(column_title_pkg, renderer, text=i)
 		treeview_pkg.append_column(column_pkg)
@@ -394,11 +391,16 @@ class widget:
 	select_pkg = treeview_pkg.get_selection()
 	delete_pkg = builder.var.get_object("remove")
 	top_level_pkg = builder.var.get_object("top_level_packages")
-	packages.append(["sys-process/htop"])
-	packages.append(["app-admin/sudo"])
-	packages.append(["app-portage/gentoolkit"])
-	packages.append(["sys-block/parted"])
-	packages.append(["sys-apps/dmidecode"])
+	packages.append(["sys-process/htop", ""])
+	packages.append(["app-admin/sudo", ""])
+	packages.append(["app-portage/gentoolkit", ""])
+	packages.append(["sys-block/parted", ""])
+	packages.append(["dev-python/pyparted", "python_targets_python2_7 python_targets_python3_4 python_targets_python3_5"])
+	packages.append(["sys-apps/dmidecode", ""])
+	packages.append(["sys-fs/e2fsprogs", ""])
+	packages.append(["sys-fs/dosfstools", ""])
+	packages.append(["sys-fs/ntfs3g", ""])
+	
 	package.list.append(["sys-process/htop"])
 	package.list.append(["app-admin/sudo"])
 	package.list.append(["app-portage/gentoolkit"])
@@ -1202,7 +1204,7 @@ def fileSystemWrite(path, fstype):
 		"ext4": "mkfs.ext4 -T small -F",
 		"fat32": "mkfs.vfat -F32",
 		"fat16": "mkfs.vfat -F16",
-		"ntfs": "mkfs.ntfs -F"}
+		"ntfs": "mkfs.ntfs -F -Q"}
 	os.system("%s %s" % (programs[fstype], path))
 def format_iter(*args):
 	path = widget.partitions.get_value(treeiter, 0)
