@@ -24,7 +24,7 @@
 
 import os, sys
 
-os.chdir(os.path.dirname(__file__))
+os.chdir("/usr/lib/autogentoo")
 sys.path.append(".")
 
 from AutoGentoo import *

@@ -52,7 +52,8 @@ def main():
 	print ("Creating %sautogentoo%s command" % (color.BOLD, color.END))
 	if os.path.exists("/usr/bin/autogentoo"):
 		os.system("rm -rf /usr/bin/autogentoo")
-	os.system("cp -R AutoGentoo /usr/bin/autogentoo")
+	autogentoo_cmd_file = open("/usr/bin/autogentoo", "w+")
+	autogentoo_cmd_file.write(open("autogentoo.installer", "r").read())
 	os.system("chmod 744 /usr/bin/autogentoo")
 	if os.path.exists("/usr/share/applications/AutoGentoo.desktop"):
 		os.system("rm -rf /usr/share/applications/AutoGentoo.desktop")

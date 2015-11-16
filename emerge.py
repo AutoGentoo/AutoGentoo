@@ -1,4 +1,4 @@
-xx#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #  emerge.py
@@ -23,47 +23,152 @@ xx#!/usr/bin/env python
 #  
 
 
-import os, subprocess
+import sys, os, subprocess
 from stepPart import get_value
 
 class Emerge:
-	def __init__(self, package):
-		if not os.path.exists("/usr/portage/%s" % package):
-			print ("Package", package, "not found!")
-			return None
-		pretend_exit = os.system("emerge -q --pretend %s > full_emerge" % package)
-		emerge_file = open("full_emerge", "r").readlines()
-		errors_start = []
-		raw_packages = []
-		self.packages = {}
-		for x in emerge_file:
-			if x[1:7] == "ebuild":
-				raw_packages.append(x)
-			if x[0:13] = "The following":
-				errors_start.append(emerge_file.index(x))
-		for x in raw_packages:
-			pkg = Package(x)
-			self.packages[pkg.path] = pkg
+	def __init__(self, package, write_config=True, options="", emerge_file="emerge.config", do_pretend=True, default_options="-q --pretend", remove_config=False):
+		if do_pretend:
+			# Create the config files to 
+			# read and create package and config instances
+			# do_pretend is used when emerge new packages without a config given
+			pretend_exit = os.system("emerge %s %s %s > %s 2>&1" % (default_options, options, package, emerge_file))
 		
+		# Variable to read the config file
+		self.emerge_file = open(emerge_file, "r").readlines()
+		
+		if remove_config:
+			# Only remove the file if remove_config is True
+			os.system("rm -rf %s" % emerge_file) # Remove old file
+		
+		self.write_config = write_config
+		self.main_package = package
+		self.packages = {} # package: Package instance
+		self.config = {} # file_name: configFile instance
+		
+		self.getPackages() # Create the package instances
+		self.getConfig() # Create the config instances
+		
+		# Append package paths to the command to
+		# later be formated
+		for x in self.packages:
+			self.command.append("=%s" % self.packages[x].package)
+		
+		# Convert the self.command list to str
+		# with each item split by a ' '
+		self.command = ' '.join(self.command)
+		
+		# Command is the command used to emerge the packages in order 
+		self.command = 'emerge -q ' + self.command
+	def getPackages(self):
+		# Define buffer variables
+		self.config_start = []
+		self.raw_packages = []
+		
+		# Config file search for packages
+		# Packages have line starting with [ebuild
+		# This format is created by the emerge --pretend command
+		for x in self.emerge_file:
+			if x[1:7] == "ebuild":
+				x = x.replace("\n", "")
+				self.raw_packages.append(x)
+			# Config file changes are detected when the line starts
+			# with 'The following' (created by the 'emerge' command)
+			if x[0:13] == "The following":
+				self.config_start.append(self.emerge_file.index(x))
+		for x in self.raw_packages:
+			# Create the Package instances and input the package
+			# line 
+			pkg = Package(x)
+			
+			# self.packages dictionary is setup with package name : Package instance
+			# Ex gnome-base/gnome: Package instace for gnome-base/gnome
+			self.packages[pkg.path] = pkg
+	def getConfig(self):
+		for x in self.config_start:
+			curr_line = self.emerge_file[x]
+			raw_path_line = self.emerge_file[x+1]
+			raw_text = []
+			y = x+2
+			for y in self.emerge_file[y:]:
+				if y != "\n":
+					raw_text.append(y)
+				else:
+					break
+			raw_text.insert(0, "#Config for the %s emerge set or package\n" % self.main_package)
+			text = ''.join(raw_text)
+			file_name = raw_path_line[raw_path_line.index('package'):raw_path_line.index('" ')]
+			path = "/etc/portage/%s" % file_name
+			self.config[file_name] = configFile(path, text, self.write_config)
+		self.command = []
+	def emerge(self):
+		exit_sig = os.system("%s" % self.command)
+		return exit_sig
+	def print_package(self, printAttr=True):
+		for x in self.packages:
+			print ("Package: %s" % x)
+			print ("	version: %s" % self.packages[x].package)
+			if self.packages[x].old:
+				print ("	Old package: %s" % self.packages[x].old)
+			if not printAttr:
+				continue
+			for y in self.packages[x].properties:
+				print ("	%s: %s" % (y, self.packages[x].properties[y]))
 class configFile:
-	
+	def __init__(self, path, string="", update_file=True):
+		self.path = path
+		self.update_text = string
+		self.file_write = open(path, "a")
+		self.file_read = open(path, "r+").readlines()
+		if self.update_text != "":
+			self.has_update = True
+		else:
+			self.has_update = False
+		if update_file:
+			self.update()
+	def update(self):
+		self.file_write.write(self.update_text)
+	def new_update(self, string=""):
+		self.update_text = string
+		if self.update_text != "":
+			self.has_update = True
+		else:
+			self.has_update = False
 class Package:
-	new = False
-	slot = False
-	updating = False
-	downgrading = False
-	reinstall = False
-	replacing = False
-	fetch_man = False
-	fetch_auto = False
-	interactive = False
-	blocked_man = False
-	blocked_auto = False
 	def __init__(self, package_str):
+		self.new = False
+		self.slot = False
+		self.updating = False
+		self.downgrading = False
+		self.reinstall = False
+		self.replacing = False
+		self.fetch_man = False
+		self.fetch_auto = False
+		self.interactive = False
+		self.blocked_man = False
+		self.blocked_auto = False
 		get_val_list = get_value(package_str, 0, ']')
 		get_property = get_val_list[0].replace("[ebuild", "")
 		get_property = get_property.replace("]", "")
-		properties = {
+		self.properties_str = {
+			"N": "self.new", #(not yet installed)
+			"S": "self.slot", # (side-by-side versions)
+			"U": "self.updating", # (to another version)
+			"D": "self.downgrading", # (best version seems lower)
+			"r": "self.reinstall", # (forced for some reason, possibly due to slot or sub-slot)
+			"R": "self.replacing", # (remerging same version)
+			"F": "self.fetch_man", # (must be manually downloaded)
+			"f": "self.fetch_auto", # (already downloaded)
+			"I": "self.interactive", # (requires user input)
+			"B": "self.blocked_man", # (unresolved conflict)
+			"b": "self.blocked_auto" # (automatically resolved conflict)
+		}
+		get_val_list = get_value(package_str, 16, ' ')
+		self.package = get_val_list[0]
+		for x in get_property:
+			if x != " ":
+				exec("%s = True" % self.properties_str[x])
+		self.properties = {
 			"N": self.new, #(not yet installed)
 			"S": self.slot, # (side-by-side versions)
 			"U": self.updating, # (to another version)
@@ -76,61 +181,23 @@ class Package:
 			"B": self.blocked_man, # (unresolved conflict)
 			"b": self.blocked_auto # (automatically resolved conflict)
 		}
-		for x in get_property:
-			if x != " ":
-				properties[x](True)
-		get_val_list = get_value(package_str, 16, ' ')
-		self.package = get_val_list[0]
 		if self.updating:
 			get_val_list = get_value(package_str, get_val_list[1], ']')
-			self.update = get_val_list.replace("[", "")
-			self.update = self.update("]", "")
+			self.old = get_val_list[0].replace("[", "")
+			self.old = self.old.replace("]", "")
+			self.old = self.old.replace("\n", "")
+		else:
+			self.old = None
 	
 	@property
-	def package(self):
-		self.package
-	@property
 	def path(self):
-		self.path = subprocess.check_output("find /usr/portage/* -name '%s.ebuild'" % self.package)
-		temp_array = []
-		found_dir = False
-		for x in self.path:
-			if x == "/":
-				if found_dir:
-					break
-				else:
-					found_dir = True
-			temp_array.append(x)
-		return ''.join(temp_array)
-	@property
-	def new(self, boolean):
-		return = bool(boolean)
-	@property
-	def slot(self, boolean):
-		return = bool(boolean)
-	@property
-	def updating(self, boolean):
-		return = bool(boolean)
-	@property
-	def downgrading(self, boolean):
-		return = bool(boolean)
-	@property
-	def reinstall(self, boolean):
-		return = bool(boolean)
-	@property
-	def fetch_man(self, boolean):
-		print ("Manual Fetch for package %s required" % self.path)
-		
-		return = bool(boolean)
-	@property
-	def fetch_auto(self, boolean):
-		return = bool(boolean)
-	@property
-	def interactive(self, boolean):
-		return = bool(boolean)
-	@property
-	def blocked_man(self, boolean):
-		return = bool(boolean)
-	@property
-	def blocked_auto(self, boolean):
-		return = bool(boolean)
+		search_package = self.package[self.package.index("/")+1:]
+		release = search_package[0:search_package.rfind("-")]
+		if self.package[-2] == "r":
+			path = self.package[0:self.package.index("/")+1] + release[0:release.rfind("-")]
+		else:
+			path = self.package[0:self.package.index("/")+1] + search_package[0:search_package.rfind("-")]
+		return path
+if __name__ == '__main__':
+	world = Emerge("@world", emerge_file="world.config", do_pretend=False, default_options="-q", remove_config=False)
+	world.emerge()
