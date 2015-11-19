@@ -34,6 +34,10 @@ class Emerge:
 			# do_pretend is used when emerge new packages without a config given
 			pretend_exit = os.system("emerge %s %s %s > %s 2>&1" % (default_options, options, package, emerge_file))
 		
+		#Setting options
+		self.options = options
+		self.default_options = default_options
+		
 		# Variable to read the config file
 		self.emerge_file = open(emerge_file, "r").readlines()
 		
@@ -51,6 +55,8 @@ class Emerge:
 		
 		# Append package paths to the command to
 		# later be formated
+		self.command = []
+		
 		for x in self.packages:
 			self.command.append("=%s" % self.packages[x].package)
 		
@@ -83,7 +89,7 @@ class Emerge:
 			
 			# self.packages dictionary is setup with package name : Package instance
 			# Ex gnome-base/gnome: Package instace for gnome-base/gnome
-			self.packages[pkg.path] = pkg
+			self.packages[pkg.package] = pkg
 	def getConfig(self):
 		for x in self.config_start:
 			curr_line = self.emerge_file[x]
@@ -100,13 +106,31 @@ class Emerge:
 			file_name = raw_path_line[raw_path_line.index('package'):raw_path_line.index('" ')]
 			path = "/etc/portage/%s" % file_name
 			self.config[file_name] = configFile(path, text, self.write_config)
-		self.command = []
 	def emerge(self):
 		exit_sig = os.system("%s" % self.command)
 		return exit_sig
+	def emerge_updates(self, execute=True):
+		cmd = []
+		for x in self.packages:
+			if self.packages[x].updating:
+				cmd.append("=%s" % x)
+		if len(cmd) == 0:
+			updates = False
+		else:
+			updates = True
+		cmd = ' '.join(cmd)
+		cmd = "emerge %s %s %s" % (self.options, self.default_options, cmd)
+		if execute:
+			exit_stat = 0
+			if updates:
+				exit_stat = os.system(cmd)
+			print ("No packages left to update")
+			return exit_stat
+		else:
+			print "Command to be executed %s" % cmd
 	def print_package(self, printAttr=True):
 		for x in self.packages:
-			print ("Package: %s" % x)
+			print ("Package: %s" % self.packages[x].path)
 			print ("	version: %s" % self.packages[x].package)
 			if self.packages[x].old:
 				print ("	Old package: %s" % self.packages[x].old)
@@ -118,8 +142,8 @@ class configFile:
 	def __init__(self, path, string="", update_file=True):
 		self.path = path
 		self.update_text = string
-		self.file_write = open(path, "a")
 		self.file_read = open(path, "r+").readlines()
+		self.file_write = open(path, "a")
 		if self.update_text != "":
 			self.has_update = True
 		else:
@@ -163,11 +187,14 @@ class Package:
 			"B": "self.blocked_man", # (unresolved conflict)
 			"b": "self.blocked_auto" # (automatically resolved conflict)
 		}
-		get_val_list = get_value(package_str, 16, ' ')
+		get_val_list = get_value(package_str, 17, ' ')
 		self.package = get_val_list[0]
 		for x in get_property:
 			if x != " ":
-				exec("%s = True" % self.properties_str[x])
+				try:
+					exec("%s = True" % self.properties_str[x])
+				except KeyError:
+					pass
 		self.properties = {
 			"N": self.new, #(not yet installed)
 			"S": self.slot, # (side-by-side versions)
@@ -199,5 +226,5 @@ class Package:
 			path = self.package[0:self.package.index("/")+1] + search_package[0:search_package.rfind("-")]
 		return path
 if __name__ == '__main__':
-	world = Emerge("@world", emerge_file="world.config", do_pretend=False, default_options="-q", remove_config=False)
-	world.emerge()
+	world = Emerge("@world", emerge_file="world.config", options="--emptytree")
+	world.emerge_updates()

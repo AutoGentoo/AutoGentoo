@@ -708,7 +708,7 @@ def Nextask_part(button):
 		toplevel_window = builder.adv_part.get_object("top_level")
 		toplevel_window.reparent(builder.main_window)
 		builder.main_window.add(toplevel_window)
-		do_part_first(1)
+		do_part_first(0)
 	else:
 		toplevel_window = builder.rootPart.get_object("top_level")
 		disk()
