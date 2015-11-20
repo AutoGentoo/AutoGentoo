@@ -154,9 +154,12 @@ class configFile:
 		self.path = path
 		self.update_text = string
 		if os.path.isfile(path):
-			self.file_write = open(path, "a")
+			real_path = path
 		else:
-			self.file_write = open("%s/autogentoo" % path, "a")
+			real_path = "%s/autogentoo" % path
+		if not os.path.exists(real_path):
+			os.system("touch %s" % real_path)
+		self.file_write = open(path, "a")
 		self.file_read = open(path, "r+").readlines()
 		
 		if self.update_text != "":
