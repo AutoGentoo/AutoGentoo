@@ -142,8 +142,12 @@ class configFile:
 	def __init__(self, path, string="", update_file=True):
 		self.path = path
 		self.update_text = string
+		if os.path.isfile(path):
+			self.file_write = open(path, "a")
+		else:
+			self.file_write = open("%s/autogentoo" % path, "a")
 		self.file_read = open(path, "r+").readlines()
-		self.file_write = open(path, "a")
+		
 		if self.update_text != "":
 			self.has_update = True
 		else:
