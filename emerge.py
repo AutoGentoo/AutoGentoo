@@ -24,7 +24,18 @@
 
 
 import sys, os, subprocess
-from stepPart import get_value
+
+def get_value(string, start_num, exit_mark=' '):
+	curr_char = ""
+	temp = ""
+	num = start_num
+	while curr_char != exit_mark:
+		curr_char = string[num]
+		temp += curr_char
+		num += 1
+	temp = temp.replace(exit_mark, "")
+	return_val = [temp, num]
+	return return_val
 
 class Emerge:
 	def __init__(self, package, write_config=True, options="", emerge_file="emerge.config", do_pretend=True, default_options="-q --pretend", remove_config=False):
