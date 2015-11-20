@@ -120,7 +120,7 @@ class Emerge:
 	def emerge(self):
 		exit_sig = os.system("%s" % self.command)
 		return exit_sig
-	def emerge_updates(self, execute=True, options):
+	def emerge_updates(self, execute=True, options=""):
 		cmd = []
 		for x in self.packages:
 			if self.packages[x].updating or self.packages[x].new:
