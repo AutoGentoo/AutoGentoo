@@ -123,7 +123,7 @@ class Emerge:
 	def emerge_updates(self, execute=True):
 		cmd = []
 		for x in self.packages:
-			if self.packages[x].updating:
+			if self.packages[x].updating or self.packages[x].new:
 				cmd.append("=%s" % x)
 		if len(cmd) == 0:
 			updates = False
@@ -153,7 +153,7 @@ class configFile:
 	def __init__(self, path, string="", update_file=True):
 		self.path = path
 		self.update_text = string
-		if os.path.isfile(path):
+		if not os.path.isdir(path):
 			real_path = path
 		else:
 			real_path = "%s/autogentoo" % path
@@ -205,7 +205,7 @@ class Package:
 			"B": "self.blocked_man", # (unresolved conflict)
 			"b": "self.blocked_auto" # (automatically resolved conflict)
 		}
-		get_val_list = get_value(package_str, 17, ' ')
+		get_val_list = get_value(package_str, 16, ' ')
 		self.package = get_val_list[0]
 		for x in get_property:
 			if x != " ":
