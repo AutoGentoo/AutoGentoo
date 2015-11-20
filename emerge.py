@@ -120,7 +120,7 @@ class Emerge:
 	def emerge(self):
 		exit_sig = os.system("%s" % self.command)
 		return exit_sig
-	def emerge_updates(self, execute=True):
+	def emerge_updates(self, execute=True, options):
 		cmd = []
 		for x in self.packages:
 			if self.packages[x].updating or self.packages[x].new:
@@ -130,7 +130,7 @@ class Emerge:
 		else:
 			updates = True
 		cmd = ' '.join(cmd)
-		cmd = "emerge %s %s %s" % (self.options, self.default_options, cmd)
+		cmd = "emerge %s %s" % (options, cmd)
 		if execute:
 			exit_stat = 0
 			if updates:
