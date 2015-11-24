@@ -392,9 +392,6 @@ to remove this partition&lt;/small&gt;</property>
     <property name="can_focus">False</property>
     <property name="icon_name">edit-clear-rtl-symbolic</property>
   </object>
-  <object class="GtkEntryCompletion" id="mount_point_entry_completion">
-    <property name="model">mount_points</property>
-  </object>
   <object class="GtkListStore" id="mount_points">
     <columns>
       <!-- column-name Directory -->
@@ -420,6 +417,9 @@ to remove this partition&lt;/small&gt;</property>
         <col id="0" translatable="yes">/var</col>
       </row>
     </data>
+  </object>
+  <object class="GtkEntryCompletion" id="mount_point_entry_completion">
+    <property name="model">mount_points</property>
   </object>
   <object class="GtkAdjustment" id="part_size_adj">
     <property name="upper">100</property>
@@ -1153,7 +1153,7 @@ to remove this partition&lt;/small&gt;</property>
                     <property name="can_focus">True</property>
                     <property name="shadow_type">none</property>
                     <property name="caps_lock_warning">False</property>
-                    <property name="placeholder_text" translatable="yes">&lt;directory in /mnt/gentoo&gt;</property>
+                    <property name="placeholder_text" translatable="yes">&lt;directory&gt;</property>
                     <property name="completion">mount_point_entry_completion</property>
                     <signal name="changed" handler="mount_point" swapped="no"/>
                   </object>
@@ -1476,7 +1476,7 @@ to remove this partition&lt;/small&gt;</property>
                   <object class="GtkEntry" id="mount_point2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="placeholder_text" translatable="yes">&lt;directory in /mnt/gentoo&gt;</property>
+                    <property name="placeholder_text" translatable="yes">&lt;directory&gt;</property>
                     <property name="completion">mount_point_entry_completion</property>
                     <signal name="changed" handler="mount_point" swapped="no"/>
                   </object>
