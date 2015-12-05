@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  pyoption.py
+#  Exceptions.py
 #  
-#  Copyright 2015 Andrei Tumbar <atadmin@Helios>
+#  Copyright 2015 Andrei Tumbar <atuser@Kronos>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,6 +20,20 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #  
-#
+#  
 
-
+class OptionError(Exception):
+	def __init__(self, warning):
+		self.value = warning
+	def __str__(self):
+		return str(self.value)
+class SectionError(Exception):
+	def __init__(self, warning):
+		self.value = warning
+	def __str__(self):
+		return str(self.value)
+class HelpCatError(Exception):
+	def __init__(self, warning):
+		self.value = warning
+	def __str__(self):
+		return str(self.value)

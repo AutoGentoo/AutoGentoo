@@ -244,5 +244,5 @@ class Package:
 			path = self.package[0:self.package.index("/")+1] + search_package[0:search_package.rfind("-")]
 		return path
 if __name__ == '__main__':
-	world = Emerge("@world", emerge_file="world.config", options="--emptytree")
+	world = Emerge("@world", emerge_file="world.config", options="-qe")
 	world.emerge_updates()
