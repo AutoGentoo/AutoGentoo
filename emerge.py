@@ -112,7 +112,7 @@ class Emerge:
 					raw_text.append(y)
 				else:
 					break
-			raw_text.insert(0, "#Config for the %s emerge set or package\n" % self.main_package)
+			raw_text.insert(0, "# Config for the %s emerge set or package\n" % self.main_package)
 			text = ''.join(raw_text)
 			file_name = raw_path_line[raw_path_line.index('package'):raw_path_line.index('" ')]
 			path = "/etc/portage/%s" % file_name
@@ -138,7 +138,7 @@ class Emerge:
 			print ("No packages left to update")
 			return exit_stat
 		else:
-			print "Command to be executed %s" % cmd
+			print ("Command to be executed %s" % cmd)
 	def print_package(self, printAttr=True):
 		for x in self.packages:
 			print ("Package: %s" % self.packages[x].path)
@@ -243,6 +243,14 @@ class Package:
 		else:
 			path = self.package[0:self.package.index("/")+1] + search_package[0:search_package.rfind("-")]
 		return path
+def main(args=sys.argv):
+	package = "@world"
+	emerge_file = "default"
+	if len(args) > 1:
+		package = args[1]
+	if len(args) > 2:
+		emerge_file = args[2]
+	emerge = Emerge(package, emerge_file=emerge_file)
+	emerge.emerge()
 if __name__ == '__main__':
-	world = Emerge("@world", emerge_file="world.config", options="--emptytree")
-	world.emerge_updates()
+	main()
