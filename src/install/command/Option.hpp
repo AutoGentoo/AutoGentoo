@@ -24,14 +24,13 @@
 
 #include <iostream>
 #include <string>
+#include <sstream> // For char to string conversions
+#include <map> // Option type definition
 #include <vector> // Vectors
 #include <algorithm> // find
 #include <list>
 
 using namespace std;
-
-
-template <class any>
 
 class Option
 {
@@ -42,105 +41,26 @@ class Option
 	vector<string> _argv;
 	string _long;
 	string _desc;
-	bool hasFunc;
 	
 	Option ( 
 	vector<string> argv,
-	const char _short,
-	const char *_long = "",
-	const char *_desc = "",
-	any *_func = NULL )
+	const char short_,
+	const char *long_ = "",
+	const char *desc = "")
 	{
 		//Define the Option information
-		_short = string ( _short );
-		_long = string ( _long );
-		_desc = string ( _desc );
+		stringstream buff;
+		buff << short_;
+		buff >> _short;
+		
+		buff << long_;
+		buff >> _long;
+		
+		buff << desc;
+		buff >> _desc;
 		
 		//Define the commandline arguments
 		_argv = argv;
-		
-		//Determine if there is a function to execute
-		if ( _func )
-		{
-			hasFunc = true;
-		}
-		else
-		{
-			hasFunc = false;
-		}
-		
-		//Find if the option was used
-		if ( getUsed ( _short ) || getUsed ( _long ) )
-		{
-			// Execute the function if their is one
-			if ( hasFunc )
-			{
-				_func ( );
-			}
-		}
-	}
-	
-	bool getUsed ( any option )
-	{
-		return find ( _argv.begin ( ), _argv.end ( ), option) != _argv.end ( ) ;
-	}
-	
-	
-	
-	any _func ( )
-	{
-		//Empty execute function
-		;
-	}
-};
-
-template <class any>
-class OptionWithArgs
-{
-	public:
-	
-	char _short;
-	vector<string> _argv;
-	string _long;
-	string _desc;
-	bool hasFunc;
-	list<any> arguments;
-	
-	OptionWithArgs (
-	vector<string> argv,
-	const char *_short,
-	list<any> _arguments,
-	const char *_long = "",
-	const char *_desc = "",
-	any *_func = NULL)
-	{
-		//Define the Option information
-		_short = string ( _short );
-		_long = string ( _long );
-		_desc = string ( _desc );
-		
-		//Define the commandline arguments
-		_argv = argv;
-		
-		//Determine if there is a function to execute
-		if ( _func )
-		{
-			hasFunc = true;
-		}
-		else
-		{
-			hasFunc = false;
-		}
-		
-		//Find if the option was used
-		if ( getUsed ( _short ) || getUsed ( _long ) )
-		{
-			// Execute the function if their is one
-			if ( hasFunc )
-			{
-				_func ( _arguments );
-			}
-		}
 	}
 	
 	bool getUsed ( )
@@ -158,16 +78,75 @@ class OptionWithArgs
 			return false;
 		}
 	}
+};
+
+class OptionWithArgs
+{
+	public:
 	
-	any _func ( any args )
+	//Default variables of an OptionWithArgs
+	char _short;
+	vector<string> _argv;
+	string _long;
+	string _desc;
+	list<string> arguments;
+	
+	OptionWithArgs (
+	vector<string> argv,
+	const char short_,
+	list<string> _arguments,
+	const char *long_ = "",
+	const char *desc = "")
 	{
-		;
+		//Define the Option information
+		stringstream buff;
+		buff << short_;
+		buff >> _short;
+		
+		buff << long_;
+		buff >> _long;
+		
+		buff << desc;
+		buff >> _desc;
+		
+		//Define the commandline arguments
+		_argv = argv;
 	}
 };
 
-template<>
+
 class OptionParser
 {
 	public:
 	
-	list<option> OptionSet
+	list<Option> OptionSet;
+	string _programName;
+	string _programDesc;
+	
+	OptionParser (
+	string programName,
+	string programDesc,
+	bool createHelp )
+	{
+		;
+	}
+	
+	void setName ( const char **name )
+	{
+		stringstream buff;
+		buff << name;
+		buff >> _programName;
+	}
+	
+	void setDesc ( const char **desc )
+	{
+		stringstream buff;
+		buff << desc;
+		buff >> _programDesc;
+	}
+	
+	void addOption ( Option newoption )
+	{
+		OptionSet.push_back ( newoption );
+	}
+};
