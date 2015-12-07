@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  pyoption.py
+#  test_options.py
 #  
-#  Copyright 2015 Andrei Tumbar <atadmin@Helios>
+#  Copyright 2015 Andrei Tumbar <atuser@Kronos>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,6 +20,18 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #  
-#
+#  
 
+from PyOption import *
+
+def main():
+	options = OptionParser
+	print options
+	#options.add_option("-t", "--test"
+	options.createHelp()
+	print options.help
+	return 0
+
+if __name__ == '__main__':
+	main()
 

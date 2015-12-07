@@ -1158,6 +1158,8 @@ def convert_unit(input_unit, output_unit):
 def mk_part(button):
 	disk_type = diskType(main_disk)
 	arg1 = main_disk
+	arg4 = int(widget.start_part.get_value())
+	arg5 = int(widget.end_part.get_value())
 	size = widget.part_size_adj.get_value()
 	if disk_type != "gpt":
 		if current.primary:
@@ -1176,8 +1178,6 @@ def mk_part(button):
 			arg3 = "fat32"
 		else:
 			arg3 = "fat16"
-	arg4 = int(widget.start_part.get_value())
-	arg5 = int(widget.end_part.get_value())
 	old = part.paths
 	os.system("parted -s %s unit MiB mkpart %s %s %s %s" % (arg1, arg2, arg3, arg4, arg5))
 	do_part(disk.disks.index(main_disk))
@@ -1191,9 +1191,9 @@ def mk_part(button):
 		pass
 	else:
 		if current.mount_point[0] == "/":
-			if not os.path.exists("/mnt/gentoo%s" % current.mount_point):
-				os.system("mkdir /mnt/gentoo%s" % current.mount_point)
-			os.system("mount %s /mnt/gentoo%s" % (path, current.mount_point))
+			if not os.path.exists("%s" % current.mount_point):
+				os.system("mkdir %s" % current.mount_point)
+			os.system("mount %s %s" % (path, current.mount_point))
 	do_part(disk.disks.index(main_disk))
 	builder.dialog_new_part.hide()
 def fileSystemWrite(path, fstype):
