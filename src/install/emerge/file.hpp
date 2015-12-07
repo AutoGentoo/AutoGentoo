@@ -9,24 +9,26 @@ class File
 	public:
 	ifstream file;
 	string text;
-	File(const char* fileName)
+	
+	File( const char *fileName )
 	{
-		file.open (fileName);
+		file.open ( fileName );
 		file >> text;
 	}
-	list<string> readlines(void)
+	
+	vector<string> readlines( )
 	{
-		list<string> returnList;
-		for (string str; getline(file, str);)
+		vector<string> returnList;
+		for ( string str; getline ( file, str ); )
 		{
-			string::size_type findNewLine = str.find("\n");
-			if (findNewLine != string::npos)
+			string::size_type findNewLine = str.find ( "\n" );
+			if ( findNewLine != string::npos )
 			{
-				returnList.push_back(str);
+				returnList.push_back ( str );
 			}
 			else
 			{
-				returnList.push_back(str + "\n");
+				returnList.push_back ( str + "\n" ) ;
 			}
 		}
 		return returnList;
