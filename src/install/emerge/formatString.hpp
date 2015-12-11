@@ -27,6 +27,11 @@
 #include <vector>
 #include <algorithm>
 
+/**\namespace strfmt
+ * The strfmt namespace consists of a various collection of tools
+ * to format string
+ *
+ */
 namespace strfmt
 {
 	void remove ( std::string &removing, const char *toRemove )

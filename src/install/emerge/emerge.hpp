@@ -37,11 +37,11 @@ using boost::io::group;
 class Emerge 
 {
 	public:
-	vector<Package> Packages;
+	vector<Package> Packages; //!< List of Package classes that was create from the config file
 	vector<string> PackageNames, emergeFile;
-	vector<int> configStart;
+	vector<int> configStart; //!< Stores the line numbers in emergeFile that need Error creation
 	string options, defaultOptions, configFile;
-	char *emergeCommand;
+	char *emergeCommand; //!< Executed during emerge ()
 	
 	Emerge (
 	string package,
@@ -51,16 +51,18 @@ class Emerge
 	string _defaultOptions="-q"
 	)
 	{
-		string buffer = str (format("emerge --pretend %s %s %s >> %s") % options % defaultOptions % package % configFile);
-		emergeCommand = new char[buffer.length() + 1];
-		strcpy(emergeCommand, buffer.c_str());
+		string buffer; //!< A string that will be formated to create a char to hold the emerge --pretend command (writes config)
+		buffer = str (format("emerge --pretend %s %s %s >> %s") % options % defaultOptions % package % configFile);
+		emergeCommand = new char[buffer.length() + 1]; //!< Char with length of the buffer string
+		strcpy(emergeCommand, buffer.c_str()); //!< Copy the string into emergeCommand
 		
 		if (do_pretend)
 		{
+			/*! Execute the emergeCommand to write the config */
 			system(emergeCommand);
 		}
 		
-		options = _options;
+		options = _options; //!< Options will be used 
 		defaultOptions = _defaultOptions;
 		emergeFile = File(configFile).readlines();
 		getPackages ( );
@@ -76,7 +78,7 @@ class Emerge
 			{
 				x = x.substr(0, x.length()-1);
 			}
-			if ( x == string ( "\n" )  || x == string ( " " ))
+			if ( x == string ( "\n" ) || x == string ( " " ) || x == string ( "" ) )
 			{
 				x = string ("");
 			}

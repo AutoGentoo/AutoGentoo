@@ -1,22 +1,131 @@
 #include <iostream>
 #include <string>
+#include <map>
 #include "formatString.hpp"
 
 using namespace std;
 
+/*! \struct PackageProperties
+ * This type is meant to store the boolean information
+ * of a Gentoo ebuild/package
+ */ 
 typedef struct PackageProperties
 {
-	bool _new;
-	bool _slot;
-	bool _updating;
-	bool _downgrading;
-	bool _reinstall;
-	bool _replacing;
-	bool _fetchman;
-	bool _fetchauto;
-	bool _interactive;
-	bool _blockedman;
-	bool _blockedauto;
+	bool _new; //!< not yet installed
+	bool _slot; //!< side-by-side versions
+	bool _updating; //!< update to another version
+	bool _downgrading; //!< best version seems lower
+	bool _reinstall; //!< forced for some reason, possibly due to slot or sub-slot
+	bool _replacing; //!< remerging same version
+	bool _fetchman; //!< must be manually downloaded
+	bool _fetchauto; //!< already downloaded
+	bool _interactive; //!< requires user input
+	bool _blockedman; //!< unresolved conflict
+	bool _blockedauto; //!< automatically resolved conflict
+	
+	bool createdList; //!< Tells set and the [] operator whether to init the list
+	map<string, bool> attrMap;
+	
+	void createList ( void )
+	{
+		attrMap["new"] = _new;
+		attrMap["slot"] = _slot;
+		attrMap["updating"] = _updating;
+		attrMap["downgrading"] = _downgrading;
+		attrMap["reinstall"] = _reinstall;
+		attrMap["replacing"] = _replacing;
+		attrMap["fetch_man"] = _fetchman;
+		attrMap["fetch_auto"] = _fetchauto;
+		attrMap["interactive"] = _interactive;
+		attrMap["blocked_man"] = _blockedman;
+		attrMap["blocked_auto"] = _blockedauto;
+		createdList = true;
+	}
+	void set ( string in, bool val )
+	{
+		if ( !createdList )
+		{
+			createList ( );
+		}
+		if ( in.length() == 1 )
+		{
+			char inc = in.at(0);
+			switch ( inc )
+			{
+				case 'N':
+					_new = val;
+					return;
+				case 'S':
+					_slot = val;
+					return;
+				case 'U':
+					_updating = val;
+					return;
+				case 'D':
+					_downgrading = val;
+					return;
+				case 'r':
+					_reinstall = val;
+					return;
+				case 'R':
+					_replacing = val;
+					return;
+				case 'F':
+					_fetchman = val;
+					return;
+				case 'f':
+					_fetchauto = val;
+					return;
+				case 'I':
+					_interactive = val;
+					return;
+				case 'B':
+					_blockedman = val;
+					return;
+				case 'b':
+					_blockedauto = val;
+					return;
+			}
+		}
+		attrMap[in] = val;
+	}
+	bool operator [] ( string in )
+	{
+		if ( !createdList )
+		{
+			createList ( );
+		}
+		if ( in.length() == 1 )
+		{
+			char inc = in.at(0);
+			switch ( inc )
+			{
+				case 'N':
+					return _new;
+				case 'S':
+					return _slot;
+				case 'U':
+					return _updating;
+				case 'D':
+					return _downgrading;
+				case 'r':
+					return _reinstall;
+				case 'R':
+					return _replacing;
+				case 'F':
+					return _fetchman;
+				case 'f':
+					return _fetchauto;
+				case 'I':
+					return _interactive;
+				case 'B':
+					return _blockedman;
+				case 'b':
+					return _blockedauto;
+			}
+		}
+		else { return attrMap[in]; }
+	}
 }PackageProperties;
 
 class Package
@@ -32,41 +141,16 @@ class Package
 		propertystr = packageString.substr(0, 15);
 		strfmt::remove(propertystr, "[ebuild");
 		strfmt::remove(propertystr, "]");
-		//[ebuild     U ] dev-lang/mono-4.0.5.1 [2.10.9-r2]
-		char x;
+		const char *x;
 		unsigned int i=0;
 		while (i < propertystr.length())
 		{
-			x = propertystr.at(i);
-			switch (x)
-			{
-				case 'N':
-					properties._new = true;
-				case 'S':
-					properties._slot = true;
-				case 'U':
-					properties._updating = true;
-				case 'D':
-					properties._downgrading = true;
-				case 'r':
-					properties._reinstall = true;
-				case 'R':
-					properties._replacing = true;
-				case 'F':
-					properties._fetchman = true;
-				case 'f':
-					properties._fetchauto = true;
-				case 'I':
-					properties._interactive = true;
-				case 'B':
-					properties._blockedman = true;
-				case 'b':
-					properties._blockedauto = true;
-			}
+			x = propertystr.substr(i-1, i).c_str();
+			properties.set(x, true);
 			i++;
 		}
 		string rawpackagestr = packageString.substr(16, packageString.length());
-		if (properties._updating)
+		if (properties["updating"])
 		{
 			packagestr = strfmt::getSubStr(rawpackagestr, 0 , "[");
 			string rawold = rawpackagestr.substr(packagestr.length(), rawpackagestr.length());
