@@ -1,5 +1,5 @@
 /*
- * Emerge.hpp
+ * checkError.hpp
  * 
  * Copyright 2015 Andrei Tumbar <atadmin@Helios>
  * 
@@ -23,12 +23,5 @@
 
 
 #include <iostream>
-#include "emerge.hpp"
-using namespace std;
+#include <string>
 
-int main(int argc, char **argv)
-{
-	Emerge test(argv[1], "", false);
-	cout << test.Packages[0].properties._updating << "EOL" << endl;
-	return 0;
-}

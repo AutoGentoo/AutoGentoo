@@ -52,7 +52,7 @@ class Emerge
 	)
 	{
 		string buffer; //!< A string that will be formated to create a char to hold the emerge --pretend command (writes config)
-		buffer = str (format("emerge --pretend %s %s %s >> %s") % options % defaultOptions % package % configFile);
+		buffer = str (format("emerge -q --pretend %s >> %s") % package % configFile);
 		emergeCommand = new char[buffer.length() + 1]; //!< Char with length of the buffer string
 		strcpy(emergeCommand, buffer.c_str()); //!< Copy the string into emergeCommand
 		
@@ -102,3 +102,5 @@ class Emerge
 		}
 	}
 };
+"setup", "unpack", "prepare", "configure", "compile",
+	"test", "install", "package", "rpm", "merge", "qmerge"

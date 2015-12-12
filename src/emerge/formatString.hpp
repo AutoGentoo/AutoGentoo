@@ -56,15 +56,26 @@ namespace strfmt
 		}
 	}
 	
-	std::string getSubStr ( std::string &input, int startIndex, const char *exitChar )
+	std::string getSubStr ( std::string input, int startIndex, const char *exitChar )
 	{
 		unsigned int currentIndex = startIndex;
-		while ( currentIndex <= input.length ( ) && input.at ( currentIndex ) != std::string ( exitChar ).at ( 0 ) )
+		while ( currentIndex != input.length ( ) && input.at ( currentIndex ) != std::string ( exitChar ).at ( 0 ) )
 		{
 			++currentIndex;
 		}
 		++currentIndex;
 		return input.substr ( startIndex, currentIndex );
+	}
+	
+	std::string getSubStrInt ( std::string input, int startIndex, const char *exitChar )
+	{
+		unsigned int currentIndex = startIndex;
+		while ( currentIndex != input.length ( ) && input.at ( currentIndex ) != std::string ( exitChar ).at ( 0 ) )
+		{
+			++currentIndex;
+		}
+		++currentIndex;
+		return currentIndex;
 	}
 	
 	int rfind ( std::string &input, const char *find )

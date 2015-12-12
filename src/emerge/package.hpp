@@ -25,6 +25,8 @@ typedef struct PackageProperties
 	
 	bool createdList; //!< Tells set and the [] operator whether to init the list
 	map<string, bool> attrMap;
+	map<string, string> packageVar;
+	vector<string> varNames;
 	
 	void createList ( void )
 	{
@@ -126,6 +128,16 @@ typedef struct PackageProperties
 		}
 		else { return attrMap[in]; }
 	}
+	void addVar ( string in )
+	{
+		int findOperator = in.find ( "=" );
+		
+		varName = in.substr ( 0, findOperator );
+		varNames.push_back ( varName );
+		
+		value = in.substr ( findOperator, in.length ( ) );
+		packageVar.push_back ( value );
+	}
 }PackageProperties;
 
 class Package
@@ -150,17 +162,22 @@ class Package
 			i++;
 		}
 		string rawpackagestr = packageString.substr(16, packageString.length());
+		string packagestrwithval;
+		int oldend = -1;
 		if (properties["updating"])
 		{
-			packagestr = strfmt::getSubStr(rawpackagestr, 0 , "[");
-			string rawold = rawpackagestr.substr(packagestr.length(), rawpackagestr.length());
+			packagestrwithval = strfmt::getSubStr(rawpackagestr, 0 , "[");
+			//x11-apps/xinit-1.3.4-r1 [1.3.3-r1] USE="systemd%*"
+			string rawold = strfmt::getSubStr(packagestr, 0 , "]");
 			strfmt::remove(rawold, "[");
 			strfmt::remove(rawold, "]");
+			oldend = strfmt::getSubStrInt(packagestr, 0, "]");
 			old = rawold;
 		}
 		else
 		{
-			packagestr = rawpackagestr;
+			packagestrwithval = rawpackagestr;
+			
 		}
 	}
 	

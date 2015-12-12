@@ -44,20 +44,31 @@ class Error
 {
 	public:
 	
-	bool writeFile;
-	string fileToWrite;
-	vector<string> stringsToWrite;
-	vector<int> lineNumbers;
+	bool writeFile; //!< Write file?
+	string fileToWrite; //!< Path to the write
+	
+	vector<string> stringsToWrite; //!< Strings to write, each element corresponds to the lineNumbers vector
+	vector<string> inputStrings; //!< Strings define in the INIT function
+	
+	vector<int> lineNumbers; //!< Line numbers in the file to write
 	
 	Error ( vector<string> &inputFile, int startLine, int endLine )
 	{
-		vector<string>::const_iterator first; //!< Will be set to the first line in the input
-		vector<string>::const_iterator last; //!< Will be set to the last line in the input
+		y = startLine;
+		for ( x = inputFile[y]; y <= endLine; y++ )
+		{
+			inputStrings.push_back ( x );
+		}
 		
-		first = inputFile.begin() + startLine;
-		last = inputFile.begin() + endLine;
-		vector<string> newVec(first, last); //!< Create a vector of strings with block
+		
 	}
 	
-	
+	void findType (  )
+	{
+		string firstLine = inputString[0];
+		
+	void addTypes ( map<string, string> &in )
+	{
+		in["The following"] = "use";
+		
 };
