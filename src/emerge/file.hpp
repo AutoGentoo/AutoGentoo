@@ -27,10 +27,10 @@ class File
 	 */
 	unsigned int currentLine;
 	
-	File ( const char *fileName )
+	File ( string fileName )
 	{
 		/// Open the file
-		file.open ( fileName );
+		file.open ( fileName.c_str ( ) );
 		
 		/// Send text from file to text
 		file >> text;

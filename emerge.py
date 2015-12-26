@@ -250,7 +250,7 @@ def main(args=sys.argv):
 		package = args[1]
 	if len(args) > 2:
 		emerge_file = args[2]
-	emerge = Emerge(package, emerge_file=emerge_file)
-	emerge.emerge()
+	emerge = Emerge(package, emerge_file=emerge_file, do_pretend=False)
+	emerge.emerge_updates()
 if __name__ == '__main__':
 	main()

@@ -78,7 +78,7 @@ class Emerge
 			{
 				x = x.substr(0, x.length()-1);
 			}
-			if ( x == string ( "\n" ) || x == string ( " " ) || x == string ( "" ) )
+			if ( x == string ( "\n" ) || x == string ( " " ) )
 			{
 				x = string ("");
 			}

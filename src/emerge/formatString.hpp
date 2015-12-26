@@ -26,6 +26,11 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/format.hpp>
+
+using boost::format;
+using boost::io::group;
 
 /**\namespace strfmt
  * The strfmt namespace consists of a various collection of tools
@@ -34,20 +39,35 @@
  */
 namespace strfmt
 {
-	void remove ( std::string &removing, const char *toRemove )
+	void remove ( std::string &removing, std::string toRemove )
 	{
 		std::string::size_type foundAt = removing.find ( toRemove );
 		if ( foundAt != std::string::npos )
 		{
-			removing.erase ( foundAt, sizeof ( toRemove ) );
+			removing.erase ( foundAt, toRemove.length ( ) );
 		}
 	}
-	
+	void removechar ( std::string &removing, char toRemove )
+	{
+		std::string::size_type foundAt = removing.find ( toRemove );
+		if ( foundAt != std::string::npos )
+		{
+			removing.erase ( foundAt, 1 );
+		}
+	}
+	void rremovechar ( std::string &removing, char toRemove )
+	{
+		std::string::size_type foundAt = removing.rfind ( toRemove );
+		if ( foundAt != std::string::npos )
+		{
+			removing.erase ( foundAt, 1 );
+		}
+	}
 	void removeNewLine ( std::string &str )
 	{
 		str.erase(str.length());
 	}
-	void replace ( std::string &replacing, const char *oldstr, const char * newstr )
+	void replace ( std::string &replacing, std::string oldstr, std::string newstr )
 	{
 		std::string::size_type foundOld = replacing.find ( oldstr );
 		if ( foundOld != std::string::npos )
@@ -56,18 +76,17 @@ namespace strfmt
 		}
 	}
 	
-	std::string getSubStr ( std::string input, int startIndex, const char *exitChar )
+	std::string getSubStr ( std::string &input, int startIndex, char exitChar )
 	{
 		unsigned int currentIndex = startIndex;
-		while ( currentIndex != input.length ( ) && input.at ( currentIndex ) != std::string ( exitChar ).at ( 0 ) )
+		while ( currentIndex != input.length ( ) && input.at ( currentIndex ) != exitChar )
 		{
 			++currentIndex;
 		}
-		++currentIndex;
-		return input.substr ( startIndex, currentIndex );
+		return input.substr ( startIndex, currentIndex-startIndex+1 );
 	}
 	
-	std::string getSubStrInt ( std::string input, int startIndex, const char *exitChar )
+	int getSubStrInt ( std::string input, int startIndex, const char *exitChar )
 	{
 		unsigned int currentIndex = startIndex;
 		while ( currentIndex != input.length ( ) && input.at ( currentIndex ) != std::string ( exitChar ).at ( 0 ) )
@@ -91,7 +110,7 @@ namespace strfmt
 		return -1;
 	}
 	
-	template<class vectorType>
+	template < class vectorType >
 	int find ( std::vector<vectorType> &input, std::string findstr )
 	{
 		int x = 0;
@@ -103,5 +122,90 @@ namespace strfmt
 			}
 		}
 		return -1;
+	}
+	
+	int strfind ( std::string in, char findchar, int startchar = 0 )
+	{
+		unsigned int x = startchar;
+		std::cout << "x=" << x << std::endl;
+		std::cout << "len=" << in.length ( ) << std::endl;
+		if ( x >= in.length ( ) )
+		{
+			return -1;
+		}
+		for ( char y = in.at ( x ); x < in.length ( ); x++ )
+		{
+			y = in.at ( x );
+			if ( y == findchar )
+			{
+				return x;
+			}
+		}
+		return -1;
+	}
+	
+	template < class type >
+	type formatini ( std::string in, boost::property_tree::ptree pt )
+	{
+		std::vector<int> findvec;
+		int find = 0;
+		while ( find != -1 )
+		{
+			find = in.find( "$", find+1 );
+			if ( find != -1 )
+			{
+				findvec.push_back ( find );
+			}
+			else
+			{
+				break;
+			}
+		}
+		std::vector<std::string> valvec;
+		for ( unsigned int x = 0; x <= findvec.size ( ) - 1; x++ )
+		{
+			if ( x == findvec.size ( ) )
+			{
+				break;
+			}
+			int y = findvec [ x ];
+			std::string buff = strfmt::getSubStr ( in, y, '}' );
+			strfmt::remove( buff, "$" );
+			strfmt::remove( buff, "{" );
+			strfmt::remove( buff, "}" );
+			valvec.push_back ( buff );
+		}
+		strfmt::removechar ( in, '"' );
+		strfmt::removechar ( in, '"' );
+		for ( unsigned int x = 0; x < valvec.size ( ); x++ )
+		{
+			std::string y = valvec [ x ];
+			type buff = pt.get<type> ( y );
+			strfmt::removechar ( buff, '"' );
+			strfmt::removechar ( buff, '"' );
+			std::string valrep = str ( format( "${%1%}" ) % y );
+			in.replace ( in.find( valrep ), valrep.length ( ), buff );
+		}
+		return in;
+	}
+	
+	std::vector<std::string> split ( std::string str, char chr )
+	{
+		std::vector<std::string> returnList;
+		for ( unsigned int y = 0; y <= str.length ( ); y++ )
+		{
+			std::vector<char> buff;
+			char x = str.at ( y );
+			if ( x != chr )
+			{
+				buff.push_back ( x );
+			}
+			else
+			{
+				returnList.push_back ( std::string ( buff.begin ( ), buff.end ( ) ) );
+			}
+		}
+		
+		return returnList;
 	}
 }

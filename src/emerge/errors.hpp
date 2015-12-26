@@ -25,9 +25,22 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include "file.hpp"
 
 using namespace std;
+
+class ErrorType
+{
+	int startChar, endChar;
+	string text;
+	ErrorType ( string _text, int _startChar, int _endChar )
+	{
+		text = _text;
+		startChar = _startChar;
+		endChar = _endChar;
+	}
+};
 
 /**\class Error
  * Error class is made to write config files generated from
@@ -51,6 +64,7 @@ class Error
 	vector<string> inputStrings; //!< Strings define in the INIT function
 	
 	vector<int> lineNumbers; //!< Line numbers in the file to write
+	map<string, ErrorType> errors;
 	
 	Error ( vector<string> &inputFile, int startLine, int endLine )
 	{
@@ -63,12 +77,14 @@ class Error
 		
 	}
 	
-	void findType (  )
+	void findType ( )
 	{
 		string firstLine = inputString[0];
 		
-	void addTypes ( map<string, string> &in )
+	void addTypes (  )
 	{
-		in["The following"] = "use";
-		
+		errors["The following"] = ErrorType( "use", 0, 13 );
+		errors["[blocks"] = ErrorType ( "block", 0, 6 );
+	}
 };
+
