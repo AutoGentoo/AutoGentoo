@@ -30,61 +30,46 @@
 
 using namespace std;
 
-class ErrorType
-{
-	int startChar, endChar;
-	string text;
-	ErrorType ( string _text, int _startChar, int _endChar )
-	{
-		text = _text;
-		startChar = _startChar;
-		endChar = _endChar;
-	}
-};
-
-/**\class Error
- * Error class is made to write config files generated from
- * a section of text from a emerge --pretend
- * 
- * This class will have the following:
- *    bool determining if file will be writen
- *    path to file to write
- *    vector of strings to write to file
- *    vector of ints corresponding to line number to write the string
- *
+/**\class Type
+ * Type class is made to divide section from the 
+ * emerge --pretend file and create three different types:
+ *    Package
+ *    Config
+ *    Warning
+ * The package lines will be sent to the Package class
+ * Config types will be made into a Config instance and sent
+ * back to emerge
+ * Warning types usually have to do with slot conficts
+ * or blocks
  */
-class Error
+class Type
 {
 	public:
 	
-	bool writeFile; //!< Write file?
-	string fileToWrite; //!< Path to the write
+	vector<string> inputStrings; //!< Lines inputed from emerge --pretend file
 	
-	vector<string> stringsToWrite; //!< Strings to write, each element corresponds to the lineNumbers vector
-	vector<string> inputStrings; //!< Strings define in the INIT function
-	
-	vector<int> lineNumbers; //!< Line numbers in the file to write
-	map<string, ErrorType> errors;
-	
-	Error ( vector<string> &inputFile, int startLine, int endLine )
+	Type ( vector<string> &inputFile, int startLine, int endLine )
 	{
 		y = startLine;
 		for ( x = inputFile[y]; y <= endLine; y++ )
 		{
 			inputStrings.push_back ( x );
 		}
-		
-		
 	}
 	
-	void findType ( )
+	string findTypes ( string line )
 	{
-		string firstLine = inputString[0];
-		
-	void addTypes (  )
-	{
-		errors["The following"] = ErrorType( "use", 0, 13 );
-		errors["[blocks"] = ErrorType ( "block", 0, 6 );
+		if ( line.substr ( 0, 13 ) == str ( "The following" )
+		{
+			return "use";
+		}
+		else if ( line.substr ( 0, 6 ) == str ( "[ebuild" )
+		{
+			return "package"
+		else
+		{
+			return "warning"
+		}
 	}
 };
 

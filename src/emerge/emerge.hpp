@@ -24,11 +24,8 @@
 
 #include <iostream>
 #include <string>
-#include <cstring>
-#include <list>
 #include <boost/format.hpp>
-#include "file.hpp"
-#include "package.hpp"
+#include "type.hpp"
 
 using namespace std;
 using boost::format;
@@ -37,7 +34,6 @@ using boost::io::group;
 class Emerge 
 {
 	public:
-	vector<Package> Packages; //!< List of Package classes that was create from the config file
 	vector<string> PackageNames, emergeFile;
 	vector<int> configStart; //!< Stores the line numbers in emergeFile that need Error creation
 	string options, defaultOptions, configFile;
@@ -63,44 +59,8 @@ class Emerge
 		}
 		
 		options = _options; //!< Options will be used 
-		defaultOptions = _defaultOptions;
+		defaultOptions = _defaultOptions; //!< creates 2 separate inputs for the emerge options such that default options do not have to be re-entered
 		emergeFile = File(configFile).readlines();
-		getPackages ( );
-	}
-	void getPackages ( )
-	{
-		vector<string> rawPackages;
-		unsigned int y = 0;
-		for ( string x; y < emergeFile.size(); y++ )
-		{
-			x = emergeFile[y];
-			if ( x.length() != 1  && x.length())
-			{
-				x = x.substr(0, x.length()-1);
-			}
-			if ( x == string ( "\n" ) || x == string ( " " ) )
-			{
-				x = string ("");
-			}
-			else if (x.substr(1, 6) == string ("ebuild"))
-			{
-				rawPackages.push_back(x);
-			}
-			if (x.substr(0, 13) == string("The following"))
-			{
-				configStart.push_back(strfmt::find<string>(emergeFile, x));
-			}
-		}
-		y = 0;
-		for ( string x; y < rawPackages.size(); y++ )
-		{
-			x = rawPackages[y];
-			Package pkg(x.c_str());
-			
-			Packages.push_back(pkg);
-			PackageNames.push_back(pkg.path());
-		}
+		Type types(emergeFile, package);
 	}
 };
-"setup", "unpack", "prepare", "configure", "compile",
-	"test", "install", "package", "rpm", "merge", "qmerge"

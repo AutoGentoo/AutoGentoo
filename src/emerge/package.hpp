@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include "formatString.hpp"
 
 using namespace std;
 
@@ -132,11 +131,11 @@ typedef struct PackageProperties
 	{
 		int findOperator = in.find ( "=" );
 		
-		varName = in.substr ( 0, findOperator );
+		string varName = in.substr ( 0, findOperator );
 		varNames.push_back ( varName );
 		
-		value = in.substr ( findOperator, in.length ( ) );
-		packageVar.push_back ( value );
+		string value = in.substr ( findOperator, in.length ( ) );
+		packageVar[varName] = value;
 	}
 }PackageProperties;
 
@@ -163,21 +162,17 @@ class Package
 		}
 		string rawpackagestr = packageString.substr(16, packageString.length());
 		string packagestrwithval;
-		int oldend = -1;
 		if (properties["updating"])
 		{
-			packagestrwithval = strfmt::getSubStr(rawpackagestr, 0 , "[");
-			//x11-apps/xinit-1.3.4-r1 [1.3.3-r1] USE="systemd%*"
-			string rawold = strfmt::getSubStr(packagestr, 0 , "]");
+			packagestrwithval = strfmt::getSubStr(rawpackagestr, 0 , '[');
+			string rawold = strfmt::getSubStr(packagestr, 0 , ']');
 			strfmt::remove(rawold, "[");
 			strfmt::remove(rawold, "]");
-			oldend = strfmt::getSubStrInt(packagestr, 0, "]");
 			old = rawold;
 		}
 		else
 		{
 			packagestrwithval = rawpackagestr;
-			
 		}
 	}
 	
