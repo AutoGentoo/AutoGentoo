@@ -1,7 +1,7 @@
 /*
- * initest.cxx
+ * read_ebuild.hpp
  * 
- * Copyright 2015 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,10 @@
 
 
 #include <iostream>
-#include <string>
-#include "ini_parser.hpp" 
+#include "_operator.hpp"
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
-	iniparser a;
-	a.read("make.globals");
-	a.read("make.conf");
-	std::cout << a.get<std::string>(argv[1]) << std::endl;
 	return 0;
 }
+

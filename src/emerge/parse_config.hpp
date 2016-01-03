@@ -26,20 +26,26 @@
 #include <vector>
 #include <map>
 
-template < class Key, class T=NULL >
+template < class Key, class T=void >
 class getVariables
 {
+	public:
+	
+	std::map < Key, T > mapped;
+	std::string str;
+	
 	getVariables ( std::string input )
 	{
 		std::vector < std::string > variables;
 		std::vector < std::string > values;
 		std::string buff_str;
-		std::vector vec
-		bool is_var;
+		std::vector < std::string > vec;
+		bool is_var = true;
 		
-		for ( int y; y =< input.length ( ); y++ )
+		for ( unsigned int y; y <= input.length ( ); y++ )
 		{
-			if ( is_var ) {
+			if ( is_var )
+			{
 				vec = &variables;
 			}
 			else
@@ -48,16 +54,22 @@ class getVariables
 			}
 			char x = input.at ( y );
 			if ( x == '=' )
-			{ 
+			{
 				vec.push_back ( buff_str ); 
 			}
 			buff_str.append ( std::string ( x ) );
 			if ( x == '=' )
 			{
 				buff_str.clear ( );
+				is_var = false;
+			}
+			if ( x == ' ' )
+			{
+				buff_str.clear ( );
+				is_var = true;
 			}
 		}
 		
-		if ( 
+		//if ( typeid ( T ) == typeid ( v
 	}
-}
+};

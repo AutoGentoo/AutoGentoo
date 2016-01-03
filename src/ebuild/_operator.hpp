@@ -1,7 +1,7 @@
 /*
- * ini_parser.cxx
+ * _operator.hpp
  * 
- * Copyright 2015 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,12 @@
 
 
 #include <iostream>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
 
-class iniparser
+class _operator
 {
-	
+	public:
+	const char* op; //!< String holding the operator string such as '?';
+	bool pre_content; //!< Bool asking for term before operator such as 'foo?'
+	const char* pre_content; //!< content 'foo' in 'foo?'
+	_operator ( const char* op, bool pre_content = false );
+};

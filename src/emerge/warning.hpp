@@ -26,7 +26,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
@@ -39,7 +38,8 @@ class req {public: vector< vector<string> > exactly_one; vector<string> item;};
  *    use_info (information on the current global use flags)
  *    req_use (required use section, read by struct to create a make.conf edit possible)
 */
-typedef struct use_req
+
+/*typedef struct use_req
 {
 	
 	basic basic_warning;
@@ -100,6 +100,29 @@ typedef struct use_req
 		
 	}
 }
+*/
+
+/*
+REQUIRED_USE="foo? ( bar )"					If foo is set, bar must be set.
+REQUIRED_USE="foo? ( !bar )"				If foo is set, bar must not be set.
+REQUIRED_USE="foo? ( || ( bar baz ) )"		If foo is set, bar or baz must be set.
+REQUIRED_USE="^^ ( foo bar baz )"			Exactly one of foo bar or baz must be set.
+REQUIRED_USE="|| ( foo bar baz )"			At least one of foo bar or baz must be set.
+REQUIRED_USE="?? ( foo bar baz )"			No more than one of foo bar or baz may be set.
+
+*/
+
+template < string pkgstr >
+typedef struct use_req
+{
+	string str = 
+	
+	void source ( )
+	{
+		
+	string getVal
+	REQUIRED_USE
+
 
 /*! \class Warning
  * Three types of warnings:
@@ -118,13 +141,17 @@ class Warning
 		for ( unsigned int x; x <= input.size(); x++ )
 		{
 			string in = input[x];
-			if ( input.size() == 1 )
+			if ( line.substr ( 0, 6 ) == string ( "[blocks" ) )
 			{
 				type = "blocks";
 			}
-			else if ( in.substr ( 0, 12 ) == "!!! Problem " )
+			else if ( in.substr ( 0, 11 ) == "!!! Problem " )
 			{
 				type = "useReq";
+			}
+			else if ( in.substr ( 0, 11 ) == "!!! Multiple" )
+			{
+				type = "slot";
 			}
 			else
 			{

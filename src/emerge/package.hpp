@@ -42,53 +42,49 @@ typedef struct PackageProperties
 		attrMap["blocked_auto"] = _blockedauto;
 		createdList = true;
 	}
-	void set ( string in, bool val )
+	void set ( char in, bool val )
 	{
 		if ( !createdList )
 		{
 			createList ( );
 		}
-		if ( in.length() == 1 )
+		switch ( in )
 		{
-			char inc = in.at(0);
-			switch ( inc )
-			{
-				case 'N':
-					_new = val;
-					return;
-				case 'S':
-					_slot = val;
-					return;
-				case 'U':
-					_updating = val;
-					return;
-				case 'D':
-					_downgrading = val;
-					return;
-				case 'r':
-					_reinstall = val;
-					return;
-				case 'R':
-					_replacing = val;
-					return;
-				case 'F':
-					_fetchman = val;
-					return;
-				case 'f':
-					_fetchauto = val;
-					return;
-				case 'I':
-					_interactive = val;
-					return;
-				case 'B':
-					_blockedman = val;
-					return;
-				case 'b':
-					_blockedauto = val;
-					return;
-			}
+			case 'N':
+				_new = val;
+				return;
+			case 'S':
+				_slot = val;
+				return;
+			case 'U':
+				_updating = val;
+				return;
+			case 'D':
+				_downgrading = val;
+				return;
+			case 'r':
+				_reinstall = val;
+				return;
+			case 'R':
+				_replacing = val;
+				return;
+			case 'F':
+				_fetchman = val;
+				return;
+			case 'f':
+				_fetchauto = val;
+				return;
+			case 'I':
+				_interactive = val;
+				return;
+			case 'B':
+				_blockedman = val;
+				return;
+			case 'b':
+				_blockedauto = val;
+				return;
 		}
-		attrMap[in] = val;
+		attrMap[string(1, in)] = val;
 	}
 	bool operator [] ( string in )
 	{
@@ -125,7 +121,7 @@ typedef struct PackageProperties
 					return _blockedauto;
 			}
 		}
-		else { return attrMap[in]; }
+		return attrMap[in];
 	}
 	void addVar ( string in )
 	{
@@ -148,18 +144,22 @@ class Package
 	
 	Package(const char *input)
 	{
+		cout << "WORKING" << endl;
 		string packageString = string(input);
+		cout << "WORKING" << endl;
 		propertystr = packageString.substr(0, 15);
+		cout << "WORKING" << endl;
 		strfmt::remove(propertystr, "[ebuild");
+		cout << "WORKING" << endl;
 		strfmt::remove(propertystr, "]");
-		const char *x;
-		unsigned int i=0;
-		while (i < propertystr.length())
+		cout << "WORKING" << endl;
+		char x;
+		for (unsigned int i=0; i < propertystr.length(); i++)
 		{
-			x = propertystr.substr(i-1, i).c_str();
+			x = propertystr.at(i);
 			properties.set(x, true);
-			i++;
 		}
+		cout << "WORKING" << endl;
 		string rawpackagestr = packageString.substr(16, packageString.length());
 		string packagestrwithval;
 		if (properties["updating"])
@@ -169,15 +169,21 @@ class Package
 			strfmt::remove(rawold, "[");
 			strfmt::remove(rawold, "]");
 			old = rawold;
+			cout << "WORKING" << endl;
 		}
 		else
 		{
 			packagestrwithval = rawpackagestr;
 		}
+		packagestrwithval = packagestrwithval.substr(1, packagestrwithval.length());
+		cout << "val:" << packagestrwithval << endl;
+		values = packagestrwithval.substr(packagestrwithval.find("  "), packagestrwithval.length());
+		
 	}
 	
 	string path()
 	{
+		cout << "PATH" << endl;
 		string searchPackage = packagestr.substr(packagestr.find("/"), packagestr.length());
 		string release = searchPackage.substr(0, strfmt::rfind(searchPackage, "-"));
 		string path;
