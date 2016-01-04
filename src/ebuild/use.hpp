@@ -1,7 +1,7 @@
 /*
- * read_ebuild.hpp
+ * use.hpp
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atadmin@Helios>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,14 +24,5 @@
 
 #include <iostream>
 #include <string>
-#include "../emerge/file.hpp"
-#include "_operator.hpp"
+#include <vector>
 
-using namespace std;
-
-struct ebuild_use
-{
-	string IUSE = "undefined"; //!< A list of all USE flags (excluding arch flags, but including USE_EXPAND flags) used within the ebuild. See IUSE.
-	string REQUIRED_USE = "undefined"; //!< A list of assertions that must be met by the configuration of USE flags to be valid for this ebuild. (Requires EAPI>=4.)
-	string PACKAGE_USE = "undefined"; //!< Found in /etc/portage/package.use
-	

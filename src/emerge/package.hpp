@@ -1,8 +1,11 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <boost/algorithm/string.hpp>
+#include "parse_config.hpp"
 
 using namespace std;
+using namespace boost::algorithm;
 
 /*! \struct PackageProperties
  * This type is meant to store the boolean information
@@ -141,25 +144,21 @@ class Package
 	
 	PackageProperties properties;
 	string propertystr, packagestr, old;
+	map< string, vector<string> > flags;
+	map< string, string > flags_str;
 	
 	Package(const char *input)
 	{
-		cout << "WORKING" << endl;
 		string packageString = string(input);
-		cout << "WORKING" << endl;
 		propertystr = packageString.substr(0, 15);
-		cout << "WORKING" << endl;
 		strfmt::remove(propertystr, "[ebuild");
-		cout << "WORKING" << endl;
 		strfmt::remove(propertystr, "]");
-		cout << "WORKING" << endl;
 		char x;
 		for (unsigned int i=0; i < propertystr.length(); i++)
 		{
 			x = propertystr.at(i);
 			properties.set(x, true);
 		}
-		cout << "WORKING" << endl;
 		string rawpackagestr = packageString.substr(16, packageString.length());
 		string packagestrwithval;
 		if (properties["updating"])
@@ -169,21 +168,24 @@ class Package
 			strfmt::remove(rawold, "[");
 			strfmt::remove(rawold, "]");
 			old = rawold;
-			cout << "WORKING" << endl;
 		}
 		else
 		{
 			packagestrwithval = rawpackagestr;
 		}
 		packagestrwithval = packagestrwithval.substr(1, packagestrwithval.length());
-		cout << "val:" << packagestrwithval << endl;
-		values = packagestrwithval.substr(packagestrwithval.find("  "), packagestrwithval.length());
-		
+		int first_space = packagestrwithval.rfind(" ");
+		string val_buff = packagestrwithval.substr ( 0, first_space );
+		int second_space = val_buff.rfind(" ");
+		string values = packagestrwithval.substr(packagestrwithval.find("  "), second_space);
+		trim ( values );
+		flags = get_variables_split ( values );
+		flags_str = get_variables ( values );
+		packagestr = packagestrwithval.substr(0, packagestrwithval.find("  "));
 	}
 	
 	string path()
 	{
-		cout << "PATH" << endl;
 		string searchPackage = packagestr.substr(packagestr.find("/"), packagestr.length());
 		string release = searchPackage.substr(0, strfmt::rfind(searchPackage, "-"));
 		string path;

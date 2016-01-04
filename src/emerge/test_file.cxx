@@ -1,7 +1,7 @@
 /*
- * read_ebuild.hpp
+ * test_file.cxx
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atadmin@Helios>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,15 +23,19 @@
 
 
 #include <iostream>
-#include <string>
-#include "../emerge/file.hpp"
-#include "_operator.hpp"
+#include "file.hpp"
 
 using namespace std;
 
-struct ebuild_use
+int main(int argc, char **argv)
 {
-	string IUSE = "undefined"; //!< A list of all USE flags (excluding arch flags, but including USE_EXPAND flags) used within the ebuild. See IUSE.
-	string REQUIRED_USE = "undefined"; //!< A list of assertions that must be met by the configuration of USE flags to be valid for this ebuild. (Requires EAPI>=4.)
-	string PACKAGE_USE = "undefined"; //!< Found in /etc/portage/package.use
-	
+	File f ( "temp" );
+	vector<string> l = f.readlines();
+	cout << l.size() << endl;
+	for ( unsigned int x = 0; x != l.size(); x++ )
+	{
+		cout << l[x] << endl;
+	}
+	return 0;
+}
+

@@ -99,7 +99,7 @@ namespace strfmt
 	
 	int rfind ( std::string &input, const char *find )
 	{
-		for ( unsigned int i=input.length( ); i < input.length( ); --i )
+		for ( unsigned int i=input.length( ); i != input.length( ); --i )
 		{
 			if ( input.at ( i ) == std::string ( find  ).at ( 0 ) )
 			{
@@ -133,7 +133,7 @@ namespace strfmt
 		{
 			return -1;
 		}
-		for ( char y = in.at ( x ); x < in.length ( ); x++ )
+		for ( char y = in.at ( x ); x != in.length ( ); x++ )
 		{
 			y = in.at ( x );
 			if ( y == findchar )
@@ -162,7 +162,7 @@ namespace strfmt
 			}
 		}
 		std::vector<std::string> valvec;
-		for ( unsigned int x = 0; x <= findvec.size ( ) - 1; x++ )
+		for ( unsigned int x = 0; x != findvec.size ( ) - 1; x++ )
 		{
 			if ( x == findvec.size ( ) )
 			{
@@ -177,7 +177,7 @@ namespace strfmt
 		}
 		strfmt::removechar ( in, '"' );
 		strfmt::removechar ( in, '"' );
-		for ( unsigned int x = 0; x < valvec.size ( ); x++ )
+		for ( unsigned int x = 0; x != valvec.size ( ); x++ )
 		{
 			std::string y = valvec [ x ];
 			type buff = pt.get<type> ( y );
@@ -192,20 +192,37 @@ namespace strfmt
 	std::vector<std::string> split ( std::string str, char chr )
 	{
 		std::vector<std::string> returnList;
-		for ( unsigned int y = 0; y <= str.length ( ); y++ )
+		std::string buff;
+		for ( unsigned int y = 0; y != str.length ( ); y++ )
 		{
-			std::vector<char> buff;
-			char x = str.at ( y );
-			if ( x != chr )
+			char curr = str[y];
+			if ( curr == chr )
 			{
-				buff.push_back ( x );
+				returnList.push_back ( buff );
+				buff.clear ( );
+				continue;
 			}
-			else
-			{
-				returnList.push_back ( std::string ( buff.begin ( ), buff.end ( ) ) );
-			}
+			buff += curr;
 		}
 		
 		return returnList;
+	}
+	
+	std::string merge ( std::vector<std::string> in )
+	{
+		std::string return_buff;
+		for ( unsigned int i; i != in.size ( ); i++ )
+		{
+			return_buff.append ( in[i] );
+		}
+		return return_buff;
+	}
+	
+	int stoi ( std::string in )
+	{
+		std::istringstream convert ( in );
+		int val;
+		convert >> val;
+		return val;
 	}
 }
