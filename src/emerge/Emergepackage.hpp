@@ -26,6 +26,7 @@
 #include <string>
 #include <map>
 #include <boost/algorithm/string.hpp>
+#include "package.hpp"
 #include "parse_config.hpp"
 
 using namespace std;
@@ -162,66 +163,119 @@ typedef struct PackageProperties
 	}
 }PackageProperties;
 
-class EmergePackage
+class EmergePackage: public Package
 {
 	public:
 	
 	PackageProperties properties;
-	string propertystr, packagestr, old;
+	string propertystr;
+	string old;
+	string slot;
 	map< string, vector<string> > flags;
 	map< string, string > flags_str;
 	
-	EmergePackage(const char *input)
+	EmergePackage ( const char *input ) : Package ( packagestr )
 	{
-		string packageString = string(input);
-		propertystr = packageString.substr(0, 15);
-		strfmt::remove(propertystr, "[ebuild");
-		strfmt::remove(propertystr, "]");
+		/* Key
+		 * + added by operator '+'
+		 * - subtracted
+		 * _ given that it is added by str.substr
+		 * ^ found by a str.find() and length ()
+		 * * Note added at bottom
+		*/
+		
+		/* [ebuild   R    ] gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB */
+		string packageString = string ( input );
+		
+		/* [ebuild   R    ] gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB
+		 * ________________
+		 */
+		propertystr = packageString.substr ( 0, 15 );
+		
+		/* [ebuild   R    ]
+		 * -------        -
+		 */
+		misc::remove ( propertystr, "[ebuild" );
+		misc::remove ( propertystr, "]" );
+		/* |   R    |*/
 		char x;
-		for (size_t i=0; i < propertystr.length(); i++)
+		for ( size_t i = 0; i != propertystr.length ( ); i++ )
 		{
-			x = propertystr.at(i);
-			properties.set(x, true);
+			x = propertystr[i];
+			properties.set ( x, true );
 		}
-		string rawpackagestr = packageString.substr(16, packageString.length());
-		string packagestrwithval;
-		if (properties["updating"])
+		
+		/* [ebuild   R    ] gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB
+		 * -----------------_________________________________________________________________________________________________
+		 */
+		rawPackageStr = misc::substr ( packageString, 16, packageString.length ( ) );
+		
+		vector < string > 
+		
+		/* gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB
+		 * ___________________________________^^
+		 */
+		packagestr = 
+		
+		/* gnome-base/gnome-3.16.0:2.0::gentoo
+		 *                            --------
+		 */
+		misc::remove ( packagestr, "::gentoo" );
+		
+		/* gnome-base/gnome-3.16.0:2.0
+		 *                        ^
+		 */
+		int slotDivide = packagestr.find ( ":" );
+		
+		/* Has a given slot */
+		if ( slotDivide != string::npos )
 		{
-			packagestrwithval = strfmt::getSubStr(rawpackagestr, 0 , '[');
-			string rawold = strfmt::getSubStr(packagestr, 0 , ']');
-			strfmt::remove(rawold, "[");
-			strfmt::remove(rawold, "]");
-			old = rawold;
+			/* gnome-base/gnome-3.16.0:2.0
+			*                          ___
+			*/
+			slot = misc::substr ( packagestr, slotDivide + 1, packagestr.length ( ) );
+			
+			/* gnome-base/gnome-3.16.0:2.0
+			*  _______________________----
+			*/
+			packagestr = misc::substr ( packagestr, 0, slotDivide );
 		}
-		else
-		{
-			packagestrwithval = rawpackagestr;
-		}
-		packagestrwithval = packagestrwithval.substr(1, packagestrwithval.length());
-		int first_space = packagestrwithval.rfind(" ");
-		string val_buff = packagestrwithval.substr ( 0, first_space );
-		int second_space = val_buff.rfind(" ");
-		string values = packagestrwithval.substr(packagestrwithval.find("  "), second_space);
-		trim ( values );
-		flags = get_variables_split ( values );
-		flags_str = get_variables ( values );
-		packagestr = packagestrwithval.substr(0, packagestrwithval.find("  "));
 	}
 	
-	string path()
+	vector < string > splitEbuild ( string input )
 	{
-		string searchPackage = packagestr.substr(packagestr.find("/"), packagestr.length());
-		string release = searchPackage.substr(0, strfmt::rfind(searchPackage, "-"));
-		string path;
-		if (packagestr.at(packagestr.length()-2) == 'r')
+		vector < string > returnVec;
+		
+		//[ebuild     U  ] net-dialup/rp-pppoe-3.11-r3::gentoo [3.8-r2::gentoo] USE="-tk% (-X%*)" 219 KiB
+		propertySection = input.substr ( 0, 15 );
+		returnVec ( propertySection );
+		
+		rawSection = misc::substr ( input, 16, input.length ( ) ); 
+		
+		int firstSecDivide;
+		int secondSecDivide;
+		int thirdSecDivide;
+		bool insideQuote = false;
+		for ( size_t i = 0; i != input.length ( ); i++ )
 		{
-			path = packagestr.substr(0, packagestr.find("/")) + release.substr(0, strfmt::rfind(release, "-"));
-		}
-		else
-		{
-			string secondHalf = searchPackage.substr(0, strfmt::rfind(searchPackage, "-"));
-			path = packagestr.substr(0, packagestr.find("/")) + searchPackage.substr(0, searchPackage.rfind("-"));
-		}
-		return path;
-	}
+			char j = input[j];
+			if ( j == ' ' && !insideQuote )
+			{
+				switch ( returnVec.size ( ) )
+				{
+					case 1:
+					firstSecDivide = i;
+					returnVec push_back ( misc::substr ( input, 16, i - 1 ) );
+					case 2:
+					secondSecDivide = i;
+					returnVec push_back ( misc::substr ( input, firstSecDivide, i ) );
+					case 3;
+					
+				}
+				
+			}
+			if ( j == '\"' )
+			{
+				insideQuote = !insideQuote;
+			}
 };
