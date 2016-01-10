@@ -57,7 +57,7 @@ class version
 		
 		vector<string> buff_vec ( strfmt::split ( buff_in, '.' ) );
 		
-		for ( unsigned int i; i <= buff_vec.size ( ); i++ )
+		for ( size_t i; i <= buff_vec.size ( ); i++ )
 		{
 			v.push_back ( strfmt::stoi ( buff_vec[i] ) );
 		}
@@ -75,7 +75,7 @@ class version
 		}
 		
 		//Compare the main version number
-		for ( unsigned int i; i <= longer.v.size ( ); i++ )
+		for ( size_t i; i <= longer.v.size ( ); i++ )
 		{
 			int curr_num_one = v[i];
 			int curr_num_two = compare.v[i];
@@ -128,7 +128,7 @@ class version
 		}
 		
 		//Compare the main version number
-		for ( unsigned int i; i <= longer.v.size ( ); i++ )
+		for ( size_t i; i <= longer.v.size ( ); i++ )
 		{
 			int curr_num_one = v[i];
 			int curr_num_two = compare.v[i];
@@ -181,7 +181,7 @@ class version
 		}
 		
 		//Compare the main version number
-		for ( unsigned int i; i <= longer.v.size ( ); i++ )
+		for ( size_t i; i <= longer.v.size ( ); i++ )
 		{
 			int curr_num_one = v[i];
 			int curr_num_two = compare.v[i];
@@ -234,7 +234,7 @@ class version
 		}
 		
 		//Compare the main version number
-		for ( unsigned int i; i <= longer.v.size ( ); i++ )
+		for ( size_t i; i <= longer.v.size ( ); i++ )
 		{
 			int curr_num_one = v[i];
 			int curr_num_two = compare.v[i];

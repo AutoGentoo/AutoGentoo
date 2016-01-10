@@ -1,7 +1,7 @@
 /*
- * gcc_test.cxx
+ * package_text.cxx
  * 
- * Copyright 2016 Andrei Tumbar <atadmin@Helios>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,17 +23,13 @@
 
 
 #include <iostream>
-#include "Emergepackage.hpp"
-
-using namespace std;
+#include "formatString.hpp"
+#include "package.hpp"
 
 int main(int argc, char **argv)
 {
-	EmergePackage gcc ( "[ebuild   R    ] sys-devel/gcc-4.9.3:4.9::gentoo  USE=\"cxx fortran (multilib) nls nptl openmp sanitize (-altivec) (-awt) -cilk -debug -doc (-fixed-point) -gcj -go -graphite (-hardened) (-libssp) (-multislot) -nopie -nossp -objc -objc++ -objc-gc -regression-test -vanilla\" 87,940 KiB" );
-	//cout << gcc.flags_str["USE"] << endl;
-	//cout << gcc.flags["USE"][1] << endl;
-	//cout << gcc.path ( ) << endl;
-	//map<string, string> vars = get_command ( "lscpu" );
-	cout << gcc.packagestr << endl;
+	Package ftp ( "[ebuild   R    ] net-ftp/oftpd-0.3.7-r7::gentoo  USE=\"ipv6\"");
+	std::cout << ftp.old << std::endl;
 	return 0;
 }
+

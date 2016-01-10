@@ -53,19 +53,19 @@ class req {public: vector< vector<string> > exactly_one; vector<string> item;};
 		vector<string> req_use_buff;
 		int currLine;
 		
-		for ( unsigned int y = currLine; input[y] != "\n"; y++ )
+		for ( size_t y = currLine; input[y] != "\n"; y++ )
 		{
 			basic_warning_buff.push_back ( input[y] );
 			currLine = y;
 		}
 		
-		for ( unsigned int y = currLine; input[y] != "\n"; y++ )
+		for ( size_t y = currLine; input[y] != "\n"; y++ )
 		{
 			use_info_buff.push_back ( input[y] );
 			currLine = y;
 		}
 		
-		for ( unsigned int y = currLine; input[y] != "\n"; y++ )
+		for ( size_t y = currLine; input[y] != "\n"; y++ )
 		{
 			req_use_buff.push_back ( input[y] );
 			currLine = y;
@@ -118,10 +118,8 @@ typedef struct use_req
 	string str = 
 	
 	void source ( )
-	{
-		
-	string getVal
-	REQUIRED_USE
+	{}
+	string getVal;
 
 
 /*! \class Warning
@@ -138,7 +136,7 @@ class Warning
 	
 	Warning ( vector<string> input )
 	{
-		for ( unsigned int x; x <= input.size(); x++ )
+		for ( size_t x; x <= input.size(); x++ )
 		{
 			string in = input[x];
 			if ( line.substr ( 0, 6 ) == string ( "[blocks" ) )

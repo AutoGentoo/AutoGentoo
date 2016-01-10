@@ -78,7 +78,7 @@ namespace strfmt
 	
 	std::string getSubStr ( std::string &input, int startIndex, char exitChar )
 	{
-		unsigned int currentIndex = startIndex;
+		size_t currentIndex = startIndex;
 		while ( currentIndex != input.length ( ) && input.at ( currentIndex ) != exitChar )
 		{
 			++currentIndex;
@@ -88,7 +88,7 @@ namespace strfmt
 	
 	int getSubStrInt ( std::string input, int startIndex, const char *exitChar )
 	{
-		unsigned int currentIndex = startIndex;
+		size_t currentIndex = startIndex;
 		while ( currentIndex != input.length ( ) && input.at ( currentIndex ) != std::string ( exitChar ).at ( 0 ) )
 		{
 			++currentIndex;
@@ -99,7 +99,7 @@ namespace strfmt
 	
 	int rfind ( std::string &input, const char *find )
 	{
-		for ( unsigned int i=input.length( ); i != input.length( ); --i )
+		for ( size_t i=input.length( ); i != input.length( ); --i )
 		{
 			if ( input.at ( i ) == std::string ( find  ).at ( 0 ) )
 			{
@@ -126,7 +126,7 @@ namespace strfmt
 	
 	int strfind ( std::string in, char findchar, int startchar = 0 )
 	{
-		unsigned int x = startchar;
+		size_t x = startchar;
 		std::cout << "x=" << x << std::endl;
 		std::cout << "len=" << in.length ( ) << std::endl;
 		if ( x >= in.length ( ) )
@@ -162,7 +162,7 @@ namespace strfmt
 			}
 		}
 		std::vector<std::string> valvec;
-		for ( unsigned int x = 0; x != findvec.size ( ) - 1; x++ )
+		for ( size_t x = 0; x != findvec.size ( ) - 1; x++ )
 		{
 			if ( x == findvec.size ( ) )
 			{
@@ -177,7 +177,7 @@ namespace strfmt
 		}
 		strfmt::removechar ( in, '"' );
 		strfmt::removechar ( in, '"' );
-		for ( unsigned int x = 0; x != valvec.size ( ); x++ )
+		for ( size_t x = 0; x != valvec.size ( ); x++ )
 		{
 			std::string y = valvec [ x ];
 			type buff = pt.get<type> ( y );
@@ -193,7 +193,7 @@ namespace strfmt
 	{
 		std::vector<std::string> returnList;
 		std::string buff;
-		for ( unsigned int y = 0; y != str.length ( ); y++ )
+		for ( size_t y = 0; y != str.length ( ); y++ )
 		{
 			char curr = str[y];
 			if ( curr == chr )
@@ -211,7 +211,7 @@ namespace strfmt
 	std::string merge ( std::vector<std::string> in )
 	{
 		std::string return_buff;
-		for ( unsigned int i; i != in.size ( ); i++ )
+		for ( size_t i; i != in.size ( ); i++ )
 		{
 			return_buff.append ( in[i] );
 		}

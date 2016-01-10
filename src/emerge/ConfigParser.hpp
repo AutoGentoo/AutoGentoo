@@ -49,7 +49,7 @@ class ConfigParser
 	
 	void read ( )
 	{
-		unsigned int y = 0;
+		size_t y = 0;
 		for ( string line = file[y]; y < file.size ( ); y++ )
 		{
 			if ( line.at ( 0 ) == '#' )

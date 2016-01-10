@@ -49,7 +49,7 @@ class Type
 	public:
 	
 	vector<Config> configs;
-	vector<Package> packages;
+	vector<EmergePackage> packages;
 	vector<Warning> warnings;
 	
 	Type ( vector<string> &inputFile, string package )
@@ -57,14 +57,14 @@ class Type
 		vector< vector<string> > usegroups;
 		vector<string> packageLines;
 		vector< vector<string> > warninggroups;
-		for ( unsigned int y; y <= inputFile.size ( ); y++ )
+		for ( size_t y; y <= inputFile.size ( ); y++ )
 		{
 			string line = inputFile[y];
 			string t = findTypes ( line );
 			if ( t == "use" )
 			{
 				vector<string> useLines;
-				for ( unsigned int z; inputFile[z] != "\n"; z++ )
+				for ( size_t z; inputFile[z] != "\n"; z++ )
 				{
 					useLines.push_back ( inputFile[z] );
 					y = z;
@@ -80,7 +80,7 @@ class Type
 			if ( t == "warning" )
 			{
 				vector<string> warningLines;
-				for ( unsigned int z; (inputFile[z] != "\n" && inputFile[z+1] != "\n"); z++ )
+				for ( size_t z; (inputFile[z] != "\n" && inputFile[z+1] != "\n"); z++ )
 				{
 					warningLines.push_back ( inputFile[z] );
 					y = z;
@@ -89,19 +89,19 @@ class Type
 			}
 		}
 		
-		for ( unsigned int y; y <= usegroups.size(); y++ )
+		for ( size_t y; y <= usegroups.size(); y++ )
 		{
 			Config current ( usegroups[y] );
 			configs.push_back ( current );
 		}
 		
-		for ( unsigned int y; y <= packageLines.size(); y++ )
+		for ( size_t y; y <= packageLines.size(); y++ )
 		{
-			Package current ( packageLines[y].c_str() );
+			EmergePackage current ( packageLines[y].c_str() );
 			packages.push_back ( current );
 		}
 		
-		for ( unsigned int y; y <= warninggroups.size(); y++ )
+		for ( size_t y; y <= warninggroups.size(); y++ )
 		{
 			Warning current ( warninggroups[y] );
 			warnings.push_back ( current );

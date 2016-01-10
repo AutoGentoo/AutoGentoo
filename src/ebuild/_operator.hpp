@@ -32,16 +32,18 @@ class _op
 {
 	public:
 	const char* op; //!< String holding the operator string such as '?';
-	bool pre_content_bool; //!< Bool asking for term before operator such as 'foo?'
-	bool post_content_bool; //!< Bool asking for term before operator such as '!foo'
+	bool hasPreContent; //!< Bool asking for term before operator such as 'foo?'
+	bool hasPostContent; //!< Bool asking for term before operator such as '!foo'
 	string pre_content;
 	string post_content;
-	_op ( const char* op, bool pre_content_bool = false, bool post_content_bool = false );
+	string content_str;
+	vector<string> content;
+	_op ( const char* op, bool hasPreContent = false, bool hasPostContent = false );
 	string read_pre_content ( string in )
 	{
 		string return_str;
-		unsigned int find_op ( in.find ( op ) );
-		for ( unsigned int i = find_op; i >= 0; i-- )
+		size_t find_op ( in.find ( op ) );
+		for ( size_t i = find_op; i >= 0; i-- )
 		{
 			char x ( in.at ( i ) );
 			if ( x != ' ' )
@@ -58,8 +60,8 @@ class _op
 	string read_post_content ( string in )
 	{
 		string return_str;
-		unsigned int find_op ( in.find ( op ) );
-		for ( unsigned int i = find_op; i <= in.length ( ); i++ )
+		size_t find_op ( in.find ( op ) );
+		for ( size_t i = find_op; i <= in.length ( ); i++ )
 		{
 			char x ( in.at ( i ) );
 			if ( x != ' ' )
@@ -74,6 +76,9 @@ class _op
 		return return_str;
 	}
 	
+	//void get_content ( string in )
+	//{
+	//	if 
 };
 
 /*
@@ -85,15 +90,28 @@ REQUIRED_USE="|| ( foo bar baz )"			At least one of foo bar or baz must be set.
 REQUIRED_USE="?? ( foo bar baz )"			No more than one of foo bar or baz may be set.
 */
 
-void init_ops ( )
+class op_if: public _op
 {
-	_op op_if ( "?", true );
-	
-	_op op_not ( "!", false, true );
-	
-	_op op_exact_one ( "^^" );
-	
-	_op op_least_one ( "||" );
-	
-	_op op_most_one ( "??" );
-}
+	public:
+	op_if ( string content_str ) :  _op ( "?", true ) {}
+};
+class op_not: public _op
+{
+	public:
+	op_not ( string content_str ) :  _op ( "!", false, true ) {}
+};
+class op_exact_one: public _op
+{
+	public:
+	op_exact_one ( string content_str ) :  _op ( "^^" ) {}
+};
+class op_least_one: public _op
+{
+	public:
+	op_least_one ( string content_str ) :  _op ( "||" ) {}
+};
+class op_most_one: public _op
+{
+	public:
+	op_most_one ( string content_str ) :  _op ( "??" ) {}
+};

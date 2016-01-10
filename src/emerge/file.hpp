@@ -25,7 +25,7 @@ class File
 	/** Used during readline () function
 	 * Every time this function is run then currentLine will increase by 1
 	 */
-	unsigned int currentLine;
+	size_t currentLine;
 	
 	File ( string fileName )
 	{

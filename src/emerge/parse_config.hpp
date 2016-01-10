@@ -39,7 +39,7 @@ std::map < std::string, std::vector< std::string > > get_variables_split ( std::
 	std::string buff_str;
 	bool is_var = true;
 	
-	for ( unsigned int y = 0; y != input.length ( ); y++ )
+	for ( size_t y = 0; y != input.length ( ); y++ )
 	{
 		if ( is_var )
 		{
@@ -78,7 +78,7 @@ std::map < std::string, std::vector< std::string > > get_variables_split ( std::
 			}
 		}
 	}
-	for ( unsigned int i = 0; i != variables.size ( ); i++ )
+	for ( size_t i = 0; i != variables.size ( ); i++ )
 	{
 		std::string var = variables[i];
 		std::string val = values[i];
@@ -99,7 +99,7 @@ std::map < std::string, std::string > get_variables ( std::string input )
 	std::string buff_str;
 	bool is_var = true;
 	
-	for ( unsigned int y = 0; y != input.length ( ); y++ )
+	for ( size_t y = 0; y != input.length ( ); y++ )
 	{
 		if ( is_var )
 		{
@@ -138,7 +138,7 @@ std::map < std::string, std::string > get_variables ( std::string input )
 			}
 		}
 	}
-	for ( unsigned int i = 0; i != variables.size ( ); i++ )
+	for ( size_t i = 0; i != variables.size ( ); i++ )
 	{
 		std::string var = variables[i];
 		std::string val = values[i];
@@ -160,7 +160,7 @@ std::map < std::string, std::string > get_command ( std::string cmd )
 	std::cout << "file opened" << std::endl;
 	std::vector<std::string> lines = f.readlines ( );
 	std::cout << "read lines" << std::endl;
-	for ( unsigned int x = 0; x != lines.size ( ); x++ )
+	for ( size_t x = 0; x != lines.size ( ); x++ )
 	{
 		std::string line = lines[x];
 		std::cout << line << std::endl;

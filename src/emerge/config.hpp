@@ -53,7 +53,7 @@ class Config
 			system ( string ("touch " + path ).c_str() );
 		}
 		
-		for ( unsigned int y = 2; y <= in.size (); y++ )
+		for ( size_t y = 2; y <= in.size (); y++ )
 		{
 			writeLines.push_back ( in[y] );
 		}
@@ -65,7 +65,7 @@ class Config
 	void write ( void )
 	{
 		file.open ( path.c_str() );
-		for ( unsigned int x; x <= writeLines.size(); x++ )
+		for ( size_t x; x <= writeLines.size(); x++ )
 		{
 			file << writeLines[x];
 		}
