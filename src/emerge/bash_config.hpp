@@ -28,13 +28,13 @@
 #include <vector>
 #include <boost/format.hpp>
 #include "file.hpp"
-#include "formatString.hpp"
+#include "_misc_tools.hpp"
 
 using namespace std;
 using boost::format;
 using boost::io::group;
 
-class ConfigParser
+class bash_config
 {
 	public:
 	
@@ -56,8 +56,8 @@ class ConfigParser
 			{
 				continue;
 			}
-			string name = strfmt::getSubStr( line, 0, "=" );
-			strfmt::remove ( name, " " );
+			string name = misc::getSubStr( line, 0, "=" );
+			misc::remove ( name, " " );
 			size_t findOther = line.find ( "$" );
 			while ( findOther != string::npos )
 			{
@@ -66,19 +66,19 @@ class ConfigParser
 					cout << format( "Invalid syntax for Config file '%1%', after '$' expected '{' got '%1%' (line %2%)" ) % filename % line.at ( findOther+1 ) % y << endl;
 					return;
 				}
-				string other = strfmt::getSubStr ( line, findOther, "}" );
+				string other = misc::getSubStr ( line, findOther, "}" );
 				string otherVar = other;
-				strfmt::remove( otherVar, "$" );
-				strfmt::remove( otherVar, "}" );
-				strfmt::remove( otherVar, "{" );
-				strfmt::replace( line, other, otherVar );
+				misc::remove( otherVar, "$" );
+				misc::remove( otherVar, "}" );
+				misc::remove( otherVar, "{" );
+				misc::replace( line, other, otherVar );
 				findOther = line.find ( "$", findOther );
 			}
 			cout << line << endl;
 			int equalop = line.find ( "=" );
 			string value = line.substr( equalop, line.length ( ) );
-			strfmt::remove(value, "= ");
-			strfmt::remove(value, "=");
+			misc::remove(value, "= ");
+			misc::remove(value, "=");
 			
 			variables[name] = value;
 		}

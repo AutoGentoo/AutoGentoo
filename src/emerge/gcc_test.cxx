@@ -23,17 +23,23 @@
 
 
 #include <iostream>
-#include "Emergepackage.hpp"
+#include "package.hpp"
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
-	EmergePackage gcc ( "[ebuild   R    ] sys-devel/gcc-4.9.3:4.9::gentoo  USE=\"cxx fortran (multilib) nls nptl openmp sanitize (-altivec) (-awt) -cilk -debug -doc (-fixed-point) -gcj -go -graphite (-hardened) (-libssp) (-multislot) -nopie -nossp -objc -objc++ -objc-gc -regression-test -vanilla\" 87,940 KiB" );
+	//EmergePackage gcc ( "[ebuild   R    ] sys-devel/gcc-4.9.3:4.9::gentoo  USE=\"cxx fortran (multilib) nls nptl openmp sanitize (-altivec) (-awt) -cilk -debug -doc (-fixed-point) -gcj -go -graphite (-hardened) (-libssp) (-multislot) -nopie -nossp -objc -objc++ -objc-gc -regression-test -vanilla\" 87,940 KiB" );
 	//cout << gcc.flags_str["USE"] << endl;
 	//cout << gcc.flags["USE"][1] << endl;
 	//cout << gcc.path ( ) << endl;
 	//map<string, string> vars = get_command ( "lscpu" );
-	cout << gcc.packagestr << endl;
+	string pkg ( argv[1] );
+	Package python ( pkg );
+	//cout << python.release.revision_num << endl;
+	//cout << python.release.revision << endl;
+	cout << python.file << endl;
+	cout << python.slot << endl;
+	//cout << python.revision << endl;
 	return 0;
 }

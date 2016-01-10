@@ -24,6 +24,8 @@
 
 #include <iostream>
 #include <string>
+#include <map>
+#include <vector>
 
 using namespace std;
 
@@ -52,9 +54,15 @@ class ebuild
 	string DEPEND; //!< The package's build dependencies are listed here. See the section Package Dependencies for more details on proper syntax.
 	string RDEPEND; //!< The package's runtime dependencies are listed here. Once again, see Package Dependencies for more details.
 	
-	ebuild ( string configFile )
+	map < string, string& > varMap;
+	
+	ebuild ( Package input )
 	{
 		configFile = configFile.c_str();
-		include configFile;
+		string prop_raw[] = { P, PN, PV, PR, PVR, PF, A, DISTDIR, FILESDIR, WORKDIR, S, T, D, SLOT, LICENSE, KEYWORDS, DESCRIPTION, SRC_URI, HOMEPAGE, IUSE, DEPEND, RDEPEND };
+		string (&prop)[sizeof(prop_raw)/sizeof(string)] = prop_raw;
+		
+		//ebuild_properties properties ( P, PN, PV, PR, PVR, PF, A, DISTDIR, FILESDIR, WORKDIR, S, T, D, SLOT, LICENSE, KEYWORDS, DESCRIPTION, SRC_URI, HOMEPAGE, IUSE, DEPEND, RDEPEND );
+		
 	}
 };
