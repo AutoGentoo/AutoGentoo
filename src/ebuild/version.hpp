@@ -25,7 +25,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "../emerge/formatString.hpp"
+#include "../emerge/_misc_tools.hpp"
 
 using namespace std;
 
@@ -34,32 +34,40 @@ class version
 	public:
 	vector<int> v; //!< Vector of the version, string divided by '.' for example 1.2.3 = [1, 2, 3]
 	string revision;
+	string slot;
 	int revision_num;
 	bool has_revision;
-	string in_str;
+	string _in_str;
 	
-	version ( string in_str )
+	void init ( string in_str )
 	{
 		vector<string> buff;
-		if ( in_str[in_str.length ( ) - 2] == 'r' )
+		slot = "0";
+		if ( in_str.find ( ":" ) != string::npos )
+		{
+			slot = misc::substr ( in_str, in_str.rfind ( ":" ) + 1, in_str.length ( ) );
+			in_str.erase ( in_str.rfind ( ":" ), slot.length ( ) + 1 );
+		}
+		_in_str = in_str;
+		if ( in_str[in_str.rfind("-") + 1] == 'r' )
 		{
 			has_revision = true;
-			revision = in_str.substr( in_str.length ( ) - 2, in_str.length ( ) );
-			revision_num = revision[in_str.length ( )];
+			revision = misc::substr( in_str, in_str.rfind("-") + 1, in_str.length() );
+			revision_num = misc::stoi ( misc::substr( revision, 1, revision.length ( ) ) );
 		}
 		
 		string buff_in = in_str;
 		
 		if ( has_revision )
 		{
-			strfmt::remove ( buff_in, revision );
+			misc::remove ( buff_in, revision );
 		}
 		
-		vector<string> buff_vec ( strfmt::split ( buff_in, '.' ) );
+		vector<string> buff_vec ( misc::split ( buff_in, '.' ) );
 		
 		for ( size_t i; i <= buff_vec.size ( ); i++ )
 		{
-			v.push_back ( strfmt::stoi ( buff_vec[i] ) );
+			v.push_back ( misc::stoi ( buff_vec[i] ) );
 		}
 	}
 	bool operator < ( version compare )
