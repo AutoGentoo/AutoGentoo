@@ -24,6 +24,8 @@
 
 #include <iostream>
 #include <string>
+#include "_misc_tools.hpp"
+#include "../ebuild/version.hpp"
 
 using namespace std;
 
@@ -31,9 +33,87 @@ class Package
 {
 	public:
 	
-	string KEYWORDS; //!< This variable now supports a couple of different functions. First of all, this variable specifies what architecture the ebuild is meant for. Some example keywords include: x86, ppc, sparc, mips, alpha, arm, hppa, amd64 and ia64. See the profiles/arch.list file in the Portage tree for more details. Obviously, you would set this to reflect the architecture of the target machine. Portage will not allow an x86 machine to build anything but x86, as specified by the KEYWORDS variable. Packages that do not support the native architecture are automatically masked by Portage. If the KEYWORDS flag has a preceding ~, then that indicates that the particular ebuild works, but needs to be tested in several environments before being moved to the stable profile with the given keyword. If the KEYWORDS flag has a preceding -, then the package does not work with the given keyword. If there is nothing leading KEYWORDS, then the package is considered stable. You can allow installation of these different types of packages through the ACCEPT_KEYWORDS variable in make.conf.
-	string IUSE; //!< This is set to whatever USE variables your package utilizes. Remember that KEYWORDS should not be listed in here!
-	Package ( string nonAmbigiousName )
+	string packagestr;
+	string path;
+	string catagory;
+	string directory;
+	string releaseStr;
+	string file;
+	string slot;
+	
+	version release;
+	
+	Package ( string input_package )
 	{
+		/* Key
+		 * + added by operator '+'
+		 * - subtracted
+		 * _ given that it is added by str.substr
+		 * ^ found by a str.find() and length ()
+		 * * Note added at bottom
+		*/
 		
+		/*
+		 * dev-lang/python-2.7.10-r1::gentoo
+		 *                          --------
+		*/
+		misc::remove ( input_package, "::gentoo" );
+		
+		/*
+		 * dev-lang/python-2.7.10-r1
+		 * ________^
+		*/
+		catagory = input_package.substr ( 0, input_package.find ( "/" ) );
+		
+		/*
+		 * dev-lang/python-2.7.10-r1
+		 *         ^_____________^
+		*/
+		string packageName = misc::substr ( input_package, catagory.length ( ) + 1, misc::rfind ( input_package, '-' ) );
+		/*
+		 * dev-lang/python-2.7.10-r1
+		 *         ^________________^
+		*/
+		string _file = misc::substr ( input_package, catagory.length ( ) + 1, input_package.length ( ) );
+		int versionSplit;
+		/* 
+		 * dev-lang/python-2.7.10-r1
+		 *                        ^
+		*/
+		
+		if ( input_package.at ( misc::rfind ( input_package, '-' ) + 1 ) == 'r' )
+		{
+			/* Has revision
+			* python-2.7.10-r1
+			* ______^------*
+			* Skipped because packageName = python-2.7.10
+			*/
+			versionSplit = misc::rfind ( packageName, '-' );
+			packageName = misc::substr ( packageName, 0, misc::rfind ( packageName, '-' ) );
+			directory = packageName.substr ( 0, versionSplit );
+		}
+		else
+		{
+			/* No revision
+			* python-2.7.10
+			*       ^
+			*/
+			versionSplit = _file.rfind ( "-" );
+			directory = packageName;
+		}
+		
+		path = catagory + "/" + directory;
+		/*
+		* python-2.7.10-r1
+		* ------^_________^
+		*/
+		releaseStr = misc::substr ( _file, versionSplit + 1, file.length ( ) );
+		release.init ( releaseStr );
+		cout << packageName << endl;
+		_file = packageName + "-" + release._in_str;
+		
+		slot = release.slot;
+		
+		file = "/usr/portage/" + catagory + "/" + directory + "/" + _file + ".ebuild";
 	}
+};
