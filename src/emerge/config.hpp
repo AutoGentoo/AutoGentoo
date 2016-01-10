@@ -27,7 +27,7 @@
 #include <vector>
 #include <boost/filesystem.hpp>
 #include "file.hpp"
-#include "formatString.hpp"
+#include "_misc_tools.hpp"
 
 using namespace std;
 
@@ -42,10 +42,10 @@ class Config
 	Config ( vector<string> in, string pkgName = "unknown" )
 	{
 		string path_raw = in[1];
-		strfmt::remove( path_raw, " in the portage(5) man page for more details)" );
-		strfmt::remove( path_raw, " (see " );
-		strfmt::removechar( path_raw, '"' );
-		strfmt::removechar( path_raw, '"' );
+		misc::remove( path_raw, " in the portage(5) man page for more details)" );
+		misc::remove( path_raw, " (see " );
+		misc::removechar( path_raw, '"' );
+		misc::removechar( path_raw, '"' );
 		path = "/etc/portage/" + path_raw;
 		if ( boost::filesystem::is_directory(path) )
 		{

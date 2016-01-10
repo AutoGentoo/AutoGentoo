@@ -29,7 +29,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include "file.hpp"
-#include "formatString.hpp"
+#include "_misc_tools.hpp"
 
 class iniparser
 {
@@ -60,7 +60,7 @@ class iniparser
 	intype get ( std::string val )
 	{
 		intype buff = pt.get<intype>( val );
-		buff = strfmt::formatini<intype> ( buff, pt );
+		buff = misc::formatini<intype> ( buff, pt );
 		return buff;
 	}
 };

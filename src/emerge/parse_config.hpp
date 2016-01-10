@@ -26,7 +26,7 @@
 #include <vector>
 #include <map>
 #include <boost/algorithm/string.hpp>
-#include "formatString.hpp"
+#include "_misc_tools.hpp"
 #include "file.hpp"
 
 using namespace std;
@@ -82,11 +82,11 @@ std::map < std::string, std::vector< std::string > > get_variables_split ( std::
 	{
 		std::string var = variables[i];
 		std::string val = values[i];
-		strfmt::remove ( var, " " );
-		strfmt::remove ( val, "\"" );
-		strfmt::remove ( val, "=" );
-		strfmt::remove ( val, "\"" );
-		std::vector<std::string> _val = strfmt::split ( val, ' ' );
+		misc::remove ( var, " " );
+		misc::remove ( val, "\"" );
+		misc::remove ( val, "=" );
+		misc::remove ( val, "\"" );
+		std::vector<std::string> _val = misc::split ( val, ' ' );
 		buff_map[var] = _val;
 	}
 	return buff_map;
@@ -142,10 +142,10 @@ std::map < std::string, std::string > get_variables ( std::string input )
 	{
 		std::string var = variables[i];
 		std::string val = values[i];
-		strfmt::remove ( var, " " );
-		strfmt::remove ( val, "\"" );
-		strfmt::remove ( val, "=" );
-		strfmt::remove ( val, "\"" );
+		misc::remove ( var, " " );
+		misc::remove ( val, "\"" );
+		misc::remove ( val, "=" );
+		misc::remove ( val, "\"" );
 		buff_map[var] = val;
 	}
 	return buff_map;
@@ -164,7 +164,7 @@ std::map < std::string, std::string > get_command ( std::string cmd )
 	{
 		std::string line = lines[x];
 		std::cout << line << std::endl;
-		std::vector<std::string> divide = strfmt::split ( line, ':' );
+		std::vector<std::string> divide = misc::split ( line, ':' );
 		std::cout << "divided" << std::endl;
 		std::string var, val;
 		std::cout << divide.size ( ) << std::endl;

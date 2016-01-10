@@ -94,7 +94,7 @@ class req {public: vector< vector<string> > exactly_one; vector<string> item;};
 		
 		info_buff.erase(rm_place_start, rm_place_end);
 		trim(info_buff);
-		strfmt::remove(info_buff, "- ");
+		misc::remove(info_buff, "- ");
 		int find_space(info_buff.find(" "));
 		info_buff = info_buff.substr(find_space, info_buff.length());
 		
