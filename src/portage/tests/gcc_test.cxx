@@ -1,7 +1,7 @@
 /*
- * read_ebuild.hpp
+ * gcc_test.cxx
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atadmin@Helios>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,15 +23,19 @@
 
 
 #include <iostream>
-#include <string>
-#include "../emerge/file.hpp"
-#include "_operator.hpp"
+#include "../package/package.hpp"
 
 using namespace std;
 
-struct ebuild_use
+int main(int argc, char **argv)
 {
-	string IUSE = "undefined"; //!< A list of all USE flags (excluding arch flags, but including USE_EXPAND flags) used within the ebuild. See IUSE.
-	string REQUIRED_USE = "undefined"; //!< A list of assertions that must be met by the configuration of USE flags to be valid for this ebuild. (Requires EAPI>=4.)
-	string PACKAGE_USE = "undefined"; //!< Found in /etc/portage/package.use
-	
+	//EmergePackage gcc ( "[ebuild   R    ] sys-devel/gcc-4.9.3:4.9::gentoo  USE=\"cxx fortran (multilib) nls nptl openmp sanitize (-altivec) (-awt) -cilk -debug -doc (-fixed-point) -gcj -go -graphite (-hardened) (-libssp) (-multislot) -nopie -nossp -objc -objc++ -objc-gc -regression-test -vanilla\" 87,940 KiB" );
+	//cout << gcc.flags_str["USE"] << endl;
+	//cout << gcc.flags["USE"][1] << endl;
+	//cout << gcc.path ( ) << endl;
+	//map<string, string> vars = get_command ( "lscpu" );
+	string pkg ( argv[1] );
+	Package package ( pkg );
+	cout << package.file << endl;
+	return 0;
+}

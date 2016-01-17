@@ -28,8 +28,8 @@
 #include <vector>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
-#include "file.hpp"
-#include "_misc_tools.hpp"
+#include "../tools/file.hpp"
+#include "../tools/_misc_tools.hpp"
 
 class iniparser
 {

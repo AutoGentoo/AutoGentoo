@@ -1,5 +1,5 @@
 /*
- * Emergepackage.hpp
+ * EmergePackage.hpp
  * 
  * Copyright 2015 Andrei Tumbar <atuser@Kronos>
  * 
@@ -27,7 +27,7 @@
 #include <map>
 #include <boost/algorithm/string.hpp>
 #include "package.hpp"
-#include "parse_config.hpp"
+#include "../config/parse_config.hpp"
 
 using namespace std;
 using namespace boost::algorithm;
@@ -171,6 +171,7 @@ class EmergePackage: public Package
 	string propertystr;
 	string old;
 	string slot;
+	int sizeOfDownload;
 	map< string, vector<string> > flags;
 	map< string, string > flags_str;
 	
@@ -187,9 +188,7 @@ class EmergePackage: public Package
 		/* [ebuild   R    ] gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB */
 		string packageString = string ( input );
 		
-		/* [ebuild   R    ] gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB
-		 * ________________
-		 */
+		
 		propertystr = packageString.substr ( 0, 15 );
 		
 		/* [ebuild   R    ]
@@ -205,77 +204,75 @@ class EmergePackage: public Package
 			properties.set ( x, true );
 		}
 		
-		/* [ebuild   R    ] gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB
-		 * -----------------_________________________________________________________________________________________________
-		 */
-		rawPackageStr = misc::substr ( packageString, 16, packageString.length ( ) );
-		
-		vector < string > 
-		
-		/* gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB
-		 * ___________________________________^^
-		 */
-		packagestr = 
-		
-		/* gnome-base/gnome-3.16.0:2.0::gentoo
-		 *                            --------
-		 */
-		misc::remove ( packagestr, "::gentoo" );
-		
-		/* gnome-base/gnome-3.16.0:2.0
-		 *                        ^
-		 */
-		int slotDivide = packagestr.find ( ":" );
-		
-		/* Has a given slot */
-		if ( slotDivide != string::npos )
-		{
-			/* gnome-base/gnome-3.16.0:2.0
-			*                          ___
-			*/
-			slot = misc::substr ( packagestr, slotDivide + 1, packagestr.length ( ) );
-			
-			/* gnome-base/gnome-3.16.0:2.0
-			*  _______________________----
-			*/
-			packagestr = misc::substr ( packagestr, 0, slotDivide );
-		}
 	}
 	
 	vector < string > splitEbuild ( string input )
 	{
+		/*
+		 * 1. propertySection
+		 * 2. _packageStr
+		 * 3. oldStr
+		 * 4. vars
+		 * 5. size
+		*/
 		vector < string > returnVec;
 		
-		//[ebuild     U  ] net-dialup/rp-pppoe-3.11-r3::gentoo [3.8-r2::gentoo] USE="-tk% (-X%*)" 219 KiB
-		propertySection = input.substr ( 0, 15 );
-		returnVec ( propertySection );
+		/* [ebuild     U  ] www-client/firefox-38.5.0::gentoo [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
+		 * ________________
+		 */
+		string propertySection = input.substr ( 0, 15 );
 		
-		rawSection = misc::substr ( input, 16, input.length ( ) ); 
+		/* [ebuild     U  ] www-client/firefox-38.5.0::gentoo [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
+		 * -----------------
+		 */
+		string rawSection = misc::substr ( input, 16, input.length ( ) ); 
 		
-		int firstSecDivide;
-		int secondSecDivide;
-		int thirdSecDivide;
-		bool insideQuote = false;
-		for ( size_t i = 0; i != input.length ( ); i++ )
-		{
-			char j = input[j];
-			if ( j == ' ' && !insideQuote )
-			{
-				switch ( returnVec.size ( ) )
-				{
-					case 1:
-					firstSecDivide = i;
-					returnVec push_back ( misc::substr ( input, 16, i - 1 ) );
-					case 2:
-					secondSecDivide = i;
-					returnVec push_back ( misc::substr ( input, firstSecDivide, i ) );
-					case 3;
-					
-				}
-				
-			}
-			if ( j == '\"' )
-			{
-				insideQuote = !insideQuote;
-			}
+		/* www-client/firefox-38.5.0::gentoo [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
+		 * _________________________________^
+		 */
+		string _packageStr = misc::substr ( rawSection, 0, rawSection.find ( " " ) - 1 );
+		
+		/* www-client/firefox-38.5.0::gentoo [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
+		 * ----------------------------------
+		 */
+		rawSection = misc::substr ( rawSection, packagestr.length ( ) + 1, rawSection.length ( ) );
+		
+		/* [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
+		 * ________________^
+		*/
+		string oldStr = misc::substr ( rawSection, 0, rawSection.find ( " " ) - 1 );
+		
+		/* [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
+		 * -----------------
+		*/
+		rawSection = misc::substr ( rawSection, oldStr.length ( ), rawSection.length ( ) );
+		
+		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
+		 *                                                                 ----
+		*/
+		rawSection.erase ( rawSection.end ( ) - 4, rawSection.end ( ) );
+		
+		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127
+		 *                                                         ^
+		*/
+		int varToSizeSplit = rawSection.rfind ( " " );
+		
+		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127
+		 * ________________________________________________________^
+		*/
+		string vars ( misc::substr ( rawSection, 0, varToSizeSplit ) );
+		
+		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127
+		 *                                                         ^_______
+		*/
+		string size ( misc::substr ( rawSection, vars.length ( ) + 1, rawSection.length ( ) ) );
+		
+		returnVec.push_back ( propertySection );
+		returnVec.push_back ( _packageStr );
+		returnVec.push_back ( oldStr );
+		returnVec.push_back ( vars );
+		returnVec.push_back ( size );
+		
+		return returnVec;
+	}
 };

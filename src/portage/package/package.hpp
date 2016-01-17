@@ -1,5 +1,5 @@
 /*
- * Emergepackage.hpp
+ * package.hpp
  * 
  * Copyright 2015 Andrei Tumbar <atuser@Kronos>
  * 
@@ -24,8 +24,8 @@
 
 #include <iostream>
 #include <string>
-#include "_misc_tools.hpp"
-#include "../ebuild/version.hpp"
+#include "../tools/_misc_tools.hpp"
+#include "version.hpp"
 
 using namespace std;
 
@@ -34,6 +34,7 @@ class Package
 	public:
 	
 	string packagestr;
+	string name;
 	string path;
 	string catagory;
 	string directory;
@@ -69,7 +70,7 @@ class Package
 		 * dev-lang/python-2.7.10-r1
 		 *         ^_____________^
 		*/
-		string packageName = misc::substr ( input_package, catagory.length ( ) + 1, misc::rfind ( input_package, '-' ) );
+		name = misc::substr ( input_package, catagory.length ( ) + 1, misc::rfind ( input_package, '-' ) );
 		/*
 		 * dev-lang/python-2.7.10-r1
 		 *         ^________________^
@@ -86,11 +87,11 @@ class Package
 			/* Has revision
 			* python-2.7.10-r1
 			* ______^------*
-			* Skipped because packageName = python-2.7.10
+			* Skipped because name = python-2.7.10
 			*/
-			versionSplit = misc::rfind ( packageName, '-' );
-			packageName = misc::substr ( packageName, 0, misc::rfind ( packageName, '-' ) );
-			directory = packageName.substr ( 0, versionSplit );
+			versionSplit = misc::rfind ( name, '-' );
+			name = misc::substr ( name, 0, misc::rfind ( name, '-' ) );
+			directory = name.substr ( 0, versionSplit );
 		}
 		else
 		{
@@ -99,7 +100,7 @@ class Package
 			*       ^
 			*/
 			versionSplit = _file.rfind ( "-" );
-			directory = packageName;
+			directory = name;
 		}
 		
 		path = catagory + "/" + directory;
@@ -109,8 +110,8 @@ class Package
 		*/
 		releaseStr = misc::substr ( _file, versionSplit + 1, file.length ( ) );
 		release.init ( releaseStr );
-		cout << packageName << endl;
-		_file = packageName + "-" + release._in_str;
+		cout << name << endl;
+		_file = name + "-" + release._in_str;
 		
 		slot = release.slot;
 		

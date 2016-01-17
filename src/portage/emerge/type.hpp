@@ -1,5 +1,5 @@
 /*
- * errors.hpp
+ * type.hpp
  * 
  * Copyright 2015 Andrei Tumbar <atadmin@Helios>
  * 
@@ -27,7 +27,7 @@
 #include <vector>
 #include <map>
 #include "config.hpp"
-#include "package.hpp"
+#include "../package/EmergePackage.hpp"
 #include "warning.hpp"
 
 using namespace std;

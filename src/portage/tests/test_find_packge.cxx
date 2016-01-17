@@ -1,7 +1,7 @@
 /*
- * test_file.cxx
+ * test_find_packge.cxx
  * 
- * Copyright 2016 Andrei Tumbar <atadmin@Helios>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,19 +23,16 @@
 
 
 #include <iostream>
-#include "file.hpp"
+#include "../package/findPackage.hpp"
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
-	File f ( "temp" );
-	vector<string> l = f.readlines();
-	cout << l.size() << endl;
-	for ( unsigned int x = 0; x != l.size(); x++ )
-	{
-		cout << l[x] << endl;
-	}
+	PortageDir portage;
+	portage.init ( );
+	string package ( portage.ambig ( argv[1] ) );
+	cout << package << endl;
 	return 0;
 }
 

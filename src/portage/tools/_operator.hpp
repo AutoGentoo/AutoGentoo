@@ -25,7 +25,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <exception>
+#include <boost/algorithm/string.hpp>
+#include "_misc_tools.hpp"
 
+using namespace boost::algorithm;
 using namespace std;
 
 class _op
@@ -38,7 +42,26 @@ class _op
 	string post_content;
 	string content_str;
 	vector<string> content;
-	_op ( const char* op, bool hasPreContent = false, bool hasPostContent = false );
+	int requiredVal;
+	
+	_op ( string op, bool hasPreContent = false, bool hasPostContent = false, int requiredVal = 2, string content_str = "" )
+	{
+		if ( !content_str.empty ( ) )
+		{
+			if ( hasPreContent )
+			{
+				pre_content = read_pre_content ( content_str );
+			}
+			
+			if ( hasPostContent )
+			{
+				post_content = read_post_content ( content_str );
+			}
+			
+			get_content ( content_str );
+		}
+	}
+	
 	string read_pre_content ( string in )
 	{
 		string return_str;
@@ -76,9 +99,13 @@ class _op
 		return return_str;
 	}
 	
-	//void get_content ( string in )
-	//{
-	//	if 
+	void get_content ( string in )
+	{
+		int getSpace = in.find ( " " );
+		string content_str ( misc::substr ( in, getSpace + 1, in.length ( ) ) );
+		trim ( content_str );
+		content = misc::split ( content_str, ' ' );
+	}
 };
 
 /*
@@ -93,25 +120,94 @@ REQUIRED_USE="?? ( foo bar baz )"			No more than one of foo bar or baz may be se
 class op_if: public _op
 {
 	public:
-	op_if ( string content_str ) :  _op ( "?", true ) {}
+	op_if ( string str ) :  _op ( "?", true, false, 1, str ) {}
 };
 class op_not: public _op
 {
 	public:
-	op_not ( string content_str ) :  _op ( "!", false, true ) {}
+	op_not ( string str ) :  _op ( "!", false, true, 0, str ) {}
 };
 class op_exact_one: public _op
 {
 	public:
-	op_exact_one ( string content_str ) :  _op ( "^^" ) {}
+	op_exact_one ( string str ) :  _op ( "^^", false, false, 2, str ) {}
 };
 class op_least_one: public _op
 {
 	public:
-	op_least_one ( string content_str ) :  _op ( "||" ) {}
+	op_least_one ( string str ) :  _op ( "||", false, false, 2, str ) {}
 };
 class op_most_one: public _op
 {
 	public:
-	op_most_one ( string content_str ) :  _op ( "??" ) {}
+	op_most_one ( string str ) :  _op ( "??", false, false, 2, str ) {}
 };
+
+/*
+string getOpType ( string in )
+{
+	
+	if ( in [ in.find ( " " ) - 1 ] == '?' )
+	{
+		return "?";
+	}
+	if ( in [ 0 ] == '!' )
+	{
+		return "!";
+	}
+	if ( in.substr ( 0, 2 ) == "^^" )
+	{
+		returnVec.push_back ( op_exact_one );
+	}
+	if ( in.substr ( 0, 2 ) == "||" )
+	{
+		returnVec.push_back ( op_least_one );
+	}
+	if ( in.substr ( 0, 2 ) == "??" )
+	{
+		returnVec.push_back ( op_most_one );
+	}
+	
+}*/
+
+
+class getOps
+{
+	public:
+	bool search, neg, exact, least, noMore;
+	string useflag;
+	
+	getOps ( string UseFlag )
+	{
+		if ( UseFlag [ 0 ] == '!' )
+		{
+			neg = true;
+		}
+		if ( UseFlag [ UseFlag.length ( ) == '?' )
+		{
+			search = true;
+		}
+		if ( UseFlag == "^^" )
+		{
+			exact = true;
+		}
+		if ( UseFlag == "||" )
+		{
+			least = true;
+		}
+		if ( UseFlag == "??" )
+		{
+			noMore = true;
+		}
+		if ( neg && search )
+		{
+			useflag = misc::substr ( UseFlag, 1, UseFlag.length ( ) - 1 );
+		}
+	}
+};
+
+void neg ( bool &a )
+{
+	a = !a;
+}
+

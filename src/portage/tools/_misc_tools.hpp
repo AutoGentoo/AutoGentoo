@@ -1,5 +1,5 @@
 /*
- * stringEdit.hpp
+ * _misc_tools.hpp
  * 
  * Copyright 2015 Andrei Tumbar <atadmin@Helios>
  * 
@@ -28,16 +28,19 @@
 #include <algorithm>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/format.hpp>
+#include "file.hpp"
 
 using boost::format;
 using boost::io::group;
 
-/**\namespace strfmt
+/**\namespace misc
  * The strfmt namespace consists of a various collection of tools
  * to format string
  *
  */
-namespace strfmt
+#ifndef MISC
+#define MISC
+namespace misc
 {
 	void remove ( std::string &removing, std::string toRemove )
 	{
@@ -75,7 +78,6 @@ namespace strfmt
 			replacing.replace ( foundOld, sizeof ( oldstr ), newstr );
 		}
 	}
-	
 	std::string getSubStr ( std::string &input, int startIndex, char exitChar )
 	{
 		size_t currentIndex = startIndex;
@@ -96,12 +98,15 @@ namespace strfmt
 		++currentIndex;
 		return currentIndex;
 	}
-	
-	int rfind ( std::string &input, const char *find )
+	std::string substr ( std::string input, int start, int end )
 	{
-		for ( size_t i=input.length( ); i != input.length( ); --i )
+		return input.substr(start, end-start);
+	}
+	int rfind ( std::string input, char find )
+	{
+		for ( size_t i=input.length( ) - 1; i != 0; --i )
 		{
-			if ( input.at ( i ) == std::string ( find  ).at ( 0 ) )
+			if ( input[ i ] == find )
 			{
 				return i;
 			}
@@ -111,11 +116,11 @@ namespace strfmt
 	}
 	
 	template < class vectorType >
-	int find ( std::vector<vectorType> &input, std::string findstr )
+	int find ( std::vector<vectorType> input, vectorType findstr )
 	{
-		int x = 0;
-		for ( std::string y = input[x]; sizeof ( input ); x++ )
+		for ( size_t x = 0; x != input.size ( ); x++ )
 		{
+			vectorType y = input [ x ];
 			if ( y == findstr )
 			{
 				return x;
@@ -127,8 +132,6 @@ namespace strfmt
 	int strfind ( std::string in, char findchar, int startchar = 0 )
 	{
 		size_t x = startchar;
-		std::cout << "x=" << x << std::endl;
-		std::cout << "len=" << in.length ( ) << std::endl;
 		if ( x >= in.length ( ) )
 		{
 			return -1;
@@ -169,20 +172,20 @@ namespace strfmt
 				break;
 			}
 			int y = findvec [ x ];
-			std::string buff = strfmt::getSubStr ( in, y, '}' );
-			strfmt::remove( buff, "$" );
-			strfmt::remove( buff, "{" );
-			strfmt::remove( buff, "}" );
+			std::string buff = misc::getSubStr ( in, y, '}' );
+			misc::remove( buff, "$" );
+			misc::remove( buff, "{" );
+			misc::remove( buff, "}" );
 			valvec.push_back ( buff );
 		}
-		strfmt::removechar ( in, '"' );
-		strfmt::removechar ( in, '"' );
+		misc::removechar ( in, '"' );
+		misc::removechar ( in, '"' );
 		for ( size_t x = 0; x != valvec.size ( ); x++ )
 		{
 			std::string y = valvec [ x ];
 			type buff = pt.get<type> ( y );
-			strfmt::removechar ( buff, '"' );
-			strfmt::removechar ( buff, '"' );
+			misc::removechar ( buff, '"' );
+			misc::removechar ( buff, '"' );
 			std::string valrep = str ( format( "${%1%}" ) % y );
 			in.replace ( in.find( valrep ), valrep.length ( ), buff );
 		}
@@ -198,6 +201,7 @@ namespace strfmt
 			char curr = str[y];
 			if ( curr == chr )
 			{
+				std::cout << "adding" << buff << std::endl;
 				returnList.push_back ( buff );
 				buff.clear ( );
 				continue;
@@ -225,4 +229,31 @@ namespace strfmt
 		convert >> val;
 		return val;
 	}
+	
+	string getOutput ( string command )
+	{
+		string cmd ( command + " > temp" );
+		system ( cmd.c_str ( ) );
+		File _file ( "temp" );
+		std::string returnBuff = _file.read ( );
+		system ( "rm -rf temp" );
+		return returnBuff;
+	}
+	
+	std::vector < std::string > splitByVec ( std::string input, std::vector < int > vec )
+	{
+		std::vector < std::string > returnVec;
+		
+		int currBuff = 0;
+		
+		for ( size_t currNum; currNum != vec.size ( ); currNum++ )
+		{
+			int curr = vec [ currNum ];
+			returnVec.push_back ( misc::substr ( input, currBuff, curr ) );
+			currBuff = curr;
+		}
+		
+		return returnVec;
+	}
 }
+#endif

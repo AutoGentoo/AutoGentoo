@@ -23,13 +23,17 @@
 
 
 #include <iostream>
-#include "formatString.hpp"
-#include "package.hpp"
+//#include "../tools/_misc_tools.hpp"
+//#include "../package/package.hpp"
 
 int main(int argc, char **argv)
 {
-	Package ftp ( "[ebuild   R    ] net-ftp/oftpd-0.3.7-r7::gentoo  USE=\"ipv6\"");
-	std::cout << ftp.old << std::endl;
+	//Package ftp ( "[ebuild   R    ] net-ftp/oftpd-0.3.7-r7::gentoo  USE=\"ipv6\"");
+	//std::cout << ftp.old << std::endl;
+	
+	bool a = true;
+	a = !a;
+	std::cout << a << std::endl;
 	return 0;
 }
 

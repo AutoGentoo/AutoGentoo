@@ -1,5 +1,5 @@
 /*
- * Emerge.hpp
+ * emerge.hpp
  * 
  * Copyright 2015 Andrei Tumbar <atadmin@Helios>
  * 

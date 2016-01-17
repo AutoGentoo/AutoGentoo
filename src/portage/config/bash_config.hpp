@@ -1,5 +1,5 @@
 /*
- * ConfigParser.hpp
+ * bash_config.hpp
  * 
  * Copyright 2015 Andrei Tumbar <atuser@Kronos>
  * 
@@ -27,8 +27,8 @@
 #include <map>
 #include <vector>
 #include <boost/format.hpp>
-#include "file.hpp"
-#include "_misc_tools.hpp"
+#include "../tools/file.hpp"
+#include "../tools/_misc_tools.hpp"
 
 using namespace std;
 using boost::format;

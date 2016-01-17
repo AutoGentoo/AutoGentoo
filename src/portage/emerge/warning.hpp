@@ -112,7 +112,7 @@ REQUIRED_USE="?? ( foo bar baz )"			No more than one of foo bar or baz may be se
 
 */
 
-template < string pkgstr >
+/*template < string pkgstr >
 typedef struct use_req
 {
 	string str = 
@@ -120,7 +120,7 @@ typedef struct use_req
 	void source ( )
 	{}
 	string getVal;
-
+*/
 
 /*! \class Warning
  * Three types of warnings:
@@ -139,7 +139,7 @@ class Warning
 		for ( size_t x; x <= input.size(); x++ )
 		{
 			string in = input[x];
-			if ( line.substr ( 0, 6 ) == string ( "[blocks" ) )
+			if ( in.substr ( 0, 6 ) == string ( "[blocks" ) )
 			{
 				type = "blocks";
 			}

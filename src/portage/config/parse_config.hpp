@@ -165,17 +165,11 @@ std::map < std::string, std::string > get_command ( std::string cmd )
 		std::string line = lines[x];
 		std::cout << line << std::endl;
 		std::vector<std::string> divide = misc::split ( line, ':' );
-		std::cout << "divided" << std::endl;
 		std::string var, val;
-		std::cout << divide.size ( ) << std::endl;
 		var = divide[0];
-		std::cout << "shit" << std::endl;
 		val = divide[1];
-		std::cout << "shit" << std::endl;
 		trim ( val );
-		std::cout << "shit" << std::endl;
 		return_map[var] = val;
-		std::cout << "shit" << std::endl;
 	}
 	system("rm -rf temp");
 	return return_map;

@@ -1,5 +1,5 @@
 /*
- * use.hpp
+ * version.hpp
  * 
  * Copyright 2016 Andrei Tumbar <atadmin@Helios>
  * 
@@ -25,7 +25,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "../emerge/_misc_tools.hpp"
+#include "../tools/_misc_tools.hpp"
 
 using namespace std;
 

@@ -1,5 +1,5 @@
 /*
- * gcc_test.cxx
+ * test_file.cxx
  * 
  * Copyright 2016 Andrei Tumbar <atadmin@Helios>
  * 
@@ -23,23 +23,20 @@
 
 
 #include <iostream>
-#include "package.hpp"
+#include <string>
+#include <vector>
+#include "../tools/_misc_tools.hpp"
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
-	//EmergePackage gcc ( "[ebuild   R    ] sys-devel/gcc-4.9.3:4.9::gentoo  USE=\"cxx fortran (multilib) nls nptl openmp sanitize (-altivec) (-awt) -cilk -debug -doc (-fixed-point) -gcj -go -graphite (-hardened) (-libssp) (-multislot) -nopie -nossp -objc -objc++ -objc-gc -regression-test -vanilla\" 87,940 KiB" );
-	//cout << gcc.flags_str["USE"] << endl;
-	//cout << gcc.flags["USE"][1] << endl;
-	//cout << gcc.path ( ) << endl;
-	//map<string, string> vars = get_command ( "lscpu" );
-	string pkg ( argv[1] );
-	Package python ( pkg );
-	//cout << python.release.revision_num << endl;
-	//cout << python.release.revision << endl;
-	cout << python.file << endl;
-	cout << python.slot << endl;
-	//cout << python.revision << endl;
+	string p ( "a b c d e f g" );
+	vector<string> q ( misc::split ( p, ' ' ) );
+	for ( size_t x = 0; x != q.size ( ); x++ )
+	{
+		cout << q[x] << "|" << endl;
+	}
 	return 0;
 }
+

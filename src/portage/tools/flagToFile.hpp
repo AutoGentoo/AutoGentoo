@@ -1,7 +1,7 @@
 /*
- * use.hpp
+ * flagToFile.hpp
  * 
- * Copyright 2016 Andrei Tumbar <atadmin@Helios>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,33 @@
 
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <map>
+#include "../package/ebuild.hpp"
 
+using namespace std;
+
+string booltostring (bool a)
+{
+	if ( a )
+	{
+		return "True";
+	}
+	if ( !a )
+	{
+		return "False";
+	}
+}
+
+void FlagsToFile ( vector < string > uses, map < string, use > useMap )
+{
+	ofstream file ( "flags" );
+	file << "[main]\n";
+	for ( size_t x = 0; x != uses.size ( ); x++ )
+	{
+		string currLine ( uses [ x ] + "=" + booltostring ( useMap [ uses [ x ] ].enabled ) + "\n" );
+		file << currLine;
+	}
+};
