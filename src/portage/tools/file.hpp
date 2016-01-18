@@ -24,6 +24,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <string>
 #include <vector>
 
 using namespace std;
@@ -47,7 +49,7 @@ class File
 	/** String with whole file stored affecter File () is
 	 * called
 	 */
-	string text;
+	stringstream text;
 	
 	/** Used during readline () function
 	 * Every time this function is run then currentLine will increase by 1
@@ -60,7 +62,7 @@ class File
 		file.open ( fileName.c_str ( ) );
 		
 		/// Send text from file to text
-		file >> text;
+		text << file.rdbuf();
 	}
 	
 	/// Return a vector of strings with each element as a line in the file
@@ -77,23 +79,12 @@ class File
 			returnList.push_back ( str + endChars );
 		}
 		/// Return the generated list
-		vector < string > buff ( returnList.begin ( ) + 1, returnList.end ( ) );
-		return buff;
+		return returnList;
 	}
 	
 	string read ( const char *endChars="\n" )
 	{
-		string returnStr;
-		for ( string str; getline ( file, str ); )
-		{
-			/** Add chars to end of str
-			 * Usually will be a \n
-			 * Append this item to list
-			 */
-			returnStr.append ( str + endChars );
-		}
-		/// Return the generated list
-		return returnStr;
+		return text.str ( );
 	}
 	
 	/** Return a string of the currentLine in file **/

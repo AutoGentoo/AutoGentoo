@@ -24,17 +24,13 @@
 
 #include <iostream>
 #include "../package/ebuild.hpp"
-//#include "../package/package.hpp"
-//#include "../tools/flagToFile.hpp"
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
-	Package python ("net-misc/networkmanager-1.0.10::gentoo");
-	cout << python.file << endl;
+	Package python ("app-emulation/qemu-2.5.0::gentoo");
 	ebuild py ( python );
-	//FlagsToFile(py.CURRENT_USE, py.USE_MAP);
 	return 0;
 }
 

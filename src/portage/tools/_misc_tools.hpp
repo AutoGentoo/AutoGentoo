@@ -21,6 +21,8 @@
  * 
  */
 
+#ifndef MISC
+#define MISC
 
 #include <iostream>
 #include <string>
@@ -38,8 +40,6 @@ using boost::io::group;
  * to format string
  *
  */
-#ifndef MISC
-#define MISC
 namespace misc
 {
 	void remove ( std::string &removing, std::string toRemove )
@@ -116,11 +116,12 @@ namespace misc
 	}
 	
 	template < class vectorType >
-	int find ( std::vector<vectorType> input, vectorType findstr )
+	int find ( std::vector < vectorType > input, vectorType findstr )
 	{
 		for ( size_t x = 0; x != input.size ( ); x++ )
 		{
 			vectorType y = input [ x ];
+			std::cout << y << std::endl;
 			if ( y == findstr )
 			{
 				return x;
@@ -201,7 +202,6 @@ namespace misc
 			char curr = str[y];
 			if ( curr == chr )
 			{
-				std::cout << "adding" << buff << std::endl;
 				returnList.push_back ( buff );
 				buff.clear ( );
 				continue;
@@ -230,13 +230,13 @@ namespace misc
 		return val;
 	}
 	
-	string getOutput ( string command )
+	std::string getOutput ( std::string command )
 	{
-		string cmd ( command + " > temp" );
-		system ( cmd.c_str ( ) );
+		std::string cmd ( command + " > temp" );
+		std::system ( cmd.c_str ( ) );
 		File _file ( "temp" );
 		std::string returnBuff = _file.read ( );
-		system ( "rm -rf temp" );
+		std::system ( "rm -rf temp" );
 		return returnBuff;
 	}
 	

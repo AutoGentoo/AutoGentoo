@@ -93,6 +93,18 @@ std::map < std::string, std::vector< std::string > > get_variables_split ( std::
 	return buff_map;
 }
 
+std::string get_env ( std::string var )
+{
+	ofstream file ("temp.sh");
+	std::string fileStr ( "#!/bin/bash\nvar=\necho $var" );
+	file << fileStr;
+	std::string cmd ( "sh temp.sh --var=$" + var + " > temp" );
+	system ( cmd.c_str ( ) );
+	std::string returnStr ( File ( "temp.sh" ).read ( ) );
+	system ( "rm -rf temp" );
+	system ( "rm -rf temp.sh" );
+	return returnStr;
+}
 std::map < std::string, std::string > get_variables ( std::string input )
 {
 	std::map < std::string, std::string > buff_map;
