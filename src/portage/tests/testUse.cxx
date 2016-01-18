@@ -1,7 +1,7 @@
 /*
- * flagToFile.hpp
+ * testUse.cxx
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atadmin@Helios>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,33 +23,18 @@
 
 
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <map>
 #include "../package/ebuild.hpp"
+//#include "../package/package.hpp"
+//#include "../tools/flagToFile.hpp"
 
 using namespace std;
 
-string booltostring (bool a)
+int main(int argc, char **argv)
 {
-	if ( a )
-	{
-		return "True";
-	}
-	if ( !a )
-	{
-		return "False";
-	}
+	Package python ("net-misc/networkmanager-1.0.10::gentoo");
+	cout << python.file << endl;
+	ebuild py ( python );
+	//FlagsToFile(py.CURRENT_USE, py.USE_MAP);
+	return 0;
 }
 
-void FlagsToFile ( vector < string > uses, map < string, Use > useMap )
-{
-	ofstream file ( "flags" );
-	file << "[main]\n";
-	for ( size_t x = 0; x != uses.size ( ); x++ )
-	{
-		string currLine ( uses [ x ] + "=" + booltostring ( useMap [ uses [ x ] ].enabled ) + "\n" );
-		file << currLine;
-	}
-};

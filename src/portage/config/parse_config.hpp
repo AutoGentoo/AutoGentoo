@@ -25,9 +25,10 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cstdlib>
 #include <boost/algorithm/string.hpp>
-#include "_misc_tools.hpp"
-#include "file.hpp"
+#include "../tools/_misc_tools.hpp"
+#include "../tools/file.hpp"
 
 using namespace std;
 using namespace boost::algorithm;
@@ -150,7 +151,15 @@ std::map < std::string, std::string > get_variables ( std::string input )
 	}
 	return buff_map;
 }
-
+std::string get_command_str ( std::string cmd )
+{
+	std::string return_str;
+	cmd += " > temp";
+	system ( cmd.c_str ( ) );
+	File f ( "temp" );
+	return_str = f.read ();
+	return return_str;
+}
 std::map < std::string, std::string > get_command ( std::string cmd )
 {
 	std::map < std::string, std::string > return_map;

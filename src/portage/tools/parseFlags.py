@@ -72,18 +72,26 @@ def listRightIndex(alist, value):
 def parse(exp):
 	exp_flag = Flag(exp)
 	return (exp_flag.val, exp_flag.search)
+def getLetter (x, string):
+	first_letter = string.rfind ("(", 0, x)
+	maybe_letter = string.rfind (")", 0, x)
+	if first_letter == -1:
+		first_letter = 0
+	if maybe_letter > first_letter:
+		first_letter = maybe_letter+1
+	elif first_letter != 0:
+		first_letter += 1
+	return first_letter
+def join(between, vec):
+	a = ""
+	for x in vec:
+		a += str(x)
+		if x != vec[-1]:
+			a += between
+	return a
 def getSet(string):
-	"""
-	a ( || ( adc ) )
-	
-	
-	a ( acb )
-	  2     8
-	  2:8 (buff_dict)
-	  [2 , 8]
-	  a : [2,8]
-	"""
-	set_dict = {}
+	def_dict = {}
+	alt_dict = {}
 	buff_set = []
 	first = []
 	lasts = []
@@ -98,32 +106,28 @@ def getSet(string):
 		buff_set.append((x, buff))
 	contents = []
 	for x in buff_set:
-		print (string[x[0]:x[1]])
-		first_letter = string.find ("(", x[0])
-		maybe_letter = string.rfind (")", 0, x[0])
-		if first_letter == -1:
-			first_letter = 0
-		if maybe_letter > first_letter:
-			first_letter = maybe_letter
-		elif first_letter != 0:
-			first_letter += 1
-		
-		
-		
+		first_letter = getLetter(x[0], string)
 		expName = string[first_letter:x[0]].strip()
-		content = string[x[0]:x[1]].strip().split(" ")
-		
-		if "(" in content:
+		content = string[x[0]+1:x[1]].strip().split(" ")
+		while "(" in content:
+			a = ""
 			try:
+				print (content)
 				start = content.index("(")
 				end = listRightIndex(content, ")")
+				end_maybe = content.index(")")
+				
+				a = '1'.join(content[start+1:end])
 				content = [y for y in content if y not in content[start:end]]
 			except:
 				pass
 			else:
 				content = [y for y in content if y not in content[start:end]]
-		set_dict[ first_letter ] = (content, expName)
-	return set_dict
+				content.append(alt_dict[a])
+		def_dict[ first_letter ] = (content, expName)
+		content_str = join("1", content)
+		alt_dict[ content_str ] = first_letter
+	return def_dict
 
 
 class flags:
@@ -160,4 +164,4 @@ def print_dict ( _dict ):
 		sys.stdout.write(str(x))
 		sys.stdout.write("=")
 		print (_dict[x])
-print_dict(getSet("modemmanager? ( ppp ) !wext? ( wifi ) ^^ ( nss gnutls ) ^^ ( dhclient dhcpcd ) foo? ( || ( bar baz ) )"))
+print_dict(getSet("modemmanager? ( ppp ) !wext? ( wifi ) ^^ ( nss gnutls ) ^^ ( dhclient dhcpcd ) foo? ( || ( bar ) )"))

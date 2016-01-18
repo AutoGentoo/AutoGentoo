@@ -28,11 +28,12 @@
 #include <map>
 #include "../tools/_misc_tools.hpp"
 #include "../tools/file.hpp"
+#include "../config/parse_config.hpp"
 #include "package.hpp"
 
 using namespace std;
 
-class use
+typedef struct
 {
 	public:
 	bool enabled;
@@ -40,7 +41,7 @@ class use
 	string name;
 	string description;
 	
-	use ( string input )
+	void init ( string input )
 	{
 		/*
 		 * + + bluetooth          : Enable Bluetooth Support
@@ -86,83 +87,21 @@ class use
 		
 		return _default;
 	}
-};
-/*
-class RequiredUses
-{
-	public:
-	vector < string > dividedUse;
-	
-	RequiredUses ( string input )
-	{
-		
-		 * modemmanager? ( ppp ) wext? ( wifi ) ^^ ( nss gnutls ) ^^ ( dhclient dhcpcd )
-		 *              ^^     ^^
-		 *              1+     -2
-		 * Setup for a required use input will consist of:
-		 *    check_op (could include another flag): modemmanager?<-- '?' is the _op
-		 *                                         ( ^ use flag ^)
-		 * The symbols above represent:
-		 *    ^
-		 *    1 : means the first space found by str.find ( )
-		 * 
-		 *    ^
-		 *    2 : the second space and concludes a required use
-		 * 
-		 *    space between + and -: ignores spaces
-		 
-		
-		bool ignoreSpace = false;
-		bool foundSpace = false;
-		int buff = 0;
-		
-		for ( size_t x = 0; x != input.length ( ); x++ )
-		{
-			char chr = input [ x ];
-			
-			if ( chr == ' ' && !ignoreSpace )
-			{
-				if ( foundSpace )
-				{
-					dividedUse.push_back ( input.substr ( buff, x ) );
-					buff = x;
-					foundSpace = false;
-				}
-				else
-				{
-					foundSpace = true;
-				}
-			}
-			
-			if ( chr == '(' )
-			{
-				ignoreSpace = true;
-			}
-			
-			if ( chr == ')' )
-			{
-				ignoreSpace = false;
-			}
-		}
-		
-	}
-};
-*/
+} Use;
+
 class ebuild
 {
 	public:
-	string IUSE; //!< A list of all USE flags (excluding arch flags, but including USE_EXPAND flags) used within the ebuild. See IUSE.
-	string REQUIRED_USE; //!< A list of assertions that must be met by the configuration of USE flags to be valid for this ebuild. (Requires EAPI>=4.)
-	vector < string > CURRENT_USE; //!< Found by executing the 'equery uses' command to get the currently enabled strings, this vectors only holds the name of the USE flag
-	map < string, use > USE_MAP; //!< Maps the name of the use flags 
+	string REQUIRED_USE; //!< A list of assertions that must be met by the configuration of Use flags to be valid for this ebuild. (Requires EAPI>=4.)
+	vector < string > CURRENT_USE; //!< Found by executing the 'equery uses' command to get the currently enabled strings, this vectors only holds the name of the Use flag
+	map < string, Use > USE_MAP; //!< Maps the name of the Use flags 
 	
 	ebuild ( Package package )
 	{
-		string sourceCmd ( "source " + package.file + " > /dev/null" );
+		string sourceCmd ( "source " + package.file + " 2> /dev/null" );
 		system ( sourceCmd.c_str ( ) );
-		IUSE = getenv( "IUSE" );
-		REQUIRED_USE = getenv( "REQUIRED_USE" );
-		
+		REQUIRED_USE = get_command_str( "echo $REQUIRED_USE" );
+		cout << REQUIRED_USE << endl;
 		string equeryCmd ( "equery uses " + package.name + " > use" );
 		system ( equeryCmd.c_str ( ) );
 		
@@ -171,7 +110,8 @@ class ebuild
 		
 		for ( size_t x = startLine + 1; x != uses_raw.size ( ); x++ )
 		{
-			use currUse ( uses_raw [ x ] );
+			Use currUse;
+			currUse.init ( uses_raw [ x ] );
 			USE_MAP [ currUse.name ] = currUse;
 			CURRENT_USE.push_back ( currUse.name );
 		}
