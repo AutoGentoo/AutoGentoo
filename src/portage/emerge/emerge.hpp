@@ -48,10 +48,15 @@ void Emerge ( string package, string emergeConfig="emerge.config", string packag
 	string tunc ( "truncate -s 0 " + packageConfig );
 	system ( tunc.c_str ( ) );
 	
+	for ( size_t i = 0; i != types.configs.size ( ); i++)
+	{
+		GentooConfig curr = types.configs [ i ];
+		curr.write ( );
+	}
+	
 	for ( size_t i = 0; i != types.packages.size ( ); i++ )
 	{
 		EmergePackage curr = types.packages [ i ];
-		cout << curr.name << endl;
 		PackageConfig ( curr, packageConfig );
 	}
 };

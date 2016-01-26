@@ -58,17 +58,13 @@ void PackageConfig ( EmergePackage pkg, string name )
 	
 	string _slot ( "slot=\"" + pkg.slot + "\"\n" );
 	file << _slot;
-	cout << "--------------------------------" << endl;
-	cout << pkg.properties.attrVec.size ( ) << endl;
 	vector < string > keys;
 	for ( size_t i = 0; i != pkg.properties.attrVec.size ( ); i++ )
 	{
 		string z = pkg.properties.attrVec [ i ];
-		cout << z << endl;
 		pkg.properties.init ( );
 		if ( pkg.properties.attrMap[ z ] )
 		{
-			cout << z << endl;
 			keys.push_back ( z );
 		}
 	}

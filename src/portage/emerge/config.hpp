@@ -60,7 +60,7 @@ class GentooConfig
 			writeLines.push_back ( in[y] );
 		}
 		
-		string commentLine = "# Config for the " + pkgName + " emerge set or package\n";
+		string commentLine = "# Config for the " + pkgName + " emerge set or package";
 		writeLines.insert( writeLines.begin(), commentLine );
 	}
 	void write ( string __path = "" )
@@ -71,9 +71,9 @@ class GentooConfig
 		}
 		ofstream file;
 		file.open ( __path.c_str() );
-		for ( size_t x = 0; x <= writeLines.size(); x++ )
+		for ( size_t x = 0; x != writeLines.size(); x++ )
 		{
-			file << writeLines[x].c_str ( );
+			file << string ( writeLines[x] + "\n" );
 		}
 	}
 };

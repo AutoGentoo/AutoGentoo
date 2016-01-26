@@ -244,14 +244,12 @@ class EmergePackage: public Package
 		
 		misc::remove ( propertystr, "[ebuild" );
 		misc::remove ( propertystr, "]" );
-		cout << packagestr << endl;
 		properties.createList ( );
 		for ( size_t i = 0; i != propertystr.length ( ); i++ )
 		{
 			char x = propertystr[i];
 			if ( x != ' ' )
 			{
-				cout << x << endl;
 				properties.set ( x, true );
 			}
 		}
