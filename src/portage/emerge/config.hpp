@@ -22,24 +22,26 @@
  */
 
 
+#ifndef __AUTOGENTOO_PORTAGE_CONFIG_FILE__
+#define __AUTOGENTOO_PORTAGE_CONFIG_FILE__
+
 #include <iostream>
 #include <string>
 #include <vector>
-#include <boost/filesystem.hpp>
-#include "../tools/file.hpp"
+#include <fstream>
 #include "../tools/_misc_tools.hpp"
+#include "../tools/is_dir.hpp"
 
 using namespace std;
 
-class Config
+class GentooConfig
 {
 	public:
 	
 	vector<string> writeLines;
 	string path;
-	ofstream file;
 	
-	Config ( vector<string> in, string pkgName = "unknown" )
+	GentooConfig ( vector<string> in, string pkgName = "unknown" )
 	{
 		string path_raw = in[1];
 		misc::remove( path_raw, " in the portage(5) man page for more details)" );
@@ -47,13 +49,13 @@ class Config
 		misc::removechar( path_raw, '"' );
 		misc::removechar( path_raw, '"' );
 		path = "/etc/portage/" + path_raw;
-		if ( boost::filesystem::is_directory(path) )
+		if ( is_dir ( path.c_str ( ) ) )
 		{
 			path = path + "/autogentoo";
 			system ( string ("touch " + path ).c_str() );
 		}
 		
-		for ( size_t y = 2; y <= in.size (); y++ )
+		for ( size_t y = 2; y != in.size (); y++ )
 		{
 			writeLines.push_back ( in[y] );
 		}
@@ -61,13 +63,19 @@ class Config
 		string commentLine = "# Config for the " + pkgName + " emerge set or package\n";
 		writeLines.insert( writeLines.begin(), commentLine );
 	}
-	
-	void write ( void )
+	void write ( string __path = "" )
 	{
-		file.open ( path.c_str() );
-		for ( size_t x; x <= writeLines.size(); x++ )
+		if ( __path.empty ( ) )
 		{
-			file << writeLines[x];
+			__path = path;
+		}
+		ofstream file;
+		file.open ( __path.c_str() );
+		for ( size_t x = 0; x <= writeLines.size(); x++ )
+		{
+			file << writeLines[x].c_str ( );
 		}
 	}
 };
+
+#endif

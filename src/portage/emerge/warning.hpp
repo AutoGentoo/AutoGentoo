@@ -22,105 +22,18 @@
  */
 
 
+#ifndef __AUTOGENTOO_WARNING___
+#define __AUTOGENTOO_WARNING___
+
 #include <iostream>
 #include <vector>
 #include <string>
 #include <map>
+#include "../package/blocks.hpp"
+#include "../package/ebuild.hpp"
+#include "../package/package.hpp"
 
 using namespace std;
-
-class basic {public: vector<string> full; string pkg;};
-class req {public: vector< vector<string> > exactly_one; vector<string> item;};
-
-/*! \struct use_req
- * This struct divides in the useReq warning into four parts:
- *    basic_warning (gives the basic information for the package needing an edit to use flag)
- *    use_info (information on the current global use flags)
- *    req_use (required use section, read by struct to create a make.conf edit possible)
-*/
-
-/*typedef struct use_req
-{
-	
-	basic basic_warning;
-	map<string, string> use_info;
-	req req_use;
-	
-	void get_sections ( vector<string> input )
-	{
-		vector<string> basic_warning_buff;
-		vector<string> use_info_buff;
-		vector<string> req_use_buff;
-		int currLine;
-		
-		for ( size_t y = currLine; input[y] != "\n"; y++ )
-		{
-			basic_warning_buff.push_back ( input[y] );
-			currLine = y;
-		}
-		
-		for ( size_t y = currLine; input[y] != "\n"; y++ )
-		{
-			use_info_buff.push_back ( input[y] );
-			currLine = y;
-		}
-		
-		for ( size_t y = currLine; input[y] != "\n"; y++ )
-		{
-			req_use_buff.push_back ( input[y] );
-			currLine = y;
-		}
-		
-		//Basic warning
-		
-		if ( basic_warning_buff.size() != 2 )
-		{
-			return;
-		}
-		basic_warning.full = basic_warning_buff;
-		string basic_warning_pkg_buff = basic_warning.full[0].erase("!!! Problem resolving dependencies for");
-		trim(basic_warning_pkg_buff);
-		basic_warning.pkg = basic_warning_pkg_buff;
-		
-		//Use info
-		if ( use_info_buff.size() != 2 )
-		{
-			return;
-		}
-		
-		info_buff = use_info_buff[1];
-		int rm_place_start(info_buff.find(basic_warning.pkg);
-		int rm_place_end(info_buff.rfind(basic_warning.pkg));
-		
-		info_buff.erase(rm_place_start, rm_place_end);
-		trim(info_buff);
-		misc::remove(info_buff, "- ");
-		int find_space(info_buff.find(" "));
-		info_buff = info_buff.substr(find_space, info_buff.length());
-		
-	}
-}
-*/
-
-/*
-REQUIRED_USE="foo? ( bar )"					If foo is set, bar must be set.
-REQUIRED_USE="foo? ( !bar )"				If foo is set, bar must not be set.
-REQUIRED_USE="foo? ( || ( bar baz ) )"		If foo is set, bar or baz must be set.
-REQUIRED_USE="^^ ( foo bar baz )"			Exactly one of foo bar or baz must be set.
-REQUIRED_USE="|| ( foo bar baz )"			At least one of foo bar or baz must be set.
-REQUIRED_USE="?? ( foo bar baz )"			No more than one of foo bar or baz may be set.
-
-*/
-
-/*template < string pkgstr >
-typedef struct use_req
-{
-	string str = 
-	
-	void source ( )
-	{}
-	string getVal;
-*/
 
 /*! \class Warning
  * Three types of warnings:
@@ -133,36 +46,64 @@ class Warning
 	public:
 	
 	string type;
+	vector < string > input;
+	size_t lineNum;
 	
-	Warning ( vector<string> input )
+	Warning ( vector < string > _input )
 	{
-		for ( size_t x; x <= input.size(); x++ )
+		input = _input;
+		for ( size_t x = 0; x != input.size ( ); x++ )
 		{
-			string in = input[x];
-			if ( in.substr ( 0, 6 ) == string ( "[blocks" ) )
+			string in = input [ x ];
+			if ( in.substr ( 0, 7 ) == string ( "[blocks" ) )
 			{
 				type = "blocks";
+				lineNum = x;
+				break;
 			}
-			else if ( in.substr ( 0, 11 ) == "!!! Problem " )
+			else if ( in.substr ( 0, 12 ) == "!!! Problem " )
 			{
 				type = "useReq";
+				lineNum = x;
+				break;
 			}
-			else if ( in.substr ( 0, 11 ) == "!!! Multiple" )
+			else if ( in.substr ( 0, 12 ) == "!!! Multiple" )
 			{
 				type = "slot";
+				lineNum = x;
+				break;
 			}
 			else
 			{
 				type = "generic";
+				lineNum = x;
 			}
 		}
+		this->doWork ( );
 	}
 	
 	void doWork ( void )
 	{
+		if ( type == "blocks" )
+		{
+			blocks b ( input [ lineNum ] );
+			string unmerge ( "emerge --unmerge " + b.blocked );
+			system ( unmerge.c_str ( ) );
+		}
+		if ( type == "slot" )
+		{
+			string pkg = input [ lineNum + 3 ];
+			string unmerge ( "emerge --unmerge " + pkg );
+			system ( unmerge.c_str ( ) );
+		}
 		if ( type == "useReq" )
 		{
-			;
+			string buff ( input [ lineNum + 3 ] );
+			buff.erase ( 0, 2 );
+			Package pkg ( buff.substr ( 0, buff.find ( " " ) ) );
+			ebuild pkg_ebuild ( pkg );
 		}
 	}
 };
+
+#endif

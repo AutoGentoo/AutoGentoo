@@ -1,7 +1,7 @@
 /*
- * testUse.cxx
+ * use.hpp
  * 
- * Copyright 2016 Andrei Tumbar <atadmin@Helios>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,36 @@
 
 
 #include <iostream>
-#include "../package/ebuild.hpp"
+#include <fstream>
+#include <string>
+
+#ifndef __USE_GENTOO_FLAG__
+#define __USE_GENTOO_FLAG__
 
 using namespace std;
 
-int main(int argc, char **argv)
+class useGentooFlag
 {
-	Package python ("net-misc/networkmanager-1.0.10-r1::gentoo");
-	ebuild py ( python );
-	return 0;
-}
+	public:
+	string package;
+	ofstream pkguse;
+	
+	useGentooFlag ( string package, string uses, bool versionSpecific )
+	{
+		string buffStr ( package + " " + uses + "\n" );
+		pkguse.open ( "/etc/portage/package.use" );
+		if ( versionSpecific )
+		{
+			buffStr = "=" + buffStr;
+		}
+		pkguse << "\n# Use flag (init) for package '" << package << "'" << "\n" << buffStr << endl;
+	}
+	
+	void append ( string _use )
+	{
+		string buffStr ( package + " " + _use + "\n" );
+		pkguse << "\n# Use flag (append) for package '" << package << "'" << "\n" << buffStr << endl;
+	}
+};
 
+#endif

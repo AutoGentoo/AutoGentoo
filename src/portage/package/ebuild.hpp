@@ -21,28 +21,36 @@
  * 
  */
 
-
 #include <iostream>
 #include <string>
 #include <cstdlib>
 #include <map>
 #include "../config/parse_config.hpp"
+#include "useGentooFlag.hpp"
 #include "package.hpp"
+
+#ifndef __EBUILD__
+#define __EBUILD__
 
 class ebuild
 {
 	public:
 	string REQUIRED_USE; //!< A list of assertions that must be met by the configuration of Use flags to be valid for this ebuild. (Requires EAPI>=4.)
+	string SUGGEST_USE; //!< A string of suggested changes to the current use flags, empty if no suggestions
 	vector < string > CURRENT_USE; //!< Found by executing the 'equery uses' command to get the currently enabled strings, this vectors only holds the name of the Use flag
 	
 	ebuild ( Package package )
 	{
 		string sourceCmd ( "source " + package.file + " 2> /dev/null && echo $REQUIRED_USE" );
-		REQUIRED_USE = get_command_str ( sourceCmd.c_str ( ) );
+		REQUIRED_USE = get_command_str ( sourceCmd );
 		REQUIRED_USE = REQUIRED_USE.erase ( REQUIRED_USE.length ( ) - 1, 1 );
 		string equeryCmd ( "equery uses " + package.name + " > use" );
 		system ( equeryCmd.c_str ( ) );
 		string writeFlags ( "python3 ../tools/writeFlags.py use \"" + REQUIRED_USE + "\"" );
 		system ( writeFlags.c_str ( ) );
+		SUGGEST_USE = get_command_str ( "python3 ../tools/parseFlags.py" );
+		useGentooFlag _use ( package.path, SUGGEST_USE, true );
 	}
 };
+
+#endif

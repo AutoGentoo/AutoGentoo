@@ -22,6 +22,9 @@
  */
 
 
+#ifndef __AUTOGENTOO_EMERGE_PACKAGES__
+#define __AUTOGENTOO_EMERGE_PACKAGES__
+
 #include <iostream>
 #include <string>
 #include <map>
@@ -36,8 +39,9 @@ using namespace boost::algorithm;
  * This type is meant to store the boolean information
  * of a Gentoo ebuild/package
  */ 
-typedef struct PackageProperties
+class PackageProperties
 {
+	public:
 	bool _new; //!< not yet installed
 	bool _slot; //!< side-by-side versions
 	bool _updating; //!< update to another version
@@ -49,13 +53,44 @@ typedef struct PackageProperties
 	bool _interactive; //!< requires user input
 	bool _blockedman; //!< unresolved conflict
 	bool _blockedauto; //!< automatically resolved conflict
+	string _status; //!< Ex: ~ or +
 	
 	bool createdList; //!< Tells set and the [] operator whether to init the list
 	map<string, bool> attrMap;
+	vector<string> attrVec;
 	map<string, string> packageVar;
 	vector<string> varNames;
 	
 	void createList ( void )
+	{
+		_status = "+";
+		_new = false;
+		_slot = false;
+		_updating = false;
+		_downgrading = false;
+		_reinstall = false;
+		_replacing = false;
+		_fetchman = false;
+		_fetchauto = false;
+		_interactive = false;
+		_blockedman = false;
+		_blockedauto = false;
+		attrVec.push_back ( "new" );
+		attrVec.push_back ( "slot" );
+		attrVec.push_back ( "updating" );
+		attrVec.push_back ( "downgrading" );
+		attrVec.push_back ( "reinstall" );
+		attrVec.push_back ( "replacing" );
+		attrVec.push_back ( "fetch_man" );
+		attrVec.push_back ( "fetch_auto" );
+		attrVec.push_back ( "interactive" );
+		attrVec.push_back ( "blocked_man" );
+		attrVec.push_back ( "blocked_auto" );
+		attrVec.push_back ( "unstable" );
+		init ( );
+		createdList = true;
+	}
+	void init ( void )
 	{
 		attrMap["new"] = _new;
 		attrMap["slot"] = _slot;
@@ -68,7 +103,7 @@ typedef struct PackageProperties
 		attrMap["interactive"] = _interactive;
 		attrMap["blocked_man"] = _blockedman;
 		attrMap["blocked_auto"] = _blockedauto;
-		createdList = true;
+		attrMap["unstable"] = _status != "+";
 	}
 	void set ( char in, bool val )
 	{
@@ -111,6 +146,12 @@ typedef struct PackageProperties
 			case 'b':
 				_blockedauto = val;
 				return;
+			case '~':
+				_status = "~";
+				return;
+			case '+':
+				_status = "+";
+				return;
 		}
 		attrMap[string(1, in)] = val;
 	}
@@ -147,6 +188,10 @@ typedef struct PackageProperties
 					return _blockedman;
 				case 'b':
 					return _blockedauto;
+				case '~':
+					return _status == "~";
+				case '+':
+					return _status == "+";
 			}
 		}
 		return attrMap[in];
@@ -161,7 +206,7 @@ typedef struct PackageProperties
 		string value = in.substr ( findOperator, in.length ( ) );
 		packageVar[varName] = value;
 	}
-}PackageProperties;
+};
 
 class EmergePackage: public Package
 {
@@ -169,13 +214,12 @@ class EmergePackage: public Package
 	
 	PackageProperties properties;
 	string propertystr;
-	string old;
-	string slot;
+	version old;
 	int sizeOfDownload;
 	map< string, vector<string> > flags;
 	map< string, string > flags_str;
 	
-	EmergePackage ( const char *input ) : Package ( packagestr )
+	EmergePackage ( string input ) : Package (  )
 	{
 		/* Key
 		 * + added by operator '+'
@@ -186,24 +230,33 @@ class EmergePackage: public Package
 		*/
 		
 		/* [ebuild   R    ] gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB */
-		string packageString = string ( input );
 		
+		vector < string > pkgdiv = splitEbuild ( input );
+		propertystr = pkgdiv [ 0 ];
+		packagestr = pkgdiv [ 1 ];
+		string oldbuff = pkgdiv [ 2 ];
+		misc::remove ( oldbuff, "::gentoo]" );
+		misc::remove ( oldbuff, "[" );
+		old.init ( oldbuff );
+		flags = get_variables_split ( pkgdiv [ 3 ] );
+		flags_str = get_variables ( pkgdiv [ 3 ] );
+		sizeOfDownload = misc::stoi ( pkgdiv [ 4 ] );
 		
-		propertystr = packageString.substr ( 0, 15 );
-		
-		/* [ebuild   R    ]
-		 * -------        -
-		 */
 		misc::remove ( propertystr, "[ebuild" );
 		misc::remove ( propertystr, "]" );
-		/* |   R    |*/
-		char x;
+		cout << packagestr << endl;
+		properties.createList ( );
 		for ( size_t i = 0; i != propertystr.length ( ); i++ )
 		{
-			x = propertystr[i];
-			properties.set ( x, true );
+			char x = propertystr[i];
+			if ( x != ' ' )
+			{
+				cout << x << endl;
+				properties.set ( x, true );
+			}
 		}
-		
+		properties.init ( );
+		init ( packagestr );
 	}
 	
 	vector < string > splitEbuild ( string input )
@@ -216,57 +269,55 @@ class EmergePackage: public Package
 		 * 5. size
 		*/
 		vector < string > returnVec;
-		
 		/* [ebuild     U  ] www-client/firefox-38.5.0::gentoo [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
 		 * ________________
 		 */
-		string propertySection = input.substr ( 0, 15 );
-		
+		string propertySection = input.substr ( 0, 16 );
 		/* [ebuild     U  ] www-client/firefox-38.5.0::gentoo [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
 		 * -----------------
 		 */
-		string rawSection = misc::substr ( input, 16, input.length ( ) ); 
-		
+		string rawSection = misc::substr ( input, 17, input.length ( ) ); 
 		/* www-client/firefox-38.5.0::gentoo [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
 		 * _________________________________^
 		 */
-		string _packageStr = misc::substr ( rawSection, 0, rawSection.find ( " " ) - 1 );
-		
+		string _packageStr = misc::substr ( rawSection, 0, rawSection.find ( " " ) );
 		/* www-client/firefox-38.5.0::gentoo [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
 		 * ----------------------------------
 		 */
-		rawSection = misc::substr ( rawSection, packagestr.length ( ) + 1, rawSection.length ( ) );
-		
+		rawSection = misc::substr ( rawSection, _packageStr.length ( ) + 1, rawSection.length ( ) );
 		/* [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
 		 * ________________^
 		*/
-		string oldStr = misc::substr ( rawSection, 0, rawSection.find ( " " ) - 1 );
-		
+		string oldStr = misc::substr ( rawSection, 0, rawSection.find ( " " ) );
 		/* [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
 		 * -----------------
 		*/
 		rawSection = misc::substr ( rawSection, oldStr.length ( ), rawSection.length ( ) );
-		
 		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
 		 *                                                                 ----
 		*/
 		rawSection.erase ( rawSection.end ( ) - 4, rawSection.end ( ) );
-		
 		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127
 		 *                                                         ^
 		*/
 		int varToSizeSplit = rawSection.rfind ( " " );
-		
 		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127
 		 * ________________________________________________________^
 		*/
-		string vars ( misc::substr ( rawSection, 0, varToSizeSplit ) );
-		
+		string vars ( misc::substr ( rawSection, 1, varToSizeSplit ) );
 		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127
 		 *                                                         ^_______
 		*/
-		string size ( misc::substr ( rawSection, vars.length ( ) + 1, rawSection.length ( ) ) );
-		
+		string size;
+		if ( vars.find ( "=" ) == string::npos )
+		{
+			size = vars;
+			vars.clear ( );
+		}
+		else
+		{
+			size = misc::substr ( rawSection, vars.length ( ) + 2, rawSection.length ( ) );
+		}
 		returnVec.push_back ( propertySection );
 		returnVec.push_back ( _packageStr );
 		returnVec.push_back ( oldStr );
@@ -276,3 +327,4 @@ class EmergePackage: public Package
 		return returnVec;
 	}
 };
+#endif

@@ -21,19 +21,21 @@
  * 
  */
 
-#ifndef MISC
-#define MISC
+#ifndef __MISC_TOOLS_AUTOGENTOO__
+#define __MISC_TOOLS_AUTOGENTOO__
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <vector>
-#include <algorithm>
+#include <fstream>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
-#include "file.hpp"
 
 using boost::format;
 using boost::io::group;
+using namespace boost::algorithm;
 
 /**\namespace misc
  * The strfmt namespace consists of a various collection of tools
@@ -121,7 +123,6 @@ namespace misc
 		for ( size_t x = 0; x != input.size ( ); x++ )
 		{
 			vectorType y = input [ x ];
-			std::cout << y << std::endl;
 			if ( y == findstr )
 			{
 				return x;
@@ -193,7 +194,7 @@ namespace misc
 		return in;
 	}
 	
-	std::vector<std::string> split ( std::string str, char chr )
+	std::vector<std::string> split ( std::string str, char chr, bool _trim = false )
 	{
 		std::vector<std::string> returnList;
 		std::string buff;
@@ -202,22 +203,40 @@ namespace misc
 			char curr = str[y];
 			if ( curr == chr )
 			{
+				if ( _trim )
+				{
+					trim ( buff );
+				}
 				returnList.push_back ( buff );
 				buff.clear ( );
 				continue;
 			}
 			buff += curr;
 		}
-		
+		returnList.push_back ( buff );
 		return returnList;
 	}
 	
-	std::string merge ( std::vector<std::string> in )
+	std::string itos ( int i )
+	{
+		std::string s;
+		std::stringstream convert;
+		convert << i;
+		s = convert.str();
+		return s;
+	}
+	
+	template < class T >
+	std::string merge ( std::vector<T> in, std::string between = "" )
 	{
 		std::string return_buff;
-		for ( size_t i; i != in.size ( ); i++ )
+		for ( size_t i = 0; i != in.size ( ); i++ )
 		{
-			return_buff.append ( in[i] );
+			return_buff += in[i];
+			if ( i + 1 != in.size ( ) )
+			{
+				return_buff.append ( between );
+			}
 		}
 		return return_buff;
 	}
@@ -234,10 +253,12 @@ namespace misc
 	{
 		std::string cmd ( command + " > temp" );
 		std::system ( cmd.c_str ( ) );
-		File _file ( "temp" );
-		std::string returnBuff = _file.read ( );
+		std::ofstream _file;
+		_file.open ( "temp" );
+		std::stringstream buff;
+		buff << _file.rdbuf();
 		std::system ( "rm -rf temp" );
-		return returnBuff;
+		return buff.str ( );
 	}
 	
 	std::vector < std::string > splitByVec ( std::string input, std::vector < int > vec )
@@ -246,7 +267,7 @@ namespace misc
 		
 		int currBuff = 0;
 		
-		for ( size_t currNum; currNum != vec.size ( ); currNum++ )
+		for ( size_t currNum = 0; currNum != vec.size ( ); currNum++ )
 		{
 			int curr = vec [ currNum ];
 			returnVec.push_back ( misc::substr ( input, currBuff, curr ) );
@@ -254,6 +275,15 @@ namespace misc
 		}
 		
 		return returnVec;
+	}
+	
+	template < class T >
+	void print_vec ( std::vector < T > in )
+	{
+		for ( size_t i = 0; i != in.size ( ); i++ )
+		{
+			std::cout << in [ i ] << std::endl;
+		}
 	}
 }
 #endif

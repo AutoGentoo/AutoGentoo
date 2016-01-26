@@ -22,45 +22,38 @@
  */
 
 
+#ifndef __AUTOGENTOO_PORTAGE_EMERGE__
+#define __AUTOGENTOO_PORTAGE_EMERGE__
+
 #include <iostream>
 #include <string>
-#include <boost/format.hpp>
+#include <vector>
 #include "type.hpp"
+#include "packageConfig.hpp"
 
 using namespace std;
-using boost::format;
-using boost::io::group;
 
-class Emerge 
+void Emerge ( string package, string emergeConfig="emerge.config", string packageConfig="package.config" )
 {
-	public:
-	vector<string> PackageNames, emergeFile;
-	vector<int> configStart; //!< Stores the line numbers in emergeFile that need Error creation
-	string options, defaultOptions, configFile;
-	char *emergeCommand; //!< Executed during emerge ()
+	vector<string> emergeFile;
 	
-	Emerge (
-	string package,
-	string _options="", 
-	bool do_pretend=true, 
-	const char *configFile="emerge.config", 
-	string _defaultOptions="-q"
-	)
+	string emergeCommand ( "emerge -pv --pretend " + package + " > " + emergeConfig + " 2>&1" );
+	
+	/*! Execute the emergeCommand to write the config */
+	//system ( emergeCommand.c_str ( ) );
+	
+	emergeFile = File ( emergeConfig ).readlines ( );
+	Type types ( emergeFile, package );
+	
+	string tunc ( "truncate -s 0 " + packageConfig );
+	system ( tunc.c_str ( ) );
+	
+	for ( size_t i = 0; i != types.packages.size ( ); i++ )
 	{
-		string buffer; //!< A string that will be formated to create a char to hold the emerge --pretend command (writes config)
-		buffer = str (format("emerge -q --pretend %s >> %s") % package % configFile);
-		emergeCommand = new char[buffer.length() + 1]; //!< Char with length of the buffer string
-		strcpy(emergeCommand, buffer.c_str()); //!< Copy the string into emergeCommand
-		
-		if (do_pretend)
-		{
-			/*! Execute the emergeCommand to write the config */
-			system(emergeCommand);
-		}
-		
-		options = _options; //!< Options will be used 
-		defaultOptions = _defaultOptions; //!< creates 2 separate inputs for the emerge options such that default options do not have to be re-entered
-		emergeFile = File(configFile).readlines();
-		Type types(emergeFile, package);
+		EmergePackage curr = types.packages [ i ];
+		cout << curr.name << endl;
+		PackageConfig ( curr, packageConfig );
 	}
 };
+
+#endif

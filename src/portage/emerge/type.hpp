@@ -30,6 +30,9 @@
 #include "../package/EmergePackage.hpp"
 #include "warning.hpp"
 
+#ifndef __AUTOGENTOO_PORTAGE_TYPE__
+#define __AUTOGENTOO_PORTAGE_TYPE__
+
 using namespace std;
 
 /**\class Type
@@ -48,60 +51,96 @@ class Type
 {
 	public:
 	
-	vector<Config> configs;
+	vector<GentooConfig> configs;
 	vector<EmergePackage> packages;
 	vector<Warning> warnings;
 	
-	Type ( vector<string> &inputFile, string package )
+	Type ( vector<string> inputFile, string package )
 	{
 		vector< vector<string> > usegroups;
 		vector<string> packageLines;
 		vector< vector<string> > warninggroups;
-		for ( size_t y; y <= inputFile.size ( ); y++ )
+		for ( size_t y = 0; y != inputFile.size ( ); y++ )
 		{
 			string line = inputFile[y];
+			if ( line.empty ( ) )
+			{
+				continue;
+			}
 			string t = findTypes ( line );
+			if ( t == "esc" )
+			{
+				break;
+			}
 			if ( t == "use" )
 			{
 				vector<string> useLines;
-				for ( size_t z; inputFile[z] != "\n"; z++ )
+				size_t b;
+				for ( size_t z = y; !inputFile[z].empty ( ); z++ )
 				{
-					useLines.push_back ( inputFile[z] );
-					y = z;
+					string buff = inputFile[z];
+					trim ( buff );
+					if ( !buff.empty ( ) )
+					{
+						useLines.push_back ( inputFile[z] );
+					}
+					b = z;
 				}
-				usegroups.push_back ( useLines );
+				y = b;
+				if ( !useLines.empty ( ) )
+				{
+					usegroups.push_back ( useLines );
+				}
 			}
 			
 			if ( t == "package" )
 			{
 				packageLines.push_back ( line );
 			}
-			
 			if ( t == "warning" )
 			{
 				vector<string> warningLines;
-				for ( size_t z; (inputFile[z] != "\n" && inputFile[z+1] != "\n"); z++ )
+				size_t b = 0;
+				for ( size_t z = y; z < inputFile.size ( ); z++ )
 				{
-					warningLines.push_back ( inputFile[z] );
-					y = z;
+					if ( inputFile[z].empty ( ) && inputFile[z+1].empty ( ) )
+					{
+						break;
+					}
+					if ( inputFile[z+1].substr ( 0, 2 ) == "  " )
+					{
+						b = z;
+						warningLines.push_back ( inputFile[z] );
+						break;
+					}
+					string buff = inputFile[z];
+					trim ( buff );
+					if ( !buff.empty ( ) or buff == "\n" )
+					{
+						warningLines.push_back ( buff );
+					}
+					b = z;
 				}
-				warninggroups.push_back ( warningLines );
+				if ( !warningLines.empty ( ) )
+				{
+					y = b;
+					warninggroups.push_back ( warningLines );
+				}
 			}
 		}
-		
-		for ( size_t y; y <= usegroups.size(); y++ )
+		for ( size_t y = 0; y != usegroups.size ( ); y++ )
 		{
-			Config current ( usegroups[y] );
+			GentooConfig current ( usegroups[y], package );
 			configs.push_back ( current );
 		}
-		
-		for ( size_t y; y <= packageLines.size(); y++ )
+		for ( size_t y = 0; y != packageLines.size ( ); y++ )
 		{
-			EmergePackage current ( packageLines[y].c_str() );
+			string buff = packageLines[y];
+			trim ( buff );
+			EmergePackage current ( buff );
 			packages.push_back ( current );
 		}
-		
-		for ( size_t y; y <= warninggroups.size(); y++ )
+		for ( size_t y = 0; y != warninggroups.size ( ); y++ )
 		{
 			Warning current ( warninggroups[y] );
 			warnings.push_back ( current );
@@ -114,14 +153,20 @@ class Type
 		{
 			return "use";
 		}
-		else if ( line.substr ( 0, 6 ) == string ( "[ebuild" ) )
+		else if ( line.substr ( 0, 7 ) == string ( "[ebuild" ) )
 		{
 			return "package";
 		}
-		else
+		else if ( line.substr ( 0, 5 ) == string ( "These" ) or line.substr ( 0, 11 ) == string ( "Calculating" ) or line.substr ( 0, 5 ) == string ( "Total" ) or line.substr ( 0, 2 ) == string ( " *" ) )
 		{
-			return "warning";
+			return "";
 		}
+		else if ( line.substr ( 0, 48 ) == "!!! The following installed packages are masked:" )
+		{
+			return "esc";
+		}
+		return "warning";
 	}
 };
 
+#endif

@@ -134,6 +134,14 @@ def sub_list ( search, _list, _alt_list ):
 			buff.append ( _alt_list [ a ] )
 		a += 1
 	return buff
+def suggest ( _set, op, _flag_list, upper ):
+	suggest_list = []
+	for x in _flag_list:
+		y = Flag ( x )
+		suggest_list.append ( y.gen_flag ( _set ) )
+	if upper.search and upper.end:
+		return suggest_list
+
 class FlagMap:
 	values = {}
 	config = configparser.ConfigParser()
@@ -143,9 +151,8 @@ class FlagMap:
 		for key in self.config["main"]:
 			self.values[key] = self.config["main"][key] 
 		self.required_use = self.config["req"]["required_use"]
-
 class Flag:
-	def __init__ (self, string):
+	def __init__ ( self, string ):
 		self.name = remove_all(string, ("^^", "!", "??", "||", "?"))
 		self.ops = []
 		try:
@@ -175,6 +182,17 @@ class Flag:
 		if "?" in string:
 			self.ops.append ( "?" )
 		self.string = string
+	def gen_flag ( self, _toggle ):
+		if _toggle:
+			if "!" in self.ops:
+				return self.name
+			else:
+				return "-" + self.name
+		else:
+			if "!" in self.ops:
+				return "-" + self.name
+			else:
+				return self.name
 class ParseFlag:
 	filename = None
 	required_use = None
@@ -183,7 +201,7 @@ class ParseFlag:
 		self.filename = filename
 		flagMap = FlagMap ( filename )
 		_map = flagMap.values
-		
+		self.errors_post = []
 		# Set the flag values in the 'flags' class
 		for key in _map:
 			keynew = key.replace ( "-", "__" )
@@ -203,22 +221,40 @@ class ParseFlag:
 					p_names.append ( y )
 					if Flag(y).search and not p[0]:
 						sys.stdout.write ( "(ok)" )
+			errors = []
 			if stat.ops[0] in ("^^", "??", "||"):
 				if stat.ops[0] == "^^":
 					num = true_num ( p_vals )
 					if num != 1:
 						if num > 1:
-							print ( "ERROR: Exaclty one must be set %s" % p_names )
+							sys.stderr.write ( "ERROR: Exaclty one must be set %s\n" % p_names )
+							errors.append ( ( False, "^^", sub_list ( True, p_vals, p_names ), stat ) )
 						if num < 1:
-							print ( "ERROR: Set exactly one of %s" % p_names )
+							sys.stderr.write ( "ERROR: Set exactly one of %s\n" % p_names ), stat
+							errors.append ( ( True, "^^", sub_list ( False, p_vals, p_names ), stat ) )
 				if stat.ops[0] == "||":
 					num = true_num ( p_vals )
 					if num <= 1:
-						print ( "ERROR: One must be set %s" % p_names )
+						sys.stderr.write ( "ERROR: One must be set %s\n" % p_names ), stat
+						errors.append ( ( True, "||", sub_list ( False, p_vals, p_names ), stat ) )
 				if stat.ops[0] == "??":
 					num = true_num ( p_vals )
 					if num > 1:
-						print ( "ERROR: Unset and/or %s" % sub_list ( True, p_vals, p_names ) )
+						sys.stderr.write ( "ERROR: Unset and/or %s\n" % sub_list ( True, p_vals, p_names ), stat )
+						errors.append ( ( False, "??", sub_list ( True, p_vals, p_names ), stat ) )
+			if "?" in stat.ops:
+				
+				if "!" in stat.ops:
+					errors.append ( ( False, "!?", sub_list ( False, p_vals, p_names ), stat ) )
+				else:
+					errors.append ( ( False, "?", sub_list ( False, p_vals, p_names ), stat ) )
+			elif "!" in stat.ops:
+				errors.append ( ( True, "!", sub_list ( False, p_vals, p_names ), stat ) )
+			for z in errors:
+				sug = suggest ( * ( z ) )
+				if sug:
+					self.errors_post.append( ' '.join(sug).strip ( ) )
+		print ( ' '.join ( self.errors_post ) )
 """
 REQUIRED_USE="foo? ( bar )"					If foo is set, bar must be set.
 REQUIRED_USE="foo? ( !bar )"				If foo is set, bar must not be set.

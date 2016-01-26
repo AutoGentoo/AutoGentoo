@@ -1,7 +1,7 @@
 /*
- * testUse.cxx
+ * main.hpp
  * 
- * Copyright 2016 Andrei Tumbar <atadmin@Helios>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,33 @@
  */
 
 
+#ifndef __AUTOGENTOO_GTK__BUILDER__
+#define __AUTOGENTOO_GTK__BUILDER__
+
 #include <iostream>
-#include "../package/ebuild.hpp"
+#include <string>
+#include <gtkmm.h>
 
 using namespace std;
 
-int main(int argc, char **argv)
+class Builder
 {
-	Package python ("net-misc/networkmanager-1.0.10-r1::gentoo");
-	ebuild py ( python );
-	return 0;
-}
-
+	public:
+	Glib::RefPtr<Gtk::Builder> builder
+	Gtk::Window main;
+	
+	vector < Glib::RefPtr < Gtk::Builder > > bld_set;
+	
+	Builder ( string file )
+	{
+		builder = Gtk::Builder::create_from_file ( file.c_str ( ) );
+		builder->get_widget ( "main", main );
+	}
+	
+	void get_bld ( string file )
+	{
+		__builder = Gtk::Builder::create_from_file ( file.c_str ( ) );
+		bld_set.push_back ( __builder );
+	}
+};
+#endif

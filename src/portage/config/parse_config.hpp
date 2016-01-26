@@ -21,6 +21,9 @@
  * 
  */
 
+#ifndef __PARSE_CONFIG__
+#define __PARSE_CONFIG__
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -195,3 +198,5 @@ std::map < std::string, std::string > get_command ( std::string cmd )
 	system("rm -rf temp");
 	return return_map;
 }
+
+#endif

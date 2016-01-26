@@ -27,17 +27,22 @@
 #include <vector>
 #include "../tools/_misc_tools.hpp"
 
+#ifndef __GENTOO__PACKAGE_VERSION__
+#define __GENTOO__PACKAGE_VERSION__
+
 using namespace std;
 
 class version
 {
 	public:
 	vector<int> v; //!< Vector of the version, string divided by '.' for example 1.2.3 = [1, 2, 3]
+	vector<string> v_str; //!< Vector of the version, string divided by '.' for example 1.2.3 = ["1", "2", "3"]
 	string revision;
 	string slot;
 	int revision_num;
 	bool has_revision;
 	string _in_str;
+	bool _contructed;
 	
 	void init ( string in_str )
 	{
@@ -52,23 +57,24 @@ class version
 		if ( in_str[in_str.rfind("-") + 1] == 'r' )
 		{
 			has_revision = true;
-			revision = misc::substr( in_str, in_str.rfind("-") + 1, in_str.length() );
-			revision_num = misc::stoi ( misc::substr( revision, 1, revision.length ( ) ) );
+			revision = misc::substr ( in_str, in_str.rfind ( "-" ) + 1, in_str.length ( ) );
+			revision_num = misc::stoi ( misc::substr ( revision, 1, revision.length ( ) ) );
+			in_str = misc::substr ( in_str, 0 , in_str.rfind ( "-" ) );
+		}
+		else
+		{
+			has_revision = false;
 		}
 		
 		string buff_in = in_str;
 		
-		if ( has_revision )
-		{
-			misc::remove ( buff_in, revision );
-		}
+		v_str = misc::split ( buff_in, '.' );
 		
-		vector<string> buff_vec ( misc::split ( buff_in, '.' ) );
-		
-		for ( size_t i; i <= buff_vec.size ( ); i++ )
+		for ( size_t i = 0; i != v_str.size ( ); i++ )
 		{
-			v.push_back ( misc::stoi ( buff_vec[i] ) );
+			v.push_back ( misc::stoi ( v_str[i] ) );
 		}
+		_contructed = true;
 	}
 	bool operator < ( version compare )
 	{
@@ -291,3 +297,5 @@ class version
 		return false;
 	}
 };
+
+#endif

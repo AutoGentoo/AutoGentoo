@@ -22,16 +22,17 @@
  */
 
 
+#ifndef __AUTOGENTOO_FILE__
+#define __AUTOGENTOO_FILE__
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include "_misc_tools.hpp"
 
 using namespace std;
-
-#ifndef FILE
-#define FILE
 
 /*! \class File
  *
@@ -66,18 +67,10 @@ class File
 	}
 	
 	/// Return a vector of strings with each element as a line in the file
-	vector<string> readlines ( const char *endChars="" )
+	vector<string> readlines ( )
 	{
-		vector < string > returnList;
-		string str;
-		while ( getline ( file, str ) )
-		{
-			/** Add chars to end of str
-			 * Usually will be a \n
-			 * Append this item to list
-			 */
-			returnList.push_back ( str + endChars );
-		}
+		vector < string > returnList ( misc::split ( text.str ( ), '\n' ) );
+		
 		/// Return the generated list
 		return returnList;
 	}
