@@ -199,4 +199,13 @@ std::map < std::string, std::string > get_command ( std::string cmd )
 	return return_map;
 }
 
+std::vector < std::string > get_command_vec_raw ( std::string cmd )
+{
+	std::vector < std::string > buff;
+	cmd += " > temp";
+	system ( cmd.c_str ( ) );
+	buff = File ( "temp" ).readlines ( );
+	system("rm -rf temp");
+	return buff;
+}
 #endif

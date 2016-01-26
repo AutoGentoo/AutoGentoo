@@ -52,6 +52,15 @@ namespace misc
 			removing.erase ( foundAt, toRemove.length ( ) );
 		}
 	}
+	std::string remove_r ( std::string removing, std::string toRemove )
+	{
+		std::string::size_type foundAt = removing.find ( toRemove );
+		if ( foundAt != std::string::npos )
+		{
+			removing.erase ( foundAt, toRemove.length ( ) );
+		}
+		return removing;
+	}
 	void removechar ( std::string &removing, char toRemove )
 	{
 		std::string::size_type foundAt = removing.find ( toRemove );
@@ -117,12 +126,30 @@ namespace misc
 		return -1;
 	}
 	
-	template < class vectorType >
-	int find ( std::vector < vectorType > input, vectorType findstr )
+	template < class T >
+	int find ( std::vector < T > input, T findstr )
 	{
 		for ( size_t x = 0; x != input.size ( ); x++ )
 		{
-			vectorType y = input [ x ];
+			T y = input [ x ];
+			if ( y == findstr )
+			{
+				return x;
+			}
+		}
+		return -1;
+	}
+	
+	int find_spec ( std::vector < std::string > input, std::string findstr, int start, int end )
+	{
+		std::cout << findstr << std::endl;
+		for ( size_t x = 0; x != input.size ( ); x++ )
+		{
+			std::string y = misc::substr ( input [ x ], start, end );
+			if ( x == 120 )
+			{
+				std::cout << y << std::endl;
+			} 
 			if ( y == findstr )
 			{
 				return x;
@@ -284,6 +311,25 @@ namespace misc
 		{
 			std::cout << in [ i ] << std::endl;
 		}
+	}
+	
+	template < class T >
+	std::vector < T > set_vec ( std::vector < T > in, size_t pos, T val )
+	{
+		std::vector < T > buffVec;
+		for ( size_t i = 0; i != in.size ( ); i++ )
+		{
+			if ( i == pos )
+			{
+				std::cout << val << std::endl;
+				buffVec.push_back ( val );
+			}
+			else
+			{
+				buffVec.push_back ( in [ i ] );
+			}
+		}
+		return buffVec;
 	}
 }
 #endif

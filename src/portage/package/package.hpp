@@ -21,8 +21,8 @@
  * 
  */
 
-#ifndef __PACKAGE__
-#define __PACKAGE__
+#ifndef __AUTOGENTOO_PACKAGE__
+#define __AUTOGENTOO_PACKAGE__
 
 #include <iostream>
 #include <string>
@@ -130,65 +130,118 @@ class Package
 		file = "/usr/portage/" + catagory + "/" + directory + "/" + _file + ".ebuild";
 	}
 	
-	void pkg_fetch ( )
+	void pkg_fetch ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " fetch" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " fetch" );
 		system ( cmd.c_str ( ) );
 	}
-	void pkg_setup ( )
+	void pkg_setup ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " setup" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " setup" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_unpack ( )
+	void src_unpack ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " unpack" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " unpack" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_prepare ( )
+	void src_prepare ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " prepare" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " prepare" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_configure ( )
+	void src_configure ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " configure" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " configure" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_compile ( )
+	void src_compile ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " compile" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " compile" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_test ( )
+	void src_test ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " test" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " test" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_install ( )
+	void src_install ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " install" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " install" );
 		system ( cmd.c_str ( ) );
 	}
-	void pkg_preinst ( )
+	void pkg_preinst ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " preinst" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " preinst" );
 		system ( cmd.c_str ( ) );
 	}
-	void pkg_postinst ( )
+	void pkg_postinst ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " postinst" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " postinst" );
 		system ( cmd.c_str ( ) );
 	}
-	void pkg_prerm ( )
+	void pkg_prerm ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " prerm" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " prerm" );
 		system ( cmd.c_str ( ) );
 	}
-	void pkg_postrm ( )
+	void pkg_postrm ( string _file = "" )
 	{
-		string cmd ( "ebuild " + this->file + " postrm" );
+		if ( _file.empty ( ) )
+		{
+			_file = file;
+		}
+		string cmd ( "ebuild " + _file + " postrm" );
 		system ( cmd.c_str ( ) );
 	}
 };
+void pkg_do_key ( string keyword, string _file )
+{
+	string cmd ( "ebuild " + _file + " " + keyword );
+	system ( cmd.c_str ( ) );
+}
 #endif

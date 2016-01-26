@@ -40,13 +40,13 @@ void Emerge ( string package, string emergeConfig="emerge.config", string packag
 	string emergeCommand ( "emerge -pv --pretend " + package + " > " + emergeConfig + " 2>&1" );
 	
 	/*! Execute the emergeCommand to write the config */
-	//system ( emergeCommand.c_str ( ) );
+	system ( emergeCommand.c_str ( ) );
 	
 	emergeFile = File ( emergeConfig ).readlines ( );
 	Type types ( emergeFile, package );
 	
-	string tunc ( "truncate -s 0 " + packageConfig );
-	system ( tunc.c_str ( ) );
+	string trunc ( "truncate -s 0 " + packageConfig );
+	system ( trunc.c_str ( ) );
 	
 	for ( size_t i = 0; i != types.configs.size ( ); i++)
 	{
