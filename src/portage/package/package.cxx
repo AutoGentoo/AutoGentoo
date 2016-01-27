@@ -31,7 +31,6 @@ int main(int argc, char* argv[ ] )
 {
 	string __file__ ( argv [ 1 ] );
 	string __cmd__ ( argv [ 2 ] );
-	cout << __file__ << endl;
 	pkg_do_key ( __cmd__, __file__ );
 	return 0;
 }

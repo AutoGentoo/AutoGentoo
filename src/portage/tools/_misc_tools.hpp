@@ -142,14 +142,9 @@ namespace misc
 	
 	int find_spec ( std::vector < std::string > input, std::string findstr, int start, int end )
 	{
-		std::cout << findstr << std::endl;
 		for ( size_t x = 0; x != input.size ( ); x++ )
 		{
 			std::string y = misc::substr ( input [ x ], start, end );
-			if ( x == 120 )
-			{
-				std::cout << y << std::endl;
-			} 
 			if ( y == findstr )
 			{
 				return x;
@@ -321,7 +316,6 @@ namespace misc
 		{
 			if ( i == pos )
 			{
-				std::cout << val << std::endl;
 				buffVec.push_back ( val );
 			}
 			else

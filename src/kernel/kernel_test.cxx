@@ -41,6 +41,13 @@ void __kernel_set_module ( )
 	cin >> _VAL;
 	__kernel.set_module ( _NAME, _VAL );
 }
+void __kernel_get_module ( )
+{
+	string _NAME;
+	cout << "name> ";
+	cin >> _NAME;
+	misc::print_vec < string > ( __kernel.find_modules ( _NAME ) );
+}
 
 void __kernel_write ( )
 {
@@ -56,6 +63,7 @@ int main(int argc, char **argv)
 	CommandLine COMMAND ( "kernel> " );
 	string cmd;
 	COMMAND.addOption ( "set_module", __kernel_set_module );
+	COMMAND.addOption ( "get_module", __kernel_get_module );
 	COMMAND.addOption ( "write", __kernel_write );
 	COMMAND.start ( cmd );
 	

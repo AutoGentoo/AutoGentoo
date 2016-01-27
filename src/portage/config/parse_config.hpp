@@ -181,13 +181,10 @@ std::map < std::string, std::string > get_command ( std::string cmd )
 	cmd += " > temp";
 	system ( cmd.c_str() );
 	File f ( "temp" );
-	std::cout << "file opened" << std::endl;
 	std::vector<std::string> lines = f.readlines ( );
-	std::cout << "read lines" << std::endl;
 	for ( size_t x = 0; x != lines.size ( ); x++ )
 	{
 		std::string line = lines[x];
-		std::cout << line << std::endl;
 		std::vector<std::string> divide = misc::split ( line, ':' );
 		std::string var, val;
 		var = divide[0];

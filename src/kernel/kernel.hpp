@@ -73,10 +73,6 @@ class kernel
 		output.open ( of.c_str ( ), ofstream::trunc );
 		for ( size_t i = 0; i != __file.size ( ); i++ )
 		{
-			if ( i == 119 )
-			{
-				cout << __file [ i ] << endl;
-			}
 			output << __file [ i ] << endl;
 		}
 		output.close ( );
@@ -99,8 +95,6 @@ class kernel
 		int found = misc::find_spec ( MODULES_NAMES, NAME, 0, NAME.length ( ) );
 		if ( found != -1 )
 		{
-			cout << MODULES [ found ].name << endl;
-			cout << LINE_NUMBERS [ found ] << endl;
 			__file = misc::set_vec < string > ( __file, LINE_NUMBERS [ found ], MODULES [ found ].set_value ( VAL ) );
 		}
 	}

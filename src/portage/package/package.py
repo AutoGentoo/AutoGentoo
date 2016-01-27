@@ -24,6 +24,13 @@
 
 import sys, configparser, os
 
+class EmergeSet:
+	def __init__ ( self, package ):
+		self.package = package
+		self.in_cfg = package + ".emerge"
+		self.out_cfg = package + ".cfg"
+		os.system ( "cd %s && ../emerge/emerge %s %s %s" % ( os.path.dirname ( os.path.abspath ( __file__ ) ), self.package, self.in_cfg, self.out_cfg ) )
+
 class PackageSet:
 	def __init__ ( self, cfg_file, log_dir ):
 		curr_dir = os.path.dirname(os.path.abspath(__file__))
@@ -49,15 +56,22 @@ class PackageSet:
 		os.chdir ( "/var/tmp/portage" )
 		for package in self.config.sections():
 			os.system ( "mkdir -p " + log_dir + "/" + package )
+			print ( "\n" )
 			print ( "emerge: %s" % package )
-			print ( self.config[package]["file"] )
 			for stage in self.stages:
-				print ( stage )
+				sys.stdout.write ( stage )
+				sys.stdout.write ( "," )
 				os.system ( curr_dir + "/package " + self.config[package]["file"] + " " + stage  + " > " + log_dir + "/" + package + "/" + stage + " .log" + " 2>&1" )
+		print ( "\n" )
 
 def main ( argv = sys.argv ):
-	print ( argv )
-	cfg = argv [ 1 ]
-	log = argv [ 2 ]
-	current = PackageSet ( cfg, log )
+	package = argv [ 1 ]
+	try:
+		argv [ 2 ]
+	except IndexError:
+		log = "logs"
+	else:
+		log = argv [ 2 ]
+	current_emg = EmergeSet ( package )
+	current_pkg = PackageSet ( current_emg.out_cfg, log )
 main ( )

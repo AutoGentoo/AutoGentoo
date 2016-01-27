@@ -24,23 +24,14 @@ long_line_column=72
 
 [files]
 current_page=4
-FILE_NAME_0=5380;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftools%2F_misc_tools.hpp;0;4
-FILE_NAME_1=5930;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcommand%2FOption.hpp;0;4
-FILE_NAME_2=2001;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Femerge.cxx;0;4
-FILE_NAME_3=1818;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Fconfig.hpp;0;4
-FILE_NAME_4=1414;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Femerge.hpp;0;4
-FILE_NAME_5=2110;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Ftype.hpp;0;4
-FILE_NAME_6=1062;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2Fpackage.hpp;0;4
-FILE_NAME_7=1377;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fgraphics%2Fbuilder.hpp;0;4
-FILE_NAME_8=1591;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Fwarning.hpp;0;4
-FILE_NAME_9=8018;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2FEmergePackage.hpp;0;4
-FILE_NAME_10=1129;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2FpackageConfig.hpp;0;4
-FILE_NAME_11=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2Fversion.hpp;0;4
-FILE_NAME_12=1081;Python;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fgraphics%2Fbuilder.py;0;4
-FILE_NAME_13=1859;Python;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2FAutoGentoo.py;0;4
+FILE_NAME_0=7274;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftools%2F_misc_tools.hpp;0;4
+FILE_NAME_1=1588;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fkernel_module.hpp;0;4
+FILE_NAME_2=2330;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fkernel.hpp;0;4
+FILE_NAME_3=0;Python;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2Fpackage.py;0;4
+FILE_NAME_4=0;None;0;EUTF-8;1;1;0;%2Frun%2Fmedia%2Fatuser%2F41760816-363d-42e3-9336-2f4df075d766%2FGnomeGentoo%2Fsquash%2Fusr%2Fsrc%2Flinux%2FModule.symvers;0;4
 
 [VTE]
-last_dir=/home/atuser/git/AutoGentoo/src/portage/emerge
+last_dir=/home/atuser/git/AutoGentoo/src/kernel
 
 [build-menu]
 PythonFT_00_LB=_Compile
