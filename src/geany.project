@@ -23,27 +23,22 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=6
-FILE_NAME_0=5697;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftools%2F_misc_tools.hpp;0;4
-FILE_NAME_1=1720;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fconfig%2Fautogentoo_config.hpp;0;4
-FILE_NAME_2=1689;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fkernel.hpp;0;4
-FILE_NAME_3=3032;Python;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2Fpackage.py;0;4
-FILE_NAME_4=18361;Python;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2FAutoGentoo.py;0;4
-FILE_NAME_5=1018;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fconfig%2Fconfig_test.cxx;0;4
-FILE_NAME_6=170;Conf;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2Fpygobject.cfg;0;4
-FILE_NAME_7=1231;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Femerge.cxx;0;4
-FILE_NAME_8=1535;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Femerge.hpp;0;4
-FILE_NAME_9=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2Fpackage.hpp;0;4
-FILE_NAME_10=5162;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2FEmergePackage.hpp;0;4
-FILE_NAME_11=2889;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2FpackageConfig.hpp;0;4
-FILE_NAME_12=0;None;0;EUTF-8;1;1;0;%2Fetc%2Fportage%2Fpackage.use;0;4
-FILE_NAME_13=285;None;0;EUTF-8;1;1;0;%2Fetc%2Fportage%2Fpackage.accept_keywords;0;4
-FILE_NAME_14=1962;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Fconfig.hpp;0;4
-FILE_NAME_15=1546;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Ftype.hpp;0;4
-FILE_NAME_16=28891;None;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2F%40world.emerge;0;4
+current_page=0
+FILE_NAME_0=1484;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Femerge.cxx;0;4
+FILE_NAME_1=1311;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Femerge.hpp;0;4
+FILE_NAME_2=3387;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Ftype.hpp;0;4
+FILE_NAME_3=1569;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Fconfig.hpp;0;4
+FILE_NAME_4=2742;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Fwarning.hpp;0;4
+FILE_NAME_5=1204;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftools%2Fis_dir.hpp;0;4
+FILE_NAME_6=46625;Conf;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Fworld.cfg;0;4
+FILE_NAME_7=1266;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2FpackageConfig.hpp;0;4
+FILE_NAME_8=3358;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2Fpackage.hpp;0;4
+FILE_NAME_9=2211;Python;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2Fpackage.py;0;4
+FILE_NAME_10=8;None;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femerge%2Fworld.emerge;0;4
+FILE_NAME_11=2215;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fpackage%2Fblocks.hpp;0;4
 
 [VTE]
-last_dir=/home/atuser/git/AutoGentoo/src/portage/package
+last_dir=/home/atuser/Documents
 
 [build-menu]
 PythonFT_00_LB=_Compile

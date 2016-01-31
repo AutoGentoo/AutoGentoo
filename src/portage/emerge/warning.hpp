@@ -117,6 +117,7 @@ class Warning
 		if ( type == "useReq" )
 		{
 			string buff ( input [ lineNum + 3 ] );
+			// Remove the spaces infront of the package string
 			buff.erase ( 0, 2 );
 			Package pkg ( buff.substr ( 0, buff.find ( " " ) ) );
 			ebuild pkg_ebuild ( pkg );
