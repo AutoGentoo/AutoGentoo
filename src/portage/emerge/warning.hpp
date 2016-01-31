@@ -111,10 +111,6 @@ class Warning
 				{
 					string unmerge ( "emerge --rage-clean " + line );
 					system ( unmerge.c_str ( ) );
-					/*Package buff ( line );
-					if ( buff.name != "gcc" )
-					{
-					}*/
 				}
 			}
 		}

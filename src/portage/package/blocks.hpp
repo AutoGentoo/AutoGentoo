@@ -39,34 +39,31 @@ class blocks
 	blocks ( string input )
 	{
 		/*
-		 * [blocks B ] <sys-apps/portage-2.1.4_rc1 (is blocking app-shells/bash-3.2_p33)
-		 * -----------^
+		 * [blocks b      ] >perl-core/Module-Metadata-1.0.19-r999 (">perl-core/Module-Metadata-1.0.19-r999" is blocking virtual/perl-Module-Metadata-1.0.19)
+		 * ----------------^
 		 */
 		input.erase ( 0, input.find ( "]" ) + 2 );
-		
 		/*
-		 * <sys-apps/portage-2.1.4_rc1 (is blocking app-shells/bash-3.2_p33)
-		 *                            ^
+		 * >perl-core/Module-Metadata-1.0.19-r999 (">perl-core/Module-Metadata-1.0.19-r999" is blocking virtual/perl-Module-Metadata-1.0.19)
+		 * _______________________________________^
 		 */
 		blocking = input.substr ( 0, input.find ( " " ) );
-		
 		/*
-		 * <sys-apps/portage-2.1.4_rc1 (is blocking app-shells/bash-3.2_p33)
-		 * ---------------------------^
+		 * >perl-core/Module-Metadata-1.0.19-r999 (">perl-core/Module-Metadata-1.0.19-r999" is blocking virtual/perl-Module-Metadata-1.0.19)
+		 * --------------------------------------^
 		 */
 		input.erase ( 0, blocking.length ( ) + 1 );
-		
 		/*
-		 * (is blocking app-shells/bash-3.2_p33)
-		 * -------------
+		 * (">perl-core/Module-Metadata-1.0.19-r999" is blocking virtual/perl-Module-Metadata-1.0.19)
+		 * --
 		 */
-		input.erase ( 0, string ( "(is blocking " ).length ( ) );
-		
+		input.erase ( 0, 2 );
 		/*
-		 * app-shells/bash-3.2_p33)
-		 * _______________________-
+		 * >perl-core/Module-Metadata-1.0.19-r999" is blocking virtual/perl-Module-Metadata-1.0.19)
+		 * ----------------------------------------                                               -
 		 */
-		blocked = input.substr ( 0, input.length ( ) - 1 );
+		size_t len ( blocking.length ( ) + 2 + string ( "is blocking " ).length ( ) );
+		blocked = input.substr ( len, input.length ( ) - len - 1 );
 	}
 };
 

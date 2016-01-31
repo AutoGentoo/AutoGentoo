@@ -33,12 +33,11 @@
 
 using namespace std;
 
-void Emerge ( string package, string emergeConfig="emerge.config", string packageConfig="package.config", bool do_pretend = true )
+void Emerge ( string package, string emergeConfig="emerge.config", string packageConfig="package.config", bool do_pretend = true, string options = "" )
 {
 	vector<string> emergeFile;
 	
-	string emergeCommand ( "emerge -pv --pretend " + package + " > " + emergeConfig + " 2>&1" );
-	
+	string emergeCommand ( "emerge -pv --pretend " + options + " " + package + " > " + emergeConfig + " 2>&1" );
 	/*! Execute the emergeCommand to write the config */
 	if ( do_pretend )
 	{
