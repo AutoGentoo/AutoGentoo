@@ -225,15 +225,21 @@ namespace misc
 			char curr = str[y];
 			if ( curr == chr )
 			{
-				if ( _trim )
-				{
-					trim ( buff );
-				}
 				returnList.push_back ( buff );
 				buff.clear ( );
 				continue;
 			}
-			buff += curr;
+			if ( _trim )
+			{
+				if ( curr != ' ' )
+				{
+					buff += curr;
+				}
+			}
+			else
+			{
+				buff += curr;
+			}
 		}
 		returnList.push_back ( buff );
 		return returnList;

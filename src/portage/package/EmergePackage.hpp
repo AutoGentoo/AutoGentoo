@@ -216,10 +216,11 @@ class EmergePackage: public Package
 	string propertystr;
 	version old;
 	int sizeOfDownload;
-	map< string, vector<string> > flags;
-	map< string, string > flags_str;
+	string input;
+	map < string, vector<string> > flags;
+	map < string, string > flags_str;
 	
-	EmergePackage ( string input ) : Package (  )
+	EmergePackage ( string __input ) : Package (  )
 	{
 		/* Key
 		 * + added by operator '+'
@@ -230,6 +231,8 @@ class EmergePackage: public Package
 		*/
 		
 		/* [ebuild   R    ] gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB */
+		
+		input = __input;
 		
 		vector < string > pkgdiv = splitEbuild ( input );
 		propertystr = pkgdiv [ 0 ];

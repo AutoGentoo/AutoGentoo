@@ -1,5 +1,5 @@
 /*
- * is_dir.hpp
+ * new_module.hpp
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
@@ -21,39 +21,23 @@
  * 
  */
 
-
-
-#ifndef __AUTOGENTOO_IS_DIR__
-#define __AUTOGENTOO_IS_DIR__
+#ifndef __AUTOGENTOO_NEW_KERNEL_MODULE__
+#define __AUTOGENTOO_NEW_KERNEL_MODULE__
 
 #include <iostream>
-#include <sys/stat.h>
+#include "kernel_module.hpp"
 
-bool is_dir ( const char* path )
-{
-	struct stat st_buf;
-	
-	int status = stat ( path, &st_buf );
-	
-	if ( status != 0 )
-	{
-		throw;
-	}
-	
-	if ( S_ISREG ( st_buf.st_mode ) )
-	{
-		return false;
-	}
-	else if ( S_ISDIR ( st_buf.st_mode ) )
-	{
-		return true;
-	}
-	return false;
-}
+using namespace std;
 
-bool is_file_exist ( const char *fileName )
+class NEW_MODULE: public KERNEL_MODULE
 {
-	std::ifstream infile ( fileName );
-	return infile.good ( );
-}
+	public:
+	string changed_value;
+	
+	NEW_MODULE ( string input, string _changed_value ) : KERNEL_MODULE ( input )
+	{
+		changed_value = _changed_value;
+	}
+};
+
 #endif

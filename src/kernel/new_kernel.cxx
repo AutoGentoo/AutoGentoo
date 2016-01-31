@@ -1,5 +1,5 @@
 /*
- * is_dir.hpp
+ * new_kernel.cxx
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
@@ -22,38 +22,51 @@
  */
 
 
-
-#ifndef __AUTOGENTOO_IS_DIR__
-#define __AUTOGENTOO_IS_DIR__
+#ifndef __AUTOGENTOO_NEW_KERNEL__
+#define __AUTOGENTOO_NEW_KERNEL__
 
 #include <iostream>
-#include <sys/stat.h>
+#include <string>
+#include <vector>
+#include "kernel.hpp"
+#include "new_module.hpp"
 
-bool is_dir ( const char* path )
-{
-	struct stat st_buf;
-	
-	int status = stat ( path, &st_buf );
-	
-	if ( status != 0 )
-	{
-		throw;
-	}
-	
-	if ( S_ISREG ( st_buf.st_mode ) )
-	{
-		return false;
-	}
-	else if ( S_ISDIR ( st_buf.st_mode ) )
-	{
-		return true;
-	}
-	return false;
-}
+using namespace std;
 
-bool is_file_exist ( const char *fileName )
+class NewKernel
 {
-	std::ifstream infile ( fileName );
-	return infile.good ( );
-}
+	public:
+	string input;
+	string ouput;
+	string arch;
+	kernel __kernel;
+	
+	NewKernel ( kernel _kernel, string _arch="amd64" )
+	{
+		arch = _arch;
+		__kernel = _kernel;
+	}
+	
+	void _change_mods ( vector < NEW_MODULE > __new_vec )
+	{
+		for ( size_t i = 0; i != __new_vec.size ( ); i++ )
+		{
+			this->_change_mod ( __new_vec [ i ], false );
+		}
+		__kernel.write ( );
+	}
+	
+	void _change_mod ( NEW_MODULE __new, bool write = true )
+	{
+		__kernel.set_module ( __new.name, __new.changed_value );
+		if ( write )
+		{
+			__kernel.write ( );
+		}
+	}
+	
+	void _change_mod_str ( NEW_MODULE __new, string __str, bool write = true )
+	{
+		
+};
 #endif

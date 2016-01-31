@@ -43,25 +43,27 @@ class GentooConfig
 	
 	GentooConfig ( vector<string> in, string pkgName = "unknown" )
 	{
-		string path_raw = in[1];
-		misc::remove( path_raw, " in the portage(5) man page for more details)" );
-		misc::remove( path_raw, " (see " );
-		misc::removechar( path_raw, '"' );
-		misc::removechar( path_raw, '"' );
+		string path_raw = in [ 1 ];
+		misc::remove( path_raw, "\" in the portage(5) man page for more details)" );
+		misc::remove( path_raw, " (see \"" );
 		path = "/etc/portage/" + path_raw;
+		if ( !is_file_exist ( path.c_str ( ) ) )
+		{
+			system ( string ( "touch " + path ).c_str ( ) );
+		}
+		
 		if ( is_dir ( path.c_str ( ) ) )
 		{
 			path = path + "/autogentoo";
-			system ( string ("touch " + path ).c_str() );
+			system ( string ( "touch " + path ).c_str ( ) );
 		}
-		
-		for ( size_t y = 2; y != in.size (); y++ )
+		for ( size_t y = 2; y != in.size ( ); y++ )
 		{
-			writeLines.push_back ( in[y] );
+			writeLines.push_back ( in [ y ] );
 		}
 		
 		string commentLine = "# Config for the " + pkgName + " emerge set or package";
-		writeLines.insert( writeLines.begin(), commentLine );
+		writeLines.insert( writeLines.begin ( ), commentLine );
 	}
 	void write ( string __path = "" )
 	{
@@ -70,10 +72,10 @@ class GentooConfig
 			__path = path;
 		}
 		ofstream file;
-		file.open ( __path.c_str() );
-		for ( size_t x = 0; x != writeLines.size(); x++ )
+		file.open ( __path.c_str ( ), ios::app );
+		for ( size_t x = 0; x != writeLines.size ( ); x++ )
 		{
-			file << string ( writeLines[x] + "\n" );
+			file << string ( writeLines [ x ] + "\n" );
 		}
 	}
 };

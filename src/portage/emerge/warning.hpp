@@ -52,6 +52,7 @@ class Warning
 	Warning ( vector < string > _input )
 	{
 		input = _input;
+		lineNum = 0;
 		for ( size_t x = 0; x != input.size ( ); x++ )
 		{
 			string in = input [ x ];
@@ -73,11 +74,16 @@ class Warning
 				lineNum = x;
 				break;
 			}
-			else
+			else if ( in.substr ( 0, 8 ) == "WARNING:" )
 			{
-				type = "generic";
+				type = "depend";
 				lineNum = x;
+				break;
 			}
+		}
+		if ( type.empty ( ) )
+		{
+			type = "generic";
 		}
 		this->doWork ( );
 	}
@@ -87,14 +93,30 @@ class Warning
 		if ( type == "blocks" )
 		{
 			blocks b ( input [ lineNum ] );
-			string unmerge ( "emerge --unmerge " + b.blocked );
+			string unmerge ( "emerge --rage-clean " + b.blocked );
 			system ( unmerge.c_str ( ) );
 		}
 		if ( type == "slot" )
 		{
 			string pkg = input [ lineNum + 3 ];
-			string unmerge ( "emerge --unmerge " + pkg );
+			string unmerge ( "emerge --rage-clean " + pkg );
 			system ( unmerge.c_str ( ) );
+		}
+		if ( type == "depend" )
+		{
+			for ( size_t i = lineNum + 1; i != input.size ( ); i++ )
+			{
+				string line ( input [ i ] );
+				if ( !line.empty ( ) && line != "\n" && line [ 0 ] != ' ' )
+				{
+					string unmerge ( "emerge --rage-clean " + line );
+					system ( unmerge.c_str ( ) );
+					/*Package buff ( line );
+					if ( buff.name != "gcc" )
+					{
+					}*/
+				}
+			}
 		}
 		if ( type == "useReq" )
 		{

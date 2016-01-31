@@ -37,9 +37,9 @@ using namespace std;
 void PackageConfig ( EmergePackage pkg, string name )
 {
 	ofstream file;
-	file.open ( name.c_str ( ), ios::app  );
+	file.open ( name.c_str ( ), ios::app );
 	
-	string lineOne ( "[" + pkg.path + "]" + "\n" );
+	string lineOne ( "[" + pkg.path + ":" + pkg.slot + "]" + "\n" );
 	file << lineOne;
 	
 	string _version ( "version=\"" + misc::merge <string> ( pkg.release.v_str, "." ) );
@@ -87,5 +87,25 @@ void PackageConfig ( EmergePackage pkg, string name )
 			file << _version_old;
 		}
 	}
+	
+	string _input ( "input=\"" + pkg.input + "\"\n" );
+	file << _input;
+	
+	for ( map < string ,string >::iterator iter = pkg.flags_str.begin ( ); iter != pkg.flags_str.end ( ); iter++ )
+	{
+		string buff ( iter->first + "=\"" + iter->second + "\"\n" );
+		file << buff;
+	}
+	
+	string ENV ( "ENV=[" );
+	vector < string > buff;
+	
+	for ( map < string ,string >::iterator iter = pkg.flags_str.begin ( ); iter != pkg.flags_str.end ( ); iter++ )
+	{
+		buff.push_back ( iter->first );
+	}
+	ENV += misc::merge <string > ( buff, "," ) + "]\n";
+	
+	file << ENV;
 }
 #endif

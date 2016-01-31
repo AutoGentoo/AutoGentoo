@@ -1,5 +1,5 @@
 /*
- * is_dir.hpp
+ * config_test.cxx
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
@@ -22,38 +22,17 @@
  */
 
 
-
-#ifndef __AUTOGENTOO_IS_DIR__
-#define __AUTOGENTOO_IS_DIR__
-
 #include <iostream>
-#include <sys/stat.h>
+#include "autogentoo_config.hpp"
 
-bool is_dir ( const char* path )
+using namespace std;
+
+int main(int argc, char **argv)
 {
-	struct stat st_buf;
-	
-	int status = stat ( path, &st_buf );
-	
-	if ( status != 0 )
-	{
-		throw;
-	}
-	
-	if ( S_ISREG ( st_buf.st_mode ) )
-	{
-		return false;
-	}
-	else if ( S_ISDIR ( st_buf.st_mode ) )
-	{
-		return true;
-	}
-	return false;
+	AutoGentoo_Config cfg;
+	cfg.load ( "test.cfg" );
+	misc::print_vec < string > ( cfg ( "parts" ) );
+	cout << cfg [ "parts" ] [ "/dev/sda1" ] << endl;
+	return 0;
 }
 
-bool is_file_exist ( const char *fileName )
-{
-	std::ifstream infile ( fileName );
-	return infile.good ( );
-}
-#endif

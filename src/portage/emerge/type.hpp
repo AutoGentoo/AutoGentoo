@@ -101,16 +101,11 @@ class Type
 			{
 				vector<string> warningLines;
 				size_t b = 0;
-				for ( size_t z = y; z < inputFile.size ( ); z++ )
+				for ( size_t z = y; z != inputFile.size ( ); z++ )
 				{
 					if ( inputFile[z].empty ( ) && inputFile[z+1].empty ( ) )
 					{
-						break;
-					}
-					if ( inputFile[z+1].substr ( 0, 2 ) == "  " )
-					{
 						b = z;
-						warningLines.push_back ( inputFile[z] );
 						break;
 					}
 					string buff = inputFile[z];

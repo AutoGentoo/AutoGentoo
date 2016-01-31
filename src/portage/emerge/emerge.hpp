@@ -33,21 +33,21 @@
 
 using namespace std;
 
-void Emerge ( string package, string emergeConfig="emerge.config", string packageConfig="package.config" )
+void Emerge ( string package, string emergeConfig="emerge.config", string packageConfig="package.config", bool do_pretend = true )
 {
 	vector<string> emergeFile;
 	
 	string emergeCommand ( "emerge -pv --pretend " + package + " > " + emergeConfig + " 2>&1" );
 	
 	/*! Execute the emergeCommand to write the config */
-	system ( emergeCommand.c_str ( ) );
-	
+	if ( do_pretend )
+	{
+		system ( emergeCommand.c_str ( ) );
+	}
 	emergeFile = File ( emergeConfig ).readlines ( );
 	Type types ( emergeFile, package );
-	
 	string trunc ( "truncate -s 0 " + packageConfig );
 	system ( trunc.c_str ( ) );
-	
 	for ( size_t i = 0; i != types.configs.size ( ); i++)
 	{
 		GentooConfig curr = types.configs [ i ];

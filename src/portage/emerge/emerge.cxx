@@ -29,44 +29,14 @@ using namespace std;
 
 int main(int argc, char* args[])
 {
-	/*vector<string> argv;
-	for ( int i = 1; i < argc; i++ )
-	{
-		argv.push_back ( string ( args[i] ) );
-	}
-	vector <string > optionsArgs;
-	optionsArgs.push_back ( "package" );
-	OptionParser options ( "emerge", "A C++ emerge tool by AutoGentoo", optionsArgs, argv );
-	
-	vector < string > commands;
-	vector < vector < string > > cmdArgs;
-	commands.push_back ( "fetch" );
-	commands.push_back ( "setup" );
-	commands.push_back ( "unpack" );
-	commands.push_back ( "prepare" );
-	commands.push_back ( "configure" );
-	commands.push_back ( "compile" );
-	commands.push_back ( "test" );
-	commands.push_back ( "install" );
-	commands.push_back ( "postinstall" );
-	commands.push_back ( "prerm" );
-	commands.push_back ( "postrm" );
-	cmdArgs.push_back ( commands );
-	
-	Option cmd ( "-c", "--command", "Execute a function in the ebuild", cmdArgs );
-	
-	options.addOption ( cmd );
-	options.createHelp ( );
-	if ( options.findOption ( "--help" ) )
-	{
-		options.showHelp ( );
-	}
-	*/
-	
 	vector<string> argv;
 	string cfg;
 	string pkgcfg;
-	for ( int i = 1; i < argc; i++ )
+	string buff;
+	string order;
+	bool pretend = true;
+	bool no_real = true;
+	for ( int i = 1; i != argc; i++ )
 	{
 		argv.push_back ( string ( args[i] ) );
 	}
@@ -78,6 +48,40 @@ int main(int argc, char* args[])
 	{
 		pkgcfg = argv [ 2 ];
 	}
-	Emerge ( argv [ 0 ], cfg, pkgcfg );
+	if ( argc > 4 )
+	{
+		buff = argv [ 3 ];
+		if ( buff == "false" or buff == "False" )
+		{
+			pretend = false;
+		}
+		else
+		{
+			pretend = true;
+		}
+	}
+	if ( argc > 5 )
+	{
+		buff = argv [ 4 ];
+		if ( buff == "false" or buff == "False" )
+		{
+			no_real = false;
+		}
+		else
+		{
+			no_real = true;
+		}
+	}
+	if ( argc > 6 )
+	{
+		order = argv [ 5 ];
+	}
+	Emerge ( argv [ 0 ], cfg, pkgcfg, pretend );
+	if ( !no_real )
+	{
+		string cmd ( "python3 ../package/package.py " + pkgcfg + " ../package/logs " + order + " False" );
+		system ( cmd.c_str ( ) );
+	}
+	
 	return 0;
 }
