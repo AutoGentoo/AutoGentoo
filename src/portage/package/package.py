@@ -62,7 +62,7 @@ class PackageSet:
 			curr += 1
 			os.system ( "mkdir -p " + log_dir + "/" + package )
 			for stage in self.stages:
-				print ( "\r%s%s%s (%s%s%s of %s%s%s) %s(%s)%s   " % ( color.green, package, color.end, color.yellow, curr, color.end, color.yellow, total, color.end, color.bold, stage, color.end ), end="", flush=True )
+				print ( "\r%s%s %40s(%s%s%s of %s%s%s) %s%s%s" % ( color.green, package, color.end, color.yellow, curr, color.end, color.yellow, total, color.end, color.bold, str ( "(" + stage + ")" ).rjust ( 10 ), color.end ), end="", flush=True )
 				os.system ( curr_dir + "/package " + self.config[package]["file"] + " " + stage  + " > " + log_dir + "/" + package + "/" + stage + " .log" + " 2>&1" )
 			print ("")
 	def create_order ( self, order = None ):
