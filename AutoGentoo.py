@@ -66,7 +66,7 @@ class builder:
 	
 	#Partition Window Configuration
 	ask_part = Gtk.Builder()
-	ask_part.add_from_file("gtk/stepPartAsk.ui")
+	ask_part.add_from_file("gtk/stepAsk.ui")
 	css = open('gtk/style.css')
 	css_data = css.read()
 	css.close()
@@ -98,6 +98,10 @@ class builder:
 	xfce = Gtk.Builder()
 	xfce.add_from_file("gtk/stepXFCE.ui")
 	
+	#Portage Binhost Configuration
+	binhost = Gtk.Builder()
+	binhost.add_from_file("gtk/stepBinHost.ui")
+	
 	#Variables Window Configuration
 	var = Gtk.Builder()
 	var.add_from_file("gtk/stepVariables.ui")
@@ -119,7 +123,6 @@ class builder:
 	install = Gtk.Builder()
 	install.add_from_file("gtk/stepInstall.ui")
 #Change directory to /usr/lib/autogentoo
-os.chdir("/usr/lib/autogentoo")
 
 class hrefParser(HTMLParser):
 	def handle_starttag(self, tag, attrs):
@@ -291,8 +294,6 @@ def get_newpart():
 	else:
 		#MBR
 		builder.dialog_new_part = builder.adv_part.get_object("dialog-new-part-mbr")
-class old_sel:
-	gpu_driver = ""
 get_newpart()
 class makeopts:
 	use_flags = ""
@@ -332,11 +333,7 @@ class get_emerge:
 			os.system("echo -ne '\r\r\r   '")
 			os.system("sleep .5s")
 	def __init__(self, atom):
-		
 		os.system("emerge -qp %s >> temp_emerge" % atom)
-class temp:
-	part = []
-	point = []
 class package:
 	list = []
 class widget:
@@ -496,113 +493,39 @@ PORTDIR='/usr/portage'
 DISTDIR='${PORTDIR}/distfiles'
 PKGDIR='${PORTDIR}/packages'
 PORTDIR_OVERLAY=/usr/local/portage""" % (makeopts.cflags, makeopts.use_flags, gpu.vendor_class)
-class install:
-	def __init__(self):
-		cr = "chroot /mnt/gentoo/ /bin/bash -c"
-		print ("Checking for mounted devices...")
-		disk_type = diskType("%s" % systype.gendev)
-		os.system("mount | grep '%s' > mountinfo.txt" % systype.gendev)
-		mounts = open("mountinfo.txt", "r").readlines()
-		current_line_num = -1
-		while current_line_num <= len(mounts):
-			current_line_num += 1
-			current_line = mounts[current_line_num]
-			current_line = current_line.replace(" ", "")
-			temp = []
-			a = -1
-			b = ""
-			while b != "o":
-				a += 1
-				b = current_line[a]
-				temp.append(b)
-			current_part = temp
-			mounts.part.append(current_part)
-			current_line = current_line[b]
-			current_line = current_line.replace("on", "")
-			temp = []
-			a = -1
-			b = ""
-			while b != "t":
-				a += 1
-				b = current_line[a]
-				temp.append(b)
-			current_mount = temp
-			mounts.mount_point.append(current_mount)
-			current_line = current_line[b]
-			current_line = current_line.replace("type", "")
-			temp = []
-			a = -1
-			b = ""
-			while b != "(":
-				a += 1
-				b = current_line[a]
-				temp.append(b)
-			current_type = temp
-			mounts.mount_point.append(current_type)
-		if len(mounts) != 0:
-			print ("Found Mounted Partitions:")
-			current_print = -1
-			while current_print != len(mounts):
-				current_print += 1
-				print ("%s on %s as an %s filesystem" % (mounts.part[current_print], mounts.mount_point[current_print], mounts.fstype[current_print]))
-		elif len(mounts) == 0 and install_type == "default":
-			print ("No mounted parts found!")
-			print ("Detected default install type")
-			os.system("echo -ne 'Cleaning Gentoo Device... '")
-			if disk_type == "gpt":
-				os.system("parted -s %s mktable ms" % systype.gendev)
-				arg2 = "BOOT"
-			else:
-				arg2 = "primary"
-				os.system("parted -s %s mktable gpt" % systype.gendev)
-			print ("Done!")
-			print ("Creating /boot partition...")
-			os.system("parted -s %s mkpart %s ext2 1 128" % (systype.gendev, arg2))
-			os.system("parted %s set 1 lba off" % systype.gendev)
-			if disk_type == "gpt":
-				os.system("parted -s %s set 1 bios_grub on" % systype.gendev)
-			else:
-				os.system("parted -s %s set 1 boot on" % systype.gendev)
-			print ("Creating / partition...")
-			if defaults.current_root_size_unit == "g":
-				os.system("parted -s %s unit gB mkpart %s ext4 %d %s" % (systype.gendev, arg2, int(round(129/1024, 0)), int(round((systype.sizeRoot-129/1024), 0))))
-			else:
-				os.system("parted -s %s mkpart %s ext4 129 %s" % (systype.gendev, arg2, int(round(systype.sizeRoot-129), 0)))
-			os.system("echo -ne 'Formating Partitions...'")
-			os.system("mkfs.ext2 -Fq -T small %s1" % systype.gendev)
-			os.system("mkfs.ext4 -Fq -T small %s2" % systype.gendev)
-			print ("Done!")
-			os.system("echo -ne 'Mounting Partitions...'")
-			os.system("mount %s2 /mnt/gentoo" % systype.gendev)
-			os.system("mkdir -p /mnt/gentoo/boot")
-			os.system("mount %s1 /mnt/gentoo/boot" % systype.gendev)
-			print ("Done!")
-		##Step TWO##
-		#Download stage3
-		os.system("wget -q --directory-prefix=/mnt/gentoo/ distfiles.gentoo.org/releases/%s/autobuilds/%s" % (get_arch.architecture,get_arch.stage3_location))
-		#Extract stage3
-		os.system("tar xjpvf /mnt/gentoo/%s -C /mnt/gentoo/ >> AutoGentoo.log" % (get_arch.stage3name))
-		##Step Three##
-		os.system("cp -L /etc/resolv.conf /mnt/gentoo/etc 2> AutoGentoo.log")
-		os.system("%s 'emerge-webrsync' >> AutoGentoo.log 2>&1" % (cr))
-		os.system("%s 'emerge --sync' >> AutoGentoo.log" % (cr))
-		if systype.profile_num == 1:
-			systype.profile = "default/linux/amd64/13.0/desktop"
-		elif systype.profile_num == 2:
-			systype.profile = "default/linux/amd64/13.0/desktop/gnome/systemd"
-		elif systype.profile_num == 3:
-			systype.profile = "default/linux/amd64/13.0/desktop/kde"
-		elif systype.profile_num == 4:
-			systype.profile = "default/linux/amd64/13.0/desktop/plasma"
-		elif systype.profile_num == 5:
-			systype.profile = "default/linux/amd64/13.0/"
-		os.system("%s 'eselect profile set %s'" % (cr, systype.profile))
-		os.system("rm -rf /mnt/gentoo/etc/locale.gen")
-		os.system("rm -rf /mnt/gentoo/etc/portage/make.conf")
-		locale_gen_file = open("/mnt/gentoo/etc/locale.gen", "w+")
-		locale_gen_file.write(config.localegen)
-		make_conf_file = open("/mnt/gentoo/etc/portage/make.conf", "w+")
-		make_conf_file.write(config.makeconf)
+def do_packages ( ):
+	os.system ( "emerge \"%s\" > temp.cfg" % ' '.join ( package.list ) )
+def write_config ( ):
+	curl --output /dev/null --silent --head --fail
+	write_out = []
+	write_out.append ( "[config]" )
+	write_out.append ( "profile=%s" % defaults.install_type )
+	write_out.append ( "hostname=%s" % defaults.hostname )
+	write_out.append ( "root_passwd=%s" % defaults.root_passwd )
+	write_out.append ( "username=%s" % defaults.username )
+	write_out.append ( "user_passwd=%s" % defaults.user_passwd )
+	write_out.append ( "updates=%s" % str ( defaults.update ).lower ( ) )
+	write_out.append ( "gentoo_device=%s" % systype.gendev )
+	write_out.append ( "[partitions]" )
+	if ( defaults.install_type == "default" ):
+		write_out.append ( "rootSize=%s" % systype.gendev )
+	else:
+		os.system ( "mount | grep \"/mnt/gentoo\" > mount.info" )
+		mounts = open ( "mount.info", "r" ).readlines ( )
+		for part in mounts:
+			part.replace ( " on", "" )
+			part.replace ( " type", "" )
+			part = part [ 0:part.find ( "(" - 1 ) ]
+			inf = part.split ( " " )
+			write_out.append ( "%s=%s" % ( inf [ 0 ], inf [ 2 ] ) )
+	write_out.append ( "[packages]" )
+	curr_dir = os.path.dirname(os.path.realpath(__file__))
+	write_out.append ( "opt=%s/temp.cfg" % curr_dir )
+	write_out.append ( "[gui]" )
+	write_out.append ( "gpu=%s" % gpu.vendor )
+	write_out.append ( "download=http://us.download.nvidia.com/XFree86/Linux-{0}/{1}/NVIDIA-Linux-{0}-{1}.run".format ( platform.machine(), gpu.working_driver_version ) )
+	write_out.append ( "xserver=%s" % xserver.xserver )
+	write_out.append ( "manager=%s" % xserver.xserver )
 def do_part_first(disk_num, unit="MiB"):
 	disk()
 	find_disk = disk.disks[disk_num]
@@ -1517,22 +1440,27 @@ def goto_none(button):
 	toplevel_window = builder.user.get_object("top_level")
 	toplevel_window.reparent(builder.main_window)
 	builder.main_window.add(toplevel_window)
-def xdm(button):
-	xserver.display_manager = "xdm"
-	top_level = builder.xfce.get_object("top_level")
+def dm_next ( gui ):
+	exec ( "top_level = builder.%s.get_object(\"top_level\")" % gui )
 	builder.main_window.remove(top_level)
-	toplevel_window = builder.user.get_object("top_level")
+	toplevel_window = builder.binhost.get_object("top_level")
 	toplevel_window.reparent(builder.main_window)
 	builder.main_window.add(toplevel_window)
+def xdm(button):
+	xserver.display_manager = "xdm"
+	dm_next ( "xfce" )
 def gdm(button):
 	xserver.display_manager = "gdm"
-	
+	dm_next ( "gnome" )
 def kdm(button):
 	xserver.display_manager = "kdm"
+	dm_next ( "kde" )
 def lightdm(button):
 	xserver.display_manager = "lightdm"
+	dm_next ( xserver.xserver )
 def startx(button):
 	xserver.display_manager = "startx"
+	dm_next ( xserver.xserver )
 
 main_handlers = {
 	"exit": Gtk.main_quit,
@@ -1611,6 +1539,21 @@ xserver_handlers = {
 	"kde": goto_kde,
 	"none": goto_none,
 	"Back": Backxserver}
+xfce_handlers = {
+	"xdm": xdm,
+	"lightdm" : lightdm,
+	"startx" : startx
+	}
+gnome_handlers = {
+	"gdm": gdm,
+	"lightdm" : lightdm,
+	"startx" : startx
+	}
+kde_handlers = {
+	"kdm": kdm,
+	"lightdm" : lightdm,
+	"startx" : startx
+	}
 rootPart_handlers = {
 	"Next": Nextroot,
 	"Back": Backroot,
@@ -1619,7 +1562,7 @@ rootPart_handlers = {
 	"setRoot": setRoot
 	}
 user_handlers = {
-	"Next": install,
+	"Next": Gtk.main_quit,
 	"Back": Backuser,
 	"root_passwd": root_passwd,
 	"hostname": hostname,
@@ -1638,6 +1581,9 @@ class main():
 		builder.main.connect_signals(main_handlers)
 		builder.ask_part.connect_signals(part_ask_handlers)
 		builder.xserver.connect_signals(xserver_handlers)
+		builder.gnome.connect_signals(gnome_handlers)
+		builder.kde.connect_signals(kde_handlers)
+		builder.xfce.connect_signals(xfce_handlers)
 		builder.rootPart.connect_signals(rootPart_handlers)
 		builder.adv_part.connect_signals(part_advanced_handlers)
 		builder.var.connect_signals(var_handlers)
