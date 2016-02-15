@@ -40,6 +40,7 @@ public:
 	vector <NEW_MODULE> depends;
 	string type;
 	string description;
+	string help;
 	T default;
 
 	int feed(vector<string> input)
@@ -57,7 +58,6 @@ public:
 			{
 				continue;
 			}
-
 		}
 	}
 };
