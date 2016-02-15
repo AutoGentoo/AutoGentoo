@@ -43,27 +43,35 @@ public:
 	__Kconfig_Set__(string input)
 	{
 		input_str = input;
-		int p_num = 0;
-		vector<int> p_vec;
 		vector<int> i_vec;
 		for (size_t i = 0; i != input.length(); i++)
 		{
 			char c = input[i];
 			if (c == '(')
 			{
-				p_num++;
 				i_vec.push_back(i)
-				p_vec.push_back(p_num);
 			}
 			if (c == ')')
 			{
 				int open = i_vec.back();
+				i_vec.pop_back();
 				int close = i;
 				cout << open << " " << input[open] << endl;
-				cout << close << " " << input[open] << endl;
+				cout << close << " " << input[close] << endl;
+				open_vec.push_back(open);
+				close_vec.push_back(close);
+				open_to_close[open] = close;
+				close_to_open[close] = open;
 			}
 		}
 	}
 };
-
+/* Operator code
+=: set equal val
+!=: set switch bool
+(: (corresponding int)
+): (corresponding int)
+!: not (switch bool)
+&&: and
+*/
 #endif
