@@ -23,23 +23,34 @@
 #  
 
 
+from gi.repository import Gtk, GObject
+
 class __builder ( Gtk.Builder ):
 	def __init__ ( self, top_level_file ):
 		# Create the page in the step of AutoGentoo
 		self.add_from_file ( top_level_file )
 		self._file = top_level_file
 		self.main = self.get_object ( "main" )
+		self.top_level = self.get_object ( "top_level" )
+	def __getitem__ ( self, name ):
+		return self.get_object ( name )
 
-class Builder:
-	def __init__ ( self, main_file ):
+class __Builder__:
+	def __init__ ( self, main_file, main_name ):
 		self.bld_set = []
 		self._map = {}
 		buff = __builder ( main_file )
+		self.main_window = buff.main
+		self.top_level = buff.top_level
 		self.bld_set.append ( buff )
 		self._map[main_file] = buff
-	def add_builder ( self, _file ):
-		self.bld_set.append ( __builder ( _file ) )
+	def add_builder ( self, _file, name ):
+		buff = __builder ( _file )
+		self.bld_set.append ( buff )
+		self._map[main_name] = buff
 	def get_obj ( self, string ):
 		exec ( "return self.%s" % string )
 	def set_obj ( self, bld, name, obj_name = name ):
 		exec ( "self.%s = bld.get_object ( %s )" % ( name, obj_name ) )
+	def __getitem__ ( self, __builder_str__ ):
+		return self._map [ __builder_str ]

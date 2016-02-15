@@ -22,33 +22,65 @@
  */
 
 
-#ifndef __AUTOGENTOO_GTK__BUILDER__
-#define __AUTOGENTOO_GTK__BUILDER__
+#ifndef __AUTOGENTOO_GTK_BUILDER__
+#define __AUTOGENTOO_GTK_BUILDER__
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <gtkmm.h>
 
-using namespace std;
-
-class Builder
+class builder
 {
 	public:
-	Glib::RefPtr<Gtk::Builder> builder
-	Gtk::Window main;
+	Glib::RefPtr<Gtk::Builder> __builder__;
+	Gtk::Window* __main;
+	std::string __file;
+	std::string __name;
 	
-	vector < Glib::RefPtr < Gtk::Builder > > bld_set;
-	
-	Builder ( string file )
+	void init ( std::string file, std::string name )
 	{
-		builder = Gtk::Builder::create_from_file ( file.c_str ( ) );
-		builder->get_widget ( "main", main );
+		__file = file;
+		__name = name;
+		__builder__ = Gtk::Builder::create_from_file ( file.c_str ( ) );
+		__builder__->get_widget ( "main", __main );
 	}
 	
-	void get_bld ( string file )
+	template < class T >
+	T get_widget ( std::string __widget )
 	{
-		__builder = Gtk::Builder::create_from_file ( file.c_str ( ) );
-		bld_set.push_back ( __builder );
+		T return_obj;
+		__builder__->get_widget ( __widget, return_obj );
+		return return_obj;
+	}
+	
+	template < class T >
+	T operator [ ] ( std::string __widget )
+	{
+		return get_widget < T > ( __widget );
+	}
+};
+
+struct widget
+{
+	std::vector < builder > _builders_vec;
+	std::vector < std::string > _builders_name;
+	
+	void add_builder ( builder __in )
+	{
+		_builders_vec.push_back ( __in );
+		_builders_name.push_back ( __in.__file );
+	}
+	
+	builder operator [ ] ( std::string __build_str )
+	{
+		for ( size_t i = 0; i != _builders_name.size ( ); i++ )
+		{
+			if ( _builders_name [ i ] == __build_str )
+			{
+				return _builders_vec [ i ];
+			}
+		}
 	}
 };
 #endif
