@@ -61,7 +61,36 @@ public:
 		}
 	}
 };
-
+class __KCONFIG_LINE__
+{
+public:
+	bool exec_line;
+	bool has_if;
+	bool is_type;
+	bool has_prompt;
+	bool is_misc;
+	__KCONFIG_LINE__(string input)
+	{
+		vector < string > __split(misc::split(input, ' ', true));
+		for (size_t i = 0; i != __split.size(); i++)
+		{
+			string keyword(__KCONFIG_OPERATOR__ |= __split[i]);
+			if (keyword == "type")
+			{
+				is_type = true;
+				if (i + 1 >= __split.size())
+				{
+					has_prompt = false;
+				}
+				else
+				{
+					has_prompt = true;
+				}
+			}
+			if (keyword == "")
+		}
+	}
+};
 
 /*Example __KCONFIG_MODULE
 config GENTOO_LINUX_UDEV

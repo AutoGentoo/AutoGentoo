@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../../portage/tools/_misc_tools.hpp"
+#include "commands.hpp"
 
 using namespace std;
 
@@ -67,25 +67,19 @@ public:
 		}
 	}
 };
-/* Operator code
-=: set equal val
-!=: set switch bool
-(: (corresponding int)
-): (corresponding int)
-!: not (switch bool)
-&&: and
-||: or
 
-Example HELLO && ( WORLD && ( FOO || BAR ))
-
-*/
-
-
-class __KCONFIG_LANG__
+class __Kconfig_if__
 {
 public:
+	bool _true;
+	__Kconfig_if__(string input)
+	{
+		__Kconfig_Set__ group(input);
 
-	__KCONFIG_LANG(string input)
+		X86_64 || (X86_32 && HIGHMEM)
+	}
+
+	bool parse(string input)
 	{
 		vector < string > __split(misc::split(input, ' ', true));
 
