@@ -69,11 +69,4 @@ struct __KCONFIG_OPERATOR__
 		return "variable"
 	}
 };
-= : set equal val
-!= : set switch bool
-(: (corresponding int)
-	) : (corresponding int)
-	!: not (switch bool)
-	&& : and
-	|| : or
 #endif
