@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "../../portage/tools/_misc_tools.hpp"
 
 using namespace std;
 
@@ -73,5 +74,21 @@ public:
 ): (corresponding int)
 !: not (switch bool)
 &&: and
+||: or
+
+Example HELLO && ( WORLD && ( FOO || BAR ))
+
 */
+
+
+class __KCONFIG_LANG__
+{
+public:
+
+	__KCONFIG_LANG(string input)
+	{
+		vector < string > __split(misc::split(input, ' ', true));
+
+	}
+};
 #endif

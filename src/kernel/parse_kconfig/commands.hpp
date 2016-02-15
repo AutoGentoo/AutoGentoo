@@ -27,19 +27,53 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "../../portage/tools/_misc_tools.hpp"
 
 using namespace std;
 
-string __kernel_command__(string str)
+struct __KCONFIG_OPERATOR__
 {
 	vector <string> type_list;
-	type_list.push_back("bool");
-	type_list.push_back("tristate");
-	type_list.push_back("string");
-	type_list.push_back("hex");
-	type_list.push_back("int");
-	type_list.push_back("help");
+	vector <string> operator_list;
+	bool inited;
+	void init()
+	{
+		type_list.push_back("bool");
+		type_list.push_back("tristate");
+		type_list.push_back("string");
+		type_list.push_back("hex");
+		type_list.push_back("int");
+		type_list.push_back("help");
+		operator_list.push_back("=");
+		operator_list.push_back("!=");
+		operator_list.push_back("!");
+		operator_list.push_back("&&");
+		operator_list.push_back("||");
+		inited = true;
+	}
 
+	string operator|= (string compare)
+	{
+		if (!inited)
+		{
+			init();
+		}
+		if (misc::find<string>(type_list, "compare") != -1)
+		{
+			return "type";
+		}
+		if (misc::find<string>(operator_list, "compare") != -1)
+		{
+			return "operator"
+		}
+		return "variable"
+	}
 };
-
+= : set equal val
+!= : set switch bool
+(: (corresponding int)
+	) : (corresponding int)
+	!: not (switch bool)
+	&& : and
+	|| : or
 #endif
