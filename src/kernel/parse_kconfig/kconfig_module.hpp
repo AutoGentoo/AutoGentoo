@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 #include "../kernel.hpp"
-#include "../../src/portage/_misc_tools.hpp"
 #include "kernel_tools.hpp"
 
 using namespace std;
@@ -48,6 +47,17 @@ public:
 		if (input[0].substr(0, 6) != "config")
 		{
 			return 1;
+		}
+
+		vector <string> content(get_indent_content(input));
+		for (size_t i = 0; i != content.size(); i++)
+		{
+			string curr_line(content[i]);
+			if (curr_line.empty())
+			{
+				continue;
+			}
+
 		}
 	}
 };

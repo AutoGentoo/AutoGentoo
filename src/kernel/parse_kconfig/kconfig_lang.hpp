@@ -1,5 +1,5 @@
-﻿/*
-* commands.hpp
+/*
+* kconfig_lang.hpp
 *
 * Copyright 2016 Andrei Tumbar <atuser@Kronos>
 *
@@ -21,25 +21,49 @@
 *
 */
 
-#ifndef __AUTOGENTOO_KERNEL_OPERATOR__
-#define __AUTOGENTOO_KERNEL_OPERATOR__
+#ifndef __AUTOGENTOO_KERNEL_LANGUAGE__
+#define __AUTOGENTOO_KERNEL_LANGUAGE__
 
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 using namespace std;
 
-string __kernel_command__(string str)
+class __Kconfig_Set__
 {
-	vector <string> type_list;
-	type_list.push_back("bool");
-	type_list.push_back("tristate");
-	type_list.push_back("string");
-	type_list.push_back("hex");
-	type_list.push_back("int");
-	type_list.push_back("help");
+public:
+	string input_str;
+	map < int, int > open_to_close;
+	map < int, int > close_to_open;
+	vector < int > open_vec;
+	vector < int > close_vec;
 
+	__Kconfig_Set__(string input)
+	{
+		input_str = input;
+		int p_num = 0;
+		vector<int> p_vec;
+		vector<int> i_vec;
+		for (size_t i = 0; i != input.length(); i++)
+		{
+			char c = input[i];
+			if (c == '(')
+			{
+				p_num++;
+				i_vec.push_back(i)
+				p_vec.push_back(p_num);
+			}
+			if (c == ')')
+			{
+				int open = i_vec.back();
+				int close = i;
+				cout << open << " " << input[open] << endl;
+				cout << close << " " << input[open] << endl;
+			}
+		}
+	}
 };
 
 #endif
