@@ -31,11 +31,53 @@
 
 using namespace std;
 
+string get_type(string input)
+{
+	if (input == "y" || input == "n" || input == "m")
+	{
+		return "bool";
+	}
+	vector<char> nums;
+	nums.push_back('0');
+	nums.push_back('1');
+	nums.push_back('2');
+	nums.push_back('3');
+	nums.push_back('4');
+	nums.push_back('5');
+	nums.push_back('6');
+	nums.push_back('7');
+	nums.push_back('8');
+	nums.push_back('9');
+	string buff;
+	for (size_t i = 0; i != input.length(); i++)
+	{
+		char c = input[i];
+		if (c == '\"')
+		{
+			return "string";
+		}
+		if (c == '-')
+		{
+			return "int";
+		}
+		if (misc::find<string>(nums, c) != -1)
+		{
+			buff = "int";
+		}
+		else
+		{
+			return;
+		}
+	}
+	return buff;
+}
+
 class KERNEL_MODULE
 {
 	public:
 	string name;
 	string value;
+	string type;
 	bool value_bool;
 	bool valid;
 	
@@ -69,6 +111,7 @@ class KERNEL_MODULE
 		{
 			value_bool = false;
 		}
+		type = get_type(value);
 	}
 	
 	string set_value ( string val )
