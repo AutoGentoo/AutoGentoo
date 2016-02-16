@@ -25,6 +25,7 @@
 #define __AUTOGENTOO_KERNEL_TOOLS__
 
 #include <iostream>
+#include <stringstream>
 #include <string>
 #include <vector>
 
@@ -48,4 +49,15 @@ vector <string> get_indent_content(vector <string> input)
 	return return_vec;
 }
 
+template < class T >
+string vector_to_string(vector<T> input, string between="\n")
+{
+	stringstream ss;
+	for (size_t i = 0; i != input.size(); i++)
+	{
+		ss << input[i];
+		ss << between;
+	}
+	return ss.str();
+}
 #endif

@@ -94,7 +94,24 @@ public:
 					prompt = curr.split[1];
 				}
 			}
-
+			int buff;
+			if (curr.keyword == "help")
+			{
+				for (size_t j = i; i != content.size(); j++)
+				{
+					string check_line(content[j]);
+					if (check_line[0] != '\t')
+					{
+						buff = j;
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+			vector <string> buff_vec(input.begin() + i, input.begin() + buff);
+			help(vector_to_string(buff_vec));
 		}
 	}
 };
