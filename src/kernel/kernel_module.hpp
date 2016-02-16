@@ -61,7 +61,7 @@ class KERNEL_MODULE
 		}
 		value = misc::substr ( input, sp + 1, input.length ( ) );
 		name = misc::substr ( input, 0, sp );
-		if ( value == "y" )
+		if ( value == "y" or value == "m" )
 		{
 			value_bool = true;
 		}
