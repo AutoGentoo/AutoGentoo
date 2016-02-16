@@ -32,16 +32,30 @@
 
 using namespace std;
 
-template < class T >
+bool str_to_bool(string input, bool __default=false)
+{
+	if (input == "y" || input == "true" || input == "True")
+	{
+		return true;
+	}
+	if (input == "n" || input == "false" || input == "False")
+	{
+		return false;
+	}
+	return __default;
+}
+
+
 class __KCONFIG_MODULE__
 {
 public:
 	vector <KERNEL_MODULE> selects;
 	vector <NEW_MODULE> depends;
 	string type;
-	string description;
+	string prompt;
 	string help;
-	T default;
+	string value;
+	bool __bool__;
 
 	int feed(vector<string> input)
 	{
@@ -53,11 +67,34 @@ public:
 		vector <string> content(get_indent_content(input));
 		for (size_t i = 0; i != content.size(); i++)
 		{
-			string curr_line(content[i]);
-			if (curr_line.empty())
+			string curr_line_buff(content[i]);
+			if (curr_line_buff.empty())
 			{
 				continue;
 			}
+			__KCONFIG_LINE__ curr(curr_line_buff);
+			if (!curr.exec_line)
+			{
+				continue;
+			}
+			if (curr.keyword.substr(0, 3) == "def")
+			{
+				type = curr.keyword.substr(3, curr.keyword.length() - 3);
+				value = curr.split[1];
+				if (type == "bool" || type == "tristate")
+				{
+					__bool__ = str_to_bool(value);
+				}
+			}
+			else if (curr.is_type)
+			{
+				type = curr.keyword;
+				if (curr.has_prompt)
+				{
+					prompt = curr.split[1];
+				}
+			}
+
 		}
 	}
 };
@@ -69,13 +106,16 @@ public:
 	bool is_type;
 	bool has_prompt;
 	bool is_misc;
+	string keyword;
+	string __keyword;
+	vector <string> split;
 	__KCONFIG_LINE__(string input)
 	{
 		vector < string > __split(misc::split(input, ' ', true));
 		for (size_t i = 0; i != __split.size(); i++)
 		{
-			string keyword(__KCONFIG_OPERATOR__ |= __split[i]);
-			if (keyword == "type")
+			 __keyword = __KCONFIG_OPERATOR__ |= __split[i];
+			if (__keyword == "type")
 			{
 				is_type = true;
 				if (i + 1 >= __split.size())
@@ -87,8 +127,14 @@ public:
 					has_prompt = true;
 				}
 			}
-			if (keyword == "")
+			if (__keyword == "if")
+			{
+				has_if = true;
+
+			}
 		}
+		keyword = __split[0];
+		split = __split;
 	}
 };
 

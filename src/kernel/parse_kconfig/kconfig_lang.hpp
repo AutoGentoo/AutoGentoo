@@ -68,21 +68,20 @@ public:
 	}
 };
 
-class __Kconfig_if__
+bool 
+
+bool __Kconfig_if__(string input, kernel &__kernel__)
 {
-public:
-	bool _true;
-	__Kconfig_if__(string input)
+	__Kconfig_Set__ group(input);
+	vector < string > __split(misc::split(input, ' ', true));
+	__Kconfig_Set__ __group(input);
+	
+	for (size_t i = 0; i != __group.open_vec.size(); i++)
 	{
-		__Kconfig_Set__ group(input);
-
-		X86_64 || (X86_32 && HIGHMEM)
+		int open = __group.open_vec[i];
+		int close = __group.close_vec[i];
 	}
-
-	bool parse(string input)
-	{
-		vector < string > __split(misc::split(input, ' ', true));
-
-	}
-};
+	
+	/*X86_64 || (X86_32 && HIGHMEM)*/
+}
 #endif
