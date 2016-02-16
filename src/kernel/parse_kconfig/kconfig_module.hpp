@@ -111,7 +111,7 @@ public:
 				}
 			}
 			vector <string> buff_vec(input.begin() + i, input.begin() + buff);
-			help(vector_to_string(buff_vec));
+			help = vector_to_string(buff_vec);
 		}
 	}
 };
