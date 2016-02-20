@@ -25,7 +25,7 @@
 #define __AUTOGENTOO_KERNEL_TOOLS__
 
 #include <iostream>
-#include <stringstream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -34,9 +34,9 @@ using namespace std;
 vector <string> get_indent_content(vector <string> input)
 {
 	vector<string> return_vec;
-	if (input[0][0] == "\t")
+	if (input[0][0] == '\t')
 	{
-		cout << "Inproper syntax! (Tab on first line)" << endl;
+		cout << "Inproper syntax! (Found Tab on first line)" << endl;
 		return return_vec;
 	}
 

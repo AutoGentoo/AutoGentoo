@@ -27,8 +27,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "../kernel.hpp"
-#include "kernel_tools.hpp"
+#include "kconfig_line.hpp"
 
 using namespace std;
 
@@ -115,45 +114,6 @@ public:
 		}
 	}
 };
-class __KCONFIG_LINE__
-{
-public:
-	bool exec_line;
-	bool has_if;
-	bool is_type;
-	bool has_prompt;
-	bool is_misc;
-	string keyword;
-	string __keyword;
-	vector <string> split;
-	__KCONFIG_LINE__(string input)
-	{
-		vector < string > __split(misc::split(input, ' ', true));
-		for (size_t i = 0; i != __split.size(); i++)
-		{
-			 __keyword = __KCONFIG_OPERATOR__ |= __split[i];
-			if (__keyword == "type")
-			{
-				is_type = true;
-				if (i + 1 >= __split.size())
-				{
-					has_prompt = false;
-				}
-				else
-				{
-					has_prompt = true;
-				}
-			}
-			if (__keyword == "if")
-			{
-				has_if = true;
-
-			}
-		}
-		keyword = __split[0];
-		split = __split;
-	}
-};
 
 /*Example __KCONFIG_MODULE
 config GENTOO_LINUX_UDEV
@@ -184,3 +144,5 @@ config GENTOO_LINUX_UDEV
 		To ensure Gentoo Linux boots, it is best to leave this setting enabled;
 		if you run a custom setup, you could consider whether to disable this.
 */
+
+#endif
