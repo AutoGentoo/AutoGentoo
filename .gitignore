@@ -1,6 +1,6 @@
 /.project
 /src/portage/package/logs/*
-/src/graphics/*
+/src/graphics/.*
 /src/graphics/*.py
 /src/graphics/*.hpp
 *.o
