@@ -31,7 +31,7 @@
 
 using namespace std;
 
-struct __KCONFIG_OPERATOR__
+typedef struct
 {
 	vector <string> type_list;
 	vector <string> command_list;
@@ -66,7 +66,7 @@ struct __KCONFIG_OPERATOR__
 		inited = true;
 	}
 
-	string operator|= (string compare)
+	string comp (string compare)
 	{
 		if (!inited)
 		{
@@ -78,11 +78,11 @@ struct __KCONFIG_OPERATOR__
 		}
 		if (misc::find<string>(operator_list, compare) != -1)
 		{
-			return "operator"
+			return "operator";
 		}
 		if (misc::find<string>(command_list, compare) != -1)
 		{
-			return "command"
+			return "command";
 		}
 		if (misc::find<string>(skip_list, compare) != -1)
 		{
@@ -96,7 +96,7 @@ struct __KCONFIG_OPERATOR__
 		{
 			return "if";
 		}
-		return "variable"
+		return "variable";
 	}
-};
+} __KCONFIG_OPERATOR__;
 #endif
