@@ -27,6 +27,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "kernel_module.hpp"
+#include "parse_kconfig/kconfig_module.hpp"
 
 using namespace std;
 
@@ -42,7 +44,9 @@ public:
 	vector<string> DEPENDS;
 	vector<string> SELECTS;
 	bool BOOL;
-	void kconfig(__KCONFIG_MODULE__ module)
+	__KCONFIG_MODULE__ kconfig_module;
+	KERNEL_MODULE kernel_module;
+	__MODULE__ ( __KCONFIG_MODULE__ module )
 	{
 		_MOD_TYPE = "kconfig";
 		NAME = module.name;
@@ -50,8 +54,11 @@ public:
 		VALUE = module.value;
 		HELP = module.help;
 		PROMPT = module.prompt;
+		DEPENDS = module.depends;
+		SELECTS = module.selects;
+		kconfig_module = module;
 	}
-	void kernel_module(KERNEL_MODULE module)
+	__MODULE__ ( KERNEL_MODULE module )
 	{
 		_MOD_TYPE = "kernel";
 		NAME = module.name;
@@ -61,6 +68,7 @@ public:
 		{
 			BOOL = module.value_bool;
 		}
+		kernel_module = module;
 	}
 };
 
