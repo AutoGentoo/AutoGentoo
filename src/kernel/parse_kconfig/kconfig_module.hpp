@@ -48,13 +48,15 @@ bool str_to_bool(string input, bool __default=false)
 class __KCONFIG_MODULE__
 {
 public:
-	vector <KERNEL_MODULE> selects;
-	vector <NEW_MODULE> depends;
+	vector <string> selects;
+	vector <string> depends;
 	string type;
+	string name;
 	string prompt;
 	string help;
 	string value;
 	bool __bool__;
+	bool is_kernel_module;
 
 	int feed(vector<string> input)
 	{
@@ -62,7 +64,8 @@ public:
 		{
 			return 1;
 		}
-
+		string in_buff ( input[0] );
+		name = in_buff.erase ( 0, 7 );
 		vector <string> content(get_indent_content(input));
 		for (size_t i = 0; i != content.size(); i++)
 		{
@@ -71,7 +74,7 @@ public:
 			{
 				continue;
 			}
-			__KCONFIG_LINE__ curr(curr_line_buff);
+			__KCONFIG_LINE__ curr ( curr_line_buff );
 			if (!curr.exec_line)
 			{
 				continue;
@@ -109,6 +112,9 @@ public:
 					}
 				}
 			}
+			if ( curr.keywords == "command" )
+			{
+				if 
 			vector <string> buff_vec(input.begin() + i, input.begin() + buff);
 			help = vector_to_string(buff_vec);
 		}
