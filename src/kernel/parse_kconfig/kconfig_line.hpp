@@ -27,6 +27,7 @@
 #include <iostream>
 #include "../kernel.hpp"
 #include "kernel_tools.hpp"
+#include "kconfig_operator.hpp"
 
 class __KCONFIG_LINE__
 {
@@ -38,13 +39,15 @@ public:
 	bool is_misc;
 	string keyword;
 	string __keyword;
+	string if_stat;
 	vector <string> split;
 	__KCONFIG_LINE__(string input)
 	{
 		vector < string > __split(misc::split(input, ' ', true));
 		for (size_t i = 0; i != __split.size(); i++)
 		{
-			 __keyword = __KCONFIG_OPERATOR__ |= __split[i];
+			__KCONFIG_OPERATOR__ op_buff;
+			__keyword = op_buff.comp ( __split[i] );
 			if (__keyword == "type")
 			{
 				is_type = true;
@@ -60,7 +63,7 @@ public:
 			if (__keyword == "if")
 			{
 				has_if = true;
-
+				if_stat = misc::merge ( vector < string > ( __split.begin ( ) + i + 1, __split.end ( ) ), " " );
 			}
 		}
 		keyword = __split[0];

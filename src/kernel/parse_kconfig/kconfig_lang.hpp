@@ -68,9 +68,9 @@ public:
 	}
 };
 
-bool 
+bool __IF__
 
-bool __Kconfig_if__(string input, kernel &__kernel__)
+bool __Kconfig_if__(string input, menuconfig &kernel)
 {
 	__Kconfig_Set__ group(input);
 	vector < string > __split(misc::split(input, ' ', true));
