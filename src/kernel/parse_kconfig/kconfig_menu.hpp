@@ -33,8 +33,10 @@
 class __KCONFIG_MENU__
 {
 	public:
+	bool value;
 	vector <__KCONFIG_MENU__> menu_list;
 	vector <__KCONFIG_MODULE__> module_list;
+	__KCONFIG_MENU__
 	void add_item ( __KCONFIG_MENU__ input )
 	{
 		menu_list.push_back ( input );

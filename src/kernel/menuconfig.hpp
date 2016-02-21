@@ -31,8 +31,15 @@
 #include <map>
 #include "kconfig_module.hpp"
 
-class menuconfig
+class __FULL_KERNEL__
 {
 	public:
+	vector < __KCONFIG_MENU__ > menu_list;
+	vector < string > menu_name_list;
+	map < string, int > find_menu;
+	
 	vector < __KCONFIG_MODULE__ > module_list;
-	map 
+	vector < string > name_list;
+	map < string, int > find_module;
+	
+	void parse 

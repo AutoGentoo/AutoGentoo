@@ -21,20 +21,20 @@
  * 
  */
 
-#ifndef __AUTOGENTOO_NEW_KERNEL_MODULE__
-#define __AUTOGENTOO_NEW_KERNEL_MODULE__
+#ifndef __AUTOGENTOO_NEW_MODULE__
+#define __AUTOGENTOO_NEW_MODULE__
 
 #include <iostream>
-#include "kernel_module.hpp"
+#include "module.hpp"
 
 using namespace std;
 
-class NEW_MODULE: public KERNEL_MODULE
+class NEW_MODULE: public __MODULE__
 {
 	public:
 	string changed_value;
 	
-	NEW_MODULE ( string input, string _changed_value ) : KERNEL_MODULE ( input )
+	NEW_MODULE ( string input, string _changed_value ) : __MODULE__ ( input )
 	{
 		changed_value = _changed_value;
 	}
