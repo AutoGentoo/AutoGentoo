@@ -30,8 +30,6 @@
 #include "kernel_module.hpp"
 #include "parse_kconfig/kconfig_module.hpp"
 
-using namespace std;
-
 class __MODULE__
 {
 public:

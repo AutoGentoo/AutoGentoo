@@ -81,7 +81,7 @@ class KERNEL_MODULE
 	bool value_bool;
 	bool valid;
 	
-	KERNEL_MODULE ( string input )
+	KERNEL_MODULE ( string input = "" )
 	{
 		if ( input [ 0 ] == '#' and input.substr ( 0, 8 ) != "# CONFIG" )
 		{
