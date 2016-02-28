@@ -23,15 +23,22 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=7
+current_page=14
 FILE_NAME_0=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fkernel.hpp;0;4
-FILE_NAME_1=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fkernel_module.hpp;0;4
+FILE_NAME_1=1767;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fkernel_module.hpp;0;4
 FILE_NAME_2=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fkernel_test.cxx;0;4
 FILE_NAME_3=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fmenuconfig.hpp;0;4
-FILE_NAME_4=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fmodule.hpp;0;4
+FILE_NAME_4=1246;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fmodule.hpp;0;4
 FILE_NAME_5=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fnew_kernel.cxx;0;4
 FILE_NAME_6=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fnew_kernel_module.hpp;0;4
 FILE_NAME_7=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fnew_module.hpp;0;4
+FILE_NAME_8=2651;C++;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fkernel%2Fparse_kconfig%2Fkconfig_module.hpp;0;4
+FILE_NAME_9=277;None;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fconfigs%2FKconfig;0;4
+FILE_NAME_10=2696;Make;0;EUTF-8;1;1;0;%2Fusr%2Fsrc%2Flinux%2FMakefile;0;4
+FILE_NAME_11=0;C;0;EUTF-8;1;1;0;%2Fusr%2Fsrc%2Flinux%2Fscripts%2Fkconfig%2Fmconf.c;0;4
+FILE_NAME_12=0;None;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fconfigs%2FKconfig_distro;0;4
+FILE_NAME_13=0;None;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fconfigs%2FKconfig_drivers;0;4
+FILE_NAME_14=349;Conf;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2F.ssh%2Fconfig;0;4
 
 [VTE]
 last_dir=/home/atuser/Documents
