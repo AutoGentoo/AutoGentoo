@@ -73,6 +73,8 @@ class AutoGentoo_Config
 			buff_map [ val_split [ 0 ] ] = val_split [ 1 ];
 			buff_list.push_back ( val_split [ 0 ] );
 		}
+		variables [ curr_section ] = buff_map;
+		variables_list [ curr_section ] = buff_list;
 	}
 	
 	map < string, string > operator [ ] ( string sect )
