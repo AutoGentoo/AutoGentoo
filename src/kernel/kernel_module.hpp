@@ -60,13 +60,13 @@ string get_type(string input)
 		{
 			return "int";
 		}
-		if (misc::find<string>(nums, c) != -1)
+		if (misc::find<char>(nums, c) != -1)
 		{
 			buff = "int";
 		}
 		else
 		{
-			return;
+			return "";
 		}
 	}
 	return buff;
