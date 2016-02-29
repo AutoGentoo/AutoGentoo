@@ -37,7 +37,7 @@ class NewKernel
 {
 	public:
 	string input;
-	string ouput;
+	string output;
 	string arch;
 	kernel __kernel;
 	
@@ -58,7 +58,7 @@ class NewKernel
 	
 	void _change_mod ( NEW_MODULE __new, bool write = true )
 	{
-		__kernel.set_module ( __new.name, __new.changed_value );
+		__kernel.set_module ( __new.NAME, __new.changed_value );
 		if ( write )
 		{
 			__kernel.write ( );
