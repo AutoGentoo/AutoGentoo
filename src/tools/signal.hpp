@@ -21,6 +21,8 @@
  * 
  */
 
+#ifndef __AUTOGENTOO_SIGNAL__
+#define __AUTOGENTOO_SIGNAL__
 
 #include <iostream>
 #include <string>
@@ -30,3 +32,5 @@ typedef struct
 	string name;
 	int line_num;
 } AG_SIGNAL;
+
+#endif
