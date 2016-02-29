@@ -22,6 +22,9 @@
  */
 
 
+#ifndef __AUTOGENTOO_SECTION_DIVIDE__
+#define __AUTOGENTOO_SECTION_DIVIDE__
+
 #include <iostream>
 #include <string>
 #include "file.hpp"
@@ -71,3 +74,5 @@ class SectionDivide
 		}
 	}
 };
+
+#endif
