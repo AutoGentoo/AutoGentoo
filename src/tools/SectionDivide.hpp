@@ -62,11 +62,11 @@ class SectionDivide
 			
 			if ( curr_split [ search_num ] == end_s )
 			{
-				if ( end_i == -1 )
+				--curr_g;
+				if ( curr_g == -1 )
 				{
 					end_i = i;
 				}
-				--curr_g;
 			}
 		}
 	}
