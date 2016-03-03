@@ -66,9 +66,9 @@ class part:
 				part.fileSystem.append(None)
 			else:
 				part.fileSystem.append(x.fileSystem.type)
-			mount = os.system("mount | grep '%s '" % x.path)
-			if mount == 0:
-				mount = str(subprocess.check_output("mount | grep '%s '" % x.path, shell=True))
+			mount_find = os.system("mount | grep '%s '" % x.path)
+			if mount_find == 0:
+				mount = subprocess.check_output("mount | grep '%s '" % x.path, shell=True).decode(encoding="utf-8", errors="strict")
 				mount = mount.replace(x.path, "")
 				mount = mount.replace(" on ", "")
 				part.mounts.append(get_value(mount, 0)[0])

@@ -22,11 +22,6 @@
 #  
 #  
 
-import os, sys
-
-os.chdir(os.path.dirname(__file__))
-sys.path.append(".")
-
 from AutoGentoo import *
 print ("""
  ______              __                 ____                       __                        

@@ -24,15 +24,9 @@
 #  
 
 import os, sys, time, subprocess, platform
-from gi.repository import Gtk, Vte, GObject, Gdk, GLib, GdkPixbuf, Pango
-from stepPart import *
-from HTMLParser import HTMLParser
-from htmlentitydefs import name2codepoint
-
-FileNotFoundError = IOError
-
-global input
-input = raw_input
+from gi.repository import Gtk, Vte, GObject, GLib, Pango
+from src.partitions.stepPart import *
+from html.parser import HTMLParser
 
 global top_level
 class defaults:
@@ -71,7 +65,7 @@ class builder:
 	css_data = css.read()
 	css.close()
 	style_provider = Gtk.CssProvider()
-	style_provider.load_from_data(css_data)
+	style_provider.load_from_path('gtk/style.css')
 	Gtk.StyleContext.add_provider_for_screen(
 		Gdk.Screen.get_default(), style_provider,
 		Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
@@ -434,7 +428,7 @@ class widget:
 	install_top_level = builder.install.get_object("top_level")
 	scrollwindow_terminal = builder.install.get_object("scrollwindow_terminal")
 	terminal = Vte.Terminal()
-	terminal.spawn_sync(Vte.PtyFlags.DEFAULT, os.environ['HOME'], ["/usr/bin/autogentoolog"], [], GLib.SpawnFlags.DO_NOT_REAP_CHILD, None, None)
+	#terminal.spawn_sync(Vte.PtyFlags.DEFAULT, os.environ['HOME'], ["/usr/bin/autogentoolog"], [], GLib.SpawnFlags.DO_NOT_REAP_CHILD, None, None)
 	scrollwindow_terminal.add(terminal)
 	logical = builder.adv_part.get_object("partition_create_type_logical")
 	primary = builder.adv_part.get_object("partition_create_type_primary")
@@ -496,7 +490,7 @@ PORTDIR_OVERLAY=/usr/local/portage""" % (makeopts.cflags, makeopts.use_flags, gp
 def do_packages ( ):
 	os.system ( "emerge \"%s\" > temp.cfg" % ' '.join ( package.list ) )
 def write_config ( ):
-	curl --output /dev/null --silent --head --fail
+	os.system ("curl --output /dev/null --silent --head --fail")
 	write_out = []
 	write_out.append ( "[config]" )
 	write_out.append ( "profile=%s" % defaults.install_type )
@@ -552,7 +546,7 @@ def do_part_first(disk_num, unit="MiB"):
 	while curr_remove != len(disk.disks):
 		curr_remove += 1
 		widget.set_disk.remove(0)
-	print "\n Number of Disks: %s" % len(disk.disks)
+	print ("\n Number of Disks: %s" % len(disk.disks))
 	for x in range(0, len(disk.disks)):
 		disk()
 		widget.set_disk.insert(x, str(x), disk.disks[x])
@@ -737,7 +731,7 @@ def change_disk_root(combo):
 		disk_num = int(disk_num)
 		print("Disk: %s" % current_disk, disk_num)
 		disk()
-		print disk.unit
+		print (disk.unit)
 		global current_root_disk
 		current_root_disk = disk_num
 		systype.gendev = current_disk
@@ -791,11 +785,11 @@ def part_selected(selection):
 			widget.change_part.set_sensitive(False)
 		global main_selection
 		main_selection = str(model[treeiter][0])
-		print "Selected Part:", main_selection
+		print ("Selected Part:", main_selection)
 		current.size = str(widget.partitions.get_value(treeiter, 3))
 		current.start = str(widget.partitions.get_value(treeiter, 5))
 		current.end = str(widget.partitions.get_value(treeiter, 6))
-		print "Size:", current.size, "\n", "Start:", current.start, "\n", "End:", current.end
+		print ("Size:", current.size, "\n", "Start:", current.start, "\n", "End:", current.end)
 def set_gentoo_device(combo):
 	tree_iter = combo.get_active_iter()
 	if tree_iter != None:
@@ -810,7 +804,7 @@ def set_gentoo_device(combo):
 		systype.gendev = main_disk
 		builder.disk_type = diskType(main_disk)
 		get_newpart()
-		print id_num
+		print (id_num)
 		do_part(id_num)
 		widget.add_part.set_sensitive(False)
 		widget.change_part.set_sensitive(False)
@@ -902,12 +896,12 @@ def part_format_type(combo):
 def format_part(button):
 	systype.fs_id = widget.format_type_change.get_active()
 	systype.fs_id += 1
-	print systype.fs_id
+	print (systype.fs_id)
 	umount = os.system("umount %s" % main_selection)
 	if umount != 0:
 		print ("Continueing")
 	if systype.fs_id != 3:
-		print systype.fs_id
+		print (systype.fs_id)
 		if systype.fs_id == 1:
 			print ("Formating in ext2")
 			os.system("mkfs.ext2 -F -T small %s" % (main_selection))
@@ -1041,7 +1035,7 @@ def get_end(size):
 	return end
 def part_label(entry):
 	current.label = entry.get_text()
-	print current.label
+	print (current.label)
 def find_table(combo):
 	tree_iter = combo.get_active_iter()
 	if tree_iter != None:
@@ -1249,7 +1243,7 @@ def package_select(selection):
 		widget.delete_pkg.set_sensitive(True)
 		global pkg_sel
 		pkg_sel = str(model[treeiter_pkg][0])
-		print "Selected Package:", pkg_sel
+		print ("Selected Package:", pkg_sel)
 	else:
 		widget.delete_pkg.set_sensitive(False)
 def rm_pkg(button):
@@ -1410,7 +1404,7 @@ def shutdown(*args):
 	Gtk.main_quit()
 def goto_xfce(button):
 	xserver.xserver = "xfce"
-	print xserver.xserver
+	print (xserver.xserver)
 	top_level = builder.xserver.get_object("top_level")
 	builder.main_window.remove(top_level)
 	toplevel_window = builder.xfce.get_object("top_level")
@@ -1418,7 +1412,7 @@ def goto_xfce(button):
 	builder.main_window.add(toplevel_window)
 def goto_gnome(button):
 	xserver.xserver = "gnome"
-	print xserver.xserver
+	print (xserver.xserver)
 	top_level = builder.xserver.get_object("top_level")
 	builder.main_window.remove(top_level)
 	toplevel_window = builder.gnome.get_object("top_level")
@@ -1426,7 +1420,7 @@ def goto_gnome(button):
 	builder.main_window.add(toplevel_window)
 def goto_kde(button):
 	xserver.xserver = "kde"
-	print xserver.xserver
+	print (xserver.xserver)
 	top_level = builder.xserver.get_object("top_level")
 	builder.main_window.remove(top_level)
 	toplevel_window = builder.kde.get_object("top_level")
@@ -1434,7 +1428,7 @@ def goto_kde(button):
 	builder.main_window.add(toplevel_window)
 def goto_none(button):
 	xserver.xserver = "none"
-	print xserver.xserver
+	print (xserver.xserver)
 	top_level = builder.xserver.get_object("top_level")
 	builder.main_window.remove(top_level)
 	toplevel_window = builder.user.get_object("top_level")
