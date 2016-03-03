@@ -739,7 +739,6 @@ to remove this partition&lt;/small&gt;</property>
                 <property name="halign">start</property>
                 <property name="hexpand">True</property>
                 <property name="yalign">0.49000000953674316</property>
-                <signal name="clicked" handler="cache" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">6</property>
