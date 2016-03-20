@@ -56,13 +56,7 @@ class Warning
 		for ( size_t x = 0; x != input.size ( ); x++ )
 		{
 			string in = input [ x ];
-			if ( in.substr ( 0, 7 ) == string ( "[blocks" ) )
-			{
-				type = "blocks";
-				lineNum = x;
-				break;
-			}
-			else if ( in.substr ( 0, 12 ) == "!!! Problem " )
+			if ( in.substr ( 0, 12 ) == "!!! Problem " )
 			{
 				type = "useReq";
 				lineNum = x;
@@ -90,12 +84,6 @@ class Warning
 	
 	void doWork ( void )
 	{
-		if ( type == "blocks" )
-		{
-			blocks b ( input [ lineNum ] );
-			string unmerge ( "emerge --rage-clean " + b.blocked );
-			system ( unmerge.c_str ( ) );
-		}
 		if ( type == "slot" )
 		{
 			string pkg = input [ lineNum + 3 ];

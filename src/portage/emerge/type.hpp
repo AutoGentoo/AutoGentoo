@@ -59,6 +59,7 @@ class Type
 	{
 		vector< vector<string> > usegroups;
 		vector<string> packageLines;
+		vector<string> blocksLines;
 		vector< vector<string> > warninggroups;
 		for ( size_t y = 0; y != inputFile.size ( ); y++ )
 		{
@@ -96,6 +97,10 @@ class Type
 			if ( t == "package" )
 			{
 				packageLines.push_back ( line );
+			}
+			if ( t == "blocks" )
+			{
+				blocksLines.push_back ( line );
 			}
 			if ( t == "warning" )
 			{
@@ -135,6 +140,14 @@ class Type
 			EmergePackage current ( buff );
 			packages.push_back ( current );
 		}
+		for ( size_t y = 0; y != blocksLines.size ( ); y++ )
+		{
+			string buff = blocksLines[y];
+			trim ( buff );
+			blocks current ( buff );
+			string unmerge ( "emerge --rage-clean " + current.blocked );
+			system ( unmerge.c_str ( ) );
+		}
 		for ( size_t y = 0; y != warninggroups.size ( ); y++ )
 		{
 			Warning current ( warninggroups[y] );
@@ -151,6 +164,10 @@ class Type
 		else if ( line.substr ( 0, 7 ) == string ( "[ebuild" ) )
 		{
 			return "package";
+		}
+		else if ( line.substr ( 0, 7 ) == string ( "[blocks" ) )
+		{
+			return "blocks";
 		}
 		else if ( line.substr ( 0, 5 ) == string ( "These" ) or line.substr ( 0, 11 ) == string ( "Calculating" ) or line.substr ( 0, 5 ) == string ( "Total" ) or line.substr ( 0, 2 ) == string ( " *" ) )
 		{
