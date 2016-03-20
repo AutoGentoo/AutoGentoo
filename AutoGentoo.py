@@ -522,6 +522,7 @@ def write_config ( ):
 	write_out.append ( "manager=%s" % xserver.xserver )
 def do_part_first(disk_num, unit="MiB"):
 	disk()
+	
 	find_disk = disk.disks[disk_num]
 	part(find_disk, "MiB")
 	iters = []
@@ -1455,6 +1456,8 @@ def lightdm(button):
 def startx(button):
 	xserver.display_manager = "startx"
 	dm_next ( xserver.xserver )
+def cache_partitions(button):
+	
 
 main_handlers = {
 	"exit": Gtk.main_quit,
@@ -1500,7 +1503,8 @@ part_advanced_handlers = {
 	"new_table": mk_table,
 	"make_table": make_table,
 	"find_table": find_table,
-	"format_iter": format_iter
+	"format_iter": format_iter,
+	"cache": cache_partitions
 	}
 var_handlers = {
 	"Next": Nextvar,
