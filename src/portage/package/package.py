@@ -48,7 +48,7 @@ class EmergeSet:
 		os.system ( "cd %s && ../emerge/emerge %s %s %s" % ( os.path.dirname ( os.path.abspath ( __file__ ) ), self.package, self.in_cfg, self.out_cfg ) )
 
 class PackageSet:
-	def __init__ ( self, cfg_file, log_dir, order = None ):
+	def __init__ ( self, cfg_file, log_dir, order = None, misc = False ):
 		self.stages = []
 		self.create_order ( order )
 		curr_dir = os.path.dirname ( os.path.abspath ( __file__ ) )
@@ -59,6 +59,10 @@ class PackageSet:
 		curr = 0
 		total = len ( self.config.sections ( ) )
 		for package in self.config.sections ( ):
+			keys = self.config [ package ] [ keys ].replace ( "[", "" ).replace ( "]", "" )
+			if misc:
+				if "reinstall" in keys:
+					continue
 			curr += 1
 			os.system ( "mkdir -p " + log_dir + "/" + package )
 			for stage in self.stages:
@@ -69,6 +73,7 @@ class PackageSet:
 		if ( order ):
 			self.stages = order;
 		else:
+			self.stages.append ( "fetch" )
 			self.stages.append ( "pretend" )
 			self.stages.append ( "setup" )
 			self.stages.append ( "unpack" )
@@ -110,6 +115,17 @@ def main ( argv = sys.argv ):
 	else:
 		if argv [ 4 ].lower ( ) == "false":
 			do_set = False
+		else:
+			do_set = True
+	try:
+		argv [ 5 ];
+	except IndexError:
+		misc = False
+	else:
+		if argv [ 5 ].lower ( ) == "true":
+			misc = True
+		else:
+			misc = False
 	if do_set:
 		current_emg = EmergeSet ( package )
 		current_pkg = PackageSet ( current_emg.out_cfg, log, order )
