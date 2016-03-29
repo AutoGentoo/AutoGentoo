@@ -89,9 +89,8 @@ int main(int argc, char* args[])
 	Emerge ( argv [ 0 ], cfg, pkgcfg, pretend, options );
 	if ( !no_real )
 	{
-		string cmd ( "python3 ../package/package.py " + pkgcfg + " ../package/logs " + order + " False" + misc );
+		string cmd ( "python3 ../package/package.py " + pkgcfg +" ../package/logs " + order + " false" + misc );
 		system ( cmd.c_str ( ) );
 	}
-	
 	return 0;
 }
