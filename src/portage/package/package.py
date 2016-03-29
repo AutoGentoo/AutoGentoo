@@ -48,7 +48,7 @@ class EmergeSet:
 		os.system ( "cd %s && ../emerge/emerge %s %s %s" % ( os.path.dirname ( os.path.abspath ( __file__ ) ), self.package, self.in_cfg, self.out_cfg ) )
 
 class PackageSet:
-	def __init__ ( self, cfg_file, log_dir, order = None, misc = False ):
+	def __init__ ( self, cfg_file, log_dir, order = None, misc = False, ebuild_opts = "" ):
 		self.stages = []
 		self.create_order ( order )
 		curr_dir = os.path.dirname ( os.path.abspath ( __file__ ) )
@@ -65,8 +65,7 @@ class PackageSet:
 					pkgs.append ( p )
 			total = len ( pkgs )
 		for package in self.config.sections ( ):
-			keys = self.config [ package ] [ "keys" 
-].replace ( "[", "" ).replace ( "]", "" ).split ( "," )
+			keys = self.config [ package ] [ "keys" ].replace ( "[", "" ).replace ( "]", "" ).split ( "," )
 			if misc:
 				if "reinstall" in keys:
 					continue
@@ -74,7 +73,7 @@ class PackageSet:
 			os.system ( "mkdir -p " + log_dir + "/" + package )
 			for stage in self.stages:
 				print ( "\r%s%s-%s%s (%s%s%s of %s%s%s) %s(%s)%s   " % ( color.green, package, self.config[package]["version"].replace("\"", "" ), color.end, color.yellow, curr, color.end, color.yellow, total, color.end, color.bold, stage, color.end ), end="", flush=True )
-				os.system ( curr_dir + "/package " + self.config[package]["file"] + " " + stage  + " > " + log_dir + "/" + package + "/" + stage + " .log" + " 2>&1" )
+				os.system ( curr_dir + "/package " + self.config[package]["file"] + " " + stage + " " + ebuild_opts + " > " + log_dir + "/" + package + "/" + stage + " .log" + " 2>&1" )
 			print ("")
 	def create_order ( self, order = None ):
 		if ( order ):
@@ -133,12 +132,17 @@ def main ( argv = sys.argv ):
 			misc = True
 		else:
 			misc = False
+	try:
+		argv [ 6 ];
+	except IndexError:
+		opts = ""
+	else:
+		opts = argv [ 6 ]
 	if do_set:
 		current_emg = EmergeSet ( package )
-		current_pkg = PackageSet ( current_emg.out_cfg, log, 
-order, misc )
+		current_pkg = PackageSet ( current_emg.out_cfg, log, order, misc, opts )
 	else:
-		current_pkg = PackageSet ( package, log, order, misc )
+		current_pkg = PackageSet ( package, log, order, misc, opts )
 try:
 	main ( )
 except KeyboardInterrupt:

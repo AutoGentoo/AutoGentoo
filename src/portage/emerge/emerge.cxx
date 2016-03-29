@@ -36,6 +36,7 @@ int main(int argc, char* args[])
 	string order;
 	string options;
 	string misc ("False");
+	string opts;
 	bool pretend = true;
 	bool no_real = true;
 	for ( int i = 1; i != argc; i++ )
@@ -86,10 +87,14 @@ int main(int argc, char* args[])
 	{
 		misc = argv [ 7 ];
 	}
+	if ( argc > 9 )
+	{
+		opts = argv [ 8 ];
+	}
 	Emerge ( argv [ 0 ], cfg, pkgcfg, pretend, options );
 	if ( !no_real )
 	{
-		string cmd ( "python3 ../package/package.py " + pkgcfg +" ../package/logs " + order + " false" + misc );
+		string cmd ( "python3 ../package/package.py " + pkgcfg + " ../package/logs " + order + " false " + misc + " " + opts );
 		system ( cmd.c_str ( ) );
 	}
 	return 0;

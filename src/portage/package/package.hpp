@@ -130,118 +130,119 @@ class Package
 		file = "/usr/portage/" + catagory + "/" + directory + "/" + _file + ".ebuild";
 	}
 	
-	void pkg_fetch ( string _file = "" )
+	void pkg_fetch ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " fetch" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " fetch" );
 		system ( cmd.c_str ( ) );
 	}
-	void pkg_setup ( string _file = "" )
+	void pkg_setup ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " setup" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " setup" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_unpack ( string _file = "" )
+	void src_unpack ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " unpack" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " unpack" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_prepare ( string _file = "" )
+	void src_prepare ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " prepare" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " prepare" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_configure ( string _file = "" )
+	void src_configure ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " configure" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " configure" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_compile ( string _file = "" )
+	void src_compile ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " compile" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " compile" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_test ( string _file = "" )
+	void src_test ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " test" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " test" );
 		system ( cmd.c_str ( ) );
 	}
-	void src_install ( string _file = "" )
+	void src_install ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " install" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " install" );
 		system ( cmd.c_str ( ) );
 	}
-	void pkg_preinst ( string _file = "" )
+	void pkg_preinst ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " preinst" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " preinst" );
 		system ( cmd.c_str ( ) );
 	}
-	void pkg_postinst ( string _file = "" )
+	void pkg_postinst ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " postinst" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " postinst" );
 		system ( cmd.c_str ( ) );
 	}
-	void pkg_prerm ( string _file = "" )
+	void pkg_prerm ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " prerm" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " prerm" );
 		system ( cmd.c_str ( ) );
 	}
-	void pkg_postrm ( string _file = "" )
+	void pkg_postrm ( string _file = "", string ebuild_opts = "" )
 	{
 		if ( _file.empty ( ) )
 		{
 			_file = file;
 		}
-		string cmd ( "ebuild " + _file + " postrm" );
+		string cmd ( "ebuild " + ebuild_opts + " " +_file + " postrm" );
 		system ( cmd.c_str ( ) );
 	}
 };
-void pkg_do_key ( string keyword, string _file )
+void pkg_do_key ( string keyword, string _file, string ebuild_opts )
 {
-	string cmd ( "ebuild " + _file + " " + keyword );
+	cout << ebuild_opts << endl;
+	string cmd ( "ebuild " + ebuild_opts + " " + _file + " " + keyword );
 	system ( cmd.c_str ( ) );
 }
 #endif
