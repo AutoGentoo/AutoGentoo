@@ -454,7 +454,6 @@ class config:
 # Whenever glibc is emerged, the locales listed here will be automatically
 # rebuilt for you.  After updating this file, you can simply run `locale-gen`
 # yourself instead of re-emerging glibc.
-
 en_US ISO-8859-1"
 en_US.UTF-8 UTF-8"
 ja_JP.EUC-JP EUC-JP"
@@ -522,7 +521,6 @@ def write_config ( ):
 	write_out.append ( "manager=%s" % xserver.xserver )
 def do_part_first(disk_num, unit="MiB"):
 	disk()
-	
 	find_disk = disk.disks[disk_num]
 	part(find_disk, "MiB")
 	iters = []
@@ -1456,8 +1454,6 @@ def lightdm(button):
 def startx(button):
 	xserver.display_manager = "startx"
 	dm_next ( xserver.xserver )
-def cache_partitions(button):
-	
 
 main_handlers = {
 	"exit": Gtk.main_quit,
@@ -1503,8 +1499,7 @@ part_advanced_handlers = {
 	"new_table": mk_table,
 	"make_table": make_table,
 	"find_table": find_table,
-	"format_iter": format_iter,
-	"cache": cache_partitions
+	"format_iter": format_iter
 	}
 var_handlers = {
 	"Next": Nextvar,
