@@ -341,6 +341,7 @@ class widget:
 	for i, column_title in enumerate(["Partition", "Filesystem", "Partition Type", "Size", "Mount Point", "Start", "End"]):
 		renderer = Gtk.CellRendererText()
 		column = Gtk.TreeViewColumn(column_title, renderer, text=i)
+		column.set_resizable ( True )
 		treeview.append_column(column)
 		if i == "Partition":
 			treeview.set_expander_column(column)
@@ -365,7 +366,6 @@ class widget:
 	mount_point_change = builder.adv_part.get_object("mount_point_change")
 	loading_spinner = builder.adv_part.get_object("loading_spinner")
 	loading_spinner.set_visible(False)
-	recalculating = builder.adv_part.get_object("recalculating")
 	memory_bar = builder.var.get_object("memory_bar")
 	memory_label = builder.var.get_object("memory_label")
 	desktop_manager = builder.var.get_object("desktop_manager")
@@ -556,17 +556,14 @@ def do_part(disk_num, unit="MiB"):
 		print ("No disk selected")
 		return
 	#Show the loading bar
-	widget.recalculating.set_label("Recalculating Partitions...")
 	widget.loading_spinner.set_visible(True)
 	widget.loading_spinner.start()
-	widget.recalculating.set_visible(True)
 	#Check if disk exists
 	disk()
 	find_disk = disk.disks[disk_num]
 	if not os.path.exists(find_disk):
 		print ("This disk has been removed")
 		widget.loading_spinner.set_visible(False)
-		widget.recalculating.set_visible(False)
 		widget.loading_spinner.stop()
 		widget.set_disk.set_active(disk_num-1)
 		widget.set_disk.remove(disk_num)
@@ -594,7 +591,6 @@ def do_part(disk_num, unit="MiB"):
 			widget.grub_device.insert(int(part.paths.index(x.path)), "%s" % x.path, "%s (%s)" % (x.path, round(x.getLength("MiB"), 2)))
 	widget.gentoo_dev_info.set_text("Gentoo Device (%s)" % (diskType(find_disk)))
 	widget.loading_spinner.set_visible(False)
-	widget.recalculating.set_visible(False)
 	widget.loading_spinner.stop()
 	widget.treeview.expand_all()
 	print ("Done!")
@@ -1124,13 +1120,10 @@ def fileSystemWrite(path, fstype):
 	os.system("%s %s" % (programs[fstype], path))
 def format_iter(*args):
 	path = widget.partitions.get_value(treeiter, 0)
-	widget.recalculating.set_label("Formating partition %s" % path)
-	widget.recalculating.set_visible(True)
 	builder.main_window.show_all()
 	fstype = widget.partitions.get_value(treeiter, 1)
 	builder.main_window.show_all
 	fileSystemWrite(path, fstype)
-	widget.recalculating.set_visible(False)
 #All the stepVar functions (advanced gentoo settings)
 def desktop_environment(combo):
 	tree_iter = combo.get_active_iter()
