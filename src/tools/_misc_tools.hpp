@@ -331,5 +331,19 @@ namespace misc
 		}
 		return buffVec;
 	}
+	
+	template < class T >
+	bool in ( std::vector < T > VEC, T VAL )
+	{
+		for ( size_t i; i != VEC.size ( ); i++ )
+		{
+			T curr = VEC [ i ];
+			if ( curr == VAL )
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }
 #endif
