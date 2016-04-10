@@ -57,23 +57,20 @@ class PackageSet:
 		self.config.read ( cfg_file )
 		os.system ( "mkdir " + log_dir + " 2> /dev/null" )
 		curr = 0
-		total = len ( self.config.sections ( ) )
+		pkgs = self.config.sections ( )
 		if misc:
 			pkgs = []
 			for p in self.config.sections ( ):
-				if reinstall not in self.config [ p ] [ "keys" ].replace ( "[", "" ).replace ( "]" "" ).split ( "," ):
+				if "replacing" not in self.config [ p ] [ "keys" ].replace ( "[", "" ).replace ( "]", "" ).split ( "," ):
 					pkgs.append ( p )
-			total = len ( pkgs )
-		for package in self.config.sections ( ):
+		total = len ( pkgs )
+		for package in pkgs:
 			keys = self.config [ package ] [ "keys" ].replace ( "[", "" ).replace ( "]", "" ).split ( "," )
-			if misc:
-				if "reinstall" in keys:
-					continue
 			curr += 1
 			os.system ( "mkdir -p " + log_dir + "/" + package )
 			for stage in self.stages:
 				print ( "\r%s%s-%s%s (%s%s%s of %s%s%s) %s(%s)%s   " % ( color.green, package, self.config[package]["version"].replace("\"", "" ), color.end, color.yellow, curr, color.end, color.yellow, total, color.end, color.bold, stage, color.end ), end="", flush=True )
-				os.system ( curr_dir + "/package " + self.config[package]["file"] + " " + stage + " " + ebuild_opts + " > " + log_dir + "/" + package + "/" + stage + " .log" + " 2>&1" )
+				os.system ( curr_dir + "/package " + self.config[package]["file"] + " " + stage + " " + ebuild_opts + " > " + log_dir + "/" + package + "/" + stage + ".log" + " 2>&1" )
 			print ("")
 	def create_order ( self, order = None ):
 		if ( order ):

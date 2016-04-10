@@ -91,6 +91,10 @@ int main(int argc, char* args[])
 	{
 		opts = argv [ 8 ];
 	}
+	else
+	{
+		opts = "--color=y";
+	}
 	Emerge ( argv [ 0 ], cfg, pkgcfg, pretend, options );
 	if ( !no_real )
 	{
