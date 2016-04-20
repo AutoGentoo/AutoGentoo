@@ -54,6 +54,7 @@ class PackageProperties
 	bool _blockedman; //!< unresolved conflict
 	bool _blockedauto; //!< automatically resolved conflict
 	string _status; //!< Ex: ~ or +
+	bool _uninstall;
 	
 	bool createdList; //!< Tells set and the [] operator whether to init the list
 	map<string, bool> attrMap;
@@ -75,6 +76,7 @@ class PackageProperties
 		_interactive = false;
 		_blockedman = false;
 		_blockedauto = false;
+		_uninstall = false;
 		attrVec.push_back ( "new" );
 		attrVec.push_back ( "slot" );
 		attrVec.push_back ( "updating" );
@@ -87,6 +89,7 @@ class PackageProperties
 		attrVec.push_back ( "blocked_man" );
 		attrVec.push_back ( "blocked_auto" );
 		attrVec.push_back ( "unstable" );
+		attrVec.push_back ( "uninstall" );
 		init ( );
 		createdList = true;
 	}
@@ -104,6 +107,7 @@ class PackageProperties
 		attrMap["blocked_man"] = _blockedman;
 		attrMap["blocked_auto"] = _blockedauto;
 		attrMap["unstable"] = _status != "+";
+		attrMap["uninstall"] = _uninstall;
 	}
 	void set ( char in, bool val )
 	{
@@ -145,6 +149,9 @@ class PackageProperties
 				return;
 			case 'b':
 				_blockedauto = val;
+				return;
+			case 'u':
+				_uninstall = val;
 				return;
 			case '~':
 				_status = "~";
@@ -188,6 +195,8 @@ class PackageProperties
 					return _blockedman;
 				case 'b':
 					return _blockedauto;
+				case 'u':
+					return _uninstall;
 				case '~':
 					return _status == "~";
 				case '+':
@@ -217,10 +226,11 @@ class EmergePackage: public Package
 	version old;
 	int sizeOfDownload;
 	string input;
+	string keyword;
 	map < string, vector<string> > flags;
 	map < string, string > flags_str;
 	
-	EmergePackage ( string __input ) : Package (  )
+	EmergePackage ( string __input, string _keyword="ebuild" ) : Package (  )
 	{
 		/* Key
 		 * + added by operator '+'
@@ -233,7 +243,7 @@ class EmergePackage: public Package
 		/* [ebuild   R    ] gnome-base/gnome-3.16.0:2.0::gentoo  USE="bluetooth cdr classic cups extras -accessibility" 0 KiB */
 		
 		input = __input;
-		
+		keyword = _keyword;
 		vector < string > pkgdiv = splitEbuild ( input );
 		propertystr = pkgdiv [ 0 ];
 		packagestr = pkgdiv [ 1 ];
@@ -243,9 +253,12 @@ class EmergePackage: public Package
 		old.init ( oldbuff );
 		flags = get_variables_split ( pkgdiv [ 3 ] );
 		flags_str = get_variables ( pkgdiv [ 3 ] );
-		sizeOfDownload = misc::stoi ( pkgdiv [ 4 ] );
+		if ( keyword == "ebuild" )
+		{
+			sizeOfDownload = misc::stoi ( pkgdiv [ 4 ] );
+		}
 		
-		misc::remove ( propertystr, "[ebuild" );
+		misc::remove ( propertystr, "[" + keyword );
 		misc::remove ( propertystr, "]" );
 		properties.createList ( );
 		for ( size_t i = 0; i != propertystr.length ( ); i++ )
@@ -256,6 +269,11 @@ class EmergePackage: public Package
 				properties.set ( x, true );
 			}
 		}
+		if ( keyword == "uninstall" )
+		{
+			properties.set ( 'u', true );
+		}
+		
 		properties.init ( );
 		init ( packagestr );
 	}
@@ -279,9 +297,18 @@ class EmergePackage: public Package
 		 */
 		string rawSection = misc::substr ( input, 17, input.length ( ) ); 
 		/* www-client/firefox-38.5.0::gentoo [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
-		 * _________________________________^
+		 * _______________________________________________________________________________________________________________________^
 		 */
 		string _packageStr = misc::substr ( rawSection, 0, rawSection.find ( " " ) );
+		if ( rawSection.find ( " " ) == string::npos )
+		{
+			returnVec.push_back ( propertySection );
+			returnVec.push_back ( _packageStr );
+			returnVec.push_back ( "" );
+			returnVec.push_back ( "" );
+			returnVec.push_back ( "0" );
+			return returnVec;
+		}
 		/* www-client/firefox-38.5.0::gentoo [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
 		 * ----------------------------------
 		 */
@@ -293,15 +320,28 @@ class EmergePackage: public Package
 		/* [38.4.0::gentoo] USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
 		 * -----------------
 		*/
-		rawSection = misc::substr ( rawSection, oldStr.length ( ), rawSection.length ( ) );
-		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
-		 *                                                                 ----
-		*/
-		rawSection.erase ( rawSection.end ( ) - 4, rawSection.end ( ) );
-		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127
-		 *                                                         ^
-		*/
+		
+		if ( keyword == "ebuild" )
+		{
+			rawSection = misc::substr ( rawSection, oldStr.length ( ), rawSection.length ( ) );
+			/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127 KiB
+			*                                                                 ----
+			*/
+		}
+		
+		if ( keyword == "ebuild" )
+		{
+			rawSection.erase ( rawSection.end ( ) - 4, rawSection.end ( ) );
+			/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127
+			*                                                         ^
+			*/
+		}
+		
 		int varToSizeSplit = rawSection.rfind ( " " );
+		if ( keyword != "ebuild" )
+		{
+			varToSizeSplit = rawSection.length ( );
+		}
 		/* USE=" USE FLAGS (lots) " LINGUAS="... ( all languages )" 177,127
 		 * ________________________________________________________^
 		*/
@@ -310,6 +350,15 @@ class EmergePackage: public Package
 		 *                                                         ^_______
 		*/
 		string size;
+		if ( keyword != "ebuild" )
+		{
+			returnVec.push_back ( propertySection );
+			returnVec.push_back ( _packageStr );
+			returnVec.push_back ( oldStr );
+			returnVec.push_back ( vars );
+			returnVec.push_back ( "0" );
+			return returnVec;
+		}
 		if ( vars.find ( "=" ) == string::npos )
 		{
 			size = vars;

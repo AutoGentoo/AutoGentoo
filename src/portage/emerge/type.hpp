@@ -55,11 +55,12 @@ class Type
 	vector<EmergePackage> packages;
 	vector<Warning> warnings;
 	
-	Type ( vector<string> inputFile, string package )
+	Type ( vector<string> inputFile, string package, bool updates_only = false )
 	{
 		vector< vector<string> > usegroups;
 		vector<string> packageLines;
 		vector<string> blocksLines;
+		vector<string> uninstallLines;
 		vector< vector<string> > warninggroups;
 		for ( size_t y = 0; y != inputFile.size ( ); y++ )
 		{
@@ -68,7 +69,7 @@ class Type
 			{
 				continue;
 			}
-			string t = findTypes ( line );
+			string t = findTypes ( line, updates_only );
 			if ( t == "esc" )
 			{
 				break;
@@ -97,6 +98,10 @@ class Type
 			if ( t == "package" )
 			{
 				packageLines.push_back ( line );
+			}
+			if ( t == "uninstall" )
+			{
+				uninstallLines.push_back ( line );
 			}
 			if ( t == "blocks" )
 			{
@@ -133,6 +138,13 @@ class Type
 			GentooConfig current ( usegroups[y], package );
 			configs.push_back ( current );
 		}
+		for ( size_t y = 0; y != uninstallLines.size ( ); y++ )
+		{
+			string buff = uninstallLines[y];
+			trim ( buff );
+			EmergePackage current ( buff, "uninstall" );
+			packages.push_back ( current );
+		}
 		for ( size_t y = 0; y != packageLines.size ( ); y++ )
 		{
 			string buff = packageLines[y];
@@ -155,7 +167,7 @@ class Type
 		}
 	}
 	
-	string findTypes ( string line )
+	string findTypes ( string line, bool up_only = false )
 	{
 		if ( line.substr ( 0, 13 ) == string ( "The following" ) )
 		{
@@ -163,11 +175,22 @@ class Type
 		}
 		else if ( line.substr ( 0, 7 ) == string ( "[ebuild" ) )
 		{
+			if ( up_only )
+			{
+				if ( line.substr ( 0, 11 ) == "[ebuild   R" )
+				{
+					return "";
+				}
+			}
 			return "package";
 		}
 		else if ( line.substr ( 0, 7 ) == string ( "[blocks" ) )
 		{
 			return "blocks";
+		}
+		else if ( line.substr ( 0, 9 ) == string ( "[uninstal" ) )
+		{
+			return "uninstall";
 		}
 		else if ( line.substr ( 0, 5 ) == string ( "These" ) or line.substr ( 0, 11 ) == string ( "Calculating" ) or line.substr ( 0, 5 ) == string ( "Total" ) or line.substr ( 0, 2 ) == string ( " *" ) )
 		{

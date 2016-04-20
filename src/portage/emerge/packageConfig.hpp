@@ -68,7 +68,7 @@ void PackageConfig ( EmergePackage pkg, string name )
 			keys.push_back ( z );
 		}
 	}
-	string _keys ( "keys=[" + misc::merge <string > ( keys, "," ) + "]\n" );
+	string _keys ( "keys=[" + misc::merge < string > ( keys, "," ) + "]\n" );
 	file << _keys;
 	
 	string _file ( "file=\"" + pkg.file + "\"\n" );

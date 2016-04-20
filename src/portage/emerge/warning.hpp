@@ -87,6 +87,8 @@ class Warning
 		if ( type == "slot" )
 		{
 			string pkg = input [ lineNum + 3 ];
+			misc::replace ( pkg, ", ebuild scheduled for merge) pulled in by", "" );
+			misc::replace ( pkg, "(", "" );
 			string unmerge ( "emerge --rage-clean " + pkg );
 			system ( unmerge.c_str ( ) );
 		}
@@ -95,10 +97,12 @@ class Warning
 			for ( size_t i = lineNum + 1; i != input.size ( ); i++ )
 			{
 				string line ( input [ i ] );
+				misc::replace ( line, ", ebuild scheduled for merge) pulled in by", "" );
+				misc::replace ( line, "(", "" );
 				if ( !line.empty ( ) && line != "\n" && line [ 0 ] != ' ' )
 				{
 					string unmerge ( "emerge --rage-clean " + line );
-					system ( unmerge.c_str ( ) );
+					//system ( unmerge.c_str ( ) );
 				}
 			}
 		}
