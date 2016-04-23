@@ -99,10 +99,6 @@ class Type
 			{
 				packageLines.push_back ( line );
 			}
-			if ( t == "uninstall" )
-			{
-				uninstallLines.push_back ( line );
-			}
 			if ( t == "blocks" )
 			{
 				blocksLines.push_back ( line );
@@ -138,18 +134,18 @@ class Type
 			GentooConfig current ( usegroups[y], package );
 			configs.push_back ( current );
 		}
-		for ( size_t y = 0; y != uninstallLines.size ( ); y++ )
-		{
-			string buff = uninstallLines[y];
-			trim ( buff );
-			EmergePackage current ( buff, "uninstall" );
-			packages.push_back ( current );
-		}
 		for ( size_t y = 0; y != packageLines.size ( ); y++ )
 		{
 			string buff = packageLines[y];
 			trim ( buff );
-			EmergePackage current ( buff );
+			if ( buff.substr ( 0, 9 ) == string ( "[uninstal" ) )
+			{
+				EmergePackage current ( buff, "uninstall" );
+			}
+			else
+			{
+				EmergePackage current ( buff );
+			}
 			packages.push_back ( current );
 		}
 		for ( size_t y = 0; y != blocksLines.size ( ); y++ )
@@ -190,7 +186,7 @@ class Type
 		}
 		else if ( line.substr ( 0, 9 ) == string ( "[uninstal" ) )
 		{
-			return "uninstall";
+			return "package";
 		}
 		else if ( line.substr ( 0, 5 ) == string ( "These" ) or line.substr ( 0, 11 ) == string ( "Calculating" ) or line.substr ( 0, 5 ) == string ( "Total" ) or line.substr ( 0, 2 ) == string ( " *" ) )
 		{
