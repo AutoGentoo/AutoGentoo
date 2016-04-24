@@ -45,16 +45,13 @@ int main(int argc, const char* args [] )
 	
 	test.add_option ( "usefile", "false", "u", "bool", "Use the file" );
 	test.add_option ( "file", "", "f", "string", "The file" );
+	test.add_option ( "print", "", "p", "string", "Print the var" );
 	
 	test.create_help ( );
-	test.feed ( input, true );
+	test.feed ( input );
 	
-	cout << test ( "file" ) << endl;
-	
-	for ( map < int, option >::iterator i = test.int_to_main.begin ( ); i != test.int_to_main.end ( ); i++ )
-	{
-		cout << i->second._long << ": " << i->second.value << endl;
-	}
+	cout << test ( "print" ) << endl;
+	cout << test ( test ( "print" ) ) << endl;
 	return 0;
 }
 

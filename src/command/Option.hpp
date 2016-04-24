@@ -61,7 +61,18 @@ class option
 	{
 		vector < string > BUFF ( misc::split ( op, '=', false ) );
 		
-		value = BUFF [ 1 ];
+		if ( BUFF.size ( ) == 1 and _type == "bool" )
+		{
+			value = "true";
+		}
+		else if ( _type != "bool" and BUFF.size ( ) == 1 )
+		{
+			value = "";
+		}
+		else
+		{
+			value = BUFF [ 1 ];
+		}
 		
 		if ( _type == "bool" )
 		{
@@ -98,7 +109,7 @@ class OptionSet
 	{
 		program = _program;
 		desc = _desc;
-		curr_opt = 0;
+		curr_opt = 1;
 	}
 	
 	void add_arg ( string arg )
@@ -141,7 +152,22 @@ class OptionSet
 		return __long__;
 	}
 	
-	void feed ( string op_line, bool exec = false )
+	string strip ( string in )
+	{
+		if ( in [ 1 ] == '-' )
+		{
+			misc::removechar ( in, '-' );
+			misc::removechar ( in, '-' );
+		}
+		else
+		{
+			misc::removechar ( in, '-' );
+		}
+		
+		return in;
+	}
+	
+	void feed ( string op_line )
 	{
 		input_line = op_line;
 		
@@ -151,34 +177,33 @@ class OptionSet
 		for ( size_t i = 0; i != op_vec.size ( ); i++ )
 		{
 			string buff = op_vec [ i ];
-			string __long;
+			string __long = "";
 			
 			bool __long__;
 			
 			__long__ = long_type ( buff );
 			
-			if ( esc )
+			if ( esc or buff.empty ( ) )
 			{
 				esc = false;
-				return;
+				continue;
 			}
 			
-			misc::removechar ( buff, '-' );
-			misc::removechar ( buff, '-' );
+			buff = this->strip ( buff );
 			
 			int __INT__;
+			vector < string > split_buff ( misc::split ( buff, '=', true ) );
 			
 			if ( __long__ )
 			{
-				__INT__ = str_to_long [ buff ];
+				__INT__ = str_to_long [ split_buff [ 0 ] ];
 				__long = buff;
 			}
 			else
 			{
-				__INT__ = str_to_short [ buff ];
+				__INT__ = str_to_short [ split_buff [ 0 ] ];
 				__long = int_to_main [ __INT__ ]._long;
 			}
-			
 			option curr = int_to_main [ __INT__ ];
 			
 			curr.option_sig ( buff, true );
@@ -211,6 +236,7 @@ class OptionSet
 		
 		help.push_back ( pkg_line );
 		help.push_back ( "" );
+		help.push_back ( "Usage:" );
 		help.push_back ( use_line );
 		
 		option buff;
@@ -230,42 +256,58 @@ class OptionSet
 		buff.option_sig ( string ( "help=" + help_str ), false );
 	}
 	
-	
-	
 	string operator () ( string op )
 	{
-		bool is_long = long_type ( op, false );
+		bool is_long;
 		int buff;
+		
+		if ( op.length ( ) > 1 )
+		{
+			is_long = true;
+		}
+		else
+		{
+			is_long = false;
+		}
 		
 		if ( is_long )
 		{
 			buff = str_to_long [ op ];
 		}
 		
-		if ( is_long )
+		if ( !is_long )
 		{
 			buff = str_to_short [ op ];
 		}
 		
-		return str_to_val [ buff ];
+		return int_to_main [ buff ].value;
 	}
 	
 	bool operator [] ( string op )
 	{
-		bool is_long = long_type ( op, false );
+		bool is_long;
 		int buff;
+		
+		if ( op.length ( ) > 1 )
+		{
+			is_long = true;
+		}
+		else
+		{
+			is_long = false;
+		}
 		
 		if ( is_long )
 		{
 			buff = str_to_long [ op ];
 		}
 		
-		if ( is_long )
+		if ( !is_long )
 		{
 			buff = str_to_short [ op ];
 		}
 		
-		return str_to_boolval [ buff ];
+		return int_to_main [ buff ].bool_val;
 	}
 };
 #endif
