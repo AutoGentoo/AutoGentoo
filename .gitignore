@@ -7,3 +7,10 @@ src/geany.project
 *.o
 *.pyc
 *.gch
+*.pretend
+*.emerge
+*.cfg
+__ag_cache__/*
+src/portage/emerge/emerge
+src/portage/package/package
+src/tools/_misc_tools
