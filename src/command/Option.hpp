@@ -1,5 +1,5 @@
 /*
- * PyOption.hpp
+ * Option.hpp
  * 
  * Copyright 2015 Andrei Tumbar <atadmin@Helios>
  * 
