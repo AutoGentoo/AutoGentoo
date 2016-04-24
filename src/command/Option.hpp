@@ -1,16 +1,16 @@
 /*
  * PyOption.hpp
  * 
- * Copyright 2015 Andrei stringumbar <atadmin@Helios>
+ * Copyright 2015 Andrei Tumbar <atadmin@Helios>
  * 
- * stringhis program is free software; you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  * 
- * stringhis program is distributed in the hope that it will be useful,
- * but WIstringHOUstring ANY WARRANstringY; without even the implied warranty of
- * MERCHANstringABILIstringY or FIstringNESS FOR A PARstringICULAR PURPOSE.  See the
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
@@ -22,18 +22,16 @@
  */
 
 
-#ifndef __AUstringOGENstringOO_OPstringION__
-#define __AUstringOGENstringOO_OPstringION__
+#ifndef __AUTOGENTOO_OPTION__
+#define __AUTOGENTOO_OPTION__
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <map>
-#include "../portage/tools/_misc_tools.hpp"
+#include "../tools/_misc_tools.hpp"
 
 using namespace std;
-
-void empty ( string ) {};
 
 class option
 {
@@ -41,22 +39,36 @@ class option
 	string name;
 	string _type;
 	string value;
-	string real_value;
+	bool bool_val;
+	bool used;
 	string desc;
 	map < string, string > _map;
 	
 	string _long;
 	string _short;
 	
-	void ( *__function__ )( string );
-	
-	option ( string __long, string _default, void ( *__f__ )( string ) = empty, string __short = "", string __type = "string", string desc = "" )
+	void init ( string __long, string _default, string __short = "", string __type = "string", string _desc = "" )
 	{
 		_long = __long;
 		_short = __short;
 		_type = __type;
+		value = _default;
+		desc = _desc;
+		used = false;
+	}
+	
+	void option_sig ( string op, bool feeded )
+	{
+		vector < string > BUFF ( misc::split ( op, '=', false ) );
 		
-		__function__ = __f__;
+		value = BUFF [ 1 ];
+		
+		if ( _type == "bool" )
+		{
+			bool_val = misc::stob ( value );
+		}
+		
+		used = feeded;
 	}
 };
 
@@ -64,13 +76,196 @@ class OptionSet
 {
 	public:
 	
-	vector < option > options;
 	string input_line;
+	string program;
+	string desc;
 	
-	void add_option ( string __long, string _default, string __short = "", void ( *f )( string ) = empty, string _type = "string", string desc = "Generic Option" ) 
+	map < int, option > int_to_main;
+	map < string, int > str_to_long;
+	map < string, int > str_to_short;
+	map < int, string > str_to_val;
+	map < int, bool > str_to_boolval;
+	map < string, string > long_to_val;
+	
+	vector < string > args;
+	vector < string > cmd_args;
+	vector < string > help;
+	
+	int curr_opt;
+	bool esc;
+	
+	void init ( string _program, string _desc )
 	{
-		option buff ( __long, _default, f, __short, _type, desc );
-		options.push_back ( buff );
+		program = _program;
+		desc = _desc;
+		curr_opt = 0;
+	}
+	
+	void add_arg ( string arg )
+	{
+		args.push_back ( arg );
+	}
+	
+	void add_option ( string __long, string _default, string __short = "", string _type = "string", string desc = "Generic Option" ) 
+	{
+		option buff;
+		buff.init ( __long, _default, __short, _type, desc );
+		str_to_long [ __long ] = curr_opt;
+		str_to_short [ __short ] = curr_opt;
+		int_to_main [ curr_opt ] = buff;
+		long_to_val [ __long ] = buff.value;
+		curr_opt++;
+	}
+	
+	bool long_type ( string buff, bool feed = true )
+	{
+		bool __long__;
+		if ( buff.substr ( 0, 2 ) == "--" )
+		{
+			__long__ = true;
+		}
+		else if ( buff [ 0 ], '-' )
+		{
+			__long__ = false;
+		}
+		else
+		{
+			if ( feed )
+			{
+				cmd_args.push_back ( buff );
+			}
+			esc = true;
+			return false;
+		}
+		
+		return __long__;
+	}
+	
+	void feed ( string op_line, bool exec = false )
+	{
+		input_line = op_line;
+		
+		vector < string > op_vec ( misc::split ( input_line, ' ', true ) );
+		op_vec.erase ( op_vec.begin ( ) );
+		
+		for ( size_t i = 0; i != op_vec.size ( ); i++ )
+		{
+			string buff = op_vec [ i ];
+			string __long;
+			
+			bool __long__;
+			
+			__long__ = long_type ( buff );
+			
+			if ( esc )
+			{
+				esc = false;
+				return;
+			}
+			
+			misc::removechar ( buff, '-' );
+			misc::removechar ( buff, '-' );
+			
+			int __INT__;
+			
+			if ( __long__ )
+			{
+				__INT__ = str_to_long [ buff ];
+				__long = buff;
+			}
+			else
+			{
+				__INT__ = str_to_short [ buff ];
+				__long = int_to_main [ __INT__ ]._long;
+			}
+			
+			option curr = int_to_main [ __INT__ ];
+			
+			curr.option_sig ( buff, true );
+			
+			int_to_main [ __INT__ ] = curr;
+			str_to_val [ __INT__ ] = curr.value;
+			long_to_val [ __long ] = curr.value;
+			
+			if ( curr._type == "bool" )
+			{
+				str_to_boolval [ __INT__ ] = curr.bool_val;
+			}
+		}
+		
+		if ( int_to_main [ str_to_long [ "help" ] ].used )
+		{
+			cout << misc::merge < string > ( help, "\n" ) << endl;
+		}
+	}
+	
+	void create_help ( )
+	{
+		string pkg_line ( program + ": " + desc );
+		string use_line ( program );
+		
+		for ( size_t i = 0; i != args.size ( ); i++ )
+		{
+			use_line += " [" + args [ i ] + "]";
+		}
+		
+		help.push_back ( pkg_line );
+		help.push_back ( "" );
+		help.push_back ( use_line );
+		
+		option buff;
+		this->add_option ( "help", "", "h", "none", "Display help" );
+		
+		help.push_back ( "" );
+		help.push_back ( "Options:" );
+		
+		for ( map < int, option >::iterator i = int_to_main.begin ( ); i != int_to_main.end ( ); i++ )
+		{
+			string buff ( "  --" + i->second._long + "    -" + i->second._short + "			" + i->second.desc );
+			help.push_back ( buff );
+		}
+		
+		string help_str ( misc::merge < string > ( help, "\n" ) );
+		
+		buff.option_sig ( string ( "help=" + help_str ), false );
+	}
+	
+	
+	
+	string operator () ( string op )
+	{
+		bool is_long = long_type ( op, false );
+		int buff;
+		
+		if ( is_long )
+		{
+			buff = str_to_long [ op ];
+		}
+		
+		if ( is_long )
+		{
+			buff = str_to_short [ op ];
+		}
+		
+		return str_to_val [ buff ];
+	}
+	
+	bool operator [] ( string op )
+	{
+		bool is_long = long_type ( op, false );
+		int buff;
+		
+		if ( is_long )
+		{
+			buff = str_to_long [ op ];
+		}
+		
+		if ( is_long )
+		{
+			buff = str_to_short [ op ];
+		}
+		
+		return str_to_boolval [ buff ];
 	}
 };
 #endif
