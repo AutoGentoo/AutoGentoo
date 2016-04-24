@@ -22,14 +22,12 @@
  */
 
 
-#ifndef __AUTOGENTOO_OPTION__
-#define __AUTOGENTOO_OPTION__
+#ifndef __PROGRAM_OPTION__
+#define __PROGRAM_OPTION__
 
 #include <iostream>
-#include <string>
-#include <vector>
 #include <map>
-#include "../tools/_misc_tools.hpp"
+#include "_misc_tools.hpp"
 
 using namespace std;
 
@@ -104,6 +102,7 @@ class OptionSet
 	string input_line;
 	string program;
 	string desc;
+	int help_distance;
 	
 	map < int, option > int_to_main;
 	map < string, int > str_to_long;
@@ -119,8 +118,9 @@ class OptionSet
 	int curr_opt;
 	bool esc;
 	
-	void init ( string _program, string _desc )
+	void init ( string _program, string _desc, int _help_distance=15 )
 	{
+		help_distance = _help_distance;
 		program = _program;
 		desc = _desc;
 		curr_opt = 1;
@@ -239,6 +239,19 @@ class OptionSet
 		}
 	}
 	
+	string space_find ( string in )
+	{
+		string out;
+		int num = help_distance - in.length ( );
+		
+		for ( int i = 0; i != num; i++ )
+		{
+			out += " ";
+		}
+		
+		return out;
+	}
+	
 	void create_help ( )
 	{
 		string pkg_line ( program + ": " + desc );
@@ -262,7 +275,7 @@ class OptionSet
 		
 		for ( map < int, option >::iterator i = int_to_main.begin ( ); i != int_to_main.end ( ); i++ )
 		{
-			string buff ( "  --" + i->second._long + "    -" + i->second._short + "			" + i->second.desc );
+			string buff ( "  --" + i->second._long + space_find ( i->second._long ) + "-" + i->second._short + "			" + i->second.desc );
 			help.push_back ( buff );
 		}
 		
