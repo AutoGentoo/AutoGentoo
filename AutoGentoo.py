@@ -343,7 +343,7 @@ class widget:
 		column = Gtk.TreeViewColumn(column_title, renderer, text=i)
 		column.set_resizable ( True )
 		treeview.append_column(column)
-		if i == "Partition":
+		if column_title == "Partition":
 			treeview.set_expander_column(column)
 	scrollable_treelist = Gtk.ScrolledWindow()
 	select = treeview.get_selection()
