@@ -44,7 +44,7 @@ void Emerge ( string package, string emergeConfig="emerge.config", string packag
 		system ( emergeCommand.c_str ( ) );
 	}
 	emergeFile = File ( emergeConfig ).readlines ( );
-	Type types ( emergeFile, package );
+	Type types ( emergeFile, package, updates_only );
 	string trunc ( "truncate -s 0 " + packageConfig );
 	system ( trunc.c_str ( ) );
 	for ( size_t i = 0; i != types.configs.size ( ); i++)

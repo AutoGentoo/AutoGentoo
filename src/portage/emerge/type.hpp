@@ -140,13 +140,12 @@ class Type
 			trim ( buff );
 			if ( buff.substr ( 0, 9 ) == string ( "[uninstal" ) )
 			{
-				EmergePackage current ( buff, "uninstall" );
+				packages.push_back ( EmergePackage ( buff, "uninstall" ) );
 			}
 			else
 			{
-				EmergePackage current ( buff );
+				packages.push_back ( EmergePackage ( buff ) );
 			}
-			packages.push_back ( current );
 		}
 		for ( size_t y = 0; y != blocksLines.size ( ); y++ )
 		{

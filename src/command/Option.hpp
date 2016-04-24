@@ -47,6 +47,19 @@ class option
 	string _long;
 	string _short;
 	
+	string bool_toggle ( string in )
+	{
+		if ( misc::stob ( in ) )
+		{
+			in = "false";
+		}
+		else
+		{
+			in = "true";
+		}
+		return in;
+	}
+	
 	void init ( string __long, string _default, string __short = "", string __type = "string", string _desc = "" )
 	{
 		_long = __long;
@@ -55,6 +68,7 @@ class option
 		value = _default;
 		desc = _desc;
 		used = false;
+		bool_val = misc::stob ( _default );
 	}
 	
 	void option_sig ( string op, bool feeded )
@@ -63,7 +77,7 @@ class option
 		
 		if ( BUFF.size ( ) == 1 and _type == "bool" )
 		{
-			value = "true";
+			value = bool_toggle ( value );
 		}
 		else if ( _type != "bool" and BUFF.size ( ) == 1 )
 		{
@@ -135,7 +149,7 @@ class OptionSet
 		{
 			__long__ = true;
 		}
-		else if ( buff [ 0 ], '-' )
+		else if ( buff [ 0 ] == '-' )
 		{
 			__long__ = false;
 		}
@@ -144,8 +158,8 @@ class OptionSet
 			if ( feed )
 			{
 				cmd_args.push_back ( buff );
+				esc = true;
 			}
-			esc = true;
 			return false;
 		}
 		
@@ -221,6 +235,7 @@ class OptionSet
 		if ( int_to_main [ str_to_long [ "help" ] ].used )
 		{
 			cout << misc::merge < string > ( help, "\n" ) << endl;
+			exit (0);
 		}
 	}
 	

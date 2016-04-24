@@ -65,12 +65,12 @@ class PackageSet:
 				if "replacing" not in self.config [ p ] [ "keys" ].replace ( "[", "" ).replace ( "]", "" ).split ( "," ):
 					pkgs.append ( p )
 		total = len ( pkgs )
-		package_log = open ( log_dir + "/package.log", "w+")
+		package_log = open ( log_dir + "/package.log", "w")
 		package_log.write ( "\n\n--------------------------------\nEmerge done on " + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + "--------------------------------\n\n" )
 		for package in pkgs:
 			keys = self.config [ package ] [ "keys" ].replace ( "[", "" ).replace ( "]", "" ).split ( "," )
 			if "uninstall" in keys:
-				package_log.write ( package + ": uninstall (" + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ")" )
+				package_log.write ( package + ": uninstall (" + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ")\n" )
 				stage = "uninstall"
 				out = " | tee " + log_dir + "/current.log " + log_dir + "/" + package + "/" + stage + ".log" + " 2>&1" 
 				os.system ( "emerge --rage-clean " + package + out )
@@ -79,7 +79,7 @@ class PackageSet:
 			os.system ( "mkdir -p " + log_dir + "/" + package )
 			for stage in self.stages:
 				package_log.write ( package + ":" + stage + " (" + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ")" )
-				out = str(" | tee " + log_dir + "/current.log " + log_dir + "/" + package + "/" + stage + ".log" + " 2>&1") 
+				out = str(" | tee " + log_dir + "/current.log " + log_dir + "/" + package + "/" + stage + ".log" + " > /dev/null 2>&1") 
 				print ( "\r%s%s-%s%s (%s%s%s of %s%s%s) %s(%s)%s   " % ( color.green, package, self.config[package]["version"].replace("\"", "" ), color.end, color.yellow, curr, color.end, color.yellow, total, color.end, color.bold, stage, color.end ), end="", flush=True )
 				os.system ( curr_dir + "/package " + self.config[package]["file"] + " " + stage + " " + ebuild_opts + out)
 			print ("")

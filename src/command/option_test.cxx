@@ -50,8 +50,20 @@ int main(int argc, const char* args [] )
 	test.create_help ( );
 	test.feed ( input );
 	
-	cout << test ( "print" ) << endl;
-	cout << test ( test ( "print" ) ) << endl;
+	if ( test [ "usefile" ] )
+	{
+		cout << "true" << endl;
+	}
+	else
+	{
+		cout << "false" << endl;
+	}
+	
+	/*
+	for ( map < int, option >::iterator i = test.int_to_main.begin ( ); i != test.int_to_main.end ( ); i++ )
+	{
+		cout << i->second._long << ": " << i->second.value << endl;
+	}*/
 	return 0;
 }
 

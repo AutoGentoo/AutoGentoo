@@ -24,81 +24,54 @@
 
 #include <iostream>
 #include "emerge.hpp"
+#include "../../command/Option.hpp"
 
 using namespace std;
 
 int main(int argc, char* args[])
 {
-	vector<string> argv;
-	string cfg;
-	string pkgcfg;
-	string buff;
-	string order;
-	string options;
-	string misc ("False");
-	string opts;
-	bool pretend = true;
-	bool no_real = true;
-	for ( int i = 1; i != argc; i++ )
+	string input;
+	
+	for ( int i = 0; i != argc; i++ )
 	{
-		argv.push_back ( string ( args[i] ) );
+		input += args [ i ];
+		input += " ";
 	}
-	if ( argc > 2 )
+	
+	
+	OptionSet test;
+	test.init ( "emerge", "Use the AutoGentoo portage API to install specified packages" );
+	
+	test.add_arg ( "PACKAGE" );
+	test.add_arg ( "OPTIONS" );
+	
+	test.add_option ( "emerge", "emerge.pretend", "e", "string", "Specify where the output of emerge --pretend is kept" );
+	test.add_option ( "config", "emerge.cfg", "c", "string", "Specify where the output of package config is kept" );
+	test.add_option ( "pretend", "true", "p", "bool", "Specify whether to execute emerge --pretend" );
+	test.add_option ( "install", "true", "i", "bool", "Specify whether to actually install or whether to just configure" );
+	test.add_option ( "order", "None", "r", "string", "Change the stage order of installation" );
+	test.add_option ( "options", "", "o", "string", "Select options run with emerge" );
+	test.add_option ( "updates", "false", "u", "bool", "Install updates only" );
+	test.add_option ( "ebuild-opts", "--color=y", "O", "string", "Select options run with ebuild" );
+	test.add_option ( "show-opts", "false", "s", "bool", "Show the current environment variables and exit" );
+	
+	test.create_help ( );
+	test.feed ( input );
+	
+	if ( test [ "show-opts" ] )
 	{
-		cfg = argv [ 1 ];
-	}
-	if ( argc > 3 )
-	{
-		pkgcfg = argv [ 2 ];
-	}
-	if ( argc > 4 )
-	{
-		buff = argv [ 3 ];
-		if ( buff == "false" or buff == "False" )
+		for ( map < int, option >::iterator i = test.int_to_main.begin ( ); i != test.int_to_main.end ( ); i++ )
 		{
-			pretend = false;
+			cout << i->second._long << ": " << i->second.value << endl;
 		}
-		else
-		{
-			pretend = true;
-		}
+		misc::print_vec < string > ( test.cmd_args );
+		exit (0);
 	}
-	if ( argc > 5 )
+	
+	Emerge ( test.cmd_args [ 0 ], test ( "emerge" ), test ( "config" ), test [ "pretend" ], test ( "options" ), test [ "updates" ] );
+	if ( test [ "install" ] )
 	{
-		buff = argv [ 4 ];
-		if ( buff == "false" or buff == "False" )
-		{
-			no_real = false;
-		}
-		else
-		{
-			no_real = true;
-		}
-	}
-	if ( argc > 6 )
-	{
-		order = argv [ 5 ];
-	}
-	if ( argc > 7 )
-	{
-		options = argv [ 6 ];
-	}
-	if ( argc > 8 )
-	{
-		misc = argv [ 7 ];
-	}
-	if ( argc > 9 )
-	{
-		opts = argv [ 8 ];
-	}
-	else
-	{
-		opts = "--color=y";
-	}
-	Emerge ( argv [ 0 ], cfg, pkgcfg, pretend, options );
-	if ( !no_real )
-	{
-		string cmd ( "python3 ../package/package.py " + pkgcfg + " ../package/logs " + order + " false " + misc + " " + opts );
+		string cmd ( "python3 ../package/package.py " + test ( "config" ) + " ../package/logs " + test ( "order" ) + " false false " + test ( "ebuild-opts" ) );
 		system ( cmd.c_str ( ) );
 	}
 	return 0;
