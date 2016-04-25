@@ -45,8 +45,12 @@ int main(int argc, char* args[])
 	emerge_opts.add_arg ( "PACKAGE" );
 	emerge_opts.add_arg ( "OPTIONS" );
 	
-	emerge_opts.add_option ( "emerge", "emerge.pretend", "e", "string", "Specify where the output of emerge --pretend is kept" );
-	emerge_opts.add_option ( "config", "emerge.cfg", "c", "string", "Specify where the output of package config is kept" );
+	string pretend = args [ 1 ];
+	pretend += ".emerge";
+	string config = args [ 1 ];
+	config += ".cfg";
+	emerge_opts.add_option ( "emerge", pretend, "e", "string", "Specify where the output of emerge --pretend is kept" );
+	emerge_opts.add_option ( "config", config, "c", "string", "Specify where the output of package config is kept" );
 	emerge_opts.add_option ( "pretend", "true", "p", "bool", "Specify whether to execute emerge --pretend" );
 	emerge_opts.add_option ( "install", "true", "i", "bool", "Specify whether to actually install or whether to just configure" );
 	emerge_opts.add_option ( "order", "None", "r", "string", "Change the stage order of installation" );
