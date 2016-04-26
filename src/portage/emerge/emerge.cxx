@@ -45,13 +45,14 @@ int main(int argc, char* args[])
 	emerge_opts.add_arg ( "PACKAGE" );
 	emerge_opts.add_arg ( "OPTIONS" );
 	
+	string name;
 	if ( string ( args [ 1 ] ).find ( "/" ) != string::npos )
 	{
-		string name = string ( args [ 1 ] ).substr ( string ( args [ 1 ] ).find ( "/" ), string ( args [ 1 ] ).length ( ) - string ( args [ 1 ] ).find ( "/" ) );
+		name = string ( args [ 1 ] ).substr ( string ( args [ 1 ] ).find ( "/" ), string ( args [ 1 ] ).length ( ) - string ( args [ 1 ] ).find ( "/" ) );
 	}
 	else
 	{
-		string name = args [ 1 ];
+		name = args [ 1 ];
 	}
 	
 	string pretend = name;
