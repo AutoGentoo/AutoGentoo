@@ -53,7 +53,7 @@ int main ( int argc, char *argv [ ] )
 	
 	if ( driver_opts [ "emerge" ] )
 	{
-		system ( "cd ../portage/emerge/ && ./emerge x11-drivers/nvidia-drivers" );
+		system ( "cd ../portage/emerge/ && ./emerge x11-drivers/nvidia-drivers -s" );
 		return 0;
 	}
 	
