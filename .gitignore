@@ -2,6 +2,7 @@
 src/portage/package/logs/*
 tests/graphics
 src/graphics/graphics
+src/graphics/drivers
 src/geany.project
 *.o
 *.pyc

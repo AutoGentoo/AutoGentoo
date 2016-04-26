@@ -53,7 +53,7 @@ int main ( int argc, char *argv [ ] )
 	
 	if ( driver_opts [ "download" ] )
 	{
-		nvidia_download = "wget $ ( python get_dist.py ) && chmod +x NVIDIA*";
+		nvidia_download = "wget $(python2 get_dist.py) && chmod +x NVIDIA*";
 	}
 	else
 	{
