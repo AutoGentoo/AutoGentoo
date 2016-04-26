@@ -46,10 +46,15 @@ int main ( int argc, char *argv [ ] )
 	driver_opts.add_option ( "install", "true", "i", "bool", "Specify whether to install the drivers" );
 	driver_opts.add_option ( "download", "true", "d", "bool", "Specify whether to download the drivers" );
 	driver_opts.add_option ( "create-xconfig", "true", "X", "bool", "Create the x-config file for updated drivers" );
+	driver_opts.add_option ( "emerge", "false", "e", "bool", "Use the portage API to install (recommended not default)" );
 	
 	driver_opts.create_help ( );
 	driver_opts.feed ( input );
 	
+	if ( driver_opts [ "emerge" ] )
+	{
+		system ( "../portage/emerge/emerge x11-drivers/nvidia-drivers" );
+	}
 	
 	if ( driver_opts [ "download" ] )
 	{
