@@ -45,9 +45,11 @@ int main(int argc, char* args[])
 	emerge_opts.add_arg ( "PACKAGE" );
 	emerge_opts.add_arg ( "OPTIONS" );
 	
-	string pretend = args [ 1 ];
+	string name = string ( args [ 1 ] ).substr ( string ( args [ 1 ] ).find ( "/" ), string ( args [ 1 ] ).length ( ) - string ( args [ 1 ] ).find ( "/" ) );
+	
+	string pretend = name;
 	pretend += ".emerge";
-	string config = args [ 1 ];
+	string config = name;
 	config += ".cfg";
 	emerge_opts.add_option ( "emerge", pretend, "e", "string", "Specify where the output of emerge --pretend is kept" );
 	emerge_opts.add_option ( "config", config, "c", "string", "Specify where the output of package config is kept" );
