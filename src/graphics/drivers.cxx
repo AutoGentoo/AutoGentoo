@@ -54,6 +54,7 @@ int main ( int argc, char *argv [ ] )
 	if ( driver_opts [ "emerge" ] )
 	{
 		system ( "../portage/emerge/emerge x11-drivers/nvidia-drivers" );
+		return 0;
 	}
 	
 	if ( driver_opts [ "download" ] )
