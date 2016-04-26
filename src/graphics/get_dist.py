@@ -155,7 +155,7 @@ def get_echo():
 
 def main():
 	gpu()
-	os.system ( "echo \">=x11-drivers/nvidia-drivers-%s\" >> /etc/portage/package.mask/nvidia-drivers\"" % gpu.driver_version );
+	os.system ( "echo \">=x11-drivers/nvidia-drivers-%s\" >> /etc/portage/package.mask/nvidia-drivers" % gpu.driver_version );
 	print ( gpu.dist_location )
 	return 0
 
