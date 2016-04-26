@@ -53,6 +53,7 @@ int main ( int argc, char *argv [ ] )
 	
 	if ( driver_opts [ "emerge" ] )
 	{
+		system ( "python2 get_dist.py > /dev/null" );
 		system ( "cd ../portage/emerge/ && ./emerge nvidia-drivers" );
 		return 0;
 	}
