@@ -23,9 +23,7 @@
 #  
 
 import os
-__dir__ = os.path.dirname ( os.path.realpath ( __file__ ) ) 
-print ( __dir__ )
-os.chdir ( __dir__ )
+os.chdir ( os.path.dirname ( os.path.realpath ( __file__ ) ) )
 from AutoGentoo import *
 print ("""
  ______              __                 ____                       __                        

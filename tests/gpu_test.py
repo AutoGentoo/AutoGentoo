@@ -27,7 +27,7 @@ import subprocess, os, platform
 from HTMLParser import HTMLParser
 #from htmlentitydefs import name2codepoint
 
-os.chdir("../")
+os.chdir ( os.path.dirname ( os.path.realpath ( __file__ ) ) )
 
 class hrefParser(HTMLParser):
 	def handle_starttag(self, tag, attrs):
@@ -53,6 +53,9 @@ class gpu:
 	echo_list = []
 	dist_location = ""
 	def __init__(self):
+		if ( os.system ( "ls graphics/nvidia" ) != 0 ):
+			os.system ( "mkdir -p graphics/nvidia" )
+			os.system ( "mkdir -p graphics/radeon" )
 		gpu.vendor = ""
 		gpu.product_full = ""
 		gpu.product_id = ""
@@ -157,8 +160,8 @@ def get_echo():
 
 def main():
 	gpu()
-	print gpu.driver_version
-	print gpu.dist_location
+	print ( gpu.driver_version )
+	print ( gpu.dist_location )
 	return 0
 
 if __name__ == '__main__':
