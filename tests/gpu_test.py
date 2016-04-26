@@ -53,7 +53,7 @@ class gpu:
 	echo_list = []
 	dist_location = ""
 	def __init__(self):
-		if ( os.system ( "ls graphics/nvidia" ) != 0 ):
+		if ( os.system ( "ls graphics/nvidia 2> /dev/null" ) != 0 ):
 			os.system ( "mkdir -p graphics/nvidia" )
 			os.system ( "mkdir -p graphics/radeon" )
 		gpu.vendor = ""
@@ -160,7 +160,6 @@ def get_echo():
 
 def main():
 	gpu()
-	print ( gpu.driver_version )
 	print ( gpu.dist_location )
 	return 0
 
