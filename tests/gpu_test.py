@@ -53,7 +53,7 @@ class gpu:
 	echo_list = []
 	dist_location = ""
 	def __init__(self):
-		if ( os.system ( "ls graphics/nvidia 2> /dev/null >&1" ) != 0 ):
+		if ( os.system ( "ls graphics/nvidia > /dev/null 2>&1" ) != 0 ):
 			os.system ( "mkdir -p graphics/nvidia" )
 			os.system ( "mkdir -p graphics/radeon" )
 		gpu.vendor = ""
@@ -107,6 +107,7 @@ class gpu:
 			gpu.driver_version = "x11-drivers/radeon-ucode"
 			#print ("Found supported version %s" % gpu.driver_version)
 			gpu.working_driver_version = gpu.driver_version
+		os.system ( "rm -rf graphics" )
 def get_nvidia_versions():
 	os.system("wget -q 'http://www.nvidia.com/object/unix.html'")
 	name_list = []
