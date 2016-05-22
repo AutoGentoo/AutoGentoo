@@ -32,7 +32,7 @@ int main(int argc, char* argv[ ] )
 	string __file__ ( argv [ 1 ] );
 	string __cmd__ ( argv [ 2 ] );
 	string __opts__ ( argv [ 3 ] );
-	pkg_do_key ( __cmd__, __file__, __opts__ );
-	return 0;
+	int return_status = pkg_do_key ( __cmd__, __file__, __opts__ );
+	return return_status;
 }
 

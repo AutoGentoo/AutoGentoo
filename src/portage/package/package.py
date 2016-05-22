@@ -81,7 +81,10 @@ class PackageSet:
 				package_log.write ( package + ":" + stage + " (" + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ")" )
 				out = str(" | tee -a " + log_dir + "/current.log >>" + log_dir + "/" + package + "/" + stage + ".log 2>&1 && echo \"\n\" >> " + log_dir + "/" + package + "/" + stage + ".log") 
 				print ( "\r%s%s-%s%s (%s%s%s of %s%s%s) %s(%s)%s   " % ( color.green, package, self.config[package]["version"].replace("\"", "" ), color.end, color.yellow, curr, color.end, color.yellow, total, color.end, color.bold, stage, color.end ), end="", flush=True )
-				os.system ( curr_dir + "/package " + self.config[package]["file"] + " " + stage + " " + ebuild_opts + out)
+				exit_status = os.system ( curr_dir + "/package " + self.config[package]["file"] + " " + stage + " " + ebuild_opts + out)
+				if exit_status != 0:
+					print ( "Error for package %s in stage %s" % ( package, stage ) )
+					exit ( exit_status )
 			print ("")
 	def create_order ( self, order = None ):
 		if ( order ):

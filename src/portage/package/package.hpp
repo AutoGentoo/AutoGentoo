@@ -239,10 +239,11 @@ class Package
 		system ( cmd.c_str ( ) );
 	}
 };
-void pkg_do_key ( string keyword, string _file, string ebuild_opts )
+int pkg_do_key ( string keyword, string _file, string ebuild_opts )
 {
-	cout << ebuild_opts << endl;
+	cout << _file << ": " << keyword << endl;
 	string cmd ( "ebuild " + ebuild_opts + " " + _file + " " + keyword + " 2> /dev/null" );
-	system ( cmd.c_str ( ) );
+	int status = system ( cmd.c_str ( ) );
+	return status;
 }
 #endif
