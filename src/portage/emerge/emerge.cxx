@@ -63,6 +63,7 @@ int main(int argc, char* args[])
 	emerge_opts.add_option ( "config", config, "c", "string", "Specify where the output of package config is kept" );
 	emerge_opts.add_option ( "pretend", "true", "p", "bool", "Specify whether to execute emerge --pretend" );
 	emerge_opts.add_option ( "install", "true", "i", "bool", "Specify whether to actually install or whether to just configure" );
+	emerge_opts.add_option ( "sync", "false", "g", "bool", "Sync the portage tree and exit (run emerge --sync)" );
 	emerge_opts.add_option ( "order", "None", "r", "string", "Change the stage order of installation" );
 	emerge_opts.add_option ( "options", "", "o", "string", "Select options run with emerge" );
 	emerge_opts.add_option ( "updates", "false", "u", "bool", "Install updates only" );
@@ -80,6 +81,12 @@ int main(int argc, char* args[])
 		}
 		misc::print_vec < string > ( emerge_opts.cmd_args );
 		exit (0);
+	}
+	
+	if ( emerge_opts [ "sync" ] )
+	{
+		system ( "emerge --sync" );
+		exit ( 0 );
 	}
 	
 	Emerge ( emerge_opts.cmd_args [ 0 ], emerge_opts ( "emerge" ), emerge_opts ( "config" ), emerge_opts [ "pretend" ], emerge_opts ( "options" ), emerge_opts [ "updates" ] );
