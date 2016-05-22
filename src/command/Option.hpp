@@ -1,7 +1,7 @@
 /*
  * Option.hpp
  * 
- * Copyright 2015 Andrei Tumbar <atadmin@Helios>
+ * Copyright 2016 Andrei Tumbar <atadmin@Helios>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

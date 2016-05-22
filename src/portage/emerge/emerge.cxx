@@ -48,7 +48,7 @@ int main(int argc, char* args[])
 	string name;
 	if ( string ( args [ 1 ] ).find ( "/" ) != string::npos )
 	{
-		name = string ( args [ 1 ] ).substr ( string ( args [ 1 ] ).find ( "/" ), string ( args [ 1 ] ).length ( ) - string ( args [ 1 ] ).find ( "/" ) );
+		name = string ( args [ 1 ] ).substr ( string ( args [ 1 ] ).find ( "/" ) + 1, string ( args [ 1 ] ).length ( ) - string ( args [ 1 ] ).find ( "/" ) - 1 );
 	}
 	else
 	{
