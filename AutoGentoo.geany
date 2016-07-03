@@ -20,10 +20,15 @@ indent_mode=3
 [project]
 name=AutoGentoo
 base_path=/home/atuser/git/AutoGentoo
+description=
 
 [long line marker]
 long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=-1
+current_page=4
+FILE_NAME_0=1780;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fpackage.h;0;2
+FILE_NAME_1=3854;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fpackage.c;0;2
+FILE_NAME_2=1369;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmstring.h;0;2
+FILE_NAME_3=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmlib.h;0;2

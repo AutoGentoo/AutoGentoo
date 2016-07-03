@@ -27,16 +27,37 @@
 
 typedef struct
 {
-  mstring     type; //ebuild, block
-  mstring_a   flags;
-  mstring     category;
-  mstring     name;
+  bool        new;
+  bool        slot;
+  bool        updating;
+  bool        downgrading;
+  bool        reinstall;
+  bool        replacing;
+  bool        fetch_man;
+  bool        fetch_auto;
+  bool        interactive;
+  bool        blocked_man;
+  bool        blocked_auto;
+} PkgProperty;
+
+typedef struct
+{
+  mstring     revision;
   mstring     version;
-  mstring     slot;
-  mstring     repo;
-  mstring     vars;
-  mstring     file;
-  int         size;
+} PkgVersion;
+
+typedef struct
+{
+  mstring           type; //ebuild, block
+  PkgProperty      *flags;
+  mstring           category;
+  mstring           name;
+  PkgVersion       *version;
+  mstring           slot;
+  mstring           repo;
+  mstring           vars;
+  mstring           file;
+  int               size;
 } Package;
 
 Package  *        package_new                (void);
@@ -44,3 +65,7 @@ Package  *        package_new                (void);
 Package  *        package_new_from_string    (mstring);
 
 int               package_do_stage           (Package*, mstring);
+
+PkgProperty *     pkgproperty_new            (void);
+
+PkgVersion  *     pkgversion_new             (void);
