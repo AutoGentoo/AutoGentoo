@@ -21,14 +21,40 @@ indent_mode=3
 name=AutoGentoo
 base_path=/home/atuser/git/AutoGentoo
 description=
+file_patterns=
 
 [long line marker]
 long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=4
-FILE_NAME_0=1780;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fpackage.h;0;2
-FILE_NAME_1=3854;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fpackage.c;0;2
-FILE_NAME_2=1369;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmstring.h;0;2
-FILE_NAME_3=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmlib.h;0;2
+current_page=1
+FILE_NAME_0=868;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fpackage.h;0;2
+FILE_NAME_1=6920;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fpackage.c;0;2
+FILE_NAME_2=1014;C;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Ftest%2Fpackage_test.c;0;2
+FILE_NAME_3=50;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2FMakefile;0;2
+FILE_NAME_4=574;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmlib.h;0;2
+FILE_NAME_5=102771;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fbuff.emerge;0;2
+FILE_NAME_6=1623;None;0;EUTF-8;0;1;0;%2Fusr%2Fportage%2Fmetadata%2Fmd5-cache%2Fapp-accessibility%2Faccerciser-3.14.0;0;2
+FILE_NAME_7=1925;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmstring.h;0;2
+FILE_NAME_8=6453;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmstring.c;0;2
+
+[VTE]
+last_dir=/home/atuser/git/AutoGentoo/src
+
+[build-menu]
+CFT_00_LB=_Compile
+CFT_00_CM=gcc -Wall -g -c "%f"  -lz -lbz2  -larchive
+CFT_00_WD=
+filetypes=C;
+NF_03_LB=Make test
+NF_03_CM=make test
+NF_03_WD=
+
+[prjorg]
+source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;*.m;
+header_patterns=*.h;*.H;*.hpp;*.hxx;*.h++;*.hh;
+ignored_dirs_patterns=.*;CVS;
+ignored_file_patterns=*.o;*.obj;*.a;*.lib;*.so;*.dll;*.lo;*.la;*.class;*.jar;*.pyc;*.mo;*.gmo;
+generate_tag_prefs=0
+external_dirs=

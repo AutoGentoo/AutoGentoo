@@ -23,6 +23,9 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 #include "mlib.h"
 
 #ifndef AUTOGENTOO_MSTRING
@@ -38,50 +41,37 @@ mstring            mstring_new_from_char       (mchar);
 
 mstring            mstring_new_from_chars      (char *);
 
-mstring            mstring_get_sub             (mstring,
-                                                int,
-                                                int);
+mstring            mstring_get_sub             (mstring, int, int);
 
-mstring            mstring_get_sub_py          (mstring,
-                                                int,
-                                                int);
+mstring            mstring_get_sub_py          (mstring, int, int);
 
-mstring            mstring_find_before         (mstring,
-                                                mchar);
+mstring            mstring_find_before         (mstring, mchar);
 
-mstring            mstring_find_after          (mstring,
-                                                mchar);
+mstring            mstring_find_after          (mstring, mchar);
 
 int                mstring_get_length          (mstring);
 
-int                mstring_find_start          (mstring,
-                                                mchar,
-                                                int);
-                                                
-int                mstring_find_start_num      (mstring,
-                                                mchar,
-                                                int,
-                                                int);
+int                mstring_find_start          (mstring, mchar, int);
 
-int                mstring_find                (mstring,
-                                                mchar);
+int                mstring_find_start_num      (mstring, mchar, int, int);
 
-int                mstring_rfind               (mstring,
-                                                mchar);
-                                                
-mstring_a            mstring_a_new                 (void);
+int                mstring_find                (mstring, mchar);
 
-mstring_a            mstring_split               (mstring,
-                                                mchar);
+int                mstring_rfind               (mstring, mchar);
 
-mstring_a *          mstring_a_split               (mstring_a,
-                                                mstring,
-                                                int);
+mstring_a          mstring_a_new               (void);
 
-int                mstring_a_find                (mstring_a,
-                                                mstring);
+mstring_a          mstring_split               (mstring, mchar);
 
-mstring            concat                      (mstring s1,
-                                                mstring s2);
+mstring_a *        mstring_a_split             (mstring_a, mstring, int);
 
+int                mstring_a_find              (mstring_a, mstring);
+
+mstring            concat                      (mstring s1, mstring s2);
+
+mstring_a          mstring_split_quote         (mstring, mchar);
+
+int                mstring_search              (mstring, mstring);
+
+mstring            itoa                        (int, int);
 #endif

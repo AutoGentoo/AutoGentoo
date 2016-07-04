@@ -23,6 +23,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 #include "mstring.h"
 
 typedef struct
@@ -44,6 +45,9 @@ typedef struct
 {
   mstring     revision;
   mstring     version;
+  mstring     repo;
+  mstring     full;
+  mstring     slot;
 } PkgVersion;
 
 typedef struct
@@ -53,11 +57,12 @@ typedef struct
   mstring           category;
   mstring           name;
   PkgVersion       *version;
-  mstring           slot;
-  mstring           repo;
-  mstring           vars;
+  PkgVersion       *old;
+  mstring_a         vars;
+  mstring_a         vals;
   mstring           file;
-  int               size;
+  mstring           name_raw;
+  mstring           size;
 } Package;
 
 Package  *        package_new                (void);
@@ -69,3 +74,9 @@ int               package_do_stage           (Package*, mstring);
 PkgProperty *     pkgproperty_new            (void);
 
 PkgVersion  *     pkgversion_new             (void);
+
+PkgVersion  *     pkgversion_new_from_str    (mstring);
+
+void              pkgproperty_reset          (PkgProperty*);
+
+void              pkgversion_parse           (PkgVersion*, mstring);

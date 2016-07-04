@@ -28,7 +28,7 @@
 mstring
 mstring_new (void)
 {
-  return "";
+  return malloc(sizeof(mstring));
 }
 
 /* Create a new empty string */
@@ -51,13 +51,13 @@ mstring_new_from_chars (char *c)
 int
 mstring_get_length (mstring str)
 {
-  return strlen(str);
+  int num;
+  for (num = 0; str[num]; num++);
+  return num;
 }
 
 mstring
-mstring_get_sub  (mstring old,
-                  int start,
-                  int length)
+mstring_get_sub  (mstring old, int start, int length)
 {
   int      size = mstring_get_length (old);
   mchar    out_array [length-start];
@@ -78,32 +78,24 @@ mstring_get_sub  (mstring old,
 }
 
 mstring
-mstring_get_sub_py (mstring old,
-                    int start,
-                    int end)
+mstring_get_sub_py (mstring old, int start, int end)
 {
   int      size = mstring_get_length (old);
-  mchar    out_array [end];
+  int      len;
+  mstring  out_array = (char*) malloc(size);
   
   if (size < end || end == -1)
   {
     end = size;
   }
+  len = end - start;
+  memcpy(out_array, &old[start], len);
   
-  int index;
-  int curr = 0;
-  
-  for (index = start; index <= end; index++, curr++)
-  {
-    out_array [curr] = old[index];
-  }
-  
-  return mstring_new_from_chars (&out_array[0]);
+  return mstring_new_from_chars (out_array);
 }
 
 int
-mstring_find (mstring in,
-              mchar find)
+mstring_find (mstring in, mchar find)
 {
   int   size = mstring_get_length (in);
   int   curr;
@@ -122,8 +114,7 @@ mstring_find (mstring in,
 }
 
 int
-mstring_rfind (mstring in,
-               char find)
+mstring_rfind (mstring in, char find)
 {
   int   size = mstring_get_length (in);
   int   curr = size;
@@ -142,9 +133,7 @@ mstring_rfind (mstring in,
 }
 
 int
-mstring_find_start (mstring in,
-                    mchar find,
-                    int start)
+mstring_find_start (mstring in, mchar find, int start)
 {
   int   size = mstring_get_length (in);
   int   curr;
@@ -165,78 +154,55 @@ mstring_find_start (mstring in,
   return -1;
 }
 
-
-mstring
-mstring_find_before  (mstring old,
-                      mchar c)
+/*char*
+char_a_new_from_string (mstring in)
 {
-  mstring   buff_a = mstring_new ();
-  int       x;
+  int     size    = mstring_get_length (in);
+  char    buff[size];
+  int     curr    = 0;
   
-  for (x = 0; x != mstring_get_length (old); x++)
+  for (;in[curr]; curr++)
   {
-    if (old[x] == c)
-    {
-      buff_a[x] =  old[x];
-      break;
-    }
-    buff_a[x]   =  old[x];
-  }
-  return buff_a;
-}
-
-mstring
-mstring_find_after  (mstring old,
-                     mchar c)
-{
-  mstring   buff_a = mstring_new ();
-  int       x;
-  
-  for (x = mstring_find (old, c); x != mstring_get_length (old); x++)
-  {
-    buff_a[x] = old[x];
-  }
-  return buff_a;
-}
-
-mstring_a
-mstring_split (mstring in,
-               mchar c)
-{
-  mstring_a    buff       =  mstring_a_new ();
-  int        curr       =  0;
-  int        index      =  0;
-  int        str_index  =  0;
-  mstring    str_buff   =  mstring_new ();
-  
-  for (curr = 0; curr != mstring_get_length (in); curr++, str_index++)
-  {
-    mchar curr_c = in[curr];
-    
-    if (curr_c == c)
-    {
-      buff[index] = str_buff;
-      str_index   =  0;
-      str_buff    =  "";
-      index++;
-      continue;
-    }
-    
-    str_buff[str_index] = curr_c;
+    buff [curr] = in[curr];
   }
   
   return buff;
-};
+}*/
+
+mstring
+mstring_find_before  (mstring old, mchar c)
+{
+  return mstring_get_sub_py (old, 0, mstring_find (old, c));
+}
+
+mstring
+mstring_find_after  (mstring old, mchar c)
+{
+  return mstring_get_sub_py (old, mstring_find (old, c), -1);
+}
+
+mstring itoa(int val, int base)
+{
+  static mchar buf[32] = {0};
+  
+  int i = 30;
+  
+  for(; val && i ; --i, val /= base)
+  {
+    buf[i] = "0123456789abcdef"[val % base];
+  }
+  
+  return &buf[i+1];
+  
+}
 
 mstring_a *
-mstring_a_split (mstring_a in,
-               mstring c,
-               int len)
+mstring_a_split (mstring_a in, mstring c, int len)
 {
   mstring_a *  buff       =  malloc(sizeof(mstring_a*));
-  int        curr       =  0;
-  int        index      =  1;
-  int        str_index  =  0;
+  int          curr       =  0;
+  int          index      =  1;
+  int          str_index  =  0;
   mstring_a    str_buff   =  mstring_a_new ();
   mstring_a    end        =  mstring_a_new ();
   
@@ -263,11 +229,56 @@ mstring_a_split (mstring_a in,
   return buff;
 };
 
+mstring_a mstring_split (mstring a_str, mchar a_delim)
+{
+  mstring_a result   = 0;
+  size_t count       = 0;
+  mstring tmp        = a_str;
+  mstring last_comma = 0;
+  mchar delim[2];
+  delim[0] = a_delim;
+  delim[1] = 0;
+
+  /* Count how many elements will be extracted. */
+  while (*tmp)
+  {
+    if (a_delim == *tmp)
+    {
+      count++;
+      last_comma = tmp;
+    }
+    tmp++;
+  }
+
+  /* Add space for trailing token. */
+  count += last_comma < (a_str + strlen(a_str) - 1);
+
+  /* Add space for terminating null string so caller
+     knows where the list of returned strings ends. */
+  count++;
+
+  result = malloc(sizeof(mstring) * count);
+
+  if (result)
+  {
+    size_t idx  = 0;
+    mstring token = strtok(a_str, delim);
+
+    while (token)
+    {
+      assert(idx < count);
+      *(result + idx++) = strdup(token);
+      token = strtok(0, delim);
+    }
+    assert(idx == count - 1);
+    *(result + idx) = 0;
+  }
+
+  return result;
+}
+
 int
-mstring_find_start_num (mstring in,
-                        mchar find,
-                        int start,
-                        int num)
+mstring_find_start_num (mstring in, mchar find, int start, int num)
 {
   int curr  = start;
   int found = 0;
@@ -311,4 +322,85 @@ mstring concat(mstring s1, mstring s2)
   strcpy                        (result, s1);
   strcat                        (result, s2);
   return result;
+}
+
+mstring_a
+mstring_split_quote (mstring in, mchar c)
+{
+  int      occ_num;
+  int     *occs = malloc (sizeof(int*));
+  int      curr = 0;
+  bool     in_quote = FALSE;
+  
+  for (; in[curr]; curr++)
+  {
+    if (in[curr] == '"')
+    {
+      in_quote = !in_quote;
+    }
+    
+    if (in_quote)
+    {
+      continue;
+    }
+    
+    if (in[curr] == c)
+    {
+      occs[occ_num] = curr;
+      occ_num++;
+    }
+  }
+  
+  mstring_a      buff = mstring_a_new ();
+  
+  for (curr=0; occs[curr]; curr++)
+  {
+    if (curr == 0)
+    {
+      buff[curr] = mstring_get_sub_py (in, 0, occs[curr]);
+    }
+    else
+    {
+      buff[curr] = mstring_get_sub_py (in, occs[curr-1], occs[curr]);
+    }
+  }
+  
+  return buff;
+}
+
+int mstring_search(mstring src, mstring str) {
+   int i, j, firstOcc;
+   i = 0, j = 0;
+ 
+   while (src[i]) {
+ 
+      while (src[i] != str[0] && src[i])
+         i++;
+ 
+      if (!src[i])
+         return -1;
+ 
+      firstOcc = i;
+ 
+      while (src[i] == str[j] && src[i] && str[j]) {
+         i++;
+         j++;
+      }
+ 
+      if (!str[j])
+         return (firstOcc);
+      if (!src[i])
+         return -1;
+ 
+      i = firstOcc + 1;
+      j = 0;
+   }
+   
+   return -1;
+}
+
+mstring_a
+mstring_a_new (void)
+{
+  return malloc(sizeof (mstring_a));
 }

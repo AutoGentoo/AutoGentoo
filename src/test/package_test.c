@@ -1,5 +1,5 @@
 /*
- * mlib.h
+ * pkg_size.c
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
@@ -23,30 +23,16 @@
 
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "../package.h"
 
-#ifndef   AUTOGENTOO_BOOL
-#define   AUTOGENTOO_BOOL
-typedef   int     bool;
-#endif
+int main(int argc, char **argv)
+{
+	mstring str = "[ebuild     U  ] gnome-extra/gnome-shell-extensions-3.18.4::gentoo [3.18.3::gentoo] USE=\"-examples\" 229 KiB";
+	Package * gnome = package_new_from_string (str);
+	
+	int __EXIT = package_do_stage (gnome, "compile");
+	free(gnome);
+	
+	return __EXIT;
+}
 
-#ifndef   NULL
-#define   NULL    ((void*) 0)
-#endif
-
-#ifndef   FALSE
-#define   FALSE   (0)
-#endif
-
-#ifndef   TRUE
-#define   TRUE    (!FALSE)
-#endif
-
-#ifndef   MSTRING
-#define   MSTRING
-typedef char     mchar;
-typedef mchar   *mstring;
-typedef mchar  **mstring_a;
-typedef int     *int_a;
-#endif
