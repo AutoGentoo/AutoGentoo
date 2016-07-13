@@ -219,6 +219,7 @@ package_new_from_string (mstring str)
   buff->size = mstring_get_sub_py (str, mstring_rfind (mstring_get_sub_py (str, 0, mstring_rfind (str, ' ')), ' ') + 1, mstring_rfind (str, ' '));
   
   buff->file = mstring_new ();
+  sprintf (buff->file, "/usr/portage/%s/%s/%s-%s.ebuild", buff->category, buff->name, buff->name, buff->version->version);
   
   free (b_var_a);
   free (b_vars);
