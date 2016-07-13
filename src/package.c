@@ -35,8 +35,7 @@ package_new (void)
   buff->name          =  mstring_new      ();
   buff->version       =  pkgversion_new   ();
   buff->old           =  pkgversion_new   ();
-  buff->vars          =  mstring_a_new    ();
-  buff->vals          =  mstring_a_new    ();
+  buff->parameters    =  map_new          ();
   buff->file          =  mstring_new      ();
   buff->name_raw      =  mstring_new      ();
   buff->size          =  mstring_new      ();
@@ -209,20 +208,23 @@ package_new_from_string (mstring str)
   }
   
   mstring_a b_var_a = mstring_split_quote (b_vars, ' ');
-  
-  curr = 0;
-  for (; b_var_a [curr]; curr++)
+  printf ("%d\n", mstring_split_quote_len (b_vars, ' '));
+  for (curr = 0; curr != mstring_split_quote_len (b_vars, ' '); curr++)
   {
     mstring_a splt_b = mstring_split (b_var_a [curr], '=');
-    
-    buff->vars [curr] = splt_b[0];
-    buff->vals [curr] = splt_b[1];
+    map_add (buff->parameters, splt_b [0], mstring_grate (splt_b[1]));
   }
   
+  buff->size = mstring_new ();
   buff->size = mstring_get_sub_py (str, mstring_rfind (mstring_get_sub_py (str, 0, mstring_rfind (str, ' ')), ' ') + 1, mstring_rfind (str, ' '));
   
-  buff->file = malloc(sizeof(mstring));
-  sprintf (buff->file, "/usr/portage/%s/%s/%s-%s.ebuild", buff->category, buff->name, buff->name, buff->version->version);
+  buff->file = mstring_new ();
+  
+  free (b_var_a);
+  free (b_vars);
+  free (flag_buff_str);
+  free (first_buff);
+  free (second_buff);
   return buff;
 }
 
@@ -232,7 +234,6 @@ package_do_stage (Package* pkg, mstring stage)
   int len = mstring_get_length (pkg->file);
   
   mchar      buff[ len + 1 ];
-  sprintf (buff, "ebuild %s %s", pkg->file, stage);
   
   return system (buff);
 }

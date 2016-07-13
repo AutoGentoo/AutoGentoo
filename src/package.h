@@ -23,8 +23,8 @@
 
 
 #include <stdio.h>
-#include <string.h>
 #include "mstring.h"
+#include "map.h"
 
 typedef struct
 {
@@ -58,8 +58,7 @@ typedef struct
   mstring           name;
   PkgVersion       *version;
   PkgVersion       *old;
-  mstring_a         vars;
-  mstring_a         vals;
+  map              *parameters;
   mstring           file;
   mstring           name_raw;
   mstring           size;

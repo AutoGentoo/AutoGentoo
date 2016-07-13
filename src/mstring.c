@@ -51,6 +51,11 @@ mstring_new_from_chars (char *c)
 int
 mstring_get_length (mstring str)
 {
+  if (!str)
+  {
+    return 0;
+  }
+  
   int num;
   for (num = 0; str[num]; num++);
   return num;
@@ -229,52 +234,59 @@ mstring_a_split (mstring_a in, mstring c, int len)
   return buff;
 };
 
-mstring_a mstring_split (mstring a_str, mchar a_delim)
+int mstring_split_len (mstring in, mchar splt)
 {
-  mstring_a result   = 0;
-  size_t count       = 0;
-  mstring tmp        = a_str;
-  mstring last_comma = 0;
-  mchar delim[2];
-  delim[0] = a_delim;
-  delim[1] = 0;
-
-  /* Count how many elements will be extracted. */
-  while (*tmp)
+  int        occ_num  =  0;
+  int        curr;
+  
+  for (;in[curr]; curr++)
   {
-    if (a_delim == *tmp)
+    if (in[curr] == splt)
     {
-      count++;
-      last_comma = tmp;
+      occ_num++;
     }
-    tmp++;
   }
+  
+  return occ_num;
+}
 
-  /* Add space for trailing token. */
-  count += last_comma < (a_str + strlen(a_str) - 1);
-
-  /* Add space for terminating null string so caller
-     knows where the list of returned strings ends. */
-  count++;
-
-  result = malloc(sizeof(mstring) * count);
-
-  if (result)
+mstring_a mstring_split (mstring in, mchar splt)
+{
+  int        occ_num  =  0;
+  int        occs [32];
+  int        curr;
+  
+  for (;in[curr]; curr++)
   {
-    size_t idx  = 0;
-    mstring token = strtok(a_str, delim);
-
-    while (token)
+    if (in[curr] == splt)
     {
-      assert(idx < count);
-      *(result + idx++) = strdup(token);
-      token = strtok(0, delim);
+      occs[occ_num] = curr;
+      occ_num++;
     }
-    assert(idx == count - 1);
-    *(result + idx) = 0;
   }
-
-  return result;
+  occs [occ_num+1] = -1;
+  
+  mstring_a      buff = mstring_a_new ();
+  
+  if (occ_num == 0)
+  {
+    buff[0] = in;
+  }
+  
+  for (curr=0; curr != occ_num; curr++)
+  {
+    if (curr == 0)
+    {
+      buff[curr] = mstring_get_sub_py (in, 0, occs[curr]);
+    }
+    else
+    {
+      buff[curr] = mstring_get_sub_py (in, occs[curr-1] + 1, occs[curr]);
+    }
+  }
+  buff[curr] = mstring_get_sub_py (in, occs[curr-1] + 1, -1);
+  
+  return buff;
 }
 
 int
@@ -324,11 +336,40 @@ mstring concat(mstring s1, mstring s2)
   return result;
 }
 
+int mstring_split_quote_len (mstring in, mchar c)
+{
+  int      occ_num = 0;
+  int      curr = 0;
+  bool     in_quote = FALSE;
+  
+  for (; in[curr]; curr++)
+  {
+    if (in[curr] == '"')
+    {
+      in_quote = !in_quote;
+    }
+    
+    if (in_quote)
+    {
+      continue;
+    }
+    
+    if (in[curr] == c)
+    {
+      occ_num++;
+    }
+  }
+  
+  occ_num++;
+  
+  return occ_num;
+}
+
 mstring_a
 mstring_split_quote (mstring in, mchar c)
 {
-  int      occ_num;
-  int     *occs = malloc (sizeof(int*));
+  int      occ_num = 0;
+  int     *occs = malloc(sizeof(int*));
   int      curr = 0;
   bool     in_quote = FALSE;
   
@@ -353,7 +394,12 @@ mstring_split_quote (mstring in, mchar c)
   
   mstring_a      buff = mstring_a_new ();
   
-  for (curr=0; occs[curr]; curr++)
+  if (occ_num == 0)
+  {
+    buff[0] = in;
+  }
+  
+  for (curr=0; curr != occ_num; curr++)
   {
     if (curr == 0)
     {
@@ -361,9 +407,12 @@ mstring_split_quote (mstring in, mchar c)
     }
     else
     {
-      buff[curr] = mstring_get_sub_py (in, occs[curr-1], occs[curr]);
+      buff[curr] = mstring_get_sub_py (in, occs[curr-1] + 1, occs[curr]);
     }
   }
+  buff[curr] = mstring_get_sub_py (in, occs[curr-1] + 1, -1);
+  
+  free(occs);
   
   return buff;
 }
@@ -403,4 +452,10 @@ mstring_a
 mstring_a_new (void)
 {
   return malloc(sizeof (mstring_a));
+}
+
+mstring
+mstring_grate (mstring in)
+{
+  return mstring_get_sub_py (in, 1, mstring_get_length (in) - 1);
 }

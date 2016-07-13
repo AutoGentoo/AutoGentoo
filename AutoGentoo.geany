@@ -29,18 +29,25 @@ long_line_column=72
 
 [files]
 current_page=1
-FILE_NAME_0=868;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fpackage.h;0;2
-FILE_NAME_1=6920;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fpackage.c;0;2
-FILE_NAME_2=1014;C;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Ftest%2Fpackage_test.c;0;2
-FILE_NAME_3=50;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2FMakefile;0;2
-FILE_NAME_4=574;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmlib.h;0;2
-FILE_NAME_5=102771;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fbuff.emerge;0;2
-FILE_NAME_6=1623;None;0;EUTF-8;0;1;0;%2Fusr%2Fportage%2Fmetadata%2Fmd5-cache%2Fapp-accessibility%2Faccerciser-3.14.0;0;2
-FILE_NAME_7=1925;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmstring.h;0;2
-FILE_NAME_8=6453;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmstring.c;0;2
+FILE_NAME_0=172525;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDocuments%2Ftest.html;0;8
+FILE_NAME_1=4762;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2Fwebmaster%2FIHSTech2016%2Fdoc2.html;0;2
+FILE_NAME_2=8081;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2Fwebmaster%2FIHSTech2016%2Fdoc1.html;0;2
+FILE_NAME_3=0;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2Fwebmaster%2FIHSTech2016%2Fteachers.html;0;2
+FILE_NAME_4=13088;CSS;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2Fwebmaster%2FIHSTSA%2Fcss%2Fstyle.css;0;2
+FILE_NAME_5=15;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmap.h;0;2
+FILE_NAME_6=548;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmap.c;0;2
+FILE_NAME_7=922;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fpackage.h;0;2
+FILE_NAME_8=5160;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fpackage.c;0;2
+FILE_NAME_9=1124;C;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Ftest%2Fpackage_test.c;0;2
+FILE_NAME_10=409;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2FMakefile;0;2
+FILE_NAME_11=574;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmlib.h;0;2
+FILE_NAME_12=102714;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fbuff.emerge;0;2
+FILE_NAME_13=1623;None;0;EUTF-8;0;1;0;%2Fusr%2Fportage%2Fmetadata%2Fmd5-cache%2Fapp-accessibility%2Faccerciser-3.14.0;0;2
+FILE_NAME_14=2429;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmstring.h;0;2
+FILE_NAME_15=1190;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fmstring.c;0;2
 
 [VTE]
-last_dir=/home/atuser/git/AutoGentoo/src
+last_dir=/home/atuser/Documents
 
 [build-menu]
 CFT_00_LB=_Compile

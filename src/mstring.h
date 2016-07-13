@@ -61,6 +61,10 @@ int                mstring_rfind               (mstring, mchar);
 
 mstring_a          mstring_a_new               (void);
 
+int                mstring_split_len           (mstring, mchar);
+
+int                mstring_split_quote_len     (mstring, mchar);
+
 mstring_a          mstring_split               (mstring, mchar);
 
 mstring_a *        mstring_a_split             (mstring_a, mstring, int);
@@ -74,4 +78,6 @@ mstring_a          mstring_split_quote         (mstring, mchar);
 int                mstring_search              (mstring, mstring);
 
 mstring            itoa                        (int, int);
+
+mstring            mstring_grate               (mstring);
 #endif

@@ -5,16 +5,16 @@ CFLAGS += -Wall -g -lz -lbz2  -larchive
 
 BIN = emerge
 TBIN = testing
-BARE = mstring package
-TBARE = test/package_test mstring package
+BARE = mstring package map
+TBARE = package_test
 
 MOBJECTS = $(patsubst %,%.o, $(BARE))
 MSOURCES = $(patsubst %,%.c, $(BARE))
 MHEADERS = $(patsubst %,%.h, $(BARE))
 
-TOBJECTS = $(patsubst %,%.o, $(TBARE))
-TSOURCES = $(patsubst %,%.c, $(TBARE))
-THEADERS = $(patsubst %,%.h, $(TBARE))
+TOBJECTS = $(patsubst %,%.o, $(TBARE) $(BARE))
+TSOURCES = $(patsubst %,%.c, $(TBARE) $(BARE))
+THEADERS = $(patsubst %,%.h, $(TBARE) $(BARE))
 
 .PHONY : all
 .DEFAULT_GOAL := all

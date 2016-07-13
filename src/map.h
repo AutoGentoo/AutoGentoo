@@ -1,5 +1,5 @@
 /*
- * pkg_size.c
+ * map.h
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
@@ -23,16 +23,17 @@
 
 
 #include <stdio.h>
-#include "../package.h"
+#include "mstring.h"
 
-int main(int argc, char **argv)
+typedef struct
 {
-	mstring str = "[ebuild     U  ] gnome-extra/gnome-shell-extensions-3.18.4::gentoo [3.18.3::gentoo] USE=\"-examples\" 229 KiB";
-	Package * gnome = package_new_from_string (str);
-	
-	int __EXIT = package_do_stage (gnome, "compile");
-	free(gnome);
-	
-	return __EXIT;
-}
+  mstring_a        variables;
+  mstring_a        values;
+  int              var_num;
+} map;
 
+map *      map_new           (void);
+
+void       map_add           (map*, mstring, mstring);
+
+mstring    map_get           (map*, mstring);
