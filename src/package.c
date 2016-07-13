@@ -232,9 +232,8 @@ package_new_from_string (mstring str)
 int
 package_do_stage (Package* pkg, mstring stage)
 {
-  int len = mstring_get_length (pkg->file);
-  
-  mchar      buff[ len + 1 ];
+  mstring buff = mstring_new ();
+  sprintf (buff, "ebuild %s %s", pkg->file, stage);
   
   return system (buff);
 }

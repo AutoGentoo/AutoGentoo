@@ -34,9 +34,9 @@ int main(int argc, char **argv)
 	printf ("%s = %s\n", "ANOTHERONE", map_get (gnome->parameters, param));
 	printf ("%s\n", gnome->file);
 	fflush (stdout);
-	//int __EXIT = package_do_stage (gnome, "compile");
+	int __EXIT = package_do_stage (gnome, "fetch");
 	free(gnome);
 	
-	return 0;
+	return __EXIT;
 }
 
