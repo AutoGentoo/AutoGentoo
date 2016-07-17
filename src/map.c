@@ -47,5 +47,10 @@ map_add (map* to_change, mstring var, mstring val)
 mstring
 map_get (map* from, mstring var)
 {
-  return from->values [mstring_a_find (from->variables, var)];
+  int buff = mstring_a_find (from->variables, var);
+  if (buff == -1) 
+  {
+    return NULL;
+  }
+  return from->values [buff];
 }

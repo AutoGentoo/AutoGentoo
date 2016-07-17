@@ -1,5 +1,5 @@
 /*
- * pkg_size.c
+ * emergeflags.h
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
@@ -25,17 +25,9 @@
 #include <stdio.h>
 #include "package.h"
 
-int main(int argc, char **argv)
+typedef struct
 {
-	mstring str = "[ebuild     U  ] gnome-extra/gnome-shell-extensions-3.18.4::gentoo [3.18.3-r2:1::unity-gentoo] PYTHON=\"gcc parted\" USE=\"-examples\" ANOTHERONE=\"testing one two three\" 229 KiB";
-	Package * gnome = package_new_from_string (str);
-	
-	printf ("%s\n", gnome->old->repo);
-	printf ("%s\n", gnome->old->repo);
-	fflush (stdout);
-	int __EXIT = package_do_stage (gnome, "fetch");
-	free(gnome);
-	
-	return __EXIT;
-}
-
+  mstring_a       content;
+  mstring         file;
+  bool            is_dir;
+} EmergeFlags;

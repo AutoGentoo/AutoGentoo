@@ -208,7 +208,6 @@ package_new_from_string (mstring str)
   }
   
   mstring_a b_var_a = mstring_split_quote (b_vars, ' ');
-  printf ("%d\n", mstring_split_quote_len (b_vars, ' '));
   for (curr = 0; curr != mstring_split_quote_len (b_vars, ' '); curr++)
   {
     mstring_a splt_b = mstring_split (b_var_a [curr], '=');

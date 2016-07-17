@@ -107,7 +107,7 @@ mstring_find (mstring in, mchar find)
   
   for (curr = 0; curr != size; curr++)
   {
-    char c = in[curr];
+    mchar c = in[curr];
     
     if (c == find)
     {
@@ -119,14 +119,14 @@ mstring_find (mstring in, mchar find)
 }
 
 int
-mstring_rfind (mstring in, char find)
+mstring_rfind (mstring in, mchar find)
 {
   int   size = mstring_get_length (in);
   int   curr = size;
   
   for (; curr != 0; curr--)
   {
-    char c = in[curr];
+    mchar c = in[curr];
     
     if (c == find)
     {
@@ -142,13 +142,13 @@ mstring_find_start (mstring in, mchar find, int start)
 {
   int   size = mstring_get_length (in);
   int   curr;
-  char  buff [size];
+  mchar  buff [size];
   
   strcpy(buff, in);
   
   for (curr = start; curr != size; curr++)
   {
-    char c = buff[curr];
+    mchar c = buff[curr];
     
     if (c == find)
     {
@@ -163,7 +163,7 @@ mstring_find_start (mstring in, mchar find, int start)
 char_a_new_from_string (mstring in)
 {
   int     size    = mstring_get_length (in);
-  char    buff[size];
+  mchar    buff[size];
   int     curr    = 0;
   
   for (;in[curr]; curr++)
@@ -215,7 +215,7 @@ mstring_a_split (mstring_a in, mstring c, int len)
   {
     mstring curr_c = in[curr];
     
-    if (curr_c == c)
+    if (strcmp (curr_c, c) == 0)
     {
       str_buff[str_index] = curr_c;
       buff[index] = str_buff;
@@ -318,7 +318,7 @@ mstring_a_find (mstring_a in, mstring search)
   
   for (curr = 0; in [curr]; curr++)
   {
-    if (in[curr] == search)
+    if (strcmp(in[curr], search) == 0)
     {
       return curr;
     }
