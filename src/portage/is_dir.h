@@ -1,7 +1,7 @@
 /*
- * pkg_size.c
+ * is_dir.h
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,20 +22,14 @@
  */
 
 
-#include <stdio.h>
-#include "package.h"
+#ifndef __AUTOGENTOO_IS_DIR__
+#define __AUTOGENTOO_IS_DIR__
 
-int main(int argc, char **argv)
-{
-	mstring str = "[ebuild     U  ] gnome-extra/gnome-shell-extensions-3.18.4::gentoo [3.18.3-r2:1::unity-gentoo] PYTHON=\"gcc parted\" USE=\"-examples\" ANOTHERONE=\"testing one two three\" 229 KiB";
-	Package * gnome = package_new_from_string (str);
-	
-	printf ("%s\n", gnome->old->repo);
-	printf ("%s\n", gnome->old->repo);
-	fflush (stdout);
-	int __EXIT = package_do_stage (gnome, "fetch");
-	free(gnome);
-	
-	return __EXIT;
-}
+#include <iostream>
+#include <sys/stat.h>
+#include <fstream>
 
+bool is_dir ( const char* path );
+bool is_file_exist ( const char *fileName );
+
+#endif

@@ -1,7 +1,7 @@
 /*
- * emergeflags.h
+ * emerge.h
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,17 @@
  */
 
 
-#include <stdio.h>
-#include "package.h"
+#ifndef __AUTOGENTOO_PORTAGE_EMERGE__
+#define __AUTOGENTOO_PORTAGE_EMERGE__
 
-typedef struct
-{
-  mstring_a       content;
-  mstring         file;
-  bool            is_dir;
-} EmergeFlags;
+#include <iostream>
+#include <string>
+#include <vector>
+#include "type.h"
+#include "packageConfig.h"
+
+using namespace std;
+
+void Emerge ( string package, string emergeConfig, string packageConfig, bool do_pretend, string options, bool updates_only );
+
+#endif

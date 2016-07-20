@@ -1,7 +1,7 @@
 /*
- * map.h
+ * ebuild.h
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +21,25 @@
  * 
  */
 
+#ifndef __EBUILD__
+#define __EBUILD__
 
-#include <stdio.h>
-#include "mstring.h"
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <map>
+#include "parse_config.h"
+#include "package.h"
+#include "use.h"
 
-typedef struct
+class ebuild
 {
-  mstring_a        variables;
-  mstring_a        values;
-  int              var_num;
-} map;
+  public:
+  string REQUIRED_USE; //!< A list of assertions that must be met by the configuration of Use flags to be valid for this ebuild. (Requires EAPI>=4.)
+  string SUGGEST_USE; //!< A string of suggested changes to the current use flags, empty if no suggestions
+  vector < string > CURRENT_USE; //!< Found by executing the 'equery uses' command to get the currently enabled strings, this vectors only holds the name of the Use flag
+  
+  ebuild ( Package package );
+};
 
-map *      map_new           (void);
-
-void       map_add           (map*, mstring, mstring);
-
-mstring    map_get           (map*, mstring);
+#endif

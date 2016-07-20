@@ -1,7 +1,7 @@
 /*
- * mlib.h
+ * package.h
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,31 +22,37 @@
  */
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef __AUTOGENTOO_PACKAGE__
+#define __AUTOGENTOO_PACKAGE__
 
-#ifndef   AUTOGENTOO_BOOL
-#define   AUTOGENTOO_BOOL
-typedef   int     bool;
-#endif
+#include <iostream>
+#include <string>
+#include "_misc_tools.h"
+#include "version.h"
 
-#ifndef   NULL
-#define   NULL    ((void*) 0)
-#endif
+using namespace std;
 
-#ifndef   FALSE
-#define   FALSE   (0)
-#endif
+class Package
+{
+  public:
+  
+  string packagestr;
+  string name;
+  string path;
+  string catagory;
+  string directory;
+  string releaseStr;
+  string file;
+  string repository;
+  string slot;
+  version release;
+  string fullPackage;
+  string overlayDir;
+  
+  Package ( string );
+  void init ( string );
+  int stage ( string, string );
+  
+};
 
-#ifndef   TRUE
-#define   TRUE    (!FALSE)
-#endif
-
-#ifndef   MSTRING
-#define   MSTRING
-typedef char     mchar;
-typedef mchar   *mstring;
-typedef mchar  **mstring_a;
-typedef int     *int_a;
 #endif

@@ -28,7 +28,12 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=-1
+current_page=2
+FILE_NAME_0=2224;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femergepackage.h;0;2
+FILE_NAME_1=899;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Femergepackage.cpp;0;2
+FILE_NAME_2=2756;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ffile.hpp;0;2
+FILE_NAME_3=2512;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2FfindPackage.cpp;0;2
+FILE_NAME_4=1904;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Fini_parser.cpp;0;2
 
 [VTE]
 last_dir=/home/atuser/Documents
