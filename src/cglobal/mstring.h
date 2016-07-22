@@ -80,4 +80,6 @@ int                mstring_search              (mstring, mstring);
 mstring            itoa                        (int, int);
 
 mstring            mstring_grate               (mstring);
+
+mstring            mstring_removechar          (mstring, char);
 #endif

@@ -91,3 +91,75 @@ section_new_from_str (mstring_a in)
   
   return buff;
 }
+
+Config
+config_new (void)
+{
+  Config       buff   = {
+    .file             = mstring_new (),
+    .comments         = malloc(sizeof(mstring_a) * 1024),
+    .sections         = malloc(sizeof(Section) * 1024),
+    .sectionc         = 0
+  };
+  
+  return buff;
+}
+
+Config
+config_new_from_str (mstring filename)
+{
+  Config       buff  = config_new ();
+  buff.file          = filename;
+  mstring_a file     = readlines (filename);
+  
+  int curr = 0;
+  int curr_comment = 0;
+  bool in_section = FALSE;
+  mstring_a buff_section = malloc(sizeof(mstring_a) * 3072);
+  int buff_s = 0;
+  for (; file[curr]; curr++)
+  {
+    if (file[curr][0] == '#')
+    {
+      buff.comments[curr_comment] = file[curr];
+      curr_comment++;
+      continue;
+    }
+    
+    if (in_section)
+    {
+      if (strcmp (file[curr], "\n") == 0)
+      {
+        Section sec_buff = section_new_from_str (buff_section);
+        buff.sections[buff.sectionc] = sec_buff;
+        buff.sectionc++;
+        in_section = FALSE;
+        buff_s = 0;
+        free(buff_section);
+        continue;
+      }
+      buff_section[buff_s] = file[curr];
+      buff_s++;
+      continue;
+    }
+    
+    if (file[curr][0] == '[')
+    {
+      in_section = TRUE;
+      buff_section[buff_s] = file[curr];
+      buff_s++;
+    }
+  }
+  
+  free(file);
+  
+  return buff;
+}
+
+void
+config_free (Config nptr)
+{
+  free (nptr.file);
+  free (nptr.comments);
+  free (nptr.sections);
+}

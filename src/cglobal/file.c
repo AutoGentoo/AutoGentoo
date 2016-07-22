@@ -61,14 +61,19 @@ readlines (mstring filename)
   
   while ((line = fgetln(f, &len)))
   {
-    mstring b_line = line;
-    int idxToDel = mstring_find (line, '\n'); 
-    memmove(&b_line[idxToDel], &b_line[idxToDel + 1], strlen(b_line) - idxToDel);
-    out[curr] =  b_line;
+    /** Create segmentation fault because of miss allocated memory **/
+    /*mstring b_line = malloc(sizeof(mchar) * strlen(line)+1);
+    strcpy(b_line, line);
+    removeChar(b_line, '\n');
+    out[curr] = malloc(sizeof(mchar) * strlen(b_line));
+    out[curr] = b_line;
+    free(b_line);*/
     curr++;
   }
   if (!feof(f))
     err(1, "fgetln");
+  
+  free(line);
   
   fclose(f);
   

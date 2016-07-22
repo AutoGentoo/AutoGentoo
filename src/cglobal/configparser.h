@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include "mstring.h"
+#include "file.h"
 
 typedef struct
 {
@@ -47,6 +48,7 @@ typedef struct
 typedef struct
 {
   mstring         file;
+  mstring_a       comments;
   
   Section        *sections;
   int             sectionc;
@@ -62,5 +64,8 @@ Section           section_new_from_str            (mstring_a);
 
 Config            config_new                      (void);
 
+Config            config_new_from_str             (mstring);
+
+void              config_free                     (Config);
 
 #endif
