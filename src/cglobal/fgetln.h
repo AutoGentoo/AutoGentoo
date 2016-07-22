@@ -1,5 +1,5 @@
 /*
- * file.h
+ * fgetln.h
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,14 +22,13 @@
  */
 
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
-#include "mstring.h"
-#include "fgetln.h"
-#include <err.h>
 
-int             getlength             (mstring);
+#ifndef __AUTOGENTOO_FGETLN__
+#define __AUTOGENTOO_FGETLN__
 
-mstring_a       readlines             (mstring);
+char * fgetln(FILE *fp, size_t *lenp);
 
-mstring         read_file             (mstring);
+#endif

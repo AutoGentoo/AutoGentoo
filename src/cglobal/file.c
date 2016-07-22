@@ -24,14 +24,55 @@
 
 #include "file.h"
 
+int
+getlength (mstring filename)
+{
+  int lines;
+  int ch=0;
+  FILE *fp;
+  fp = fopen(filename, "r");
+  if (fp == NULL)
+    err(1, "%s", filename);
+  
+  while(!feof(fp))
+  {
+    ch = fgetc(fp);
+    if(ch == '\n')
+    {
+      lines++;
+    }
+  }
+  
+  return lines;
+}
+
 mstring_a
 readlines (mstring filename)
 {
-  mstring full_file = (char*) malloc (sizeof(char) * (mstring_get_length (read_file (filename)) + 1) );
-  full_file = read_file (filename);
-  mstring_a buff = mstring_split (full_file, '\n');
-  free(full_file);
-  return buff;
+  FILE *f;
+  size_t len;
+  char *line;
+  mstring_a out = malloc (sizeof(mstring_a) * getlength (filename));
+  int curr = 0;
+  
+  f = fopen(filename, "r");
+  if (f == NULL)
+    err(1, "%s", filename);
+  
+  while ((line = fgetln(f, &len)))
+  {
+    mstring b_line = line;
+    int idxToDel = mstring_find (line, '\n'); 
+    memmove(&b_line[idxToDel], &b_line[idxToDel + 1], strlen(b_line) - idxToDel);
+    out[curr] =  b_line;
+    curr++;
+  }
+  if (!feof(f))
+    err(1, "fgetln");
+  
+  fclose(f);
+  
+  return out;
 }
 
 mstring

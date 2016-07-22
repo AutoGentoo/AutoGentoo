@@ -30,9 +30,10 @@ int main(int argc, char *argv[])
 {
   password *buff = password_new_md5 (argv[1]);
   mstring pass = getpass("Verify Password: ");
-  printf ("%s", password_varify (buff, pass) ? "Correct!" : "Incorrect!");
+  printf ("%s", password_varify (buff, pass) ? "Correct!\n" : "Incorrect!\n");
   
-  printf("\n%s\n%s", buff->md5, buff->salt);
+  if (password_varify (buff, pass))
+    printf("%s\t<-- MD5 Hash\n%s\t<-- Password Salt\n", buff->md5, buff->salt);
   return 0;
 }
 

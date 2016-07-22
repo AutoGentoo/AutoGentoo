@@ -27,9 +27,12 @@
 Variable
 variable_new (void)
 {
-  Variable       buff   =  malloc (sizeof(Variable);
-  buff.name             =  mstring_new ();
-  buff.value            =  mstring_new ();
+  Variable       buff = {
+    .name             = mstring_new (),
+    .value            = mstring_new (),
+    .arguments        = mstring_a_new (),
+    .full_value       = mstring_new ()
+  };
   
   return buff;
 }
@@ -37,45 +40,54 @@ variable_new (void)
 Variable
 variable_new_from_str (mstring in)
 {
-  Variable       buff   =  variable_new ();
-  buff.name             =  mstring_find_before (in, '=');
-  buff.value            =  mstring_find_after (in, '=');
+  Variable        buff    =  variable_new ();
+  buff.name               =  mstring_find_before (in, '=');
+  buff.full_value         =  mstring_find_after (in, '=');
+  int             get_eq  =  mstring_find (in, '=');
+  int             get_arg =  mstring_find_start (in, ' ', get_eq);
+  buff.value              =  mstring_get_sub_py (in, get_eq, get_arg);
+  buff.arguments          =  mstring_split (mstring_get_sub_py (in, get_arg, -1), ' ');
   
   return buff;
 }
 
-ArgVariable
-argvariable_new (void)
+Section
+section_new (void)
 {
-  ArgVariable    buff   =  malloc (sizeof(ArgVariable);
-  buff.name             =  mstring_new ();
-  buff.value            =  mstring_new ();
-  buff.arguments        =  mstring_a_new ();
-  buff.full_value       =  mstring_new ();
-  buff.argc             =  0;
+  Section       buff  = {
+    .name             = mstring_new (),
+    .variables        = malloc(sizeof(Variable) * 2048),
+    .varc             = 0,
+    .comments         = malloc(sizeof(mstring_a) * 1024)
+  };
   
   return buff;
 }
 
-ArgVariable
-argvariable_new_from_str (mstring in)
+Section
+section_new_from_str (mstring_a in)
 {
-  ArgVariable    buff   =  argvariable_new ();
-  buff.name             =  mstring_find_before (in, '=');
-  buff.full_value       =  mstring_find_after (in, '=');
-}
-
-ListVariable
-listvariable_new (void)
-{
-  ListVariable   buff   =  malloc (sizeof(ListVariable);
-  buff.name             =  mstring_new ();
+  Section       buff = section_new ();
+  buff.name          = mstring_grate (in[0]);
+  
+  int curr;
+  int curr_comment = 0;
+  for (curr = 1; in [curr]; ++curr)
+  {
+    if (in[curr][0] == '#')
+    {
+      buff.comments[curr_comment] = in[curr];
+      curr_comment++;
+      continue;
+    }
+    
+    if (!in[curr])
+      break;
+    
+    Variable currVar = variable_new_from_str (in[curr]);
+    buff.variables[buff.varc] = currVar;
+    buff.varc++;
+  }
   
   return buff;
 }
-
-ListVariable      listvariable_new_from_str       (mstring);
-
-Section           section_new                     (void);
-
-Section           section_new_from_str            (mstring);

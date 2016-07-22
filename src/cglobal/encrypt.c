@@ -48,9 +48,9 @@ password_new_md5 (mstring string)
   password * pbuff = password_new ();
   pbuff->salt = agmd5_generate ();
   
-  mstring cmdbuff = malloc (1082);
+  mstring cmdbuff = malloc (sizeof(mstring) * 1082);
   sprintf(cmdbuff, "openssl passwd -1 -salt %s %s", pbuff->salt, string);
-  pbuff->md5 = get_output (cmdbuff);
+  pbuff->md5 = mstring_find_before(get_output (cmdbuff), '\n');
   free (cmdbuff);
   return pbuff;
 }
@@ -58,9 +58,9 @@ password_new_md5 (mstring string)
 bool
 password_varify (password* inpwd, mstring checkpwd)
 {
-  mstring cmdbuff = malloc (1082);
+  mstring cmdbuff = malloc (sizeof(mstring) * 1082);
   sprintf(cmdbuff, "openssl passwd -1 -salt %s %s", inpwd->salt, checkpwd);
-  bool out = strcmp(mstring_find_before(get_output (cmdbuff), ' '), inpwd->md5) == 0;
+  bool out = strcmp(mstring_find_before(get_output (cmdbuff), '\n'), inpwd->md5) == 0;
   free (cmdbuff);
   return out;
 }

@@ -6,9 +6,9 @@ LIB = -lcrypto
 
 ETBIN = encrypt_test
 FTBIN = file_test
-ETBARE = encrypt mstring command_tools file
-FTBARE = mstring file
-BARE = mstring encrypt configparer command_tools file
+ETBARE = encrypt mstring command_tools file fgetln
+FTBARE = mstring file fgetln
+BARE = mstring encrypt configparser command_tools file fgetln
 
 OBJECTS = $(patsubst %,%.o, $(BARE))
 SOURCES = $(patsubst %,%.cpp, $(BARE))
@@ -35,8 +35,7 @@ test: $(ETOBJECTS) $(FTOBJECTS)
 	$(LL) $(ETOBJECTS) encrypt_test.o -o $(ETBIN) $(LIB)
 	$(LL) $(FTOBJECTS) file_test.o -o $(FTBIN) $(LIB)
 
-#all: $(OBJECTS)
-#	
+all: $(OBJECTS)
 
 clean:
 	rm -rf $(OBJECTS)
@@ -45,3 +44,4 @@ clean:
 	rm -rf $(BIN)
 	rm -rf $(ETBIN)
 	rm -rf $(FTBIN)
+	rm -rf *.gch

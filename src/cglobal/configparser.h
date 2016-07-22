@@ -34,17 +34,14 @@ typedef struct
   mstring         value;
   mstring_a       arguments;
   mstring         full_value;
-  int             argc;
-  int             type; /** 0: variable, 1: argument, 2: list item **/
 } Variable; 
 
 typedef struct
 {
   mstring         name;
-  int            *variabletypes; /** 0: variable, 1: argument, 2: list item **/
   Variable       *variables;
   int             varc;
-  
+  mstring_a       comments;
 } Section;
 
 typedef struct
@@ -55,15 +52,15 @@ typedef struct
   int             sectionc;
 } Config;
 
-Variable *        variable_new                    (void);
+Variable          variable_new                    (void);
 
-Variable *        variable_new_from_str           (mstring);
+Variable          variable_new_from_str           (mstring);
 
-Section *         section_new                     (void);
+Section           section_new                     (void);
 
-Section *         section_new_from_str            (mstring);
+Section           section_new_from_str            (mstring_a);
 
-Config *          config_new                      (void);
+Config            config_new                      (void);
 
 
 #endif

@@ -27,12 +27,12 @@
 
 int main(int argc, char **argv)
 {
-	int x;
-	mstring_a buff = readlines ("mlib.h");
-	for (x=0; buff[x]; ++x)
-	{
-		printf ("%s\n", buff[x]);
-	}
-	return 0;
+  int x;
+  mstring_a buff = readlines ("mlib.h");
+  for (x=0; buff[x]; ++x)
+  {
+    printf ("%s\n", buff[x]);
+  }
+  return 0;
 }
 
