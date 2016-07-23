@@ -23,14 +23,24 @@
 
 
 #include <stdio.h>
-#include "configparser.h"
+#include "mstring.h"
+#include "iniparser.h"
 
 int main(int argc, char **argv)
 {
-  Config test = config_new_from_str ("../../autogentoo.conf");
+  dictionary  *   ini ;
   
-  printf("%s\n", test.comments[1]);
+  mstring ini_name = "../../autogentoo.conf";
   
-  config_free (test);
+  ini = iniparser_load(ini_name);
+  
+  if (ini==NULL)
+  {
+    fprintf(stderr, "cannot parse file: %s\n", ini_name);
+    return -1 ;
+  }
+  
+  printf ("%s\n", iniparser_getstring(ini, "user:fullname", NULL));
+  
   return 0;
 }

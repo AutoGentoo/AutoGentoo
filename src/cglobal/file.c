@@ -52,7 +52,7 @@ readlines (mstring filename)
   FILE *f;
   size_t len;
   char *line;
-  mstring_a out = malloc (sizeof(mstring_a) * getlength (filename));
+  mstring_a out = calloc (getlength (filename), sizeof(mstring_a));
   int curr = 0;
   
   f = fopen(filename, "r");
@@ -61,19 +61,13 @@ readlines (mstring filename)
   
   while ((line = fgetln(f, &len)))
   {
-    /** Create segmentation fault because of miss allocated memory **/
-    /*mstring b_line = malloc(sizeof(mchar) * strlen(line)+1);
-    strcpy(b_line, line);
-    removeChar(b_line, '\n');
-    out[curr] = malloc(sizeof(mchar) * strlen(b_line));
-    out[curr] = b_line;
-    free(b_line);*/
+    out[curr] = calloc (mstring_get_length (line), sizeof(mstring));
+    out[curr] = mstring_get_sub_py (line, 0, -2);
+    free(line);
     curr++;
   }
   if (!feof(f))
     err(1, "fgetln");
-  
-  free(line);
   
   fclose(f);
   

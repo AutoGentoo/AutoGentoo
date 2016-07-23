@@ -9,8 +9,8 @@ FTBIN = file_test
 CTBIN = config_test
 ETBARE = encrypt mstring command_tools file fgetln
 FTBARE = mstring file fgetln
-CTBARE = mstring file configparser fgetln
-BARE = mstring encrypt configparser command_tools file fgetln
+CTBARE = mstring file iniparser dictionary fgetln
+BARE = mstring encrypt iniparser dictionary command_tools file fgetln
 
 OBJECTS = $(patsubst %,%.o, $(BARE))
 SOURCES = $(patsubst %,%.c, $(BARE))

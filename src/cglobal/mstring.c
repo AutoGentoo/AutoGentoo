@@ -87,16 +87,28 @@ mstring_get_sub_py (mstring old, int start, int end)
 {
   int      size = mstring_get_length (old);
   int      len;
-  mstring  out_array = (char*) malloc(size);
+  mstring  out_array = (char*) malloc(size + 1);
   
-  if (size < end || end == -1)
+  if (size < end)
   {
     end = size;
   }
+  
+  if (end < 0)
+  {
+    end = size + end;
+    end++;
+  }
+  
   len = end - start;
   memcpy(out_array, &old[start], len);
   
-  return mstring_new_from_chars (out_array);
+  if (out_array[len] != '\0')
+  {
+    out_array[len + 1] = '\0';
+  }
+  
+  return out_array;
 }
 
 int
@@ -230,6 +242,9 @@ mstring_a_split (mstring_a in, mstring c, int len)
   
   end[0]      = itoa (curr, 10);
   buff[0]     = end;
+  
+  free(str_buff);
+  free(end);
   
   return buff;
 };
@@ -444,4 +459,34 @@ mstring
 mstring_grate (mstring in)
 {
   return mstring_get_sub_py (in, 1, mstring_get_length (in) - 1);
+}
+
+mstring
+mstring_removechar (mstring in, mchar chr)
+{
+  mstring out = malloc(sizeof(mstring) * mstring_get_length (in));
+  int curr;
+  int out_curr;
+  for (curr = 0, out_curr = 0; in[curr]; curr++)
+  {
+    if (in[curr] != chr)
+    {
+      out[out_curr] = in[curr];
+      out_curr++;
+    }
+  }
+  
+  return out;
+}
+
+void
+mstring_a_free (mstring_a in)
+{
+  int curr;
+  for (curr=0; in[curr]; curr++)
+  {
+    free(in[curr]);
+  }
+  
+  free(in);
 }

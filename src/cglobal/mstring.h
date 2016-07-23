@@ -81,5 +81,7 @@ mstring            itoa                        (int, int);
 
 mstring            mstring_grate               (mstring);
 
-mstring            mstring_removechar          (mstring, char);
+mstring            mstring_removechar          (mstring, mchar);
+
+void               mstring_a_free              (mstring_a);
 #endif

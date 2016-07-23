@@ -66,6 +66,14 @@ Config            config_new                      (void);
 
 Config            config_new_from_str             (mstring);
 
-void              config_free                     (Config);
+void              variable_free                   (Variable*);
+
+void              section_free                    (Section*);
+
+void              config_free                     (Config*);
+
+mstring           section_get_value               (Section, mstring);
+
+mstring           config_get_value                (Config, mstring, mstring);
 
 #endif

@@ -28,10 +28,10 @@ Variable
 variable_new (void)
 {
   Variable       buff = {
-    .name             = mstring_new (),
-    .value            = mstring_new (),
-    .arguments        = mstring_a_new (),
-    .full_value       = mstring_new ()
+    .name             = NULL,
+    .value            = NULL,
+    .arguments        = NULL,
+    .full_value       = NULL
   };
   
   return buff;
@@ -96,7 +96,7 @@ Config
 config_new (void)
 {
   Config       buff   = {
-    .file             = mstring_new (),
+    .file             = NULL,
     .comments         = malloc(sizeof(mstring_a) * 1024),
     .sections         = malloc(sizeof(Section) * 1024),
     .sectionc         = 0
@@ -110,7 +110,8 @@ config_new_from_str (mstring filename)
 {
   Config       buff  = config_new ();
   buff.file          = filename;
-  mstring_a file     = readlines (filename);
+  mstring_a file     = calloc (getlength (filename), sizeof(mstring_a));
+  file = readlines (filename);
   
   int curr = 0;
   int curr_comment = 0;
@@ -122,6 +123,8 @@ config_new_from_str (mstring filename)
     if (file[curr][0] == '#')
     {
       buff.comments[curr_comment] = file[curr];
+      printf ("%d,\t%s\n", curr, file[curr]);
+      fflush (stdout);
       curr_comment++;
       continue;
     }
@@ -151,15 +154,70 @@ config_new_from_str (mstring filename)
     }
   }
   
-  free(file);
+  mstring_a_free(file);
   
   return buff;
 }
 
 void
-config_free (Config nptr)
+variable_free (Variable *ptr)
 {
-  free (nptr.file);
-  free (nptr.comments);
-  free (nptr.sections);
+  free (ptr->name);
+  free (ptr->value);
+  free (ptr->arguments);
+  free (ptr->full_value);
+}
+
+void
+section_free (Section *ptr)
+{
+  free (ptr->name);
+  free (ptr->comments);
+  int curr;
+  for (curr=0; curr != ptr->varc; curr++)
+  {
+    variable_free (&ptr->variables [curr]);
+  }
+}
+
+void
+config_free (Config *ptr)
+{
+  free (ptr->comments);
+  free (ptr->sections);
+  int curr;
+  for (curr=0; curr != ptr->sectionc; curr++)
+  {
+    section_free (&ptr->sections [curr]);
+  }
+}
+
+mstring
+section_get_value (Section sec, mstring var)
+{
+  int curr;
+  for (curr = 0; curr != sec.varc; curr++)
+  {
+    if (strcmp (sec.variables[curr].name, var) == 0)
+    {
+      return sec.variables[curr].value;
+    }
+  }
+  
+  return NULL;
+}
+
+mstring
+config_get_value (Config cfg, mstring sec, mstring var)
+{
+  int curr;
+  for (curr = 0; curr != cfg.sectionc; curr++)
+  {
+    if (strcmp (cfg.sections[curr].name, sec) == 0)
+    {
+      return section_get_value (cfg.sections[curr], var);
+    }
+  }
+  
+  return NULL;
 }
