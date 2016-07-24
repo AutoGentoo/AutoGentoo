@@ -22,7 +22,7 @@
  */
 
 
-#include "emergepackage.h"
+#include "emergepackage.hh"
 
 using namespace std;
 using namespace boost::algorithm;

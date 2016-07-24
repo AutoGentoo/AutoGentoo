@@ -1,5 +1,5 @@
 /*
- * findPackage.h
+ * bash_config.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,33 +22,31 @@
  */
 
 
-#ifndef __AUTOGENTOO_FINDPKG__
-#define __AUTOGENTOO_FINDPKG__
+#ifndef __BASH_CONFIG_H__
+#define __BASH_CONFIG_H__
 
-#include <stdio.h>
 #include <iostream>
 #include <string>
+#include <map>
 #include <vector>
-#include <stdlib.h>
-#include "file.h"
+#include <boost/format.hpp>
+#include "file.hh"
+#include "_misc_tools.hh"
 
 using namespace std;
+using boost::format;
+using boost::io::group;
 
-class EmergeCat
+class bash_config
 {
   public:
-  vector<string> packages;
-  string category;
   
-  EmergeCat ( string cat );
+  string filename;
+  vector<string> file;
+  map<string, string> variables;
+  
+  bash_config ( const char *_file );
+  void read ( );
 };
-
-typedef struct
-{
-  vector<EmergeCat> categories;
-  
-  void init (void);
-  string ambig ( string pkg );
-} PortageDir;
 
 #endif

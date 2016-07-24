@@ -22,7 +22,7 @@
  */
 
 
-#include "version.h"
+#include "version.hh"
   
 void version::init ( string in_str )
 {

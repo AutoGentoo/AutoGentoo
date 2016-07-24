@@ -21,7 +21,7 @@
  * 
  */
 
-#include "package.h"
+#include "package.hh"
 
 Package::Package ( string input = "" )
 {

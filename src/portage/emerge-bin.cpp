@@ -23,9 +23,9 @@
 
 
 #include <iostream>
-#include "emerge.h"
-#include "option.h"
-#include "_misc_tools.h"
+#include "emerge.hh"
+#include "option.hh"
+#include "_misc_tools.hh"
 
 using namespace std;
 

@@ -1,5 +1,5 @@
 /*
- * packageConfig.h
+ * package.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,19 +22,37 @@
  */
 
 
-#ifndef __AUTOGENTOO_PACKAGE_CONFIG_FILE__
-#define __AUTOGENTOO_PACKAGE_CONFIG_FILE__
+#ifndef __AUTOGENTOO_PACKAGE__
+#define __AUTOGENTOO_PACKAGE__
 
 #include <iostream>
 #include <string>
-#include <vector>
-#include <fstream>
-#include "package.h"
-#include "emergepackage.h"
-#include "_misc_tools.h"
+#include "_misc_tools.hh"
+#include "version.hh"
 
 using namespace std;
 
-void PackageConfig ( EmergePackage pkg, string name );
+class Package
+{
+  public:
+  
+  string packagestr;
+  string name;
+  string path;
+  string catagory;
+  string directory;
+  string releaseStr;
+  string file;
+  string repository;
+  string slot;
+  version release;
+  string fullPackage;
+  string overlayDir;
+  
+  Package ( string );
+  void init ( string );
+  int stage ( string, string );
+  
+};
 
 #endif

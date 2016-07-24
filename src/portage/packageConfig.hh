@@ -1,5 +1,5 @@
 /*
- * emerge.h
+ * packageConfig.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,17 +22,19 @@
  */
 
 
-#ifndef __AUTOGENTOO_PORTAGE_EMERGE__
-#define __AUTOGENTOO_PORTAGE_EMERGE__
+#ifndef __AUTOGENTOO_PACKAGE_CONFIG_FILE__
+#define __AUTOGENTOO_PACKAGE_CONFIG_FILE__
 
 #include <iostream>
 #include <string>
 #include <vector>
-#include "type.h"
-#include "packageConfig.h"
+#include <fstream>
+#include "package.hh"
+#include "emergepackage.hh"
+#include "_misc_tools.hh"
 
 using namespace std;
 
-void Emerge ( string package, string emergeConfig, string packageConfig, bool do_pretend, string options, bool updates_only );
+void PackageConfig ( EmergePackage pkg, string name );
 
 #endif

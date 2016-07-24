@@ -1,5 +1,5 @@
 /*
- * is_dir.h
+ * findPackage.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,14 +22,33 @@
  */
 
 
-#ifndef __AUTOGENTOO_IS_DIR__
-#define __AUTOGENTOO_IS_DIR__
+#ifndef __AUTOGENTOO_FINDPKG__
+#define __AUTOGENTOO_FINDPKG__
 
+#include <stdio.h>
 #include <iostream>
-#include <sys/stat.h>
-#include <fstream>
+#include <string>
+#include <vector>
+#include <stdlib.h>
+#include "file.hh"
 
-bool is_dir ( const char* path );
-bool is_file_exist ( const char *fileName );
+using namespace std;
+
+class EmergeCat
+{
+  public:
+  vector<string> packages;
+  string category;
+  
+  EmergeCat ( string cat );
+};
+
+typedef struct
+{
+  vector<EmergeCat> categories;
+  
+  void init (void);
+  string ambig ( string pkg );
+} PortageDir;
 
 #endif

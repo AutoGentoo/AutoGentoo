@@ -1,5 +1,5 @@
 /*
- * warning.hpp
+ * warning.cpp
  * 
  * Copyright 2015 Andrei Tumbar <atadmin@Helios>
  * 
@@ -22,7 +22,7 @@
  */
 
 
-#include "warning.h"
+#include "warning.hh"
 
 Warning::Warning ( vector < string > _input )
 {

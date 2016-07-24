@@ -21,7 +21,7 @@
  * 
  */
 
-#include "ebuild.h"
+#include "ebuild.hh"
 
 ebuild::ebuild ( Package package )
 {

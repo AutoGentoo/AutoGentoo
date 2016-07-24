@@ -1,5 +1,5 @@
 /*
- * file.h
+ * is_dir.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,46 +22,14 @@
  */
 
 
-#ifndef __AUTOGENTOO_FILE__
-#define __AUTOGENTOO_FILE__
+#ifndef __AUTOGENTOO_IS_DIR__
+#define __AUTOGENTOO_IS_DIR__
 
 #include <iostream>
+#include <sys/stat.h>
 #include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include "_misc_tools.h"
 
-using namespace std;
-
-/*! \class File
- *
- * class File is meant to create vector of strings to be used
- * during reading files line by line
- *
- */
-class File
-{
-  public:
-  
-  /// Empty file constructor
-  ifstream file;
-  
-  /** String with whole file stored affecter File () is
-   * called
-   */
-  stringstream text;
-  
-  /** Used during readline () function
-   * Every time this function is run then currentLine will increase by 1
-   */
-  size_t currentLine;
-  
-  File ( string fileName );
-  vector<string> readlines ( );
-  string read ( );
-  string readline ( );
-  string get ( int line );
-};
+bool is_dir ( const char* path );
+bool is_file_exist ( const char *fileName );
 
 #endif

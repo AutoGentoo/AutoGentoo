@@ -1,5 +1,5 @@
 /*
- * _misc_tools.h
+ * _misc_tools.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 

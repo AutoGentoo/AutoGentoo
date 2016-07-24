@@ -28,17 +28,24 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=8
-FILE_NAME_0=834;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fencrypt.h;0;2
-FILE_NAME_1=837;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fencrypt.c;0;4
-FILE_NAME_2=1320;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fconfigparser.h;0;2
-FILE_NAME_3=1757;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fconfigparser.c;0;2
-FILE_NAME_4=1987;Conf;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fautogentoo.conf;0;2
-FILE_NAME_5=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fmlib.h;0;2
-FILE_NAME_6=1836;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fmstring.h;0;2
-FILE_NAME_7=3017;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fmstring.c;0;2
-FILE_NAME_8=1065;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fencrypt_test.c;0;2
-FILE_NAME_9=0;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2FMakefile;0;2
+current_page=3
+FILE_NAME_0=969;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fbash_config.hh;0;2
+FILE_NAME_1=12;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fblocks.hh;0;2
+FILE_NAME_2=1020;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fconfig.hh;0;2
+FILE_NAME_3=991;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Femerge.hh;0;2
+FILE_NAME_4=989;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Femergepackage.hh;0;2
+FILE_NAME_5=986;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Ffile.hh;0;2
+FILE_NAME_6=978;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2FfindPackage.hh;0;2
+FILE_NAME_7=916;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fis_dir.hh;0;2
+FILE_NAME_8=1020;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2F_misc_tools.hh;0;2
+FILE_NAME_9=948;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Foption.hh;0;2
+FILE_NAME_10=961;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fpackage.hh;0;2
+FILE_NAME_11=1056;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2FpackageConfig.hh;0;2
+FILE_NAME_12=997;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fparse_config.hh;0;2
+FILE_NAME_13=951;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Ftype.hh;0;2
+FILE_NAME_14=9;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fuse.hh;0;2
+FILE_NAME_15=894;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fversion.hh;0;2
+FILE_NAME_16=1012;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fwarning.hh;0;2
 
 [VTE]
 last_dir=/home/atuser/Documents

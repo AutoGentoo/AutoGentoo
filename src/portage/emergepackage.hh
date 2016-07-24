@@ -1,5 +1,5 @@
 /*
- * emergepackage.h
+ * emergepackage.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -29,8 +29,8 @@
 #include <string>
 #include <map>
 #include <boost/algorithm/string.hpp>
-#include "package.h"
-#include "parse_config.h"
+#include "package.hh"
+#include "parse_config.hh"
 
 using namespace std;
 using namespace boost::algorithm;

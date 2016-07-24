@@ -22,7 +22,7 @@
  */
 
 
-#include "type.h"
+#include "type.hh"
 
 Type::Type ( vector<string> inputFile, string package, bool updates_only )
 {

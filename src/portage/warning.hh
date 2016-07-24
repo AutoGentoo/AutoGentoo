@@ -1,5 +1,5 @@
 /*
- * config.h
+ * warning.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,27 +22,35 @@
  */
 
 
-#ifndef __AUTOGENTOO_PORTAGE_CONFIG_FILE__
-#define __AUTOGENTOO_PORTAGE_CONFIG_FILE__
+#ifndef __AUTOGENTOO_WARNING___
+#define __AUTOGENTOO_WARNING___
 
 #include <iostream>
-#include <string>
 #include <vector>
-#include <fstream>
-#include "_misc_tools.h"
-#include "is_dir.h"
+#include <string>
+#include <map>
+#include "blocks.hh"
+#include "ebuild.hh"
+#include "package.hh"
 
 using namespace std;
 
-class GentooConfig
+/*! \class Warning
+ * Three types of warnings:
+ *    blocks
+ *    useReq (edit /etc/portage/make.conf)
+ *    genericSlot (do nothing)
+ */
+class Warning
 {
   public:
   
-  vector<string> writeLines;
-  string path;
+  string type;
+  vector < string > input;
+  size_t lineNum;
   
-  GentooConfig ( vector<string> in, string pkgName );
-  void write ( string __path );
+  Warning ( vector < string > _input );
+  void doWork ( void );
 };
 
 #endif

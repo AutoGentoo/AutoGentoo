@@ -22,7 +22,7 @@
  */
 
 
-#include "use.h"
+#include "use.hh"
 
 useGentooFlag::useGentooFlag ( string package, string uses, bool versionSpecific )
 {

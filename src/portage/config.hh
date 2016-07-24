@@ -1,5 +1,5 @@
 /*
- * use.h
+ * config.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,23 +22,27 @@
  */
 
 
-#ifndef __USE_GENTOO_FLAG__
-#define __USE_GENTOO_FLAG__
+#ifndef __AUTOGENTOO_PORTAGE_CONFIG_FILE__
+#define __AUTOGENTOO_PORTAGE_CONFIG_FILE__
 
 #include <iostream>
-#include <fstream>
 #include <string>
+#include <vector>
+#include <fstream>
+#include "_misc_tools.hh"
+#include "is_dir.hh"
 
 using namespace std;
 
-class useGentooFlag
+class GentooConfig
 {
   public:
-  string package;
-  ofstream pkguse;
   
-  useGentooFlag ( string package, string uses, bool versionSpecific );
-  void append ( string _use );
+  vector<string> writeLines;
+  string path;
+  
+  GentooConfig ( vector<string> in, string pkgName );
+  void write ( string __path );
 };
 
 #endif

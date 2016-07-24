@@ -1,5 +1,5 @@
 /*
- * blocks.h
+ * use.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,21 +22,23 @@
  */
 
 
-#include <iostream>
-#include <string>
+#ifndef __USE_GENTOO_FLAG__
+#define __USE_GENTOO_FLAG__
 
-#ifndef __AUTOGENTOO_BLOCKS__
-#define __AUTOGENTOO_BLOCKS___
+#include <iostream>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
-class blocks
+class useGentooFlag
 {
   public:
-  string blocking;
-  string blocked;
+  string package;
+  ofstream pkguse;
   
-  blocks ( string input );
+  useGentooFlag ( string package, string uses, bool versionSpecific );
+  void append ( string _use );
 };
 
 #endif

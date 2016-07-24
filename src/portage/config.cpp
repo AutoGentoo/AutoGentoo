@@ -22,7 +22,7 @@
  */
 
 
-#include "config.h"
+#include "config.hh"
 
 GentooConfig::GentooConfig ( vector<string> in, string pkgName )
 {

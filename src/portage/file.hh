@@ -1,5 +1,5 @@
 /*
- * version.h
+ * file.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,34 +22,46 @@
  */
 
 
+#ifndef __AUTOGENTOO_FILE__
+#define __AUTOGENTOO_FILE__
+
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
-#include "_misc_tools.h"
-
-#ifndef __GENTOO__PACKAGE_VERSION__
-#define __GENTOO__PACKAGE_VERSION__
+#include "_misc_tools.hh"
 
 using namespace std;
 
-class version
+/*! \class File
+ *
+ * class File is meant to create vector of strings to be used
+ * during reading files line by line
+ *
+ */
+class File
 {
   public:
-  vector<int> v; //!< Vector of the version, string divided by '.' for example 1.2.3 = [1, 2, 3]
-  vector<string> v_str; //!< Vector of the version, string divided by '.' for example 1.2.3 = ["1", "2", "3"]
-  string revision;
-  string slot;
-  int revision_num;
-  bool has_revision;
-  string _in_str;
-  bool _contructed;
   
-  void init ( string in_str );
-  bool operator < ( version compare );
-  bool operator <= ( version compare );
-  bool operator >= ( version compare );
-  bool operator > ( version compare );
-  bool operator = ( version compare );
+  /// Empty file constructor
+  ifstream file;
+  
+  /** String with whole file stored affecter File () is
+   * called
+   */
+  stringstream text;
+  
+  /** Used during readline () function
+   * Every time this function is run then currentLine will increase by 1
+   */
+  size_t currentLine;
+  
+  File ( string fileName );
+  vector<string> readlines ( );
+  string read ( );
+  string readline ( );
+  string get ( int line );
 };
 
 #endif

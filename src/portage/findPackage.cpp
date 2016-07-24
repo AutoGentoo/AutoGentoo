@@ -22,7 +22,7 @@
  */
 
 
-#include "findPackage.h"
+#include "findPackage.hh"
 
 EmergeCat::EmergeCat ( string cat )
 {

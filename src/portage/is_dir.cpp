@@ -23,7 +23,7 @@
 
 
 
-#include "is_dir.h"
+#include "is_dir.hh"
 
 bool is_dir ( const char* path )
 {

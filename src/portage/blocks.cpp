@@ -22,7 +22,7 @@
  */
 
 
-#include "blocks.h"
+#include "blocks.hh"
 
 blocks::blocks ( string input )
 {

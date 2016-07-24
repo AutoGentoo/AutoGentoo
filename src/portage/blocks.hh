@@ -1,5 +1,5 @@
 /*
- * bash_config.h
+ * blocks.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,31 +22,21 @@
  */
 
 
-#ifndef __BASH_CONFIG_H__
-#define __BASH_CONFIG_H__
-
 #include <iostream>
 #include <string>
-#include <map>
-#include <vector>
-#include <boost/format.hpp>
-#include "file.h"
-#include "_misc_tools.h"
+
+#ifndef __AUTOGENTOO_BLOCKS__
+#define __AUTOGENTOO_BLOCKS___
 
 using namespace std;
-using boost::format;
-using boost::io::group;
 
-class bash_config
+class blocks
 {
   public:
+  string blocking;
+  string blocked;
   
-  string filename;
-  vector<string> file;
-  map<string, string> variables;
-  
-  bash_config ( const char *_file );
-  void read ( );
+  blocks ( string input );
 };
 
 #endif

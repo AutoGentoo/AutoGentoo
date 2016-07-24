@@ -21,7 +21,7 @@
  * 
  */
 
-#include "parse_config.h"
+#include "parse_config.hh"
 
 using namespace std;
 

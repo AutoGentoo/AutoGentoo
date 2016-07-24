@@ -22,7 +22,7 @@
  */
 
 
-#include "emerge.h"
+#include "emerge.hh"
 
 void Emerge ( string package, string emergeConfig, string packageConfig, bool do_pretend, string options, bool updates_only )
 {

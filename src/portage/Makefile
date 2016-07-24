@@ -8,7 +8,7 @@ BARE = bash_config ebuild file _misc_tools parse_config version blocks emerge fi
 
 OBJECTS = $(patsubst %,%.o, $(BARE))
 SOURCES = $(patsubst %,%.cpp, $(BARE))
-HEADERS = $(patsubst %,%.h, $(BARE))
+HEADERS = $(patsubst %,%.hh, $(BARE))
 
 .PHONY : all
 .DEFAULT_GOAL := all
@@ -24,4 +24,6 @@ all: $(OBJECTS)
 
 clean:
 	rm -rf $(OBJECTS)
+	rm -rf emerge-bin.o
+	rm -rf *.gch
 	rm -rf $(BIN)

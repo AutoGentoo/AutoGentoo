@@ -1,5 +1,5 @@
 /*
- * ebuild.h
+ * version.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -21,25 +21,35 @@
  * 
  */
 
-#ifndef __EBUILD__
-#define __EBUILD__
 
 #include <iostream>
 #include <string>
-#include <cstdlib>
-#include <map>
-#include "parse_config.h"
-#include "package.h"
-#include "use.h"
+#include <vector>
+#include "_misc_tools.hh"
 
-class ebuild
+#ifndef __GENTOO__PACKAGE_VERSION__
+#define __GENTOO__PACKAGE_VERSION__
+
+using namespace std;
+
+class version
 {
   public:
-  string REQUIRED_USE; //!< A list of assertions that must be met by the configuration of Use flags to be valid for this ebuild. (Requires EAPI>=4.)
-  string SUGGEST_USE; //!< A string of suggested changes to the current use flags, empty if no suggestions
-  vector < string > CURRENT_USE; //!< Found by executing the 'equery uses' command to get the currently enabled strings, this vectors only holds the name of the Use flag
+  vector<int> v; //!< Vector of the version, string divided by '.' for example 1.2.3 = [1, 2, 3]
+  vector<string> v_str; //!< Vector of the version, string divided by '.' for example 1.2.3 = ["1", "2", "3"]
+  string revision;
+  string slot;
+  int revision_num;
+  bool has_revision;
+  string _in_str;
+  bool _contructed;
   
-  ebuild ( Package package );
+  void init ( string in_str );
+  bool operator < ( version compare );
+  bool operator <= ( version compare );
+  bool operator >= ( version compare );
+  bool operator > ( version compare );
+  bool operator = ( version compare );
 };
 
 #endif

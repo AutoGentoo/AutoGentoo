@@ -1,5 +1,5 @@
 /*
- * type.h
+ * type.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -26,9 +26,9 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "config.h"
-#include "emergepackage.h"
-#include "warning.h"
+#include "config.hh"
+#include "emergepackage.hh"
+#include "warning.hh"
 
 #ifndef __AUTOGENTOO_PORTAGE_TYPE__
 #define __AUTOGENTOO_PORTAGE_TYPE__

@@ -22,7 +22,7 @@
  */
 
 
-#include "option.h"
+#include "option.hh"
 
 string option::bool_toggle ( string in )
 {

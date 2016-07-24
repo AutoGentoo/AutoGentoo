@@ -1,5 +1,5 @@
 /*
- * warning.h
+ * ebuild.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -21,36 +21,25 @@
  * 
  */
 
-
-#ifndef __AUTOGENTOO_WARNING___
-#define __AUTOGENTOO_WARNING___
+#ifndef __EBUILD__
+#define __EBUILD__
 
 #include <iostream>
-#include <vector>
 #include <string>
+#include <cstdlib>
 #include <map>
-#include "blocks.h"
-#include "ebuild.h"
-#include "package.h"
+#include "parse_config.hh"
+#include "package.hh"
+#include "use.hh"
 
-using namespace std;
-
-/*! \class Warning
- * Three types of warnings:
- *    blocks
- *    useReq (edit /etc/portage/make.conf)
- *    genericSlot (do nothing)
- */
-class Warning
+class ebuild
 {
   public:
+  string REQUIRED_USE; //!< A list of assertions that must be met by the configuration of Use flags to be valid for this ebuild. (Requires EAPI>=4.)
+  string SUGGEST_USE; //!< A string of suggested changes to the current use flags, empty if no suggestions
+  vector < string > CURRENT_USE; //!< Found by executing the 'equery uses' command to get the currently enabled strings, this vectors only holds the name of the Use flag
   
-  string type;
-  vector < string > input;
-  size_t lineNum;
-  
-  Warning ( vector < string > _input );
-  void doWork ( void );
+  ebuild ( Package package );
 };
 
 #endif

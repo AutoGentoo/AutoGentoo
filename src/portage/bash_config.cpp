@@ -22,7 +22,7 @@
  */
 
 
-#include "bash_config.h"
+#include "bash_config.hh"
 
 bash_config::bash_config ( const char *_file )
 {

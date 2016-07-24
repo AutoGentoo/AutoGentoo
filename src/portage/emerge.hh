@@ -1,5 +1,5 @@
 /*
- * package.h
+ * emerge.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,37 +22,17 @@
  */
 
 
-#ifndef __AUTOGENTOO_PACKAGE__
-#define __AUTOGENTOO_PACKAGE__
+#ifndef __AUTOGENTOO_PORTAGE_EMERGE__
+#define __AUTOGENTOO_PORTAGE_EMERGE__
 
 #include <iostream>
 #include <string>
-#include "_misc_tools.h"
-#include "version.h"
+#include <vector>
+#include "type.hh"
+#include "packageConfig.hh"
 
 using namespace std;
 
-class Package
-{
-  public:
-  
-  string packagestr;
-  string name;
-  string path;
-  string catagory;
-  string directory;
-  string releaseStr;
-  string file;
-  string repository;
-  string slot;
-  version release;
-  string fullPackage;
-  string overlayDir;
-  
-  Package ( string );
-  void init ( string );
-  int stage ( string, string );
-  
-};
+void Emerge ( string package, string emergeConfig, string packageConfig, bool do_pretend, string options, bool updates_only );
 
 #endif

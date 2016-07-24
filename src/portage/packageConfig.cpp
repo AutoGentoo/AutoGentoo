@@ -22,7 +22,7 @@
  */
 
 
-#include "packageConfig.h"
+#include "packageConfig.hh"
 
 using namespace std;
 

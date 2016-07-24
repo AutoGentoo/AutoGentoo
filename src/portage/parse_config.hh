@@ -1,5 +1,5 @@
 /*
- * parse_config.h
+ * parse_config.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -31,8 +31,8 @@
 #include <map>
 #include <cstdlib>
 #include <boost/algorithm/string.hpp>
-#include "_misc_tools.h"
-#include "file.h"
+#include "_misc_tools.hh"
+#include "file.hh"
 
 using namespace std;
 using namespace boost::algorithm;

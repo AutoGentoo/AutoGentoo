@@ -1,5 +1,5 @@
 /*
- * option.h
+ * option.hh
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <map>
-#include "_misc_tools.h"
+#include "_misc_tools.hh"
 
 using namespace std;
 

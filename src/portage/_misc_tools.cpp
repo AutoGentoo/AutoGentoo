@@ -21,7 +21,7 @@
  * 
  */
 
-#include "_misc_tools.h"
+#include "_misc_tools.hh"
 
 void misc::remove ( std::string &removing, std::string toRemove )
 {
