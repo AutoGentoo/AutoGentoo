@@ -26,23 +26,45 @@ import http.client
 import urllib
 import os
 
-def sync (url):
+def sync_dir (url, dir):
     out = []
+    os.system("wget -q %s/%s -O sync-%s.temp" % (url, dir, dir[:-1]))
+    synctemp = open("sync-%s.temp" % dir[:-1], "r").readlines ()
+    os.remove ("sync-%s.temp" % dir[:-1])
     
+    for file in synctemp:
+        out.append (file)
+    return out
+
+def sync (url):
+    out = {}
+    top = []
     sys.stdout.write ("Downloading file list...")
     os.system("wget -q %s -O sync.temp" % url)
     sys.stdout.write ("done\n")
     synctemp = open("sync.temp", "r").readlines ()
+    os.remove("sync.temp")
     
     for line in synctemp:
         if not line.startswith ("<li>"):
             continue
-        out.append (line[line.find('"')+1:line.rfind('"')]);
-    os.remove("sync.temp")
+        top.append (line[line.find('"')+1:line.rfind('"')]);
+    for _dir in top:
+        if _dir.endswith ("/"):
+            out[_dir[:-1]] = sync_dir (url, _dir)
+    
     return out
 
 def main(args):
-    print (sync("localhost:8000"))
+    IP = ""
+    
+    if (not len(args) > 1):
+        print ("You must enter a IP address")
+        IP = input ("IP: ")
+    else:
+        IP = args[1]
+    
+    print (sync("http://%s:8000/" % IP))
     
     return 0
 
