@@ -99,4 +99,7 @@ void PackageConfig ( EmergePackage pkg, string name )
   ENV += misc::merge ( buff, "," ) + "]\n";
   
   file << ENV;
+  
+  file << string ("eapi=" + pkg.eapi);
+  
 }

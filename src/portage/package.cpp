@@ -110,6 +110,11 @@ void Package::init ( string input_package )
   slot = release.slot;
   
   file = "/usr/portage/" + catagory + "/" + directory + "/" + _file + ".ebuild";
+  
+  char* eapi_temp = (char*) malloc (sizeof(char) * file.length () + string("source   && echo $EAPI ").length ());
+  sprintf (eapi_temp, "source %s && echo $EAPI", file.c_str ());
+  eapi = misc::getOutput (string (eapi_temp));
+  free(eapi_temp);
 }
 
 int Package::stage (string stage, string ebuild_opts)

@@ -48,6 +48,7 @@ class Package
   version release;
   string fullPackage;
   string overlayDir;
+  string eapi;
   
   Package ( string );
   void init ( string );

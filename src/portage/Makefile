@@ -13,7 +13,7 @@ HEADERS = $(patsubst %,%.hh, $(BARE))
 .PHONY : all
 .DEFAULT_GOAL := all
 
-%.o : %.cpp %.h
+%.o : %.cpp %.hh
 	$(CXX) $(CFLAGS) -o $@ -c $< -I$(INCDIRS)
 
 

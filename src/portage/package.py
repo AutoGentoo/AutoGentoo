@@ -51,6 +51,8 @@ class EmergeSet:
 class PackageSet:
 	def __init__ ( self, cfg_file, log_dir, order = None, misc = False, ebuild_opts = "" ):
 		self.stages = []
+		self.stages_upgrade = []
+		self.stages_upgrade_old = []
 		self.create_order ( order )
 		curr_dir = os.path.dirname ( os.path.abspath ( __file__ ) )
 		log_dir = curr_dir + "/" + log_dir
@@ -77,7 +79,16 @@ class PackageSet:
 				continue
 			curr += 1
 			os.system ( "mkdir -p " + log_dir + "/" + package )
-			for stage in self.stages:
+			
+			stages = []
+			if "new" in keys:
+				stages = self.stages
+			if ("updating", "reinstall", "downgrading") in keys and :
+				if int (self.config [ package ] [ "eapi" ]) > 1:
+					stages = self.stages_upgrade
+				else:
+					stages = self.stages_upgrade_old
+			for stage in stages:
 				package_log.write ( package + ":" + stage + " (" + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ")" )
 				out = str(" | tee -a " + log_dir + "/current.log >>" + log_dir + "/" + package + "/" + stage + ".log 2>&1 && echo \"\n\" >> " + log_dir + "/" + package + "/" + stage + ".log") 
 				print ( "\r%s%s-%s%s (%s%s%s of %s%s%s) %s(%s)%s   " % ( color.green, package, self.config[package]["version"].replace("\"", "" ), color.end, color.yellow, curr, color.end, color.yellow, total, color.end, color.bold, stage, color.end ), end="", flush=True )
@@ -90,7 +101,6 @@ class PackageSet:
 		if ( order ):
 			self.stages = order;
 		else:
-			self.stages.append ( "fetch" )
 			self.stages.append ( "pretend" )
 			self.stages.append ( "setup" )
 			self.stages.append ( "unpack" )
@@ -101,11 +111,32 @@ class PackageSet:
 			self.stages.append ( "install" )
 			self.stages.append ( "preinst" )
 			self.stages.append ( "postinst" )
-			self.stages.append ( "merge" )
-			self.stages.append ( "prerm" )
-			self.stages.append ( "postrm" )
-			self.stages.append ( "cleanrm" )
-
+			
+			self.stages_upgrade.append ("pretend")
+			self.stages_upgrade.append ("setup")
+			self.stages_upgrade.append ("unpack")
+			self.stages_upgrade.append ("prepare")
+			self.stages_upgrade.append ("configure")
+			self.stages_upgrade.append ("compile")
+			self.stages_upgrade.append ("test")
+			self.stages_upgrade.append ("install")
+			self.stages_upgrade.append ("preinst")
+			self.stages_upgrade.append ("prerm")
+			self.stages_upgrade.append ("postrm")
+			self.stages_upgrade.append ("postinst")
+			
+			self.stages_upgrade_old.append ("pretend")
+			self.stages_upgrade_old.append ("setup")
+			self.stages_upgrade_old.append ("unpack")
+			self.stages_upgrade_old.append ("prepare")
+			self.stages_upgrade_old.append ("configure")
+			self.stages_upgrade_old.append ("compile")
+			self.stages_upgrade_old.append ("test")
+			self.stages_upgrade_old.append ("install")
+			self.stages_upgrade_old.append ("preinst")
+			self.stages_upgrade_old.append ("postinst")
+			self.stages_upgrade_old.append ("prerm")
+			self.stages_upgrade_old.append ("postrm")
 def main ( argv = sys.argv ):
 	package = argv [ 1 ]
 	try:
