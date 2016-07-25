@@ -1,6 +1,6 @@
 CC = gcc
 LL = gcc
-INCDIRS = .
+INCDIRS = ../
 CFLAGS += -Wall -g
 
 BIN = http-server
@@ -16,9 +16,7 @@ HEADERS = $(patsubst %,%.h, $(BARE))
 %.o : %.c %.h
 	$(CC) $(CFLAGS) -o $@ -c $< -I$(INCDIRS)
 
-
 all: $(OBJECTS)
-	$(eval INCDIRS=.)
 	$(CC) $(CFLAGS) -o $(BIN).o -c $(BIN).c -I$(INCDIRS)
 	$(LL) $(OBJECTS) $(BIN).o -o $(BIN)
 

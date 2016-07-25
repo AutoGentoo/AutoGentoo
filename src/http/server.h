@@ -36,6 +36,8 @@
 #include <netdb.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <ifaddrs.h>
+#include <netinet/in.h> 
 
 #define CONNMAX 1000
 #define BYTES 1024
@@ -45,4 +47,5 @@ int listenfd, clients[CONNMAX];
 void error         (char *);
 void startServer   (char *);
 void respond       (int);
+
 #endif

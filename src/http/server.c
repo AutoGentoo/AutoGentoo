@@ -23,7 +23,8 @@
 
 
 #include <stdio.h>
-#include "server.h"
+#include <http/server.h>
+
 
 //start server
 void startServer(char *port)
@@ -92,7 +93,7 @@ void respond(int n)
       else
       {
         if ( strncmp(reqline[1], "/\0", 2)==0 )
-          reqline[1] = "/index.html";    //Because if no file is specified, index.html will be opened by default (like it happens in APACHE...
+          reqline[1] = "";
 
         strcpy(path, ROOT);
         strcpy(&path[strlen(ROOT)], reqline[1]);

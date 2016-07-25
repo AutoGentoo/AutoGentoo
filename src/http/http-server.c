@@ -21,7 +21,7 @@
  * 
  */
 
-#include "server.h"
+#include <http/server.h>
 
 int main(int argc, char* argv[])
 {
@@ -33,11 +33,14 @@ int main(int argc, char* argv[])
   char PORT[6];
   ROOT = getenv("PWD");
   strcpy(PORT,"10000");
-
+  
+  int usephp = 0;
+  char * ip = malloc (sizeof(char) * 40);
   int slot=0;
 
   //Parsing the command line arguments
-  while ((c = getopt (argc, argv, "p:r:")) != -1)
+  while ((c = getopt (argc, argv, "i:p:r:h")) != -1)
+  {
     switch (c)
     {
       case 'r':
@@ -45,7 +48,18 @@ int main(int argc, char* argv[])
         strcpy(ROOT,optarg);
         break;
       case 'p':
+        if (!strcmp (optarg, "10001"))
+        {
+          fprintf (stderr, "Can't bind to port 10001 (used by php server)\n");
+          exit(1);
+        }
         strcpy(PORT,optarg);
+        break;
+      case 'h':
+        usephp = 1;
+        break;
+      case 'i':
+        strcpy(ip,optarg);
         break;
       case '?':
         fprintf(stderr,"Wrong arguments given!!!\n");
@@ -53,33 +67,61 @@ int main(int argc, char* argv[])
       default:
         exit(1);
     }
+  }
   
   printf("Server started at port no. %s%s%s with root directory as %s%s%s\n","\033[92m",PORT,"\033[0m","\033[92m",ROOT,"\033[0m");
   // Setting all elements to -1: signifies there is no client connected
-  int i;
-  for (i=0; i<CONNMAX; i++)
-    clients[i]=-1;
-  startServer(PORT);
-
-  // ACCEPT connections
-  while (1)
+  
+  pid_t pid = fork();
+  
+  if (pid == 0)
   {
-    addrlen = sizeof(clientaddr);
-    clients[slot] = accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen);
-
-    if (clients[slot]<0)
-      error ("accept() error");
-    else
+    if (usephp)
     {
-      if ( fork()==0 )
+      if (ip == NULL)
       {
-        respond(slot);
-        exit(0);
+        ip = "localhost";
       }
+      printf ("Started a php server at root directory on port 10001\n");
+      printf ("\n%s\n", ip);
+      char * phpcmd = malloc (sizeof (char) * strlen("cd   && php -S :10001 ") + strlen (ROOT) + strlen(ip));
+      sprintf (phpcmd, "cd %s && php -S %s:10001", ROOT, ip);
+      system (phpcmd);
+      free(phpcmd);
     }
-
-    while (clients[slot]!=-1) slot = (slot+1)%CONNMAX;
   }
-
+  else if (pid > 0)
+  {
+    int i;
+    for (i=0; i<CONNMAX; i++)
+      clients[i]=-1;
+    startServer(PORT);
+  
+    // ACCEPT connections
+    while (1)
+    {
+      addrlen = sizeof(clientaddr);
+      clients[slot] = accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen);
+  
+      if (clients[slot]<0)
+        error ("accept() error");
+      else
+      {
+        if ( fork()==0 )
+        {
+          respond(slot);
+          exit(0);
+        }
+      }
+  
+      while (clients[slot]!=-1) slot = (slot+1)%CONNMAX;
+    }
+  }
+  else
+  {
+    printf("fork() failed!\n");
+    return 1;
+  }
+  
   return 0;
 }
