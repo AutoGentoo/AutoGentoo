@@ -1,3 +1,6 @@
+*
+!*.*
+!*/
 /.project
 src/portage/package/logs/*
 tests/graphics
@@ -15,5 +18,3 @@ src/portage/emerge/emerge
 src/portage/package/package
 src/tools/_misc_tools
 src/testing
-*
-!*.*

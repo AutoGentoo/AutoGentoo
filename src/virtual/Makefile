@@ -1,10 +1,11 @@
 CC = gcc
 LL = gcc
-INCDIRS = .
+INCDIRS = ../
 CFLAGS += -Wall -g
+LIBS = -lssl -lcrypto
 
 BIN = lxd-sync
-BARE = lxd
+BARE = lxd getdiff
 
 OBJECTS = $(patsubst %,%.o, $(BARE))
 SOURCES = $(patsubst %,%.c, $(BARE))
@@ -14,12 +15,11 @@ HEADERS = $(patsubst %,%.h, $(BARE))
 .DEFAULT_GOAL := all
 
 %.o : %.c %.h
-	$(CC) $(CFLAGS) -o $@ -c $< -I$(INCDIRS)
+	$(CC) $(CFLAGS) -o $@ -c $< -I$(INCDIRS) $(LIBS)
 
 
 all: $(OBJECTS)
-	$(eval INCDIRS=.)
-	$(CC) $(CFLAGS) -o $(BIN).o -c $(BIN).c -I$(INCDIRS)
+	$(CC) $(CFLAGS) -o $(BIN).o -c $(BIN).c -I$(INCDIRS) $(LIBS)
 	$(LL) $(OBJECTS) $(BIN).o -o $(BIN)
 
 clean:

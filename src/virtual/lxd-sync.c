@@ -22,7 +22,7 @@
  */
 
 
-#include "lxd.h"
+#include <virtual/lxd.h>
 
 int main(int argc, char **argv)
 {

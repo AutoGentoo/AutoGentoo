@@ -40,7 +40,7 @@
 #include <netinet/in.h> 
 
 #define CONNMAX 1000
-#define BYTES 1024
+#define BYTES 10240
 
 char *ROOT;
 int listenfd, clients[CONNMAX];
