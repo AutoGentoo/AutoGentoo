@@ -27,8 +27,8 @@
 
 #include <stdio.h>
 #include <openssl/md5.h>
-#include "mstring.h"
-#include "command_tools.h"
+#include <cglobal/mstring.h>
+#include <cglobal/command_tools.h>
 
 typedef struct
 {

@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "mlib.h"
+#include <cglobal/mlib.h>
 
 #ifndef AUTOGENTOO_MSTRING
 #define AUTOGENTOO_MSTRING

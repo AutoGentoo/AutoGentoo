@@ -1,6 +1,6 @@
 CC = gcc
 LL = gcc
-INCDIRS = .
+INCDIRS = ../
 CFLAGS += -Wall -g
 LIB = -lcrypto
 
@@ -35,7 +35,6 @@ CTHEADERS = $(patsubst %,%.h, $(CTBARE))
 	$(CC) $(CFLAGS) -o $@ -c $< -I$(INCDIRS)
 
 test: $(ETOBJECTS) $(FTOBJECTS) $(CTOBJECTS)
-	$(eval INCDIRS=.)
 	$(CC) $(CFLAGS) -o encrypt_test.o -c encrypt_test.c -I$(INCDIRS)
 	$(CC) $(CFLAGS) -o file_test.o -c file_test.c -I$(INCDIRS)
 	$(CC) $(CFLAGS) -o config_test.o -c config_test.c -I$(INCDIRS)

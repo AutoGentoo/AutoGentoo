@@ -24,8 +24,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "mstring.h"
-#include "file.h"
+#include <cglobal/mstring.h>
+#include <cglobal/file.h>
 
 mstring         get_output          (mstring);
 
