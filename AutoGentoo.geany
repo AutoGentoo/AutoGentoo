@@ -29,23 +29,9 @@ long_line_column=72
 
 [files]
 current_page=3
-FILE_NAME_0=969;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fbash_config.hh;0;2
-FILE_NAME_1=12;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fblocks.hh;0;2
-FILE_NAME_2=1020;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fconfig.hh;0;2
-FILE_NAME_3=991;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Femerge.hh;0;2
-FILE_NAME_4=989;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Femergepackage.hh;0;2
-FILE_NAME_5=986;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Ffile.hh;0;2
-FILE_NAME_6=978;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2FfindPackage.hh;0;2
-FILE_NAME_7=916;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fis_dir.hh;0;2
-FILE_NAME_8=1020;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2F_misc_tools.hh;0;2
-FILE_NAME_9=948;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Foption.hh;0;2
-FILE_NAME_10=961;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fpackage.hh;0;2
-FILE_NAME_11=1056;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2FpackageConfig.hh;0;2
-FILE_NAME_12=997;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fparse_config.hh;0;2
-FILE_NAME_13=951;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Ftype.hh;0;2
-FILE_NAME_14=9;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fuse.hh;0;2
-FILE_NAME_15=894;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fversion.hh;0;2
-FILE_NAME_16=1012;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fportage%2Ftemp%2Fwarning.hh;0;2
+FILE_NAME_0=1743;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fvirtual%2Flxd.c;0;2
+FILE_NAME_1=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fvirtual%2Flxd.h;0;2
+FILE_NAME_2=399;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fvirtual%2FMakefile;0;2
 
 [VTE]
 last_dir=/home/atuser/Documents

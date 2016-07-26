@@ -22,6 +22,7 @@
  */
 
 #include <http/server.h>
+#include <signal.h>
 
 int main(int argc, char* argv[])
 {
@@ -122,6 +123,9 @@ int main(int argc, char* argv[])
     printf("fork() failed!\n");
     return 1;
   }
+  
+  
+  kill(pid, SIGTERM);
   
   return 0;
 }
