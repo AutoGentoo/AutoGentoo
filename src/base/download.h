@@ -1,5 +1,5 @@
 /*
- * server.h
+ * download.h
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,30 +22,14 @@
  */
 
 
-#ifndef __AUTOGENTOO_HTTP_SERVER__
-#define __AUTOGENTOO_HTTP_SERVER__
-
 #include <stdio.h>
+#include <curl/curl.h>
 #include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <ifaddrs.h>
-#include <netinet/in.h> 
 
-#define CONNMAX 1000
-#define BYTES 102400
+#ifndef __AUTOGENTOO_DOWNLOAD_H__
 
-char *ROOT;
-int listenfd, clients[CONNMAX];
-void error         (char *);
-void startServer   (char *);
-void respond       (int);
+void     download_to_file        (char* url,char* outfilename);
+
+size_t   write_data              (void *ptr, size_t size, size_t nmemb, FILE *stream);
 
 #endif

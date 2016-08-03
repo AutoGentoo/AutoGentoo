@@ -32,7 +32,7 @@ CTHEADERS = $(patsubst %,%.h, $(CTBARE))
 .DEFAULT_GOAL := all
 
 %.o : %.c %.h
-	$(CC) $(CFLAGS) -o $@ -c $< -I$(INCDIRS)
+	$(CC) $(CFLAGS) -fPIC -o $@ -c $< -I$(INCDIRS)
 
 test: $(ETOBJECTS) $(FTOBJECTS) $(CTOBJECTS)
 	$(CC) $(CFLAGS) -o encrypt_test.o -c encrypt_test.c -I$(INCDIRS)
@@ -43,6 +43,7 @@ test: $(ETOBJECTS) $(FTOBJECTS) $(CTOBJECTS)
 	$(LL) $(CTOBJECTS) config_test.o -o $(CTBIN) $(LIB)
 
 all: $(OBJECTS)
+	gcc -shared -o libcglobal.so $(OBJECTS)
 
 clean:
 	rm -rf $(OBJECTS)
@@ -55,3 +56,4 @@ clean:
 	rm -rf $(CTBIN)
 	rm -rf *.o
 	rm -rf *.gch
+	rm -rf *.so

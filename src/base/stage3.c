@@ -1,5 +1,5 @@
 /*
- * server.h
+ * stage3.c
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,30 +22,30 @@
  */
 
 
-#ifndef __AUTOGENTOO_HTTP_SERVER__
-#define __AUTOGENTOO_HTTP_SERVER__
+#include <base/stage3.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <ifaddrs.h>
-#include <netinet/in.h> 
+Stage3
+stage3_new (char* arch)
+{
+  Stage3       buff;
+  buff.arch = arch;
+  sprintf(buff.buff_link, "http://distfiles.gentoo.org/releases/%s/autobuilds/latest-stage3.txt", buff.arch);
+  buff.name = malloc (sizeof(char) * 45);
+  buff.date = malloc (sizeof(char) * 10);
+  
+  return buff;
+}
 
-#define CONNMAX 1000
-#define BYTES 102400
+Stage3
+stage3_new_latest (char* arch)
+{
+  Stage3 out = stage3_new (arch);
+  download_to_file (out.buff_link, "stage3_buff.txt");
+  char ** filelines = readlines ("stage3_buff.txt");
+  char *  mainline = mstring_find_before (file[2], ' ');
+  out.date = mstring_find_before (file[2], '/');
+  out.name = mstring_get_sub_py (mainline, mstring_get_length (out.date) + 1, -1);
+  
+  return out;
+}
 
-char *ROOT;
-int listenfd, clients[CONNMAX];
-void error         (char *);
-void startServer   (char *);
-void respond       (int);
-
-#endif

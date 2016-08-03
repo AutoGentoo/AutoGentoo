@@ -1,5 +1,5 @@
 /*
- * server.h
+ * stage3.h
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,30 +22,22 @@
  */
 
 
-#ifndef __AUTOGENTOO_HTTP_SERVER__
-#define __AUTOGENTOO_HTTP_SERVER__
-
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <ifaddrs.h>
-#include <netinet/in.h> 
+#include <cglobal/mstring.h>
+#include <base/download.h>
+#include <cglobal/file.h>
 
-#define CONNMAX 1000
-#define BYTES 102400
+typedef struct
+{
+  char   *arch;
+  char   *buff_link;
+  char   *link;
+  char   *name;
+  char   *date;
+} Stage3;
 
-char *ROOT;
-int listenfd, clients[CONNMAX];
-void error         (char *);
-void startServer   (char *);
-void respond       (int);
+Stage3        stage3_new             (char*);
 
-#endif
+Stage3        stage3_new_latest      (char*);
+
+Stage3        stage3_new_specify     (char*);

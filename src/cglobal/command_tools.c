@@ -35,15 +35,14 @@ get_output (mstring cmd_in)
   return buff;
 }
 
-/*
+
 mstring_a
 get_output_lines (mstring cmd)
 {
   sprintf (cmd, "%s > cmd.temp", cmd);
   
   system (cmd);
-  File *filebuff = file_new_from_name ("cmd.temp");
+  mstring_a filebuff = readlines ("cmd.temp");
   system("rm -rf cmd.temp");
-  return filebuff->lines;
+  return filebuff;
 }
-*/

@@ -1,5 +1,5 @@
 /*
- * server.h
+ * profile_test.c
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,30 +22,17 @@
  */
 
 
-#ifndef __AUTOGENTOO_HTTP_SERVER__
-#define __AUTOGENTOO_HTTP_SERVER__
-
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <ifaddrs.h>
-#include <netinet/in.h> 
+#include <base/profile.h>
 
-#define CONNMAX 1000
-#define BYTES 102400
+int main(int argc, char **argv)
+{
+  ProfileList buff;
+  profilelist_get_list (&buff);
+  printf("passwd");
+  printf ("%s", buff.active_name);
+  profilelist_free (&buff);
+  
+  return 0;
+}
 
-char *ROOT;
-int listenfd, clients[CONNMAX];
-void error         (char *);
-void startServer   (char *);
-void respond       (int);
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * server.h
+ * devices.h
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,30 +22,21 @@
  */
 
 
-#ifndef __AUTOGENTOO_HTTP_SERVER__
-#define __AUTOGENTOO_HTTP_SERVER__
-
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <ifaddrs.h>
-#include <netinet/in.h> 
 
-#define CONNMAX 1000
-#define BYTES 102400
+typedef struct
+{
+  char   *path;
+  char   *label;
+  char   *type; /* scsi, sata */
+  char   *size;
+  char   *logical_sec;
+  char   *physical_sec
+  
+} Disk;
 
-char *ROOT;
-int listenfd, clients[CONNMAX];
-void error         (char *);
-void startServer   (char *);
-void respond       (int);
-
-#endif
+typedef struct
+{
+  char  **mount_devices;
+  char  **mount_points;
+  
