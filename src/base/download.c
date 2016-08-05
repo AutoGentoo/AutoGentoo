@@ -22,14 +22,15 @@
  */
 
 
-#include <stdio.h>
+#include <base/download.h>
 
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
   size_t written = fwrite(ptr, size, nmemb, stream);
   return written;
 }
 
-void download_to_file (char *url, char*outfilename)
+int download_to_file (char *url, char*outfilename)
+{
   CURL *curl;
   FILE *fp;
   CURLcode res;

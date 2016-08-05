@@ -1,7 +1,7 @@
 /*
- * download.h
+ * download_test.c
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
+ * Copyright 2016 Unknown <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,10 @@
 
 
 #include <stdio.h>
-#include <curl/curl.h>
-#include <string.h>
+#include <base/download.h>
 
-#ifndef __AUTOGENTOO_DOWNLOAD_H__
-
-int     download_to_file        (char* url,char* outfilename);
-
-size_t   write_data              (void *ptr, size_t size, size_t nmemb, FILE *stream);
-
-#endif
+int main (int argc, char **argv)
+{
+  download_to_file ("https://www.kernel.org/pub/linux/utils/cpu/crusoe/sha256sums.asc", "new.asc");
+  return 0;
+}
