@@ -30,15 +30,17 @@ def char_to_bool ( char ):
 		return "True"
 	return "False"
 
-def main(_file):
+def main(_file, req):
 	_if = open ( _file, "r" ).readlines ( )
 	_of = open ( "flags", "w+" )
-	_of.write ( "[main]" )
+	_of.write ( "[main]\n" )
 	for i in _if:
 		enabled = char_to_bool ( i[ 0 ] )
-		_of.write ( i[1:] + "=" + enabled + "\n" )
+		_of.write ( i[1:-1] + "=" + enabled + "\n" )
+	_of.write ("[req]\n")
+	_of.write ("required_use=%s" % req)
 	return 0
 
 if __name__ == '__main__':
-	main(sys.argv[1])
+	main(sys.argv[1], sys.argv[2])
 
