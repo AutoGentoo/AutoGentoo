@@ -94,7 +94,7 @@ int main(int argc, char* args[])
   
   if ( emerge_opts [ "install" ] )
   {
-    string cmd ( "python3 ../package/package.py " + emerge_opts ( "config" ) + " ../package/logs " + emerge_opts ( "order" ) + " false false " + emerge_opts ( "ebuild-opts" ) );
+    string cmd ( "python3 package.py " + emerge_opts ( "config" ) + " logs " + emerge_opts ( "order" ) + " false false " + emerge_opts ( "ebuild-opts" ) );
     system ( cmd.c_str ( ) );
   }
   return 0;
