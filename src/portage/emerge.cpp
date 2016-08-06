@@ -28,7 +28,7 @@ void Emerge ( string package, string emergeConfig, string packageConfig, bool do
 {
   vector<string> emergeFile;
   
-  string emergeCommand ( "emerge --verbose --pretend " + options + " " + package + " > " + emergeConfig + " 2>&1" );
+  string emergeCommand ( "emerge --verbose --pretend --ignore-default-opts " + options + " " + package + " > " + emergeConfig + " 2>&1" );
   /*! Execute the emergeCommand to write the config */
   if ( do_pretend )
   {
