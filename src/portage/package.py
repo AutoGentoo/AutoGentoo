@@ -83,7 +83,7 @@ class PackageSet:
 			stages = []
 			if "new" in keys:
 				stages = self.stages
-			if ("updating", "reinstall", "downgrading") in keys and :
+			if ("updating", "reinstall", "downgrading") in keys:
 				if int (self.config [ package ] [ "eapi" ]) > 1:
 					stages = self.stages_upgrade
 				else:
