@@ -31,7 +31,7 @@ Warning::Warning ( vector < string > _input )
 	for ( size_t x = 0; x != input.size ( ); x++ )
 	{
 		string in = input [ x ];
-		if ( in.substr ( 0, 12 ) == "!!! Problem " )
+		if ( in.substr ( 0, 12 ) == "!!! Problem " or in.substr (0, 14) == "!!! The ebuild" )
 		{
 			type = "useReq";
 			lineNum = x;
