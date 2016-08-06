@@ -83,13 +83,14 @@ def getSet(string):
         start = content.index("(")
         end = listRightIndex(content, ")")
         end_maybe = content.index(")")
-        
         a = '1'.join(content[start+1:end])
         content = [y for y in content if y not in content[start-1:end]]
       except:
         pass
       else:
         content = [y for y in content if y not in content[start-1:end]]
+        print (a)
+        print (alt_dict)
         content.append(alt_dict[a])
     def_dict[ first_letter ] = (content, expName)
     content_str = join("1", content)

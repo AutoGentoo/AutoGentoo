@@ -154,51 +154,6 @@ int misc::strfind ( std::string in, char findchar, int startchar = 0 )
   return -1;
 }
 
-template < class type >
-type misc::formatini ( std::string in, boost::property_tree::ptree pt )
-{
-  std::vector<int> findvec;
-  int find = 0;
-  while ( find != -1 )
-  {
-    find = in.find( "$", find+1 );
-    if ( find != -1 )
-    {
-      findvec.push_back ( find );
-    }
-    else
-    {
-      break;
-    }
-  }
-  std::vector<std::string> valvec;
-  for ( size_t x = 0; x != findvec.size ( ) - 1; x++ )
-  {
-    if ( x == findvec.size ( ) )
-    {
-      break;
-    }
-    int y = findvec [ x ];
-    std::string buff = misc::getSubStr ( in, y, '}' );
-    misc::remove( buff, "$" );
-    misc::remove( buff, "{" );
-    misc::remove( buff, "}" );
-    valvec.push_back ( buff );
-  }
-  misc::removechar ( in, '"' );
-  misc::removechar ( in, '"' );
-  for ( size_t x = 0; x != valvec.size ( ); x++ )
-  {
-    std::string y = valvec [ x ];
-    type buff = pt.get<type> ( y );
-    misc::removechar ( buff, '"' );
-    misc::removechar ( buff, '"' );
-    std::string valrep = str ( format( "${%1%}" ) % y );
-    in.replace ( in.find( valrep ), valrep.length ( ), buff );
-  }
-  return in;
-}
-
 std::vector<std::string> misc::split ( std::string str, char chr, bool _trim = false )
 {
   std::vector<std::string> returnList;
@@ -261,7 +216,7 @@ int misc::stoi ( std::string in )
 
 bool misc::stob ( std::string in )
 {
-  boost::algorithm::to_lower ( in );
+  std::transform(in.begin(), in.end(), in.begin(), ::tolower);
   if ( in == "false" )
   {
     return false;
@@ -278,12 +233,12 @@ bool misc::stob ( std::string in )
 std::string misc::getOutput ( std::string command )
 {
   std::string cmd ( command + " > temp" );
-  std::system ( cmd.c_str ( ) );
+  system ( cmd.c_str ( ) );
   std::ofstream _file;
   _file.open ( "temp" );
   std::stringstream buff;
   buff << _file.rdbuf();
-  std::system ( "rm -rf temp" );
+  system ( "rm -rf temp" );
   return buff.str ( );
 }
 
@@ -341,4 +296,20 @@ bool misc::in ( V VEC, T VAL )
     }
   }
   return false;
+}
+
+std::string &misc::ltrim(std::string &s) {
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+  return s;
+}
+
+// trim from end
+std::string &misc::rtrim(std::string &s) {
+  s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+  return s;
+}
+
+// trim from both ends
+std::string &misc::trim(std::string &s) {
+  return ltrim(rtrim(s));
 }

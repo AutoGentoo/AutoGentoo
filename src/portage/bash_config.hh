@@ -29,13 +29,10 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <boost/format.hpp>
 #include "file.hh"
 #include "_misc_tools.hh"
 
 using namespace std;
-using boost::format;
-using boost::io::group;
 
 class bash_config
 {

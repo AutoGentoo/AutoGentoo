@@ -178,7 +178,7 @@ map < string, string > get_command ( string cmd )
     string var, val;
     var = divide[0];
     val = divide[1];
-    trim ( val );
+    misc::trim ( val );
     return_map[var] = val;
   }
   system("rm -rf temp");

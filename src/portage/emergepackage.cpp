@@ -24,9 +24,6 @@
 
 #include "emergepackage.hh"
 
-using namespace std;
-using namespace boost::algorithm;
-
 /*! \struct PackageProperties
  * This type is meant to store the boolean information
  * of a Gentoo ebuild/package

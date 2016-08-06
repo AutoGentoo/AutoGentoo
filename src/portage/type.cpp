@@ -50,7 +50,7 @@ Type::Type ( vector<string> inputFile, string package, bool updates_only )
       for ( size_t z = y; !inputFile[z].empty ( ); z++ )
       {
         string buff = inputFile[z];
-        trim ( buff );
+        misc::trim ( buff );
         if ( !buff.empty ( ) )
         {
           useLines.push_back ( inputFile[z] );
@@ -84,7 +84,7 @@ Type::Type ( vector<string> inputFile, string package, bool updates_only )
           break;
         }
         string buff = inputFile[z];
-        trim ( buff );
+        misc::trim ( buff );
         if ( !buff.empty ( ) or buff == "\n" )
         {
           warningLines.push_back ( buff );
@@ -106,7 +106,7 @@ Type::Type ( vector<string> inputFile, string package, bool updates_only )
   for ( size_t y = 0; y != packageLines.size ( ); y++ )
   {
     string buff = packageLines[y];
-    trim ( buff );
+    misc::trim ( buff );
     if ( buff.substr ( 0, 9 ) == string ( "[uninstal" ) )
     {
       packages.push_back ( EmergePackage ( buff, "uninstall" ) );
@@ -119,7 +119,7 @@ Type::Type ( vector<string> inputFile, string package, bool updates_only )
   for ( size_t y = 0; y != blocksLines.size ( ); y++ )
   {
     string buff = blocksLines[y];
-    trim ( buff );
+    misc::trim ( buff );
     blocks current ( buff );
     string unmerge ( "emerge --rage-clean " + current.blocked );
     system ( unmerge.c_str ( ) );

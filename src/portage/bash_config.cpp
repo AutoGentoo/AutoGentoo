@@ -46,7 +46,6 @@ void bash_config::read ( )
     {
       if ( line.at ( findOther+1 ) != '{' )
       {
-        cout << format( "Invalid syntax for Config file '%1%', after '$' expected '{' got '%1%' (line %2%)" ) % filename % line.at ( findOther+1 ) % y << endl;
         return;
       }
       string other = misc::getSubStr ( line, findOther, '}' );

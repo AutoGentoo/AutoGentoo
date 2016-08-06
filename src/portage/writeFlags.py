@@ -38,9 +38,10 @@ def main(_file, req):
 		enabled = char_to_bool ( i[ 0 ] )
 		_of.write ( i[1:-1] + "=" + enabled + "\n" )
 	_of.write ("[req]\n")
-	_of.write ("required_use=%s" % req)
+	_of.write ("required_use=%s\n" % req)
 	return 0
 
 if __name__ == '__main__':
+	print (sys.argv)
 	main(sys.argv[1], sys.argv[2])
 

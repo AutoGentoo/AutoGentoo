@@ -26,17 +26,12 @@
 #define __MISC_TOOLS_AUTOGENTOO__
 
 #include <iostream>
+#include <stdlib.h>
 #include <string>
 #include <sstream>
 #include <vector>
 #include <fstream>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
-using boost::format;
-using boost::io::group;
-using namespace boost::algorithm;
+#include <algorithm>
 
 /**\namespace misc
  * The strfmt namespace consists of a various collection of tools
@@ -59,8 +54,6 @@ namespace misc
   int find ( std::vector < T > input, T findstr );
   int find_spec ( std::vector < std::string > input, std::string findstr, int start, int end );
   int strfind ( std::string in, char findchar, int startchar );
-  template < class type >
-  type formatini ( std::string in, boost::property_tree::ptree pt );
   std::vector<std::string> split ( std::string str, char chr, bool _trim );
   std::string itos ( int i );
   std::string merge ( std::vector<std::string>, std::string );
@@ -73,6 +66,9 @@ namespace misc
   std::vector < T > set_vec ( std::vector < T > in, size_t pos, T val );
   template < class V, class T >
   bool in ( V VEC, T VAL );
+  std::string &ltrim(std::string &s);
+  std::string &rtrim(std::string &s);
+  std::string &trim(std::string &s);
 }
 
 #endif

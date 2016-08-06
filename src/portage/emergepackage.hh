@@ -28,12 +28,10 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include <boost/algorithm/string.hpp>
 #include "package.hh"
 #include "parse_config.hh"
 
 using namespace std;
-using namespace boost::algorithm;
 
 /*! \struct PackageProperties
  * This type is meant to store the boolean information

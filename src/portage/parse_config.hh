@@ -30,12 +30,10 @@
 #include <vector>
 #include <map>
 #include <cstdlib>
-#include <boost/algorithm/string.hpp>
 #include "_misc_tools.hh"
 #include "file.hh"
 
 using namespace std;
-using namespace boost::algorithm;
 
 map <string, vector<string> > get_variables_split ( string input );
 string get_env ( string var );

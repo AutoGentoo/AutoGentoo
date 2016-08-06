@@ -28,6 +28,7 @@
 #include <map>
 #include "config.hh"
 #include "emergepackage.hh"
+#include "_misc_tools.hh"
 #include "warning.hh"
 
 #ifndef __AUTOGENTOO_PORTAGE_TYPE__
