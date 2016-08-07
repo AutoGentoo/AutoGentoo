@@ -73,11 +73,11 @@ int main(int argc, char* argv[])
   printf("Server started at port no. %s%s%s with root directory as %s%s%s\n","\033[92m",PORT,"\033[0m","\033[92m",ROOT,"\033[0m");
   // Setting all elements to -1: signifies there is no client connected
   
-  pid_t pid = fork();
   
-  if (pid == 0)
+  if (usephp)
   {
-    if (usephp)
+    pid_t pid = fork();
+    if (pid == 0)
     {
       if (ip == NULL)
       {
@@ -90,8 +90,42 @@ int main(int argc, char* argv[])
       system (phpcmd);
       free(phpcmd);
     }
+    else if (pid > 0)
+    {
+      int i;
+      for (i=0; i<CONNMAX; i++)
+        clients[i]=-1;
+      startServer(PORT);
+    
+      // ACCEPT connections
+      while (1)
+      {
+        addrlen = sizeof(clientaddr);
+        clients[slot] = accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen);
+    
+        if (clients[slot]<0)
+          error ("accept() error");
+        else
+        {
+          if ( fork()==0 )
+          {
+            respond(slot);
+            exit(0);
+          }
+        }
+    
+        while (clients[slot]!=-1) slot = (slot+1)%CONNMAX;
+      }
+    }
+    else
+    {
+      printf("fork() failed!\n");
+      return 1;
+    }
+    
+    kill(pid, SIGTERM);
   }
-  else if (pid > 0)
+  else
   {
     int i;
     for (i=0; i<CONNMAX; i++)
@@ -118,14 +152,6 @@ int main(int argc, char* argv[])
       while (clients[slot]!=-1) slot = (slot+1)%CONNMAX;
     }
   }
-  else
-  {
-    printf("fork() failed!\n");
-    return 1;
-  }
-  
-  
-  kill(pid, SIGTERM);
   
   return 0;
 }
