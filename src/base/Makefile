@@ -2,7 +2,6 @@ CC = gcc
 LL = gcc
 INCDIRS = ../
 CFLAGS += -Wall -g
-LIB = -lcurl
 LIBDIR = ../cglobal/
 
 BIN = test
@@ -32,10 +31,10 @@ DTHEADERS = $(patsubst %,%.h, $(DTBARE))
 	$(CC) $(CFLAGS) -o $@ -c $< -I$(INCDIRS)
 
 test: $(DTOBJECTS)
-	#$(CC) $(CFLAGS) -o $(PTBIN).o -c $(PTBIN).c -I$(INCDIRS)
-	#$(LL) $(PTOBJECTS) $(PTBIN).o -o $(PTBIN) -L$(LIBDIR) $(LIB)
+	$(CC) $(CFLAGS) -o $(PTBIN).o -c $(PTBIN).c -I$(INCDIRS)
+	$(LL) $(PTOBJECTS) $(PTBIN).o -o $(PTBIN) -L$(LIBDIR) -lcglobal
 	$(CC) $(CFLAGS) -o $(DTBIN).o -c $(DTBIN).c -I$(INCDIRS)
-	$(LL) $(DTOBJECTS) $(DTBIN).o -o $(DTBIN) -L$(LIBDIR) $(LIB)
+	$(LL) $(DTOBJECTS) $(DTBIN).o -o $(DTBIN) -lcurl 
 
 clean:
 	rm -rf $(OBJECTS)

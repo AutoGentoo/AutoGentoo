@@ -104,7 +104,7 @@ profilelist_get_list (ProfileList * out)
 {
   system("eselect --brief profile list");
   mstring_a profiles = get_output_lines ("eselect --brief profile list");
-  printf ("%s", profiles[0]);
+  //printf ("%s", profiles[0]);
   mstring_a used_profiles = malloc (sizeof(mstring) * 128);
   
   int curr;

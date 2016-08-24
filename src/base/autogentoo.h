@@ -74,3 +74,27 @@ typedef struct
 ag_system             ag_system_new             (void);
 
 ag_system             ag_system_new_from_file   (char*);
+
+int                   ag_system_download_stg    (ag_system);
+
+int                   ag_system_extract_stg     (ag_system);
+
+int                   ag_system_mount_main      (ag_system);
+
+int                   ag_system_mount_chroot    (ag_system);
+
+int                   ag_system_sync            (ag_system, int);
+
+int                   ag_system_extract         (ag_system);
+
+int                   ag_system_install         (ag_system);
+
+int                   ag_system_install_extra   (ag_system);
+
+int                   ag_system_kernel          (ag_system);
+
+int                   ag_system_systemd         (ag_system);
+
+int                   ag_system_grub            (ag_system);
+
+int                   ag_system_

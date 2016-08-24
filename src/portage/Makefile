@@ -4,7 +4,7 @@ INCDIRS = .
 CFLAGS += -Wall -g
 
 BIN = emerge
-BARE = bash_config ebuild file _misc_tools parse_config version blocks emerge findPackage packageConfig type warning config emergepackage is_dir package use option
+BARE = bash_config ebuild file _misc_tools parse_config version blocks emerge findPackage packageConfig type warning config emergepackage is_dir package use option flags
 
 OBJECTS = $(patsubst %,%.o, $(BARE))
 SOURCES = $(patsubst %,%.cpp, $(BARE))
@@ -20,7 +20,9 @@ HEADERS = $(patsubst %,%.hh, $(BARE))
 all: $(OBJECTS)
 	$(eval INCDIRS=.)
 	$(CXX) $(CFLAGS) -o emerge-bin.o -c emerge-bin.cpp -I$(INCDIRS)
+	$(CXX) $(CFLAGS) -o flags-bin.o -c flags-bin.cpp -I$(INCDIRS)
 	$(LXX) $(OBJECTS) emerge-bin.o -o $(BIN)
+	$(LXX) $(OBJECTS) flags-bin.o -o flags-bin
 
 clean:
 	rm -rf $(OBJECTS)
