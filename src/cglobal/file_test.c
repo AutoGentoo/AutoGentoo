@@ -28,7 +28,8 @@
 int main(int argc, char **argv)
 {
   int x;
-  mstring_a buff = readlines ("mlib.h");
+  char **buff = malloc (sizeof(char) * (getlength("mlib.h") + 1));
+  readlines (buff, "mlib.h");
   for (x=0; buff[x]; ++x)
   {
     printf ("%s\n", buff[x]);

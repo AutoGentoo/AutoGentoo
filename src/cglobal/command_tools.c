@@ -27,22 +27,25 @@
 mstring
 get_output (mstring cmd_in)
 {
-  char cmd [1024];
+  char *cmd = malloc (sizeof(char) * (mstring_get_length (cmd_in) + 15));
   sprintf (cmd, "%s > cmd.temp", cmd_in);
   system (cmd);
   mstring buff = read_file ("cmd.temp");
   system ("rm -rf cmd.temp");
+  free(cmd);
   return buff;
 }
 
 
 mstring_a
-get_output_lines (mstring cmd)
+get_output_lines (mstring cmd_in)
 {
-  sprintf (cmd, "%s > cmd.temp", cmd);
-  
+  char *cmd = malloc (sizeof(char) * (mstring_get_length (cmd_in) + 15));
+  sprintf (cmd, "%s > cmd.temp", cmd_in);
   system (cmd);
-  mstring_a filebuff = readlines ("cmd.temp");
+  char **lines = malloc (sizeof(char) * (getlength("cmd.temp") + 1));
+  readlines (lines, "cmd.temp");
   system("rm -rf cmd.temp");
-  return filebuff;
+  free(cmd);
+  return lines;
 }

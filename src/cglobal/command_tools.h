@@ -29,4 +29,4 @@
 
 mstring         get_output          (mstring);
 
-//mstring_a       get_output_lines    (mstring);
+mstring_a       get_output_lines    (mstring);

@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdarg.h>
 #include <cglobal/mlib.h>
 
 #ifndef AUTOGENTOO_MSTRING
@@ -67,6 +68,8 @@ int                mstring_split_quote_len     (mstring, mchar);
 
 mstring_a          mstring_split               (mstring, mchar);
 
+mstring_a          mstring_split_str           (mstring, mstring);
+
 mstring_a *        mstring_a_split             (mstring_a, mstring, int);
 
 int                mstring_a_find              (mstring_a, mstring);
@@ -84,4 +87,10 @@ mstring            mstring_grate               (mstring);
 mstring            mstring_removechar          (mstring, mchar);
 
 void               mstring_a_free              (mstring_a);
+
+int                mstring_a_get_length        (mstring_a);
+
+mstring            rprintf                     (const char* format, ...);
+
+void               aprint                      (mstring_a);
 #endif

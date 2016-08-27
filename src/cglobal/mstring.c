@@ -312,6 +312,40 @@ mstring_a mstring_split (mstring a_str, mchar a_delim)
   return result;
 }
 
+mstring_a mstring_split_str (mstring in, mstring delim)
+{
+  mstring buff_out = strdup (in);
+  mstring buff;
+  mstring token;
+  
+  int count = 0;
+  const char *tmp = in;
+  while(tmp == strstr(tmp, delim))
+  {
+     count++;
+     tmp++;
+  }
+  
+  mstring_a out = malloc (sizeof (char*) * count + 1);
+  
+  int curr = 0;
+  
+  if (buff_out != NULL)
+  {
+    buff = in;
+
+    while ((token = strsep(&in, delim)) != NULL)
+    {
+      out[curr] = token;
+      curr++;
+    }
+  
+    free(buff);
+  }
+  
+  return out;
+}
+
 int
 mstring_a_find (mstring_a in, mstring search)
 {
@@ -489,4 +523,35 @@ mstring_a_free (mstring_a in)
   }
   
   free(in);
+}
+
+int
+mstring_a_get_length (mstring_a in)
+{
+  int out;
+  for (out=0; in[out]; out++);
+  return out;
+}
+
+mstring
+rprintf (const char* format, ...)
+{
+  char       msg[1024];
+  va_list    args;
+
+  va_start(args, format);
+  vsnprintf(msg, sizeof(msg), format, args); // do check return value
+  va_end(args);
+
+  return msg;
+}
+
+void
+aprint (mstring_a in)
+{
+  int i;
+  for (i=0; in[i]; i++)
+  {
+    printf ("%s\n", in[i]);
+  }
 }

@@ -30,6 +30,8 @@
 
 int             getlength             (mstring);
 
-mstring_a       readlines             (mstring);
+void            readlines             (char** line, mstring);
 
 mstring         read_file             (mstring);
+
+int             get_longest           (mstring filename);

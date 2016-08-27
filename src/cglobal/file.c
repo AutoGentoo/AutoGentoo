@@ -27,51 +27,58 @@
 int
 getlength (mstring filename)
 {
-  int lines;
-  int ch=0;
-  FILE *fp;
-  fp = fopen(filename, "r");
-  if (fp == NULL)
-    err(1, "%s", filename);
-  
-  while(!feof(fp))
-  {
-    ch = fgetc(fp);
-    if(ch == '\n')
-    {
-      lines++;
-    }
-  }
-  
-  return lines;
-}
-
-mstring_a
-readlines (mstring filename)
-{
-  FILE *f;
-  size_t len;
-  char *line;
-  mstring_a out = calloc (getlength (filename), sizeof(mstring_a));
-  int curr = 0;
-  
-  f = fopen(filename, "r");
-  if (f == NULL)
-    err(1, "%s", filename);
-  
-  while ((line = fgetln(f, &len)))
-  {
-    out[curr] = calloc (mstring_get_length (line), sizeof(mstring));
-    out[curr] = mstring_get_sub_py (line, 0, -2);
-    free(line);
-    curr++;
-  }
-  if (!feof(f))
-    err(1, "fgetln");
-  
-  fclose(f);
+  int out;
+  char *f = NULL;
+  system (rprintf ("wc -l %s > temp.t\n", filename));
+  sscanf (read_file ("temp.t"), "%d %s", &out, f);
+  system ("rm -rf temp.t");
   
   return out;
+}
+
+int
+get_longest (mstring filename)
+{
+  int out;
+  char *f = NULL;
+  system (rprintf ("wc -L %s > temp.t\n", filename));
+  sscanf (read_file ("temp.t"), "%d %s", &out, f);
+  system ("rm -rf temp.t");
+  
+  return out;
+}
+
+
+void readlines (char** lines, mstring b_filename)
+{
+  FILE * fp;
+  fp = fopen(b_filename, "r");
+  //char lines[getlength(b_filename) + 1][get_longest (b_filename)];
+  char * line = NULL;
+  size_t len = 0;
+  ssize_t read;
+  
+  if (fp == NULL)
+  {
+    return;
+  }
+  
+  int curr = 0;
+  
+  while ((read = getline(&line, &len, fp)) != -1)
+  {
+    lines[curr] = malloc (sizeof(char) * mstring_get_length (line) - 1);
+    memcpy (lines[curr], line, mstring_get_length(line) - 1);
+    curr++;
+  }
+  
+  fclose(fp);
+  if (line)
+  {
+    free(line);
+  }
+  
+  return;
 }
 
 mstring
