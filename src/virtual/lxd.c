@@ -27,7 +27,7 @@
 int
 lxd_sync (char * lxd_img, char * dest)
 {
-  char * command_tar  = malloc (sizeof(char) * strlen("cd /usr/portage/packages && rm -rf compressed.tar.gz && tar cfz compressed.tar.gz ") + );
+  char * command_tar  = malloc (sizeof(char) * strlen("cd /usr/portage/packages && rm -rf compressed.tar.gz && tar cfz compressed.tar.gz "));
   char * command_pull = malloc (sizeof(char) * strlen ("lxc file pull   /usr/portage/packages/compressed.tar.gz   ") + strlen(lxd_img) + strlen(dest));
   char * command_untar = malloc (sizeof(char) * strlen ("tar xf   /compressed.tar.gz -C  ") + strlen (dest) + strlen (dest));
   

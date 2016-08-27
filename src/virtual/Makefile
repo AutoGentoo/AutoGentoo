@@ -5,7 +5,7 @@ CFLAGS += -Wall -g
 LIBS = -lssl -lcrypto
 
 BIN = lxd-sync
-BARE = lxd getdiff
+BARE = lxd
 
 OBJECTS = $(patsubst %,%.o, $(BARE))
 SOURCES = $(patsubst %,%.c, $(BARE))
@@ -21,6 +21,8 @@ HEADERS = $(patsubst %,%.h, $(BARE))
 all: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BIN).o -c $(BIN).c -I$(INCDIRS) $(LIBS)
 	$(LL) $(OBJECTS) $(BIN).o -o $(BIN)
+
+test: all
 
 clean:
 	rm -rf $(OBJECTS)

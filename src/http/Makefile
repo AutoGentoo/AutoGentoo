@@ -16,6 +16,8 @@ HEADERS = $(patsubst %,%.h, $(BARE))
 %.o : %.c %.h
 	$(CC) $(CFLAGS) -o $@ -c $< -I$(INCDIRS)
 
+test: $(OBJECTS)
+
 all: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(BIN).o -c $(BIN).c -I$(INCDIRS)
 	$(LL) $(OBJECTS) $(BIN).o -o $(BIN)
