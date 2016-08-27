@@ -21,22 +21,41 @@
  * 
  */
 
+#ifndef __AUTOGENTOO_DEVICES_H__
+#define __AUTOGENTOO_DEVICES_H__
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <cglobal/mstring.h>
+#include <cglobal/command_tools.h>
 
-typedef struct
-{
-  char   *path;
-  char   *label;
-  char   *type; /* scsi, sata */
-  char   *size;
-  char   *logical_sec;
-  char   *physical_sec
-  
-} Disk;
+typedef struct __DISK Disk;
+typedef struct __PART Partition;
+typedef struct __FREE Free;
+typedef struct __STOR Storage;
 
-typedef struct
-{
-  char  **mount_devices;
-  char  **mount_points;
-  
+Partition part_new               ();
+
+void      part_free              (Partition*);
+
+Partition part_new_from_str      (char**, Disk*);
+
+Free      free_new_from_str      (char**, Disk*);
+
+Disk      disk_new               ();
+
+void      disk_free              (Disk*);
+
+Disk      disk_new_from_path     (char*);
+
+void      probe_devices          (Storage*);
+
+Disk      get_disk               (Storage*, char*);
+
+Partition get_partition          (Storage*, char*);
+
+Storage*  storage_new            ();
+
+void      storage_free           (Storage*);
+
+#endif

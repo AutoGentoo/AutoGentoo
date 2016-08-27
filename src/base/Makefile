@@ -7,10 +7,12 @@ LIBDIR = ../cglobal/
 BIN = test
 PTBIN = profile_test
 DTBIN = download_test
+DEVTBIN = devices_test
 
-BARE = profile download
+BARE = profile download devices
 PTBARE = profile
 DTBARE = download
+DEVTBARE = devices
 
 OBJECTS = $(patsubst %,%.o, $(BARE))
 SOURCES = $(patsubst %,%.c, $(BARE))
@@ -24,17 +26,25 @@ DTOBJECTS = $(patsubst %,%.o, $(DTBARE))
 DTSOURCES = $(patsubst %,%.c, $(DTBARE))
 DTHEADERS = $(patsubst %,%.h, $(DTBARE))
 
+DEVTOBJECTS = $(patsubst %,%.o, $(DEVTBARE))
+DEVTSOURCES = $(patsubst %,%.c, $(DEVTBARE))
+DEVTHEADERS = $(patsubst %,%.h, $(DEVTBARE))
+
 .PHONY : all
 .DEFAULT_GOAL := all
 
 %.o : %.c %.h
 	$(CC) $(CFLAGS) -o $@ -c $< -I$(INCDIRS)
 
-test: $(DTOBJECTS)
+all: $(OBJECTS)
+
+test: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(PTBIN).o -c $(PTBIN).c -I$(INCDIRS)
 	$(LL) $(PTOBJECTS) $(PTBIN).o -o $(PTBIN) -L$(LIBDIR) -lcglobal
 	$(CC) $(CFLAGS) -o $(DTBIN).o -c $(DTBIN).c -I$(INCDIRS)
 	$(LL) $(DTOBJECTS) $(DTBIN).o -o $(DTBIN) -lcurl 
+	$(CC) $(CFLAGS) -o $(DEVTBIN).o -c $(DEVTBIN).c -I$(INCDIRS)
+	$(LL) $(DEVTOBJECTS) $(DEVTBIN).o -o $(DEVTBIN) -L$(LIBDIR) -lcglobal
 
 clean:
 	rm -rf $(OBJECTS)
