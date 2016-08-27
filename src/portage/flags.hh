@@ -37,19 +37,22 @@ typedef struct
 
 typedef struct
 {
-  void parse (string);
+  char* type;
+} Opt;
+
+typedef struct
+{
+  void parse (string, string);
+  void content (string);
+  void str (string);
+  
   bool is_flag;
   
   Flag flag;
   Opt opt;
   
-  char* str;
+  char* _content;
 } Arg;
-
-typedef struct
-{
-  char* type;
-} Opt;
 
 int        get_close            (string paren);
 

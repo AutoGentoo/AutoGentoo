@@ -30,8 +30,92 @@ ebuild::ebuild ( Package package )
   REQUIRED_USE = REQUIRED_USE.erase ( REQUIRED_USE.length ( ) - 1, 1 );
   string equeryCmd ( "equery uses " + package.name + " > use" );
   system ( equeryCmd.c_str ( ) );
-  string writeFlags ( "python3 writeFlags.py use \"" + REQUIRED_USE + "\"" );
+  string req ("sed -i \'" + REQUIRED_USE +  "\' use");
+  system(req);
+  string writeFlags ( "python3 writeFlags.py use" );
   system ( writeFlags.c_str ( ) );
   SUGGEST_USE = get_command_str ( "python3 parseFlags.py" );
   useGentooFlag _use ( package.path, SUGGEST_USE, true );
 }
+
+/*
+ * -apache2
+-bcmath
++berkdb
++bzip2
+-calendar
+-cdb
+-cgi
+-cjk
++cli
++crypt
++ctype
+-curl
+-debug
+-embed
+-enchant
++exif
++fileinfo
++filter
+-flatfile
+-fpm
+-ftp
+-gd
++gdbm
+-gmp
++hash
++iconv
+-imap
+-inifile
+-intl
+-iodbc
++ipv6
++json
+-kerberos
++ldap
+-ldap-sasl
+-libedit
+-libmysqlclient
+-mhash
+-mssql
+-mysql
+-mysqli
++nls
+-oci8-instant-client
+-odbc
++opcache
+-pcntl
+-pdo
++phar
++posix
+-postgres
+-qdbm
++readline
+-recode
++session
+-sharedmem
++simplexml
+-snmp
+-soap
+-sockets
++spell
+-sqlite
++ssl
+-sybase-ct
++systemd
+-sysvipc
+-threads
+-tidy
++tokenizer
++truetype
++unicode
+-vpx
+-wddx
++xml
+-xmlreader
+-xmlrpc
+-xmlwriter
+-xpm
+-xslt
+-zip
++zlib */

@@ -49,7 +49,7 @@ int get_close (string paren)
 }
 
 
-parseblock (string blockRaw)
+void parseblock (string blockRaw)
 {
   string::iterator buff_i = blockRaw.begin (); 
   string buff;
@@ -61,6 +61,7 @@ parseblock (string blockRaw)
   int par = 0;
   int b_s = 0;
   int b_e = 0;
+  int curr_arg = 0;
   string p_buff;
   
   Arg* out = new Arg [128];
@@ -86,7 +87,7 @@ parseblock (string blockRaw)
         if (pa)
         {
           p_buff =  misc::substr (blockRaw, b_s + 2, b_e-1);
-          cout << p_buff << endl << endl;
+          out[curr_arg].content (p_buff);
         }
       }
     }
@@ -111,7 +112,7 @@ parseblock (string blockRaw)
   }
 }
 
-void Arg::parse (string arg, string val);
+void Arg::parse (string arg, string val)
 {
   if (arg[arg.length ()] == '?')
   {
@@ -124,3 +125,7 @@ void Arg::parse (string arg, string val);
   
 }
 
+void Arg::content (string in)
+{
+  _content = (char*) in.c_str ();
+}

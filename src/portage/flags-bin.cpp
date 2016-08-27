@@ -30,4 +30,3 @@ int main(int argc, char **argv)
 	parseblock ("cli? ( ^^ ( readline libedit ) ) truetype? ( gd ) vpx? ( gd ) cjk? ( gd ) exif? ( gd ) xpm? ( gd ) gd? ( zlib ) simplexml? ( xml ) soap? ( xml ) wddx? ( xml ) xmlrpc? ( || ( xml iconv ) ) xmlreader? ( xml ) xslt? ( xml ) ldap-sasl? ( ldap ) mhash? ( hash ) phar? ( hash ) libmysqlclient? ( || ( mysql mysqli pdo ) ) qdbm? ( !gdbm ) readline? ( !libedit ) recode? ( !imap !mysql !mysqli ) sharedmem? ( !threads ) !cli? ( !cgi? ( !fpm? ( !apache2? ( !embed? ( cli ) ) ) ) )");
 	return 0;
 }
-

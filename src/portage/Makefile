@@ -16,6 +16,7 @@ HEADERS = $(patsubst %,%.hh, $(BARE))
 %.o : %.cpp %.hh
 	$(CXX) $(CFLAGS) -o $@ -c $< -I$(INCDIRS)
 
+test: all
 
 all: $(OBJECTS)
 	$(eval INCDIRS=.)
@@ -27,5 +28,8 @@ all: $(OBJECTS)
 clean:
 	rm -rf $(OBJECTS)
 	rm -rf emerge-bin.o
+	rm -rf *.emerge
+	rm -rf *.cfg
 	rm -rf *.gch
 	rm -rf $(BIN)
+	rm -rf flags-bin

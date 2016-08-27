@@ -57,45 +57,132 @@ def join(between, vec):
     if x != vec[-1]:
       a += between
   return a
-def getSet(string):
-  def_dict = {}
-  alt_dict = {}
-  buff_set = []
-  first = []
-  lasts = []
-  for x in range(len(string)):
-    if string[x] == "(":
-      first.append(x)
-  for x in reversed(first):
-    buff = string.find (")", x)
-    if buff in lasts:
-      buff = string.find(")", buff+1)
-    lasts.append(buff)
-    buff_set.append((x, buff))
-  contents = []
-  for x in buff_set:
-    first_letter = getLetter(x[0], string)
-    expName = string[first_letter:x[0]].strip()
-    content = string[x[0]+1:x[1]].strip().split(" ")
-    while "(" in content:
-      a = ""
-      try:
-        start = content.index("(")
-        end = listRightIndex(content, ")")
-        end_maybe = content.index(")")
-        a = '1'.join(content[start+1:end])
-        content = [y for y in content if y not in content[start-1:end]]
-      except:
-        pass
+
+def getpar (string):
+  out = []
+  types = []
+  __out__ = []
+  par = 0
+  arg_buff = ""
+  content_buff = ""
+  i = -1
+  while i != len(string):
+    i += 1
+    try:
+      x = string[i]
+    except IndexError:
+      break
+    
+    if x == '(':
+      par += 1
+      if par != 1:
+        content_buff += x
+        continue
+      i += 1
+      continue
+    if x == ')':
+      par -= 1
+      if (par == 0):
+        out.append ([arg_buff, content_buff[:-1]])
+        content_buff = ""
+        arg_buff = ""
       else:
-        content = [y for y in content if y not in content[start-1:end]]
-        print (a)
-        print (alt_dict)
-        content.append(alt_dict[a])
-    def_dict[ first_letter ] = (content, expName)
-    content_str = join("1", content)
-    alt_dict[ content_str ] = first_letter
-  return def_dict
+        content_buff += x
+        continue
+      i += 1
+      continue
+    if par > 0:
+      content_buff += x
+      continue
+    
+    if (x == ' ' and string[i-1] == '?'):
+      continue
+    
+    arg_buff += x
+  
+  par = 0
+  arg_buff = ""
+  content_buff = ""
+  i = -1
+  
+  while i != len(string):
+    i += 1
+    try:
+      x = string[i]
+    except IndexError:
+      break
+    
+    if x == '(':
+      par += 1
+      i += 1
+      continue
+    if x == ')':
+      par -= 1
+      if (par == 0):
+        content_buff = content_buff[:-1]
+        splt = content_buff.split (" ")
+        num_buff = []
+        
+        for x in splt:
+          if x[-1] in ('?', '^', '|'):
+            num_buff.append (1)
+          else:
+            num_buff.append (0)
+        types.append (num_buff)
+        __out__.append ([arg_buff, content_buff.split (' ')])
+        content_buff = ""
+        arg_buff = ""
+      i += 1
+      continue
+    if par > 1:
+      continue
+    if par > 0:
+      content_buff += x
+      continue
+    
+    if (x == ' ' and string[i-1] == '?'):
+      continue
+    
+    arg_buff += x
+  
+  __out__
+  
+  return [out, __out__, types]
+  
+  # -----Item-----
+  # [arg, content]
+
+
+def pars (basic, clean, _type):
+  # Input is item from each list returned from getpar ()
+  
+  for i, x in enumerate(_type):
+    if x != 1:
+      continue
+    
+
+def getSet(string):
+  #X509? ( !ldap ssl? ( abs ) )
+  
+  pared = getpar (string)
+  
+  print (pared[0])
+  print (pared[1])
+  print (pared[2])
+  
+  #for x in pared [2]:
+  #  for y in x:
+  #    if y:
+  #      
+  
+  #def_dict = {}
+  
+  exit (0)
+  #return def_dict
+  
+  # ----Item------     points to item      last
+  # iter : ['flag', 'flag', 'int',       'parent']
+  
 def eval_flag ( flag, process ):
   if type ( flag ) == int:
     g = Flag ( process [ flag ][ 1 ] )
@@ -209,6 +296,7 @@ class ParseFlag:
       exec ( "global %s; %s = %s" % ( keynew, keynew, _map[ key ] ) )
     self.required_use = flagMap.required_use.replace ( "-", "__" ).replace ( "\"", "" )
     self.processed = getSet ( self.required_use )
+    print (self.processed)
     for x in self.processed:
       stat = Flag ( self.processed [ x ] [ 1 ] )
       p_vals = []
@@ -255,7 +343,7 @@ class ParseFlag:
         sug = suggest ( * ( z ) )
         if sug:
           self.errors_post.append( ' '.join(sug).strip ( ) )
-    print ( ' '.join ( self.errors_post ) )
+    #print ( ' '.join ( self.errors_post ) )
 """
 REQUIRED_USE="foo? ( bar )"          If foo is set, bar must be set.
 REQUIRED_USE="foo? ( !bar )"        If foo is set, bar must not be set.
