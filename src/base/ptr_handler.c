@@ -149,7 +149,9 @@ void gfree (PointerGroup* pgrp)
     }
     pfree (pgrp->ptrs[i]);
   }
-  free (pgrp);
+  pfree (pgrp->ptrs);
+  pfree (pgrp->is_array);
+  pfree (pgrp);
 }
 
 void set_valid (void *ptr)
@@ -189,5 +191,6 @@ void free_all ()
   {
     gfree (mainHandler->groups[i]);
   }
-  free (mainHandler);
+  pfree (mainHandler->groups);
+  pfree (mainHandler);
 }
