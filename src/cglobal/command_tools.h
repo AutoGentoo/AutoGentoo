@@ -21,6 +21,8 @@
  * 
  */
 
+#ifndef __AUTOGENTOO_COMMAND_TOOL_H__
+#define __AUTOGENTOO_COMMAND_TOOL_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,3 +32,7 @@
 mstring         get_output          (mstring);
 
 mstring_a       get_output_lines    (mstring);
+
+int             get_output_length   (mstring __command);
+
+#endif

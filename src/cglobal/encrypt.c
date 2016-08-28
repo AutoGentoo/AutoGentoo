@@ -28,8 +28,8 @@ password *
 password_new (void)
 {
   password     *buff   =  malloc(sizeof(password*));
-  buff->md5            =  mstring_new ();
-  buff->salt           =  mstring_new ();
+  buff->md5            =  "";
+  buff->salt           =  "";
   return buff;
 }
 

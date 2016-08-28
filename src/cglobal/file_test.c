@@ -28,12 +28,12 @@
 int main(int argc, char **argv)
 {
   int x;
-  char **buff = malloc (sizeof(char) * (getlength("mlib.h") + 1));
-  readlines (buff, "mlib.h");
+  char **buff = readlines ("mlib.h");
   for (x=0; buff[x]; ++x)
   {
     printf ("%s\n", buff[x]);
   }
+  free(buff);
   return 0;
 }
 

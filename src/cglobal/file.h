@@ -30,7 +30,7 @@
 
 int             getlength             (mstring);
 
-void            readlines             (char** line, mstring);
+char**          readlines             (mstring);
 
 mstring         read_file             (mstring);
 

@@ -32,65 +32,63 @@
 #ifndef AUTOGENTOO_MSTRING
 #define AUTOGENTOO_MSTRING
 
-/** mstring stands for Minux String
- * This type is the main string type for this software
-**/
+char*              mstring_new_from_char       (char );
 
-mstring            mstring_new                 (void);
+char*              mstring_new_from_chars      (char *);
 
-mstring            mstring_new_from_char       (mchar);
+char*              mstring_get_sub             (char*, int, int);
 
-mstring            mstring_new_from_chars      (char *);
+char*              mstring_get_sub_py          (char*, int, int);
 
-mstring            mstring_get_sub             (mstring, int, int);
+char*              mstring_find_before         (char*, char );
 
-mstring            mstring_get_sub_py          (mstring, int, int);
+char*              mstring_find_after          (char*, char );
 
-mstring            mstring_find_before         (mstring, mchar);
+int                mstring_get_length          (char*);
 
-mstring            mstring_find_after          (mstring, mchar);
+int                mstring_find_start          (char*, char , int);
 
-int                mstring_get_length          (mstring);
+int                mstring_find_start_num      (char*, char , int, int);
 
-int                mstring_find_start          (mstring, mchar, int);
+int                mstring_find                (char*, char );
 
-int                mstring_find_start_num      (mstring, mchar, int, int);
+int                mstring_rfind               (char*, char );
 
-int                mstring_find                (mstring, mchar);
+int                mstring_split_len           (char*, char );
 
-int                mstring_rfind               (mstring, mchar);
+int                mstring_split_quote_len     (char*, char );
 
-mstring_a          mstring_a_new               (void);
+char**             mstring_split               (char*, char );
 
-int                mstring_split_len           (mstring, mchar);
+char**             mstring_split_str           (char*, char*);
 
-int                mstring_split_quote_len     (mstring, mchar);
+char***            mstring_a_split             (mstring_a, char*, int);
 
-mstring_a          mstring_split               (mstring, mchar);
+int                mstring_a_find              (mstring_a, char*);
 
-mstring_a          mstring_split_str           (mstring, mstring);
+char*              concat                      (char*, char*);
 
-mstring_a *        mstring_a_split             (mstring_a, mstring, int);
+char**             mstring_split_quote         (char*, char );
 
-int                mstring_a_find              (mstring_a, mstring);
+int                mstring_search              (char*, char*);
 
-mstring            concat                      (mstring, mstring);
+char*              itoa                        (int, int);
 
-mstring_a          mstring_split_quote         (mstring, mchar);
+char*              mstring_grate               (char*);
 
-int                mstring_search              (mstring, mstring);
-
-mstring            itoa                        (int, int);
-
-mstring            mstring_grate               (mstring);
-
-mstring            mstring_removechar          (mstring, mchar);
+char*              mstring_removechar          (char*, char );
 
 void               mstring_a_free              (mstring_a);
 
 int                mstring_a_get_length        (mstring_a);
 
-mstring            rprintf                     (const char* format, ...);
+//const char*      rprintf                     (const char* format, ...);
 
 void               aprint                      (mstring_a);
+
+void               print                       (char* format, ...);
+
+int                systemf                     (const char* format, ...);
+
+void               mstring_a_hp_stk            (char**, char**);
 #endif

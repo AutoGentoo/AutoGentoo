@@ -26,7 +26,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <cglobal/mstring.h>
 #include <cglobal/command_tools.h>
 
 typedef struct __DISK Disk;
@@ -34,17 +33,9 @@ typedef struct __PART Partition;
 typedef struct __FREE Free;
 typedef struct __STOR Storage;
 
-Partition part_new               ();
-
-void      part_free              (Partition*);
-
 Partition part_new_from_str      (char**, Disk*);
 
 Free      free_new_from_str      (char**, Disk*);
-
-Disk      disk_new               ();
-
-void      disk_free              (Disk*);
 
 Disk      disk_new_from_path     (char*);
 

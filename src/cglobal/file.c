@@ -29,10 +29,11 @@ getlength (mstring filename)
 {
   int out;
   char *f = NULL;
-  system (rprintf ("wc -l %s > temp.t\n", filename));
-  sscanf (read_file ("temp.t"), "%d %s", &out, f);
+  systemf ("wc -l %s > temp.t", filename);
+  char *buffer = read_file ("temp.t");
+  sscanf (buffer, "%d %s", &out, f);
+  free (buffer);
   system ("rm -rf temp.t");
-  
   return out;
 }
 
@@ -41,44 +42,48 @@ get_longest (mstring filename)
 {
   int out;
   char *f = NULL;
-  system (rprintf ("wc -L %s > temp.t\n", filename));
-  sscanf (read_file ("temp.t"), "%d %s", &out, f);
+  systemf ("wc -L %s > temp.t", filename);
+  char *buffer = read_file ("temp.t");
+  sscanf (buffer, "%d %s", &out, f);
+  free (buffer);
   system ("rm -rf temp.t");
   
   return out;
 }
 
 
-void readlines (char** lines, mstring b_filename)
+char** readlines (mstring filename)
 {
+  char **lines = malloc (sizeof(char*) * (getlength(filename) + 1));
   FILE * fp;
-  fp = fopen(b_filename, "r");
-  //char lines[getlength(b_filename) + 1][get_longest (b_filename)];
+  fp = fopen(filename, "r");
+  
   char * line = NULL;
   size_t len = 0;
   ssize_t read;
   
   if (fp == NULL)
   {
-    return;
+    return NULL;
   }
   
   int curr = 0;
   
   while ((read = getline(&line, &len, fp)) != -1)
   {
-    lines[curr] = malloc (sizeof(char) * mstring_get_length (line) - 1);
+    if (line == NULL)
+    {
+      continue;
+    }
+    print ("%d   %s", curr, line);
+    lines[curr] = malloc (sizeof(char) * mstring_get_length (line) + 1);
     memcpy (lines[curr], line, mstring_get_length(line) - 1);
     curr++;
   }
   
   fclose(fp);
-  if (line)
-  {
-    free(line);
-  }
-  
-  return;
+  free (line);
+  return lines;
 }
 
 mstring

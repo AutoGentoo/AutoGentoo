@@ -24,48 +24,19 @@
 
 #include "mstring.h"
 
-/* Create a new empty string */
-mstring
-mstring_new (void)
-{
-  return malloc(sizeof(mstring));
-}
-
-/* Create a new empty string */
-mstring
-mstring_new_from_char (mchar c)
-{
-  mstring  buff;
-  
-  buff = &c;
-  
-  return buff;
-}
-
-mstring
-mstring_new_from_chars (char *c)
-{
-  return c;
-}
-
 int
-mstring_get_length (mstring str)
+mstring_get_length (char* str)
 {
-  if (!str)
-  {
-    return 0;
-  }
-  
   int num;
   for (num = 0; str[num]; num++);
   return num;
 }
 
-mstring
-mstring_get_sub  (mstring old, int start, int length)
+char*
+mstring_get_sub  (char* old, int start, int length)
 {
-  int      size = mstring_get_length (old);
-  mchar    out_array [length-start];
+  int  size = mstring_get_length (old);
+  char* out_array = malloc (sizeof(char) * (length + 1));
   
   if (size < (start+length))
   {
@@ -79,15 +50,15 @@ mstring_get_sub  (mstring old, int start, int length)
     out_array [curr] = old[curr+start];
   }
   
-  return mstring_new_from_chars (&out_array[0]);
+  return out_array;
 }
 
-mstring
-mstring_get_sub_py (mstring old, int start, int end)
+char*
+mstring_get_sub_py (char* old, int start, int end)
 {
   int      size = mstring_get_length (old);
   int      len;
-  mstring  out_array = (char*) malloc(size + 1);
+  char    *out_array = malloc (sizeof (char) * size + 1);
   
   if (size < end)
   {
@@ -112,14 +83,14 @@ mstring_get_sub_py (mstring old, int start, int end)
 }
 
 int
-mstring_find (mstring in, mchar find)
+mstring_find (char* in, char find)
 {
   int   size = mstring_get_length (in);
   int   curr;
   
   for (curr = 0; curr != size; curr++)
   {
-    mchar c = in[curr];
+    char c = in[curr];
     
     if (c == find)
     {
@@ -131,14 +102,14 @@ mstring_find (mstring in, mchar find)
 }
 
 int
-mstring_rfind (mstring in, mchar find)
+mstring_rfind (char* in, char find)
 {
   int   size = mstring_get_length (in);
   int   curr = size;
   
   for (; curr != 0; curr--)
   {
-    mchar c = in[curr];
+    char c = in[curr];
     
     if (c == find)
     {
@@ -150,17 +121,17 @@ mstring_rfind (mstring in, mchar find)
 }
 
 int
-mstring_find_start (mstring in, mchar find, int start)
+mstring_find_start (char* in, char find, int start)
 {
   int   size = mstring_get_length (in);
   int   curr;
-  mchar  buff [size];
+  char  buff [size];
   
   strcpy(buff, in);
   
   for (curr = start; curr != size; curr++)
   {
-    mchar c = buff[curr];
+    char c = buff[curr];
     
     if (c == find)
     {
@@ -171,36 +142,21 @@ mstring_find_start (mstring in, mchar find, int start)
   return -1;
 }
 
-/*char*
-char_a_new_from_string (mstring in)
-{
-  int     size    = mstring_get_length (in);
-  mchar    buff[size];
-  int     curr    = 0;
-  
-  for (;in[curr]; curr++)
-  {
-    buff [curr] = in[curr];
-  }
-  
-  return buff;
-}*/
-
-mstring
-mstring_find_before  (mstring old, mchar c)
+char*
+mstring_find_before  (char* old, char c)
 {
   return mstring_get_sub_py (old, 0, mstring_find (old, c));
 }
 
-mstring
-mstring_find_after  (mstring old, mchar c)
+char*
+mstring_find_after  (char* old, char c)
 {
   return mstring_get_sub_py (old, mstring_find (old, c), -1);
 }
 
-mstring itoa(int val, int base)
+char* itoa(int val, int base)
 {
-  static mchar buf[32] = {0};
+  static char buf[32] = {0};
   
   int i = 30;
   
@@ -213,26 +169,26 @@ mstring itoa(int val, int base)
   
 }
 
-mstring_a *
-mstring_a_split (mstring_a in, mstring c, int len)
+char***
+mstring_a_split (char** in, char* c, int len)
 {
-  mstring_a *  buff       =  malloc(sizeof(mstring_a*));
+  char** *  buff       =  malloc(sizeof(mstring_a) * mstring_a_get_length (in));
   int          curr       =  0;
   int          index      =  1;
   int          str_index  =  0;
-  mstring_a    str_buff   =  mstring_a_new ();
-  mstring_a    end        =  mstring_a_new ();
+  char**    str_buff   =  malloc (sizeof(char*) * mstring_a_get_length (in));
+  char**    end        =  malloc (sizeof(char*) * mstring_a_get_length (in));
   
   for (curr = 0; curr != len; curr++, str_index++)
   {
-    mstring curr_c = in[curr];
+    char* curr_c = in[curr];
     
     if (strcmp (curr_c, c) == 0)
     {
       str_buff[str_index] = curr_c;
       buff[index] = str_buff;
       str_index   =  0;
-      str_buff    =  mstring_a_new ();
+      str_buff    =  malloc (sizeof(char*) * mstring_a_get_length (in));
       index++;
       continue;
     }
@@ -249,7 +205,7 @@ mstring_a_split (mstring_a in, mstring c, int len)
   return buff;
 };
 
-int mstring_split_len (mstring in, mchar splt)
+int mstring_split_len (char* in, char splt)
 {
   int        occ_num  =  0;
   int        curr;
@@ -265,58 +221,59 @@ int mstring_split_len (mstring in, mchar splt)
   return occ_num;
 }
 
-mstring_a mstring_split (mstring a_str, mchar a_delim)
+char** mstring_split (char* a_str, char a_delim)
 {
-  char** result    = 0;
-  size_t count     = 0;
-  char* tmp        = a_str;
-  char* last_comma = 0;
-  char delim[2];
-  delim[0] = a_delim;
-  delim[1] = 0;
-
-  /* Count how many elements will be extracted. */
-  while (*tmp)
+  int a = 0;
+  int c = 0;
+  for (a=0; a_str[a]; a++)
   {
-    if (a_delim == *tmp)
+    if (a_str[a] == a_delim)
     {
-      count++;
-      last_comma = tmp;
+      c++;
     }
-    tmp++;
   }
-
-  /* Add space for trailing token. */
-  count += last_comma < (a_str + strlen(a_str) - 1);
-
-  /* Add space for terminating null string so caller
-     knows where the list of returned strings ends. */
-  count++;
-
-  result = malloc(sizeof(char*) * count);
-
-  if (result)
+  
+  char **out = malloc (sizeof (char*) *(c+2));
+  
+  char *buffer = malloc (sizeof(char) * (a+1));
+  int  c_buff = 0;
+  int first = 0;
+  int i = 0;
+  print (a_str);
+  for (i=0; c_buff != c+1; i++)
   {
-    size_t idx  = 0;
-    char* token = strtok(a_str, delim);
-
-    while (token)
+    if (a_str[i] == a_delim)
     {
-      assert(idx < count);
-      *(result + idx++) = strdup(token);
-      token = strtok(0, delim);
+      if (!buffer || strcmp (buffer, "") == 0)
+        break;
+      out[c_buff] = malloc (sizeof(char) * (mstring_get_length (buffer) + 5));
+      strcpy (out[c_buff], buffer);
+      memset(buffer, 0, mstring_get_length(buffer));
+      first = 0;
+      c_buff++;
+      continue;
     }
-    *(result + idx) = 0;
+    
+    if (first)
+    {
+      sprintf (buffer, "%s%c", buffer, a_str[i]);
+    }
+    else
+    {
+      sprintf (buffer, "%c", a_str[i]);
+      first = 1;
+    }
   }
-
-  return result;
+  free (buffer);
+  return out;
 }
 
-mstring_a mstring_split_str (mstring in, mstring delim)
+char** mstring_split_str (char* in, char* delim)
 {
-  mstring buff_out = strdup (in);
-  mstring buff;
-  mstring token;
+  char* buff_out = malloc (sizeof(char) * mstring_get_length (in));
+  strcpy (buff_out, in);
+  char* buff;
+  char* token;
   
   int count = 0;
   const char *tmp = in;
@@ -326,7 +283,7 @@ mstring_a mstring_split_str (mstring in, mstring delim)
      tmp++;
   }
   
-  mstring_a out = malloc (sizeof (char*) * count + 1);
+  char** out = malloc (sizeof (char*) * count + 1);
   
   int curr = 0;
   
@@ -343,11 +300,13 @@ mstring_a mstring_split_str (mstring in, mstring delim)
     free(buff);
   }
   
+  free (buff_out);
+  
   return out;
 }
 
 int
-mstring_a_find (mstring_a in, mstring search)
+mstring_a_find (char** in, char* search)
 {
   int curr;
   
@@ -362,16 +321,16 @@ mstring_a_find (mstring_a in, mstring search)
   return -1;
 }
 
-mstring concat(mstring s1, mstring s2)
+char* concat(char* s1, char* s2)
 {
-  mstring   result  =  malloc   (strlen(s1)+strlen(s2)+1);
+  char*   result  =  malloc   (mstring_get_length(s1)+mstring_get_length(s2)+1);
   
   strcpy                        (result, s1);
   strcat                        (result, s2);
   return result;
 }
 
-int mstring_split_quote_len (mstring in, mchar c)
+int mstring_split_quote_len (char* in, char c)
 {
   int      occ_num = 0;
   int      curr = 0;
@@ -400,8 +359,8 @@ int mstring_split_quote_len (mstring in, mchar c)
   return occ_num;
 }
 
-mstring_a
-mstring_split_quote (mstring in, mchar c)
+char**
+mstring_split_quote (char* in, char c)
 {
   int      occ_num = 0;
   int     *occs = malloc(sizeof(int*));
@@ -427,7 +386,7 @@ mstring_split_quote (mstring in, mchar c)
     }
   }
   
-  mstring_a      buff = mstring_a_new ();
+  char**      buff = malloc (sizeof(char*) * mstring_get_length (in));
   
   if (occ_num == 0)
   {
@@ -452,7 +411,7 @@ mstring_split_quote (mstring in, mchar c)
   return buff;
 }
 
-int mstring_search(mstring src, mstring str) {
+int mstring_search(char* src, char* str) {
    int i, j, firstOcc;
    i = 0, j = 0;
  
@@ -483,22 +442,16 @@ int mstring_search(mstring src, mstring str) {
    return -1;
 }
 
-mstring_a
-mstring_a_new (void)
-{
-  return malloc(sizeof (mstring_a));
-}
-
-mstring
-mstring_grate (mstring in)
+char*
+mstring_grate (char* in)
 {
   return mstring_get_sub_py (in, 1, mstring_get_length (in) - 1);
 }
 
-mstring
-mstring_removechar (mstring in, mchar chr)
+char*
+mstring_removechar (char* in, char chr)
 {
-  mstring out = malloc(sizeof(mstring) * mstring_get_length (in));
+  char* out = malloc(sizeof(char*) * mstring_get_length (in));
   int curr;
   int out_curr;
   for (curr = 0, out_curr = 0; in[curr]; curr++)
@@ -514,28 +467,67 @@ mstring_removechar (mstring in, mchar chr)
 }
 
 void
-mstring_a_free (mstring_a in)
+mstring_a_free (char** in)
 {
-  int curr;
+  int curr = 0;
   for (curr=0; in[curr]; curr++)
   {
-    free(in[curr]);
+    if (in[curr] != NULL)
+    {
+      print ("%d            %s", curr, in[curr]);
+      free(in[curr]);
+    }
+    else
+    {
+      free (in);
+      return;
+    }
   }
   
   free(in);
 }
 
 int
-mstring_a_get_length (mstring_a in)
+mstring_a_get_length (char** in)
 {
-  int out;
-  for (out=0; in[out]; out++);
+  //for (out=0; in[out]; out++);
+  return (int)sizeof(in)/sizeof(char*);
+}
+
+const char*
+rprintf (const char* format, ...)
+{
+  char       msg[1024];
+  memset(&msg[0], 0, sizeof(msg));
+  va_list    args;
+
+  va_start(args, format);
+  vsnprintf(msg, sizeof(msg), format, args);
+  va_end(args);
+  
+  char* out = msg;
+  
   return out;
 }
 
-mstring
-rprintf (const char* format, ...)
+void
+aprint (char** in)
 {
+  int i;
+  for (i=0; in[i]; i++)
+  {
+    printf ("%s\n", in[i]);
+  }
+}
+
+void
+print (char* format, ...)
+{
+  if (!format)
+  {
+    return;
+  }
+  
   char       msg[1024];
   va_list    args;
 
@@ -543,15 +535,29 @@ rprintf (const char* format, ...)
   vsnprintf(msg, sizeof(msg), format, args); // do check return value
   va_end(args);
 
-  return msg;
+  printf ("%s\n", msg);
 }
 
-void
-aprint (mstring_a in)
+int
+systemf (const char* format, ...)
+{
+  char       msg[1024];
+  va_list    args;
+  
+  va_start(args, format);
+  vsnprintf(msg, sizeof(msg), format, args); // do check return value
+  va_end(args);
+
+  return system(msg);
+}
+
+void mstring_a_hp_stk (char** __dest, char** __src)
 {
   int i;
-  for (i=0; in[i]; i++)
+  for (i=0; __src[i]; i++)
   {
-    printf ("%s\n", in[i]);
+    __dest[i] = __src[i];
   }
+  
+  mstring_a_free (__src);
 }

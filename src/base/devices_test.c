@@ -29,7 +29,6 @@ int main(int argc, char **argv)
 {
   Storage *st = storage_new ();
   probe_devices (st);
-  printf ("passed probe\n");
   storage_free(st);
   return 0;
 }

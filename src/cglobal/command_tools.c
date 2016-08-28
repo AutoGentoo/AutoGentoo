@@ -27,25 +27,33 @@
 mstring
 get_output (mstring cmd_in)
 {
-  char *cmd = malloc (sizeof(char) * (mstring_get_length (cmd_in) + 15));
-  sprintf (cmd, "%s > cmd.temp", cmd_in);
+  char cmd[mstring_get_length (cmd_in) + 15];
+  snprintf (cmd, mstring_get_length (cmd_in) + 15, "%s > cmd.temp", cmd_in);
   system (cmd);
   mstring buff = read_file ("cmd.temp");
   system ("rm -rf cmd.temp");
-  free(cmd);
   return buff;
 }
 
+int
+get_output_length (mstring __command)
+{
+  char cmd [mstring_get_length (__command) + 15];
+  snprintf (cmd, mstring_get_length (__command) + 15, "%s > cmd.temp", __command);
+  system (cmd);
+  int out = getlength ("cmd.temp");
+  system("rm -rf cmd.temp");
+  
+  return out;
+}
 
 mstring_a
 get_output_lines (mstring cmd_in)
 {
-  char *cmd = malloc (sizeof(char) * (mstring_get_length (cmd_in) + 15));
-  sprintf (cmd, "%s > cmd.temp", cmd_in);
+  char cmd [mstring_get_length (cmd_in) + 15];
+  snprintf (cmd, mstring_get_length (cmd_in) + 15, "%s > cmd.temp", cmd_in);
   system (cmd);
-  char **lines = malloc (sizeof(char) * (getlength("cmd.temp") + 1));
-  readlines (lines, "cmd.temp");
+  char** lines = readlines ("cmd.temp");
   system("rm -rf cmd.temp");
-  free(cmd);
   return lines;
 }
