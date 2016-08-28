@@ -115,6 +115,11 @@ void* galloc (size_t size, size_t tsize, PointerGroup* group)
 
 void pfree (void *ptr)
 {
+  if (ptr == NULL)
+  {
+    return;
+  }
+  
   if (!get_valid (ptr))
   {
     if (VERBOSE)

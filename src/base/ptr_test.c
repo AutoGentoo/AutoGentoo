@@ -29,6 +29,7 @@ int main(int argc, char **argv)
 {
   char* test = palloc (20, sizeof(char));
   sprintf (test, "Hello World\n");
+  VERBOSE = 1;
   printf (test);
   return 0;
 }
