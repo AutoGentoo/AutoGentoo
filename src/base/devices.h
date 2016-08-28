@@ -33,6 +33,58 @@ typedef struct __PART Partition;
 typedef struct __FREE Free;
 typedef struct __STOR Storage;
 
+struct __PART
+{
+  char      path[15];
+  int       num;
+  Disk     *parent;
+  int       type; /* Primary:0, Extended:1, Logical:2 */
+  char      fstype[25];
+  char      name[128];
+  char    **flags;
+  
+  char      mount_point[1024];
+  
+  /* In BYTES */
+  int       start;
+  int       end;
+  int       size;
+  
+};
+
+struct __FREE
+{
+  int       start;
+  int       end;
+  int       size;
+  
+  Disk     *parent;
+  
+};
+
+struct __DISK
+{
+  char    path[10];
+  int     size;
+  char    transport[24]; /* scsi */
+  int     logical_sec;
+  int     physical_sec;
+  char    table[10]; /* msdos, gpt */
+  char    model[1024];
+  
+  char    UNIT[3]; /* CHS, CYL, BYT */
+  
+  int        part_types[128]; /* Free:0, Partition: 1 */
+  Partition  partitions[128];
+  Free       freespaces[128];
+  
+};
+
+struct __STOR
+{
+  Disk      *disks;
+};
+
 Partition part_new_from_str      (char**, Disk*);
 
 Free      free_new_from_str      (char**, Disk*);

@@ -42,58 +42,6 @@ UNIT;
 */
 
 
-struct __PART
-{
-  char      path[15];
-  int       num;
-  Disk     *parent;
-  int       type; /* Primary:0, Extended:1, Logical:2 */
-  char      fstype[25];
-  char      name[128];
-  char    **flags;
-  
-  char      mount_point[1024];
-  
-  /* In BYTES */
-  int       start;
-  int       end;
-  int       size;
-  
-};
-
-struct __FREE
-{
-  int       start;
-  int       end;
-  int       size;
-  
-  Disk     *parent;
-  
-};
-
-struct __DISK
-{
-  char    path[10];
-  int     size;
-  char    transport[24]; /* scsi */
-  int     logical_sec;
-  int     physical_sec;
-  char    table[10]; /* msdos, gpt */
-  char    model[1024];
-  
-  char    UNIT[3]; /* CHS, CYL, BYT */
-  
-  int        part_types[128]; /* Free:0, Partition: 1 */
-  Partition  partitions[128];
-  Free       freespaces[128];
-  
-};
-
-struct __STOR
-{
-  Disk      *disks;
-};
-
 Partition part_new_from_str (char** splt, Disk* parent)
 {
   Partition out;
@@ -156,13 +104,8 @@ Disk disk_new_from_path (char* path)
   
   for (; curr != get_output_length (cmd); curr++, curr_p++)
   {
-    print ("==========%s=========", cmd_buff[curr]);
     char** part_splt = mstring_split (cmd_buff[curr], ':');
-    aprint (part_splt);
-    print ("passed part_splt");
-    fflush (stdout);
     char * cmpbuff = mstring_get_sub_py (part_splt[4], 0, 4);
-    print ("==========%s=========", cmd_buff[curr]);
     if (strcmp (cmpbuff, "free") == 0)
     {
       out.part_types[curr_p] = 0;
@@ -178,7 +121,6 @@ Disk disk_new_from_path (char* path)
     free (cmpbuff);
     mstring_a_free (part_splt);
   }
-  print ("-------");
   mstring_a_free (cmd_buff);
   mstring_a_free (disk_buff);
   free(cmd);
@@ -204,9 +146,12 @@ void storage_free (Storage* ptr)
 
 void probe_devices (Storage* out)
 {
+  printf ("Looking for disks...");
+  fflush(stdout);
   char** blks = get_output_lines ("lsblk --raw");
   int curr_dev = 1;
   int curr_disk = 0;
+  print ("done");
   for (curr_dev = 1; blks[curr_dev]; curr_dev++)
   {
     char** splt = mstring_split(blks[curr_dev], ' ');
@@ -214,7 +159,10 @@ void probe_devices (Storage* out)
     {
       char b[10];
       snprintf (b, 10, "/dev/%s", splt[0]);
+      printf ("Scanning disk %s...", b);
+      fflush(stdout);
       out->disks[curr_disk] = disk_new_from_path (b);
+      print ("done");
       curr_disk++;
     }
     mstring_a_free (splt);

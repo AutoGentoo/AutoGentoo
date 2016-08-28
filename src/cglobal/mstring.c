@@ -232,16 +232,20 @@ char** mstring_split (char* a_str, char a_delim)
       c++;
     }
   }
-  
-  char **out = malloc (sizeof (char*) *(c+2));
+  c++;
+  char **out = calloc (c+2, sizeof(char*));
   
   char *buffer = malloc (sizeof(char) * (a+1));
   int  c_buff = 0;
   int first = 0;
   int i = 0;
-  print (a_str);
-  for (i=0; c_buff != c+1; i++)
+  for (i=0; c_buff != c; i++)
   {
+    if (!a_str[i])
+    {
+      break;
+    }
+    
     if (a_str[i] == a_delim)
     {
       if (!buffer || strcmp (buffer, "") == 0)
@@ -264,7 +268,17 @@ char** mstring_split (char* a_str, char a_delim)
       first = 1;
     }
   }
-  free (buffer);
+  
+  out[c_buff] = malloc (sizeof(char) * (mstring_get_length (buffer) + 5));
+  strcpy (out[c_buff], buffer);
+  c_buff++;
+  
+  for (;out[c_buff]; c_buff++)
+  {
+    out[c_buff] = calloc (1, sizeof(char));
+  }
+  if (buffer)
+    free (buffer);
   return out;
 }
 
@@ -472,16 +486,15 @@ mstring_a_free (char** in)
   int curr = 0;
   for (curr=0; in[curr]; curr++)
   {
-    if (in[curr] != NULL)
+    if (in[curr])
     {
-      print ("%d            %s", curr, in[curr]);
+      if (strcmp(in[curr], "") != 0)
+        free (in);
+        return;
       free(in[curr]);
     }
-    else
-    {
-      free (in);
-      return;
-    }
+    free (in);
+    return;
   }
   
   free(in);
@@ -490,8 +503,9 @@ mstring_a_free (char** in)
 int
 mstring_a_get_length (char** in)
 {
-  //for (out=0; in[out]; out++);
-  return (int)sizeof(in)/sizeof(char*);
+  int out;
+  for (out=0; in[out]; out++);
+  return out;
 }
 
 const char*

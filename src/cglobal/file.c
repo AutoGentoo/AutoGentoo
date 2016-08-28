@@ -75,9 +75,10 @@ char** readlines (mstring filename)
     {
       continue;
     }
-    print ("%d   %s", curr, line);
-    lines[curr] = malloc (sizeof(char) * mstring_get_length (line) + 1);
-    memcpy (lines[curr], line, mstring_get_length(line) - 1);
+    lines[curr] = malloc (sizeof(char) * mstring_get_length (line));
+    char* buff = mstring_get_sub_py (line, 0, -2);
+    sprintf (lines[curr], "%s", buff);
+    free (buff);
     curr++;
   }
   
