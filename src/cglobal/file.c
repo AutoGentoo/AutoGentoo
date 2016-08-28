@@ -54,7 +54,7 @@ get_longest (mstring filename)
 
 char** readlines (mstring filename)
 {
-  char **lines = malloc (sizeof(char*) * (getlength(filename) + 1));
+  char **lines = malloc (sizeof(char*) * (getlength(filename)));
   FILE * fp;
   fp = fopen(filename, "r");
   
@@ -68,14 +68,18 @@ char** readlines (mstring filename)
   }
   
   int curr = 0;
-  
   while ((read = getline(&line, &len, fp)) != -1)
   {
-    if (line == NULL)
+    char* malloc_buffer = malloc (sizeof(char) * mstring_get_length (line));
+    if (!get_valid_ptr (malloc_buffer))
     {
-      continue;
+      free (malloc_buffer);
     }
-    lines[curr] = malloc (sizeof(char) * mstring_get_length (line));
+    else
+    {
+      lines[curr] = malloc_buffer;
+    }
+    
     char* buff = mstring_get_sub_py (line, 0, -2);
     sprintf (lines[curr], "%s", buff);
     free (buff);

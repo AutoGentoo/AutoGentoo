@@ -97,4 +97,4 @@ int                   ag_system_systemd         (ag_system);
 
 int                   ag_system_grub            (ag_system);
 
-int                   ag_system_
+//int                   ag_system_

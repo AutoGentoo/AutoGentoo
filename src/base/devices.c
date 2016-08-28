@@ -130,6 +130,7 @@ Disk disk_new_from_path (char* path)
 
 Storage* storage_new ()
 {
+  INIT ();
   Storage *out = malloc (sizeof(Storage));
   char** lns = get_output_lines ("ls /sys/block | grep -v loop");
   int disknum = mstring_a_get_length (lns);

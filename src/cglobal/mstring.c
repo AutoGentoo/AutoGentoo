@@ -24,6 +24,15 @@
 
 #include "mstring.h"
 
+int POINTER_LENGTH = 0;
+
+void INIT (void)
+{
+  char* buff = malloc (sizeof(char));
+  set_valid_ptr (buff);
+  free (buff);
+}
+
 int
 mstring_get_length (char* str)
 {
@@ -273,10 +282,6 @@ char** mstring_split (char* a_str, char a_delim)
   strcpy (out[c_buff], buffer);
   c_buff++;
   
-  for (;out[c_buff]; c_buff++)
-  {
-    out[c_buff] = calloc (1, sizeof(char));
-  }
   if (buffer)
     free (buffer);
   return out;
@@ -484,14 +489,24 @@ void
 mstring_a_free (char** in)
 {
   int curr = 0;
-  for (curr=0; in[curr]; curr++)
+  for (curr=0; ; curr++)
   {
-    if (in[curr])
+    if (in[curr] != NULL)
     {
-      if (strcmp(in[curr], "") != 0)
-        free (in);
-        return;
+      if (!get_valid_ptr (in[curr]))
+      {
+        char* sizebuff = malloc (sizeof(char) * 20);
+        sprintf (sizebuff, "%p", in[curr]);
+        if (sizebuff == NULL)
+        {
+          free(sizebuff);
+          continue;
+        }
+        free (sizebuff);
+        continue;
+      }
       free(in[curr]);
+      continue;
     }
     free (in);
     return;
@@ -574,4 +589,28 @@ void mstring_a_hp_stk (char** __dest, char** __src)
   }
   
   mstring_a_free (__src);
+}
+
+void set_valid_ptr (void *ptr)
+{
+  char* sizebuff = malloc (sizeof(char) * 20);
+  sprintf (sizebuff, "%p", ptr);
+  
+  int length = mstring_get_length (sizebuff);
+  POINTER_LENGTH = length;
+  free (sizebuff);
+}
+
+int get_valid_ptr (void *ptr)
+{
+  char* sizebuff = malloc (sizeof(char) * 20);
+  sprintf (sizebuff, "%p", ptr);
+  
+  int length = mstring_get_length (sizebuff);
+  free (sizebuff);
+  if (length != POINTER_LENGTH)
+  {
+    return 0;
+  }
+  return 1;
 }

@@ -32,6 +32,10 @@
 #ifndef AUTOGENTOO_MSTRING
 #define AUTOGENTOO_MSTRING
 
+extern int POINTER_LENGTH;
+
+void               INIT                        (void);
+
 char*              mstring_new_from_char       (char );
 
 char*              mstring_new_from_chars      (char *);
@@ -91,4 +95,9 @@ void               print                       (char* format, ...);
 int                systemf                     (const char* format, ...);
 
 void               mstring_a_hp_stk            (char**, char**);
+
+void               set_valid_ptr               (void *ptr);
+
+int                get_valid_ptr               (void *ptr);
+
 #endif

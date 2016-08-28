@@ -27,10 +27,11 @@
 
 int main(int argc, char **argv)
 {
+  
   Storage *st = storage_new ();
   probe_devices (st);
   
-  print(st->disks[0].partitions[0].mount_point);
+  print("%s", st->disks[0].partitions[0].path);
   
   
   storage_free(st);
