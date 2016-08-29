@@ -35,7 +35,6 @@ extern "C" {
 #include <mstring.h>
 
 typedef struct _PointerHandler PointerHandler;
-typedef struct _PointerGroup PointerGroup;
 
 struct _PointerHandler
 {
