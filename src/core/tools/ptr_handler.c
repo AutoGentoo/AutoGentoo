@@ -43,10 +43,10 @@ void mptrhandler_deinit ()
 
 void ptrhandler_init (PtrHandler* handler)
 {
-  handler->length = 0;
+  handler->length = 5;
   handler->pointer_count = 0;
   handler->pointers = malloc (sizeof (Handle*) * handler->length);
-  handler->address = malloc (sizeof (char) * handler->length);
+  handler->address = malloc (sizeof (char*) * handler->length);
   ptrhandler_realloc (handler);
 }
 
@@ -61,7 +61,7 @@ void ptrhandler_realloc (PtrHandler* handler)
   {
     handler->length += alloc_interval;
     handler->pointers = realloc (handler->pointers, sizeof (Handle*) * handler->length);
-    handler->address = realloc (handler->address, sizeof (char) * handler->length);
+    handler->address = realloc (handler->address, sizeof (char*) * handler->length);
   }
 }
 

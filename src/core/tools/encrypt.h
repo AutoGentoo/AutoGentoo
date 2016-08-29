@@ -41,5 +41,5 @@ char*          agmd5_generate              (void);
 
 password *     password_new_md5            (char* string);
 
-int            password_varify             (password*, char*);
+int            password_verify             (password*, char*);
 #endif

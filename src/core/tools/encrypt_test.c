@@ -24,16 +24,19 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include "encrypt.h"
+#include <encrypt.h>
 
 int main(int argc, char *argv[])
 {
-  password *buff = password_new_md5 (argv[1]);
+  char* fpass = getpass ("Type Password: ");
+  password *buff = password_new_md5 (fpass);
   char* pass = getpass("Verify Password: ");
-  printf ("%s", password_varify (buff, pass) ? "Correct!\n" : "Incorrect!\n");
+  printf ("%s", password_verify (buff, pass) ? "Correct!\n" : "Incorrect!\n");
   
-  if (password_varify (buff, pass))
+  if (password_verify (buff, pass))
     printf("%s\t<-- MD5 Hash\n%s\t<-- Password Salt\n", buff->md5, buff->salt);
+  
+  free_raw (fpass);
   return 0;
 }
 

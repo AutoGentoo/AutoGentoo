@@ -27,7 +27,7 @@
 
 int main(int argc, char **argv)
 {
-  VERBOSE = 1;
+  VERBOSE = 0;
   int x;
   char **buff = readlines ("mstring.h");
   for (x=0; buff[x]; ++x)

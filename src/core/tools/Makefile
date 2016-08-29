@@ -11,7 +11,7 @@ CTBIN = ptr_test
 ETBARE = encrypt mstring command_tools file fgetln ptr_handler
 FTBARE = mstring file fgetln ptr_handler
 CTBARE = mstring file iniparser dictionary fgetln ptr_handler
-PTRBARE = ptr_handler mstring
+PTRBARE = ptr_handler
 BARE = mstring encrypt iniparser dictionary command_tools file ptr_handler fgetln
 
 OBJECTS = $(patsubst %,%.o, $(BARE))

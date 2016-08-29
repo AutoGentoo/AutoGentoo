@@ -27,7 +27,7 @@
 password *
 password_new (void)
 {
-  password     *buff   =  malloc(sizeof(password*));
+  password     *buff   =  palloc(sizeof(password*));
   buff->md5            =  "";
   buff->salt           =  "";
   return buff;
@@ -36,7 +36,7 @@ password_new (void)
 char*
 agmd5_generate (void)
 {
-  char* buff = malloc (32);
+  char* buff = palloc (sizeof (char) * 32);
   buff = mstring_find_before(get_output ("date | md5sum"), ' ');
   return buff;
 }
@@ -48,19 +48,17 @@ password_new_md5 (char* string)
   password * pbuff = password_new ();
   pbuff->salt = agmd5_generate ();
   
-  char* cmdbuff = malloc (sizeof(char*) * 1082);
+  char* cmdbuff = palloc (sizeof(char) * 1082);
   sprintf(cmdbuff, "openssl passwd -1 -salt %s %s", pbuff->salt, string);
   pbuff->md5 = mstring_find_before(get_output (cmdbuff), '\n');
-  free (cmdbuff);
   return pbuff;
 }
 
 int
-password_varify (password* inpwd, char* checkpwd)
+password_verify (password* inpwd, char* checkpwd)
 {
-  char* cmdbuff = malloc (sizeof(char*) * 1082);
+  char* cmdbuff = palloc (sizeof(char) * 1082);
   sprintf(cmdbuff, "openssl passwd -1 -salt %s %s", inpwd->salt, checkpwd);
   int out = strcmp(mstring_find_before(get_output (cmdbuff), '\n'), inpwd->md5) == 0;
-  free (cmdbuff);
   return out;
 }

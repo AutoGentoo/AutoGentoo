@@ -74,18 +74,18 @@ char** readlines (char* filename)
     lines[curr] = malloc (sizeof (char) * (mstring_get_length (buff) + 4));
     if (!get_valid (lines[curr]))
     {
-      free (buff);
-      free (lines[curr]);
+      free_raw (buff);
+      pfree (lines[curr]);
       continue;
     }
     
     sprintf (lines[curr], "%s", buff);
-    free (buff);
+    free_raw (buff);
     curr++;
   }
   
   fclose(fp);
-  free (line);
+  free_raw (line);
   return lines;
 }
 
@@ -106,7 +106,7 @@ read_file (char* filename)
     rewind(handler);
 
     // Allocate a string that can hold it all
-    buffer = (char*) malloc(sizeof(char) * (string_size + 1) );
+    buffer = (char*) palloc(sizeof(char) * (string_size + 1) );
 
     // Read it all in one operation
     read_size = fread(buffer, sizeof(char), string_size, handler);
@@ -119,7 +119,7 @@ read_file (char* filename)
     {
       // Something went wrong, throw away the memory and set
       // the buffer to NULL
-      free(buffer);
+      pfree(buffer);
       buffer = NULL;
     }
 
