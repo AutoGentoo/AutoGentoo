@@ -24,19 +24,19 @@
 
 #include "command_tools.h"
 
-mstring
-get_output (mstring cmd_in)
+char*
+get_output (char* cmd_in)
 {
   char cmd[mstring_get_length (cmd_in) + 15];
   snprintf (cmd, mstring_get_length (cmd_in) + 15, "%s > cmd.temp", cmd_in);
   system (cmd);
-  mstring buff = read_file ("cmd.temp");
+  char* buff = read_file ("cmd.temp");
   system ("rm -rf cmd.temp");
   return buff;
 }
 
 int
-get_output_length (mstring __command)
+get_output_length (char* __command)
 {
   char cmd [mstring_get_length (__command) + 15];
   snprintf (cmd, mstring_get_length (__command) + 15, "%s > cmd.temp", __command);
@@ -47,8 +47,8 @@ get_output_length (mstring __command)
   return out;
 }
 
-mstring_a
-get_output_lines (mstring cmd_in)
+char**
+get_output_lines (char* cmd_in)
 {
   char cmd [mstring_get_length (cmd_in) + 15];
   snprintf (cmd, mstring_get_length (cmd_in) + 15, "%s > cmd.temp", cmd_in);

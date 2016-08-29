@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 {
   dictionary  *   ini ;
   
-  mstring ini_name = "../../autogentoo.conf";
+  char* ini_name = "../../autogentoo.conf";
   
   ini = iniparser_load(ini_name);
   

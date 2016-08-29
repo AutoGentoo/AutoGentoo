@@ -128,27 +128,3 @@ profilelist_get_list (ProfileList * out)
   free(profiles);
   free(used_profiles);
 }
-
-void
-profilelist_free (ProfileList *ptr)
-{
-  free (ptr->active_name);
-  
-  int curr;
-  for (curr=0; curr != ptr->profilec; curr++)
-  {
-    profile_free (&ptr->profiles[curr]);
-  }
-}
-
-void
-profile_free (Profile *ptr)
-{
-  free(ptr->full);
-  free(ptr->mainType);
-  free(ptr->archType);
-  free(ptr->desktop);
-  free(ptr->init);
-  free(ptr->varaint);
-  free(ptr->second_varaint);
-}

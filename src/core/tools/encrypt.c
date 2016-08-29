@@ -22,7 +22,7 @@
  */
 
 
-#include "encrypt.h"
+#include <encrypt.h>
 
 password *
 password_new (void)
@@ -33,34 +33,34 @@ password_new (void)
   return buff;
 }
 
-mstring
+char*
 agmd5_generate (void)
 {
-  mstring buff = malloc (32);
+  char* buff = malloc (32);
   buff = mstring_find_before(get_output ("date | md5sum"), ' ');
   return buff;
 }
 
 
 password *
-password_new_md5 (mstring string)
+password_new_md5 (char* string)
 {
   password * pbuff = password_new ();
   pbuff->salt = agmd5_generate ();
   
-  mstring cmdbuff = malloc (sizeof(mstring) * 1082);
+  char* cmdbuff = malloc (sizeof(char*) * 1082);
   sprintf(cmdbuff, "openssl passwd -1 -salt %s %s", pbuff->salt, string);
   pbuff->md5 = mstring_find_before(get_output (cmdbuff), '\n');
   free (cmdbuff);
   return pbuff;
 }
 
-bool
-password_varify (password* inpwd, mstring checkpwd)
+int
+password_varify (password* inpwd, char* checkpwd)
 {
-  mstring cmdbuff = malloc (sizeof(mstring) * 1082);
+  char* cmdbuff = malloc (sizeof(char*) * 1082);
   sprintf(cmdbuff, "openssl passwd -1 -salt %s %s", inpwd->salt, checkpwd);
-  bool out = strcmp(mstring_find_before(get_output (cmdbuff), '\n'), inpwd->md5) == 0;
+  int out = strcmp(mstring_find_before(get_output (cmdbuff), '\n'), inpwd->md5) == 0;
   free (cmdbuff);
   return out;
 }

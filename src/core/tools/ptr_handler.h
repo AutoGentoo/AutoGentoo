@@ -22,8 +22,8 @@
  */
 
 
-#ifndef __AUTOGENTOO_MEMORY_MANAGMENT__
-#define __AUTOGENTOO_MEMORY_MANAGMENT__
+#ifndef __AUTOGENTOO_PTR_HANDLER_H__
+#define __AUTOGENTOO_PTR_HANDLER_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,36 +38,30 @@ typedef struct _PointerGroup PointerGroup;
 
 struct _PointerHandler
 {
-  PointerGroup**   groups;
-  int              size;
-  int*             freed;
-};
-
-struct _PointerGroup
-{
   void**           ptrs;
-  int              size;
-  int*             is_array;
+  int              count;
 };
 
+/* Size of the current runtime pointer (8, 9, or 10) */
 extern int POINTER_SIZE;
-extern PointerHandler* mainHandler;
+
+/* The main handler for the program */
+extern PointerHandler* handler;
+
+/* Set to 1 if you need to see the pointers being allocated/deallocated */
 extern int VERBOSE;
 
-void main_init() __attribute__((constructor));
+/* The size of each palloc () will be increased by this number (default 4) */
+extern int PALLOC_ADD;
 
-int handler_init (PointerHandler* handler);
+void handler_init() __attribute__((constructor));
 
-PointerGroup* new_group ();
-
-void* paalloc (size_t size, size_t tsize);
-void* palloc (size_t size, size_t tsize);
-void* gaalloc (size_t size, size_t tsize, PointerGroup* group);
-void* galloc (size_t size, size_t tsize, PointerGroup* group);
+void* palloc (size_t size);
 
 void pfree (void *ptr);
-void ar_pfree (void **ar_ptr);
-void gfree (PointerGroup* pgrp);
+
+/* Only called by you */
+void array_free (void **ptr);
 
 void set_valid (void *ptr);
 int get_valid (void *ptr);

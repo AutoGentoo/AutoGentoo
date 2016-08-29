@@ -64,5 +64,6 @@ clean:
 	rm -rf $(DTBIN)
 	rm -rf $(DEVTBIN)
 	rm -rf parted_test
+	rm -rf $(PTRBIN)
 	rm -rf *.o
 	rm -rf *.gch

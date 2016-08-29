@@ -25,7 +25,7 @@
 #include "file.h"
 
 int
-getlength (mstring filename)
+getlength (char* filename)
 {
   int out;
   char *f = NULL;
@@ -38,7 +38,7 @@ getlength (mstring filename)
 }
 
 int
-get_longest (mstring filename)
+get_longest (char* filename)
 {
   int out;
   char *f = NULL;
@@ -52,7 +52,7 @@ get_longest (mstring filename)
 }
 
 
-char** readlines (mstring filename)
+char** readlines (char* filename)
 {
   char **lines = malloc (sizeof(char*) * (getlength(filename)));
   FILE * fp;
@@ -70,15 +70,8 @@ char** readlines (mstring filename)
   int curr = 0;
   while ((read = getline(&line, &len, fp)) != -1)
   {
-    char* malloc_buffer = malloc (sizeof(char) * mstring_get_length (line));
-    if (!get_valid_ptr (malloc_buffer))
-    {
-      free (malloc_buffer);
-    }
-    else
-    {
-      lines[curr] = malloc_buffer;
-    }
+    char* malloc_buffer = malloc (mstring_get_length (line) * sizeof(char));
+    lines[curr] = malloc_buffer;
     
     char* buff = mstring_get_sub_py (line, 0, -2);
     sprintf (lines[curr], "%s", buff);
@@ -91,8 +84,8 @@ char** readlines (mstring filename)
   return lines;
 }
 
-mstring
-read_file (mstring filename)
+char*
+read_file (char* filename)
 {
   char *buffer = NULL;
   int string_size, read_size;

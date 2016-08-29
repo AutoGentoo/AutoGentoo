@@ -1,7 +1,7 @@
 /*
- * devices_test.c
+ * file_test.c
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,22 +23,17 @@
 
 
 #include <stdio.h>
-#include <base/devices.h>
+#include "file.h"
 
 int main(int argc, char **argv)
 {
-  
-  Storage *st = storage_new ();
-  probe_devices (st);
-  
-  /*int i;
-  for (i=0; st->disks[i]; i++)
+  int x;
+  char **buff = readlines ("mstring.h");
+  for (x=0; buff[x]; ++x)
   {
-    print("Found disks at %s", st->disks[0].partitions[0].path);
-    
-  */
-  
-  storage_free(st);
+    printf ("%s\n", buff[x]);
+  }
+  pfree(buff);
   return 0;
 }
 

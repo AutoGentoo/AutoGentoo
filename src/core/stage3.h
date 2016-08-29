@@ -1,5 +1,5 @@
 /*
- * command_tools.h
+ * stage3.h
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -21,18 +21,23 @@
  * 
  */
 
-#ifndef __AUTOGENTOO_COMMAND_TOOL_H__
-#define __AUTOGENTOO_COMMAND_TOOL_H__
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <cglobal/mstring.h>
-#include <cglobal/file.h>
+#include <core/tools/mstring.h>
+#include <core/tools/download.h>
+#include <core/tools/file.h>
 
-mstring         get_output          (mstring);
+typedef struct
+{
+  char   *arch;
+  char   *buff_link;
+  char   *link;
+  char   *name;
+  char   *date;
+} Stage3;
 
-mstring_a       get_output_lines    (mstring);
+Stage3        stage3_new             (char*);
 
-int             get_output_length   (mstring __command);
+Stage3        stage3_new_latest      (char*);
 
-#endif
+Stage3        stage3_new_specify     (char*);

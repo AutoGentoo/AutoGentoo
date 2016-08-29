@@ -27,14 +27,10 @@
 #include <string.h>
 #include <assert.h>
 #include <stdarg.h>
-#include <cglobal/mlib.h>
+#include <ptr_handler.h>
 
 #ifndef AUTOGENTOO_MSTRING
 #define AUTOGENTOO_MSTRING
-
-extern int POINTER_LENGTH;
-
-void               INIT                        (void);
 
 char*              mstring_new_from_char       (char );
 
@@ -66,9 +62,9 @@ char**             mstring_split               (char*, char );
 
 char**             mstring_split_str           (char*, char*);
 
-char***            mstring_a_split             (mstring_a, char*, int);
+char***            mstring_a_split             (char**, char*, int);
 
-int                mstring_a_find              (mstring_a, char*);
+int                mstring_a_find              (char**, char*);
 
 char*              concat                      (char*, char*);
 
@@ -82,22 +78,16 @@ char*              mstring_grate               (char*);
 
 char*              mstring_removechar          (char*, char );
 
-void               mstring_a_free              (mstring_a);
-
-int                mstring_a_get_length        (mstring_a);
+int                mstring_a_get_length        (char**);
 
 //const char*      rprintf                     (const char* format, ...);
 
-void               aprint                      (mstring_a);
+void               aprint                      (char**);
 
 void               print                       (char* format, ...);
 
 int                systemf                     (const char* format, ...);
 
 void               mstring_a_hp_stk            (char**, char**);
-
-void               set_valid_ptr               (void *ptr);
-
-int                get_valid_ptr               (void *ptr);
 
 #endif

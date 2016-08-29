@@ -1,5 +1,5 @@
 /*
- * file_test.c
+ * file.h
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -23,17 +23,15 @@
 
 
 #include <stdio.h>
-#include "file.h"
+#include <stdlib.h>
+#include <mstring.h>
+#include <fgetln.h>
+#include <err.h>
 
-int main(int argc, char **argv)
-{
-  int x;
-  char **buff = readlines ("mlib.h");
-  for (x=0; buff[x]; ++x)
-  {
-    printf ("%s\n", buff[x]);
-  }
-  free(buff);
-  return 0;
-}
+int             getlength             (char*);
 
+char**          readlines             (char*);
+
+char*           read_file             (char*);
+
+int             get_longest           (char* filename);

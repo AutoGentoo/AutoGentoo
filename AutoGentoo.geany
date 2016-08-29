@@ -28,16 +28,10 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=2
-FILE_NAME_0=913;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fbase%2Fdevices_test.c;0;2
-FILE_NAME_1=1294;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fbase%2Fdevices.h;0;2
-FILE_NAME_2=1446;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Ffile.c;0;2
-FILE_NAME_3=1413;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fcommand_tools.c;0;2
-FILE_NAME_4=5767;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fbase%2Fdevices.c;0;2
-FILE_NAME_5=1185;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fbase%2FMakefile;0;2
-FILE_NAME_6=2;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fcommand_tools.h;0;2
-FILE_NAME_7=1505;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fmstring.h;0;2
-FILE_NAME_8=8628;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcglobal%2Fmstring.c;0;2
+current_page=0
+FILE_NAME_0=901;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fbase%2Fprofile.h;0;2
+FILE_NAME_1=3061;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fbase%2Fprofile.c;0;2
+FILE_NAME_2=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fbase%2Fptr_handler.h;0;2
 
 [VTE]
 last_dir=/home/atuser/Documents

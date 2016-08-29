@@ -1,5 +1,5 @@
 /*
- * encrypt_test.c
+ * encrypt.h
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
  * 
@@ -22,18 +22,24 @@
  */
 
 
+#ifndef __AUTOGENTOO_PASSWORD_ENCRYPT__
+#define __AUTOGENTOO_PASSWORD_ENCRYPT__
+
 #include <stdio.h>
-#include <unistd.h>
-#include "encrypt.h"
+#include <openssl/md5.h>
+#include <command_tools.h>
 
-int main(int argc, char *argv[])
+typedef struct
 {
-  password *buff = password_new_md5 (argv[1]);
-  mstring pass = getpass("Verify Password: ");
-  printf ("%s", password_varify (buff, pass) ? "Correct!\n" : "Incorrect!\n");
-  
-  if (password_varify (buff, pass))
-    printf("%s\t<-- MD5 Hash\n%s\t<-- Password Salt\n", buff->md5, buff->salt);
-  return 0;
-}
+  char*       md5;
+  char*       salt;
+} password;
 
+password *     password_new                (void);
+
+char*          agmd5_generate              (void);
+
+password *     password_new_md5            (char* string);
+
+int            password_varify             (password*, char*);
+#endif

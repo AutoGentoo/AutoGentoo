@@ -1,7 +1,7 @@
 /*
- * file.h
+ * devices_test.c
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,15 +23,11 @@
 
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <cglobal/mstring.h>
-#include <cglobal/fgetln.h>
-#include <err.h>
+#include <base/devices.h>
 
-int             getlength             (mstring);
+int main(int argc, char **argv)
+{
+  
+  return 0;
+}
 
-char**          readlines             (mstring);
-
-mstring         read_file             (mstring);
-
-int             get_longest           (mstring filename);
