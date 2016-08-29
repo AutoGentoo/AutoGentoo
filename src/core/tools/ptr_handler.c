@@ -172,7 +172,7 @@ void free_raw (void* ptr)
     free (ptr);
     return;
   }
-  printf ("Pointer at address %p is not valid", ptr);
+  _warn ("Pointer at address %p is not valid", ptr);
 }
 
 void array_free (void** ptr)
