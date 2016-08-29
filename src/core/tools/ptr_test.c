@@ -23,7 +23,6 @@
 
 
 #include <stdio.h>
-#include <mstring.h>
 #include <ptr_handler.h>
 
 int main(int argc, char **argv)
@@ -37,8 +36,8 @@ int main(int argc, char **argv)
   
   sprintf (_test[0], "Hello");
   
-  print (test);
-  print (_test[0]);
+  printf ("%s\n", test);
+  printf ("%s\n", _test[0]);
   return 0;
 }
 

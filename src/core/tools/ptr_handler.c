@@ -25,109 +25,166 @@
 #include <stdio.h>
 #include <ptr_handler.h>
 
-PointerHandler* handler = NULL;
-int POINTER_SIZE = 0;
+PtrHandler* ptrhandler = NULL;
+int alloc_interval = 10;
+int alloc_padding = 0;
 int VERBOSE = 0;
-int PALLOC_ADD = 4;
 
-void handler_init ()
+void mptrhandler_init ()
 {
-  handler = malloc (sizeof(PointerHandler) + 1);
-  handler->count = 1;
-  handler->ptrs = malloc (sizeof(void*) * handler->count);
+  ptrhandler = malloc (sizeof(PtrHandler));
+  ptrhandler_init (ptrhandler);
+}
+
+void mptrhandler_deinit ()
+{
+  handler_free (ptrhandler);
+}
+
+void ptrhandler_init (PtrHandler* handler)
+{
+  handler->length = 0;
+  handler->pointer_count = 0;
+  handler->pointers = malloc (sizeof (Handle*) * handler->length);
+  handler->address = malloc (sizeof (char) * handler->length);
+  ptrhandler_realloc (handler);
+}
+
+void ptrhandler_deinit (PtrHandler* handler)
+{
+  handler_free (handler);
+}
+
+void ptrhandler_realloc (PtrHandler* handler)
+{
+  if (handler->pointer_count >= handler->length)
+  {
+    handler->length += alloc_interval;
+    handler->pointers = realloc (handler->pointers, sizeof (Handle*) * handler->length);
+    handler->address = realloc (handler->address, sizeof (char) * handler->length);
+  }
+}
+
+Handle* halloc (size_t size)
+{
+  return hhalloc (size, ptrhandler);
+}
+
+Handle* hhalloc (size_t size, PtrHandler* handler)
+{
+  handler->pointer_count++;
+  ptrhandler_realloc (handler);
+  
+  handler->pointers[handler->pointer_count-1] = malloc (sizeof(Handle*) + 8);
+  handler->pointers[handler->pointer_count-1]->size = size;
+  handler->pointers[handler->pointer_count-1]->freed = FALSE;
+  
+  handler->pointers[handler->pointer_count-1]->ptr = malloc (size+alloc_padding);
+  handler->address[handler->pointer_count-1] = malloc (sizeof(char) * 20);
+  sprintf (handler->address[handler->pointer_count-1], "%p", handler->pointers[handler->pointer_count-1]->ptr);
+  _warn ("Allocated pointer at %p with handle at %p", handler->pointers[handler->pointer_count-1]->ptr, handler->pointers[handler->pointer_count-1]);
+  
+  return handler->pointers[handler->pointer_count-1];
 }
 
 void* palloc (size_t size)
 {
-  /* Allocate space for the pointer */
-  handler->ptrs = realloc (handler->ptrs, sizeof(void*) * handler->count + PALLOC_ADD);
-  //~ handler->freed = realloc (handler->freed, sizeof(void*) * handler->freed_count + PALLOC_ADD);
-  
-  /* Create the pointer */
-  void* ptr = malloc (size + PALLOC_ADD);
-  
-  if (VERBOSE)
+  return halloc (size)->ptr;
+}
+
+void* phalloc (size_t size, PtrHandler* handler)
+{
+  return hhalloc (size, handler)->ptr;
+}
+
+Handle* get_handle (void* ptr)
+{
+  return get_hhandle (ptr, ptrhandler);
+}
+
+Handle* get_hhandle (void* ptr, PtrHandler* handler)
+{
+  int i;
+  for (i=0; i != handler->pointer_count; i++)
   {
-    printf ("Allocating pointer at %p\n", ptr);
+    Handle* buff = handler->pointers[i];
+    if (buff->ptr == ptr)
+    {
+      return buff;
+    }
+  }
+  _warn ("Handler not found for address %p", ptr);
+  return NULL;
+}
+
+void hfree (Handle* handle)
+{
+  if (!get_hvalid (handle))
+  {
+    return;
   }
   
-  if (!get_valid (ptr))
+  if (handle->freed)
   {
-    pfree (ptr);
-    return NULL;
+    return;
   }
   
-  handler->ptrs[handler->count-1] = ptr;
-  handler->count++;
-  //~ handler->freed_count++;
+  free_raw (handle->ptr);
+  free_raw (handle);
   
-  return ptr;
+  handle->freed = TRUE;
 }
 
 void pfree (void* ptr)
 {
-  if (ptr == NULL)
+  Handle* handle = get_handle (ptr);
+  if (handle == NULL)
   {
-    return;
-  }
-  if (!get_valid (ptr))
-  {
-    if (VERBOSE)
-    {
-      printf ("error: pointer %p is not valid!\n", ptr);
-    }
-    return;
+    return free_raw (ptr);
   }
   
-  if (strcmp ((char*)ptr, "") == 0)
-  {
-    return;
-  }
-  
-  if (VERBOSE)
-  {
-    printf ("Deallocating pointer at %p (%s)\n", ptr, (char*)ptr);
-  }
-  
-  free (ptr);
+  hfree (handle);
 }
 
-void array_free_bare (void **ptr)
+void phfree (void* ptr, PtrHandler* handler)
+{
+  hfree (get_hhandle (ptr, handler));
+}
+
+void handler_free (PtrHandler* handler)
+{
+  int i;
+  for (i=0; i != handler->pointer_count; i++)
+  {
+    hfree (handler->pointers[i]);
+    free_raw (handler->address[i]);
+  }
+  free_raw (handler->pointers);
+  free_raw (handler->address);
+  free_raw (handler);
+}
+
+void free_raw (void* ptr)
+{
+  if (get_valid (ptr))
+  {
+    _warn ("Deallocating pointer with address %p", ptr);
+    free (ptr);
+    return;
+  }
+  printf ("Pointer at address %p is not valid", ptr);
+}
+
+void array_free (void** ptr)
 {
   int i;
   for (i=0; ptr[i]; i++)
   {
-    free (ptr[i]);
+    free_raw (ptr[i]);
   }
   
-  free (ptr);
+  free_raw (ptr);
 }
-
-void array_free (void **ptr)
-{
-  int i;
-  for (i=0; ptr[i]; i++)
-  {
-    pfree (ptr[i]);
-  }
-  
-  pfree (ptr);
-}
-
-/*void set_valid (void *ptr)
-{
-  char sbuff[25];
-  snprintf (sbuff, 25, "%p", ptr);
-  
-  for (;sbuff[POINTER_SIZE]; POINTER_SIZE++);
-  
-  * Check if pointer is valid *
-  if (POINTER_SIZE < 8 || POINTER_SIZE > 10)
-  {
-    printf ("Pointer %p sent to void set_valid (void *ptr) is not valid!\n", ptr);
-    raise(SIGSEGV);
-  }
-}*/
 
 int get_valid (void *ptr)
 {
@@ -148,14 +205,28 @@ int get_valid (void *ptr)
   return 1;
 }
 
-void free_all ()
+int get_hvalid (Handle* handle)
 {
-  int i;
-  for (i=0; i != handler->count; i++)
+  if (!get_valid (handle) || !get_valid (handle->ptr))
   {
-    pfree (handler->ptrs[i]);
+    return 0;
   }
-  free (handler->ptrs);
+  return 1;
+}
+
+void _warn (const char* format, ...)
+{
+  if (!format || !VERBOSE)
+  {
+    return;
+  }
   
-  pfree (handler);
+  char       msg[1024];
+  va_list    args;
+
+  va_start(args, format);
+  vsnprintf(msg, sizeof(msg), format, args); // do check return value
+  va_end(args);
+
+  printf ("%s\n", msg);
 }

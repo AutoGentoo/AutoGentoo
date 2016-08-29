@@ -21,7 +21,6 @@
  * 
  */
 
-
 #ifndef __AUTOGENTOO_PTR_HANDLER_H__
 #define __AUTOGENTOO_PTR_HANDLER_H__
 
@@ -31,43 +30,100 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <signal.h>
-#include <mstring.h>
 
-typedef struct _PointerHandler PointerHandler;
+enum BOOL { FALSE = 0, TRUE = 1 };
 
-struct _PointerHandler
+typedef struct _Handle Handle;
+typedef struct _PtrHandler PtrHandler;
+
+struct _Handle
 {
-  void**           ptrs;
-  int              count;
+  void*       ptr;
+  size_t      size;
+  enum BOOL   freed;
 };
 
-/* Size of the current runtime pointer (8, 9, or 10) */
-extern int POINTER_SIZE;
+struct _PtrHandler
+{
+  Handle** pointers;
+  char**    address;
+  int      length;
+  int      pointer_count;
+};
 
-/* The main handler for the program */
-extern PointerHandler* handler;
+extern PtrHandler* ptrhandler;
 
-/* Set to 1 if you need to see the pointers being allocated/deallocated */
+/* PtrHandler->pointers will be reallocated after this interval
+ * Default: 10, meaning after 10 pointers have been allocated PtrHandler->pointers will be reallocated
+ * Higher values will speed up the program but will require more buffer memory;
+ * Lower value will slow down the program but it is good for programs with little need for dynamic memory
+*/
+extern int alloc_interval;
+
+/* This value will be added to each allocation done by this library
+ * It is 0 by default be I assume that the programmer will provide enough memory for what they need
+ * but this is a nice to have just in case (I would suggest an exponent of 2)
+*/
+extern int alloc_padding;
+
+/* This value is a boolean that will determine is free/alloc _warnings are displayed (for debugging, default 0) */
 extern int VERBOSE;
 
-/* The size of each palloc () will be increased by this number (default 4) */
-extern int PALLOC_ADD;
+void mptrhandler_init () __attribute__((constructor));
+void mptrhandler_deinit () __attribute__((destructor));
 
-void handler_init() __attribute__((constructor));
+void ptrhandler_init (PtrHandler* handler);
+void ptrhandler_deinit (PtrHandler* handler);
 
+/* Adds 10 to PtrHandler->pointers if need be */
+void ptrhandler_realloc (PtrHandler* handler);
+
+/* Allocates for handles */
+Handle* halloc (size_t size);
+
+/* Allocates for handles for custom PtrHandler */
+Handle* hhalloc (size_t size, PtrHandler* handler);
+
+/* Allocates for general pointers (creates a handle) */
 void* palloc (size_t size);
 
-void pfree (void *ptr);
+/* Allocates for general pointers (creates a handle on custom PtrHandler) */
+void* phalloc (size_t size, PtrHandler* handler);
 
-/* Free all items and the ptr */
-void array_free (void **ptr);
-void array_free_bare (void **ptr);
+/* Get the pointer's handle */
+Handle* get_handle (void* ptr);
 
-void set_valid (void *ptr);
+/* Get the pointer's handle */
+Handle* get_hhandle (void* ptr, PtrHandler* handler);
+
+/* Free the handle and the pointer */
+void hfree (Handle* handle);
+
+/* Free the pointer and the handle if there is one */
+void pfree (void* ptr);
+
+/* Free pointer and handle on custom PtrHandler */
+void phfree (void* ptr, PtrHandler* handler);
+
+/* Free all pointers in PtrHandler */
+void handler_free (PtrHandler* handler);
+
+/* Check if ptr is valid and free it */
+void free_raw (void* ptr);
+
+/* Free an array and all its items */
+void array_free (void** ptr);
+
+/* Check if ptr is valid */
 int get_valid (void *ptr);
 
-void free_all () __attribute__((destructor));
+/* Check if handle ptr and handle->ptr are valid */
+int get_hvalid (Handle* handle);
+
+/* Printf message is VERBOSE */
+void _warn (const char* message, ...);
 
 #ifdef __cplusplus
 }
