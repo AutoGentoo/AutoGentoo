@@ -26,7 +26,7 @@
 #define __AUTOGENTOO_PROFILE_H__
 
 #include <stdio.h>
-#include <cglobal/command_tools.h>
+#include <core/tools/command_tools.h>
 
 /**
  * Current supported profiles:
@@ -37,7 +37,7 @@
 
 typedef struct
 {
-  int         valid
+  int         valid;
   char        full[64];
   char        main[16]; /** Default, Hardened, etc. **/
   char        arch[16]; /** AMD64, X86, musl, ulibc **/
@@ -48,8 +48,8 @@ typedef struct
   
   /** Only for non-desktop systems **/
   int         has_variant;
-       varaint; /** selinux, developer, no-multilib, systemd, x32 **/
-  mstring     second_varaint; /** selinux **/
+  char*       varaint[128]; /** selinux, developer, no-multilib, systemd, x32 **/
+  char*       second_varaint[128]; /** selinux **/
   
 } Profile;
 

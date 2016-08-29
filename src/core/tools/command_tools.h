@@ -26,8 +26,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mstring.h>
-#include <file.h>
+#include "mstring.h"
+#include "file.h"
 
 char*           get_output          (char*);
 

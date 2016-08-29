@@ -23,7 +23,7 @@
 
 
 #include <stdio.h>
-#include <base/devices.h>
+#include <core/devices.h>
 
 /*
 parted --machine --script --align=opt /dev/sda unit b p free

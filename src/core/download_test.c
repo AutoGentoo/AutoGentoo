@@ -23,7 +23,7 @@
 
 
 #include <stdio.h>
-#include <base/download.h>
+#include <core/download.h>
 
 int main (int argc, char **argv)
 {

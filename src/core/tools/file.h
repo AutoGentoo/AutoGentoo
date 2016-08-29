@@ -24,8 +24,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mstring.h>
-#include <fgetln.h>
+#include "mstring.h"
+#include "fgetln.h"
 #include <err.h>
 
 int             getlength             (char*);

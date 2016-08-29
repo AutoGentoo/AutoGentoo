@@ -22,7 +22,7 @@
  */
 
 
-#include <base/stage3.h>
+#include <core/stage3.h>
 
 Stage3
 stage3_new (char* arch)

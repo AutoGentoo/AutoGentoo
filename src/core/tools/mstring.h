@@ -27,7 +27,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdarg.h>
-#include <ptr_handler.h>
+#include "ptr_handler.h"
 
 #ifndef AUTOGENTOO_MSTRING
 #define AUTOGENTOO_MSTRING

@@ -23,19 +23,12 @@
 
 
 #include <stdio.h>
-#include <base/profile.h>
+#include <core/profile.h>
 
 Profile
 profile_new (void)
 {
   Profile       out;
-  out.full      = malloc (sizeof(char) * 1024);
-  out.mainType  = malloc (sizeof(char) * 16);
-  out.archType  = malloc (sizeof(char) * 16);
-  out.desktop   = malloc (sizeof(char) * 16);
-  out.init      = malloc (sizeof(char) * 16);
-  out.varaint   = malloc (sizeof(char) * 16);
-  out.second_varaint= malloc (sizeof(char) * 16);
   
   return out;
 }

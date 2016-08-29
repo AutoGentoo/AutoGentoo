@@ -2,7 +2,7 @@ CC = gcc
 LL = gcc
 INCDIRS = ../
 CFLAGS += -Wall -g
-LIBDIR = ../cglobal/
+LIBDIR = tools/
 
 BIN = test
 PTBIN = profile_test
