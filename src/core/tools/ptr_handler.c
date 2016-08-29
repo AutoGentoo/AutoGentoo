@@ -47,6 +47,7 @@ void ptrhandler_init (PtrHandler* handler)
   handler->pointer_count = 0;
   handler->pointers = malloc (sizeof (Handle*) * handler->length);
   handler->address = malloc (sizeof (char*) * handler->length);
+  handler->freed = malloc (sizeof (enum BOOL) * handler->length);
   ptrhandler_realloc (handler);
 }
 
@@ -62,6 +63,7 @@ void ptrhandler_realloc (PtrHandler* handler)
     handler->length += alloc_interval;
     handler->pointers = realloc (handler->pointers, sizeof (Handle*) * handler->length);
     handler->address = realloc (handler->address, sizeof (char*) * handler->length);
+    handler->freed = realloc (handler->freed, sizeof (enum BOOL) * handler->length);
   }
 }
 
@@ -77,7 +79,8 @@ Handle* hhalloc (size_t size, PtrHandler* handler)
   
   handler->pointers[handler->pointer_count-1] = malloc (sizeof(Handle*) + 8);
   handler->pointers[handler->pointer_count-1]->size = size;
-  handler->pointers[handler->pointer_count-1]->freed = FALSE;
+  handler->pointers[handler->pointer_count-1]->parent = handler;
+  handler->freed[handler->pointer_count-1] = FALSE;
   
   handler->pointers[handler->pointer_count-1]->ptr = malloc (size+alloc_padding);
   handler->address[handler->pointer_count-1] = malloc (sizeof(char) * 20);
@@ -102,6 +105,21 @@ Handle* get_handle (void* ptr)
   return get_hhandle (ptr, ptrhandler);
 }
 
+int get_hhandle_i (Handle* handle, PtrHandler* handler)
+{
+  int i;
+  for (i=0; i != handler->pointer_count; i++)
+  {
+    Handle* buff = handler->pointers[i];
+    if (buff == handle)
+    {
+      return i;
+    }
+  }
+  
+  return -1;
+}
+
 Handle* get_hhandle (void* ptr, PtrHandler* handler)
 {
   int i;
@@ -124,15 +142,15 @@ void hfree (Handle* handle)
     return;
   }
   
-  if (handle->freed)
+  if (handle->parent->freed[get_hhandle_i (handle, handle->parent)] == TRUE)
   {
     return;
   }
   
+  handle->parent->freed[get_hhandle_i (handle, handle->parent)] = TRUE;
+  
   free_raw (handle->ptr);
   free_raw (handle);
-  
-  handle->freed = TRUE;
 }
 
 void pfree (void* ptr)

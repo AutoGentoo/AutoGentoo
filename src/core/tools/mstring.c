@@ -57,7 +57,7 @@ mstring_get_sub_py (char* old, int start, int end)
 {
   int      size = mstring_get_length (old);
   int      len;
-  char    *out_array = palloc (sizeof (char) * (size + 4));
+  char    *out_array = malloc (sizeof (char) * (size + 4));
   
   if (size < end)
   {

@@ -42,15 +42,16 @@ struct _Handle
 {
   void*       ptr;
   size_t      size;
-  enum BOOL   freed;
+  PtrHandler* parent;
 };
 
 struct _PtrHandler
 {
-  Handle** pointers;
-  char**    address;
-  int      length;
-  int      pointer_count;
+  Handle**    pointers;
+  char**      address;
+  enum BOOL*  freed;
+  int         length;
+  int         pointer_count;
 };
 
 extern PtrHandler* ptrhandler;

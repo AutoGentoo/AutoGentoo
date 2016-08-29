@@ -70,22 +70,17 @@ char** readlines (char* filename)
   int curr = 0;
   while ((read = getline(&line, &len, fp)) != -1)
   {
-    char* buff = mstring_get_sub_py (line, 0, -2);
-    lines[curr] = malloc (sizeof (char) * (mstring_get_length (buff) + 4));
+    lines[curr] = mstring_get_sub_py (line, 0, -2);
     if (!get_valid (lines[curr]))
     {
-      free_raw (buff);
-      pfree (lines[curr]);
+      free_raw (lines[curr]);
       continue;
     }
-    
-    sprintf (lines[curr], "%s", buff);
-    free_raw (buff);
     curr++;
   }
   
   fclose(fp);
-  free_raw (line);
+  free (line);
   return lines;
 }
 
