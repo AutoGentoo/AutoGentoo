@@ -70,10 +70,15 @@ char** readlines (char* filename)
   int curr = 0;
   while ((read = getline(&line, &len, fp)) != -1)
   {
-    char* malloc_buffer = malloc (mstring_get_length (line) * sizeof(char));
-    lines[curr] = malloc_buffer;
-    
     char* buff = mstring_get_sub_py (line, 0, -2);
+    lines[curr] = malloc (sizeof (char) * (mstring_get_length (buff) + 4));
+    if (!get_valid (lines[curr]))
+    {
+      free (buff);
+      free (lines[curr]);
+      continue;
+    }
+    
     sprintf (lines[curr], "%s", buff);
     free (buff);
     curr++;

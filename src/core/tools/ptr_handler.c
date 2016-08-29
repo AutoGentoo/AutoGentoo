@@ -32,16 +32,6 @@ int PALLOC_ADD = 4;
 
 void handler_init ()
 {
-  int* mbuff = malloc (sizeof(int) + 1);
-  if (mbuff == NULL)
-  {
-    printf ("Program ran into an error while initializing!\n");
-    raise (SIGSEGV);
-  }
-  
-  set_valid (mbuff);
-  free (mbuff);
-  
   handler = malloc (sizeof(PointerHandler) + 1);
   handler->count = 1;
   handler->ptrs = malloc (sizeof(void*) * handler->count);
@@ -51,6 +41,7 @@ void* palloc (size_t size)
 {
   /* Allocate space for the pointer */
   handler->ptrs = realloc (handler->ptrs, sizeof(void*) * handler->count + PALLOC_ADD);
+  //~ handler->freed = realloc (handler->freed, sizeof(void*) * handler->freed_count + PALLOC_ADD);
   
   /* Create the pointer */
   void* ptr = malloc (size + PALLOC_ADD);
@@ -68,13 +59,14 @@ void* palloc (size_t size)
   
   handler->ptrs[handler->count-1] = ptr;
   handler->count++;
+  //~ handler->freed_count++;
   
   return ptr;
 }
 
-void pfree (void *ptr)
+void pfree (void* ptr)
 {
-  if (!ptr)
+  if (ptr == NULL)
   {
     return;
   }
@@ -87,9 +79,25 @@ void pfree (void *ptr)
     return;
   }
   
+  if (strcmp ((char*)ptr, "") == 0)
+  {
+    return;
+  }
+  
   if (VERBOSE)
   {
     printf ("Deallocating pointer at %p (%s)\n", ptr, (char*)ptr);
+  }
+  
+  free (ptr);
+}
+
+void array_free_bare (void **ptr)
+{
+  int i;
+  for (i=0; ptr[i]; i++)
+  {
+    free (ptr[i]);
   }
   
   free (ptr);
@@ -103,23 +111,23 @@ void array_free (void **ptr)
     pfree (ptr[i]);
   }
   
-  pfree (ptr[i]);
+  pfree (ptr);
 }
 
-void set_valid (void *ptr)
+/*void set_valid (void *ptr)
 {
   char sbuff[25];
   snprintf (sbuff, 25, "%p", ptr);
   
   for (;sbuff[POINTER_SIZE]; POINTER_SIZE++);
   
-  /* Check if pointer is valid */
+  * Check if pointer is valid *
   if (POINTER_SIZE < 8 || POINTER_SIZE > 10)
   {
     printf ("Pointer %p sent to void set_valid (void *ptr) is not valid!\n", ptr);
     raise(SIGSEGV);
   }
-}
+}*/
 
 int get_valid (void *ptr)
 {
@@ -132,7 +140,8 @@ int get_valid (void *ptr)
   
   int size = 0;
   for (;sbuff[size]; size++);
-  if (size != POINTER_SIZE)
+  
+  if (size != 8 && size != 9 && size != 10)
   {
     return 0;
   }
@@ -146,6 +155,7 @@ void free_all ()
   {
     pfree (handler->ptrs[i]);
   }
-  pfree (handler->ptrs);
+  free (handler->ptrs);
+  
   pfree (handler);
 }

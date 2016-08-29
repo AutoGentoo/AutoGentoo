@@ -32,6 +32,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <mstring.h>
 
 typedef struct _PointerHandler PointerHandler;
 typedef struct _PointerGroup PointerGroup;
@@ -60,8 +61,9 @@ void* palloc (size_t size);
 
 void pfree (void *ptr);
 
-/* Only called by you */
+/* Free all items and the ptr */
 void array_free (void **ptr);
+void array_free_bare (void **ptr);
 
 void set_valid (void *ptr);
 int get_valid (void *ptr);

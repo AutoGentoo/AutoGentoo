@@ -27,13 +27,20 @@
 
 int main(int argc, char **argv)
 {
+  VERBOSE = 1;
   int x;
   char **buff = readlines ("mstring.h");
   for (x=0; buff[x]; ++x)
   {
-    printf ("%s\n", buff[x]);
+    if (!get_valid (buff[x]))
+    {
+      continue;
+    }
+    print ("%s", buff[x]);
   }
-  pfree(buff);
+  
+  array_free ((void**)buff);
+  
   return 0;
 }
 

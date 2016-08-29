@@ -3,9 +3,9 @@
  * 
  * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
- * This program is free software; you can redistribute it and/or modify
+ * This program is pfree software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the pfree Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful,
@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * along with this program; if not, write to the pfree Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  * 
@@ -35,7 +35,7 @@ char*
 mstring_get_sub  (char* old, int start, int length)
 {
   int  size = mstring_get_length (old);
-  char* out_array = malloc (sizeof(char) * (length + 1));
+  char* out_array = palloc (sizeof(char) * (length + 1));
   
   if (size < (start+length))
   {
@@ -57,7 +57,7 @@ mstring_get_sub_py (char* old, int start, int end)
 {
   int      size = mstring_get_length (old);
   int      len;
-  char    *out_array = malloc (sizeof (char) * size + 1);
+  char    *out_array = malloc (sizeof (char) * (size + 4));
   
   if (size < end)
   {
@@ -68,6 +68,12 @@ mstring_get_sub_py (char* old, int start, int end)
   {
     end = size + end;
     end++;
+  }
+  
+  if (start < 0)
+  {
+    start = size + start;
+    start++;
   }
   
   len = end - start;
@@ -171,12 +177,12 @@ char* itoa(int val, int base)
 char***
 mstring_a_split (char** in, char* c, int len)
 {
-  char** *  buff       =  malloc(sizeof(char**) * mstring_a_get_length (in));
+  char** *  buff       =  palloc(sizeof(char**) * mstring_a_get_length (in));
   int          curr       =  0;
   int          index      =  1;
   int          str_index  =  0;
-  char**    str_buff   =  malloc (sizeof(char*) * mstring_a_get_length (in));
-  char**    end        =  malloc (sizeof(char*) * mstring_a_get_length (in));
+  char**    str_buff   =  palloc (sizeof(char*) * mstring_a_get_length (in));
+  char**    end        =  palloc (sizeof(char*) * mstring_a_get_length (in));
   
   for (curr = 0; curr != len; curr++, str_index++)
   {
@@ -187,7 +193,7 @@ mstring_a_split (char** in, char* c, int len)
       str_buff[str_index] = curr_c;
       buff[index] = str_buff;
       str_index   =  0;
-      str_buff    =  malloc (sizeof(char*) * mstring_a_get_length (in));
+      str_buff    =  palloc (sizeof(char*) * mstring_a_get_length (in));
       index++;
       continue;
     }
@@ -198,8 +204,8 @@ mstring_a_split (char** in, char* c, int len)
   end[0]      = itoa (curr, 10);
   buff[0]     = end;
   
-  free(str_buff);
-  free(end);
+  pfree(str_buff);
+  pfree(end);
   
   return buff;
 };
@@ -234,7 +240,7 @@ char** mstring_split (char* a_str, char a_delim)
   c++;
   char **out = calloc (c+2, sizeof(char*));
   
-  char *buffer = malloc (sizeof(char) * (a+1));
+  char *buffer = palloc (sizeof(char) * (a+1));
   int  c_buff = 0;
   int first = 0;
   int i = 0;
@@ -249,7 +255,7 @@ char** mstring_split (char* a_str, char a_delim)
     {
       if (!buffer || strcmp (buffer, "") == 0)
         break;
-      out[c_buff] = malloc (sizeof(char) * (mstring_get_length (buffer) + 5));
+      out[c_buff] = palloc (sizeof(char) * (mstring_get_length (buffer) + 5));
       strcpy (out[c_buff], buffer);
       memset(buffer, 0, mstring_get_length(buffer));
       first = 0;
@@ -268,18 +274,18 @@ char** mstring_split (char* a_str, char a_delim)
     }
   }
   
-  out[c_buff] = malloc (sizeof(char) * (mstring_get_length (buffer) + 5));
+  out[c_buff] = palloc (sizeof(char) * (mstring_get_length (buffer) + 5));
   strcpy (out[c_buff], buffer);
   c_buff++;
   
   if (buffer)
-    free (buffer);
+    pfree (buffer);
   return out;
 }
 
 char** mstring_split_str (char* in, char* delim)
 {
-  char* buff_out = malloc (sizeof(char) * mstring_get_length (in));
+  char* buff_out = palloc (sizeof(char) * mstring_get_length (in));
   strcpy (buff_out, in);
   char* buff;
   char* token;
@@ -292,7 +298,7 @@ char** mstring_split_str (char* in, char* delim)
      tmp++;
   }
   
-  char** out = malloc (sizeof (char*) * count + 1);
+  char** out = palloc (sizeof (char*) * count + 1);
   
   int curr = 0;
   
@@ -306,10 +312,10 @@ char** mstring_split_str (char* in, char* delim)
       curr++;
     }
   
-    free(buff);
+    pfree(buff);
   }
   
-  free (buff_out);
+  pfree (buff_out);
   
   return out;
 }
@@ -332,7 +338,7 @@ mstring_a_find (char** in, char* search)
 
 char* concat(char* s1, char* s2)
 {
-  char*   result  =  malloc   (mstring_get_length(s1)+mstring_get_length(s2)+1);
+  char*   result  =  palloc   (mstring_get_length(s1)+mstring_get_length(s2)+1);
   
   strcpy                        (result, s1);
   strcat                        (result, s2);
@@ -372,7 +378,7 @@ char**
 mstring_split_quote (char* in, char c)
 {
   int      occ_num = 0;
-  int     *occs = malloc(sizeof(int*));
+  int     *occs = palloc(sizeof(int*));
   int      curr = 0;
   int      in_quote = 0;
   
@@ -395,7 +401,7 @@ mstring_split_quote (char* in, char c)
     }
   }
   
-  char**      buff = malloc (sizeof(char*) * mstring_get_length (in));
+  char**      buff = palloc (sizeof(char*) * mstring_get_length (in));
   
   if (occ_num == 0)
   {
@@ -415,7 +421,7 @@ mstring_split_quote (char* in, char c)
   }
   buff[curr] = mstring_get_sub_py (in, occs[curr-1] + 1, -1);
   
-  free(occs);
+  pfree(occs);
   
   return buff;
 }
@@ -460,7 +466,7 @@ mstring_grate (char* in)
 char*
 mstring_removechar (char* in, char chr)
 {
-  char* out = malloc(sizeof(char*) * mstring_get_length (in));
+  char* out = palloc(sizeof(char*) * mstring_get_length (in));
   int curr;
   int out_curr;
   for (curr = 0, out_curr = 0; in[curr]; curr++)
