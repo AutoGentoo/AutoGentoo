@@ -2,7 +2,7 @@ CC = gcc
 LL = gcc
 INCDIRS = ../
 CFLAGS += -Wall -g
-LIBDIR = tools/
+LIBDIR = ../libraries
 
 BIN = test
 PTBIN = profile_test
@@ -43,6 +43,7 @@ test: $(OBJECTS)
 	$(LL) $(DTOBJECTS) $(DTBIN).o -o $(DTBIN) -lcurl
 	$(CC) $(CFLAGS) -o $(DEVTBIN).o -c $(DEVTBIN).c -I$(INCDIRS)
 	$(LL) $(DEVTOBJECTS) $(DEVTBIN).o -o $(DEVTBIN) -L$(LIBDIR) -lparted -lcglobal
+	export LD_LIBRARY_PATH=$(LIBDIR)
 
 all: $(OBJECTS) test
 
