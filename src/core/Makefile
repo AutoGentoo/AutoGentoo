@@ -7,14 +7,12 @@ LIBDIR = tools/
 BIN = test
 PTBIN = profile_test
 DTBIN = download_test
-PTRBIN = ptr_test
-#DEVTBIN = devices_test
+DEVTBIN = parted_test
 
-BARE = profile download ptr_handler
+BARE = profile download disk
 PTBARE = profile
 DTBARE = download
-PTRBARE = ptr_handler
-#DEVTBARE = devices
+DEVTBARE = disk
 
 OBJECTS = $(patsubst %,%.o, $(BARE))
 SOURCES = $(patsubst %,%.c, $(BARE))
@@ -24,17 +22,13 @@ PTOBJECTS = $(patsubst %,%.o, $(PTBARE))
 PTSOURCES = $(patsubst %,%.c, $(PTBARE))
 PTHEADERS = $(patsubst %,%.h, $(PTBARE))
 
-PTROBJECTS = $(patsubst %,%.o, $(PTRBARE))
-PTRSOURCES = $(patsubst %,%.c, $(PTRBARE))
-PTRHEADERS = $(patsubst %,%.h, $(PTRBARE))
-
 DTOBJECTS = $(patsubst %,%.o, $(DTBARE))
 DTSOURCES = $(patsubst %,%.c, $(DTBARE))
 DTHEADERS = $(patsubst %,%.h, $(DTBARE))
 
-#DEVTOBJECTS = $(patsubst %,%.o, $(DEVTBARE))
-#DEVTSOURCES = $(patsubst %,%.c, $(DEVTBARE))
-#DEVTHEADERS = $(patsubst %,%.h, $(DEVTBARE))
+DEVTOBJECTS = $(patsubst %,%.o, $(DEVTBARE))
+DEVTSOURCES = $(patsubst %,%.c, $(DEVTBARE))
+DEVTHEADERS = $(patsubst %,%.h, $(DEVTBARE))
 
 .PHONY : all
 .DEFAULT_GOAL := all
@@ -46,12 +40,9 @@ test: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(PTBIN).o -c $(PTBIN).c -I$(INCDIRS)
 	$(LL) $(PTOBJECTS) $(PTBIN).o -o $(PTBIN) -L$(LIBDIR) -lcglobal
 	$(CC) $(CFLAGS) -o $(DTBIN).o -c $(DTBIN).c -I$(INCDIRS)
-	$(LL) $(DTOBJECTS) $(DTBIN).o -o $(DTBIN) -lcurl 
-	$(CC) $(CFLAGS) -o $(PTRBIN).o -c $(PTRBIN).c -I$(INCDIRS)
-	$(LL) $(PTROBJECTS) $(PTRBIN).o -o $(PTRBIN)
-	#$(CC) $(CFLAGS) -o $(DEVTBIN).o -c $(DEVTBIN).c -I$(INCDIRS)
-	#$(LL) $(DEVTOBJECTS) $(DEVTBIN).o -o $(DEVTBIN) -L$(LIBDIR) -lcglobal
-	$(CC) $(CFLAGS) -o parted_test parted_test.c -lparted
+	$(LL) $(DTOBJECTS) $(DTBIN).o -o $(DTBIN) -lcurl
+	$(CC) $(CFLAGS) -o $(DEVTBIN).o -c $(DEVTBIN).c -I$(INCDIRS)
+	$(LL) $(DEVTOBJECTS) $(DEVTBIN).o -o $(DEVTBIN) -L$(LIBDIR) -lparted -lcglobal
 
 all: $(OBJECTS) test
 
@@ -63,7 +54,5 @@ clean:
 	rm -rf $(PTBIN)
 	rm -rf $(DTBIN)
 	rm -rf $(DEVTBIN)
-	rm -rf parted_test
-	rm -rf $(PTRBIN)
 	rm -rf *.o
 	rm -rf *.gch

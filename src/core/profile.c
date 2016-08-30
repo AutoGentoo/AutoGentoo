@@ -25,66 +25,80 @@
 #include <stdio.h>
 #include <core/profile.h>
 
-Profile
-profile_new (void)
+Profile*
+profile_new_from_str (char* in)
 {
-  Profile       out;
+  Profile* out = malloc (sizeof(Profile));
+  char**  divided = mstring_split (in, '/');
+  snprintf (out->full, 64, "%s", in);
+  snprintf (out->main, 16, "%s", divided[0]);
+  snprintf (out->arch, 16, "%s", divided[2]);
   
-  return out;
-}
-
-Profile
-profile_new_from_str   (mstring in)
-{
-  Profile out = profile_new ();
-  //"default/linux/amd64/13.0"
-  mstring_a  divided = mstring_split (in, '/');
-  out.full = in;
-  out.mainType = divided[0];
-  out.archType = divided[2];
-  
-  if (strcmp (divided[3], "13.0") != 0)
+  if (!divided[3])
   {
-    fprintf (stderr, "Profile %s not supported, skipping...", in);
-    out.not_valid = TRUE;
+    //fprintf (stderr, "Profile %s not supported, skipping...\n", in);
+    out->valid = FALSE;
+    free (divided);
     return out;
   }
   
-  out.not_valid = FALSE;
-  
-  if (strcmp (divided[4], "desktop") != 0)
+  if (strcmp (divided[3], "13.0") != 0)
   {
-    out.varaint = "";
-    out.has_variant = FALSE;
-    out.isdesktop   = FALSE;
+    //fprintf (stderr, "Profile %s not supported, skipping...\n", in);
+    out->valid = FALSE;
+    free (divided);
+    return out;
+  }
+  out->valid = TRUE;
+  
+  if (divided[4] == NULL)
+  {
+    out->has_variant = FALSE;
+    out->isdesktop   = FALSE;
     if (divided[5])
     {
-      out.varaint = divided[5];
+      snprintf (out->varaint, 16,"%s", divided[5]);
     }
     if (divided[6])
     {
-      out.second_varaint = divided[6];
+      snprintf (out->second_varaint, 16,"%s", divided[6]);
     }
   }
   else
   {
-    out.isdesktop = TRUE;
-    if (!divided[5])
+    if (strcmp (divided[4], "desktop") != 0)
     {
-      out.desktop = "xfce";
+    out->has_variant = FALSE;
+      out->isdesktop   = FALSE;
+      if (divided[5])
+      {
+        snprintf (out->varaint, 16,"%s", divided[5]);
+      }
+      if (divided[6])
+      {
+        snprintf (out->second_varaint, 16,"%s", divided[6]);
+      }
     }
     else
     {
-      out.desktop = divided[5];
-    }
-    
-    if (!divided[6])
-    {
-      out.init = "openrc";
-    }
-    else
-    {
-      out.init = divided[6];
+      out->isdesktop = TRUE;
+      if (!divided[5])
+      {
+        strcpy(out->desktop, "xfce");
+      }
+      else
+      {
+        strcpy(out->desktop, divided[5]);
+      }
+      
+      if (!divided[6])
+      {
+        strcpy(out->init, "openrc");
+      }
+      else
+      {
+        strcpy(out->init, divided[6]);
+      }
     }
   }
   
@@ -92,32 +106,48 @@ profile_new_from_str   (mstring in)
   return out;
 }
 
+ProfileList* profilelist_new ()
+{
+  ProfileList* out = malloc (sizeof (ProfileList));
+  out->profiles = malloc (sizeof(Profile*) * 128);
+  
+  return out;
+};
+
 void
 profilelist_get_list (ProfileList * out)
 {
-  system("eselect --brief profile list");
-  mstring_a profiles = get_output_lines ("eselect --brief profile list");
-  //printf ("%s", profiles[0]);
-  mstring_a used_profiles = malloc (sizeof(mstring) * 128);
+  char** profiles = get_output_lines ("eselect --brief profile list");
+  char** used_profiles = palloc (sizeof(char*) * 128);
+  char* active_buff = get_output ("eselect --brief --colour=no profile show | cut -c 3-100");
   
   int curr;
   int p_curr;
   for (curr = 0, p_curr = 0; profiles[curr]; curr++)
   {
-    Profile p_buff = profile_new_from_str (profiles[curr]);
-    if (p_buff.not_valid == TRUE)
+    Profile* p_buff = profile_new_from_str (profiles[curr]);
+    
+    if (!p_buff->valid)
     {
       continue;
     }
+    
+    if (strcmp (p_buff->full, active_buff) == 0)
+    {
+      out->active = p_buff;
+    }
+    
     out->profiles [p_curr] = p_buff;
     used_profiles[p_curr] = profiles[curr];
     p_curr++;
-    out->profilec++;
+    out->count++;
   }
   
-  out->active_name = mstring_get_sub_py (get_output ("eselect --brief --colour=no profile show"), 2, -1);
-  out->active = mstring_a_find (used_profiles, out->active_name);
-  
-  free(profiles);
-  free(used_profiles);
+  array_free ((void**)profiles);
+}
+
+void profilelist_free (ProfileList* ptr)
+{
+  array_free ((void**)ptr->profiles);
+  //free (ptr);
 }

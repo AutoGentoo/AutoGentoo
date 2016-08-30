@@ -1,7 +1,7 @@
 /*
- * profile_test.c
+ * disk.h
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +21,24 @@
  * 
  */
 
+#ifndef __AUTOGENTOO_PARTED_DISK_H__
+#define __AUTOGENTOO_PARTED_DISK_H__
 
 #include <stdio.h>
-#include <core/profile.h>
+#include <parted/parted.h>
+#include <core/tools/ptr_handler.h>
 
-int main(int argc, char **argv)
+struct Disk
 {
-  ProfileList* buff = profilelist_new ();
-  profilelist_get_list (buff);
-  
-  print("%s", buff->active->full);
-  
-  profilelist_free (buff);
-  
-  return 0;
-}
+  PedDevice*      p_device;
+  PedDisk*        p_disk;
+  PedPartition**  partitions;
+};
 
+extern int TOTAL_DISKS;
+
+struct Disk** disk_get_all (void);
+
+void disk_free (struct Disk** ptr);
+
+#endif

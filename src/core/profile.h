@@ -48,8 +48,8 @@ typedef struct
   
   /** Only for non-desktop systems **/
   int         has_variant;
-  char*       varaint[128]; /** selinux, developer, no-multilib, systemd, x32 **/
-  char*       second_varaint[128]; /** selinux **/
+  char        varaint[16]; /** selinux, developer, no-multilib, systemd, x32 **/
+  char        second_varaint[16]; /** selinux **/
   
 } Profile;
 
@@ -59,5 +59,14 @@ typedef struct
   int             count;
   Profile*        active;
 } ProfileList;
+
+
+Profile* profile_new_from_str (char* in);
+
+void profilelist_get_list (ProfileList * out);
+
+ProfileList* profilelist_new ();
+
+void profilelist_free (ProfileList* ptr);
 
 #endif

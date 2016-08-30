@@ -109,6 +109,11 @@ read_file (char* filename)
     // fread doesn't set it so put a \0 in the last position
     // and buffer is now officially a string
     buffer[string_size] = '\0';
+    
+    if (buffer[string_size-1] == '\n')
+    {
+      buffer[string_size-1] = ' ';
+    }
 
     if (string_size != read_size)
     {

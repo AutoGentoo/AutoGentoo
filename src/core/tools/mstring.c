@@ -531,6 +531,7 @@ print (char* format, ...)
   va_end(args);
 
   printf ("%s\n", msg);
+  fflush (stdout);
 }
 
 int

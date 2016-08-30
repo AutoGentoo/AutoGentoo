@@ -23,11 +23,11 @@
 
 
 #include <stdio.h>
-#include <parted/parted.h>
+#include <core/disk.h>
 
 int main(int argc, char **argv)
 {
-  printf ("Scanning disks...");
+  /*printf ("Scanning disks...");
   fflush (stdout);
   ped_device_probe_all ();
   printf ("done\n");
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
   
   PedDevice* devlist [128];
   
-  /* Get the first device */
+  * Get the first device
   PedDevice* first_dev = ped_device_get_next (NULL);
   PedDevice* last = first_dev;
   
@@ -46,6 +46,7 @@ int main(int argc, char **argv)
   while (last != NULL)
   {
     devlist[curr] = ped_device_get_next (last);
+    
     last = devlist[curr];
     curr++;
   }
@@ -53,10 +54,27 @@ int main(int argc, char **argv)
   int i;
   for (i=0; devlist[i]; i++)
   {
+    PedDisk* peddisk_buffer = ped_disk_new (devlist[i]);
     printf ("Found device at %s\nModel name: %s\n", devlist[i]->path, devlist[i]->model);
+    printf ("Disk has label: %s\n", peddisk_buffer->type->name);
     fflush (stdout);
   }
+  */
+  struct Disk** test = disk_get_all ();
+  
+  int i;
+  for (i=0; i != TOTAL_DISKS; i++)
+  {
+    printf ("Found disk with path: %s\nModel: %s\nLabel: %s\n", test[i]->p_device->path, test[i]->p_device->model, test[i]->p_disk->type->name);
+    fflush(stdout);
+  }
+  printf ("Found %d disks total\n", TOTAL_DISKS);
+  disk_free (test);
+  
   
   return 0;
+  
+  
+  
 }
 
