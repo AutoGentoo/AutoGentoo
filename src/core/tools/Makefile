@@ -52,6 +52,7 @@ test: $(OBJECTS)
 
 all: $(OBJECTS)
 	gcc -shared -o libcglobal.so $(OBJECTS)
+	cp libcglobal.so ../../libraries
 
 clean:
 	rm -rf $(OBJECTS)

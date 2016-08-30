@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.19.0 -->
+<interface>
+  <requires lib="gtk+" version="3.16"/>
+  <object class="GtkWindow" id="installer_window">
+    <property name="width_request">800</property>
+    <property name="height_request">500</property>
+    <property name="can_focus">False</property>
+    <property name="margin_left">6</property>
+    <property name="margin_right">6</property>
+    <property name="margin_top">6</property>
+    <property name="margin_bottom">6</property>
+    <property name="title" translatable="yes">AutoGentoo LiveCD Installer</property>
+    <property name="window_position">center</property>
+    <signal name="destroy" handler="exit" swapped="no"/>
+    <child>
+      <object class="GtkAlignment" id="top_level">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkBox" id="top_level_box">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkBox" id="img_box">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_top">80</property>
+                <child>
+                  <object class="GtkImage" id="cd_img">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="pixbuf">cd_in_tray.png</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkImage" id="computer_img">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="pixbuf">gentoo_installed.png</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="info_main">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="valign">start</property>
+                <property name="margin_left">100</property>
+                <property name="margin_right">100</property>
+                <property name="margin_top">50</property>
+                <property name="label" translatable="yes">  Welcome to AutoGentoo, the tool written to speed
+up the Gentoo Linux install. You will taken through a
+set of steps required to install this system. I would 
+recommend planning out your partition table prior to 
+                       continuing.</property>
+                <attributes>
+                  <attribute name="font-desc" value="Nimbus Mono L Bold 12"/>
+                  <attribute name="style" value="normal"/>
+                  <attribute name="scale" value="1"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="control_box">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkButton" id="next">
+                    <property name="label" translatable="yes">Next</property>
+                    <property name="width_request">70</property>
+                    <property name="height_request">30</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="xalign">0.4699999988079071</property>
+                    <signal name="clicked" handler="next" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="quit">
+                    <property name="label" translatable="yes">Exit</property>
+                    <property name="width_request">70</property>
+                    <property name="height_request">30</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">True</property>
+                    <property name="xalign">0.49000000953674316</property>
+                    <signal name="clicked" handler="exit" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="pack_type">end</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
