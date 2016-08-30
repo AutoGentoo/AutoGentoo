@@ -25,6 +25,8 @@
 #define __AUTOGENTOO_PARTED_DISK_H__
 
 #include <stdio.h>
+#include <unistd.h>
+#include <pwd.h>
 #include <parted/parted.h>
 #include <core/tools/ptr_handler.h>
 

@@ -29,6 +29,19 @@ int TOTAL_DISKS = 0;
 
 struct Disk** disk_get_all (void)
 {
+  struct passwd *p = getpwuid(getuid());
+  
+  if (p == NULL)
+  {
+    fprintf (stderr, "Failed to get username!\n");
+    exit (1);
+  }
+  if (strcmp (p->pw_name, "root") != 0)
+  {
+    fprintf (stderr, "Not running as root!\n");
+    exit (1);
+  }
+  
   struct Disk** out = malloc (sizeof(struct Disk*) * 128);
   
   ped_device_probe_all ();
