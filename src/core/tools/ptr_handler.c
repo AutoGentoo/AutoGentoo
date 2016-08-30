@@ -179,6 +179,7 @@ void handler_free (PtrHandler* handler)
   }
   free_raw (handler->pointers);
   free_raw (handler->address);
+  free_raw (handler->freed);
   free_raw (handler);
 }
 
