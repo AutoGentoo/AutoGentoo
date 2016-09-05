@@ -3,6 +3,7 @@ LL = gcc
 INCDIRS = .
 CFLAGS += -Wall -g
 LIB = -lcrypto
+LD_PATH=../../libraries
 
 ETBIN = encrypt_test
 FTBIN = file_test
@@ -50,9 +51,12 @@ test: $(OBJECTS)
 	$(LL) $(CTOBJECTS) config_test.o -o $(CTBIN) $(LIB)
 	$(LL) $(PTROBJECTS) ptr_test.o -o $(CTBIN) $(LIB)
 
-all: $(OBJECTS)
+$(LD_PATH):
+	mkdir -p ../../libraries
+
+all: $(OBJECTS) | $(LD_PATH)
 	gcc -shared -o libcglobal.so $(OBJECTS)
-	cp libcglobal.so ../../libraries
+	cp libcglobal.so $(LD_PATH)
 
 clean:
 	rm -rf $(OBJECTS)
