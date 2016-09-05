@@ -28,9 +28,20 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=0
-FILE_NAME_0=1689;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcore%2Ftools%2FMakefile;0;2
-FILE_NAME_1=277;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2F.gitignore;0;2
+current_page=13
+FILE_NAME_0=907;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcore%2Fdisk.c;0;2
+FILE_NAME_1=918;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcore%2Fdisk.h;0;2
+FILE_NAME_2=1911;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcore%2Fparted_test.c;0;2
+FILE_NAME_3=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcore%2Ftools%2Fmstring.h;0;2
+FILE_NAME_4=0;C;0;EUTF-8;0;1;0;%2Fusr%2Finclude%2Fparted%2Fdevice.h;0;8
+FILE_NAME_5=14907;C;0;EUTF-8;0;1;0;%2Fusr%2Finclude%2Fparted%2Fdisk.h;0;8
+FILE_NAME_6=847;C;0;EUTF-8;0;1;0;%2Fusr%2Finclude%2Fparted%2Fparted.h;0;4
+FILE_NAME_7=1070;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcore%2Fdownload.c;0;2
+FILE_NAME_8=1261;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcore%2FMakefile;0;2
+FILE_NAME_9=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcore%2Ftools%2Fcommand_tools.c;0;2
+FILE_NAME_10=2689;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fcore%2Ftools%2Ffile.c;0;2
+FILE_NAME_11=0;Python;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fportage%2Fusr%2Fbin%2Femerge;0;2
+FILE_NAME_12=88844;Python;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fportage%2Fusr%2Flib64%2Fpython2.7%2Fsite-packages%2Fportage%2Fpackage%2Febuild%2Fconfig.py;0;2
 
 [VTE]
 last_dir=/home/atuser/Documents
