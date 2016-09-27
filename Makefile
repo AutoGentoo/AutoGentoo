@@ -41,7 +41,7 @@ virtual-clean:
 	cd src/virtual && make clean
 
 all:
-	cd core/tools && make
+	cd src/core/tools && make
 	cd src/core && make
 	cd src/base && make
 	cd src/http && make
