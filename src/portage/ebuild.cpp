@@ -31,7 +31,7 @@ ebuild::ebuild ( Package package )
   string equeryCmd ( "equery uses " + package.name + " > use" );
   system ( equeryCmd.c_str ( ) );
   string req ("sed -i \'" + REQUIRED_USE +  "\' use");
-  system(req);
+  system(req.c_str());
   string writeFlags ( "python3 writeFlags.py use" );
   system ( writeFlags.c_str ( ) );
   SUGGEST_USE = get_command_str ( "python3 parseFlags.py" );

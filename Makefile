@@ -1,23 +1,17 @@
 .PHONY : all
 .DEFAULT_GOAL := all
 
-base:
-	cd src/base && make
+tools:
+	cd src/core/tools && make
 
-base-test: cglobal-test
-	cd src/base && make test
+core: tools
+	cd src/core && make
 
-base-clean:
-	cd src/base && make clean
+core-test:
+	cd src/core && make test
 
-cglobal:
-	cd src/cglobal && make
-
-cglobal-test:
-	cd src/cglobal && make test
-
-cglobal-clean:
-	cd src/cglobal && make clean
+core-clean:
+	cd src/core && make clean
 
 http:
 	cd src/http && make 
@@ -47,12 +41,13 @@ virtual-clean:
 	cd src/virtual && make clean
 
 all:
-	cd src/cglobal && make
+	cd core/tools && make
+	cd src/core && make
 	cd src/base && make
 	cd src/http && make
 	cd src/portage && make
 	cd src/virtual && make
 
-test: cglobal-test http-test portage-test virtual-test
+test: core-test http-test portage-test virtual-test
 
-clean: base-clean cglobal-clean http-clean portage-clean virtual-clean
+clean: core-clean http-clean portage-clean virtual-clean
