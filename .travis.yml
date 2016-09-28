@@ -2,7 +2,7 @@ language: c
 script: make
 compiler: gcc
 
-ddons:
+addons:
   apt:
     packages:
      - parted
