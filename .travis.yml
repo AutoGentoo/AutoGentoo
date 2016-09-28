@@ -6,3 +6,4 @@ ddons:
   apt:
     packages:
      - parted
+     - libparted-dev
