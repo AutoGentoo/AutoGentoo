@@ -9,3 +9,4 @@ addons:
      - libparted-dev
      - libtool
      - autotools-dev
+     - libgtk-3-dev
