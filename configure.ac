@@ -10,7 +10,6 @@ AM_PROG_AR
 LT_INIT
 AC_SUBST([LIBTOOL_DEPS])
 
-
 AC_CHECK_LIB([parted], [ped_device_read], [], AC_MSG_ERROR([*** libparted not found.]))
 
 PKG_CHECK_MODULES([AUTOGENTOO], [
