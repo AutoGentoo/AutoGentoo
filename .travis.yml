@@ -7,3 +7,5 @@ addons:
     packages:
      - parted
      - libparted-dev
+     - libtool
+     - autotools-dev
