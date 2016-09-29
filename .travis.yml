@@ -1,6 +1,5 @@
 sudo: required
 language: c
-script: make
 compiler: gcc
 
 addons:
