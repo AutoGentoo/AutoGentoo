@@ -38,6 +38,11 @@ AC_CONFIG_FILES([
   src/core/tools/Makefile
   src/http/Makefile
   src/portage/Makefile
+  lib/Makefile
+  lib/http/Makefile
+  lib/portage/Makefile
+  lib/core/Makefile
+  lib/core/tools/Makefile
 ])
 
 
