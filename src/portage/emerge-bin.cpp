@@ -33,6 +33,13 @@ int main(int argc, char* args[])
 {
   string input;
   
+  if (!args[1])
+  {
+    cout << "Improper use of command" << endl \
+         << "Use '--help' for more info" << endl;
+    exit (1);
+  }
+  
   for ( int i = 0; i != argc; i++ )
   {
     input += args [ i ];
@@ -41,7 +48,7 @@ int main(int argc, char* args[])
   
   
   OptionSet emerge_opts;
-  emerge_opts.init ( "emerge", "Use the AutoGentoo portage API to install specified packages", 15 );
+  emerge_opts.init ( "agemerge", "Use the AutoGentoo portage API to install specified packages", 15 );
   
   emerge_opts.add_arg ( "PACKAGE" );
   emerge_opts.add_arg ( "OPTIONS" );
