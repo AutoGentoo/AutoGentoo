@@ -1,7 +1,7 @@
 /*
- * stage3.h
+ * mount.h
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,21 +23,17 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <core/tools/mstring.h>
-#include <core/tools/file.h>
-#include <core/download.h>
 
-typedef struct
+struct __mount
 {
-  char   *arch;
-  char   *buff_link;
-  char   *link;
-  char   *name;
-  char   *date;
-} Stage3;
+  char* dev;
+  char* dest;
+  int status;
+};
 
-Stage3        stage3_new             (char*);
-
-Stage3        stage3_new_latest      (char*);
-
-Stage3        stage3_new_specify     (char*);
+struct __mount* mount (char* dev, char* dest);
+int mount_chroot (char* dest);
+int umount (struct __mount* dev);
+int umount_chroot (char* dest);

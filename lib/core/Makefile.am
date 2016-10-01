@@ -5,4 +5,5 @@ coreinclude_HEADERS =                   \
                          disk.h         \
                          download.h     \
                          profile.h      \
-                         stage3.h
+                         stage3.h       \
+                         mount.h

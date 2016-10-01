@@ -12,9 +12,9 @@ AC_SUBST([LIBTOOL_DEPS])
 
 AC_CHECK_LIB([parted], [ped_device_read], [], AC_MSG_ERROR([*** libparted not found.]))
 
-PKG_CHECK_MODULES([AUTOGENTOO], [
-    glib-2.0
-    gtk+-3.0])
+PKG_CHECK_MODULES(libcurl, libcurl)
+PKG_CHECK_MODULES(glib, glib-2.0)
+PKG_CHECK_MODULES(gtk, gtk+-3.0)
 
 LIBPARTED_REQUIRED_VERSION='1.7.1'
 LIBPARTED_REQUIRED_INT=`echo "$LIBPARTED_REQUIRED_VERSION" |

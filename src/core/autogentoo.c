@@ -1,7 +1,7 @@
 /*
- * stage3.h
+ * autogentoo.c
  * 
- * Copyright 2016 Andrei Tumbar <atuser@Kronos-Ubuntu>
+ * Copyright 2016 Andrei Tumbar <atuser@Kronos>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,21 +23,10 @@
 
 
 #include <stdio.h>
-#include <core/tools/mstring.h>
-#include <core/tools/file.h>
-#include <core/download.h>
 
-typedef struct
+int main(int argc, char **argv)
 {
-  char   *arch;
-  char   *buff_link;
-  char   *link;
-  char   *name;
-  char   *date;
-} Stage3;
+  printf ("This does nothing right now");
+  return 0;
+}
 
-Stage3        stage3_new             (char*);
-
-Stage3        stage3_new_latest      (char*);
-
-Stage3        stage3_new_specify     (char*);

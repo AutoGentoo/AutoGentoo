@@ -42,8 +42,8 @@ stage3_new_latest (char* arch)
   Stage3 out = stage3_new (arch);
   download_to_file (out.buff_link, "stage3_buff.txt");
   char ** filelines = readlines ("stage3_buff.txt");
-  char *  mainline = mstring_find_before (file[2], ' ');
-  out.date = mstring_find_before (file[2], '/');
+  char *  mainline = mstring_find_before (filelines[2], ' ');
+  out.date = mstring_find_before (filelines[2], '/');
   out.name = mstring_get_sub_py (mainline, mstring_get_length (out.date) + 1, -1);
   
   return out;
