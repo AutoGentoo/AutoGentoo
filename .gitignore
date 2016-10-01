@@ -51,3 +51,6 @@ src/portage/.deps/
 src/portage/Makefile
 src/portage/Makefile.in
 stamp-h1
+config.h.in~
+src/core/.deps
+src/core/autogentoo
