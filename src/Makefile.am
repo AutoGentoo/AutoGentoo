@@ -1,1 +1,1 @@
-SUBDIRS = core http portage
+SUBDIRS = core http portage gui

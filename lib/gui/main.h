@@ -22,16 +22,20 @@
  */
 
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <gtk/gtk.h>
 
 struct __AutoGentooMain
 {
-	GtkWindow *     main;
-	GtkAdjustment * top_level;
-	
-}
+  GtkWindow *     main;
+  GtkAdjustment * top_level;
+  GtkBuilder **   builders;
+  int             i;
+};
 
 extern struct __AutoGentooMain* AutoGentooMain;
+extern int file_c;
 extern char* file_order[];
 
 void contruct (struct __AutoGentooMain*);

@@ -23,7 +23,7 @@ AC_ARG_ENABLE([gtk],
 AS_IF([test "$enable_gtk" != "no"],
   [PKG_CHECK_MODULES([gtk],
     [gtk+-3.0],
-    [enable_gtk=yes],
+    [enable_gtk=yes, PKG_CHECK_MODULES([GTK], [gtk+-3.0])],
     [AS_IF([test "$enable_gtk" = "yes"],
       [AC_MSG_ERROR([gtk+-3.0 required, but not found.])],
       [enable_gtk=no])])])
@@ -50,9 +50,11 @@ AC_CONFIG_FILES([
   src/core/tools/Makefile
   src/http/Makefile
   src/portage/Makefile
+  src/gui/Makefile
   lib/Makefile
   lib/http/Makefile
   lib/portage/Makefile
+  lib/gui/Makefile
   lib/core/Makefile
   lib/core/tools/Makefile
 ])

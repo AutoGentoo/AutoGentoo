@@ -1,2 +1,2 @@
 httpincludedir = $(pkgincludedir)/http
-httpinclude_HEADERS = server.h
+httpinclude_HEADERS = main.h
