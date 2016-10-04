@@ -54,3 +54,7 @@ stamp-h1
 config.h.in~
 src/core/.deps
 src/core/autogentoo
+src/gui/.deps/
+src/gui/tempgui
+src/http/.deps/
+src/http/http-server
