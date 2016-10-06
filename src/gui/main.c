@@ -63,4 +63,15 @@ int main (int argc, char** argv)
   return 0;
 }
 
-//void back (struct __AutoGentooMain*);
+void back (struct __AutoGentooMain*)
+{
+  gtk_container_remove (GTK_CONTAINER (main_class->main), GTK_WIDGET (main_class->top_level));
+  main_class->i--;
+  if (main_class->i < 0)
+  {
+    printf ("Can't back anymore exiting...\n");
+    exit (1);
+  }
+  main_class->top_level = GTK_ADJUSTMENT (gtk_builder_get_object (main_class->builders[main_class->i], "top_level"));
+  gtk_container_add (GTK_CONTAINER (main_class->main), GTK_WIDGET (main_class->top_level));
+}
