@@ -63,7 +63,7 @@ int main (int argc, char** argv)
   return 0;
 }
 
-void back (struct __AutoGentooMain*)
+void back (struct __AutoGentooMain* main_class)
 {
   gtk_container_remove (GTK_CONTAINER (main_class->main), GTK_WIDGET (main_class->top_level));
   main_class->i--;
