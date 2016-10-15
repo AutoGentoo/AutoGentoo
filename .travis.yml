@@ -1,7 +1,7 @@
 sudo: required
 language: c
 compiler: gcc
-script: ./autogen.sh && make
+script: ./autogen.sh && ./configure && make
 
 addons:
   apt:

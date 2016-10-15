@@ -24,6 +24,3 @@ if test -z $AUTORECONF; then
 else
         autoreconf --force --install --verbose || exit $?
 fi
-
-test -n "$NOCONFIGURE" || "$srcdir/configure" "$@"
-
