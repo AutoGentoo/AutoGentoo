@@ -7,6 +7,7 @@
 src/portage/agemerge
 *.so
 *.geany
+src/.deps/*
 INSTALL
 Makefile
 Makefile.in

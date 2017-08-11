@@ -43,6 +43,15 @@ PKG_CHECK_EXISTS(
     AC_MSG_ERROR([*** libparted too old.  Require libparted >= $LIBPARTED_REQUIRED_VERSION but only found libparted $LIBPARTED_FOUND_VERSION.])
   ])
 
+AM_PATH_PYTHON([3.4],, [:])
+AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != :])
+PY_PREFIX=`$PYTHON -c "import sys; print (sys.prefix)"`
+PY_INCLUDE=`$PYTHON -c "from distutils import sysconfig; print (sysconfig.get_python_inc())"`
+PYTHON_LIBS="-lpython$PYTHON_VERSION"
+PYTHON_CFLAGS="-I$PY_INCLUDE"
+AC_SUBST([PYTHON_LIBS])
+AC_SUBST([PYTHON_CFLAGS])
+
 AC_CONFIG_FILES([
   Makefile
   src/Makefile

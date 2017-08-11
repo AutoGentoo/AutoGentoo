@@ -53,7 +53,7 @@ hostnameToIp (PyObject * self, PyObject * args) {
     char * hostname;
     char ip [100];
     
-    if (!PyArg_ParseTuple (args, "s", &hostname) {
+    if (!PyArg_ParseTuple (args, "s", &hostname)) {
         return NULL;
     }
     hostname_to_ip(hostname , ip);
