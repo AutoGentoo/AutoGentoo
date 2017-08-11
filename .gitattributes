@@ -2,3 +2,5 @@
 *.h linguist-language=C
 *.cpp linguist-language=C++
 *.hh linguist-language=C++
+*.sh linguist-vendored
+*.ac linguist-vendored
