@@ -32,7 +32,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include <htoip.h>
+#include <ip_convert.h>
 
 int findhosts (char ** ips);
 int hostscan (char* hostname);

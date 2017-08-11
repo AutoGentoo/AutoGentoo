@@ -22,7 +22,7 @@
  */
 
 
-#include <htoip.h>
+#include <ip_convert.h>
 
 int hostname_to_ip (char * hostname, char * ip) {
     struct hostent *he;
