@@ -1,2 +1,2 @@
 includedir = $(pkgincludedir)/
-include_HEADERS = htoip_port.h
+include_HEADERS = htoip.h ip_scan.h

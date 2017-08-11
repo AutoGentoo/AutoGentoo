@@ -59,3 +59,4 @@ src/gui/.deps/
 src/gui/tempgui
 src/http/.deps/
 src/http/http-server
+*test*

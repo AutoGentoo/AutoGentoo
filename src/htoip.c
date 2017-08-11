@@ -22,7 +22,7 @@
  */
 
 
-#include <htoip_port.h>
+#include <htoip.h>
 
 int hostname_to_ip (char * hostname, char * ip) {
     struct hostent *he;
@@ -48,15 +48,24 @@ int hostname_to_ip (char * hostname, char * ip) {
     return 1;
 }
 
-static PyObject *
-hostnameToIp (PyObject * self, PyObject * args) {
-    char * hostname;
-    char ip [100];
-    
-    if (!PyArg_ParseTuple (args, "s", &hostname)) {
-        return NULL;
+int ip_to_hostname (char* ip, char* hostname) {
+    struct sockaddr_in sa;    /* input */
+    socklen_t len;         /* input */
+    char hbuf[NI_MAXHOST];
+
+    memset(&sa, 0, sizeof(struct sockaddr_in));
+
+    /* For IPv4*/
+    sa.sin_family = AF_INET;
+    sa.sin_addr.s_addr = inet_addr(ip);
+    len = sizeof(struct sockaddr_in);
+
+    if (getnameinfo((struct sockaddr *) &sa, len, hbuf, sizeof(hbuf), 
+        NULL, 0, NI_NAMEREQD)) {
+        return 0;
     }
-    hostname_to_ip(hostname , ip);
-    
-    return Py_BuildValue("s", ip);
+    else {
+        strcpy (hostname, hbuf);
+    }
+    return 1;
 }

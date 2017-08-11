@@ -47,7 +47,8 @@ AM_PATH_PYTHON([3.4],, [:])
 AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != :])
 PY_PREFIX=`$PYTHON -c "import sys; print (sys.prefix)"`
 PY_INCLUDE=`$PYTHON -c "from distutils import sysconfig; print (sysconfig.get_python_inc())"`
-PYTHON_LIBS="-lpython$PYTHON_VERSION"
+PY_LIB=`$PYTHON -c "from distutils import sysconfig; print (sysconfig.get_python_inc()[[sysconfig.get_python_inc().rfind('/')+1:]])"`
+PYTHON_LIBS="-l$PY_LIB"
 PYTHON_CFLAGS="-I$PY_INCLUDE"
 AC_SUBST([PYTHON_LIBS])
 AC_SUBST([PYTHON_CFLAGS])

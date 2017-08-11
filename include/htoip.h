@@ -34,6 +34,6 @@
 #include <arpa/inet.h>
 
 int hostname_to_ip (char * hostname, char * ip);
-static PyObject * hostnameToIp (PyObject * self, PyObject * args);
+int ip_to_hostname (char * ip, char * hostname);
 
 #endif
