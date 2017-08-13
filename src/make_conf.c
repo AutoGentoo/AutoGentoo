@@ -26,10 +26,10 @@
 
 struct make_conf init_make_conf (char * CHOST, char * CFLAGS, char * USE) {
     struct make_conf out;
-    strcpy (out.CHOST, CHOST);
-    strcpy (out.CFLAGS, CFLAGS);
+    out.CHOST = CHOST;
+    out.CFLAGS = CFLAGS;
     out.CXXFLAGS = "${CFLAGS}";
-    strcpy (out.USE, USE);
+    out.USE = USE;
     
     out.PORTAGE_TMPDIR = "autogentoo/tmp";
     out.PORTDIR = "/usr/portage";
