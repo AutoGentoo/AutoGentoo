@@ -103,7 +103,7 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
     fflush(stdout);
     
     char *new_dirs [] = {
-        conf.config.PORTDIR,
+        conf.config.PORTAGE_TMPDIR,
         conf.config.DISTDIR,
         conf.config.PKGDIR,
         conf.config.PORT_LOGDIR,
