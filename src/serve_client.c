@@ -159,8 +159,8 @@ void _mkdir(const char *dir) {
         for(p = tmp + 1; *p; p++)
                 if(*p == '/') {
                         *p = 0;
-                        mkdir(tmp, S_IRWXU);
+                        mkdir(tmp, 0777);
                         *p = '/';
                 }
-        mkdir(tmp, S_IRWXU);
+        mkdir(tmp, 0777);
 }
