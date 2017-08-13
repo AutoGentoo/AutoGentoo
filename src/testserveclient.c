@@ -31,6 +31,7 @@ int main(int argc, char **argv)
     struct serve_client test;
     
     test.hostname = "test";
+    test.profile = "default/linux/amd64/13.0";
     test.config = init_make_conf ("x86_64-pc-linux-gnu", "-march=native -02 -pipe", "bindist mmx sse sse2");
     
     manager = init_manager ("/home/atuser/autogentoo");
