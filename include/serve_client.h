@@ -32,8 +32,6 @@
 
 struct serve_client { // Chroot environment 
     char * hostname;
-    char * root;
-    char * config_root;
     struct make_conf config;
     struct serve_client * back;
     struct serve_client * next;
@@ -51,5 +49,6 @@ struct serve_client * get_client_from_ip (struct serve_client_manager * manager,
 void add_to_manager (struct serve_client_manager * manager, struct serve_client conf);
 void init_serve_client (struct serve_client_manager * manager, struct serve_client conf);
 struct serve_client_manager * init_manager (char * top_dir);
+void _mkdir(const char *dir);
 
 #endif

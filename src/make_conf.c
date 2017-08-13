@@ -31,11 +31,11 @@ struct make_conf init_make_conf (char * CHOST, char * CFLAGS, char * USE) {
     out.CXXFLAGS = "${CFLAGS}";
     strcpy (out.USE, USE);
     
-    out.PORTAGE_TMPDIR = "autogentoo/TMP";
+    out.PORTAGE_TMPDIR = "autogentoo/tmp";
     out.PORTDIR = "/usr/portage";
-    out.DISTDIR = "autogentoo/DIST";
-    out.PKGDIR = "autogentoo/PKG";
-    out.PORT_LOGDIR = "autogentoo/LOG";
+    out.DISTDIR = "autogentoo/dist";
+    out.PKGDIR = "autogentoo/pkg";
+    out.PORT_LOGDIR = "autogentoo/log";
     
     return out;
 }
