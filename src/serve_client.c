@@ -88,7 +88,7 @@ PORT_LOGDIR=\"${SYS_ROOT}/%s\"\n\
 \n\
 # Portage package configuration\n\
 USE=\"%s\"\n\
-EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root\'${SYS_ROOT}/autogentoo/\' --autounmask-continue\"\n\
+EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\'${SYS_ROOT}/autogentoo/\' --autounmask-continue\"\n\
 \n\0",  conf.config.CFLAGS, conf.config.CXXFLAGS, conf.config.CHOST,
     _ROOT_,
     conf.config.PORTAGE_TMPDIR,
@@ -126,6 +126,15 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root\'
     {
         fputs(make_conf_buff, fp_mc);
         fclose(fp_mc);
+    }
+    
+    // Create the profile symlink
+    char sym_buf_p1 [128];
+    char sym_buf_p2 [128];
+    sprintf (sym_buf_p1, "/usr/portage/profiles/%s/", conf.profile);
+    sprintf (sym_buf_p2, "%s/autogentoo/etc/portage/make.profile", _ROOT_);
+    if (symlink (sym_buf_p1, sym_buf_p2) != 0) {
+        printf ("Failed to symlink profile!\n");
     }
 }
 
