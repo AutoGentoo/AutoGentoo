@@ -60,3 +60,4 @@ src/gui/tempgui
 src/http/.deps/
 src/http/http-server
 *test*
+!*test*.c

@@ -29,9 +29,11 @@
 #include <make_conf.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 struct serve_client { // Chroot environment 
     char * hostname;
+    char * profile;
     struct make_conf config;
     struct serve_client * back;
     struct serve_client * next;
