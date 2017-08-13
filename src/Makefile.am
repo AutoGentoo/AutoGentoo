@@ -13,6 +13,6 @@ libip_la_SOURCES = ip_convert.c ip_scan.c
 libip_la_CFLAGS = ${AUTOGENTOO_CFLAGS} ${PYTHON_CFLAGS} -I$(top_srcdir)/include/
 libip_la_LDFLAGS = -version-info 0
 
-libagserver_la_SOURCES = serve_client.c
+libagserver_la_SOURCES = serve_client.c list.c make_conf.c
 libagserver_la_CFLAGS = ${AUTOGENTOO_CFLAGS} ${PYTHON_CFLAGS} -I$(top_srcdir)/include/
 libagserver_la_LDFLAGS = -version-info 0

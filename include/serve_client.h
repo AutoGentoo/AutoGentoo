@@ -26,13 +26,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <make_conf.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 struct serve_client { // Chroot environment 
     char * hostname;
-    char * rootdir;
-    char * ARCH;
-    char * CFLAGS;
-    char * CXXFLAGS;
+    char * root;
+    char * config_root;
+    struct make_conf config;
     struct serve_client * back;
     struct serve_client * next;
 };
