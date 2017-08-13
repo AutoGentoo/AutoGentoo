@@ -6,11 +6,7 @@ script: ./autogen.sh && ./configure && make
 addons:
   apt:
     packages:
-     - parted
-     - libparted-dev
      - libtool
      - autotools-dev
-     - libgtk-3-dev
      - autoconf
      - automake
-     - curl
