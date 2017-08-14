@@ -109,8 +109,10 @@ void server_respond (int n)
             reqline[1] = strtok(NULL, " \t");
             reqline[2] = strtok(NULL, " \t\n");
             request_t rt = atoi (reqline[1]);
-            printf ("GOT %d\n", rt);
-            write (clients[n], "HTTP/1.0 501\n", 13);
+            
+            response_t res = exec_method (rt, reqline[2]);
+            
+            rsend (clients[n], res);
         }
     }
 
