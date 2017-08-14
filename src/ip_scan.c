@@ -31,7 +31,8 @@ int findhosts (char ** ips) {
     hostname_to_ip(hostname , ip);
     char p_ip[4][4]; // Parsed ip into 8 bit ranges
     
-    for (char* p = ip; p = strchr(p, '.'); ++p)
+    char* p;
+    for (p = ip; p = strchr(p, '.'); ++p)
         *p = ' ';
     
     sscanf(ip,"%s %s %s %s",p_ip[0], p_ip[1], p_ip[2], p_ip[3]);
