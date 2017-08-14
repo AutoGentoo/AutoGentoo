@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <server.h>
+#include <response.h>
 
 char * ROOT;
 
@@ -83,7 +84,7 @@ void server_respond (int n)
             reqline[1] = strtok(NULL, " \t");
             reqline[2] = strtok(NULL, " \t\n");
             if (strncmp(reqline[2], "HTTP/1.0", 8) != 0 && strncmp(reqline[2], "HTTP/1.1", 8) != 0) {
-                write(clients[n], "HTTP/1.0 400 Bad Request\n", 25);
+                rsend (clients[n], BAD_REQUEST);
             }
             else {
                 if (strncmp(reqline[1], "/\0", 2) == 0)
@@ -95,12 +96,13 @@ void server_respond (int n)
 
                 if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
                 {
-                    send(clients[n], "HTTP/1.0 200 OK\n\n", 17, 0);
+                    rsend (clients[n], OK);
+                    send (clients[n], "\n", 1, 0);
                     while ((bytes_read = read(fd, data_to_send, BYTES)) > 0)
                         write(clients[n], data_to_send, bytes_read);
                 }
                 else
-                    write(clients[n], "HTTP/1.0 404 Not Found\n", 23); // FILE NOT FOUND
+                    rsend (clients[n], NOT_FOUND);
             }
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {

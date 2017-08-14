@@ -39,7 +39,7 @@
 #include <netinet/in.h>
 #include <request.h>
 #include <serve_client.h>
-
+#include <response.h>
 
 #define CONNMAX 1000
 #define BYTES 102400

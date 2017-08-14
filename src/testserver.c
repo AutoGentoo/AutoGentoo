@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     struct sockaddr_in clientaddr;
     socklen_t addrlen;
 
-    ROOT = "~/";
+    ROOT = "/home/atuser/";
     int i;
     
     for (i=0; i<CONNMAX; i++)
