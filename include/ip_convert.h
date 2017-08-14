@@ -26,7 +26,6 @@
 #define __AUTOGENTOO_IP_HOSTNAME_PORT__
 
 #include <stdio.h>
-#include <Python.h>
 #include <string.h> //memset
 #include <sys/socket.h>
 #include <errno.h>
