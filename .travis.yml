@@ -2,7 +2,7 @@ sudo: required
 language: c
 compiler: gcc
 script: ./autogen.sh && ./configure && make
-dist:trusty
+dist: trusty
 
 addons:
   apt:
