@@ -2,13 +2,11 @@ sudo: required
 language: c
 compiler: gcc
 script: ./autogen.sh && ./configure && make
+dist:trusty
 
 addons:
   apt:
     packages:
      - libtool
-     - autotools-dev
      - autoconf
      - automake
-     - parted
-     - libparted-dev
