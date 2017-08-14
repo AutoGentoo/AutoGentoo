@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include <server.h>
 
+char * ROOT;
+
 void server_start (char* port)
 {
     struct addrinfo hints, *res, *p;

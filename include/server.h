@@ -51,8 +51,8 @@ int  listenfd, clients[CONNMAX];
 struct serve_client_manager *main_manager;
 
 void error         (char *);
-void startServer   (char *);
-void respond       (int);
+void server_start  (char *);
+void server_respond(int);
 void handle_exit   (int a);
 void strrev        (char *p);
 void send_request  (char *request, char* res);

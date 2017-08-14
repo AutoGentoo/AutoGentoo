@@ -28,12 +28,15 @@
 int main(int argc, char **argv)
 {
     int slot;
-    char ROOT[128] = "~/";
+    struct sockaddr_in clientaddr;
+    socklen_t addrlen;
+
+    ROOT = "~/";
     int i;
     
     for (i=0; i<CONNMAX; i++)
         clients[i]=-1;
-    startServer(9490);
+    server_start("9490");
     
     // ACCEPT connections
     while (1)
@@ -47,7 +50,7 @@ int main(int argc, char **argv)
         {
             if ( fork()==0 )
             {
-                respond(slot);
+                server_respond(slot);
                 exit(0);
             }
         }
