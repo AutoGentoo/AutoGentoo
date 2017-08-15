@@ -198,7 +198,6 @@ void read_manager (int fd, struct serve_client_manager * manager) { // You must 
     for (i=0; i!=buff_used; i++) {
         add_to_manager (manager, read_client (fd));
     }
-    printf ("profile: %s\n", manager->clients[0].profile);
 }
 
 struct serve_client read_client (int fd) {
