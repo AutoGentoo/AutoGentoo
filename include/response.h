@@ -45,26 +45,26 @@ typedef enum {
     HTTP_SERVICE_UNAVAILABLE = 503
 } response_nt;
 
-struct response_t {
+typedef struct {
     response_nt code;
     char * message;
     size_t len;
-};
+} response_t;
 
-extern struct response_t OK;
-extern struct response_t CREATED;
-extern struct response_t NO_CONTENT;
-extern struct response_t BAD_REQUEST;
-extern struct response_t UNAUTHORIZED;
-extern struct response_t FORBIDDEN;
-extern struct response_t NOT_FOUND;
-extern struct response_t METHOD_NOT_ALLOWED;
-extern struct response_t REQUEST_TIMEOUT;
-extern struct response_t INTERNAL_ERROR;
-extern struct response_t NOT_IMPLEMENTED;
-extern struct response_t BAD_GATEWAY;
-extern struct response_t SERVICE_UNAVAILABLE;
+extern response_t OK;
+extern response_t CREATED;
+extern response_t NO_CONTENT;
+extern response_t BAD_REQUEST;
+extern response_t UNAUTHORIZED;
+extern response_t FORBIDDEN;
+extern response_t NOT_FOUND;
+extern response_t METHOD_NOT_ALLOWED;
+extern response_t REQUEST_TIMEOUT;
+extern response_t INTERNAL_ERROR;
+extern response_t NOT_IMPLEMENTED;
+extern response_t BAD_GATEWAY;
+extern response_t SERVICE_UNAVAILABLE;
 
-ssize_t rsend (int fd, struct response_t code);
+ssize_t rsend (int fd, response_t code);
 
 #endif

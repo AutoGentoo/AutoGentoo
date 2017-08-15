@@ -26,6 +26,9 @@
 #define __AUTOGENTOO_CLIENT_EMERGE__
 
 #include <stdio.h>
+#include <response.h>
+#include <s_emerge.h>
+#include <serve_client.h>
 
 typedef enum {
     install_s,  // Install only on the server (used for build tools)
@@ -42,6 +45,29 @@ struct client_request {
     request_t type;
 };
 
-void process_request (struct client_request t);
+struct method_s {
+    request_t type;
+    response_t (*method)(char*, int);
+};
+
+#define INSTALL_S (struct method_s) {install_s,m_install_s}
+#define REMOVE_S (struct method_s) {remove_s,m_remove_s}
+#define INSTALL_C (struct method_s) {install_c,m_install_c}
+#define REMOVE_C (struct method_s) {remove_c,m_remove_c}
+#define GET (struct method_s) {get,m_get}
+#define INSTALL (struct method_s) {install,m_install}
+#define _REMOVE (struct method_s) {_remove,m__remove}
+
+extern struct method_s methods [];
+
+response_t m_install_s (char*, int);
+response_t m_remove_s (char*, int);
+response_t m_install_c (char*, int);
+response_t m_remove_c (char*, int);
+response_t m_get (char*, int);
+response_t m_install (char*, int);
+response_t m__remove (char*, int);
+
+response_t exec_method (request_t, char*, int);
 
 #endif

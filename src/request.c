@@ -34,35 +34,39 @@ struct method_s methods [] = {
     _REMOVE
 };
 
-response_t m_install_s (char* command) {
+response_t m_install_s (char* command, int sockfd) {
+    char * ip = get_ip_from_fd (sockfd);
+    //struct serve_client * client = get_client_from_ip (ip)
+    //struct emerge_session es = init_emerge_session (sockfd, 
+    
     return OK;
 }
 
-response_t m_remove_s (char* command) {
+response_t m_remove_s (char* command, int sockfd) {
     return NOT_IMPLEMENTED;
 }
 
-response_t m_install_c (char* command) {
+response_t m_install_c (char* command, int sockfd) {
     return NOT_IMPLEMENTED;
 }
-response_t m_remove_c (char* command) {
+response_t m_remove_c (char* command, int sockfd) {
     return NOT_IMPLEMENTED;
 }
-response_t m_get (char* command) {
+response_t m_get (char* command, int sockfd) {
     return NOT_IMPLEMENTED;
 }
-response_t m_install (char* command) {
+response_t m_install (char* command, int sockfd) {
     return NOT_IMPLEMENTED;
 }
-response_t m__remove (char* command) {
+response_t m__remove (char* command, int sockfd) {
     return NOT_IMPLEMENTED;
 }
 
-response_t exec_method (request_t type, char* command) {
+response_t exec_method (request_t type, char* command, int sockfd) {
     int i;
     for (i=0; i != sizeof (methods) / sizeof (struct method_s); i++) {
         if (methods[i].type == type) {
-            return methods[i].method (command);
+            return methods[i].method (command, sockfd);
         }
     }
     // Method could not be found
