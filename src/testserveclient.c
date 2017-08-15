@@ -27,19 +27,29 @@
 
 int main(int argc, char **argv)
 {
-    struct serve_client_manager * manager;
+    struct serve_client_manager manager;
     struct serve_client test;
     
-    test.hostname = "test";
-    test.profile = "default/linux/amd64/13.0";
+    strcpy (test.hostname, "test");
+    strcpy(test.profile, "default/linux/amd64/13.0");
     test.config = init_make_conf ("x86_64-pc-linux-gnu", "-march=native -O2 -pipe", "bindist mmx sse sse2");
     
     manager = init_manager ("/home/atuser/autogentoo");
-    add_to_manager (manager, test);
+    add_to_manager (&manager, test);
+    //init_serve_client (manager, test);
     
-    init_serve_client (manager, test);
-    printf ("complete\n");
-    fflush(stdout);
+    FILE * w__fd = fopen ("WRITE.dat", "w+b");
+    int w_fd = fileno (w__fd);
+    write_manager (w_fd, manager);
+    fclose (w__fd);
+    
+    struct serve_client_manager new_manager;
+    
+    FILE * __fd = fopen ("WRITE.dat", "rb");
+    int _fd = fileno(__fd);
+    read_manager (_fd, &new_manager);
+    
+    fclose (__fd);
     return 0;
 }
 

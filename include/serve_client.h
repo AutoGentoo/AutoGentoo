@@ -30,27 +30,39 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 struct serve_client { // Chroot environment 
-    char * hostname;
-    char * profile;
+    char hostname[128];
+    char profile[256];
     struct make_conf config;
-    struct serve_client * back;
-    struct serve_client * next;
 };
 
 struct serve_client_manager {
-    char * top_dir;
-    struct serve_client ** clients;
+    char top_dir[256];
+    struct serve_client * clients;
     int size;
     int used;
 };
 
-struct serve_client * get_client_from_host (struct serve_client_manager * manager, char* hostname);
-struct serve_client * get_client_from_ip (struct serve_client_manager * manager, char* ip);
+struct sserve_client_manager {
+    char top_dir [256];
+    int size;
+    int used;
+};
+
+int get_client_from_host (struct serve_client_manager manager, char* hostname);
+int get_client_from_ip (struct serve_client_manager manager, char* ip);
 void add_to_manager (struct serve_client_manager * manager, struct serve_client conf);
-void init_serve_client (struct serve_client_manager * manager, struct serve_client conf);
-struct serve_client_manager * init_manager (char * top_dir);
+void init_serve_client (struct serve_client_manager manager, struct serve_client conf);
+struct serve_client_manager init_manager (char * top_dir);
 void _mkdir(const char *dir);
+struct sserve_client gen_simple (struct serve_client);
+struct sserve_client_manager gen_simple_manager (struct serve_client_manager manager);
+void write_manager (int fd, struct serve_client_manager manager);
+void read_manager (int fd, struct serve_client_manager * manager);
+struct serve_client read_client (int fd);
 
 #endif

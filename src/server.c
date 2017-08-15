@@ -110,7 +110,7 @@ void server_respond (int n)
             reqline[2] = strtok(NULL, " \t\n");
             request_t rt = atoi (reqline[1]);
             
-            response_t res = exec_method (rt, reqline[2]);
+            response_t res = exec_method (rt, reqline[2], clients[n]);
             
             rsend (clients[n], res);
         }
