@@ -50,10 +50,10 @@
 struct emerge_session {
     int socketfd;
     int systemfd;
-    struct serve_client * client;
+    struct serve_client client;
 };
 
-struct emerge_session init_emerge_session (int, struct serve_client*);
+struct emerge_session init_emerge_session (int, struct serve_client);
 
 char * get_ip_from_fd (int);
 int semerge_install (struct emerge_session, char *);
