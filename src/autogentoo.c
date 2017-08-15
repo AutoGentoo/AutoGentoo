@@ -63,9 +63,6 @@ int main (int argc, char ** argv) {
         }
     }
     
-    char b_hs [32];
-    gethostname (b_hs, sizeof (b_hs));
-    
     struct serve_client_manager manager_t;
     
     if (access (b_fconfig, F_OK) != -1) {
@@ -81,12 +78,12 @@ int main (int argc, char ** argv) {
         manager_t = init_manager (b_root);
     }
     
-    hostname_to_ip (b_hs, config_m.cfg_server.ip);
-    strcpy(config_m.cfg_server.port, "9490");
-    strcpy(config_m.cfg_server.root, manager_t.top_dir);
+    strcpy(config_m.port, "9490");
     
     config_m.manager = manager_t;
     config_m.config_path = b_fconfig;
+    
+    server_main (use_daemon);
     
     return 0;
 }

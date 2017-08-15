@@ -32,15 +32,9 @@
 #include <server.h>
 #include <ip_convert.h>
 
-struct server_config {
-    char ip[32]; // Will always be this hosts ip
-    char port[4]; // 9490
-    char root[256]; // Same root as in serve_client_manager
-};
-
 struct AutoGentoo {
     struct serve_client_manager manager;
-    struct server_config cfg_server;
+    char port[4];
     char * config_path;
 };
 

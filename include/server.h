@@ -40,15 +40,16 @@
 #include <request.h>
 #include <serve_client.h>
 #include <response.h>
+#include <autogentoo.h>
 
 #define CONNMAX 1000
 #define BYTES 102400
 #define BUFSIZE 1024
 
-extern char *ROOT;
-extern char* S_PORT;
 int  listenfd, clients[CONNMAX];
-struct serve_client_manager *main_manager;
+
+void daemonize (char*);
+void server_main (char);
 
 void error         (char *);
 void server_start  (char *);
