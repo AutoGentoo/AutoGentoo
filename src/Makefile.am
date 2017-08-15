@@ -1,6 +1,10 @@
 AM_CFLAGS = ${AUTOGENTOO_CFLAGS} ${PYTHON_CFLAGS} -I$(top_srcdir)/include/ $(PYTHON_LIBS)
 ACLOCAL_AMFLAGS='-I m4'
 
+bin_PROGRAMS = autogentoo
+autogentoo_SOURCES = autogentoo.c
+autogentoo_LDADD = libip.la libagserver.la
+
 #check_PROGRAMS = testlibip testipscan
 #testlibip_SOURCES = testhtoip.c
 #testlibip_LDADD = libip.la
