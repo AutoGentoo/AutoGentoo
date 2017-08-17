@@ -1,5 +1,5 @@
 /*
- * make_conf.c
+ * _string.c
  * 
  * Copyright 2017 Unknown <atuser@Hyperion>
  * 
@@ -22,27 +22,25 @@
  */
 
 
-#ifndef __AUTOGENTOO_MAKE_CONF__
-#define __AUTOGENTOO_MAKE_CONF__
-
 #include <stdio.h>
-#include <string.h>
+#include <_string.h>
 
-struct make_conf {
-    // Architecture configuration
-    char * CFLAGS;
-    char * CXXFLAGS;
-    char * CHOST;
-    char * USE;
+void string_copy (char* dest, char* src) {
+    char* ptr = src;
     
-    // Portage binhost setup
-    char * PORTAGE_TMPDIR; // build dir, relative to sc_root
-    char * PORTDIR; // ebuild portage tree, relative to /
-    char * DISTDIR; // distfiles, relative to sc_root
-    char * PKGDIR; // built bins, relative to sc_root
-    char * PORT_LOGDIR; // logs, relative to sc_root
-};
+    int orig_str_size = 0;
+    
+    // Count the number of characters in the original string
+    while (*ptr++ != '\0')
+        orig_str_size++;        
 
-struct make_conf init_make_conf (char * CHOST, char * CFLAGS, char * USE);
+    printf("Size of the original string: %d\n", orig_str_size);
 
-#endif
+    // Place the '\0' character at the end of the backup string.
+    dest[orig_str_size] = '\0'; 
+    ptr = &src[0]; 
+    int idx = 0;
+    while (*ptr != '\0')
+        dest[idx++] = *ptr++;
+}
+

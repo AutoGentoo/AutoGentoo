@@ -1,5 +1,5 @@
 /*
- * make_conf.c
+ * _string.h
  * 
  * Copyright 2017 Unknown <atuser@Hyperion>
  * 
@@ -21,21 +21,10 @@
  * 
  */
 
+#ifndef __AUTOGENTOO__STRING_H__
+#define __AUTOGENTOO__STRING_H__
 
-#include <make_conf.h>
+#include <stdio.h>
 
-struct make_conf init_make_conf (char * CHOST, char * CFLAGS, char * USE) {
-    struct make_conf out;
-    out.CHOST = CHOST;
-    out.CFLAGS = CFLAGS;
-    out.CXXFLAGS = "${CFLAGS}";
-    out.USE = USE;
-    
-    out.PORTAGE_TMPDIR = "autogentoo/tmp";
-    out.PORTDIR = "/usr/portage";
-    out.DISTDIR = "autogentoo/dist";
-    out.PKGDIR = "autogentoo/pkg";
-    out.PORT_LOGDIR = "autogentoo/log";
-    
-    return out;
-}
+void string_copy (char* dest, char* src);
+#endif
