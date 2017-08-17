@@ -59,13 +59,14 @@ struct manager {
     struct serve_client clients[32];
     int client_c;
     char root[256];
+    char _config[256];
 };
 
 int get_client_from_ip (struct manager * m_man, char* ip);
 void init_serve_client (struct manager m_man, struct serve_client conf);
 void _mkdir(const char *dir);
-void write_serve (int fd);
-void read_serve (int fd);
+void write_serve (int fd, struct manager * m_man);
+void read_serve (int fd, struct manager * m_man);
 int get_client_from_hostname  (struct manager * m_man, char * hostname);
 
 typedef enum {

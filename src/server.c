@@ -194,12 +194,15 @@ void daemonize(char * _cwd)
     /* Fork off the parent process */
     pid = fork();
     if (pid < 0)  
-    {   
+    {
         exit(1);
     }   
 
     if (pid > 0)  
-    {   
+    {
+        printf ("Forked to pid: %d\n", (int)pid);
+        printf ("Moving to background\n");
+        fflush(stdout);
         exit(0); /*Killing the Parent Process*/
     }   
 
@@ -249,6 +252,10 @@ void server_main (char daemon, struct manager * m_man) {
     server_start(config_m.port);
     
     printf ("Starting server\n");
+    
+    if (daemon != 0) {
+        daemonize (m_man->root);
+    }
     
     while (1)
     {

@@ -45,7 +45,7 @@ int main (int argc, char ** argv) {
     char  use_daemon = 0;
     int c;
     
-    while ((c = getopt (argc, argv, "r:c:d")) != -1) {
+    while ((c = getopt (argc, argv, "r:c:dh")) != -1) {
         switch (c) {
             case 'r':
                 strcpy(b_root, optarg);
@@ -55,6 +55,18 @@ int main (int argc, char ** argv) {
                 break;
             case 'd':
                 use_daemon = 1;
+                break;
+            case 'h':
+                printf ("AutoGentoo help page\n\
+This is the server binary\
+\n\
+Options:\n\
+  -r dir\tRoot directory, all clients are installed under this directory\n\
+  -c file\tConfig writen to from by this program (loaded at boot)\n\
+  -d\t\tFork program into daemon on boot\n\
+  -h\t\tPrint this message and quit\n\
+");
+                return 0;
                 break;
             case '?':
                 if (optopt == 'r' || optopt == 'c')
