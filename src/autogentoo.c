@@ -73,12 +73,12 @@ int main (int argc, char ** argv) {
     
     struct manager * m_man = malloc (sizeof (struct manager));
     strcpy(m_man->root, b_root);
+    strcpy(m_man->_config, b_fconfig);
     
     if (access (b_fconfig, F_OK) != -1) {
-        FILE * __fd = fopen (b_fconfig, "rb");
-        int _fd = fileno(__fd);
-        read_serve (_fd);
-        fclose (__fd);
+        int _fd = open (b_fconfig, O_RDONLY);
+        read_serve (_fd, m_man);
+        close (_fd);
     }
     
     strcpy(config_m.port, "9490");

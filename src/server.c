@@ -148,6 +148,9 @@ void server_respond (int n, struct manager * m_man)
                 strcpy(m_man->clients[m_man->client_c].PKGDIR, "autogentoo/pkg");
                 strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "autogentoo/log");
                 m_man->client_c++;
+                FILE * _fd = fopen (m_man->_config, "w+");
+                write_serve (fileno(_fd), m_man);
+                fclose (_fd);
             }
             else if (rt == ADDIP) {
                 strcpy(m_man->clients[m_man->client_c].ip[m_man->clients[m_man->client_c].ip_c], ip);

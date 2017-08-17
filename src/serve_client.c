@@ -141,22 +141,12 @@ void _mkdir(const char *dir) {
         mkdir(tmp, 0777);
 }
 
-void write_serve (int fd) {
-    //write (fd, &, sizeof (int));
-    /*
-    int i;
-    for (i=0; i != total_clients; i++) {
-        write (fd, [i], sizeof (struct serve_client));
-    }*/
+void write_serve (int fd, struct manager * m_man) {
+    write (fd, m_man, sizeof (struct manager));
 }
 
-void read_serve (int fd) { // You must malloc this pointer first
-    //read (fd, &total_clients, sizeof(int));
-    
-    int i;
-    //for (i=0; i!=total_clients; i++) {
-    //    read (fd, s_clients[i], sizeof(struct serve_client));
-    //}
+void read_serve (int fd, struct manager * m_man) { // You must malloc this pointer first
+    read (fd, m_man, sizeof(struct manager));
 }
 
 struct link_srv link_methods [] = {
