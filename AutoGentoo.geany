@@ -29,21 +29,18 @@ long_line_column=72
 
 [files]
 current_page=1
-FILE_NAME_0=1437;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Ftestserveclient.c;0;4
-FILE_NAME_1=5383;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserve_client.c;0;4
-FILE_NAME_2=1592;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserve_client.h;0;4
-FILE_NAME_3=1254;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fautogentoo.c;0;4
-FILE_NAME_4=1115;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Frequest.c;0;4
-FILE_NAME_5=1324;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fs_emerge.h;0;4
-FILE_NAME_6=968;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Frequest.h;0;4
-FILE_NAME_7=3569;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.c;0;4
-FILE_NAME_8=1216;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserver.h;0;4
-FILE_NAME_9=778;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2FMakefile.am;0;4
-FILE_NAME_10=147;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2FMakefile.am;0;4
-FILE_NAME_11=1775;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fresponse.h;0;4
-FILE_NAME_12=1107;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fresponse.c;0;4
-FILE_NAME_13=1044;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fs_emerge.c;0;4
-FILE_NAME_14=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Ftestserver.c;0;4
+FILE_NAME_0=2612;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fautogentoo.c;0;4
+FILE_NAME_1=5417;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.c;0;4
+FILE_NAME_2=3;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.test;0;4
+FILE_NAME_3=4532;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserve_client.c;0;4
+FILE_NAME_4=1666;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserve_client.h;0;4
+FILE_NAME_5=2008;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Frequest.c;0;4
+FILE_NAME_6=1053;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fs_emerge.h;0;4
+FILE_NAME_7=2241;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Frequest.h;0;4
+FILE_NAME_8=1476;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserver.h;0;4
+FILE_NAME_9=891;C;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2F_string.h;0;4
+FILE_NAME_10=1236;C;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2F_string.c;0;4
+FILE_NAME_11=158;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2FMakefile.am;0;4
 
 [VTE]
 last_dir=/home/atuser/Documents

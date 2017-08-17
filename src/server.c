@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <server.h>
+#include <_string.h>
 #include <response.h>
 
 void server_start (char* port)
@@ -43,6 +44,8 @@ void server_start (char* port)
         listenfd = socket(p->ai_family, p->ai_socktype, 0);
         if (listenfd == -1)
             continue;
+        if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0)
+            error("setsockopt(SO_REUSEADDR) failed");
         if (bind(listenfd, p->ai_addr, p->ai_addrlen) == 0)
             break;
     }
@@ -61,10 +64,12 @@ void server_start (char* port)
 }
 
 // client connection
-void server_respond (int n)
+void server_respond (int n, struct manager * m_man)
 {
     char mesg[99999], *reqline[3], data_to_send[BYTES], path[99999];
     int rcvd, fd, bytes_read;
+    char *ip;
+    response_t res;
 
     memset((void*)mesg, (int)'\0', 99999);
 
@@ -76,8 +81,8 @@ void server_respond (int n)
         fprintf(stderr, "Client disconnected upexpectedly.\n");
     else // message received
     {
-        printf("%s", mesg);
         reqline[0] = strtok(mesg, " \t\n");
+        ip = get_ip_from_fd (clients[n]);
         if (strncmp(reqline[0], "GET\0", 4) == 0) {
             reqline[1] = strtok(NULL, " \t");
             reqline[2] = strtok(NULL, " \t\n");
@@ -88,19 +93,20 @@ void server_respond (int n)
                 if (strncmp(reqline[1], "/\0", 2) == 0)
                     reqline[1] = "";
 
-                strcpy(path, config_m.manager.top_dir);
-                strcpy(&path[strlen(config_m.manager.top_dir)], reqline[1]);
-                printf("file: %s\n", path);
+                strcpy(path, m_man->root);
+                strcpy(&path[strlen(m_man->root)], reqline[1]);
 
                 if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
                 {
                     rsend (clients[n], OK);
+                    res = OK;
                     send (clients[n], "\n", 1, 0);
                     while ((bytes_read = read(fd, data_to_send, BYTES)) > 0)
                         write(clients[n], data_to_send, bytes_read);
                 }
                 else
                     rsend (clients[n], NOT_FOUND);
+                    res = NOT_FOUND;
             }
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
@@ -108,12 +114,60 @@ void server_respond (int n)
             reqline[2] = strtok(NULL, " \t\n");
             request_t rt = atoi (reqline[1]);
             
-            response_t res = exec_method (rt, reqline[2], clients[n]);
+            response_t res = exec_method (rt, m_man, reqline[2], clients[n]);
             
             rsend (clients[n], res);
         }
+        else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
+            reqline[1] = strtok(NULL, " \t");
+            reqline[2] = strtok(NULL, " \t\n");
+            serve_c rt = atoi (reqline[1]);
+            struct link_srv linked = get_link_srv (rt);
+            char request_opts [linked.argc][32];
+            
+            int i;
+            for (i=0; i != linked.argc; i++) {
+                strcpy(request_opts[i], strtok (NULL, "\n"));
+            }
+            int sc_no;
+            int sent = 0;
+            if (rt == CREATE) {
+                m_man->clients[m_man->client_c].ip_c = 0;
+                strcpy(m_man->clients[m_man->client_c].hostname, request_opts[0]);
+                strcpy(m_man->clients[m_man->client_c].ip[m_man->clients[m_man->client_c].ip_c], ip);
+                m_man->clients[m_man->client_c].ip_c++;
+                strcpy(m_man->clients[m_man->client_c].profile, request_opts[1]);
+                strcpy(m_man->clients[m_man->client_c].CHOST, request_opts[2]);
+                strcpy(m_man->clients[m_man->client_c].CFLAGS, request_opts[3]);
+                strcpy(m_man->clients[m_man->client_c].CXXFLAGS, "${CFLAGS}");
+                strcpy(m_man->clients[m_man->client_c].USE, request_opts[4]);
+                
+                strcpy(m_man->clients[m_man->client_c].PORTAGE_TMPDIR, "autogentoo/tmp");
+                strcpy(m_man->clients[m_man->client_c].PORTDIR, "/usr/portage");
+                strcpy(m_man->clients[m_man->client_c].DISTDIR, "autogentoo/dist");
+                strcpy(m_man->clients[m_man->client_c].PKGDIR, "autogentoo/pkg");
+                strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "autogentoo/log");
+                m_man->client_c++;
+            }
+            else if (rt == INIT) {
+                sc_no = get_client_from_ip (m_man, ip);
+                if (sc_no == -1) {
+                    rsend (clients[n], FORBIDDEN);
+                    res = FORBIDDEN;
+                    sent = 1;
+                }
+                else {
+                    init_serve_client (*m_man, m_man->clients[sc_no]);
+                }
+            }
+            if (!sent)
+                rsend (clients[n], OK);
+                res = OK;
+        }
+        printf ("[%s](%s, %s): %d %s\n", ip, reqline[0], reqline[1], res.code, res.message);
     }
-
+    
+    
     // Closing SOCKET
     shutdown(
         clients[n],
@@ -177,7 +231,7 @@ void daemonize(char * _cwd)
 }
 
 
-void server_main (char daemon) {
+void server_main (char daemon, struct manager * m_man) {
     int slot;
     struct sockaddr_in clientaddr;
     socklen_t addrlen;
@@ -187,29 +241,19 @@ void server_main (char daemon) {
         clients[i]=-1;
     server_start(config_m.port);
     
-    if (daemon != 0) {
-        // Create the daemon
-        printf ("Creating daemon\n");
-        daemonize (config_m.manager.top_dir);
-    }
-    
     printf ("Starting server\n");
     
     while (1)
     {
         addrlen = sizeof(clientaddr);
         clients[slot] = accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen);
-    
-        if (clients[slot]<0)
-            error ("accept() error");
-        else
-        {
-            if ( fork()==0 )
-            {
-                server_respond(slot);
-                exit(0);
-            }
+        
+        if ((int)clients[slot] < 0) {
+            error ("accept() error\n");
+            continue;
         }
+        
+        server_respond(slot, m_man);
     
         while (clients[slot]!=-1) slot = (slot+1)%CONNMAX;
     }

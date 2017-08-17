@@ -44,3 +44,12 @@ void string_copy (char* dest, char* src) {
         dest[idx++] = *ptr++;
 }
 
+int check_in (char * arr[], char * el, size_t size) {
+    int i;
+    for (i=0; i != (int)size; i++) {
+        if (strcmp (arr[i], el) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}

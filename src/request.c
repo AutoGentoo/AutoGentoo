@@ -34,39 +34,48 @@ struct method_s methods [] = {
     _REMOVE
 };
 
-response_t m_install_s (char* command, int sockfd) {
-    char * ip = get_ip_from_fd (sockfd);
-    //struct serve_client * client = get_client_from_ip (ip)
-    //struct emerge_session es = init_emerge_session (sockfd, 
-    
+response_t m_install_s (char* command, int client_no) {
+    char cmd[128];
+    char opts[128];
+    //get_emerge_command (s_clients[client_no], opts);
+    sprintf (cmd, "%s %s", opts, command);
+    printf ("%s\n", cmd);
+    fflush (stdout);
+    if (system (cmd) != 0)
+        return INTERNAL_ERROR;
     return OK;
 }
 
-response_t m_remove_s (char* command, int sockfd) {
+response_t m_remove_s (char* command, int client_no) {
     return NOT_IMPLEMENTED;
 }
 
-response_t m_install_c (char* command, int sockfd) {
+response_t m_install_c (char* command, int client_no) {
     return NOT_IMPLEMENTED;
 }
-response_t m_remove_c (char* command, int sockfd) {
+response_t m_remove_c (char* command, int client_no) {
     return NOT_IMPLEMENTED;
 }
-response_t m_get (char* command, int sockfd) {
+response_t m_get (char* command, int client_no) {
     return NOT_IMPLEMENTED;
 }
-response_t m_install (char* command, int sockfd) {
+response_t m_install (char* command, int client_no) {
     return NOT_IMPLEMENTED;
 }
-response_t m__remove (char* command, int sockfd) {
+response_t m__remove (char* command, int client_no) {
     return NOT_IMPLEMENTED;
 }
 
-response_t exec_method (request_t type, char* command, int sockfd) {
+response_t exec_method (request_t type, struct manager * man, char* command, int sockfd) {
     int i;
     for (i=0; i != sizeof (methods) / sizeof (struct method_s); i++) {
         if (methods[i].type == type) {
-            return methods[i].method (command, sockfd);
+            char * ip = get_ip_from_fd (sockfd);
+            int client_no = get_client_from_ip (man, ip);
+            if (client_no < 0) {
+                return UNAUTHORIZED;
+            }
+            return methods[i].method (command, client_no);
         }
     }
     // Method could not be found

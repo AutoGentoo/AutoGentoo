@@ -26,43 +26,62 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <make_conf.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <response.h>
+#include <_string.h>
 
 struct serve_client { // Chroot environment 
-    char hostname[128];
-    char profile[256];
-    struct make_conf config;
+    char hostname[64];
+    char profile[32];
+    char ip[16][16]; // Multiple ip's can point to one client
+    int ip_c;
+    
+    // Architecture configuration
+    char CFLAGS[64];
+    char CXXFLAGS[64];
+    char CHOST[32];
+    char USE[128];
+    
+    // Portage binhost setup
+    char PORTAGE_TMPDIR[256]; // build dir, relative to sc_root
+    char PORTDIR[256]; // ebuild portage tree, relative to /
+    char DISTDIR[256]; // distfiles, relative to sc_root
+    char PKGDIR[256]; // built bins, relative to sc_root
+    char PORT_LOGDIR[256]; // logs, relative to sc_root
 };
 
-struct serve_client_manager {
-    char top_dir[256];
-    struct serve_client * clients;
-    int size;
-    int used;
+struct manager {
+    struct serve_client clients[32];
+    int client_c;
+    char root[256];
 };
 
-struct sserve_client_manager {
-    char top_dir [256];
-    int size;
-    int used;
-};
-
-int get_client_from_host (struct serve_client_manager manager, char* hostname);
-int get_client_from_ip (struct serve_client_manager manager, char* ip);
-void add_to_manager (struct serve_client_manager * manager, struct serve_client conf);
-void init_serve_client (struct serve_client_manager manager, struct serve_client conf);
-struct serve_client_manager init_manager (char * top_dir);
+int get_client_from_ip (struct manager * m_man, char* ip);
+void init_serve_client (struct manager m_man, struct serve_client conf);
 void _mkdir(const char *dir);
-struct sserve_client gen_simple (struct serve_client);
-struct sserve_client_manager gen_simple_manager (struct serve_client_manager manager);
-void write_manager (int fd, struct serve_client_manager manager);
-void read_manager (int fd, struct serve_client_manager * manager);
-struct serve_client read_client (int fd);
+void write_serve (int fd);
+void read_serve (int fd);
+
+typedef enum {
+    CREATE, // Create new serve_client
+    INIT // Initialize the new serve_client
+} serve_c;
+
+struct link_srv {
+    serve_c command;
+    int argc;
+};
+
+extern struct link_srv link_methods [];
+
+#define L_CREATE (struct link_srv) {CREATE, 5}
+#define L_INIT (struct link_srv) {INIT, 0}
+
+struct link_srv get_link_srv (serve_c);
 
 #endif

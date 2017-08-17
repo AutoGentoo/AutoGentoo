@@ -33,12 +33,12 @@
 #include <ip_convert.h>
 
 struct AutoGentoo {
-    struct serve_client_manager manager;
     char port[4];
     char * config_path;
 };
 
 extern struct AutoGentoo config_m;
 void _getcwd (char* out, size_t size);
+void print_bin (void * ptr, size_t size);
 
 #endif

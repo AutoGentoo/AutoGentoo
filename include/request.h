@@ -29,6 +29,7 @@
 #include <response.h>
 #include <s_emerge.h>
 #include <serve_client.h>
+#include <autogentoo.h>
 
 typedef enum {
     install_s,  // Install only on the server (used for build tools)
@@ -68,6 +69,6 @@ response_t m_get (char*, int);
 response_t m_install (char*, int);
 response_t m__remove (char*, int);
 
-response_t exec_method (request_t, char*, int);
+response_t exec_method (request_t type, struct manager * man, char* command, int sockfd);
 
 #endif

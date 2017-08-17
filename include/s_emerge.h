@@ -25,39 +25,11 @@
 #define __AUTOGENTOO_EMERGE__
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <request.h>
 #include <serve_client.h>
-#include <sys/types.h>
+#include <autogentoo.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <signal.h>
-#include <stdio.h>
-#include <string.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <sys/time.h>
-#include <stdlib.h>
-#include <memory.h>
-#include <ifaddrs.h>
-#include <net/if.h>
-#include <stdarg.h>
-
-struct emerge_session {
-    int socketfd;
-    int systemfd;
-    struct serve_client client;
-};
-
-struct emerge_session init_emerge_session (int, struct serve_client);
 
 char * get_ip_from_fd (int);
-int semerge_install (struct emerge_session, char *);
-int semerge_uninstall (struct emerge_session, char *);
-int semerge_reinstall (struct emerge_session, char *);
+//void get_emerge_command (struct serve_client, char*);
 
 #endif

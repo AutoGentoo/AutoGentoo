@@ -32,12 +32,8 @@ char * get_ip_from_fd (int fd) {
     ip = inet_ntoa(addr.sin_addr);
     return ip;
 }
-
-/*int semerge_install (struct serve_client * client, char * atom) {
-    char system_call [128];
-    sprintf (system_call, "emerge -q --buildpkg --usepkg --root='%s' --config-root='%s' --automask-continue %s", client->config.ROOT);
-}
-
-int semerge_uninstall (struct serve_client *, char *);
-int semerge_reinstall (struct serve_client *, char *);
+/*
+void get_emerge_command (struct serve_client client, char* out) {
+    sprintf (out, "emerge -q --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s' --automask-continue", TOP_DIR, client.hostname, TOP_DIR, client.hostname);
+};
 */

@@ -30,6 +30,14 @@ void _getcwd (char* out, size_t size) {
        perror("getcwd() error");
 }
 
+void print_bin (void * ptr, size_t size) {
+    int i;
+    for (i=0; i!=(int)size; i++) {
+        unsigned char c = ((char*)ptr)[i] ;
+        printf ("%02x ", c);
+    }
+}
+
 int main (int argc, char ** argv) {
     char b_root[128];
     _getcwd (b_root, sizeof (b_root));
@@ -63,27 +71,21 @@ int main (int argc, char ** argv) {
         }
     }
     
-    struct serve_client_manager manager_t;
+    struct manager * m_man = malloc (sizeof (struct manager));
+    strcpy(m_man->root, b_root);
     
     if (access (b_fconfig, F_OK) != -1) {
         FILE * __fd = fopen (b_fconfig, "rb");
         int _fd = fileno(__fd);
-        read_manager (_fd, &manager_t);
+        read_serve (_fd);
         fclose (__fd);
-    }
-    else {
-        fprintf (stderr, "Config %s not found, creating new\n", b_fconfig);
-        printf ("Creating manager in %s\n", b_root);
-        fflush(stdout);
-        manager_t = init_manager (b_root);
     }
     
     strcpy(config_m.port, "9490");
     
-    config_m.manager = manager_t;
     config_m.config_path = b_fconfig;
     
-    server_main (use_daemon);
+    server_main (use_daemon, m_man);
     
     return 0;
 }

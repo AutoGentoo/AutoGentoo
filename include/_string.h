@@ -25,6 +25,9 @@
 #define __AUTOGENTOO__STRING_H__
 
 #include <stdio.h>
+#include <string.h>
 
 void string_copy (char* dest, char* src);
+int check_in (char * arr[], char * el, size_t size);
+
 #endif

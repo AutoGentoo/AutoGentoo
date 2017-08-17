@@ -49,11 +49,11 @@
 int  listenfd, clients[CONNMAX];
 
 void daemonize (char*);
-void server_main (char);
+void server_main (char, struct manager * m_man);
 
 void error         (char *);
 void server_start  (char *);
-void server_respond(int);
+void server_respond(int, struct manager * m_man);
 void handle_exit   (int a);
 void strrev        (char *p);
 void send_request  (char *request, char* res);
