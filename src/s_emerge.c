@@ -32,8 +32,7 @@ char * get_ip_from_fd (int fd) {
     ip = inet_ntoa(addr.sin_addr);
     return ip;
 }
-/*
-void get_emerge_command (struct serve_client client, char* out) {
-    sprintf (out, "emerge -q --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s' --automask-continue", TOP_DIR, client.hostname, TOP_DIR, client.hostname);
-};
-*/
+
+void get_emerge_command (struct manager * m_man, struct serve_client client, char* out) {
+    sprintf (out, "emerge -q --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s/autogentoo' --automask-continue", m_man->root, client.hostname, m_man->root, client.hostname);
+}

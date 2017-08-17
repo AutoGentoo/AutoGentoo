@@ -39,6 +39,16 @@ int get_client_from_ip (struct manager * m_man, char* ip) {
     return -1;
 }
 
+int get_client_from_hostname  (struct manager * m_man, char * hostname) {
+    int i;
+    for (i=0; i != m_man->client_c; i++) {
+        if (strcmp (m_man->clients[i].hostname, hostname) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 /* Because a system is just a set of packages
  * All we need here is to setup a make.conf to emerge these packages
  */
@@ -151,7 +161,8 @@ void read_serve (int fd) { // You must malloc this pointer first
 
 struct link_srv link_methods [] = {
     L_CREATE,
-    L_INIT
+    L_INIT,
+    L_ADDIP
 };
 
 struct link_srv get_link_srv (serve_c c) {

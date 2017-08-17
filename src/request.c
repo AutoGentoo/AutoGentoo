@@ -34,10 +34,10 @@ struct method_s methods [] = {
     _REMOVE
 };
 
-response_t m_install_s (char* command, int client_no) {
-    char cmd[128];
-    char opts[128];
-    //get_emerge_command (s_clients[client_no], opts);
+response_t m_install_s (char* command, struct manager * m_man, struct serve_client client) {
+    char cmd[288];
+    char opts[256];
+    get_emerge_command (m_man, client, opts);
     sprintf (cmd, "%s %s", opts, command);
     printf ("%s\n", cmd);
     fflush (stdout);
@@ -46,23 +46,23 @@ response_t m_install_s (char* command, int client_no) {
     return OK;
 }
 
-response_t m_remove_s (char* command, int client_no) {
+response_t m_remove_s (char* command, struct manager * m_man, struct serve_client client) {
     return NOT_IMPLEMENTED;
 }
 
-response_t m_install_c (char* command, int client_no) {
+response_t m_install_c (char* command, struct manager * m_man, struct serve_client client) {
     return NOT_IMPLEMENTED;
 }
-response_t m_remove_c (char* command, int client_no) {
+response_t m_remove_c (char* command, struct manager * m_man, struct serve_client client) {
     return NOT_IMPLEMENTED;
 }
-response_t m_get (char* command, int client_no) {
+response_t m_get (char* command, struct manager * m_man, struct serve_client client) {
     return NOT_IMPLEMENTED;
 }
-response_t m_install (char* command, int client_no) {
+response_t m_install (char* command, struct manager * m_man, struct serve_client client) {
     return NOT_IMPLEMENTED;
 }
-response_t m__remove (char* command, int client_no) {
+response_t m__remove (char* command, struct manager * m_man, struct serve_client client) {
     return NOT_IMPLEMENTED;
 }
 
@@ -75,7 +75,7 @@ response_t exec_method (request_t type, struct manager * man, char* command, int
             if (client_no < 0) {
                 return UNAUTHORIZED;
             }
-            return methods[i].method (command, client_no);
+            return methods[i].method (command, man, man->clients[client_no]);
         }
     }
     // Method could not be found

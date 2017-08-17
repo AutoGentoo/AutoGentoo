@@ -114,7 +114,7 @@ void server_respond (int n, struct manager * m_man)
             reqline[2] = strtok(NULL, " \t\n");
             request_t rt = atoi (reqline[1]);
             
-            response_t res = exec_method (rt, m_man, reqline[2], clients[n]);
+            res = exec_method (rt, m_man, reqline[2], clients[n]);
             
             rsend (clients[n], res);
         }
@@ -148,6 +148,10 @@ void server_respond (int n, struct manager * m_man)
                 strcpy(m_man->clients[m_man->client_c].PKGDIR, "autogentoo/pkg");
                 strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "autogentoo/log");
                 m_man->client_c++;
+            }
+            else if (rt == ADDIP) {
+                strcpy(m_man->clients[m_man->client_c].ip[m_man->clients[m_man->client_c].ip_c], ip);
+                m_man->clients[m_man->client_c].ip_c++;
             }
             else if (rt == INIT) {
                 sc_no = get_client_from_ip (m_man, ip);
