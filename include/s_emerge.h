@@ -30,6 +30,6 @@
 #include <sys/socket.h>
 
 char * get_ip_from_fd (int);
-//void get_emerge_command (struct serve_client, char*);
+void get_emerge_command (struct manager * m_man, struct serve_client client, char* out);
 
 #endif

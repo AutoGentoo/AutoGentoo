@@ -66,10 +66,12 @@ void init_serve_client (struct manager m_man, struct serve_client conf);
 void _mkdir(const char *dir);
 void write_serve (int fd);
 void read_serve (int fd);
+int get_client_from_hostname  (struct manager * m_man, char * hostname);
 
 typedef enum {
     CREATE, // Create new serve_client
-    INIT // Initialize the new serve_client
+    INIT, // Initialize the new serve_client
+    ADDIP // Add ip to serve_client ip list
 } serve_c;
 
 struct link_srv {
@@ -81,6 +83,7 @@ extern struct link_srv link_methods [];
 
 #define L_CREATE (struct link_srv) {CREATE, 5}
 #define L_INIT (struct link_srv) {INIT, 0}
+#define L_ADDIP (struct link_srv) {ADDIP, 1} // Hostname of serve_client
 
 struct link_srv get_link_srv (serve_c);
 

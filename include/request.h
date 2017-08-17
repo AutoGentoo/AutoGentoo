@@ -48,7 +48,7 @@ struct client_request {
 
 struct method_s {
     request_t type;
-    response_t (*method)(char*, int);
+    response_t (*method)(char*, struct manager *, struct serve_client);
 };
 
 #define INSTALL_S (struct method_s) {install_s,m_install_s}
@@ -61,13 +61,13 @@ struct method_s {
 
 extern struct method_s methods [];
 
-response_t m_install_s (char*, int);
-response_t m_remove_s (char*, int);
-response_t m_install_c (char*, int);
-response_t m_remove_c (char*, int);
-response_t m_get (char*, int);
-response_t m_install (char*, int);
-response_t m__remove (char*, int);
+response_t m_install_s (char*, struct manager *, struct serve_client);
+response_t m_remove_s (char*, struct manager *, struct serve_client);
+response_t m_install_c (char*, struct manager *, struct serve_client);
+response_t m_remove_c (char*, struct manager *, struct serve_client);
+response_t m_get (char*, struct manager *, struct serve_client);
+response_t m_install (char*, struct manager *, struct serve_client);
+response_t m__remove (char*, struct manager *, struct serve_client);
 
 response_t exec_method (request_t type, struct manager * man, char* command, int sockfd);
 
