@@ -41,6 +41,8 @@ typedef enum {
     _remove      // Remove from both client and server
 } request_t;
 
+extern char *request_names[];
+
 struct client_request {
     char * atom;
     request_t type;

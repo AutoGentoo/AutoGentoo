@@ -24,6 +24,16 @@
 
 #include <request.h>
 
+char *request_names[] = {
+    "INSTALL_S",
+    "REMOVE_S",
+    "INSTALL_C",
+    "REMOVE_C",
+    "GET",
+    "INSTALL",
+    "_REMOVE"
+};
+
 struct method_s methods [] = {
     INSTALL_S,
     REMOVE_S,

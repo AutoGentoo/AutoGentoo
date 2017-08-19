@@ -241,7 +241,7 @@ void daemonize(char * _cwd)
 }
 
 
-void server_main (char daemon, struct manager * m_man) {
+void server_main (unsigned daemon, struct manager * m_man) {
     int slot;
     struct sockaddr_in clientaddr;
     socklen_t addrlen;
@@ -253,7 +253,7 @@ void server_main (char daemon, struct manager * m_man) {
     
     printf ("Starting server\n");
     
-    if (daemon != 0) {
+    if (daemon) {
         daemonize (m_man->root);
     }
     
