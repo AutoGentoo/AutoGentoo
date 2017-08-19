@@ -51,20 +51,24 @@ typedef struct {
     size_t len;
 } response_t;
 
-extern response_t OK;
-extern response_t CREATED;
-extern response_t NO_CONTENT;
-extern response_t BAD_REQUEST;
-extern response_t UNAUTHORIZED;
-extern response_t FORBIDDEN;
-extern response_t NOT_FOUND;
-extern response_t METHOD_NOT_ALLOWED;
-extern response_t REQUEST_TIMEOUT;
-extern response_t INTERNAL_ERROR;
-extern response_t NOT_IMPLEMENTED;
-extern response_t BAD_GATEWAY;
-extern response_t SERVICE_UNAVAILABLE;
+
+#define OK (response_t) {HTTP_OK, "OK", 2}
+#define CREATED (response_t) {HTTP_CREATED, "Created", 7}
+#define NO_CONTENT (response_t) {HTTP_NO_CONTENT, "No Content", 10}
+#define BAD_REQUEST (response_t) {HTTP_BAD_REQUEST, "Bad Request", 11}
+#define UNAUTHORIZED (response_t) {HTTP_UNAUTHORIZED, "Unauthorized", 12}
+#define FORBIDDEN (response_t) {HTTP_FORBIDDEN, "Forbidden", 9}
+#define NOT_FOUND (response_t) {HTTP_NOT_FOUND, "Not found", 9}
+#define METHOD_NOT_ALLOWED (response_t) {HTTP_METHOD_NOT_ALLOWED, "Method Not Allowed", 18}
+#define REQUEST_TIMEOUT (response_t) {HTTP_REQUEST_TIMEOUT, "Requeset Timeout", 16}
+#define INTERNAL_ERROR (response_t) {HTTP_INTERNAL_ERROR, "Internal Error", 14}
+#define NOT_IMPLEMENTED (response_t) {HTTP_NOT_IMPLEMENTED, "Method Not Implemented", 22}
+#define BAD_GATEWAY (response_t) {HTTP_BAD_GATEWAY, "Bad Gateway", 11}
+#define SERVICE_UNAVAILABLE (response_t) {HTTP_SERVICE_UNAVAILABLE, "Service Unavailable", 19}
+
+extern response_t res_list[];
 
 ssize_t rsend (int fd, response_t code);
+response_t get_res (response_nt x);
 
 #endif

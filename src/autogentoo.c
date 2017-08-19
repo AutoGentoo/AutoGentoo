@@ -105,7 +105,7 @@ Client Options\n\
                 break;
             case 'i':
                 strcpy(__opts.atom, optarg);
-                __opts.t = install_c;
+                __opts.t = install;
                 set_request (&req, __opts.t, __opts.atom);
                 break;
             case 'I':
@@ -120,7 +120,7 @@ Client Options\n\
                 break;
             case 'R':
                 strcpy (__opts.atom, optarg);
-                __opts.t = remove_s;
+                __opts.t = _remove;
                 set_request (&req, __opts.t, __opts.atom);
                 break;
             case '?':
@@ -143,6 +143,7 @@ Client Options\n\
         strcpy(m_man->root, __opts.p);
         strcpy(m_man->_config, __opts.f);
         
+        chdir (m_man->root);
         if (access (__opts.f, F_OK) != -1) {
             int _fd = open (__opts.f, O_RDONLY);
             read_serve (_fd, m_man);
@@ -158,6 +159,7 @@ Client Options\n\
     else {
         // Client
         printf ("%s package %s\n", request_names[(int)req.type], req.atom);
+        response_t res = ask_server ("127.0.0.1", req);
     }
     return 0;
 }

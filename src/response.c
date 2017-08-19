@@ -24,22 +24,33 @@
 
 #include <response.h>
 
-response_t OK = {HTTP_OK, "OK", 2};
-response_t CREATED = {HTTP_CREATED, "Created", 7};
-response_t NO_CONTENT = {HTTP_NO_CONTENT, "No Content", 10};
-response_t BAD_REQUEST = {HTTP_BAD_REQUEST, "Bad Request", 11};
-response_t UNAUTHORIZED = {HTTP_UNAUTHORIZED, "Unauthorized", 12};
-response_t FORBIDDEN = {HTTP_FORBIDDEN, "Forbidden", 9};
-response_t NOT_FOUND = {HTTP_NOT_FOUND, "Not found", 9};
-response_t METHOD_NOT_ALLOWED = {HTTP_METHOD_NOT_ALLOWED, "Method Not Allowed", 18};
-response_t REQUEST_TIMEOUT = {HTTP_REQUEST_TIMEOUT, "Requeset Timeout", 16};
-response_t INTERNAL_ERROR = {HTTP_INTERNAL_ERROR, "Internal Error", 14};
-response_t NOT_IMPLEMENTED = {HTTP_NOT_IMPLEMENTED, "Method Not Implemented", 22};
-response_t BAD_GATEWAY = {HTTP_BAD_GATEWAY, "Bad Gateway", 11};
-response_t SERVICE_UNAVAILABLE = {HTTP_SERVICE_UNAVAILABLE, "Service Unavailable", 19};
-
 ssize_t rsend (int fd, response_t code) {
     char message[40];
     sprintf (message, "HTTP/1.0 %d %s\n", code.code, code.message);
     return send(fd, message, 14 + code.len, 0);
+}
+
+response_t res_list[] = {
+    OK,
+    CREATED,
+    NO_CONTENT,
+    BAD_REQUEST,
+    UNAUTHORIZED,
+    FORBIDDEN,
+    NOT_FOUND,
+    METHOD_NOT_ALLOWED,
+    REQUEST_TIMEOUT,
+    INTERNAL_ERROR,
+    NOT_IMPLEMENTED,
+    BAD_GATEWAY,
+    SERVICE_UNAVAILABLE
+};
+
+response_t get_res (response_nt x) {
+    int i;
+    for (i=0;i != sizeof (res_list) / sizeof (res_list[0]); i++) {
+        if (res_list[i].code == x) {
+            return res_list[i];
+        }
+    }
 }

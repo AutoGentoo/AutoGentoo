@@ -26,26 +26,20 @@
 
 char *request_names[] = {
     "INSTALL_S",
-    "REMOVE_S",
-    "INSTALL_C",
-    "REMOVE_C",
-    "GET",
+    "REMOVE",
     "INSTALL",
-    "_REMOVE"
+    "REMOVE_C"
 };
 
 struct method_s methods [] = {
     INSTALL_S,
-    REMOVE_S,
-    INSTALL_C,
-    REMOVE_C,
-    GET,
+    REMOVE,
     INSTALL,
-    _REMOVE
+    REMOVE_C,
 };
 
 response_t m_install_s (char* command, struct manager * m_man, struct serve_client client) {
-    char cmd[288];
+    char cmd[320];
     char opts[256];
     get_emerge_command (m_man, client, opts);
     sprintf (cmd, "%s %s", opts, command);
@@ -57,22 +51,25 @@ response_t m_install_s (char* command, struct manager * m_man, struct serve_clie
 }
 
 response_t m_remove_s (char* command, struct manager * m_man, struct serve_client client) {
-    return NOT_IMPLEMENTED;
+    char cmd[320];
+    char opts[256];
+    get_emerge_command (m_man, client, opts);
+    sprintf (cmd, "%s --unmerge %s", opts, command);
+    printf ("%s\n", cmd);
+    fflush (stdout);
+    if (system (cmd) != 0)
+        return INTERNAL_ERROR;
+    return OK;
 }
 
 response_t m_install_c (char* command, struct manager * m_man, struct serve_client client) {
-    return NOT_IMPLEMENTED;
+    return OK;
 }
 response_t m_remove_c (char* command, struct manager * m_man, struct serve_client client) {
-    return NOT_IMPLEMENTED;
+    return OK;
 }
-response_t m_get (char* command, struct manager * m_man, struct serve_client client) {
-    return NOT_IMPLEMENTED;
-}
+
 response_t m_install (char* command, struct manager * m_man, struct serve_client client) {
-    return NOT_IMPLEMENTED;
-}
-response_t m__remove (char* command, struct manager * m_man, struct serve_client client) {
     return NOT_IMPLEMENTED;
 }
 
@@ -90,4 +87,40 @@ response_t exec_method (request_t type, struct manager * man, char* command, int
     }
     // Method could not be found
     return NOT_IMPLEMENTED;
+}
+
+response_t ask_server (char* ip, struct client_request req) {
+    int sockfd, n;
+    struct sockaddr_in server;
+    
+    char buffer[256];
+    
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    
+    if (sockfd < 0) {
+        perror ("ERROR opening socket");
+    }
+    
+    server.sin_addr.s_addr = inet_addr (ip);
+    server.sin_family = AF_INET;
+    server.sin_port = htons(9490);
+    
+    if (connect (sockfd, (struct sockaddr *)&server, sizeof(server)) < 0) {
+        printf ("connect() failed\n");
+        fflush(stdout);
+        exit(1);
+    }
+    
+    sprintf (buffer, "CMD %d %s", (int)req.type, req.atom);
+    printf ("%s\n", buffer);
+    
+    write (sockfd, buffer, strlen(buffer));
+    
+    response_nt res_t;
+    char message[256];
+    recv (sockfd, message, 256, 0);
+    
+    strtok (message, " ");
+    sscanf (strtok (NULL, " "), "%d", &res_t);
+    return get_res (res_t);
 }

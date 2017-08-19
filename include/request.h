@@ -33,12 +33,9 @@
 
 typedef enum {
     install_s,  // Install only on the server (used for build tools)
-    remove_s,   // Remove package from server
-    install_c,  // Install on the client machine only
+    _remove,   // Remove package from server removes from client if possible
+    install,  // Install on the client and server
     remove_c,   // Remove from the client
-    get,        // Download the binary, dont install
-    install,    // Install on both client and server
-    _remove      // Remove from both client and server
 } request_t;
 
 extern char *request_names[];
@@ -54,12 +51,9 @@ struct method_s {
 };
 
 #define INSTALL_S (struct method_s) {install_s,m_install_s}
-#define REMOVE_S (struct method_s) {remove_s,m_remove_s}
-#define INSTALL_C (struct method_s) {install_c,m_install_c}
+#define REMOVE (struct method_s) {_remove,m_remove_s}
+#define INSTALL (struct method_s) {install,m_install_c}
 #define REMOVE_C (struct method_s) {remove_c,m_remove_c}
-#define GET (struct method_s) {get,m_get}
-#define INSTALL (struct method_s) {install,m_install}
-#define _REMOVE (struct method_s) {_remove,m__remove}
 
 extern struct method_s methods [];
 
@@ -67,10 +61,8 @@ response_t m_install_s (char*, struct manager *, struct serve_client);
 response_t m_remove_s (char*, struct manager *, struct serve_client);
 response_t m_install_c (char*, struct manager *, struct serve_client);
 response_t m_remove_c (char*, struct manager *, struct serve_client);
-response_t m_get (char*, struct manager *, struct serve_client);
-response_t m_install (char*, struct manager *, struct serve_client);
-response_t m__remove (char*, struct manager *, struct serve_client);
 
 response_t exec_method (request_t type, struct manager * man, char* command, int sockfd);
 
+response_t ask_server (char* ip, struct client_request req);
 #endif
