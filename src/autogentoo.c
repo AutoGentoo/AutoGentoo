@@ -158,8 +158,58 @@ Client Options\n\
     }
     else {
         // Client
+        if ((int)req.type == -1) {
+            printf ("Nothing to do. Exiting...\n");
+            return 0;
+        }
+        
+        char _hostname[100]; // To find the ip
+        char _ip [16]; // current ip to define the range
+        char s_ip[16];
+        gethostname(_hostname, (size_t)100);
+        hostname_to_ip(_hostname , _ip);
+        
         printf ("%s package %s\n", request_names[(int)req.type], req.atom);
-        response_t res = ask_server ("127.0.0.1", req);
+        if (strncmp (_ip, "127.0.0", 7) == 0) {
+            printf ("Not connected to network, using localhost\n");
+            fflush(stdout);
+            strcpy (s_ip, "127.0.0.1");
+        }
+        else {
+            printf ("Searching for servers...");
+            fflush (stdout);
+            char ips[32][32];
+            int host_c = findhosts ((char**)ips);
+            if (host_c == 0) {
+                printf ("error\nNo running servers found!\n");
+                return 1;
+            }
+            else if (host_c > 1) {
+                printf ("found %d\n", host_c);
+                fflush(stdout);
+                int i;
+                for (i=0; i != host_c; i++) {
+                    char host_n[64];
+                    ip_to_hostname (ips[i], host_n);
+                    printf ("[%d] %s (%s)\n", i+1, ips[i], host_n);
+                }
+                printf ("Please pick a server: ");
+                int s_n;
+                scanf ("%d", &s_n);
+                strcpy (s_ip, ips[s_n - 1]);
+            }
+            else {
+                printf ("found 1\n");
+                fflush(stdout);
+                strcpy (s_ip, ips[0]);
+            }
+            
+            if (strcmp (s_ip, _ip) == 0)
+                strcpy (s_ip, "127.0.0.1");
+        }
+               
+        response_t res = ask_server (s_ip, req);
+        printf ("%s\n", res.message);
     }
     return 0;
 }

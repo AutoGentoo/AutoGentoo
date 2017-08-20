@@ -31,6 +31,7 @@
 #include <serve_client.h>
 #include <server.h>
 #include <ip_convert.h>
+#include <ip_scan.h>
 #include <request.h>
 
 struct AutoGentoo {

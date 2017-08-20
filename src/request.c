@@ -106,21 +106,21 @@ response_t ask_server (char* ip, struct client_request req) {
     server.sin_port = htons(9490);
     
     if (connect (sockfd, (struct sockaddr *)&server, sizeof(server)) < 0) {
-        printf ("connect() failed\n");
+        printf ("connect() failed: %d\n",errno);
         fflush(stdout);
         exit(1);
     }
     
     sprintf (buffer, "CMD %d %s", (int)req.type, req.atom);
-    printf ("%s\n", buffer);
     
     write (sockfd, buffer, strlen(buffer));
     
     response_nt res_t;
     char message[256];
-    recv (sockfd, message, 256, 0);
+    recv (sockfd, message, sizeof (message), 0);
     
     strtok (message, " ");
     sscanf (strtok (NULL, " "), "%d", &res_t);
+    close (sockfd);
     return get_res (res_t);
 }

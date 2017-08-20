@@ -23,7 +23,7 @@
 
 #include <ip_scan.h>
 
-int findhosts (char ** ips) {
+int findhosts (char * ips[]) {
     // define range
     char hostname[100]; // To find the ip
     char ip [16]; // current ip to define the range
@@ -42,12 +42,15 @@ int findhosts (char ** ips) {
     for (; current_ip <= 255; current_ip++) {
         char buf[16];
         sprintf (buf, "%s.%s.%s.%d", p_ip[0], p_ip[1], p_ip[2], current_ip);
-        int stat = hostscan (buf);
-        if (stat !=0) {
-            sprintf(ips[host_s],"%s", buf);
+        if (hostscan (buf)) {
+            fflush(stdout);
+            
+            ips[host_s] = buf;
+            print_bin ((char*)ips[host_s], 32);
             host_s++;
         }
     }
+    printf ("\n");
     
     return host_s;
 }
@@ -58,18 +61,7 @@ int hostscan (char* hostname) {
     }
     
     int portno = 9490;
-    int valid = 0;
-    while (portno <= 9490) {
-        valid = checkvalid (hostname, portno);
-        if (valid == 1) {
-            return portno;
-        }
-        if (valid == -1) {
-            return 0;
-        }
-        portno++;
-    }
-    return 0;
+    return checkvalid (hostname, portno);
 }
 
 int checkip (char *ip) {
@@ -93,7 +85,7 @@ int checkvalid (char* hostname, int portno) {
     server = gethostbyname(hostname);
 
     if (server == NULL) {
-        return -1;
+        return 0;
     }
     
     /* Set timeouts due to windows always connecting but not responding */

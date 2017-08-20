@@ -34,7 +34,7 @@
 #include <netdb.h>
 #include <ip_convert.h>
 
-int findhosts (char ** ips);
+int findhosts (char *ips[32]);
 int hostscan (char* hostname);
 int checkip (char *ip);
 int checkvalid (char*, int);
