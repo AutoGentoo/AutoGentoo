@@ -67,7 +67,8 @@ response_t m_install_c (char* command, struct manager * m_man, struct serve_clie
         response_t res = m_install_s (command, m_man, client); 
     }
     else {
-        ask_server (
+        ;
+	//ask_server (
     }
     return OK;
 }

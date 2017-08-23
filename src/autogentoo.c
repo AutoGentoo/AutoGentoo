@@ -23,7 +23,7 @@
  
 #include <autogentoo.h>
 
-unsigned IS_CLIENT = 0;
+char IS_CLIENT = 0;
 
 void _getcwd (char* out, size_t size) {
     if (getcwd(out, size) == NULL)
