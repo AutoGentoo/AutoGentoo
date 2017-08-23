@@ -205,8 +205,22 @@ Client Options\n\
             if (strcmp (s_ip, _ip) == 0)
                 strcpy (s_ip, "127.0.0.1");
         }
-               
-        response_t res = ask_server (s_ip, req);
+        
+        response_t res;
+        
+        if (req.type == remove_c) { // A client only remove
+            //res = exec_method (req, reqline[2], clients[n]);
+        }
+        else {
+            char message[256];
+            res = ask_server (s_ip, req, message);
+            printf (message);
+        }
+        
+        if (req.type > 0) {
+            
+        }
+        
         printf ("%s\n", res.message);
     }
     return 0;

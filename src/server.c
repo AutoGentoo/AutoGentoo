@@ -130,7 +130,7 @@ void server_respond (int n, struct manager * m_man)
                 strcpy(request_opts[i], strtok (NULL, "\n"));
             }
             int sc_no;
-            int sent = 0;
+            char sent = 0;
             if (rt == CREATE) {
                 m_man->clients[m_man->client_c].ip_c = 0;
                 strcpy(m_man->clients[m_man->client_c].hostname, request_opts[0]);
@@ -144,7 +144,7 @@ void server_respond (int n, struct manager * m_man)
                 
                 strcpy(m_man->clients[m_man->client_c].PORTAGE_TMPDIR, "autogentoo/tmp");
                 strcpy(m_man->clients[m_man->client_c].PORTDIR, "/usr/portage");
-                strcpy(m_man->clients[m_man->client_c].DISTDIR, "autogentoo/dist");
+                strcpy(m_man->clients[m_man->client_c].DISTDIR, "/usr/portage/distfiles");
                 strcpy(m_man->clients[m_man->client_c].PKGDIR, "autogentoo/pkg");
                 strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "autogentoo/log");
                 m_man->client_c++;
@@ -153,8 +153,16 @@ void server_respond (int n, struct manager * m_man)
                 fclose (_fd);
             }
             else if (rt == ADDIP) {
-                strcpy(m_man->clients[m_man->client_c].ip[m_man->clients[m_man->client_c].ip_c], ip);
-                m_man->clients[m_man->client_c].ip_c++;
+                sc_no = get_client_from_hostname (m_man, request_opts[0]);
+                if (sc_no == -1) {
+                    rsend (clients[n], BAD_REQUEST);
+                    res = BAD_REQUEST;
+                    sent = 1;
+                }
+                else {
+                    strcpy(m_man->clients[sc_no].ip[m_man->clients[sc_no].ip_c], ip);
+                    m_man->clients[sc_no].ip_c++;
+                }
             }
             else if (rt == INIT) {
                 sc_no = get_client_from_ip (m_man, ip);
@@ -165,6 +173,25 @@ void server_respond (int n, struct manager * m_man)
                 }
                 else {
                     init_serve_client (*m_man, m_man->clients[sc_no]);
+                }
+            }
+            else if (rt == GETCLIENT) {
+                sc_no = get_client_from_ip (m_man, ip);
+                sent = 1;
+                if (sc_no == -1) {
+                    rsend (clients[n], NOT_FOUND);
+                    res = NOT_FOUND;
+                }
+                else {
+                    rsend (clients[n], OK);
+                    res = OK;
+                    char c_buff[256];
+                    sprintf (c_buff, "%s\n%s\n%s\n%s\n", 
+                             m_man->clients[sc_no].CFLAGS, 
+                             m_man->clients[sc_no].CXXFLAGS, 
+                             m_man->clients[sc_no].CHOST,
+                             m_man->clients[sc_no].USE);
+                    write (clients[n], c_buff, sizeof (c_buff));
                 }
             }
             if (!sent)

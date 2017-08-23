@@ -28,19 +28,17 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=1
-FILE_NAME_0=2612;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fautogentoo.c;0;4
-FILE_NAME_1=5417;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.c;0;4
-FILE_NAME_2=3;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.test;0;4
-FILE_NAME_3=4532;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserve_client.c;0;4
-FILE_NAME_4=1666;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserve_client.h;0;4
-FILE_NAME_5=2008;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Frequest.c;0;4
+current_page=5
+FILE_NAME_0=6759;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fautogentoo.c;0;4
+FILE_NAME_1=3827;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.c;0;4
+FILE_NAME_2=4532;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserve_client.c;0;4
+FILE_NAME_3=1666;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserve_client.h;0;4
+FILE_NAME_4=1761;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Frequest.c;0;4
+FILE_NAME_5=1527;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Frequest.h;0;4
 FILE_NAME_6=1053;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fs_emerge.h;0;4
-FILE_NAME_7=2241;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Frequest.h;0;4
-FILE_NAME_8=1476;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserver.h;0;4
-FILE_NAME_9=891;C;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2F_string.h;0;4
-FILE_NAME_10=1236;C;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2F_string.c;0;4
-FILE_NAME_11=158;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2FMakefile.am;0;4
+FILE_NAME_7=1476;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserver.h;0;4
+FILE_NAME_8=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fs_emerge.c;0;4
+FILE_NAME_9=1057;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fautogentoo.h;0;4
 
 [VTE]
 last_dir=/home/atuser/Documents
@@ -54,7 +52,7 @@ NF_03_LB=Make test
 NF_03_CM=make check
 NF_03_WD=
 CFT_01_LB=_Build
-CFT_01_CM=gcc -Wall -o "%e" "%f" -lcrypto
+CFT_01_CM=gcc -Wall -o "%e" "%f"
 CFT_01_WD=
 
 [prjorg]

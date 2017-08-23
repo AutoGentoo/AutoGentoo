@@ -42,7 +42,7 @@ struct serve_client { // Chroot environment
     int ip_c;
     
     // Architecture configuration
-    char CFLAGS[64];
+    char CFLAGS[128];
     char CXXFLAGS[64];
     char CHOST[32];
     char USE[128];
@@ -53,6 +53,13 @@ struct serve_client { // Chroot environment
     char DISTDIR[256]; // distfiles, relative to sc_root
     char PKGDIR[256]; // built bins, relative to sc_root
     char PORT_LOGDIR[256]; // logs, relative to sc_root
+};
+
+struct _client {
+    char CFLAGS[128];
+    char CXXFLAGS[64];
+    char CHOST[32];
+    char USE[128];
 };
 
 struct manager {
@@ -72,7 +79,8 @@ int get_client_from_hostname  (struct manager * m_man, char * hostname);
 typedef enum {
     CREATE, // Create new serve_client
     INIT, // Initialize the new serve_client
-    ADDIP // Add ip to serve_client ip list
+    ADDIP, // Add ip to serve_client ip list
+    GETCLIENT // Get client information (CFLAGS, CHOST etc.)
 } serve_c;
 
 struct link_srv {
@@ -85,6 +93,7 @@ extern struct link_srv link_methods [];
 #define L_CREATE (struct link_srv) {CREATE, 5}
 #define L_INIT (struct link_srv) {INIT, 0}
 #define L_ADDIP (struct link_srv) {ADDIP, 1} // Hostname of serve_client
+#define L_GETCLIENT (struct link_srv) {GETCLIENT, 0} // Automatically detect which client from ip
 
 struct link_srv get_link_srv (serve_c);
 

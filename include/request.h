@@ -50,19 +50,17 @@ struct method_s {
     response_t (*method)(char*, struct manager *, struct serve_client);
 };
 
-#define INSTALL_S (struct method_s) {install_s,m_install_s}
-#define REMOVE (struct method_s) {_remove,m_remove_s}
-#define INSTALL (struct method_s) {install,m_install_c}
-#define REMOVE_C (struct method_s) {remove_c,m_remove_c}
+#define INSTALL_S (struct method_s) {install_s,m_install}
+#define REMOVE (struct method_s) {_remove,m_remove}
+#define INSTALL (struct method_s) {install,m_install}
+#define REMOVE_C (struct method_s) {remove_c,m_remove}
 
 extern struct method_s methods [];
 
-response_t m_install_s (char*, struct manager *, struct serve_client);
-response_t m_remove_s (char*, struct manager *, struct serve_client);
-response_t m_install_c (char*, struct manager *, struct serve_client);
-response_t m_remove_c (char*, struct manager *, struct serve_client);
+response_t m_install (char*, struct manager *, struct serve_client);
+response_t m_remove (char*, struct manager *, struct serve_client);
 
 response_t exec_method (request_t type, struct manager * man, char* command, int sockfd);
 
-response_t ask_server (char* ip, struct client_request req);
+response_t ask_server (char* ip, struct client_request req, char* message);
 #endif

@@ -70,7 +70,7 @@ CHOST=\"%s\"\n\
 SYS_ROOT=\"%s\"\n\
 PORTAGE_TMPDIR=\"${SYS_ROOT}/%s\"\n\
 PORTDIR=\"%s\"\n\
-DISTDIR=\"${SYS_ROOT}/%s\"\n\
+DISTDIR=\"%s\"\n\
 PKGDIR=\"${SYS_ROOT}/%s\"\n\
 PORT_LOGDIR=\"${SYS_ROOT}/%s\"\n\
 \n\
@@ -152,7 +152,8 @@ void read_serve (int fd, struct manager * m_man) { // You must malloc this point
 struct link_srv link_methods [] = {
     L_CREATE,
     L_INIT,
-    L_ADDIP
+    L_ADDIP,
+    L_GETCLIENT
 };
 
 struct link_srv get_link_srv (serve_c c) {

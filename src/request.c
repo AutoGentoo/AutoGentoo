@@ -38,7 +38,7 @@ struct method_s methods [] = {
     REMOVE_C,
 };
 
-response_t m_install_s (char* command, struct manager * m_man, struct serve_client client) {
+response_t m_install (char* command, struct manager * m_man, struct serve_client client) {
     char cmd[320];
     char opts[256];
     get_emerge_command (m_man, client, opts);
@@ -50,7 +50,7 @@ response_t m_install_s (char* command, struct manager * m_man, struct serve_clie
     return OK;
 }
 
-response_t m_remove_s (char* command, struct manager * m_man, struct serve_client client) {
+response_t m_remove (char* command, struct manager * m_man, struct serve_client client) {
     char cmd[320];
     char opts[256];
     get_emerge_command (m_man, client, opts);
@@ -62,22 +62,14 @@ response_t m_remove_s (char* command, struct manager * m_man, struct serve_clien
     return OK;
 }
 
-response_t m_install_c (char* command, struct manager * m_man, struct serve_client client) {
-    if (IS_CLIENT) {
-        response_t res = m_install_s (command, m_man, client); 
-    }
-    else {
-        ;
-	//ask_server (
-    }
-    return OK;
-}
-response_t m_remove_c (char* command, struct manager * m_man, struct serve_client client) {
-    return OK;
-}
-
-response_t m_install (char* command, struct manager * m_man, struct serve_client client) {
-    return NOT_IMPLEMENTED;
+response_t exec_method_client (request_t type, char * command) {
+    struct _client client;
+    char *client_config = "/etc/portage/autogentoo.conf";
+    if (access (client_config, F_OK) == -1)
+        _mkdir ("/etc/portage");
+        
+        int fd = open (client_config, O_RDWR);
+        
 }
 
 response_t exec_method (request_t type, struct manager * man, char* command, int sockfd) {
@@ -96,7 +88,7 @@ response_t exec_method (request_t type, struct manager * man, char* command, int
     return NOT_IMPLEMENTED;
 }
 
-response_t ask_server (char* ip, struct client_request req) {
+response_t ask_server (char* ip, struct client_request req, char *message) {
     int sockfd, n;
     struct sockaddr_in server;
     
@@ -123,7 +115,6 @@ response_t ask_server (char* ip, struct client_request req) {
     write (sockfd, buffer, strlen(buffer));
     
     response_nt res_t;
-    char message[256];
     recv (sockfd, message, sizeof (message), 0);
     
     strtok (message, " ");
