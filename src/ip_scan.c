@@ -45,8 +45,8 @@ int findhosts (char * ips[]) {
         if (hostscan (buf)) {
             fflush(stdout);
             
-            ips[host_s] = buf;
-            print_bin ((char*)ips[host_s], 32);
+            strcpy(ips[host_s], buf);
+            printf (ips[host_s]);
             host_s++;
         }
     }

@@ -56,6 +56,7 @@ struct _opts {
     unsigned c:1;
     request_t t;
     char atom[64];
+    char a[32];
 };
 
 int main (int argc, char ** argv) {
@@ -66,7 +67,7 @@ int main (int argc, char ** argv) {
     req.type = -1;
     int c;
     
-    while ((c = getopt (argc, argv, "p:f:dhsci:I:r:R:")) != -1) {
+    while ((c = getopt (argc, argv, "p:f:dhsci:I:r:R:a:")) != -1) {
         switch (c) {
             case 'p':
                 strcpy(__opts.p, optarg);
@@ -98,8 +99,12 @@ Client Options\n\
   \t\tbuild dependencies only such as autotools\n\
   -r pkg\tRemove package from the client\n\
   -R pkg\tRemove package from both client and server\n\
+  -a address\tIP Address of server (must input)\n\
 ");
                 return 0;
+                break;
+            case 'a':
+                strcpy (__opts.a, optarg);
                 break;
             case 'c':
                 __opts.c = 1;
@@ -126,7 +131,7 @@ Client Options\n\
                 set_request (&req, __opts.t, __opts.atom);
                 break;
             case '?':
-                if (optopt == 'r' || optopt == 'f' || optopt == 'i' || optopt == 'I' || optopt == 'r' || optopt == 'R')
+                if (optopt == 'r' || optopt == 'f' || optopt == 'i' || optopt == 'I' || optopt == 'r' || optopt == 'R' || optopt == 'a')
                     fprintf (stderr, "Option -%c requires an argument.\n", optopt);
                 else if (isprint (optopt))
                     fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -163,7 +168,7 @@ Client Options\n\
         
         char _hostname[100]; // To find the ip
         char _ip [16]; // current ip to define the range
-        char s_ip[16];
+        char s_ip[32];
         gethostname(_hostname, (size_t)100);
         hostname_to_ip(_hostname , _ip);
         
@@ -174,38 +179,8 @@ Client Options\n\
             strcpy (s_ip, "127.0.0.1");
         }
         else {
-            printf ("Searching for servers...");
-            fflush (stdout);
-            char ips[32][32];
-            int host_c = findhosts ((char**)ips);
-            if (host_c == 0) {
-                printf ("error\nNo running servers found!\n");
-                return 1;
-            }
-            else if (host_c > 1) {
-                printf ("found %d\n", host_c);
-                fflush(stdout);
-                int i;
-                for (i=0; i != host_c; i++) {
-                    char host_n[64];
-                    ip_to_hostname (ips[i], host_n);
-                    printf ("[%d] %s (%s)\n", i+1, ips[i], host_n);
-                }
-                printf ("Please pick a server: ");
-                int s_n;
-                scanf ("%d", &s_n);
-                strcpy (s_ip, ips[s_n - 1]);
-            }
-            else {
-                printf ("found 1\n");
-                fflush(stdout);
-                strcpy (s_ip, ips[0]);
-            }
-            
-            if (strcmp (s_ip, _ip) == 0)
-                strcpy (s_ip, "127.0.0.1");
+            strcpy (s_ip, __opts.a);
         }
-        
         response_t res;
         
         if (req.type == remove_c) { // A client only remove
@@ -213,8 +188,7 @@ Client Options\n\
         }
         else {
             char message[256];
-            res = ask_server (s_ip, req, message);
-            printf (message);
+            res = ask_server (s_ip, req, &message[0]);
         }
         
         if (req.type > 0) {

@@ -115,10 +115,12 @@ response_t ask_server (char* ip, struct client_request req, char *message) {
     write (sockfd, buffer, strlen(buffer));
     
     response_nt res_t;
-    recv (sockfd, message, sizeof (message), 0);
+    char _m[256];
+    recv (sockfd, _m, sizeof (_m), 0);
     
-    strtok (message, " ");
+    strtok (_m, " ");
     sscanf (strtok (NULL, " "), "%d", &res_t);
+    strcpy (message, _m);
     close (sockfd);
     return get_res (res_t);
 }

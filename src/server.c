@@ -124,13 +124,21 @@ void server_respond (int n, struct manager * m_man)
             serve_c rt = atoi (reqline[1]);
             struct link_srv linked = get_link_srv (rt);
             char request_opts [linked.argc][32];
+            int sc_no;
+            char sent = 0;
             
             int i;
             for (i=0; i != linked.argc; i++) {
-                strcpy(request_opts[i], strtok (NULL, "\n"));
+                char *b = strtok (NULL, "\n");
+                if (b!=NULL) {
+                    strcpy(request_opts[i], b);
+                }
+                else {
+                    rsend (clients[n], BAD_REQUEST);
+                    res = BAD_REQUEST;
+                    sent = 1;
+                }
             }
-            int sc_no;
-            char sent = 0;
             if (rt == CREATE) {
                 m_man->clients[m_man->client_c].ip_c = 0;
                 strcpy(m_man->clients[m_man->client_c].hostname, request_opts[0]);
