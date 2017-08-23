@@ -140,7 +140,7 @@ void server_respond (int n, struct manager * m_man)
                     break;
                 }
             }
-            if (!sent) {
+            if (sent == 0) {
                 if (rt == CREATE) {
                     m_man->clients[m_man->client_c].ip_c = 0;
                     strcpy(m_man->clients[m_man->client_c].hostname, request_opts[0]);
@@ -205,9 +205,10 @@ void server_respond (int n, struct manager * m_man)
                     }
                 }
             }
-            if (!sent)
+            if (sent == 0) {
                 rsend (clients[n], OK);
                 res = OK;
+            }
         }
         printf ("[%s](%s, %s): %d %s\n", ip, reqline[0], reqline[1], res.code, res.message);
     }
