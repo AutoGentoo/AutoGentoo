@@ -81,6 +81,7 @@ response_t exec_method (request_t type, struct manager * man, char* command, int
             if (client_no < 0) {
                 return UNAUTHORIZED;
             }
+            printf ("%s\n", man->clients[client_no].hostname);
             return methods[i].method (command, man, man->clients[client_no]);
         }
     }
