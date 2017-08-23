@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include <response.h>
-#include <s_emerge.h>
+#include <emerge.h>
 #include <serve_client.h>
 #include <autogentoo.h>
 
@@ -60,6 +60,7 @@ extern struct method_s methods [];
 response_t m_install (char*, struct manager *, struct serve_client);
 response_t m_remove (char*, struct manager *, struct serve_client);
 
+response_t exec_method_client (request_t type, char * command);
 response_t exec_method (request_t type, struct manager * man, char* command, int sockfd);
 
 response_t ask_server (char* ip, struct client_request req, char* message);

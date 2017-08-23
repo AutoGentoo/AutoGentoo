@@ -24,6 +24,6 @@ libip_la_SOURCES = ip_convert.c ip_scan.c
 libip_la_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/
 libip_la_LDFLAGS = -version-info 0
 
-libagserver_la_SOURCES = serve_client.c list.c server.c response.c request.c s_emerge.c _string.c
+libagserver_la_SOURCES = serve_client.c list.c server.c response.c request.c emerge.c _string.c
 libagserver_la_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/
 libagserver_la_LDFLAGS = -version-info 0

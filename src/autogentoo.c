@@ -183,16 +183,13 @@ Client Options\n\
         }
         response_t res;
         
-        if (req.type == remove_c) { // A client only remove
-            //res = exec_method (req, reqline[2], clients[n]);
-        }
-        else {
+        if (req.type != remove_c) { // A client only remove
             char message[256];
             res = ask_server (s_ip, req, &message[0]);
         }
         
         if (req.type > 0) {
-            
+            res = exec_method_client (req.type, req.atom);
         }
         
         printf ("%s\n", res.message);

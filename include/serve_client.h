@@ -75,6 +75,7 @@ void _mkdir(const char *dir);
 void write_serve (int fd, struct manager * m_man);
 void read_serve (int fd, struct manager * m_man);
 int get_client_from_hostname  (struct manager * m_man, char * hostname);
+void write_client (char*);
 
 typedef enum {
     CREATE, // Create new serve_client

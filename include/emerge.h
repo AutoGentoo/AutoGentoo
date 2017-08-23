@@ -1,5 +1,5 @@
 /*
- * s_emerge.c
+ * s_emerge.h
  * 
  * Copyright 2017 Unknown <atuser@Hyperion>
  * 
@@ -21,18 +21,16 @@
  * 
  */
 
+#ifndef __AUTOGENTOO_EMERGE__
+#define __AUTOGENTOO_EMERGE__
 
-#include <s_emerge.h>
+#include <stdio.h>
+#include <serve_client.h>
+#include <autogentoo.h>
+#include <sys/socket.h>
 
-char * get_ip_from_fd (int fd) {
-    struct sockaddr_in addr;
-    socklen_t addr_size = sizeof(struct sockaddr_in);
-    int res = getpeername(fd, (struct sockaddr *)&addr, &addr_size);
-    char *ip;
-    ip = inet_ntoa(addr.sin_addr);
-    return ip;
-}
+char * get_ip_from_fd (int);
+void s_emerge (struct manager * m_man, struct serve_client client, char* out);
+void c_emerge (char *out);
 
-void get_emerge_command (struct manager * m_man, struct serve_client client, char* out) {
-    sprintf (out, "emerge -q --autounmask-continue --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s/autogentoo'", m_man->root, client.hostname, m_man->root, client.hostname);
-}
+#endif

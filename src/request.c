@@ -41,7 +41,7 @@ struct method_s methods [] = {
 response_t m_install (char* command, struct manager * m_man, struct serve_client client) {
     char cmd[320];
     char opts[256];
-    get_emerge_command (m_man, client, opts);
+    s_emerge (m_man, client, opts);
     sprintf (cmd, "%s %s", opts, command);
     printf ("%s\n", cmd);
     fflush (stdout);
@@ -53,7 +53,7 @@ response_t m_install (char* command, struct manager * m_man, struct serve_client
 response_t m_remove (char* command, struct manager * m_man, struct serve_client client) {
     char cmd[320];
     char opts[256];
-    get_emerge_command (m_man, client, opts);
+    s_emerge (m_man, client, opts);
     sprintf (cmd, "%s --unmerge %s", opts, command);
     printf ("%s\n", cmd);
     fflush (stdout);
@@ -63,13 +63,20 @@ response_t m_remove (char* command, struct manager * m_man, struct serve_client 
 }
 
 response_t exec_method_client (request_t type, char * command) {
-    struct _client client;
-    char *client_config = "/etc/portage/autogentoo.conf";
-    if (access (client_config, F_OK) == -1)
-        _mkdir ("/etc/portage");
-        
-        int fd = open (client_config, O_RDWR);
-        
+    char cmd[320];
+    char opts[256];
+    c_emerge (opts);
+    if (type == install) {
+        sprintf (cmd, "%s %s", opts, command);
+    }
+    else {
+        sprintf (cmd, "%s --unmerge %s", opts, command);
+    }
+    printf ("%s\n", cmd);
+    fflush(stdout);
+    if (system(cmd) !=0)
+        return INTERNAL_ERROR;
+    return OK;
 }
 
 response_t exec_method (request_t type, struct manager * man, char* command, int sockfd) {
@@ -88,11 +95,9 @@ response_t exec_method (request_t type, struct manager * man, char* command, int
     return NOT_IMPLEMENTED;
 }
 
-response_t ask_server (char* ip, struct client_request req, char *message) {
+void serve_req(char* ip, char* req, char *message) {
     int sockfd, n;
     struct sockaddr_in server;
-    
-    char buffer[256];
     
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     
@@ -110,17 +115,26 @@ response_t ask_server (char* ip, struct client_request req, char *message) {
         exit(1);
     }
     
-    sprintf (buffer, "CMD %d %s", (int)req.type, req.atom);
+    write (sockfd, req, strlen(req));
     
-    write (sockfd, buffer, strlen(buffer));
-    
-    response_nt res_t;
     char _m[256];
     recv (sockfd, _m, sizeof (_m), 0);
+    
+    strcpy (message, _m);
+    close (sockfd);
+}
+
+response_t ask_server (char* ip, struct client_request req, char *message) {
+    char buffer[256];
+    char _m[256];
+    sprintf (buffer, "CMD %d %s", (int)req.type, req.atom);
+    
+    serve_req (ip, buffer, &_m[0]);
+    
+    response_nt res_t;
     
     strtok (_m, " ");
     sscanf (strtok (NULL, " "), "%d", &res_t);
     strcpy (message, _m);
-    close (sockfd);
     return get_res (res_t);
 }
