@@ -161,7 +161,6 @@ void server_respond (int n, struct manager * m_man)
                     FILE * _fd = fopen (m_man->_config, "w+");
                     write_serve (fileno(_fd), m_man);
                     fclose (_fd);
-                    printf ("%s", m_man->clients[m_man->client_c-1].hostname);
                 }
                 else if (rt == ADDIP) {
                     sc_no = get_client_from_hostname (m_man, request_opts[0]);

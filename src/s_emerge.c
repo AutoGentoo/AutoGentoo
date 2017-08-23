@@ -34,5 +34,5 @@ char * get_ip_from_fd (int fd) {
 }
 
 void get_emerge_command (struct manager * m_man, struct serve_client client, char* out) {
-    sprintf (out, "emerge -q --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s/autogentoo' --automask-continue", m_man->root, client.hostname, m_man->root, client.hostname);
+    sprintf (out, "emerge -q --automask-continue --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s/autogentoo'", m_man->root, client.hostname, m_man->root, client.hostname);
 }
