@@ -249,7 +249,7 @@ void server_main (unsigned daemon, struct manager * m_man) {
     int i;
     for (i=0; i<CONNMAX; i++)
         clients[i]=-1;
-    server_start(config_m.port);
+    server_start("9490");
     
     printf ("Starting server\n");
     

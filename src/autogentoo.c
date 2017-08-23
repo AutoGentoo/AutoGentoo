@@ -23,7 +23,7 @@
  
 #include <autogentoo.h>
 
-struct AutoGentoo config_m;
+unsigned IS_CLIENT = 0;
 
 void _getcwd (char* out, size_t size) {
     if (getcwd(out, size) == NULL)
@@ -79,13 +79,14 @@ int main (int argc, char ** argv) {
                 break;
             case 's':
                 __opts.s = 1;
+                IS_CLIENT = 0;
                 break;
             case 'h':
                 printf ("AutoGentoo help page\n\
 This is the server binary\n\
 Server Options (-s):\n\
   -p dir\tRoot directory, all clients are installed under this directory\n\
-  -c file\tConfig writen to from by this program (loaded at boot)\n\
+  -f file\tConfig writen to from by this program (loaded at boot)\n\
   -d\t\tFork program into daemon on boot\n\
   -h\t\tPrint this message and quit\n\
   -s\t\tEnable server mode\n\
@@ -102,6 +103,7 @@ Client Options\n\
                 break;
             case 'c':
                 __opts.c = 1;
+                IS_CLIENT = 1;
                 break;
             case 'i':
                 strcpy(__opts.atom, optarg);
@@ -149,10 +151,6 @@ Client Options\n\
             read_serve (_fd, m_man);
             close (_fd);
         }
-        
-        strcpy(config_m.port, "9490");
-        
-        config_m.config_path = __opts.f;
         
         server_main (__opts.d, m_man);
     }

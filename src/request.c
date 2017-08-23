@@ -63,6 +63,12 @@ response_t m_remove_s (char* command, struct manager * m_man, struct serve_clien
 }
 
 response_t m_install_c (char* command, struct manager * m_man, struct serve_client client) {
+    if (IS_CLIENT) {
+        response_t res = m_install_s (command, m_man, client); 
+    }
+    else {
+        ask_server (
+    }
     return OK;
 }
 response_t m_remove_c (char* command, struct manager * m_man, struct serve_client client) {

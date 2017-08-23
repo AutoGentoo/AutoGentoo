@@ -34,12 +34,8 @@
 #include <ip_scan.h>
 #include <request.h>
 
-struct AutoGentoo {
-    char port[4];
-    char * config_path;
-};
+extern char IS_CLIENT;
 
-extern struct AutoGentoo config_m;
 void _getcwd (char* out, size_t size);
 void print_bin (void * ptr, size_t size);
 
