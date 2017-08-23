@@ -137,6 +137,7 @@ void server_respond (int n, struct manager * m_man)
                     rsend (clients[n], BAD_REQUEST);
                     res = BAD_REQUEST;
                     sent = 1;
+                    break;
                 }
             }
             if (!sent) {
