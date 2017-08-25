@@ -137,12 +137,8 @@ void server_respond (int n, struct manager * m_man)
             
             int i;
             for (i=0; i != linked.argc; i++) {
-                char *b = strtok (NULL, "\n");
-                if (b!=NULL) {
-                    request_opts[i] = malloc (sizeof (char) * strlen (b));
-                    request_opts[i] = b;
-                }
-                else {
+                request_opts[i] = strtok (NULL, "\n");
+                if (request_opts[i] == NULL) {
                     rsend (clients[n], BAD_REQUEST);
                     res = BAD_REQUEST;
                     sent = 1;
