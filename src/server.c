@@ -131,7 +131,7 @@ void server_respond (int n, struct manager * m_man)
             reqline[2] = strtok(NULL, " \t\n");
             serve_c rt = atoi (reqline[1]);
             struct link_srv linked = get_link_srv (rt);
-            char request_opts [linked.argc][32];
+            char request_opts [linked.argc][1024];
             int sc_no;
             char sent = 0;
             
