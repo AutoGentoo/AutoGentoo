@@ -89,7 +89,7 @@ int checkvalid (char* hostname, int portno) {
     }
     
     /* Set timeouts due to windows always connecting but not responding */
-    struct timeval timeout;      
+    struct timeval timeout;
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
 

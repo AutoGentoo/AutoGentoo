@@ -92,21 +92,29 @@ void server_respond (int n, struct manager * m_man)
             else {
                 if (strncmp(reqline[1], "/\0", 2) == 0)
                     reqline[1] = "";
-
-                strcpy(path, m_man->root);
-                strcpy(&path[strlen(m_man->root)], reqline[1]);
-
-                if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
-                {
-                    rsend (clients[n], OK);
-                    res = OK;
-                    send (clients[n], "\n", 1, 0);
-                    while ((bytes_read = read(fd, data_to_send, BYTES)) > 0)
-                        write(clients[n], data_to_send, bytes_read);
+                
+                char *ip = get_ip_from_fd (clients[n]);
+                int sc_no = get_client_from_ip (m_man, ip);
+                if (sc_no < 0) {
+                    rsend (clients[n], FORBIDDEN);
+                    res = FORBIDDEN;
                 }
-                else
-                    rsend (clients[n], NOT_FOUND);
-                    res = NOT_FOUND;
+                else {
+                    sprintf (path, "%s/%s%s", m_man->root, m_man->clients[sc_no].hostname, reqline[1]);
+                
+                    if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
+                    {
+                        rsend (clients[n], OK);
+                        res = OK;
+                        send (clients[n], "\n", 1, 0);
+                        while ((bytes_read = read(fd, data_to_send, BYTES)) > 0)
+                            write(clients[n], data_to_send, bytes_read);
+                    }
+                    else {
+                        rsend (clients[n], NOT_FOUND);
+                        res = NOT_FOUND;
+                    }
+                }
             }
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {

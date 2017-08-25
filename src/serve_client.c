@@ -89,7 +89,6 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
     
     char *new_dirs [] = {
         conf.PORTAGE_TMPDIR,
-        conf.DISTDIR,
         conf.PKGDIR,
         conf.PORT_LOGDIR,
         "autogentoo/etc/portage"
@@ -120,6 +119,19 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
     sprintf (sym_buf_p2, "%s/autogentoo/etc/portage/make.profile", _ROOT_);
     if (symlink (sym_buf_p1, sym_buf_p2) != 0) {
         printf ("Failed to symlink profile!\n");
+    }
+    char sym_lib_p1[128];
+    char sym_lib_p2[128];
+    sprintf (sym_lib_p2, "%s/lib", _ROOT_);
+    if ((size_t)-1 > 0xffffffffUL) {
+        sprintf (sym_lib_p1, "%s/lib64", _ROOT_);
+    }
+    else {
+        sprintf (sym_lib_p1, "%s/lib32", _ROOT_);
+    }
+    printf (sym_lib_p2);
+    if (symlink (sym_lib_p1, sym_lib_p2) != 0) {
+        printf ("Failed to symlink /lib!\n");
     }
 }
 
