@@ -131,7 +131,7 @@ void server_respond (int n, struct manager * m_man)
             reqline[2] = strtok(NULL, " \t\n");
             serve_c rt = atoi (reqline[1]);
             struct link_srv linked = get_link_srv (rt);
-            char request_opts [linked.argc][1024];
+            char **request_opts = malloc (sizeof (char*) * linked.argc);
             int sc_no;
             char sent = 0;
             
@@ -139,7 +139,8 @@ void server_respond (int n, struct manager * m_man)
             for (i=0; i != linked.argc; i++) {
                 char *b = strtok (NULL, "\n");
                 if (b!=NULL) {
-                    strcpy(request_opts[i], b);
+                    request_opts[i] = malloc (sizeof (char) * strlen (b));
+                    request_opts[i] = b;
                 }
                 else {
                     rsend (clients[n], BAD_REQUEST);
