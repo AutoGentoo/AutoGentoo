@@ -42,10 +42,10 @@ struct serve_client { // Chroot environment
     int ip_c;
     
     // Architecture configuration
-    char CFLAGS[128];
+    char CFLAGS[1024];
     char CXXFLAGS[64];
     char CHOST[32];
-    char USE[128];
+    char USE[512];
     
     // Portage binhost setup
     char PORTAGE_TMPDIR[256]; // build dir, relative to sc_root
@@ -56,7 +56,7 @@ struct serve_client { // Chroot environment
 };
 
 struct _client {
-    char CFLAGS[128];
+    char CFLAGS[1024];
     char CXXFLAGS[64];
     char CHOST[32];
     char USE[128];
