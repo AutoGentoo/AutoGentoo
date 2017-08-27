@@ -147,7 +147,6 @@ Client Options\n\
     
     if (__opts.s) {
         struct manager * m_man = malloc (sizeof (struct manager));
-        m_man->debug = 1;
         strcpy(m_man->root, __opts.p);
         strcpy(m_man->_config, __opts.f);
         
