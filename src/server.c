@@ -218,7 +218,8 @@ void server_respond (int n, struct manager * m_man)
                     }
                 }
                 else if (rt == STAGE1) {
-                    dup2(clients[n], STDOUT_FILENO);
+                    FILE * ss_fp = fopen ("buf.log", "w+");
+                    dup2(clients[n], fileno (ss_fp));
                     sc_no = get_client_from_ip (m_man, ip);
                     char pkgs[8191];
                     FILE * fp = fopen ("/usr/portage/profiles/default/linux/packages.build", "r");
