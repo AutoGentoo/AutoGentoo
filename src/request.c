@@ -41,7 +41,7 @@ struct method_s methods [] = {
 response_t m_install (char* command, struct manager * m_man, struct serve_client client) {
     char cmd[2048];
     char opts[1024];
-    s_emerge (m_man, client, opts);
+    emerges (m_man, client, opts);
     sprintf (cmd, "%s %s", opts, command);
     printf ("%s\n", cmd);
     fflush (stdout);
@@ -53,7 +53,7 @@ response_t m_install (char* command, struct manager * m_man, struct serve_client
 response_t m_remove (char* command, struct manager * m_man, struct serve_client client) {
     char cmd[320];
     char opts[256];
-    s_emerge (m_man, client, opts);
+    emerges (m_man, client, opts);
     sprintf (cmd, "%s --unmerge %s", opts, command);
     printf ("%s\n", cmd);
     fflush (stdout);
@@ -65,7 +65,7 @@ response_t m_remove (char* command, struct manager * m_man, struct serve_client 
 response_t exec_method_client (request_t type, char * command) {
     char cmd[320];
     char opts[256];
-    c_emerge (opts);
+    emergec (opts);
     if (type == install) {
         sprintf (cmd, "%s %s", opts, command);
     }

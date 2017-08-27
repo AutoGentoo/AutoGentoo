@@ -40,6 +40,7 @@
 #include <request.h>
 #include <serve_client.h>
 #include <response.h>
+#include <sys/wait.h>
 #include <autogentoo.h>
 
 #define CONNMAX 1000

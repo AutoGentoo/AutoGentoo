@@ -218,27 +218,46 @@ void server_respond (int n, struct manager * m_man)
                     }
                 }
                 else if (rt == STAGE1) {
-                    FILE * ss_fp = fopen ("buf.log", "w+");
-                    dup2(clients[n], fileno (ss_fp));
                     sc_no = get_client_from_ip (m_man, ip);
-                    char pkgs[8191];
-                    FILE * fp = fopen ("/usr/portage/profiles/default/linux/packages.build", "r");
-                    char line[255];
-                    strcat (pkgs, "-u "); // Dont emerge packages that are already binaries
-                    while (fgets(line, sizeof(line), fp) != NULL) {
-                        char *pos;
-                        if ((pos=strchr(line, '\n')) != NULL)
-                            *pos = '\0';
-                        if (line[0] == '#' || line[0] == '\n' || strcmp (line, "") == 0) {
-                            continue;
-                        }
-                        strcat (pkgs, line);
-                        strcat (pkgs, " ");
+                    if (sc_no == -1) {
+                        rsend (clients[n], FORBIDDEN);
+                        res = FORBIDDEN;
+                        sent = 1;
                     }
-                    res = m_install (pkgs, m_man, m_man->clients[sc_no]);
-                    rsend (clients[n], res);
-                    sent = 1;
-                    fclose (fp);
+                    else {
+                        char pkgs[8191];
+                        FILE * fp = fopen ("/usr/portage/profiles/default/linux/packages.build", "r");
+                        char line[255];
+                        strcat (pkgs, "-u "); // Dont emerge packages that are already binaries
+                        while (fgets(line, sizeof(line), fp) != NULL) {
+                            char *pos;
+                            if ((pos=strchr(line, '\n')) != NULL)
+                                *pos = '\0';
+                            if (line[0] == '#' || line[0] == '\n' || strcmp (line, "") == 0) {
+                                continue;
+                            }
+                            strcat (pkgs, line);
+                            strcat (pkgs, " ");
+                        }
+                        fclose (fp);
+                        
+                        // Create buffs to redirect STDOUT and STDERR
+                        int stdout_b, stderr_b;
+                        stdout_b = dup (STDOUT_FILENO);
+                        stderr_b = dup (STDERR_FILENO);
+                        dup2(clients[n], STDOUT_FILENO);
+                        dup2(clients[n], STDERR_FILENO);
+                        close(clients[n]);
+                        
+                        res = m_install (pkgs, m_man, m_man->clients[sc_no]);
+                        rsend (clients[n], res);
+                        
+                        close (STDOUT_FILENO);
+                        close (STDERR_FILENO);
+                        dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+                        dup2 (stderr_b, STDERR_FILENO);
+                        sent = 1;
+                    }
                 }
                 else if (rt == STAGE3) {
                     sc_no = get_client_from_ip (m_man, ip);

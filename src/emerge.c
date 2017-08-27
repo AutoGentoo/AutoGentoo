@@ -33,10 +33,24 @@ char * get_ip_from_fd (int fd) {
     return ip;
 }
 
-void s_emerge (struct manager * m_man, struct serve_client client, char* out) {
-    sprintf (out, "emerge -q --autounmask-continue --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s/autogentoo' > buf.log", m_man->root, client.hostname, m_man->root, client.hostname);
+char** emergese (struct manager * m_man, struct serve_client client, char **command, size_t n) {
+    char __root[128];
+    char __croot[128];
+    sprintf (__root, "--root='%s/%s'", m_man->root, client.hostname);
+    sprintf (__croot, "--config-root='%s/%s/autogentoo'", m_man->root, client.hostname);
+    char *out[32] = {"emerge", "-q", "--autounmask-coninue", "--buildpkg", "--usepkg", __root, __croot};
+    int i;
+    for (i=7; i!=(n+7); i++) {
+        out[i] = command[i-7];
+    }
+    out[n+7] = NULL;
+    return &out[0];
 }
 
-void c_emerge (char *out) {
+void emerges (struct manager * m_man, struct serve_client client, char* out) {
+    sprintf (out, "emerge -q --autounmask-continue --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s/autogentoo'", m_man->root, client.hostname, m_man->root, client.hostname);
+}
+
+void emergec (char *out) {
     sprintf (out, "emerge -q --autounmask-continue --usepkgonly");
 }

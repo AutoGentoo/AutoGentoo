@@ -30,7 +30,8 @@
 #include <sys/socket.h>
 
 char * get_ip_from_fd (int);
-void s_emerge (struct manager * m_man, struct serve_client client, char* out);
-void c_emerge (char *out);
+char** emergese (struct manager * m_man, struct serve_client client, char **command, size_t n);
+void emerges (struct manager * m_man, struct serve_client client, char* out);
+void emergec (char *out);
 
 #endif
