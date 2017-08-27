@@ -64,3 +64,11 @@ int check_in (char * arr[], char * el, size_t size) {
     }
     return -1;
 }
+
+int _strtok_n (char* s, char delim) {
+    static int n = 0;
+    
+    int i, j;
+    for (i=n, j=0; s[i] != delim; i++, j++);
+    return j;
+}

@@ -37,7 +37,7 @@
 
 struct serve_client { // Chroot environment 
     char hostname[64];
-    char profile[32];
+    char profile[128];
     char ip[16][16]; // Multiple ip's can point to one client
     int ip_c;
     

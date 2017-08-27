@@ -53,7 +53,11 @@ int get_client_from_hostname  (struct manager * m_man, char * hostname) {
  * All we need here is to setup a make.conf to emerge these packages
  */
 void init_serve_client (struct manager m_man, struct serve_client conf) {
+<<<<<<< Updated upstream
     char make_conf_buff [8192];
+=======
+    char make_conf_buff [4192];
+>>>>>>> Stashed changes
     char _ROOT_ [128];
     char EXTRA [2048];
     int i_c;
@@ -86,6 +90,7 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
 \n\
 %s\
 \n\0",  conf.CFLAGS, conf.CXXFLAGS, conf.CHOST,
+<<<<<<< Updated upstream
     _ROOT_,
     conf.PORTAGE_TMPDIR,
     conf.PORTDIR,
@@ -94,6 +99,15 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
     conf.PORT_LOGDIR,
     conf.USE,
     EXTRA
+=======
+        _ROOT_,
+        conf.PORTAGE_TMPDIR,
+        conf.PORTDIR,
+        conf.DISTDIR,
+        conf.PKGDIR,
+        conf.PORT_LOGDIR,
+        conf.USE
+>>>>>>> Stashed changes
     );
     
     char *new_dirs [] = {
@@ -140,6 +154,16 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
     }
     if (symlink (sym_lib_p1, sym_lib_p2) != 0) {
         printf ("Failed to symlink /lib!\n");
+    }
+    sprintf (sym_lib_p2, "%s/usr/lib", _ROOT_);
+    if ((size_t)-1 > 0xffffffffUL) {
+        sprintf (sym_lib_p1, "%s/usr/lib64", _ROOT_);
+    }
+    else {
+        sprintf (sym_lib_p1, "%s/usr/lib32", _ROOT_);
+    }
+    if (symlink (sym_lib_p1, sym_lib_p2) != 0) {
+        printf ("Failed to symlink /usr/lib!\n");
     }
 }
 

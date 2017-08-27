@@ -30,5 +30,6 @@
 void expand (char* dest, char** src, char* delim, size_t n);
 void string_copy (char* dest, char* src);
 int check_in (char * arr[], char * el, size_t size);
+int _strtok_n (char* s, char delim);
 
 #endif
