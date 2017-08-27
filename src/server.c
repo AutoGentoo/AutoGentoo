@@ -122,23 +122,27 @@ void server_respond (int n, struct manager * m_man)
             reqline[2] = strtok(NULL, " \t\n");
             request_t rt = atoi (reqline[1]);
             
-            // Create buffs to redirect STDOUT and STDERR
-            int stdout_b, stderr_b;
-            stdout_b = dup (STDOUT_FILENO);
-            stderr_b = dup (STDERR_FILENO);
-            dup2(clients[n], STDOUT_FILENO);
-            dup2(clients[n], STDERR_FILENO);
-            close(clients[n]);
-            
-            res = exec_method (rt, m_man, reqline[2], ip);
-            rsend (1, res); // Write to stdout instead of socket
-            
-            close (STDOUT_FILENO);
-            close (STDERR_FILENO);
-            dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
-            dup2 (stderr_b, STDERR_FILENO);
-            
-            rsend (clients[n], res);
+            pid_t f_cpid = fork ();
+            if (f_cpid < 0) exit (1);
+            if (f_cpid == 0) {
+                // Create buffs to redirect STDOUT and STDERR
+                int stdout_b, stderr_b;
+                stdout_b = dup (STDOUT_FILENO);
+                stderr_b = dup (STDERR_FILENO);
+                dup2(clients[n], STDOUT_FILENO);
+                dup2(clients[n], STDERR_FILENO);
+                close(clients[n]);
+                
+                res = exec_method (rt, m_man, reqline[2], ip);
+                rsend (1, res); // Write to stdout instead of socket
+                
+                close (STDOUT_FILENO);
+                close (STDERR_FILENO);
+                dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+                dup2 (stderr_b, STDERR_FILENO);
+                exit (0);
+            }
+            else return;
         }
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
             reqline[1] = strtok(NULL, " \t");
@@ -256,66 +260,92 @@ void server_respond (int n, struct manager * m_man)
                         fclose (fp);
                         
                         // Create buffs to redirect STDOUT and STDERR
-                        int stdout_b, stderr_b;
-                        stdout_b = dup (STDOUT_FILENO);
-                        stderr_b = dup (STDERR_FILENO);
-                        dup2(clients[n], STDOUT_FILENO);
-                        dup2(clients[n], STDERR_FILENO);
-                        close(clients[n]);
-                        
-                        res = m_install (pkgs, m_man, m_man->clients[sc_no]);
-                        rsend (1, res); // Write to stdout instead of socket
-                        
-                        close (STDOUT_FILENO);
-                        close (STDERR_FILENO);
-                        dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
-                        dup2 (stderr_b, STDERR_FILENO);
-                        sent = 1;
+                        pid_t f_spid = fork ();
+                        if (f_spid < 0) exit (1);
+                        if (f_spid == 0) {
+                            int stdout_b, stderr_b;
+                            stdout_b = dup (STDOUT_FILENO);
+                            stderr_b = dup (STDERR_FILENO);
+                            dup2(clients[n], STDOUT_FILENO);
+                            dup2(clients[n], STDERR_FILENO);
+                            close(clients[n]);
+                            res = m_install (pkgs, m_man, m_man->clients[sc_no]);
+                            rsend (1, res); // Write to stdout instead of socket
+                            
+                            close (STDOUT_FILENO);
+                            close (STDERR_FILENO);
+                            dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+                            dup2 (stderr_b, STDERR_FILENO);
+                            sent = 1;
+                        }
+                        else return;
                     }
                 }
-                else if (rt == STAGE3) {
+                else if (rt == UNOSYNC) {
                     sc_no = get_client_from_ip (m_man, ip);
-                    // Create buffs to redirect STDOUT and STDERR
-                    int stdout_b, stderr_b;
-                    stdout_b = dup (STDOUT_FILENO);
-                    stderr_b = dup (STDERR_FILENO);
-                    dup2(clients[n], STDOUT_FILENO);
-                    dup2(clients[n], STDERR_FILENO);
-                    close(clients[n]);
                     if (sc_no > -1) {
-                        res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
+                        // Create buffs to redirect STDOUT and STDERR
+                        int stdout_b, stderr_b;
+                        // Create buffs to redirect STDOUT and STDERR
+                        pid_t f_nupid = fork ();
+                        if (f_nupid < 0) exit (1);
+                        if (f_nupid == 0) {
+                            int stdout_b, stderr_b;
+                            stdout_b = dup (STDOUT_FILENO);
+                            stderr_b = dup (STDERR_FILENO);
+                            dup2(clients[n], STDOUT_FILENO);
+                            dup2(clients[n], STDERR_FILENO);
+                            close(clients[n]);
+                            
+                            res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
+                            rsend (1, res); // Write to stdout instead of socket
+                            
+                            close (STDOUT_FILENO);
+                            close (STDERR_FILENO);
+                            dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+                            dup2 (stderr_b, STDERR_FILENO);
+                            sent = 1;
+                        }
+                        else return;
                     }
                     else {
                         res = FORBIDDEN;
+                        rsend (clients[n], res); // Write to stdout instead of socket
                     }
-                    rsend (1, res); // Write to stdout instead of socket
                     sent = 1;
-                    close (STDOUT_FILENO);
-                    close (STDERR_FILENO);
-                    dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
-                    dup2 (stderr_b, STDERR_FILENO);
                 }
                 else if (rt == UPDATE) {
-                    // Create buffs to redirect STDOUT and STDERR
-                    int stdout_b, stderr_b;
-                    stdout_b = dup (STDOUT_FILENO);
-                    stderr_b = dup (STDERR_FILENO);
-                    dup2(clients[n], STDOUT_FILENO);
-                    dup2(clients[n], STDERR_FILENO);
-                    close(clients[n]);
-                    system ("emerge --sync");
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
-                        res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
+                        // Create buffs to redirect STDOUT and STDERR
+                        int stdout_b, stderr_b;
+                        // Create buffs to redirect STDOUT and STDERR
+                        pid_t f_upid = fork ();
+                        if (f_upid < 0) exit (1);
+                        if (f_upid == 0) {
+                            int stdout_b, stderr_b;
+                            stdout_b = dup (STDOUT_FILENO);
+                            stderr_b = dup (STDERR_FILENO);
+                            dup2(clients[n], STDOUT_FILENO);
+                            dup2(clients[n], STDERR_FILENO);
+                            close(clients[n]);
+                            
+                            system ("emerge --sync");
+                            res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
+                            rsend (1, res); // Write to stdout instead of socket
+                            
+                            close (STDOUT_FILENO);
+                            close (STDERR_FILENO);
+                            dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+                            dup2 (stderr_b, STDERR_FILENO);
+                            sent = 1;
+                        }
+                        else return;
                     }
                     else {
                         res = FORBIDDEN;
+                        rsend (clients[n], res); // Write to stdout instead of socket
                     }
-                    rsend (1, res); // Write to stdout instead of socket
-                    close (STDOUT_FILENO);
-                    close (STDERR_FILENO);
-                    dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
-                    dup2 (stderr_b, STDERR_FILENO);
                     sent = 1;
                 }
             }
