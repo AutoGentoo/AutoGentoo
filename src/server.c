@@ -250,7 +250,7 @@ void server_respond (int n, struct manager * m_man)
                         close(clients[n]);
                         
                         res = m_install (pkgs, m_man, m_man->clients[sc_no]);
-                        rsend (clients[n], res);
+                        rsend (1, res); // Write to stdout instead of socket
                         
                         close (STDOUT_FILENO);
                         close (STDERR_FILENO);
@@ -274,7 +274,7 @@ void server_respond (int n, struct manager * m_man)
                     else {
                         res = FORBIDDEN;
                     }
-                    rsend (clients[n], res);
+                    rsend (1, res); // Write to stdout instead of socket
                     sent = 1;
                     close (STDOUT_FILENO);
                     close (STDERR_FILENO);
@@ -297,7 +297,7 @@ void server_respond (int n, struct manager * m_man)
                     else {
                         res = FORBIDDEN;
                     }
-                    rsend (clients[n], res);
+                    rsend (1, res); // Write to stdout instead of socket
                     close (STDOUT_FILENO);
                     close (STDERR_FILENO);
                     dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
