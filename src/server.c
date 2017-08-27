@@ -235,6 +235,13 @@ void server_respond (int n, struct manager * m_man)
                     res = m_install (pkgs, m_man, m_man->clients[sc_no]);
                     rsend (clients[n], res);
                     sent = 1;
+                    fclose (fp);
+                }
+                else if (rt == STAGE3) {
+                    sc_no = get_client_from_ip (m_man, ip);
+                    res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
+                    rsend (clients[n], res);
+                    sent = 1;
                 }
             }
             if (sent == 0) {
