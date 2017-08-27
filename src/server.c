@@ -130,13 +130,17 @@ void server_respond (int n, struct manager * m_man)
             reqline[1] = strtok(NULL, " \t");
             reqline[2] = strtok(NULL, " \t\n");
             serve_c rt = atoi (reqline[1]);
+            int l_argc = 0;
+            if (strncmp (reqline[2], "HTTP", 4) != 0) {
+                l_argc = atoi (reqline[2]);
+            }
             struct link_srv linked = get_link_srv (rt);
-            char **request_opts = malloc (sizeof (char*) * linked.argc);
+            char **request_opts = malloc (sizeof (char*) * (l_argc + linked.argc));
             int sc_no;
             char sent = 0;
             
             int i;
-            for (i=0; i != linked.argc; i++) {
+            for (i=0; i != (l_argc + linked.argc); i++) {
                 request_opts[i] = strtok (NULL, "\n");
                 if (request_opts[i] == NULL) {
                     rsend (clients[n], BAD_REQUEST);
@@ -149,23 +153,27 @@ void server_respond (int n, struct manager * m_man)
                 if (rt == CREATE) {
                     m_man->clients[m_man->client_c].ip_c = 0;
                     strcpy(m_man->clients[m_man->client_c].hostname, request_opts[0]);
-                    strcpy(m_man->clients[m_man->client_c].ip[m_man->clients[m_man->client_c].ip_c], ip);
-                    m_man->clients[m_man->client_c].ip_c++;
                     strcpy(m_man->clients[m_man->client_c].profile, request_opts[1]);
                     strcpy(m_man->clients[m_man->client_c].CHOST, request_opts[2]);
                     strcpy(m_man->clients[m_man->client_c].CFLAGS, request_opts[3]);
                     strcpy(m_man->clients[m_man->client_c].CXXFLAGS, "${CFLAGS}");
                     strcpy(m_man->clients[m_man->client_c].USE, request_opts[4]);
-                    
+                    for (m_man->clients[m_man->client_c].extra_c; m_man->clients[m_man->client_c].extra_c!=(l_argc);m_man->clients[m_man->client_c].extra_c++) {
+                        strcpy (m_man->clients[m_man->client_c].EXTRA[m_man->clients[m_man->client_c].extra_c], request_opts[m_man->clients[m_man->client_c].extra_c+5]);
+                    }
                     strcpy(m_man->clients[m_man->client_c].PORTAGE_TMPDIR, "autogentoo/tmp");
                     strcpy(m_man->clients[m_man->client_c].PORTDIR, "/usr/portage");
                     strcpy(m_man->clients[m_man->client_c].DISTDIR, "/usr/portage/distfiles");
                     strcpy(m_man->clients[m_man->client_c].PKGDIR, "autogentoo/pkg");
                     strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "autogentoo/log");
+                    strcpy(m_man->clients[m_man->client_c].ip[m_man->clients[m_man->client_c].ip_c], ip);
+                    m_man->clients[m_man->client_c].ip_c++;
                     m_man->client_c++;
-                    FILE * _fd = fopen (m_man->_config, "w+");
-                    write_serve (fileno(_fd), m_man);
-                    fclose (_fd);
+                    if(!m_man->debug) {
+                        FILE * _fd = fopen (m_man->_config, "w+");
+                        write_serve (fileno(_fd), m_man);
+                        fclose (_fd);
+                    }
                 }
                 else if (rt == ADDIP) {
                     sc_no = get_client_from_hostname (m_man, request_opts[0]);

@@ -46,6 +46,8 @@ struct serve_client { // Chroot environment
     char CXXFLAGS[64];
     char CHOST[32];
     char USE[512];
+    char EXTRA[512][32];
+    int extra_c;
     
     // Portage binhost setup
     char PORTAGE_TMPDIR[256]; // build dir, relative to sc_root
@@ -65,6 +67,7 @@ struct _client {
 struct manager {
     struct serve_client clients[32];
     int client_c;
+    int debug; // If true, will not write to config
     char root[256];
     char _config[256];
 };

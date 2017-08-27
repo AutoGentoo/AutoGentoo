@@ -25,6 +25,17 @@
 #include <stdio.h>
 #include <_string.h>
 
+void expand (char* dest, char** src, char* delim, size_t n) {
+    int i;
+    for (i=0; i!=(int)n; i++) {
+        printf ("%d\n", i);
+        strcat (dest, src[i]);
+        printf ("%d\n", i);
+        fflush(stdout);
+        strcat (dest, delim);
+    }
+}
+
 void string_copy (char* dest, char* src) {
     char* ptr = src;
     
