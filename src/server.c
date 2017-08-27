@@ -261,6 +261,13 @@ void server_respond (int n, struct manager * m_man)
                 }
                 else if (rt == STAGE3) {
                     sc_no = get_client_from_ip (m_man, ip);
+                    // Create buffs to redirect STDOUT and STDERR
+                    int stdout_b, stderr_b;
+                    stdout_b = dup (STDOUT_FILENO);
+                    stderr_b = dup (STDERR_FILENO);
+                    dup2(clients[n], STDOUT_FILENO);
+                    dup2(clients[n], STDERR_FILENO);
+                    close(clients[n]);
                     if (sc_no > -1) {
                         res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
                     }
@@ -269,9 +276,20 @@ void server_respond (int n, struct manager * m_man)
                     }
                     rsend (clients[n], res);
                     sent = 1;
+                    close (STDOUT_FILENO);
+                    close (STDERR_FILENO);
+                    dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+                    dup2 (stderr_b, STDERR_FILENO);
                 }
                 else if (rt == UPDATE) {
-                    system ("emerge -q --sync");
+                    // Create buffs to redirect STDOUT and STDERR
+                    int stdout_b, stderr_b;
+                    stdout_b = dup (STDOUT_FILENO);
+                    stderr_b = dup (STDERR_FILENO);
+                    dup2(clients[n], STDOUT_FILENO);
+                    dup2(clients[n], STDERR_FILENO);
+                    close(clients[n]);
+                    system ("emerge --sync");
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
                         res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
@@ -280,6 +298,10 @@ void server_respond (int n, struct manager * m_man)
                         res = FORBIDDEN;
                     }
                     rsend (clients[n], res);
+                    close (STDOUT_FILENO);
+                    close (STDERR_FILENO);
+                    dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+                    dup2 (stderr_b, STDERR_FILENO);
                     sent = 1;
                 }
             }
