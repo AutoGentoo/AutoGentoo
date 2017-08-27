@@ -188,7 +188,8 @@ struct link_srv link_methods [] = {
     L_ADDIP,
     L_GETCLIENT,
     L_STAGE1,
-    L_STAGE3
+    L_STAGE3,
+    L_UPDATE
 };
 
 struct link_srv get_link_srv (serve_c c) {

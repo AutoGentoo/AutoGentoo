@@ -240,7 +240,24 @@ void server_respond (int n, struct manager * m_man)
                 }
                 else if (rt == STAGE3) {
                     sc_no = get_client_from_ip (m_man, ip);
-                    res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
+                    if (sc_no > -1) {
+                        res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
+                    }
+                    else {
+                        res = FORBIDDEN;
+                    }
+                    rsend (clients[n], res);
+                    sent = 1;
+                }
+                else if (rt == UPDATE) {
+                    system ("emerge -q --sync");
+                    sc_no = get_client_from_ip (m_man, ip);
+                    if (sc_no > -1) {
+                        res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
+                    }
+                    else {
+                        res = FORBIDDEN;
+                    }
                     rsend (clients[n], res);
                     sent = 1;
                 }

@@ -86,7 +86,8 @@ typedef enum {
     ADDIP, // Add ip to serve_client ip list
     GETCLIENT, // Get client information (CFLAGS, CHOST etc.)
     STAGE1, // Emerge system base packages
-    STAGE3 // Emerge build deps
+    STAGE3, // Emerge build deps
+    UPDATE
 } serve_c;
 
 struct link_srv {
@@ -102,6 +103,7 @@ extern struct link_srv link_methods [];
 #define L_GETCLIENT (struct link_srv) {GETCLIENT, 0} // Automatically detect which client from ip
 #define L_STAGE1 (struct link_srv) {STAGE1, 0}
 #define L_STAGE3 (struct link_srv) {STAGE3, 0}
+#define L_UPDATE (struct link_srv) {UPDATE, 0}
 
 struct link_srv get_link_srv (serve_c);
 
