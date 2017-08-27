@@ -223,6 +223,7 @@ void server_respond (int n, struct manager * m_man)
                     char pkgs[8191];
                     FILE * fp = fopen ("/usr/portage/profiles/default/linux/packages.build", "r");
                     char line[255];
+                    strcat (pkgs, "-u "); // Dont emerge packages that are already binaries
                     while (fgets(line, sizeof(line), fp) != NULL) {
                         char *pos;
                         if ((pos=strchr(line, '\n')) != NULL)
