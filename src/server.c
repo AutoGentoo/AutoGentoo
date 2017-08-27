@@ -208,7 +208,7 @@ void server_respond (int n, struct manager * m_man)
                     else {
                         rsend (clients[n], OK);
                         res = OK;
-                        char c_buff[256];
+                        char c_buff[1024];
                         sprintf (c_buff, "%s\n%s\n%s\n%s\n", 
                                  m_man->clients[sc_no].CFLAGS, 
                                  m_man->clients[sc_no].CXXFLAGS, 
@@ -216,6 +216,25 @@ void server_respond (int n, struct manager * m_man)
                                  m_man->clients[sc_no].USE);
                         write (clients[n], c_buff, sizeof (c_buff));
                     }
+                }
+                else if (rt == STAGE1) {
+                    sc_no = get_client_from_ip (m_man, ip);
+                    char pkgs[8191];
+                    FILE * fp = fopen ("/usr/portage/profiles/default/linux/packages.build", "r");
+                    char line[255];
+                    while (fgets(line, sizeof(line), fp) != NULL) {
+                        char *pos;
+                        if ((pos=strchr(line, '\n')) != NULL)
+                            *pos = '\0';
+                        if (line[0] == '#' || line[0] == '\n' || strcmp (line, "") == 0) {
+                            continue;
+                        }
+                        strcat (pkgs, line);
+                        strcat (pkgs, " ");
+                    }
+                    res = m_install (pkgs, m_man, m_man->clients[sc_no]);
+                    rsend (clients[n], res);
+                    sent = 1;
                 }
             }
             if (sent == 0) {

@@ -39,8 +39,8 @@ struct method_s methods [] = {
 };
 
 response_t m_install (char* command, struct manager * m_man, struct serve_client client) {
-    char cmd[320];
-    char opts[256];
+    char cmd[2048];
+    char opts[1024];
     s_emerge (m_man, client, opts);
     sprintf (cmd, "%s %s", opts, command);
     printf ("%s\n", cmd);
