@@ -53,11 +53,7 @@ int get_client_from_hostname  (struct manager * m_man, char * hostname) {
  * All we need here is to setup a make.conf to emerge these packages
  */
 void init_serve_client (struct manager m_man, struct serve_client conf) {
-<<<<<<< Updated upstream
     char make_conf_buff [8192];
-=======
-    char make_conf_buff [4192];
->>>>>>> Stashed changes
     char _ROOT_ [128];
     char EXTRA [2048];
     int i_c;
@@ -90,24 +86,14 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
 \n\
 %s\
 \n\0",  conf.CFLAGS, conf.CXXFLAGS, conf.CHOST,
-<<<<<<< Updated upstream
-    _ROOT_,
-    conf.PORTAGE_TMPDIR,
-    conf.PORTDIR,
-    conf.DISTDIR,
-    conf.PKGDIR,
-    conf.PORT_LOGDIR,
-    conf.USE,
-    EXTRA
-=======
         _ROOT_,
         conf.PORTAGE_TMPDIR,
         conf.PORTDIR,
         conf.DISTDIR,
         conf.PKGDIR,
         conf.PORT_LOGDIR,
-        conf.USE
->>>>>>> Stashed changes
+        conf.USE,
+        EXTRA
     );
     
     char *new_dirs [] = {

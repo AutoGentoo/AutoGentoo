@@ -135,7 +135,6 @@ void server_respond (int n, struct manager * m_man)
                 l_argc = atoi (reqline[2]);
             }
             struct link_srv linked = get_link_srv (rt);
-<<<<<<< Updated upstream
             char **request_opts = malloc (sizeof (char*) * (l_argc + linked.argc));
             int sc_no;
             char sent = 0;
@@ -144,45 +143,12 @@ void server_respond (int n, struct manager * m_man)
             for (i=0; i != (l_argc + linked.argc); i++) {
                 request_opts[i] = strtok (NULL, "\n");
                 if (request_opts[i] == NULL) {
-=======
-            int sc_no;
-            char sent = 0;
-            char ip[16];
-            strcpy (ip, get_ip_from_fd (clients[n]));
-            if (rt == CREATE) {
-                m_man->clients[m_man->client_c].ip_c = 0;
-                strcpy(m_man->clients[m_man->client_c].hostname, strtok (NULL, "\n"));
-                strcpy(m_man->clients[m_man->client_c].ip[m_man->clients[m_man->client_c].ip_c], ip);
-                m_man->clients[m_man->client_c].ip_c++;
-                strcpy(m_man->clients[m_man->client_c].profile, strtok (NULL, "\n"));
-                strcpy(m_man->clients[m_man->client_c].CHOST, strtok (NULL, "\n"));
-                strcpy(m_man->clients[m_man->client_c].CFLAGS, strtok (NULL, "\n"));
-                strcpy(m_man->clients[m_man->client_c].CXXFLAGS, "${CFLAGS}");
-                strcpy(m_man->clients[m_man->client_c].USE, strtok (NULL, "\n"));
-                strcpy(m_man->clients[m_man->client_c].PORTAGE_TMPDIR, "autogentoo/tmp");
-                strcpy(m_man->clients[m_man->client_c].PORTDIR, "/usr/portage");
-                strcpy(m_man->clients[m_man->client_c].DISTDIR, "/usr/portage/distfiles");
-                strcpy(m_man->clients[m_man->client_c].PKGDIR, "autogentoo/pkg");
-                strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "autogentoo/log");
-                m_man->client_c++;
-                FILE * _fd = fopen (m_man->_config, "w+");
-                write_serve (fileno(_fd), m_man);
-                fclose (_fd);
-            }
-            else if (rt == ADDIP) {
-                sc_no = get_client_from_hostname (m_man, strtok (NULL, "\n"));
-                if (sc_no == -1) {
->>>>>>> Stashed changes
                     rsend (clients[n], BAD_REQUEST);
                     res = BAD_REQUEST;
                     sent = 1;
-                }
-                else {
-                    strcpy(m_man->clients[sc_no].ip[m_man->clients[sc_no].ip_c], ip);
-                    m_man->clients[sc_no].ip_c++;
+                    break;
                 }
             }
-<<<<<<< Updated upstream
             if (sent == 0) {
                 if (rt == CREATE) {
                     m_man->clients[m_man->client_c].ip_c = 0;
@@ -208,36 +174,48 @@ void server_respond (int n, struct manager * m_man)
                         write_serve (fileno(_fd), m_man);
                         fclose (_fd);
                     }
-=======
-            else if (rt == INIT) {
-                sc_no = get_client_from_ip (m_man, ip);
-                if (sc_no == -1) {
-                    rsend (clients[n], FORBIDDEN);
-                    res = FORBIDDEN;
+                }
+                else if (rt == ADDIP) {
+                    sc_no = get_client_from_hostname (m_man, request_opts[0]);
+                    if (sc_no == -1) {
+                        rsend (clients[n], BAD_REQUEST);
+                        res = BAD_REQUEST;
+                        sent = 1;
+                    }
+                    else {
+                        strcpy(m_man->clients[sc_no].ip[m_man->clients[sc_no].ip_c], ip);
+                        m_man->clients[sc_no].ip_c++;
+                    }
+                }
+                else if (rt == INIT) {
+                    sc_no = get_client_from_ip (m_man, ip);
+                    if (sc_no == -1) {
+                        rsend (clients[n], FORBIDDEN);
+                        res = FORBIDDEN;
+                        sent = 1;
+                    }
+                    else {
+                        init_serve_client (*m_man, m_man->clients[sc_no]);
+                    }
+                }
+                else if (rt == GETCLIENT) {
+                    sc_no = get_client_from_ip (m_man, ip);
                     sent = 1;
->>>>>>> Stashed changes
-                }
-                else {
-                    init_serve_client (*m_man, m_man->clients[sc_no]);
-                }
-            }
-            else if (rt == GETCLIENT) {
-                sc_no = get_client_from_ip (m_man, ip);
-                sent = 1;
-                if (sc_no == -1) {
-                    rsend (clients[n], NOT_FOUND);
-                    res = NOT_FOUND;
-                }
-                else {
-                    rsend (clients[n], OK);
-                    res = OK;
-                    char c_buff[256];
-                    sprintf (c_buff, "%s\n%s\n%s\n%s\n", 
-                             m_man->clients[sc_no].CFLAGS, 
-                             m_man->clients[sc_no].CXXFLAGS, 
-                             m_man->clients[sc_no].CHOST,
-                             m_man->clients[sc_no].USE);
-                    write (clients[n], c_buff, sizeof (c_buff));
+                    if (sc_no == -1) {
+                        rsend (clients[n], NOT_FOUND);
+                        res = NOT_FOUND;
+                    }
+                    else {
+                        rsend (clients[n], OK);
+                        res = OK;
+                        char c_buff[256];
+                        sprintf (c_buff, "%s\n%s\n%s\n%s\n", 
+                                 m_man->clients[sc_no].CFLAGS, 
+                                 m_man->clients[sc_no].CXXFLAGS, 
+                                 m_man->clients[sc_no].CHOST,
+                                 m_man->clients[sc_no].USE);
+                        write (clients[n], c_buff, sizeof (c_buff));
+                    }
                 }
             }
             if (sent == 0) {
