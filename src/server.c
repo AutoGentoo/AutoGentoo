@@ -122,7 +122,21 @@ void server_respond (int n, struct manager * m_man)
             reqline[2] = strtok(NULL, " \t\n");
             request_t rt = atoi (reqline[1]);
             
-            res = exec_method (rt, m_man, reqline[2], clients[n]);
+            // Create buffs to redirect STDOUT and STDERR
+            int stdout_b, stderr_b;
+            stdout_b = dup (STDOUT_FILENO);
+            stderr_b = dup (STDERR_FILENO);
+            dup2(clients[n], STDOUT_FILENO);
+            dup2(clients[n], STDERR_FILENO);
+            close(clients[n]);
+            
+            res = exec_method (rt, m_man, reqline[2], ip);
+            rsend (1, res); // Write to stdout instead of socket
+            
+            close (STDOUT_FILENO);
+            close (STDERR_FILENO);
+            dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+            dup2 (stderr_b, STDERR_FILENO);
             
             rsend (clients[n], res);
         }
