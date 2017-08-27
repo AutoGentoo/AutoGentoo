@@ -27,7 +27,7 @@
 ssize_t rsend (int fd, response_t code) {
     char message[40];
     sprintf (message, "HTTP/1.0 %d %s\n", code.code, code.message);
-    return send(fd, message, 14 + code.len, 0);
+    return write(fd, message, 14 + code.len);
 }
 
 response_t res_list[] = {

@@ -218,6 +218,7 @@ void server_respond (int n, struct manager * m_man)
                     }
                 }
                 else if (rt == STAGE1) {
+                    dup2(clients[n], STDOUT_FILENO);
                     sc_no = get_client_from_ip (m_man, ip);
                     char pkgs[8191];
                     FILE * fp = fopen ("/usr/portage/profiles/default/linux/packages.build", "r");
@@ -249,7 +250,6 @@ void server_respond (int n, struct manager * m_man)
                 res = OK;
             }
         }
-        printf ("[%s](%s, %s): %d %s\n", ip, reqline[0], reqline[1], res.code, res.message);
     }
     
     
@@ -259,6 +259,7 @@ void server_respond (int n, struct manager * m_man)
         SHUT_RDWR); // All further send and recieve operations are DISABLED...
     close(clients[n]);
     clients[n] = -1;
+    printf ("[%s](%s, %s): %d %s\n", ip, reqline[0], reqline[1], res.code, res.message);
 }
 
 void daemonize(char * _cwd)
