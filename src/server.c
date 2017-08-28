@@ -142,7 +142,10 @@ void server_respond (int n, struct manager * m_man)
                 dup2 (stderr_b, STDERR_FILENO);
                 exit (0);
             }
-            else return;
+            else {
+                close (clients[n]);
+                return;
+            }
         }
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
             reqline[1] = strtok(NULL, " \t");
@@ -278,7 +281,10 @@ void server_respond (int n, struct manager * m_man)
                             dup2 (stderr_b, STDERR_FILENO);
                             sent = 1;
                         }
-                        else return;
+                        else {
+                            close (clients[n]);
+                            return;
+                        }
                     }
                 }
                 else if (rt == UNOSYNC) {
@@ -306,7 +312,10 @@ void server_respond (int n, struct manager * m_man)
                             dup2 (stderr_b, STDERR_FILENO);
                             sent = 1;
                         }
-                        else return;
+                        else {
+                            close (clients[n]);
+                            return;
+                        }
                     }
                     else {
                         res = FORBIDDEN;
@@ -340,7 +349,10 @@ void server_respond (int n, struct manager * m_man)
                             dup2 (stderr_b, STDERR_FILENO);
                             sent = 1;
                         }
-                        else return;
+                        else {
+                            close (clients[n]);
+                            return;
+                        }
                     }
                     else {
                         res = FORBIDDEN;
