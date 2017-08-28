@@ -119,7 +119,7 @@ void server_respond (int n, struct manager * m_man)
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
             reqline[1] = strtok(NULL, " \t");
-            reqline[2] = strtok(NULL, " \t\n");
+            reqline[2] = strtok(NULL, "\n");
             request_t rt = atoi (reqline[1]);
             
             pid_t f_cpid = fork ();
