@@ -23,23 +23,11 @@
 
 #ifndef __AUTOGENTOO_SERVE_CLIENT__
 #define __AUTOGENTOO_SERVE_CLIENT__
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <response.h>
-#include <_string.h>
 
 struct serve_client { // Chroot environment 
     char hostname[64];
     char profile[128];
-    char ip[16][16]; // Multiple ip's can point to one client
-    int ip_c;
+    char id[16]; // 16 char id for ids
     
     // Architecture configuration
     char CFLAGS[1024];
@@ -64,8 +52,18 @@ struct _client {
     char USE[128];
 };
 
+struct _iptosc {
+    char ip[16];
+    char id[16];
+};
+
+#define MAX_CLIENTS 32
+
 struct manager {
-    struct serve_client clients[32];
+    struct serve_client clients[MAX_CLIENTS];
+    struct _iptosc current_actives[MAX_CLIENTS];    // Link ip to serve_client multiple to ips
+                                                    // Client can link to multiple server_clients and switch accordingly
+    int _iptosc_c;
     int client_c;
     int debug; // If true, will not write to config
     char root[256];
@@ -73,17 +71,19 @@ struct manager {
 };
 
 int get_client_from_ip (struct manager * m_man, char* ip);
+int get_client_from_id (struct manager * m_man, char* ip);
 void init_serve_client (struct manager m_man, struct serve_client conf);
 void _mkdir(const char *dir);
 void write_serve (int fd, struct manager * m_man);
 void read_serve (int fd, struct manager * m_man);
 int get_client_from_hostname  (struct manager * m_man, char * hostname);
 void write_client (char*);
+void _ip_activate (struct manager* m_man, char* ip, char* id);
 
 typedef enum {
     CREATE, // Create new serve_client
     INIT, // Initialize the new serve_client
-    ADDIP, // Add ip to serve_client ip list
+    ACTIVATE, // Active ip to id
     GETCLIENT, // Get client information (CFLAGS, CHOST etc.)
     STAGE1, // Emerge system base packages
     UNOSYNC, // emerge -uDN @world
@@ -96,17 +96,33 @@ struct link_srv {
     int argc;
 };
 
+struct str_req {
+    char* ID;
+    serve_c BIND;
+};
+
 extern struct link_srv link_methods [];
+extern struct str_req str_link[];
 
 #define L_CREATE (struct link_srv) {CREATE, 5}
 #define L_INIT (struct link_srv) {INIT, 0}
-#define L_ADDIP (struct link_srv) {ADDIP, 1} // Hostname of serve_client
-#define L_GETCLIENT (struct link_srv) {GETCLIENT, 0} // Automatically detect which client from ip
+#define L_ACTIVATE (struct link_srv) {ACTIVATE, 1} // ID of serve_client
+#define L_GETCLIENT (struct link_srv) {GETCLIENT, 1} // Ask for id
 #define L_STAGE1 (struct link_srv) {STAGE1, 0}
 #define L_UNOSYNC (struct link_srv) {UNOSYNC, 0}
 #define L_UPDATE (struct link_srv) {UPDATE, 0}
 #define L_EDIT (struct link_srv) {EDIT, 5}
 
+#define S_CREATE (struct str_req) {"CREATE", CREATE}
+#define S_INIT (struct str_req) {"INIT", INIT}
+#define S_ACTIVATE (struct str_req) {"ADDIP", ACTIVATE}
+#define S_GETCLIENT (struct str_req) {"GETCLIENT", GETCLIENT}
+#define S_STAGE1 (struct str_req) {"STAGE1", STAGE1}
+#define S_UNOSYNC (struct str_req) {"UNOSYNC", UNOSYNC}
+#define S_UPDATE (struct str_req) {"UPDATE", UPDATE}
+#define S_EDIT (struct str_req) {"EDIT", EDIT}
+
 struct link_srv get_link_srv (serve_c);
+struct link_srv get_link_str (char*);
 
 #endif

@@ -24,6 +24,8 @@
 
 #include <stdio.h>
 #include <_string.h>
+#include <stdlib.h>
+#include <time.h>
 
 void expand (char* dest, char** src, char* delim, size_t n) {
     int i;
@@ -71,4 +73,15 @@ int _strtok_n (char* s, char delim) {
     int i, j;
     for (i=n, j=0; s[i] != delim; i++, j++);
     return j;
+}
+
+void gen_id (char* id, int len) {
+    srandom(time(NULL));  // Correct seeding function for random()
+    char c;
+    int i;
+    for (i=0; i!=len; i++) {
+        c = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[random () % 62];
+        id[i] = c;
+    }
+    id[len+1] = '\0';
 }

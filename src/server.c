@@ -155,15 +155,15 @@ void server_respond (int n, struct manager * m_man)
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
             reqline[1] = strtok(NULL, " \t");
             reqline[2] = strtok(NULL, " \t\n");
-            serve_c rt = atoi (reqline[1]);
             int l_argc = 0;
             if (strncmp (reqline[2], "HTTP", 4) != 0) {
                 l_argc = atoi (reqline[2]);
             }
-            struct link_srv linked = get_link_srv (rt);
+            struct link_srv linked = get_link_str (reqline[1]);
+            serve_c rt = linked.command;
             char **request_opts = malloc (sizeof (char*) * (l_argc + linked.argc));
-            int sc_no;
             char sent = 0;
+            int sc_no;
             
             int i;
             for (i=0; i != (l_argc + linked.argc); i++) {
@@ -177,7 +177,6 @@ void server_respond (int n, struct manager * m_man)
             }
             if (sent == 0) {
                 if (rt == CREATE) {
-                    m_man->clients[m_man->client_c].ip_c = 0;
                     strcpy(m_man->clients[m_man->client_c].hostname, request_opts[0]);
                     strcpy(m_man->clients[m_man->client_c].profile, request_opts[1]);
                     strcpy(m_man->clients[m_man->client_c].CHOST, request_opts[2]);
@@ -192,25 +191,31 @@ void server_respond (int n, struct manager * m_man)
                     strcpy(m_man->clients[m_man->client_c].DISTDIR, "/usr/portage/distfiles");
                     strcpy(m_man->clients[m_man->client_c].PKGDIR, "autogentoo/pkg");
                     strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "autogentoo/log");
-                    strcpy(m_man->clients[m_man->client_c].ip[m_man->clients[m_man->client_c].ip_c], ip);
-                    m_man->clients[m_man->client_c].ip_c++;
+                    gen_id (m_man->clients[m_man->client_c].id, 14); // Leave extra space for buf and 1 for \0
+                    
+                    
+                    _ip_activate (m_man, ip, m_man->clients[m_man->client_c].id);
                     m_man->client_c++;
                     if(!m_man->debug) {
                         FILE * _fd = fopen (m_man->_config, "w+");
                         write_serve (fileno(_fd), m_man);
                         fclose (_fd);
                     }
+                    rsend (clients[n], OK);
+                    res = OK;
+                    sent = 1;
+                    write (clients[n], m_man->clients[m_man->client_c - 1].id, 16);
+                    write (clients[n], "\n", 1);
                 }
-                else if (rt == ADDIP) {
-                    sc_no = get_client_from_hostname (m_man, request_opts[0]);
+                else if (rt == ACTIVATE) {
+                    sc_no = get_client_from_id (m_man, request_opts[0]);
                     if (sc_no == -1) {
                         rsend (clients[n], BAD_REQUEST);
                         res = BAD_REQUEST;
                         sent = 1;
                     }
                     else {
-                        strcpy(m_man->clients[sc_no].ip[m_man->clients[sc_no].ip_c], ip);
-                        m_man->clients[sc_no].ip_c++;
+                        _ip_activate (m_man, ip, m_man->clients[sc_no].id);
                     }
                 }
                 else if (rt == INIT) {
@@ -225,7 +230,7 @@ void server_respond (int n, struct manager * m_man)
                     }
                 }
                 else if (rt == GETCLIENT) {
-                    sc_no = get_client_from_ip (m_man, ip);
+                    sc_no = get_client_from_id (m_man, request_opts[0]);
                     sent = 1;
                     if (sc_no == -1) {
                         rsend (clients[n], NOT_FOUND);
@@ -399,6 +404,7 @@ void server_respond (int n, struct manager * m_man)
                 rsend (clients[n], OK);
                 res = OK;
             }
+            free (request_opts); // Too many memory leaks
         }
     }
     
