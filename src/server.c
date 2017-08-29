@@ -365,6 +365,35 @@ void server_respond (int n, struct manager * m_man)
                     }
                     sent = 1;
                 }
+                else if (rt == EDIT) {
+                    sc_no = get_client_from_ip (m_man, ip);
+                    if (sc_no > -1) {
+                        strcpy(m_man->clients[sc_no].hostname, request_opts[0]);
+                        strcpy(m_man->clients[sc_no].profile, request_opts[1]);
+                        strcpy(m_man->clients[sc_no].CHOST, request_opts[2]);
+                        strcpy(m_man->clients[sc_no].CFLAGS, request_opts[3]);
+                        strcpy(m_man->clients[sc_no].CXXFLAGS, "${CFLAGS}");
+                        strcpy(m_man->clients[sc_no].USE, request_opts[4]);
+                        for (m_man->clients[sc_no].extra_c; m_man->clients[sc_no].extra_c!=(l_argc);m_man->clients[sc_no].extra_c++) {
+                            strcpy (m_man->clients[sc_no].EXTRA[m_man->clients[sc_no].extra_c], request_opts[m_man->clients[sc_no].extra_c+5]);
+                        }
+                        strcpy(m_man->clients[sc_no].PORTAGE_TMPDIR, "autogentoo/tmp");
+                        strcpy(m_man->clients[sc_no].PORTDIR, "/usr/portage");
+                        strcpy(m_man->clients[sc_no].DISTDIR, "/usr/portage/distfiles");
+                        strcpy(m_man->clients[sc_no].PKGDIR, "autogentoo/pkg");
+                        strcpy(m_man->clients[sc_no].PORT_LOGDIR, "autogentoo/log");
+                        if(!m_man->debug) {
+                            FILE * _fd = fopen (m_man->_config, "w+");
+                            write_serve (fileno(_fd), m_man);
+                            fclose (_fd);
+                        }
+                        else {
+                            res = FORBIDDEN;
+                            rsend (clients[n], res); // Write to stdout instead of socket
+                            sent = 1;
+                        }
+                    }
+                }
             }
             if (sent == 0) {
                 rsend (clients[n], OK);

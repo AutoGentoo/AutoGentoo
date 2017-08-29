@@ -189,7 +189,8 @@ struct link_srv link_methods [] = {
     L_GETCLIENT,
     L_STAGE1,
     L_UNOSYNC,
-    L_UPDATE
+    L_UPDATE,
+    L_EDIT
 };
 
 struct link_srv get_link_srv (serve_c c) {

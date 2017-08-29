@@ -86,8 +86,9 @@ typedef enum {
     ADDIP, // Add ip to serve_client ip list
     GETCLIENT, // Get client information (CFLAGS, CHOST etc.)
     STAGE1, // Emerge system base packages
-    UNOSYNC, // Emerge build deps
-    UPDATE
+    UNOSYNC, // emerge -uDN @world
+    UPDATE, // emerge --sync && emerge -uDN @world
+    EDIT // Edit your make.conf and serve_client configuration
 } serve_c;
 
 struct link_srv {
@@ -104,6 +105,7 @@ extern struct link_srv link_methods [];
 #define L_STAGE1 (struct link_srv) {STAGE1, 0}
 #define L_UNOSYNC (struct link_srv) {UNOSYNC, 0}
 #define L_UPDATE (struct link_srv) {UPDATE, 0}
+#define L_EDIT (struct link_srv) {EDIT, 5}
 
 struct link_srv get_link_srv (serve_c);
 
