@@ -84,6 +84,9 @@ void server_respond (int n, struct manager * m_man)
         reqline[0] = strtok(mesg, " \t");
         ip = get_ip_from_fd (clients[n]);
         if (strncmp(reqline[0], "GET\0", 4) == 0) {
+            pid_t g_pid = fork ();
+            if (g_pid < 0) exit (1);
+            if (g_pid == 0) {close (clients[n]); return;}
             reqline[1] = strtok(NULL, " \t");
             reqline[2] = strtok(NULL, " \t\n");
             if (strncmp(reqline[2], "HTTP/1.0", 8) != 0 && strncmp(reqline[2], "HTTP/1.1", 8) != 0) {
@@ -116,6 +119,8 @@ void server_respond (int n, struct manager * m_man)
                     }
                 }
             }
+            close (clients[n]);
+            //exit (0); // Allow fork() to reach printf at end
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
             reqline[1] = strtok(NULL, " \t");
@@ -140,7 +145,7 @@ void server_respond (int n, struct manager * m_man)
                 close (STDERR_FILENO);
                 dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
                 dup2 (stderr_b, STDERR_FILENO);
-                exit (0);
+                //exit (0);
             }
             else {
                 close (clients[n]);
