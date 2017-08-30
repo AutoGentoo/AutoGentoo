@@ -83,13 +83,15 @@ void server_respond (int n, struct manager * m_man)
     else // message received
     {
         reqline[0] = strtok(mesg, " \t");
+        reqline[1] = strtok(NULL, " \t");
+        reqline[2] = strtok(NULL, " \n");
         ip = get_ip_from_fd (clients[n]);
+        printf ("[%s](%s, %s): ", ip, reqline[0], reqline[1]);
+        fflush (stdout);
         if (strncmp(reqline[0], "GET\0", 4) == 0) {
             pid_t g_pid = fork ();
             if (g_pid < 0) exit (1);
             if (g_pid == 0) {close (clients[n]); return;}
-            reqline[1] = strtok(NULL, " \t");
-            reqline[2] = strtok(NULL, " \t\n");
             if (strncmp(reqline[2], "HTTP/1.0", 8) != 0 && strncmp(reqline[2], "HTTP/1.1", 8) != 0) {
                 rsend (clients[n], BAD_REQUEST);
             }
@@ -124,8 +126,6 @@ void server_respond (int n, struct manager * m_man)
             //exit (0); // Allow fork() to reach printf at end
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
-            reqline[1] = strtok(NULL, " \t");
-            reqline[2] = strtok(NULL, "\n");
             request_t rt = atoi (reqline[1]);
             
             pid_t f_cpid = fork ();
@@ -154,15 +154,13 @@ void server_respond (int n, struct manager * m_man)
             }
         }
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
-            reqline[1] = strtok(NULL, " \t");
-            reqline[2] = strtok(NULL, " \t\n");
             int l_argc = 0;
             if (strncmp (reqline[2], "HTTP", 4) != 0) {
                 l_argc = atoi (reqline[2]);
             }
             struct link_srv linked = get_link_str (reqline[1]);
             serve_c rt = linked.command;
-            char **request_opts = malloc (sizeof (char*) * (l_argc + linked.argc));
+            char *request_opts[32];
             char sent = 0;
             int sc_no;
             
@@ -425,21 +423,25 @@ void server_respond (int n, struct manager * m_man)
                     write (clients[n], "\n", sizeof(char));
                     int i;
                     for (i=0; i!=m_man->client_c; i++) {
-                        write (clients[n], m_man->clients[i].id, strlen(m_man->clients[i].id));
+                        write (clients[n], m_man->clients[i].id, 14);
                         write (clients[n], "\n", sizeof(char));
                     } // No need to rsend, leave it for post scope
                 }
                 else if (rt == GETACTIVE) {
                     sc_no = get_client_from_ip (m_man, ip);
-                    write (clients[n], m_man->clients[sc_no].id, strlen(m_man->clients[sc_no].id));
-                    write (clients[n], "\n", 1);
+                    if (sc_no > -1) {
+                        write (clients[n], m_man->clients[sc_no].id, strlen(m_man->clients[sc_no].id));
+                        write (clients[n], "\n", 1);
+                    }
+                    else {
+                        write (clients[n], "invalid\n", 8);
+                    }
                 }
             }
             if (sent == 0) {
                 rsend (clients[n], OK);
                 res = OK;
             }
-            free (request_opts); // Too many memory leaks
         }
     }
     
@@ -450,7 +452,7 @@ void server_respond (int n, struct manager * m_man)
         SHUT_RDWR); // All further send and recieve operations are DISABLED...
     close(clients[n]);
     clients[n] = -1;
-    printf ("[%s](%s, %s): %d %s\n", ip, reqline[0], reqline[1], res.code, res.message);
+    printf ("%d %s\n", res.code, res.message);
 }
 
 void daemonize(char * _cwd)
