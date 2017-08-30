@@ -119,7 +119,7 @@ extern struct str_req str_link[];
 
 #define S_CREATE (struct str_req) {"CREATE", CREATE}
 #define S_INIT (struct str_req) {"INIT", INIT}
-#define S_ACTIVATE (struct str_req) {"ADDIP", ACTIVATE}
+#define S_ACTIVATE (struct str_req) {"ACTIVATE", ACTIVATE}
 #define S_GETCLIENT (struct str_req) {"GETCLIENT", GETCLIENT}
 #define S_STAGE1 (struct str_req) {"STAGE1", STAGE1}
 #define S_UNOSYNC (struct str_req) {"UNOSYNC", UNOSYNC}
