@@ -218,6 +218,11 @@ void server_respond (int n, struct manager * m_man)
                     else {
                         _ip_activate (m_man, ip, m_man->clients[sc_no].id);
                     }
+                    if(!m_man->debug) {
+                        FILE * _fd = fopen (m_man->_config, "w+");
+                        write_serve (fileno(_fd), m_man);
+                        fclose (_fd);
+                    }
                 }
                 else if (rt == INIT) {
                     sc_no = get_client_from_ip (m_man, ip);
