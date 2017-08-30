@@ -88,7 +88,9 @@ typedef enum {
     STAGE1, // Emerge system base packages
     UNOSYNC, // emerge -uDN @world
     UPDATE, // emerge --sync && emerge -uDN @world
-    EDIT // Edit your make.conf and serve_client configuration
+    EDIT, // Edit your make.conf and serve_client configuration
+    GETCLIENTS, // Not to be confused with GETCLIENTS, first return line will be client_c followed by \n delimed ids
+    GETACTIVE // Returns id of active client from the ip of request
 } serve_c;
 
 struct link_srv {
@@ -112,6 +114,8 @@ extern struct str_req str_link[];
 #define L_UNOSYNC (struct link_srv) {UNOSYNC, 0}
 #define L_UPDATE (struct link_srv) {UPDATE, 0}
 #define L_EDIT (struct link_srv) {EDIT, 5}
+#define L_GETCLIENTS (struct link_srv) {GETCLIENTS, 0}
+#define L_GETACTIVE (struct link_srv) {GETACTIVE, 0}
 
 #define S_CREATE (struct str_req) {"CREATE", CREATE}
 #define S_INIT (struct str_req) {"INIT", INIT}
@@ -121,6 +125,8 @@ extern struct str_req str_link[];
 #define S_UNOSYNC (struct str_req) {"UNOSYNC", UNOSYNC}
 #define S_UPDATE (struct str_req) {"UPDATE", UPDATE}
 #define S_EDIT (struct str_req) {"EDIT", EDIT}
+#define S_GETCLIENTS (struct str_req) {"GETCLIENTS", GETCLIENTS}
+#define S_GETACTIVE (struct str_req) {"GETACTIVE", GETACTIVE}
 
 struct link_srv get_link_srv (serve_c);
 struct link_srv get_link_str (char*);

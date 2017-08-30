@@ -25,6 +25,7 @@
 #include <server.h>
 #include <_string.h>
 #include <response.h>
+#include <stdlib.h>
 
 void server_start (char* port)
 {
@@ -240,11 +241,24 @@ void server_respond (int n, struct manager * m_man)
                         rsend (clients[n], OK);
                         res = OK;
                         char c_buff[1024];
-                        sprintf (c_buff, "%s\n%s\n%s\n%s\n", 
-                                 m_man->clients[sc_no].CFLAGS, 
-                                 m_man->clients[sc_no].CXXFLAGS, 
+                        char EXTRA [2048];
+                        
+                        sprintf (EXTRA, "");
+                        
+                        int i_c;
+                        for (i_c=0; i_c!=m_man->clients[sc_no].extra_c; i_c++) {
+                            strcat (EXTRA, m_man->clients[sc_no].EXTRA[i_c]);
+                            strcat (EXTRA, "\n");
+                        }
+                        sprintf (c_buff, "%d\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n", 
+                                 m_man->clients[sc_no].extra_c,
+                                 m_man->clients[sc_no].CFLAGS,
+                                 m_man->clients[sc_no].CXXFLAGS,
                                  m_man->clients[sc_no].CHOST,
-                                 m_man->clients[sc_no].USE);
+                                 m_man->clients[sc_no].USE,
+                                 m_man->clients[sc_no].hostname,
+                                 m_man->clients[sc_no].profile,
+                                 EXTRA);
                         write (clients[n], c_buff, sizeof (c_buff));
                     }
                 }
@@ -398,6 +412,22 @@ void server_respond (int n, struct manager * m_man)
                             sent = 1;
                         }
                     }
+                }
+                else if (rt == GETCLIENTS) {
+                    char n_buff[12];
+                    snprintf(n_buff, 12, "%d", m_man->client_c);
+                    write (clients[n], n_buff, 12);
+                    write (clients[n], "\n", sizeof(char));
+                    int i;
+                    for (i=0; i!=m_man->client_c; i++) {
+                        write (clients[n], m_man->clients[i].id, strlen(m_man->clients[i].id));
+                        write (clients[n], "\n", sizeof(char));
+                    } // No need to rsend, leave it for post scope
+                }
+                else if (rt == GETACTIVE) {
+                    sc_no = get_client_from_ip (m_man, ip);
+                    write (clients[n], m_man->clients[sc_no].id, strlen(m_man->clients[sc_no].id));
+                    write (clients[n], "\n", 1);
                 }
             }
             if (sent == 0) {
