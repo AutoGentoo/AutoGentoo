@@ -28,18 +28,21 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=3
-FILE_NAME_0=2460;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Frequest.c;0;4
-FILE_NAME_1=4100;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.c;0;4
-FILE_NAME_2=6011;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fautogentoo.c;0;4
-FILE_NAME_3=3976;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserve_client.c;0;4
-FILE_NAME_4=1749;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserve_client.h;0;4
-FILE_NAME_5=2029;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Frequest.h;0;4
-FILE_NAME_6=1476;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserver.h;0;4
-FILE_NAME_7=884;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fautogentoo.h;0;4
-FILE_NAME_8=634;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fresponse.h;0;4
-FILE_NAME_9=1529;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2F_string.c;0;4
-FILE_NAME_10=1112;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2F_string.h;0;4
+current_page=11
+FILE_NAME_0=2331;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserve_client.c;0;4
+FILE_NAME_1=3409;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserve_client.h;0;4
+FILE_NAME_2=3154;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Frequest.c;0;4
+FILE_NAME_3=9963;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.c;0;4
+FILE_NAME_4=844;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2F_string.c;0;4
+FILE_NAME_5=6011;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fautogentoo.c;0;4
+FILE_NAME_6=1794;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Frequest.h;0;4
+FILE_NAME_7=1386;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserver.h;0;4
+FILE_NAME_8=884;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fautogentoo.h;0;4
+FILE_NAME_9=634;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fresponse.h;0;4
+FILE_NAME_10=1136;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2F_string.h;0;4
+FILE_NAME_11=10;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fs.test;0;4
+FILE_NAME_12=250;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FVideoGame17%2Fsrc%2Fmain.ts;0;4
+FILE_NAME_13=1572;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Femerge.c;0;4
 
 [VTE]
 last_dir=/home/atuser/Documents
