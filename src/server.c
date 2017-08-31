@@ -418,8 +418,8 @@ void server_respond (int n, struct manager * m_man)
                 }
                 else if (rt == GETCLIENTS) {
                     char n_buff[12];
-                    snprintf(n_buff, 12, "%d", m_man->client_c);
-                    write (clients[n], n_buff, 12);
+                    sprintf(n_buff, "%d", m_man->client_c);
+                    write (clients[n], n_buff, strlen(n_buff));
                     write (clients[n], "\n", sizeof(char));
                     int i;
                     for (i=0; i!=m_man->client_c; i++) {
