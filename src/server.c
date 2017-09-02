@@ -88,12 +88,18 @@ void server_respond (int n, struct manager * m_man)
         ip = get_ip_from_fd (clients[n]);
         printf ("[%s](%s, %s): ", ip, reqline[0], reqline[1]);
         fflush (stdout);
+        if (reqline[2] == NULL) {
+            res = BAD_REQUEST;
+            rsend (clients[n], BAD_REQUEST);
+            reqline[0] = "\0"; // Make sure that the request doesn't continue
+        }
         if (strncmp(reqline[0], "GET\0", 4) == 0) {
             pid_t g_pid = fork ();
             if (g_pid < 0) exit (1);
             if (g_pid == 0) {close (clients[n]); return;}
             if (strncmp(reqline[2], "HTTP/1.0", 8) != 0 && strncmp(reqline[2], "HTTP/1.1", 8) != 0) {
                 rsend (clients[n], BAD_REQUEST);
+                res = BAD_REQUEST;
             }
             else {
                 if (strncmp(reqline[1], "/\0", 2) == 0)
