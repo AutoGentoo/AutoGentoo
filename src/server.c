@@ -112,7 +112,7 @@ void server_respond (int n, struct manager * m_man)
                     res = FORBIDDEN;
                 }
                 else {
-                    sprintf (path, "%s/%s/autogentoo/pkg/%s", m_man->root, m_man->clients[sc_no].hostname, reqline[1]);
+                    sprintf (path, "%s/%s/autogentoo/pkg/%s", m_man->root, m_man->clients[sc_no].id, reqline[1]);
                 
                     if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
                     {
