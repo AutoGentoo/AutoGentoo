@@ -84,7 +84,7 @@ void server_respond (int n, struct manager * m_man)
     {
         reqline[0] = strtok(mesg, " \t");
         reqline[1] = strtok(NULL, " \t");
-        reqline[2] = strtok(NULL, " \n");
+        reqline[2] = strtok(NULL, "\n");
         ip = get_ip_from_fd (clients[n]);
         printf ("[%s](%s, %s): ", ip, reqline[0], reqline[1]);
         fflush (stdout);
