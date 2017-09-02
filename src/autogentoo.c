@@ -23,6 +23,10 @@
  
 #include <autogentoo.h>
 
+#ifndef AUTOGENTOO_DATADIR
+#define AUTOGENTOO_DATADIR "/usr/local/share/autogentoo" // Just incase you are doing it manually
+#endif
+
 char IS_CLIENT = 0;
 
 void _getcwd (char* out, size_t size) {

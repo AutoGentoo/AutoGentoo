@@ -1,8 +1,11 @@
 AM_CFLAGS = ${AUTOGENTOO_CFLAGS} ${PYTHON_CFLAGS} -I$(top_srcdir)/include/ $(PYTHON_LIBS)
 ACLOCAL_AMFLAGS='-I m4'
 
+pkgdata_DATA = update.py
+
 bin_PROGRAMS = autogentoo
 autogentoo_SOURCES = autogentoo.c
+autogentoo_CFLAGS = -D AUTOGENTOO_DATADIR=$(pkgdatadir) ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/
 autogentoo_LDADD = libautogentoo.la
 
 #check_PROGRAMS = testlibip testipscan
