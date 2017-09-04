@@ -77,12 +77,14 @@ void server_respond (int n, struct manager * m_man)
 
     rcvd = recv(clients[n], mesg, 99999, 0);
     int __error = 0;
-    if (rcvd < 0) // receive error
+    if (rcvd < 0) { // receive error
         fprintf(stderr, ("recv() error\n"));
         __error = 1;
-    else if (rcvd == 0) // receive socket closed
+    }
+    else if (rcvd == 0) { // receive socket closed
         fprintf(stderr, "Client disconnected upexpectedly.\n");
         __error = 2;
+    }
     else // message received
     {
         reqline[0] = strtok(mesg, " \t");
@@ -397,7 +399,7 @@ void server_respond (int n, struct manager * m_man)
                     sent = 1;
                 }
                 else if (rt == EDIT) {
-                    sc_no = get_client_from_ip (m_man, ip);
+                    sc_no = get_client_from_id (m_man, reqline[2]);
                     if (sc_no > -1) {
                         strcpy(m_man->clients[sc_no].hostname, request_opts[0]);
                         strcpy(m_man->clients[sc_no].profile, request_opts[1]);
