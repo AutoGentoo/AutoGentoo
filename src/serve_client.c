@@ -226,7 +226,8 @@ struct str_req str_link[] = {
     S_EDIT,
     S_GETCLIENTS,
     S_GETACTIVE,
-    S_GETSPEC
+    S_GETSPEC,
+    S_SYNC
 };
 
 struct link_srv link_methods [] = {
@@ -240,7 +241,8 @@ struct link_srv link_methods [] = {
     L_EDIT,
     L_GETCLIENTS,
     L_GETACTIVE,
-    L_GETSPEC
+    L_GETSPEC,
+    L_SYNC
 };
 
 struct link_srv get_link_srv (serve_c c) {

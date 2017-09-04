@@ -91,7 +91,8 @@ typedef enum {
     EDIT, // Edit your make.conf and serve_client configuration
     GETCLIENTS, // Not to be confused with GETCLIENTS, first return line will be client_c followed by \n delimed ids
     GETACTIVE, // Returns id of active client from the ip of request
-    GETSPEC // Returns specs about the build server
+    GETSPEC, // Returns specs about the build server
+    SYNC // Run emerge --sync
 } serve_c;
 
 struct link_srv {
@@ -118,6 +119,7 @@ extern struct str_req str_link[];
 #define L_GETCLIENTS (struct link_srv) {GETCLIENTS, 0}
 #define L_GETACTIVE (struct link_srv) {GETACTIVE, 0}
 #define L_GETSPEC (struct link_srv) {GETSPEC, 0}
+#define L_SYNC (struct link_srv) {SYNC, 0}
 
 #define S_CREATE (struct str_req) {"CREATE", CREATE}
 #define S_INIT (struct str_req) {"INIT", INIT}
@@ -130,6 +132,7 @@ extern struct str_req str_link[];
 #define S_GETCLIENTS (struct str_req) {"GETCLIENTS", GETCLIENTS}
 #define S_GETACTIVE (struct str_req) {"GETACTIVE", GETACTIVE}
 #define S_GETSPEC (struct str_req) {"GETSPEC", GETSPEC}
+#define S_SYNC (struct str_req) {"SYNC", SYNC}
 
 struct link_srv get_link_srv (serve_c);
 struct link_srv get_link_str (char*);

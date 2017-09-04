@@ -361,6 +361,40 @@ void server_respond (int n, struct manager * m_man)
                     }
                     sent = 1;
                 }
+                else if (rt == SYNC) {
+                    // Create buffs to redirect STDOUT and STDERR
+                    int stdout_b, stderr_b;
+                    // Create buffs to redirect STDOUT and STDERR
+                    pid_t f_upid = fork ();
+                    if (f_upid < 0) exit (1);
+                    if (f_upid == 0) {
+                        int stdout_b, stderr_b;
+                        stdout_b = dup (STDOUT_FILENO);
+                        stderr_b = dup (STDERR_FILENO);
+                        dup2(clients[n], STDOUT_FILENO);
+                        dup2(clients[n], STDERR_FILENO);
+                        close(clients[n]);
+                        
+                        if (system("emerge --sync") != 0) {
+                            res = INTERNAL_ERROR;
+                        }
+                        else {
+                            res = OK;
+                        }
+                        
+                        rsend (1, res); // Write to stdout instead of socket
+                        
+                        close (STDOUT_FILENO);
+                        close (STDERR_FILENO);
+                        dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+                        dup2 (stderr_b, STDERR_FILENO);
+                        sent = 1;
+                    }
+                    else {
+                        close (clients[n]);
+                        return;
+                    }
+                }
                 else if (rt == UPDATE) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
