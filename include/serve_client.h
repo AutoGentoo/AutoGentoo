@@ -79,6 +79,7 @@ void read_serve (int fd, struct manager * m_man);
 int get_client_from_hostname  (struct manager * m_man, char * hostname);
 void write_client (char*);
 void _ip_activate (struct manager* m_man, char* ip, char* id);
+void remove_client (struct manager* m_man, int index);
 
 typedef enum {
     CREATE, // Create new serve_client
@@ -92,7 +93,8 @@ typedef enum {
     GETCLIENTS, // Not to be confused with GETCLIENTS, first return line will be client_c followed by \n delimed ids
     GETACTIVE, // Returns id of active client from the ip of request
     GETSPEC, // Returns specs about the build server
-    SYNC // Run emerge --sync
+    SYNC, // Run emerge --sync
+    SCREMOVE // Id to remove
 } serve_c;
 
 struct link_srv {
@@ -120,6 +122,7 @@ extern struct str_req str_link[];
 #define L_GETACTIVE (struct link_srv) {GETACTIVE, 0}
 #define L_GETSPEC (struct link_srv) {GETSPEC, 0}
 #define L_SYNC (struct link_srv) {SYNC, 0}
+#define L_SCREMOVE (struct link_srv) {SCREMOVE, 1}
 
 #define S_CREATE (struct str_req) {"CREATE", CREATE}
 #define S_INIT (struct str_req) {"INIT", INIT}
@@ -133,6 +136,7 @@ extern struct str_req str_link[];
 #define S_GETACTIVE (struct str_req) {"GETACTIVE", GETACTIVE}
 #define S_GETSPEC (struct str_req) {"GETSPEC", GETSPEC}
 #define S_SYNC (struct str_req) {"SYNC", SYNC}
+#define S_SCREMOVE (struct str_req) {"SCREMOVE", SCREMOVE}
 
 struct link_srv get_link_srv (serve_c);
 struct link_srv get_link_str (char*);
