@@ -41,6 +41,8 @@ class Server:
         reply = server_socket.send (b"SRV GETCLIENTS HTTP/1.0\n").decode ('utf-8')
         server_socket.close ()
         split = reply.split ("\n")
+        self.clients = []
+        self.ids = []
         for i in range (0, int(split[0])):
             self.ids.append (split[i+1])
             self.clients.append (Client (split[i+1], self))

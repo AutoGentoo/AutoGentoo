@@ -310,7 +310,7 @@
                     <property name="can_focus">False</property>
                     <property name="margin_bottom">6</property>
                     <child>
-                      <object class="GtkLabel" id="_chost_info2">
+                      <object class="GtkLabel" id="_hostname_info">
                         <property name="width_request">90</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -337,6 +337,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="has_frame">False</property>
+                                <signal name="changed" handler="client_change" swapped="no"/>
                               </object>
                             </child>
                           </object>
@@ -353,6 +354,58 @@
                     <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="_profile_top">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_bottom">6</property>
+                    <child>
+                      <object class="GtkLabel" id="_profile_info">
+                        <property name="width_request">90</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">profile</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScrolledWindow" id="_profile_scroll">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="vscrollbar_policy">never</property>
+                        <property name="shadow_type">in</property>
+                        <child>
+                          <object class="GtkViewport" id="_profile_viewport">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkEntry" id="profile">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="has_frame">False</property>
+                                <signal name="changed" handler="client_change" swapped="no"/>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
                 <child>
@@ -388,57 +441,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="has_frame">False</property>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">4</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkBox" id="_use_top">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="margin_bottom">6</property>
-                    <child>
-                      <object class="GtkLabel" id="_use_info">
-                        <property name="width_request">90</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">USE</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkScrolledWindow" id="_use_scroll">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="vscrollbar_policy">never</property>
-                        <property name="shadow_type">in</property>
-                        <child>
-                          <object class="GtkViewport" id="_use_viewport">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkEntry" id="use">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="has_frame">False</property>
+                                <signal name="changed" handler="client_change" swapped="no"/>
                               </object>
                             </child>
                           </object>
@@ -502,6 +505,58 @@
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkBox" id="_use_top">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_bottom">6</property>
+                    <child>
+                      <object class="GtkLabel" id="_use_info">
+                        <property name="width_request">90</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">USE</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScrolledWindow" id="_use_scroll">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="vscrollbar_policy">never</property>
+                        <property name="shadow_type">in</property>
+                        <child>
+                          <object class="GtkViewport" id="_use_viewport">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkEntry" id="use">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="has_frame">False</property>
+                                <signal name="changed" handler="client_change" swapped="no"/>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">7</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkButton" id="_client_apply">
                     <property name="label">gtk-apply</property>
                     <property name="visible">True</property>
@@ -517,8 +572,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="pack_type">end</property>
-                    <property name="position">7</property>
+                    <property name="position">8</property>
                   </packing>
                 </child>
               </object>
@@ -583,5 +637,7 @@
     </columns>
   </object>
   <object class="GtkTextBuffer" id="_server_spec"/>
-  <object class="GtkTextBuffer" id="extra"/>
+  <object class="GtkTextBuffer" id="extra">
+    <signal name="changed" handler="client_change" swapped="no"/>
+  </object>
 </interface>
