@@ -49,8 +49,8 @@ class ui:
         self.server = server
         self.builder = Gtk.Builder()
         self.builder.add_from_file (self.file_p)
-        self.clients_tree = TreeGrid (str, str, str, str, str)
-        self.clients_tree.render (self.builder.get_object ("client_list_scroll"), ("ID", "Address", "Hostname", "Profile", "CHOST"))
+        self.clients_tree = TreeGrid (str, str, str, str, str, str)
+        self.clients_tree.render (self.builder.get_object ("client_list_scroll"), ("ID", "Address", "Hostname", "Profile", "CHOST", "Active"))
         self.window = self.builder.get_object ("window_main")
         self.window.connect("delete-event", Gtk.main_quit)
         cpuinfo = self.builder.get_object ("_server_spec")
@@ -71,8 +71,9 @@ class ui:
     def regen (self):
         self.server.regen ()
         self.clients_tree.treestore.clear()
-        for client in self.server.clients:
-            self.clients_tree.treestore.append (None, [client._id, self.server.ip, client.hostname, "...%s" % client.profile[-20:], client.CHOST])
+        for i in range (len(self.server.clients)):
+            client = self.server.clients[i]
+            self.clients_tree.treestore.append (None, [client._id, self.server.ip, client.hostname, "...%s" % client.profile[-20:], client.CHOST, "•" if i == self.server.active else ""])
         self.gen_active ()
     
     def client_change (self, widget):
