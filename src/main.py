@@ -22,18 +22,17 @@
 #  
 #  
 
+import autogentoo
+from ui import ui
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-import autogentoo
 
 def main(args):
     server_main = autogentoo.Server ("192.168.1.160")
     server_main.regen ()
-    cmd = ""
-    while (cmd not in ("q", "quit", "exit")):
-        exec ("print (%s)" % cmd)
-        cmd = input (": ")
+    ui_main = ui ("../ui/main.ui", server_main)
+    Gtk.main ()
     return 0
 
 if __name__ == '__main__':
