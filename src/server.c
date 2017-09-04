@@ -25,6 +25,7 @@
 #include <server.h>
 #include <_string.h>
 #include <response.h>
+#include <sys/sysinfo.h>
 #include <stdlib.h>
 
 void server_start (char* port)
@@ -442,6 +443,22 @@ void server_respond (int n, struct manager * m_man)
                     else {
                         write (clients[n], "invalid\n", 8);
                     }
+                }
+                else if (rt == GETSPEC) {
+                    char out_buff [8192];
+                    system ("lscpu > build.spec");
+                    FILE *fp = fopen("build.spec", "r");
+                    int symbol;
+                    if(fp != NULL)
+                    {
+                        while((symbol = getc(fp)) != EOF)
+                        {
+                            strcat(out_buff, &symbol);
+                        }
+                        fclose(fp);
+                        remove ("build.spec");
+                    }
+                    write (clients[n], out_buff, strlen (out_buff));
                 }
             }
             if (sent == 0) {
