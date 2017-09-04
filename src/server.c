@@ -211,11 +211,11 @@ void server_respond (int n, struct manager * m_man)
                         write_serve (fileno(_fd), m_man);
                         fclose (_fd);
                     }
+                    write (clients[n], m_man->clients[m_man->client_c - 1].id, strlen(m_man->clients[m_man->client_c - 1].id));
+                    write (clients[n], "\n", 1);
                     rsend (clients[n], OK);
                     res = OK;
                     sent = 1;
-                    write (clients[n], m_man->clients[m_man->client_c - 1].id, 16);
-                    write (clients[n], "\n", 1);
                 }
                 else if (rt == ACTIVATE) {
                     sc_no = get_client_from_id (m_man, request_opts[0]);
