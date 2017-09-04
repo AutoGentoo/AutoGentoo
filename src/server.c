@@ -477,9 +477,7 @@ void server_respond (int n, struct manager * m_man)
         SHUT_RDWR); // All further send and recieve operations are DISABLED...
     close(clients[n]);
     clients[n] = -1;
-    if (error == 0) {
-        printf ("%d %s\n", res.code, res.message);
-    }
+    printf ("%d %s\n", res.code, res.message);
 }
 
 void daemonize(char * _cwd)
