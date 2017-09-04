@@ -114,7 +114,7 @@ extern struct str_req str_link[];
 #define L_STAGE1 (struct link_srv) {STAGE1, 0}
 #define L_UNOSYNC (struct link_srv) {UNOSYNC, 0}
 #define L_UPDATE (struct link_srv) {UPDATE, 0}
-#define L_EDIT (struct link_srv) {EDIT, 5}
+#define L_EDIT (struct link_srv) {EDIT, 6}
 #define L_GETCLIENTS (struct link_srv) {GETCLIENTS, 0}
 #define L_GETACTIVE (struct link_srv) {GETACTIVE, 0}
 #define L_GETSPEC (struct link_srv) {GETSPEC, 0}

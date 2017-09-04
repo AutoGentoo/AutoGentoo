@@ -399,16 +399,16 @@ void server_respond (int n, struct manager * m_man)
                     sent = 1;
                 }
                 else if (rt == EDIT) {
-                    sc_no = get_client_from_id (m_man, reqline[2]);
+                    sc_no = get_client_from_id (m_man, reqline[0]);
                     if (sc_no > -1) {
-                        strcpy(m_man->clients[sc_no].hostname, request_opts[0]);
-                        strcpy(m_man->clients[sc_no].profile, request_opts[1]);
-                        strcpy(m_man->clients[sc_no].CHOST, request_opts[2]);
-                        strcpy(m_man->clients[sc_no].CFLAGS, request_opts[3]);
+                        strcpy(m_man->clients[sc_no].hostname, request_opts[1]);
+                        strcpy(m_man->clients[sc_no].profile, request_opts[2]);
+                        strcpy(m_man->clients[sc_no].CHOST, request_opts[3]);
+                        strcpy(m_man->clients[sc_no].CFLAGS, request_opts[4]);
                         strcpy(m_man->clients[sc_no].CXXFLAGS, "${CFLAGS}");
-                        strcpy(m_man->clients[sc_no].USE, request_opts[4]);
-                        for (m_man->clients[sc_no].extra_c; m_man->clients[sc_no].extra_c!=(l_argc);m_man->clients[sc_no].extra_c++) {
-                            strcpy (m_man->clients[sc_no].EXTRA[m_man->clients[sc_no].extra_c], request_opts[m_man->clients[sc_no].extra_c+5]);
+                        strcpy(m_man->clients[sc_no].USE, request_opts[5]);
+                        for (m_man->clients[sc_no].extra_c=0; m_man->clients[sc_no].extra_c!=(l_argc);m_man->clients[sc_no].extra_c++) {
+                            strcpy (m_man->clients[sc_no].EXTRA[m_man->clients[sc_no].extra_c], request_opts[m_man->clients[sc_no].extra_c+6]);
                         }
                         strcpy(m_man->clients[sc_no].PORTAGE_TMPDIR, "autogentoo/tmp");
                         strcpy(m_man->clients[sc_no].PORTDIR, "/usr/portage");
