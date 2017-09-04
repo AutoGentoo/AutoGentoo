@@ -420,11 +420,11 @@ void server_respond (int n, struct manager * m_man)
                             write_serve (fileno(_fd), m_man);
                             fclose (_fd);
                         }
-                        else {
-                            res = FORBIDDEN;
-                            rsend (clients[n], res); // Write to stdout instead of socket
-                            sent = 1;
-                        }
+                    }
+                    else {
+                        res = NOT_FOUND;
+                        rsend (clients[n], res); // Write to stdout instead of socket
+                        sent = 1;
                     }
                 }
                 else if (rt == GETCLIENTS) {
