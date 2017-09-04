@@ -76,11 +76,13 @@ void server_respond (int n, struct manager * m_man)
     memset((void*)mesg, (int)'\0', 99999);
 
     rcvd = recv(clients[n], mesg, 99999, 0);
-
+    int __error = 0;
     if (rcvd < 0) // receive error
         fprintf(stderr, ("recv() error\n"));
+        __error = 1;
     else if (rcvd == 0) // receive socket closed
         fprintf(stderr, "Client disconnected upexpectedly.\n");
+        __error = 2;
     else // message received
     {
         reqline[0] = strtok(mesg, " \t");
@@ -473,7 +475,9 @@ void server_respond (int n, struct manager * m_man)
         SHUT_RDWR); // All further send and recieve operations are DISABLED...
     close(clients[n]);
     clients[n] = -1;
-    printf ("%d %s\n", res.code, res.message);
+    if (error == 0) {
+        printf ("%d %s\n", res.code, res.message);
+    }
 }
 
 void daemonize(char * _cwd)
