@@ -40,6 +40,7 @@ class ui:
     file_p = None
     window = None
     server = None
+    new_client = None # New client dialog
     handlers = {}
     
     clients_tree = None
@@ -60,14 +61,84 @@ class ui:
         ci_sr.close ()
         cpuinfo.set_text (res)
         
+        # Dialogs
+        self.new_client = self.builder.get_object ("dialog_new_client")
+        
         self.handlers = {
             "client_change": self.client_change,
-            "client_apply": self.client_apply
+            "client_apply": self.client_apply,
+            "sig_new_client": self.new_client_open,
+            "new_client_close": self.new_client_close,
+            "new_client_create": self.new_client_create,
+            "remove_client_open": self.remove_client_open
         }
         self.builder.connect_signals (self.handlers)
         self.clients_tree.treeview.connect ("row-activated", self.activate)
         
         self.window.show_all()
+    
+    def remove_client_open (self, widget):
+        model, _iter = self.clients_tree.treeview.get_selection ().get_selected ()
+        _id = model.get_value (_iter, 0)
+        dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.QUESTION,
+            Gtk.ButtonsType.YES_NO, "Remove client with id '%s'" % _id)
+        dialog.format_secondary_text(
+            "Removing this client will remove all server side package and chroot environment")
+        response = dialog.run()
+        if response == Gtk.ResponseType.YES:
+            remove_socket = SocketRequest (self.server.ip, self.server.port)
+            remove_socket.send (("SRV SCREMOVE HTTP/1.0\n%s\n" % _id).encode ("utf-8"))
+        dialog.destroy()
+        self.regen()
+    
+    def new_client_close (self, widget):
+        self.new_client.hide()
+    
+    def new_client_create (self, widget):
+        new_entries = [
+            self.builder.get_object ("new_hostname"),
+            self.builder.get_object ("new_profile"),
+            self.builder.get_object ("new_chost"),
+            self.builder.get_object ("new_cflags"),
+            self.builder.get_object ("new_use")
+        ]
+        args = []
+        for x in new_entries:
+            b = x.get_text ()
+            if (b == ""):
+                info_dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK, "Not all required fields have values")
+                info_dialog.format_secondary_text(
+                    "Put valid values in to every (*) field")
+                info_dialog.run()
+                info_dialog.destroy()
+                return
+    
+            args.append (x.get_text())
+        
+        start_iter = self.builder.get_object ("new_extra").get_start_iter()
+        end_iter = self.builder.get_object ("new_extra").get_end_iter()
+        extra_buff = self.builder.get_object ("new_extra").get_text(start_iter, end_iter, True).strip()
+        if extra_buff:
+            args.append (extra_buff)
+        new_id = self.server.create (*args)
+        self.regen (False)
+        self.new_client_close (widget)
+    
+    def new_client_open (self, widget):
+        new_entries = {
+            self.builder.get_object ("new_hostname"): "",
+            self.builder.get_object ("new_profile"): "default/linux/amd64/13.0/",
+            self.builder.get_object ("new_chost"): "x86_64-pc-linux-gnu",
+            self.builder.get_object ("new_cflags"): "-O2 -pipe",
+            self.builder.get_object ("new_use"): "bindist mmx sse sse2",
+            self.builder.get_object ("new_extra"): ""
+        }
+        
+        for x, value in new_entries.items():
+            x.set_text (value)
+        
+        self.new_client.show_all()
     
     def activate (self, treeview, path, column):
         __iter = treeview.get_model().get_iter (path)
@@ -136,6 +207,14 @@ class ui:
     
     def gen_active (self):
         if (self.server.active < 0):
+            self.builder.get_object ("_client_hostname").set_label ("Activate a client")
+            self.builder.get_object ("id").set_text ("")
+            self.builder.get_object ("chost").set_text ("")
+            self.builder.get_object ("profile").set_text ("")
+            self.builder.get_object ("hostname").set_text ("")
+            self.builder.get_object ("cflags").set_text ("")
+            self.builder.get_object ("use").set_text ("")
+            self.builder.get_object ("extra").set_text ("")
             return
         active_client = self.server.clients[self.server.active]
         self.builder.get_object ("_client_hostname").set_label (active_client.hostname)

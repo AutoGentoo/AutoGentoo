@@ -54,7 +54,30 @@ class Server:
     
     def get_active (self):
         active_socket = socketrequest.SocketRequest (self.ip, self.port)
-        self.active = int (self.ids.index (active_socket.send (b"SRV GETACTIVE HTTP/1.0").decode('utf-8').split('\n')[0]))
+        try:
+            self.active = int (self.ids.index (active_socket.send (b"SRV GETACTIVE HTTP/1.0").decode('utf-8').split('\n')[0]))
+        except ValueError:
+            self.active = -1
+    
+    def create (self, hostname, profile, chost, cflags, use, extra=""):
+        create_socket = socketrequest.SocketRequest (self.ip, self.port)
+        new_id = create_socket.send (("SRV CREATE %s\n%s\n%s\n%s\n%s\n%s\n%s\n" % (
+            len(extra) if len(extra) > 0 else "HTTP/1.0",
+            hostname,
+            profile,
+            chost,
+            cflags,
+            use,
+            extra
+        )).encode ("utf-8")).decode ("utf-8").split ("\n")[0]
+        
+        # No need to regen
+        self.ids.append (new_id)
+        self.clients.append (Client (new_id, self))
+        self.clients[-1].GETCLIENT ()
+        self.get_active ()
+        
+        return new_id
 
 class Client:
     _id = ""
