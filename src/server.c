@@ -447,12 +447,12 @@ void server_respond (int n, struct manager * m_man)
                 else if (rt == GETSPEC) {
                     system ("lscpu > build.spec");
                     FILE *lspcu_fp = fopen("build.spec", "r");
-                    int symbol;
+                    char symbol;
                     if(lspcu_fp != NULL)
                     {
                         while((symbol = getc(lspcu_fp)) != EOF)
                         {
-                            write (clients[n], &symbol, sizeof (int*));
+                            write (clients[n], &symbol, sizeof (char*));
                         }
                         fclose(lspcu_fp);
                         remove ("build.spec");
