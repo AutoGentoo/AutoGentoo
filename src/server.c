@@ -445,20 +445,18 @@ void server_respond (int n, struct manager * m_man)
                     }
                 }
                 else if (rt == GETSPEC) {
-                    char out_buff [8192];
                     system ("lscpu > build.spec");
-                    FILE *fp = fopen("build.spec", "r");
+                    FILE *lspcu_fp = fopen("build.spec", "r");
                     int symbol;
-                    if(fp != NULL)
+                    if(lspcu_fp != NULL)
                     {
-                        while((symbol = getc(fp)) != EOF)
+                        while((symbol = getc(lspcu_fp)) != EOF)
                         {
-                            strcat(out_buff, &symbol);
+                            write (clients[n], &symbol, sizeof (int*));
                         }
-                        fclose(fp);
+                        fclose(lspcu_fp);
                         remove ("build.spec");
                     }
-                    write (clients[n], out_buff, strlen (out_buff));
                 }
             }
             if (sent == 0) {
