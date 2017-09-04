@@ -38,6 +38,8 @@
 #include <_string.h>
 #include <sys/stat.h>
 
+static const struct serve_client EMPTY_CLIENT;
+
 int get_client_from_ip (struct manager * m_man, char* ip) {
     int i;
     for (i=0; i!=m_man->_iptosc_c; i++) {
@@ -227,7 +229,8 @@ struct str_req str_link[] = {
     S_GETCLIENTS,
     S_GETACTIVE,
     S_GETSPEC,
-    S_SYNC
+    S_SYNC,
+    S_SCREMOVE
 };
 
 struct link_srv link_methods [] = {
@@ -242,7 +245,8 @@ struct link_srv link_methods [] = {
     L_GETCLIENTS,
     L_GETACTIVE,
     L_GETSPEC,
-    L_SYNC
+    L_SYNC,
+    L_SCREMOVE
 };
 
 struct link_srv get_link_srv (serve_c c) {
@@ -320,4 +324,14 @@ void _ip_activate (struct manager* m_man, char* ip, char* id) {
         m_man->_iptosc_c++;
     }
     strcpy (m_man->current_actives[index].id, id);
+}
+
+void remove_client (struct manager* m_man, int index) {
+    if (index != m_man->client_c - 1) {
+        m_man->clients[index] = m_man->clients[m_man->client_c-1]; // Put the final element in its place
+    }
+    else {
+        m_man->clients[index] = EMPTY_CLIENT; // Set as to empty item
+    }
+    m_man->client_c--;
 }

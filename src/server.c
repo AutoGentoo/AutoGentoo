@@ -496,6 +496,22 @@ void server_respond (int n, struct manager * m_man)
                         remove ("build.spec");
                     }
                 }
+                else if (rt == SCREMOVE) {
+                    sc_no = get_client_from_id (m_man, request_opts[0]);
+                    if (sc_no < 0) {
+                        res = NOT_FOUND;
+                        rsend (clients[n], res);
+                        sent = 1;
+                    }
+                    else {
+                        remove_client (m_man, sc_no);
+                        if(!m_man->debug) {
+                            FILE * _fd = fopen (m_man->_config, "w+");
+                            write_serve (fileno(_fd), m_man);
+                            fclose (_fd);
+                        }
+                    }
+                }
             }
             if (sent == 0) {
                 rsend (clients[n], OK);
