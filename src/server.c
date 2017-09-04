@@ -452,7 +452,7 @@ void server_respond (int n, struct manager * m_man)
                     {
                         while((symbol = getc(lspcu_fp)) != EOF)
                         {
-                            write (clients[n], &symbol, sizeof (char*));
+                            write (clients[n], &symbol, sizeof (char));
                         }
                         fclose(lspcu_fp);
                         remove ("build.spec");
