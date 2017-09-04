@@ -399,7 +399,7 @@ void server_respond (int n, struct manager * m_man)
                     sent = 1;
                 }
                 else if (rt == EDIT) {
-                    sc_no = get_client_from_id (m_man, reqline[0]);
+                    sc_no = get_client_from_id (m_man, request_opts[0]);
                     if (sc_no > -1) {
                         strcpy(m_man->clients[sc_no].hostname, request_opts[1]);
                         strcpy(m_man->clients[sc_no].profile, request_opts[2]);
