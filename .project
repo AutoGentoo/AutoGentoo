@@ -29,11 +29,14 @@ long_line_column=72
 
 [files]
 current_page=1
-FILE_NAME_0=1100;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fmain.py;0;4
-FILE_NAME_1=1829;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fui.py;0;4
-FILE_NAME_2=1726;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fautogentoo.py;0;4
-FILE_NAME_3=1252;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fsocketrequest.py;0;4
-FILE_NAME_4=0;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2F_string.c;0;4
-FILE_NAME_5=18921;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.c;0;4
-FILE_NAME_6=0;Python;0;EUTF-8;0;1;0;%2Fusr%2Flib64%2Fpython3.6%2Fsite-packages%2Fgi%2Frepository%2F__init__.py;0;4
-FILE_NAME_7=0;Python;0;EUTF-8;0;1;0;%2Fusr%2Flib64%2Fpython3.6%2Fsite-packages%2Fgi%2Fimporter.py;0;4
+FILE_NAME_0=1133;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fmain.py;0;4
+FILE_NAME_1=2450;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fui.py;0;4
+FILE_NAME_2=1601;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Ftreegrid.py;0;4
+FILE_NAME_3=1080;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fautogentoo.py;0;4
+FILE_NAME_4=1094;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fsocketrequest.py;0;4
+FILE_NAME_5=0;Python;0;EUTF-8;0;1;0;%2Fusr%2Flib64%2Fpython3.6%2Fsite-packages%2Fgi%2Frepository%2F__init__.py;0;4
+FILE_NAME_6=0;Python;0;EUTF-8;0;1;0;%2Fusr%2Flib64%2Fpython3.6%2Fsite-packages%2Fgi%2Fimporter.py;0;4
+FILE_NAME_7=1202;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fupdate.py;0;4
+FILE_NAME_8=302;Make;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2FMakefile.am;0;4
+FILE_NAME_9=915;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fautogentoo.c;0;4
+FILE_NAME_10=1025;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fstdio.py;0;4

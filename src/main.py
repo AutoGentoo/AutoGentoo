@@ -27,11 +27,12 @@ from ui import ui
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from stdio import *
 
 def main(args):
     server_main = autogentoo.Server ("192.168.1.160")
-    server_main.regen ()
     ui_main = ui ("../ui/main.ui", server_main)
+    ui_main.regen ()
     Gtk.main ()
     return 0
 

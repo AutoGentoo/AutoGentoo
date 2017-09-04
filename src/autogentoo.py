@@ -31,7 +31,7 @@ class Server:
     ids = []
     ip = ""
     port = 9490
-    server_socket = None
+    active = -1
     
     def __init__ (self, ip):
         self.ip = ip
@@ -44,6 +44,8 @@ class Server:
         for i in range (0, int(split[0])):
             self.ids.append (split[i+1])
             self.clients.append (Client (split[i+1], self))
+        active_socket = socketrequest.SocketRequest (self.ip, self.port)
+        self.active = int (self.ids.index (active_socket.send (b"SRV GETACTIVE HTTP/1.0").decode('utf-8').split('\n')[0]))
         
         for x in self.clients:
             x.GETCLIENT ()

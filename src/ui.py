@@ -32,6 +32,8 @@ from gi.repository.Vte import Terminal
 from gi.repository import GLib
 from treegrid import TreeGrid
 import os
+from socketrequest import SocketRequest
+from stdio import *
 
 class ui:
     builder = None
@@ -46,20 +48,32 @@ class ui:
         self.server = server
         self.builder = Gtk.Builder()
         self.builder.add_from_file (self.file_p)
-        self.clients_tree = TreeGrid (str, str, str)
-        self.clients_tree.render (self.builder.get_object ("client_list_scroll"), ("ID", "Address", "Hostname"))
+        self.clients_tree = TreeGrid (str, str, str, str, str)
+        self.clients_tree.render (self.builder.get_object ("client_list_scroll"), ("ID", "Address", "Hostname", "Profile", "CHOST"))
         self.window = self.builder.get_object ("window_main")
         self.window.connect("delete-event", Gtk.main_quit)
-        terminal = self.builder.get_object ("_server_ssh")
-        terminal.spawn_sync(
-            Vte.PtyFlags.DEFAULT,
-            os.environ['HOME'],
-            ["/usr/bin/ssh", "root@%s" % self.server.ip],
-            [],
-            GLib.SpawnFlags.DO_NOT_REAP_CHILD,
-            None,
-            None,
-        )
-        clients_view = self.builder.get_object ("clients_view")
-        
+        cpuinfo = self.builder.get_object ("_server_spec")
+        ci_sr = SocketRequest (self.server.ip, self.server.port)
+        res = "\n".join(ci_sr.send (b"SRV GETSPEC HTTP/1.0\n").decode ("utf-8").split ("\n")[:-2]) # Account for \n at end and HTTP/1.0 200 OK
+        self.builder.get_object ("_server_spec_scroll").set_vexpand(True)
+        ci_sr.close ()
+        cpuinfo.set_text (res)
         self.window.show_all()
+        
+    def regen (self):
+        self.server.regen ()
+        for client in self.server.clients:
+            self.clients_tree.treestore.append (None, [client._id, self.server.ip, client.hostname, "...%s" % client.profile[-20:], client.CHOST])
+        self.gen_active ()
+    
+    def gen_active (self):
+        if (self.server.active < 0):
+            return
+        active_client = self.server.clients[self.server.active]
+        self.builder.get_object ("_client_hostname").set_label (active_client.hostname)
+        self.builder.get_object ("id").set_text (active_client._id)
+        self.builder.get_object ("chost").set_text (active_client.CHOST)
+        self.builder.get_object ("hostname").set_text (active_client.hostname)
+        self.builder.get_object ("cflags").set_text (active_client.CFLAGS)
+        self.builder.get_object ("use").set_text (active_client.USE)
+        self.builder.get_object ("extra").set_text ("\n".join(active_client.EXTRAS))

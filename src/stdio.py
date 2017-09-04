@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  socketrequest.py
+#  stdio.py
 #  
 #  Copyright 2017 Andrei Tumbar <atuser@Hyperion>
 #  
@@ -23,30 +23,10 @@
 #  
 
 
-import socket
+def printf (string, *_format):
+    from sys import stdout
+    stdout.write (string % _format)
+    stdout.flush ()
 
-class SocketRequest:
-    socket = None
-    ip = ""
-    port = None
-    request = "" # Only the last request, resets after next request
-    
-    def __init__ (self, ip, port):
-        self.ip = ip
-        self.port = port
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect ((self.ip, self.port))
-    
-    def send (self, request):
-        self.request = request
-        self.socket.sendall (request)
-        res = b""
-        while True:
-            data = self.socket.recv(16384)
-            if not data: break
-            res += data
-        return res
-        
-    
-    def close (self):
-        self.socket.close()
+def sprintf (string, *_format):
+    return string % _format

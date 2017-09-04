@@ -31,14 +31,29 @@ class TreeGrid:
     # GTK Objects
     treestore = None
     treeview = None
+    treeview_select = None
     renderer = None
     select = None
     parent = None
+    ex = -1
     
     def __init__ (self, *types):
-        self.treestore = Gtk.TreeStore (*types)
+        b = []
+        for x in range(0, len(types)):
+            t = types[x]
+            if type(types[x]) in (tuple, list):
+                assert self.ex > -1
+                self.ex = x
+                t = types[x][0]
+            b.append (t)
+        
+        self.treestore = Gtk.TreeStore (*b)
         self.__types = types
         self.treeview = Gtk.TreeView.new_with_model(self.treestore)
+        self.treeview_select = self.treeview.get_selection()
+    
+    def get_select (self):
+        return self.treeview_select.get_selected ()[1] # Return treeiter of treeview
     
     def render (self, parent, headers=[], size=(700, 250)):
         self.__headers = headers
@@ -48,6 +63,8 @@ class TreeGrid:
             self.renderer = Gtk.CellRendererText()
             column = Gtk.TreeViewColumn(column_title, self.renderer, text=i)
             self.treeview.append_column(column)
+            if i == self.ex:
+                self.treeview.set_expander_column(column)
         
         self.scrollable_treelist = Gtk.ScrolledWindow()
         self.select = self.treeview.get_selection()
