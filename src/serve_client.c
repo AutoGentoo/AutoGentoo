@@ -36,6 +36,7 @@
 #include <response.h>
 #include <request.h>
 #include <_string.h>
+#include <sys/stat.h>
 
 int get_client_from_ip (struct manager * m_man, char* ip) {
     int i;
@@ -148,12 +149,22 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
     char sym_buf_p2 [128];
     sprintf (sym_buf_p1, "/usr/portage/profiles/%s/", conf.profile);
     sprintf (sym_buf_p2, "%s/autogentoo/etc/portage/make.profile", _ROOT_);
-    if (symlink (sym_buf_p1, sym_buf_p2) != 0) {
-        printf ("Failed to symlink profile!\n");
-    }
     char sym_lib_p1[128];
     char sym_lib_p2[128];
     sprintf (sym_lib_p2, "%s/lib", _ROOT_);
+    
+    // Check if symlinks exist and remove them
+    struct stat __sym_buff;
+    if (lstat (sym_buf_p2, &__sym_buff) == 0) {
+        unlink (sym_buf_p2);
+    }
+    if (lstat (sym_lib_p2, &__sym_buff) == 0) {
+        unlink (sym_lib_p2);
+    }
+    
+    if (symlink (sym_buf_p1, sym_buf_p2) != 0) {
+        printf ("Failed to symlink profile!\n");
+    }
     if ((size_t)-1 > 0xffffffffUL) {
         sprintf (sym_lib_p1, "%s/lib64", _ROOT_);
     }
@@ -164,6 +175,9 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
         printf ("Failed to symlink /lib!\n");
     }
     sprintf (sym_lib_p2, "%s/usr/lib", _ROOT_);
+    if (lstat (sym_lib_p2, &__sym_buff) == 0) { // Again for /usr/lib
+        unlink (sym_lib_p2);
+    }
     if ((size_t)-1 > 0xffffffffUL) {
         sprintf (sym_lib_p1, "%s/usr/lib64", _ROOT_);
     }
