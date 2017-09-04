@@ -65,9 +65,16 @@ class ui:
             "client_apply": self.client_apply
         }
         self.builder.connect_signals (self.handlers)
+        self.clients_tree.treeview.connect ("row-activated", self.activate)
         
         self.window.show_all()
-        
+    
+    def activate (self, treeview, path, column):
+        __iter = treeview.get_model().get_iter (path)
+        activate_socket = SocketRequest (self.server.ip, self.server.port)
+        activate_socket.send (("SRV ACTIVATE HTTP/1.0\n%s\n" % treeview.get_model().get_value (__iter, 0)).encode ("utf-8"))
+        self.regen()
+    
     def regen (self):
         self.server.regen ()
         self.clients_tree.treestore.clear()
