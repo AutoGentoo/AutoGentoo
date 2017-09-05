@@ -33,6 +33,9 @@ def main(args):
     server_main = autogentoo.Server ("192.168.1.160")
     ui_main = ui ("../ui/main.ui", server_main)
     ui_main.regen ()
+    import signal    # enable Ctrl-C since there is no menu to quit
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
     Gtk.main ()
     return 0
 
