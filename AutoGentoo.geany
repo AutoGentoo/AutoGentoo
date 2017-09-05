@@ -29,9 +29,9 @@ long_line_column=72
 
 [files]
 current_page=0
-FILE_NAME_0=19985;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.c;0;4
-FILE_NAME_1=6048;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserve_client.c;0;4
-FILE_NAME_2=4567;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserve_client.h;0;4
+FILE_NAME_0=22746;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserver.c;0;4
+FILE_NAME_1=6529;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fserve_client.c;0;4
+FILE_NAME_2=1671;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserve_client.h;0;4
 FILE_NAME_3=3154;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Frequest.c;0;4
 FILE_NAME_4=844;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2F_string.c;0;4
 FILE_NAME_5=6011;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fautogentoo.c;0;4
