@@ -14,7 +14,7 @@ indent_width=4
 indent_type=0
 indent_hard_tab_width=8
 detect_indent=true
-detect_indent_width=true
+detect_indent_width=false
 indent_mode=2
 
 [project]
@@ -28,16 +28,15 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=11
-FILE_NAME_0=5346;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fpackagemeta.py;0;4
-FILE_NAME_1=708;CSS;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fui%2Fcss%2Fmain.css;0;4
-FILE_NAME_2=2475;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Ftreegrid.py;0;4
-FILE_NAME_3=2491;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fui.py;0;4
-FILE_NAME_4=7749;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fportage.py;0;4
+current_page=0
+FILE_NAME_0=7960;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fpackagemeta.py;0;8
+FILE_NAME_1=859;CSS;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fui%2Fcss%2Fmain.css;0;4
+FILE_NAME_2=1596;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Ftreegrid.py;0;4
+FILE_NAME_3=2355;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fui.py;0;4
+FILE_NAME_4=10274;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fportage.py;0;4
 FILE_NAME_5=1159;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fstdio.py;0;4
 FILE_NAME_6=1072;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fmetadata%2Fmd5-cache%2Fdev-lang%2Fpython-2.7.12;0;4
 FILE_NAME_7=979;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fmain.py;0;4
 FILE_NAME_8=1675;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fautogentoo.py;0;4
-FILE_NAME_9=418;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fmetadata%2Fmd5-cache%2Fdev-lang%2Fclojure-1.8.0;0;4
-FILE_NAME_10=26;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fprofiles%2Farch.list;0;4
-FILE_NAME_11=763;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fmetadata%2Fmd5-cache%2Fsys-devel%2Fgcc-4.6.4;0;4
+FILE_NAME_9=1495;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2F_xml.py;0;4
+FILE_NAME_10=208;XML;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fgnome-base%2Fmetadata.xml;0;4

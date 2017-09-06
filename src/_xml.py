@@ -42,13 +42,29 @@ class XML_EL(object):
         return res
 
     def _getelem(self, name):
-        res = self.etElem.find(name)
+        res = self.etElem.findall(name)
         if res is None:
             return None
-        return XML_EL(res)
+        if (len(res) == 1):
+            return XML_EL(res[0])
+        out = []
+        for x in res:
+            out.append (XML_EL(x))
+        return out
 
     def _getattr(self, name):
         return self.etElem.get(name)
+        
+    def find_attr (self, name, attr_name, attr_val):
+        res_buf = self._getelem (name)
+        for x in res_buf:
+            try:
+                x[attr_name]
+            except IndexError:
+                continue
+            else:
+                if x[attr_name] == attr_val:
+                    return x
     
     def text (self):
         return self.etElem.text

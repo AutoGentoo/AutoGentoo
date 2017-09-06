@@ -37,3 +37,19 @@
 .sub-section:last-child  {
     border-bottom: none;
 }
+
+.package-tabs {
+    background-image: linear-gradient(rgb(250, 250, 250) 0%, rgb(235, 235, 235) 100%);
+}
+
+.category-name label {
+    font-size: 26px;
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+
+
+.cat-pkg {
+    font-weight: bold;
+}

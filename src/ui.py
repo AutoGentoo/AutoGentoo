@@ -34,7 +34,7 @@ from treegrid import TreeGrid
 import os
 from socketrequest import SocketRequest
 from stdio import *
-from packagemeta import PackageMeta
+from packagemeta import PortageMeta
 import portage
 
 class ui:
@@ -62,10 +62,11 @@ class ui:
         self.builder.get_object ("_server_spec_scroll").set_vexpand(True)
         ci_sr.close ()
         cpuinfo.set_text (res)
-        self.temp_meta = PackageMeta ()
         self.portage = portage.portage (self.server.ip, "~/Downloads/portage")
-        self.temp_meta._parse_package (self.portage, self.portage.packages["gnome-base"]["gnome"])
-        self.builder.get_object ("_package_scroll").add (self.temp_meta)
+        self.portageMeta = PortageMeta (self.portage)
+        #self.portageMeta.parse_package (self.portage.packages["gnome-base"]["gnome"])
+        self.portageMeta.parse_category ("gnome-base")
+        self.builder.get_object ("_package_scroll").add (self.portageMeta)
         
         # CSS
         style_provider = Gtk.CssProvider()
@@ -92,7 +93,7 @@ class ui:
         self.builder.connect_signals (self.handlers)
         self.clients_tree.treeview.connect ("row-activated", self.activate)
         
-        self.window.show_all()
+        self.window.show()
     
     def remove_client_open (self, widget):
         model, _iter = self.clients_tree.treeview.get_selection ().get_selected ()

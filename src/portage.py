@@ -277,10 +277,14 @@ class portage:
     def get_maintainer (self, cat, pkg):
         tree = _xml._XML ("%s/%s/%s/metadata.xml" % (self.path, cat, pkg))
         return tree.pkgmetadata.maintainer.email.text(), tree.pkgmetadata.maintainer.name.text()
+    
+    def get_cat_info (self, cat):
+        tree = _xml._XML ("%s/%s/metadata.xml" % (self.path, cat))
+        return tree.catmetadata.find_attr ('longdescription', 'lang', 'en').text().strip().replace ("\t", "").replace ("\n", " ")
 
 def main(args):
     temp = portage ("kronos", "~/Downloads/portage")
-    print(temp.get_maintainer("sys-devel", "gcc"))
+    print(temp.get_cat_info("gnome-base"))
     
     return 0
 
