@@ -23,7 +23,7 @@
 #  
 
 from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
-import portage
+import portage, sys
 
 def css_rgba (r, b, g, a):
     return Gdk.RGBA(r/255,g/255,b/255,a)
@@ -126,7 +126,9 @@ class PackageMeta (Gtk.Box):
                 buf.append (imgbuf)
                 
             self.store.append (buf)
+        
         self.use = useMeta (_portage, package)
+        self.meta.pack_start(self.use, True, False, 0)
 
     def get_tree_cell_text(self, col, cell, model, iter, user_data):
         if (col.__index != 0):
@@ -140,27 +142,6 @@ class PackageMeta (Gtk.Box):
         cell.set_fixed_size (57, 35)
         cell.set_property('pixbuf', GdkPixbuf.Pixbuf.new_from_file_at_scale(model.get_value(iter, col.__index), 57, -1, True))
 
-class mBox (Gtk.Box):
-    __gtype_name__ = 'mBox'
-    
-    def __init__ (self, *args, **kwargs):
-        Gtk.Box.__init__ (self, args, kwargs)
-    
-    def set_margins (self, top, right=None, bottom=None, left=None):
-        if (right == None):
-            right = top
-        if (bottom == None):
-            bottom = top
-        if (left == None):
-            left = right
-        if (left != -1):
-            self.set_margin_start (left)
-        if (right != -1):
-            self.set_margin_end (right)
-        if (top != -1):
-            self.set_margin_top (top)
-        if (bottom != -1):
-            self.set_margin_bottom (bottom)
 
 class packageCenter (Gtk.Box):
     __gtype_name__ = 'packageCenter'
@@ -186,26 +167,109 @@ class packageCenter (Gtk.Box):
     def pack_start (self, widget, ex, fill, padding):
         self.top.pack_start (widget, ex, fill, padding)
 
-class iconLabel (mBox):
+class iconLabel (Gtk.Box):
     __gtype_name__ = 'iconLabel'
     
     def __init__ (self, _icon_path, label_text):
-        mBox.__init__ (self, orientation=Gtk.Orientation.HORIZONTAL)
+        Gtk.Box.__init__ (self, orientation=Gtk.Orientation.VERTICAL)
+        self.top = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
         self.set_margins (0, 15)
         self.icon = Gtk.Image.new_from_file (_icon_path)
         self.label = Gtk.Label ()
         self.label.set_markup (label_text)
+        self.set_size_request (115, -1)
         
-        self.pack_start (self.icon, False, False, 0)
-        self.pack_start (self.label, True, False, 0)
+        self.top.pack_start (self.icon, True, False, 0)
+        self.top.pack_start (self.label, True, False, 6)
+        self.pack_start (self.top, False, False, 0)
+        
+    def set_margins (self, top, right=None, bottom=None, left=None):
+        if (right == None):
+            right = top
+        if (bottom == None):
+            bottom = top
+        if (left == None):
+            left = right
+        if (left != -1):
+            self.set_margin_start (left)
+        if (right != -1):
+            self.set_margin_end (right)
+        if (top != -1):
+            self.set_margin_top (top)
+        if (bottom != -1):
+            self.set_margin_bottom (bottom)
 
-class useMeta (mBox):
+class inlineList (Gtk.Box):
+    __gtype_name__ = 'inlineList'
+    
+    current_horizontal = 0
+    max_horizontal = 0
+    current_box = None
+    
+    def __init__ (self, max_horizontal):
+        Gtk.Box.__init__ (self, orientation=Gtk.Orientation.VERTICAL) # Used for overflow
+        self.max_horizontal = max_horizontal
+        self.current_box = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
+        self.add (self.current_box)
+    
+    def new_pack_start (self, widget, expand, fill, padding):
+        self.current_box.pack_start (widget, expand, fill, padding) # Always append to last box
+        self.current_horizontal += 1
+        if (self.current_horizontal == self.max_horizontal):
+            self.current_horizontal = 0
+            self.current_box = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
+            self.add (self.current_box)
+        
+
+class useMeta (Gtk.Box):
     __gtype_name__ = 'useMeta'
     
     def __init__ (self, _portage, package):
-        mBox.__init__ (self, orientation=Gtk.Orientation.HORIZONTAL)
+        Gtk.Box.__init__ (self, orientation=Gtk.Orientation.HORIZONTAL)
         self.set_margins (10, 15)
         
         self.left_side = iconLabel ("../ui/resources/sliders.png", "USE flags")
         self.pack_start (self.left_side, False, False, 0)
+        
+        self.right_side = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
+        self.local_use_label = Gtk.Label ()
+        self.local_use_label.set_xalign (0.0)
+        self.local_use_label.get_style_context ().add_class ("use-flag-info")
+        self.local_use_label.set_text ("LOCAL USE FlAGS")
+        self.global_use_label = Gtk.Label ()
+        self.global_use_label.set_xalign (0.0)
+        self.global_use_label.get_style_context ().add_class ("use-flag-info")
+        self.global_use_label.set_text ("GLOBAL USE FlAGS")
+        self.local_use = inlineList (6)
+        self.global_use = inlineList (6)
+        for x in _portage.local_use[package.category][package.name]:
+            temp_l = Gtk.Label (x.name)
+            temp_l.set_tooltip_text (x.description)
+            self.local_use.new_pack_start (temp_l, False, False, 6)
+        for x in package.globaluse:
+            temp_l = Gtk.Label (_portage.global_use[x].name)
+            temp_l.set_tooltip_text (_portage.global_use[x].description)
+            self.global_use.new_pack_start (temp_l, False, False, 6)
+        
+        self.right_side.pack_start (self.local_use_label, False, False, 0)
+        self.right_side.pack_start (self.local_use, False, False, 0)
+        
+        self.right_side.pack_start (self.global_use_label, False, False, 0)
+        self.right_side.pack_start (self.global_use, False, False, 0)
+        self.pack_start (self.right_side, False, False, 0)
     
+    def set_margins (self, top, right=None, bottom=None, left=None):
+        if (right == None):
+            right = top
+        if (bottom == None):
+            bottom = top
+        if (left == None):
+            left = right
+        if (left != -1):
+            self.set_margin_start (left)
+        if (right != -1):
+            self.set_margin_end (right)
+        if (top != -1):
+            self.set_margin_top (top)
+        if (bottom != -1):
+            self.set_margin_bottom (bottom)

@@ -34,7 +34,7 @@ Ebuild = namedtuple ("Ebuild", ('name', 'id', 'keywords', 'slot'))
 PackageBinary = namedtuple ("PackageBinary", ("name", "category", "version", "slot", "build_time", "size", "use"))
 PackageMeta = namedtuple ("PackageMeta", ("name", "v_id")) # Used to id packages before generation
 Flag = namedtuple ("Flag", ("name", "description"))
-Package = namedtuple ("Package", ("name", "category", "description", "homepage", "versions", "license"))
+Package = namedtuple ("Package", ("name", "category", "description", "homepage", "versions", "license", "globaluse"))
 
 class portage:
     packages = {} # category: {name: Package}
@@ -220,9 +220,33 @@ class portage:
             _license = parsed["LICENSE"].split (' ')
         except KeyError:
             pass
+        try:
+            parsed["IUSE"]
+        except KeyError:
+            parsed["IUSE"] = ""
             
-        return Ebuild(meta.name, meta.v_id, keywords, slot), meta, parsed, _license
-        
+        return Ebuild(meta.name, meta.v_id, keywords, slot), meta, parsed, _license, parsed["IUSE"]
+    
+    def get_flag_names (self, arr):
+        out = []
+        for x in arr:
+            out.append (x.name)
+        return out
+    
+    def parse_iuse (self, iuse_list, cat, pkg):
+        out = []
+        for flag in iuse_list:
+            if not flag:
+                continue
+            if flag[0] in ("+", "-"):
+                flag = flag[1:]
+            try:
+                if (flag not in self.get_flag_names(self.local_use[cat][pkg])):
+                    out.append (flag)
+            except KeyError:
+                out.append (flag)
+        return out
+    
     def generate_packages (self):
         self.packages = {}
         self.package_list = {}
@@ -233,11 +257,12 @@ class portage:
             
             cat_pkgs = os.listdir ("%s/metadata/md5-cache/%s" % (self.path, cat))
             for pkg in cat_pkgs:
-                temp, meta, parsed = self.generate_package(cat,pkg)
+                temp, meta, parsed, _license, iuse = self.generate_package(cat,pkg)
                 try:
                     self.packages[cat][meta.name]
                 except KeyError:
-                    self.packages[cat][meta.name] = Package (meta.name, cat, parsed["DESCRIPTION"], parsed["HOMEPAGE"], [])
+                    global_iuse = self.parse_iuse (iuse.split (" "), cat, meta.name)
+                    self.packages[cat][meta.name] = Package (meta.name, cat, parsed["DESCRIPTION"], parsed["HOMEPAGE"], [], _license, global_iuse)
                     self.package_list[meta.name] = cat
                 self.packages[cat][meta.name].versions.append (temp)
     
@@ -250,6 +275,7 @@ class portage:
 
 def main(args):
     temp = portage ("kronos", "~/Downloads/portage")
+    print(temp.local_use["sys-devel"]["gcc"])
     return 0
 
 if __name__ == '__main__':
