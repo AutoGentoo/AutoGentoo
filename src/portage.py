@@ -217,7 +217,7 @@ class portage:
         except KeyError:
             parsed["HOMEPAGE"] = ""
         try:
-            _license = parsed["LICENSE"].split (' ')
+            _license = parsed["LICENSE"]
         except KeyError:
             pass
         try:

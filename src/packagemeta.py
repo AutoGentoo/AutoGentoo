@@ -128,7 +128,9 @@ class PackageMeta (Gtk.Box):
             self.store.append (buf)
         
         self.use = useMeta (_portage, package)
-        self.meta.pack_start(self.use, True, False, 0)
+        self.meta.pack_start(self.use, False, False, 0)
+        self.license = licenseMeta (package)
+        self.meta.pack_start (self.license, False, False, 0)
 
     def get_tree_cell_text(self, col, cell, model, iter, user_data):
         if (col.__index != 0):
@@ -178,10 +180,11 @@ class iconLabel (Gtk.Box):
         self.label = Gtk.Label ()
         self.label.set_markup (label_text)
         self.set_size_request (115, -1)
+        self.label.set_xalign (0.0)
         
         self.top.pack_start (self.icon, True, False, 0)
-        self.top.pack_start (self.label, True, False, 6)
-        self.pack_start (self.top, False, False, 0)
+        self.top.pack_start (self.label, True, True, 6)
+        self.pack_start (self.top, False, True, 0)
         
     def set_margins (self, top, right=None, bottom=None, left=None):
         if (right == None):
@@ -219,7 +222,40 @@ class inlineList (Gtk.Box):
             self.current_horizontal = 0
             self.current_box = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
             self.add (self.current_box)
+
+class licenseMeta (Gtk.Box):
+    __gtype_name__ = 'licenseMeta'
+    
+    def __init__ (self, package):
+        Gtk.Box.__init__ (self, orientation=Gtk.Orientation.HORIZONTAL)
+        self.set_margins (10, 15)
         
+        self.left_side = iconLabel ("../ui/resources/legal.png", "License")
+        self.pack_start (self.left_side, False, False, 0)
+        
+        self.right_side = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
+        self.main_label = Gtk.Label ()
+        self.main_label.get_style_context().add_class ('license')
+        self.main_label.set_xalign (0.0)
+        self.main_label.set_text (package.license)
+        self.right_side.pack_start (self.main_label, True, True, 0)
+        self.pack_start (self.right_side, False, False, 0)
+        
+    def set_margins (self, top, right=None, bottom=None, left=None):
+        if (right == None):
+            right = top
+        if (bottom == None):
+            bottom = top
+        if (left == None):
+            left = right
+        if (left != -1):
+            self.set_margin_start (left)
+        if (right != -1):
+            self.set_margin_end (right)
+        if (top != -1):
+            self.set_margin_top (top)
+        if (bottom != -1):
+            self.set_margin_bottom (bottom)
 
 class useMeta (Gtk.Box):
     __gtype_name__ = 'useMeta'
@@ -256,6 +292,7 @@ class useMeta (Gtk.Box):
         
         self.right_side.pack_start (self.global_use_label, False, False, 0)
         self.right_side.pack_start (self.global_use, False, False, 0)
+        
         self.pack_start (self.right_side, False, False, 0)
     
     def set_margins (self, top, right=None, bottom=None, left=None):
