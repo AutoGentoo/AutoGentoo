@@ -34,3 +34,11 @@
     font-family: Open Sans;
     font-size: 11px;
 }
+
+.sub-section {
+    border-bottom: #ddd solid 1px;
+}
+
+.sub-section:last-child  {
+    border-bottom: none;
+}

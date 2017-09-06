@@ -107,8 +107,8 @@ class PackageMeta (Gtk.Box):
         
         self.meta = packageCenter ("Package Metadata")
         self.binaries = packageCenter ("Server Binaries")
-        self.pack_start (self.meta, True, False, 0)
-        self.pack_start (self.binaries, True, False, 0)
+        self.pack_start (self.meta, True, True, 0)
+        self.pack_start (self.binaries, True, True, 0)
         
         self.show_all ()
         
@@ -177,7 +177,7 @@ class iconLabel (Gtk.Box):
     def __init__ (self, _icon_path, label_text):
         Gtk.Box.__init__ (self, orientation=Gtk.Orientation.VERTICAL)
         self.top = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
-        self.set_margins (0, 15)
+        set_margins (self, 0, 15)
         self.icon = Gtk.Image.new_from_file (_icon_path)
         self.label = Gtk.Label ()
         self.label.set_markup (label_text)
@@ -187,22 +187,6 @@ class iconLabel (Gtk.Box):
         self.top.pack_start (self.icon, True, False, 0)
         self.top.pack_start (self.label, True, True, 6)
         self.pack_start (self.top, False, True, 0)
-        
-    def set_margins (self, top, right=None, bottom=None, left=None):
-        if (right == None):
-            right = top
-        if (bottom == None):
-            bottom = top
-        if (left == None):
-            left = right
-        if (left != -1):
-            self.set_margin_start (left)
-        if (right != -1):
-            self.set_margin_end (right)
-        if (top != -1):
-            self.set_margin_top (top)
-        if (bottom != -1):
-            self.set_margin_bottom (bottom)
 
 class inlineList (Gtk.Box):
     __gtype_name__ = 'inlineList'
@@ -225,15 +209,34 @@ class inlineList (Gtk.Box):
             self.current_box = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
             self.add (self.current_box)
 
+def set_margins (widget, top, right=None, bottom=None, left=None):
+    if (right == None):
+        right = top
+    if (bottom == None):
+        bottom = top
+    if (left == None):
+        left = right
+    if (left != -1):
+        widget.set_margin_start (left)
+    if (right != -1):
+        widget.set_margin_end (right)
+    if (top != -1):
+        widget.set_margin_top (top)
+    if (bottom != -1):
+        widget.set_margin_bottom (bottom)
+
 class licenseMeta (Gtk.Box):
     __gtype_name__ = 'licenseMeta'
     
     def __init__ (self, package):
         Gtk.Box.__init__ (self, orientation=Gtk.Orientation.HORIZONTAL)
-        self.set_margins (10, 15)
+        self.set_halign (Gtk.Align (0)) # Fill
+        self.set_valign (Gtk.Align (3)) # Center
         
         self.left_side = iconLabel ("../ui/resources/legal.png", "License")
-        self.pack_start (self.left_side, False, False, 0)
+        self.get_style_context().add_class ("sub-section")
+        self.pack_start (self.left_side, False, True, 0)
+        self.left_side.set_valign (Gtk.Align (3)) # Center
         
         self.right_side = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
         self.main_label = Gtk.Label ()
@@ -241,33 +244,24 @@ class licenseMeta (Gtk.Box):
         self.main_label.set_xalign (0.0)
         self.main_label.set_text (package.license)
         self.right_side.pack_start (self.main_label, True, True, 0)
-        self.pack_start (self.right_side, False, False, 0)
-        
-    def set_margins (self, top, right=None, bottom=None, left=None):
-        if (right == None):
-            right = top
-        if (bottom == None):
-            bottom = top
-        if (left == None):
-            left = right
-        if (left != -1):
-            self.set_margin_start (left)
-        if (right != -1):
-            self.set_margin_end (right)
-        if (top != -1):
-            self.set_margin_top (top)
-        if (bottom != -1):
-            self.set_margin_bottom (bottom)
+        self.pack_start (self.right_side, False, True, 0)
+        set_margins (self.right_side, 10, 15)
+
+
 
 class useMeta (Gtk.Box):
     __gtype_name__ = 'useMeta'
     
     def __init__ (self, _portage, package):
         Gtk.Box.__init__ (self, orientation=Gtk.Orientation.HORIZONTAL)
-        self.set_margins (10, 15)
+        
+        self.set_halign (Gtk.Align (0)) # Fill
+        self.set_valign (Gtk.Align (3)) # Center
         
         self.left_side = iconLabel ("../ui/resources/sliders.png", "USE flags")
-        self.pack_start (self.left_side, False, False, 0)
+        self.get_style_context().add_class ("sub-section")
+        self.pack_start (self.left_side, False, True, 0)
+        self.left_side.set_valign (Gtk.Align (3)) # Center
         
         self.right_side = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
         self.local_use_label = Gtk.Label ()
@@ -295,20 +289,5 @@ class useMeta (Gtk.Box):
         self.right_side.pack_start (self.global_use_label, False, False, 0)
         self.right_side.pack_start (self.global_use, False, False, 0)
         
-        self.pack_start (self.right_side, False, False, 0)
-    
-    def set_margins (self, top, right=None, bottom=None, left=None):
-        if (right == None):
-            right = top
-        if (bottom == None):
-            bottom = top
-        if (left == None):
-            left = right
-        if (left != -1):
-            self.set_margin_start (left)
-        if (right != -1):
-            self.set_margin_end (right)
-        if (top != -1):
-            self.set_margin_top (top)
-        if (bottom != -1):
-            self.set_margin_bottom (bottom)
+        self.pack_start (self.right_side, False, True, 0)
+        set_margins (self.right_side, 10, 15)
