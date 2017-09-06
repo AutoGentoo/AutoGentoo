@@ -26,6 +26,7 @@ from collections import namedtuple
 import os
 from stdio import *
 import socketrequest
+import _xml
 
 global current_keywords
 current_keywords = ["amd64", "x86", "alpha", "arm", "hppa", "ia64", "ppc", "ppc64", "sparc"]
@@ -272,10 +273,15 @@ class portage:
         for x in pkg_buf:
             out.append (self.packages[self.package_list[x]][x])
         return out
+    
+    def get_maintainer (self, cat, pkg):
+        tree = _xml._XML ("%s/%s/%s/metadata.xml" % (self.path, cat, pkg))
+        return tree.pkgmetadata.maintainer.email.text(), tree.pkgmetadata.maintainer.name.text()
 
 def main(args):
     temp = portage ("kronos", "~/Downloads/portage")
-    print(temp.local_use["sys-devel"]["gcc"])
+    print(temp.get_maintainer("sys-devel", "gcc"))
+    
     return 0
 
 if __name__ == '__main__':
