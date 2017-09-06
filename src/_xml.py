@@ -47,6 +47,8 @@ class XML_EL(object):
             return None
         if (len(res) == 1):
             return XML_EL(res[0])
+        if (len(res) == 0):
+            return None
         out = []
         for x in res:
             out.append (XML_EL(x))

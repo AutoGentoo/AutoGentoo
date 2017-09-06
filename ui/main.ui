@@ -77,8 +77,6 @@
   <object class="GtkTextBuffer" id="extra">
     <signal name="changed" handler="client_change" swapped="no"/>
   </object>
-  <object class="GtkTextBuffer" id="new_extra"/>
-  <object class="GtkEntryCompletion" id="package_list_completion"/>
   <object class="GtkWindow" id="window_main">
     <property name="can_focus">False</property>
     <property name="default_width">940</property>
@@ -206,7 +204,9 @@
             <property name="primary_icon_name">edit-find-symbolic</property>
             <property name="primary_icon_activatable">False</property>
             <property name="primary_icon_sensitive">False</property>
-            <property name="completion">package_list_completion</property>
+            <property name="placeholder_text" translatable="yes">Search Package</property>
+            <signal name="activate" handler="pkg_search" swapped="no"/>
+            <signal name="search-changed" handler="pkg_search" swapped="no"/>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -731,6 +731,7 @@
       <placeholder/>
     </child>
   </object>
+  <object class="GtkTextBuffer" id="new_extra"/>
   <object class="GtkDialog" id="dialog_new_client">
     <property name="can_focus">False</property>
     <property name="resizable">False</property>

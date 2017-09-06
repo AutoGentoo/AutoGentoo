@@ -203,7 +203,6 @@ class portage:
             keywords = self.gen_unknown_key ()
         for x in keywords:
             if keywords[x] == 2:
-                printf ("%s/%s %s\n", cat, pkg, x)
                 break
         try:
             slot = parsed["SLOT"]
@@ -270,17 +269,59 @@ class portage:
     def search (self, atom):
         pkg_buf = [s for s in self.package_list if atom in s]
         out = []
-        for x in pkg_buf:
+        for i, x in enumerate(pkg_buf):
             out.append (self.packages[self.package_list[x]][x])
+            if (i == 50):
+                break
         return out
     
     def get_maintainer (self, cat, pkg):
         tree = _xml._XML ("%s/%s/%s/metadata.xml" % (self.path, cat, pkg))
-        return tree.pkgmetadata.maintainer.email.text(), tree.pkgmetadata.maintainer.name.text()
+        _long = ""
+        try:
+            tree.pkgmetadata.longdescription
+        except IndexError:
+            pass
+        else:
+            try:
+                len (tree.pkgmetadata.longdescription)
+            except TypeError:
+                _long = tree.pkgmetadata.longdescription.text ()
+            else:
+                _long = tree.pkgmetadata.find_attr ('longdescription', 'lang', 'en').text()
+        
+        maintainer_parsed = self.parse_maintainer (tree.pkgmetadata.maintainer)
+        
+        return maintainer_parsed, self.format_long_description(_long)
+    
+    def parse_maintainer (self, maintainer, _list=True):
+        name = ""
+        email = ""
+        
+        try:
+            maintainer.name
+        except IndexError:
+            name = maintainer.email.text()
+            email = ""
+        except AttributeError:
+            out = []
+            for person in maintainer:
+                out.append (self.parse_maintainer(person, False))
+            return out
+        else:
+            email = maintainer.email.text()
+            name = maintainer.name.text()
+        if (_list):
+            return [(email, name)]
+        else:
+            return (email, name)
+    
+    def format_long_description (self, desc):
+        return desc.strip().replace ("\t", "").replace ("\n", " ")
     
     def get_cat_info (self, cat):
         tree = _xml._XML ("%s/%s/metadata.xml" % (self.path, cat))
-        return tree.catmetadata.find_attr ('longdescription', 'lang', 'en').text().strip().replace ("\t", "").replace ("\n", " ")
+        return self.format_long_description(tree.catmetadata.find_attr ('longdescription', 'lang', 'en').text())
 
 def main(args):
     temp = portage ("kronos", "~/Downloads/portage")

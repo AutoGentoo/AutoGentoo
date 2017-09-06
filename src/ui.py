@@ -88,12 +88,18 @@ class ui:
             "sig_new_client": self.new_client_open,
             "new_client_close": self.new_client_close,
             "new_client_create": self.new_client_create,
-            "remove_client_open": self.remove_client_open
+            "remove_client_open": self.remove_client_open,
+            "pkg_search": self.pkg_search
         }
         self.builder.connect_signals (self.handlers)
         self.clients_tree.treeview.connect ("row-activated", self.activate)
         
         self.window.show()
+    
+    def pkg_search (self, entry_widget):
+        if (self.builder.get_object ("notebook_main").get_current_page () != 2):
+            self.builder.get_object ("notebook_main").set_current_page (2)
+        self.portageMeta.search (entry_widget.get_text ())
     
     def remove_client_open (self, widget):
         model, _iter = self.clients_tree.treeview.get_selection ().get_selected ()

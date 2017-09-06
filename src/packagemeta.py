@@ -37,7 +37,7 @@ class PortageMeta (Gtk.Box):
         
         self.pkgtabs = packageTabs (self)
         self.pkgtabs.parse_root ()
-        self.pack_start (self.pkgtabs, False, False, 0)
+        self.pack_start (self.pkgtabs, False, True, 0)
         
         self.pkgmeta = PackageMeta ()
         self.pack_start (self.pkgmeta, True, True, 0)
@@ -45,25 +45,47 @@ class PortageMeta (Gtk.Box):
         self.catmeta = CategoryMeta (self._portage, self)
         self.pack_start (self.catmeta, True, True, 0)
         
+        self.searchmeta = SearchMeta (self._portage, self)
+        self.pack_start (self.searchmeta, True, False, 0)
+        
         self.pkgmeta.hide ()
         self.catmeta.hide ()
+        self.searchmeta.hide ()
+        
+        while Gtk.events_pending():
+            Gtk.main_iteration_do(True)
         self.show ()
     
     def parse_package (self, package):
         self.catmeta.hide ()
+        self.searchmeta.hide ()
         
         self.pkgtabs.parse_package (package)
         self.pkgmeta._parse_package (self._portage, package)
+        self.pkgmeta.view.queue_draw ()
+        self.pkgmeta.show_all ()
         while Gtk.events_pending():
             Gtk.main_iteration_do(True)
         self.pkgmeta.show_all ()
     
     def parse_category (self, cat):
         self.pkgmeta.hide ()
+        self.searchmeta.hide ()
         
         self.pkgtabs.parse_category (cat)
         self.catmeta.parse_category (cat)
+        while Gtk.events_pending():
+            Gtk.main_iteration_do(True)
         self.catmeta.show_all ()
+        
+    def search (self, atom):
+        self.pkgmeta.hide ()
+        self.catmeta.hide ()
+        
+        self.pkgtabs.parse_root ()
+        self.searchmeta.parse_search (atom)
+        self.searchmeta.show_all ()
+        
 
 class PackageMeta (Gtk.Box):
     __gtype_name__ = 'packageMeta'
@@ -82,6 +104,7 @@ class PackageMeta (Gtk.Box):
         self.desc_label = Gtk.Label ()
         self.homepkg_label = Gtk.LinkButton ()
         self.pkg_label.set_xalign (0.0)
+        self.cat_label.set_xalign (0.0)
         
         self.header_top.set_margin_bottom (12)
         self.header_top.set_margin_start (12)
@@ -89,7 +112,7 @@ class PackageMeta (Gtk.Box):
         
         self.override_background_color(Gtk.StateType.NORMAL, css_rgba(250, 250, 250, 1))
         
-        self.header_second.pack_start (self.cat_label, True, False, 0)
+        self.header_second.pack_start (self.cat_label, True, True, 0)
         self.header_second.pack_start (self.pkg_label, True, False, 0)
         
         self.desc_top.pack_start (self.desc_label, False, False, 0)
@@ -155,7 +178,7 @@ class PackageMeta (Gtk.Box):
         self.store.clear()
         self.meta.clear()
         self.cat_label.set_markup ("<span font='Open Sans 20px' foreground='#777'>%s/</span>" % package.category)
-        self.pkg_label.set_markup ("<span font='Open Sans 31px' foreground='#333'>%s</span>" % package.name)
+        self.pkg_label.set_markup ("<span font='Open Sans 27px' foreground='#333'>%s</span>" % package.name)
         self.desc_label.set_markup ("<span font='Open Sans 21px' foreground='#333'>%s</span>" % package.description)
         self.desc_label.set_line_wrap (True)
         self.desc_label.set_size_request(450, -1)
@@ -166,7 +189,9 @@ class PackageMeta (Gtk.Box):
             for arch in portage.current_keywords:
                 imgbuf = self.img_buff[ebuild.keywords[arch]]
                 buf.append (imgbuf)
-                
+            
+            while Gtk.events_pending():
+                Gtk.main_iteration_do(True)
             self.store.append (buf)
         
         self.use = useMeta (_portage, package)
@@ -175,6 +200,8 @@ class PackageMeta (Gtk.Box):
         self.meta.pack_start (self.license, False, False, 0)
         self.maintainer = maintainerMeta (_portage, package)
         self.meta.pack_start (self.maintainer, False, False, 0)
+        if self.maintainer.longdesc:
+            self.meta.pack_start (self.maintainer.longdesc, False, False, 0)
 
     def get_tree_cell_text(self, col, cell, model, iter, user_data):
         if (col.__index != 0):
@@ -227,9 +254,50 @@ class CategoryMeta (Gtk.Box):
     def parse_category (self, cat):
         self.name.set_text (cat)
         self.info_main.set_text (self._portage.get_cat_info (cat))
-        
+        self.packages.clear ()
         for pkg in sorted(self._portage.packages[cat]):
             temp = SimplePackage (self._portage.packages[cat][pkg])
+            temp._action.connect ("activate-link", self.handle_click)
+            self.packages.pack_start (temp, False, False, 0)
+            
+        self.show_all ()
+
+class RootMeta (Gtk.Box):
+    __gtype_name__ = 'rootMeta'
+    
+    def __init__ (self, _portage):
+        Gtk.Box.__init__ (self, orientation=Gtk.Orientation.VERTICAL)
+        
+
+class SearchMeta (Gtk.Box):
+    __gtype_name__ = "searchMeta"
+    def __init__ (self, _portage, parent):
+        Gtk.Box.__init__ (self, orientation=Gtk.Orientation.VERTICAL)
+        self.parent = parent
+        self.name = Gtk.Label ()
+        
+        self.pack_start (self.name, True, True, 6)
+        
+        set_margins (self.name, 12, 0)
+        
+        self.packages = packageCenter ("Search results")
+        self.pack_start (self.packages, True, True, 0)
+        
+        self._portage = _portage
+        self.show_all () # Show all the children
+        self.hide () # Then hide me
+    
+    def handle_click (self, widget, uri):
+        cat, pkg = uri.split ('/')
+        package = self._portage.packages[cat][pkg]
+        self.parent.parse_package (package)
+    
+    def parse_search (self, atom):
+        self.name.set_text ("Search results for %s" % atom)
+        self.packages.clear ()
+        
+        for pkg in sorted(self._portage.search (atom), key=lambda __pkg: len(__pkg.name)):
+            temp = SimplePackage (pkg)
             temp._action.connect ("activate-link", self.handle_click)
             self.packages.pack_start (temp, False, False, 0)
             
@@ -260,7 +328,7 @@ class packageCenter (Gtk.Box):
         self.top.pack_start (widget, ex, fill, padding)
     
     def clear (self):
-        destroy_children (self.top)
+        destroy_children (self.top, 1)
 
 class SimplePackage (Gtk.Box):
     __gtype_name__ = "SimplePackage"
@@ -337,8 +405,8 @@ def set_margins (widget, top, right=None, bottom=None, left=None):
     if (bottom != -1):
         widget.set_margin_bottom (bottom)
 
-def destroy_children (widget):
-    for child in widget.get_children ():
+def destroy_children (widget, start=0, end=None):
+    for child in widget.get_children ()[start:end]:
         child.destroy ()
 
 class metaItem (Gtk.Box):
@@ -424,11 +492,21 @@ class maintainerMeta (metaItem):
     
     def __init__ (self, _portage, package):
         metaItem.__init__ (self, "Maintainer(s)", "../ui/resources/user.png")
-        uri, name = _portage.get_maintainer (package.category, package.name)
-        self.main_label = Gtk.Label (name)
-        self.main_label.set_tooltip_text (uri)
-        self.main_label.set_xalign (0.0)
-        self.pack_right (self.main_label)
+        maintainerList, _long = _portage.get_maintainer (package.category, package.name)
+        for dude in maintainerList:
+            label = Gtk.Label (dude[1])
+            label.set_tooltip_text (dude[0])
+            label.set_xalign (0.0)
+            self.pack_right (label)
+        
+        self.longdesc = None
+        if _long:
+            self.longdesc = metaItem ("Full description", "../ui/resources/info.png")
+            self.longdesc.main_label = Gtk.Label (_long)
+            self.longdesc.main_label.set_line_wrap (True)
+            self.longdesc.main_label.set_max_width_chars (70)
+            self.longdesc.main_label.set_xalign(0.0)
+            self.longdesc.pack_right (self.longdesc.main_label)
 
 class packageTabs (Gtk.Box):
     __gtype_name__ = 'packageTabs'

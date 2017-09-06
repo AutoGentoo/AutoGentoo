@@ -13,7 +13,7 @@ replace_tabs=false
 indent_width=4
 indent_type=0
 indent_hard_tab_width=8
-detect_indent=true
+detect_indent=false
 detect_indent_width=false
 indent_mode=2
 
@@ -29,7 +29,7 @@ long_line_column=72
 
 [files]
 current_page=0
-FILE_NAME_0=7960;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fpackagemeta.py;0;8
+FILE_NAME_0=9767;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fpackagemeta.py;0;8
 FILE_NAME_1=859;CSS;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fui%2Fcss%2Fmain.css;0;4
 FILE_NAME_2=1596;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Ftreegrid.py;0;4
 FILE_NAME_3=2355;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fui.py;0;4
