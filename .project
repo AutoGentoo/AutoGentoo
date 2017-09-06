@@ -28,15 +28,15 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=3
-FILE_NAME_0=979;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fmain.py;0;4
-FILE_NAME_1=9467;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fui.py;0;4
-FILE_NAME_2=1530;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Ftreegrid.py;0;4
-FILE_NAME_3=1675;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fautogentoo.py;0;4
-FILE_NAME_4=3477;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fportage.py;0;4
-FILE_NAME_5=598;None;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fdev-lang%2Fpython%2Fpython-2.7.12.ebuild;0;4
-FILE_NAME_6=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fdev-lang%2Fpython%2FManifest;0;4
-FILE_NAME_7=1418;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fsocketrequest.py;0;4
-FILE_NAME_8=0;XML;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fdev-lang%2Fpython%2Fmetadata.xml;0;4
-FILE_NAME_9=0;None;0;EUTF-8;1;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fdev-lang%2Fpython%2Fpython-3.6.1-r1.ebuild;0;4
-FILE_NAME_10=615;XML;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fmetadata%2Fdtd%2Fmetadata.dtd;0;2
+current_page=0
+FILE_NAME_0=1714;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fportage.py;0;4
+FILE_NAME_1=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fprofiles%2Fcategories;0;4
+FILE_NAME_2=257;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fprofiles%2Fuse.local.desc;0;4
+FILE_NAME_3=1072;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fmetadata%2Fmd5-cache%2Fdev-lang%2Fpython-2.7.12;0;4
+FILE_NAME_4=1322;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fportage.c;0;4
+FILE_NAME_5=979;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fmain.py;0;4
+FILE_NAME_6=9467;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fui.py;0;4
+FILE_NAME_7=1530;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Ftreegrid.py;0;4
+FILE_NAME_8=1675;Python;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo-GClient%2Fsrc%2Fautogentoo.py;0;4
+FILE_NAME_9=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fmetadata%2Fmd5-cache%2Fdev-lang%2Fclojure-1.8.0;0;4
+FILE_NAME_10=26;None;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fportage%2Fprofiles%2Farch.list;0;4

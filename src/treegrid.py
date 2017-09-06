@@ -60,8 +60,8 @@ class TreeGrid:
         self.parent = parent
         assert (len (self.__headers) == len(self.__types))
         for i, column_title in enumerate(self.__headers):
-            self.renderer = Gtk.CellRendererText()
-            column = Gtk.TreeViewColumn(column_title, self.renderer, text=i)
+            renderer = Gtk.CellRendererText()
+            column = Gtk.TreeViewColumn(column_title, renderer, text=i)
             self.treeview.append_column(column)
             if i == self.ex:
                 self.treeview.set_expander_column(column)

@@ -27,13 +27,15 @@
 import gi
 gi.require_version('Vte', '2.91')
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Vte
+from gi.repository import Gtk, Vte, Gdk
 from gi.repository.Vte import Terminal
 from gi.repository import GLib
 from treegrid import TreeGrid
 import os
 from socketrequest import SocketRequest
 from stdio import *
+from packagemeta import PackageMeta
+import portage
 
 class ui:
     builder = None
@@ -60,6 +62,21 @@ class ui:
         self.builder.get_object ("_server_spec_scroll").set_vexpand(True)
         ci_sr.close ()
         cpuinfo.set_text (res)
+        self.temp_meta = PackageMeta ()
+        self.portage = portage.portage (self.server.ip, "~/Downloads/portage")
+        self.temp_meta._parse_package (self.portage, self.portage.packages["sys-devel"]["gcc"])
+        self.builder.get_object ("_package_scroll").add (self.temp_meta)
+        
+        # CSS
+        style_provider = Gtk.CssProvider()
+        
+        style_provider.load_from_path("../ui/css/main.css")
+
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(),
+            style_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
         
         # Dialogs
         self.new_client = self.builder.get_object ("dialog_new_client")

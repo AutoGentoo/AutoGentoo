@@ -30,3 +30,13 @@ def printf (string, *_format):
 
 def sprintf (string, *_format):
     return string % _format
+
+def group(seq, sep):
+    g = []
+    for el in seq:
+        if el == sep:
+            yield g
+            g = []
+            continue
+        g.append(el)
+    yield g

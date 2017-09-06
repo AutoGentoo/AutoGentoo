@@ -25,42 +25,53 @@
 from collections import namedtuple
 import os
 from stdio import *
+import socketrequest
 
+global current_keywords
 current_keywords = ["amd64", "x86", "alpha", "arm", "hppa", "ia64", "ppc", "ppc64", "sparc"]
 
-
-Keyword = namedtuple ("Keyword", ('identifier', 'stable'))
-Version = namedtuple ("Version", ('id', 'ebuild', 'keywords', 'slot'))
+Ebuild = namedtuple ("Ebuild", ('name', 'id', 'keywords', 'slot'))
+PackageBinary = namedtuple ("PackageBinary", ("name", "category", "version", "slot", "build_time", "size", "use"))
+PackageMeta = namedtuple ("PackageMeta", ("name", "v_id")) # Used to id packages before generation
 Flag = namedtuple ("Flag", ("name", "description"))
-Package = namedtuple ("Package", ("name", "description", "homepage", "globalflags", "localflags", "versions"))
+Package = namedtuple ("Package", ("name", "category", "description", "homepage", "versions", "license"))
 
 class portage:
-    packages = {} # category: [packages]
-    global_use = []
+    packages = {} # category: {name: Package}
+    package_list = {} # {name: category} used for searching
+    server_packages = {}
+    global_use = {}
+    local_use = {}
     path = ""
+    binhost_ip = ""
+    binhost_port = 9490
     
-    def __init__ (self, path="/usr/portage"):
+    def __init__ (self, binhost_ip, path="/usr/portage"):
         self.path = os.path.expanduser(path)
         self.generate_global_use ()
+        self.generate_local_use ()
         self.generate_packages ()
+        self.binhost_ip = binhost_ip
+        socket_package = socketrequest.SocketRequest (self.binhost_ip, 9490)
+        res = socket_package.send (b"GET /Packages HTTP/1.0").decode ("utf-8")
+        self.generate_server_packages (res.splitlines ()[2:]) # Skip 200 OK and newline
     
     def readlines (self, path):
         out = []
         with open ("%s/%s" % (self.path, path), "r") as f:
-            out = f.readlines ()
+            out = f.read().splitlines()
             f.close ()
         return out
     
     def generate_global_use (self):
         b = self.readlines ("profiles/use.desc")
         for x in b:
-            x = x[:-1] # Remove newline
             if not x: # Skip comments and empty lines
                 continue
             elif x[0] == "#":
                 continue
-            i_b = x.find (" - ")
-            self.global_use.append (Flag (x[:i_b], x[i_b+3:]))
+            i_b = x.find (" ")
+            self.global_use[x[:i_b]] = Flag (x[:i_b], x[i_b+3:])
     
     def get_dirs (self, path):
         return [name for name in os.listdir(path)
@@ -68,82 +79,177 @@ class portage:
     
     def parse_version_id (self, buff):
         if (buff[buff.rfind("-")+1] == 'r'): # Revision number
-            return buff[:buff.rfind ("-", 0, buff.rfind ("-"))]
+            v_id = buff[buff.rfind ("-", 0, buff.rfind ("-"))+1:]
+            name = buff[:buff.rfind ("-", 0, buff.rfind ("-"))]
         else:
-            return buff[:buff.rfind ("-")]
+            v_id = buff[buff.rfind ("-")+1:]
+            name = buff[:buff.rfind ("-")]
+        return PackageMeta (name, v_id)
     
-    def parse_keywords (self, buf):
-        stable = True
-        if (buf == ""):
-            return None
-        if (buf[0] == "~"):
-            stable = False
-            buf = buf[1:]
-        if (buf not in current_keywords):
-            return None
-        return Keyword (buf, stable)
+    def gen_unknown_key (self):
+        out = {}
+        for x in current_keywords:
+            out[x] = "unknown"
+        return out
     
-    def get_full_keywords (self, buf):
-        added = []
-        print (buf)
-        for x in buf:
-            if (x == ""):
+    def gen_keywords (self, keyword_str):
+        # KEYWORD STATUS
+        # 0 = stable
+        # 1 = unstable (~)
+        # 2 = broken (-)
+        # 3 = unknown
+        
+        key_list = list(filter(bool, keyword_str.split (" ")))
+        out = self.gen_unknown_key () # They default to unknown
+        for key in key_list:
+            if (key == "*"):
+                for x in current_keywords:
+                    try:
+                        out[x]
+                    except KeyError:
+                        out[x] = "stable"
                 continue
-            if (x[0] == "~"):
-                x = x[1:]
-            if x not in current_keywords:
+            if (key == "~*"):
+                for x in current_keywords:
+                    try:
+                        out[x]
+                    except KeyError:
+                        out[x] = "unstable"
                 continue
-            added.append (x)
-        return set(current_keywords) - set(added)
-
-    def parse_ebuild (self, pkg, cat, ebuild):
-        lines = self.readlines ("%s/%s/%s" % (pkg, cat, ebuild))
+            if (key == "**"):
+                for x in current_keywords:
+                    out[x] = "masked"
+                break
+            
+            status = "stable"
+            if key[0] == "~":
+                status = "unstable"
+                key = key[1:]
+            elif key[0] == "-":
+                status = "masked"
+                key = key[1:]
+            out[key] = status
+        
+        return out
+    
+    def get_cats (self):
+        return self.readlines ("profiles/categories")
+    
+    def generate_local_use (self):
+        cats = self.get_cats ()
+        localuse = self.readlines ("profiles/use.local.desc")
+        self.local_use = {}
+        for cat in cats:
+            self.local_use[cat] = {}
+        for line in localuse:
+            if not line: # Skip comments and empty lines
+                continue
+            elif line[0] == "#":
+                continue
+            desc_delim = line.find (" ")
+            c_cat = line[:line.find("/")]
+            name = line[line.find("/")+1:line.find(":")]
+            flag_name = line[line.find(":")+1:line.find(" ")]
+            desc = line[line.find(" ")+3:]
+            try:
+                self.local_use[c_cat][name]
+            except KeyError:
+                self.local_use[c_cat][name] = []
+            self.local_use[c_cat][name].append (Flag (flag_name, desc))
+    
+    def parse_cpv (self, cpv):
+        cat = cpv[:cpv.find("/")]
+        namebuf = cpv[cpv.find("/")+1:]
+        vid = self.parse_version_id (namebuf)
+        return cat, vid.name, vid.v_id
+    
+    def generate_server_packages (self, binhost_package_lines):
+        self.server_packages = {}
+        dirs = self.get_cats ()
+        for cat in dirs:
+            self.server_packages [cat] = {}
+        package_buff = list (group (binhost_package_lines, ""))
+        for pkg in package_buff[1:-1]:
+            parsed = self.parse_from_delim (pkg, ": ")
+            cat, name, v = self.parse_cpv(parsed["CPV"])
+            try:
+                self.server_packages[cat][name]
+            except KeyError:
+                self.server_packages[cat][name] = {}
+            try:
+                parsed["SLOT"]
+            except KeyError:
+                parsed["SLOT"] = "0"
+            self.server_packages[cat][name][v] = PackageBinary(name, cat, v, parsed["SLOT"], parsed["BUILD_TIME"], parsed["SIZE"], parsed["USE"])
+    
+    def parse_from_delim (self, lines, delim):
         parsed = {}
         for line in lines:
-            __split = line.split("=")
-            if len(__split) != 2:
-                continue
-            parsed[__split[0]] = __split[1].replace ("\"", "")
-        
-        try:
-            v_architectures = parsed["KEYWORDS"].strip().split (" ")
-        except KeyError:
-            v_architectures = current_keywords
-        v_architectures = self.get_full_keywords (v_architectures) | set(v_architectures)
-        v_keywords = list(self.parse_keywords (x) for x in v_architectures if self.parse_keywords (x) != None)
-        v_ebuild = ebuild
-        print (v_keywords)
-        try:
-            v_slot = parsed["SLOT"]
-        except KeyError:
-            v_slot = "0"
-        v_id = self.parse_version_id (ebuild.replace (".ebuild", ""))
-        
+            splt = line.split (delim, 1)
+            parsed[splt[0]] = splt[1]
+        return parsed
     
     def generate_package (self, cat, pkg):
-        ebuilds = []
-        pkg_dir = "%s/%s/" % (cat, pkg)
-        manifest = self.readlines ("%s/Manifest" % pkg_dir)
-        for line in manifest:
-            tokens = line.split (' ')
-            if tokens[0] != "EBUILD":
-                continue
-            ebuilds.append (tokens[1])
+        meta = self.parse_version_id (pkg)
+        metalines = self.readlines ("metadata/md5-cache/%s/%s" % (cat, pkg))
+        parsed = self.parse_from_delim (metalines, "=")
+        keywords = {}
+        slot = ""
+        _license = []
+        try:
+            keywords = self.gen_keywords(parsed["KEYWORDS"])
+        except KeyError:
+            keywords = self.gen_unknown_key ()
+        for x in keywords:
+            if keywords[x] == 2:
+                printf ("%s/%s %s\n", cat, pkg, x)
+                break
+        try:
+            slot = parsed["SLOT"]
+        except KeyError:
+            slot = "0"
+        try:
+            parsed["DESCRIPTION"]
+        except KeyError:
+            parsed["DESCRIPTION"]
+        try:
+            parsed["HOMEPAGE"]
+        except KeyError:
+            parsed["HOMEPAGE"] = ""
+        try:
+            _license = parsed["LICENSE"].split (' ')
+        except KeyError:
+            pass
+            
+        return Ebuild(meta.name, meta.v_id, keywords, slot), meta, parsed, _license
         
-        versions = []
-        for ebuild in ebuilds:
-            self.parse_ebuild (cat, pkg, ebuild)
-    
     def generate_packages (self):
-        dirs = set(self.get_dirs(self.path))
-        for cat in dirs - set(("distfile", "eclass", "licenses", "metadata", "profiles", "scripts", "packages")):
-            self.packages [cat] = []
-            cat_pkgs = self.get_dirs ("%s/%s" % (self.path, cat))
+        self.packages = {}
+        self.package_list = {}
+        dirs = self.get_cats ()
+        for cat in dirs:
+            self.packages [cat] = {}
+            self.server_packages[cat] = {}
+            
+            cat_pkgs = os.listdir ("%s/metadata/md5-cache/%s" % (self.path, cat))
             for pkg in cat_pkgs:
-                self.packages[cat].append (self.generate_package(cat,pkg))
-        
+                temp, meta, parsed = self.generate_package(cat,pkg)
+                try:
+                    self.packages[cat][meta.name]
+                except KeyError:
+                    self.packages[cat][meta.name] = Package (meta.name, cat, parsed["DESCRIPTION"], parsed["HOMEPAGE"], [])
+                    self.package_list[meta.name] = cat
+                self.packages[cat][meta.name].versions.append (temp)
+    
+    def search (self, atom):
+        pkg_buf = [s for s in self.package_list if atom in s]
+        out = []
+        for x in pkg_buf:
+            out.append (self.packages[self.package_list[x]][x])
+        return out
+
 def main(args):
-    temp = portage ("~/Downloads/portage")
+    temp = portage ("kronos", "~/Downloads/portage")
     return 0
 
 if __name__ == '__main__':

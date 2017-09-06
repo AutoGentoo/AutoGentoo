@@ -24,6 +24,55 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
   </object>
+  <object class="GtkBox" id="_portage_search_top">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="orientation">vertical</property>
+    <child>
+      <object class="GtkBox" id="_portage_info_top">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel" id="_portage_info_1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">&lt;span foreground="#333" font="35px"&gt;Welcome to the Gentoo Portage Tree&lt;/span&gt;</property>
+            <property name="use_markup">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="_portage_info_2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">&lt;span foreground="#333" font="35px"&gt;Home to &lt;span foreground="#54487a"&gt;19292&lt;/span&gt; packages&lt;/span&gt;</property>
+            <property name="use_markup">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+  </object>
   <object class="GtkTextBuffer" id="_server_spec"/>
   <object class="GtkTextBuffer" id="extra">
     <signal name="changed" handler="client_change" swapped="no"/>
@@ -149,6 +198,8 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="halign">center</property>
+            <property name="margin_top">6</property>
+            <property name="margin_bottom">6</property>
             <property name="hexpand">True</property>
             <property name="primary_icon_name">edit-find-symbolic</property>
             <property name="primary_icon_activatable">False</property>
