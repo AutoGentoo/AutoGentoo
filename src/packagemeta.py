@@ -116,7 +116,9 @@ class PackageMeta (Gtk.Box):
         self.store.clear()
         self.cat_label.set_markup ("<span font='Open Sans 20px' foreground='#777'>%s/</span>" % package.category)
         self.pkg_label.set_markup ("<span font='Open Sans 31px' foreground='#333'>%s</span>" % package.name)
-        self.desc_label.set_markup ("<span font='Open Sans 31px' foreground='#333'>%s</span>" % package.description)
+        self.desc_label.set_markup ("<span font='Open Sans 21px' foreground='#333'>%s</span>" % package.description)
+        self.desc_label.set_line_wrap (True)
+        self.desc_label.set_size_request(450, -1)
         self.homepkg_label.set_uri(package.homepage)
         self.homepkg_label.set_label(package.homepage)
         for ebuild in package.versions:

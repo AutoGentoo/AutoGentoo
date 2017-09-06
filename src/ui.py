@@ -64,7 +64,7 @@ class ui:
         cpuinfo.set_text (res)
         self.temp_meta = PackageMeta ()
         self.portage = portage.portage (self.server.ip, "~/Downloads/portage")
-        self.temp_meta._parse_package (self.portage, self.portage.packages["sys-devel"]["gcc"])
+        self.temp_meta._parse_package (self.portage, self.portage.packages["gnome-base"]["gnome"])
         self.builder.get_object ("_package_scroll").add (self.temp_meta)
         
         # CSS
