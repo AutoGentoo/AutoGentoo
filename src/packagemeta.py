@@ -86,7 +86,7 @@ class PackageMeta (Gtk.Box):
         
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("Version", renderer, text=0)
-        column.set_fixed_width (175)
+        column.set_fixed_width (332)
         column.__index = 0
         column.set_cell_data_func(renderer, self.get_tree_cell_text)
         self.view.append_column(column)
@@ -161,7 +161,7 @@ class packageCenter (Gtk.Box):
         self.head_label.get_style_context ().add_class ("package-center-label")
         self.head_label.set_padding(15, 10)
         self.head_label.set_xalign (0.0)
-        self.top.set_size_request (688, -1) # 688px is the allocated width of the TreeView
+        self.top.set_size_request (845, -1) # 688px is the allocated width of the TreeView
         self.set_margin_top (12)
         
         self.top.add (self.head_label)
@@ -297,7 +297,6 @@ class maintainerMeta (metaItem):
     
     def __init__ (self, _portage, package):
         metaItem.__init__ (self, "Maintainer(s)", "../ui/resources/user.png")
-        
         uri, name = _portage.get_maintainer (package.category, package.name)
         self.main_label = Gtk.Label (name)
         self.main_label.set_tooltip_text (uri)

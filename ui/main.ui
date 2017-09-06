@@ -81,6 +81,8 @@
   <object class="GtkEntryCompletion" id="package_list_completion"/>
   <object class="GtkWindow" id="window_main">
     <property name="can_focus">False</property>
+    <property name="default_width">940</property>
+    <property name="default_height">600</property>
     <child>
       <object class="GtkBox" id="top_level">
         <property name="visible">True</property>
@@ -194,7 +196,7 @@
         </child>
         <child>
           <object class="GtkSearchEntry" id="search">
-            <property name="width_request">270</property>
+            <property name="width_request">540</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="halign">center</property>
@@ -696,6 +698,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="shadow_type">in</property>
+                <property name="min_content_width">900</property>
                 <child>
                   <placeholder/>
                 </child>
