@@ -329,8 +329,12 @@ class SearchMeta (Gtk.Box):
     def parse_search (self, atom):
         self.name.set_text ("Search results for %s" % atom)
         self.packages.clear ()
-        
-        for pkg in sorted(self._portage.search (atom), key=lambda __pkg: len(__pkg.name)):
+        pkgnum = 0
+        pkgfound = sorted(self._portage.search (atom), key=lambda __pkg: len(__pkg.name))
+        if len (pkgfound) == 1:
+            self.parent.parse_package (pkgfound[0])
+            return
+        for pkg in pkgfound:
             temp = SimplePackage (pkg)
             temp._action.connect ("activate-link", self.handle_click)
             self.packages.pack_start (temp, False, False, 0)
