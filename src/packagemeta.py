@@ -31,9 +31,10 @@ def css_rgba (r, b, g, a):
 class PortageMeta (Gtk.Box):
     __gtype_name__ = 'portageMeta'
     
-    def __init__ (self, _portage):
+    def __init__ (self, _portage, parent):
         Gtk.Box.__init__ (self, orientation=Gtk.Orientation.VERTICAL)
         self._portage = _portage
+        self.parent = parent
         
         self.pkgtabs = packageTabs (self)
         self.pkgtabs.parse_root ()
@@ -48,6 +49,10 @@ class PortageMeta (Gtk.Box):
         self.searchmeta = SearchMeta (self._portage, self)
         self.pack_start (self.searchmeta, True, False, 0)
         
+        self.rootmeta = RootMeta (self._portage, self)
+        self.pack_start (self.rootmeta, True, False, 0)
+        
+        self.rootmeta.hide ()
         self.pkgmeta.hide ()
         self.catmeta.hide ()
         self.searchmeta.hide ()
@@ -57,6 +62,7 @@ class PortageMeta (Gtk.Box):
         self.show ()
     
     def parse_package (self, package):
+        self.rootmeta.hide ()
         self.catmeta.hide ()
         self.searchmeta.hide ()
         
@@ -69,6 +75,7 @@ class PortageMeta (Gtk.Box):
         self.pkgmeta.show_all ()
     
     def parse_category (self, cat):
+        self.rootmeta.hide ()
         self.pkgmeta.hide ()
         self.searchmeta.hide ()
         
@@ -79,12 +86,21 @@ class PortageMeta (Gtk.Box):
         self.catmeta.show_all ()
         
     def search (self, atom):
+        self.rootmeta.hide ()
         self.pkgmeta.hide ()
         self.catmeta.hide ()
         
-        self.pkgtabs.parse_root ()
+        self.pkgtabs.parse_root (False)
         self.searchmeta.parse_search (atom)
         self.searchmeta.show_all ()
+    
+    def parse_root (self):
+        self.pkgmeta.hide ()
+        self.catmeta.hide ()
+        self.searchmeta.hide ()
+        
+        self.pkgtabs.parse_root ()
+        self.rootmeta.show_all ()
         
 
 class PackageMeta (Gtk.Box):
@@ -265,9 +281,26 @@ class CategoryMeta (Gtk.Box):
 class RootMeta (Gtk.Box):
     __gtype_name__ = 'rootMeta'
     
-    def __init__ (self, _portage):
+    def __init__ (self, _portage, parent):
         Gtk.Box.__init__ (self, orientation=Gtk.Orientation.VERTICAL)
+        self.parent = parent
+        self._portage = _portage
         
+        self.root_search = Gtk.SearchEntry ()
+        self.root_search.set_placeholder_text ("Search Package")
+        self.root_search.set_size_request (450, -1)
+        self.root_search_info = Gtk.Label ()
+        set_margins (self.root_search_info, 0, 12)
+        self.root_search_info.set_markup ("""<span foreground="#333" font="26px">Welcome to the Home of <span foreground="#54487a">%s</span> Gentoo Packages</span>""" % self._portage.package_c)
+        self.root_search_info.set_line_wrap (True)
+        self.root_search_info.set_max_width_chars (600)
+        
+        self.pack_start (self.root_search_info, True, False, 0)
+        self.root_search_parent = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.root_search_parent.pack_start (self.root_search, True, False, 12)
+        self.pack_start (self.root_search_parent, True, False, 12)
+        
+        self.root_search.connect ('activate', self.parent.parent.pkg_search)
 
 class SearchMeta (Gtk.Box):
     __gtype_name__ = "searchMeta"
@@ -525,18 +558,23 @@ class packageTabs (Gtk.Box):
     def pack_start (self, widget, ex, fill, padding):
         self.top.pack_start (widget, ex, fill, padding)
     
-    def parse_root (self):
+    def parse_root (self, disable_button=True):
         # Clear out self.top
         destroy_children (self.top)
         
         self.root_label = Gtk.Label ("/")
         self.root_label.set_padding (0,0)
         self.root_button = Gtk.Button()
+        self.root_button.connect ('clicked', self.handle_root)
         self.root_button.add(self.root_label)
         self.pack_start (self.root_button, False, False, 4)
-        self.root_button.set_sensitive (False)
+        if disable_button:
+            self.root_button.set_sensitive (False)
         
         self.show_all ()
+    
+    def handle_root (self, widget):
+        self.parent.parse_root ()
     
     def handle_cat (self, widget):
         self.parent.parse_category (widget.get_label ())

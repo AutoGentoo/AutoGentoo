@@ -43,6 +43,7 @@ class portage:
     server_packages = {}
     global_use = {}
     local_use = {}
+    package_c = 0
     path = ""
     binhost_ip = ""
     binhost_port = 9490
@@ -251,6 +252,7 @@ class portage:
         self.packages = {}
         self.package_list = {}
         dirs = self.get_cats ()
+        self.package_c = 0
         for cat in dirs:
             self.packages [cat] = {}
             self.server_packages[cat] = {}
@@ -264,6 +266,7 @@ class portage:
                     global_iuse = self.parse_iuse (iuse.split (" "), cat, meta.name)
                     self.packages[cat][meta.name] = Package (meta.name, cat, parsed["DESCRIPTION"], parsed["HOMEPAGE"], [], _license, global_iuse)
                     self.package_list[meta.name] = cat
+                    self.package_c += 1
                 self.packages[cat][meta.name].versions.append (temp)
     
     def search (self, atom):

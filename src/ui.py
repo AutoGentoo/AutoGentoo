@@ -63,9 +63,8 @@ class ui:
         ci_sr.close ()
         cpuinfo.set_text (res)
         self.portage = portage.portage (self.server.ip, "~/Downloads/portage")
-        self.portageMeta = PortageMeta (self.portage)
-        #self.portageMeta.parse_package (self.portage.packages["gnome-base"]["gnome"])
-        self.portageMeta.parse_category ("gnome-base")
+        self.portageMeta = PortageMeta (self.portage, self)
+        self.portageMeta.parse_root ()
         self.builder.get_object ("_package_scroll").add (self.portageMeta)
         
         # CSS
