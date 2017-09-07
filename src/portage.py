@@ -293,7 +293,12 @@ class portage:
             else:
                 _long = tree.pkgmetadata.find_attr ('longdescription', 'lang', 'en').text()
         
-        maintainer_parsed = self.parse_maintainer (tree.pkgmetadata.maintainer)
+        try:
+            tree.pkgmetadata.maintainer
+        except IndexError:
+            maintainer_parsed = None
+        else:
+            maintainer_parsed = self.parse_maintainer (tree.pkgmetadata.maintainer)
         
         return maintainer_parsed, self.format_long_description(_long)
     

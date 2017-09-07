@@ -215,7 +215,8 @@ class PackageMeta (Gtk.Box):
         self.license = licenseMeta (package)
         self.meta.pack_start (self.license, False, False, 0)
         self.maintainer = maintainerMeta (_portage, package)
-        self.meta.pack_start (self.maintainer, False, False, 0)
+        if self.maintainer.maintainerList != None:
+            self.meta.pack_start (self.maintainer, False, False, 0)
         if self.maintainer.longdesc:
             self.meta.pack_start (self.maintainer.longdesc, False, False, 0)
 
@@ -525,12 +526,13 @@ class maintainerMeta (metaItem):
     
     def __init__ (self, _portage, package):
         metaItem.__init__ (self, "Maintainer(s)", "../ui/resources/user.png")
-        maintainerList, _long = _portage.get_maintainer (package.category, package.name)
-        for dude in maintainerList:
-            label = Gtk.Label (dude[1])
-            label.set_tooltip_text (dude[0])
-            label.set_xalign (0.0)
-            self.pack_right (label)
+        self.maintainerList, _long = _portage.get_maintainer (package.category, package.name)
+        if (self.maintainerList != None):
+            for dude in self.maintainerList:
+                label = Gtk.Label (dude[1])
+                label.set_tooltip_text (dude[0])
+                label.set_xalign (0.0)
+                self.pack_right (label)
         
         self.longdesc = None
         if _long:
