@@ -8,11 +8,12 @@ AC_PROG_CXX
 AC_PROG_CC
 AM_PROG_AR
 LT_INIT
+
 AC_SUBST([LIBTOOL_DEPS])
 
 #AC_CHECK_LIB([parted], [ped_device_read], [], AC_MSG_ERROR([*** libparted not found.]))
 
-PKG_CHECK_MODULES(libcurl, libcurl)
+#PKG_CHECK_MODULES(libcurl, libcurl)
 #PKG_CHECK_MODULES(glib, glib-2.0)
 
 #AC_ARG_ENABLE([gtk],

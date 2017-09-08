@@ -38,7 +38,7 @@ def main(args):
         pkgbuf = x[x.find("]") + 2:]
         pkgs.append ("=%s" % pkgbuf[:pkgbuf.find(" ")])
     
-    print ("emerge -quDN %s" % " ".join (pkgs))
+    print ("emerge -q --update --deep %s" % " ".join (pkgs))
     return 0
 
 if __name__ == '__main__':
