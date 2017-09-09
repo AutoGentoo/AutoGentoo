@@ -26,6 +26,7 @@
 #include <_string.h>
 #include <response.h>
 #include <sys/sysinfo.h>
+#include <sys/mman.h>
 #include <stdlib.h>
 
 void server_start (char* port)
@@ -65,6 +66,20 @@ void server_start (char* port)
     }
 }
 
+static int *hang_me;
+static int *close_me;
+
+int child_finished (int sig) {
+    if (hang_me > 0) {
+        waitpid (*hang_me, 0, WNOHANG);
+        *hang_me = -1;
+    }
+    
+    if (close_me > 2) {
+        close (*close_me);
+    }
+}
+
 // client connection
 void server_respond (int n, struct manager * m_man)
 {
@@ -73,7 +88,7 @@ void server_respond (int n, struct manager * m_man)
     char *ip;
     response_t res;
     pid_t pid = -1;
-    signal(SIGCHLD, SIG_IGN);
+    signal(SIGCHLD, child_finished);
 
     memset((void*)mesg, (int)'\0', 99999);
 
@@ -534,7 +549,6 @@ void server_respond (int n, struct manager * m_man)
         }
     }
     
-    
     // Closing SOCKET
     if (pid == -1) {
         shutdown(
@@ -542,18 +556,18 @@ void server_respond (int n, struct manager * m_man)
             SHUT_RDWR); // All further send and recieve operations are DISABLED...
         close(clients[n]);
         clients[n] = -1;
+        printf ("%d %s\n", res.code, res.message);
     }
-    if (pid == 0) {
+    else if (pid == 0) {
         shutdown(
             clients[n],
             SHUT_RDWR); // All further send and recieve operations are DISABLED...
         close(clients[n]);
+        printf ("%d %s\n", res.code, res.message);
+        *hang_me = getpid ();
+        *close_me = clients[n];
         clients[n] = -1;
-        printf ("%d %s\n", res.code, res.message);
         _exit (0);
-    }
-    else if (pid == -1) {
-        printf ("%d %s\n", res.code, res.message);
     }
 }
 
@@ -619,7 +633,12 @@ void server_main (unsigned daemon, struct manager * m_man) {
     int slot;
     struct sockaddr_in clientaddr;
     socklen_t addrlen;
-
+    
+    hang_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE, 
+        MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    close_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE, 
+        MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    
     int i;
     for (i=0; i<CONNMAX; i++)
         clients[i]=-1;
