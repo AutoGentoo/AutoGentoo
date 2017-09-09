@@ -72,6 +72,8 @@ void server_respond (int n, struct manager * m_man)
     int rcvd, fd, bytes_read;
     char *ip;
     response_t res;
+    pid_t pid = -1;
+    signal(SIGCHLD, SIG_IGN);
 
     memset((void*)mesg, (int)'\0', 99999);
 
@@ -99,49 +101,48 @@ void server_respond (int n, struct manager * m_man)
             reqline[0] = "\0"; // Make sure that the request doesn't continue
         }
         if (strncmp(reqline[0], "GET\0", 4) == 0) {
-            pid_t g_pid = fork ();
-            if (g_pid < 0) exit (1);
-            if (g_pid == 0) {close (clients[n]); return;}
-            if (strncmp(reqline[2], "HTTP/1.0", 8) != 0 && strncmp(reqline[2], "HTTP/1.1", 8) != 0) {
-                rsend (clients[n], BAD_REQUEST);
-                res = BAD_REQUEST;
-            }
-            else {
-                if (strncmp(reqline[1], "/\0", 2) == 0)
-                    reqline[1] = "";
-                
-                char *ip = get_ip_from_fd (clients[n]);
-                int sc_no = get_client_from_ip (m_man, ip);
-                if (sc_no < 0) {
-                    rsend (clients[n], FORBIDDEN);
-                    res = FORBIDDEN;
+            pid = fork ();
+            if (pid < 0) exit (1);
+            if (pid == 0) {
+                if (strncmp(reqline[2], "HTTP/1.0", 8) != 0 && strncmp(reqline[2], "HTTP/1.1", 8) != 0) {
+                    rsend (clients[n], BAD_REQUEST);
+                    res = BAD_REQUEST;
                 }
                 else {
-                    sprintf (path, "%s/%s/autogentoo/pkg/%s", m_man->root, m_man->clients[sc_no].id, reqline[1]);
-                
-                    if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
-                    {
-                        rsend (clients[n], OK);
-                        res = OK;
-                        send (clients[n], "\n", 1, 0);
-                        while ((bytes_read = read(fd, data_to_send, BYTES)) > 0)
-                            write(clients[n], data_to_send, bytes_read);
+                    if (strncmp(reqline[1], "/\0", 2) == 0)
+                        reqline[1] = "";
+                    
+                    char *ip = get_ip_from_fd (clients[n]);
+                    int sc_no = get_client_from_ip (m_man, ip);
+                    if (sc_no < 0) {
+                        rsend (clients[n], FORBIDDEN);
+                        res = FORBIDDEN;
                     }
                     else {
-                        rsend (clients[n], NOT_FOUND);
-                        res = NOT_FOUND;
+                        sprintf (path, "%s/%s/autogentoo/pkg/%s", m_man->root, m_man->clients[sc_no].id, reqline[1]);
+                    
+                        if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
+                        {
+                            rsend (clients[n], OK);
+                            res = OK;
+                            send (clients[n], "\n", 1, 0);
+                            while ((bytes_read = read(fd, data_to_send, BYTES)) > 0)
+                                write(clients[n], data_to_send, bytes_read);
+                        }
+                        else {
+                            rsend (clients[n], NOT_FOUND);
+                            res = NOT_FOUND;
+                        }
                     }
                 }
             }
-            close (clients[n]);
-            //exit (0); // Allow fork() to reach printf at end
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
             request_t rt = atoi (reqline[1]);
             
-            pid_t f_cpid = fork ();
-            if (f_cpid < 0) exit (1);
-            if (f_cpid == 0) {
+            pid = fork ();
+            if (pid < 0) exit (1);
+            if (pid == 0) {
                 // Create buffs to redirect STDOUT and STDERR
                 int stdout_b, stderr_b;
                 stdout_b = dup (STDOUT_FILENO);
@@ -157,11 +158,6 @@ void server_respond (int n, struct manager * m_man)
                 close (STDERR_FILENO);
                 dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
                 dup2 (stderr_b, STDERR_FILENO);
-                //exit (0);
-            }
-            else {
-                close (clients[n]);
-                return;
             }
         }
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
@@ -193,7 +189,7 @@ void server_respond (int n, struct manager * m_man)
                     strcpy(m_man->clients[m_man->client_c].CFLAGS, request_opts[3]);
                     strcpy(m_man->clients[m_man->client_c].CXXFLAGS, "${CFLAGS}");
                     strcpy(m_man->clients[m_man->client_c].USE, request_opts[4]);
-                    for (m_man->clients[m_man->client_c].extra_c; m_man->clients[m_man->client_c].extra_c!=(l_argc);m_man->clients[m_man->client_c].extra_c++) {
+                    for (m_man->clients[m_man->client_c].extra_c=0; m_man->clients[m_man->client_c].extra_c!=(l_argc);m_man->clients[m_man->client_c].extra_c++) {
                         strcpy (m_man->clients[m_man->client_c].EXTRA[m_man->clients[m_man->client_c].extra_c], request_opts[m_man->clients[m_man->client_c].extra_c+5]);
                     }
                     strcpy(m_man->clients[m_man->client_c].PORTAGE_TMPDIR, "autogentoo/tmp");
@@ -301,9 +297,9 @@ void server_respond (int n, struct manager * m_man)
                         fclose (fp);
                         
                         // Create buffs to redirect STDOUT and STDERR
-                        pid_t f_spid = fork ();
-                        if (f_spid < 0) exit (1);
-                        if (f_spid == 0) {
+                        pid = fork ();
+                        if (pid < 0) exit (1);
+                        if (pid == 0) {
                             int stdout_b, stderr_b;
                             stdout_b = dup (STDOUT_FILENO);
                             stderr_b = dup (STDERR_FILENO);
@@ -319,10 +315,6 @@ void server_respond (int n, struct manager * m_man)
                             dup2 (stderr_b, STDERR_FILENO);
                             sent = 1;
                         }
-                        else {
-                            close (clients[n]);
-                            return;
-                        }
                     }
                 }
                 else if (rt == UNOSYNC) {
@@ -331,9 +323,9 @@ void server_respond (int n, struct manager * m_man)
                         // Create buffs to redirect STDOUT and STDERR
                         int stdout_b, stderr_b;
                         // Create buffs to redirect STDOUT and STDERR
-                        pid_t f_nupid = fork ();
-                        if (f_nupid < 0) exit (1);
-                        if (f_nupid == 0) {
+                        pid = fork ();
+                        if (pid < 0) exit (1);
+                        if (pid == 0) {
                             int stdout_b, stderr_b;
                             stdout_b = dup (STDOUT_FILENO);
                             stderr_b = dup (STDERR_FILENO);
@@ -350,10 +342,6 @@ void server_respond (int n, struct manager * m_man)
                             dup2 (stderr_b, STDERR_FILENO);
                             sent = 1;
                         }
-                        else {
-                            close (clients[n]);
-                            return;
-                        }
                     }
                     else {
                         res = FORBIDDEN;
@@ -365,9 +353,9 @@ void server_respond (int n, struct manager * m_man)
                     // Create buffs to redirect STDOUT and STDERR
                     int stdout_b, stderr_b;
                     // Create buffs to redirect STDOUT and STDERR
-                    pid_t f_upid = fork ();
-                    if (f_upid < 0) exit (1);
-                    if (f_upid == 0) {
+                    pid = fork ();
+                    if (pid < 0) exit (1);
+                    if (pid == 0) {
                         int stdout_b, stderr_b;
                         stdout_b = dup (STDOUT_FILENO);
                         stderr_b = dup (STDERR_FILENO);
@@ -390,10 +378,6 @@ void server_respond (int n, struct manager * m_man)
                         dup2 (stderr_b, STDERR_FILENO);
                         sent = 1;
                     }
-                    else {
-                        close (clients[n]);
-                        return;
-                    }
                 }
                 else if (rt == UPDATE) {
                     sc_no = get_client_from_ip (m_man, ip);
@@ -401,9 +385,9 @@ void server_respond (int n, struct manager * m_man)
                         // Create buffs to redirect STDOUT and STDERR
                         int stdout_b, stderr_b;
                         // Create buffs to redirect STDOUT and STDERR
-                        pid_t f_upid = fork ();
-                        if (f_upid < 0) exit (1);
-                        if (f_upid == 0) {
+                        pid = fork ();
+                        if (pid < 0) exit (1);
+                        if (pid == 0) {
                             int stdout_b, stderr_b;
                             stdout_b = dup (STDOUT_FILENO);
                             stderr_b = dup (STDERR_FILENO);
@@ -420,10 +404,6 @@ void server_respond (int n, struct manager * m_man)
                             dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
                             dup2 (stderr_b, STDERR_FILENO);
                             sent = 1;
-                        }
-                        else {
-                            close (clients[n]);
-                            return;
                         }
                     }
                     else {
@@ -518,9 +498,9 @@ void server_respond (int n, struct manager * m_man)
                         // Create buffs to redirect STDOUT and STDERR
                         int stdout_b, stderr_b;
                         // Create buffs to redirect STDOUT and STDERR
-                        pid_t f_upid = fork ();
-                        if (f_upid < 0) exit (1);
-                        if (f_upid == 0) {
+                        pid = fork ();
+                        if (pid < 0) exit (1);
+                        if (pid == 0) {
                             int stdout_b, stderr_b;
                             stdout_b = dup (STDOUT_FILENO);
                             stderr_b = dup (STDERR_FILENO);
@@ -537,10 +517,6 @@ void server_respond (int n, struct manager * m_man)
                             dup2 (stderr_b, STDERR_FILENO);
                             sent = 1;
                         }
-                        else {
-                            close (clients[n]);
-                            return;
-                        }
                     }
                     else {
                         res = FORBIDDEN;
@@ -549,21 +525,36 @@ void server_respond (int n, struct manager * m_man)
                     }
                 }
             }
-            if (sent == 0) {
-                rsend (clients[n], OK);
-                res = OK;
+            if (pid == -1 || pid == 0) {
+                if (sent == 0) {
+                    rsend (clients[n], OK);
+                    res = OK;
+                }
             }
         }
     }
     
     
     // Closing SOCKET
-    shutdown(
-        clients[n],
-        SHUT_RDWR); // All further send and recieve operations are DISABLED...
-    close(clients[n]);
-    clients[n] = -1;
-    printf ("%d %s\n", res.code, res.message);
+    if (pid == -1) {
+        shutdown(
+            clients[n],
+            SHUT_RDWR); // All further send and recieve operations are DISABLED...
+        close(clients[n]);
+        clients[n] = -1;
+    }
+    if (pid == 0) {
+        shutdown(
+            clients[n],
+            SHUT_RDWR); // All further send and recieve operations are DISABLED...
+        close(clients[n]);
+        clients[n] = -1;
+        printf ("%d %s\n", res.code, res.message);
+        _exit (0);
+    }
+    else if (pid == -1) {
+        printf ("%d %s\n", res.code, res.message);
+    }
 }
 
 void daemonize(char * _cwd)
