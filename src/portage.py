@@ -218,7 +218,7 @@ class portage:
         except KeyError:
             parsed["HOMEPAGE"] = ""
         try:
-            _license = parsed["LICENSE"]
+            _license = parsed["LICENSE"].split (' ')
         except KeyError:
             pass
         try:
@@ -264,7 +264,7 @@ class portage:
                     self.packages[cat][meta.name]
                 except KeyError:
                     global_iuse = self.parse_iuse (iuse.split (" "), cat, meta.name)
-                    self.packages[cat][meta.name] = Package (meta.name, cat, parsed["DESCRIPTION"], parsed["HOMEPAGE"], [], _license, global_iuse)
+                    self.packages[cat][meta.name] = Package (meta.name, cat, parsed["DESCRIPTION"], parsed["HOMEPAGE"].split (' '), [], _license, global_iuse)
                     self.package_list[meta.name] = cat
                     self.package_c += 1
                 self.packages[cat][meta.name].versions.append (temp)
@@ -272,7 +272,7 @@ class portage:
     def search (self, atom):
         pkg_buf = [s for s in self.package_list if atom in s]
         out = []
-        for i, x in enumerate(pkg_buf):
+        for i, x in enumerate(sorted (pkg_buf, key=len)):
             out.append (self.packages[self.package_list[x]][x])
             if (i == 50):
                 break

@@ -118,7 +118,6 @@ class PackageMeta (Gtk.Box):
         self.cat_label = Gtk.Label ()
         self.pkg_label = Gtk.Label ()
         self.desc_label = Gtk.Label ()
-        self.homepkg_label = Gtk.LinkButton ()
         self.pkg_label.set_xalign (0.0)
         self.cat_label.set_xalign (0.0)
         
@@ -132,7 +131,6 @@ class PackageMeta (Gtk.Box):
         self.header_second.pack_start (self.pkg_label, True, False, 0)
         
         self.desc_top.pack_start (self.desc_label, False, False, 0)
-        self.desc_top.pack_start (self.homepkg_label, False, False, 0)
         
         self.header_top.pack_start (self.header_second, False, False, 0)
         self.header_top.pack_start (self.desc_top, True, False, 0)
@@ -198,8 +196,11 @@ class PackageMeta (Gtk.Box):
         self.desc_label.set_markup ("<span font='Open Sans 21px' foreground='#333'>%s</span>" % package.description)
         self.desc_label.set_line_wrap (True)
         self.desc_label.set_size_request(450, -1)
-        self.homepkg_label.set_uri(package.homepage)
-        self.homepkg_label.set_label(package.homepage)
+        for x in package.homepage:
+            homepkg_label = Gtk.LinkButton ()
+            self.desc_top.pack_start (homepkg_label, False, False, 0)
+            homepkg_label.set_uri(x)
+            homepkg_label.set_label(x)
         for ebuild in package.versions:
             buf = ["%s <span font='Open Sans 10px' foreground='#888'>: %s</span>" % (ebuild.id, ebuild.slot)]
             for arch in portage.current_keywords:
@@ -473,12 +474,12 @@ class licenseMeta (metaItem):
     def __init__ (self, package):
         metaItem.__init__ (self, "License", "../ui/resources/legal.png")
         
-        self.main_label = Gtk.Label ()
-        self.main_label.get_style_context().add_class ('license')
-        self.main_label.set_xalign (0.0)
-        self.main_label.set_text (package.license)
-        
-        self.pack_right (self.main_label)
+        for x in package.license:
+            new_label = Gtk.Label ()
+            new_label.get_style_context().add_class ('license')
+            new_label.set_xalign (0.0)
+            new_label.set_text (x)
+            self.pack_right (new_label)
 
 class useMeta (metaItem):
     __gtype_name__ = 'useMeta'

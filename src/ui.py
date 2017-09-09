@@ -62,7 +62,7 @@ class ui:
         self.builder.get_object ("_server_spec_scroll").set_vexpand(True)
         ci_sr.close ()
         cpuinfo.set_text (res)
-        self.portage = portage.portage (self.server.ip, "~/Downloads/portage")
+        self.portage = portage.portage (self.server.ip, "/usr/portage")
         self.portageMeta = PortageMeta (self.portage, self)
         self.portageMeta.parse_root ()
         self.builder.get_object ("_package_scroll").add (self.portageMeta)
