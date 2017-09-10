@@ -54,6 +54,9 @@ class portage:
         self.generate_local_use ()
         self.generate_packages ()
         self.binhost_ip = binhost_ip
+        self.generate_from_server ()
+    
+    def generate_from_server (self):
         socket_package = socketrequest.SocketRequest (socketrequest.Address(self.binhost_ip, 9490))
         res = socket_package.send (b"GET /Packages HTTP/1.0").decode ("utf-8")
         self.generate_server_packages (res.splitlines ()[2:]) # Skip 200 OK and newline

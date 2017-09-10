@@ -61,7 +61,13 @@ class PortageMeta (Gtk.Box):
             Gtk.main_iteration_do(True)
         self.show ()
     
+    
+    def rerender (self):
+        if self.current_render == 0:
+            self.pkgmeta.regen_binaries (self._portage, self.pkgmeta.current_package)
+    
     def parse_package (self, package):
+        self.current_render = 0
         self.rootmeta.hide ()
         self.catmeta.hide ()
         self.searchmeta.hide ()
@@ -69,12 +75,13 @@ class PortageMeta (Gtk.Box):
         self.pkgtabs.parse_package (package)
         self.pkgmeta._parse_package (self._portage, package)
         self.pkgmeta.view.queue_draw ()
-        self.pkgmeta.show_all ()
+        self.pkgmeta.show ()
         while Gtk.events_pending():
             Gtk.main_iteration_do(True)
-        self.pkgmeta.show_all ()
+        self.pkgmeta.show ()
     
     def parse_category (self, cat):
+        self.current_render = 1
         self.rootmeta.hide ()
         self.pkgmeta.hide ()
         self.searchmeta.hide ()
@@ -86,6 +93,7 @@ class PortageMeta (Gtk.Box):
         self.catmeta.show_all ()
         
     def search (self, atom):
+        self.current_render = 2
         self.rootmeta.hide ()
         self.pkgmeta.hide ()
         self.catmeta.hide ()
@@ -97,6 +105,7 @@ class PortageMeta (Gtk.Box):
         self.searchmeta.show_all ()
     
     def parse_root (self):
+        self.current_render = 3
         self.pkgmeta.hide ()
         self.catmeta.hide ()
         self.searchmeta.hide ()
@@ -189,11 +198,24 @@ class PackageMeta (Gtk.Box):
         
         self.show_all ()
         self.hide ()
-        
+    
+    def regen_binaries (self, _portage, package):
+        self.binaries.clear ()
+        try:
+            _portage.server_packages[package.category][package.name]
+        except KeyError:
+            self.binaries.hide ()
+        else:
+            for version_id, version in _portage.server_packages[package.category][package.name].items ():
+                bin_buf = binaryPackage (version)
+                self.binaries.pack_start (bin_buf, False, False, 0)
+            self.binaries.show_all()
+    
     def _parse_package (self, _portage, package):
         self.store.clear()
         self.meta.clear()
-        self.binaries.clear ()
+        self.current_package = package
+        self._portage = portage
         self.cat_label.set_markup ("<span font='Open Sans 20px' foreground='#777'>%s/</span>" % package.category)
         self.pkg_label.set_markup ("<span font='Open Sans 27px' foreground='#333'>%s</span>" % package.name)
         self.desc_label.set_markup ("<span font='Open Sans 21px' foreground='#333'>%s</span>" % package.description)
@@ -225,14 +247,10 @@ class PackageMeta (Gtk.Box):
         if self.maintainer.longdesc:
             self.meta.pack_start (self.maintainer.longdesc, False, False, 0)
         
-        try:
-            _portage.server_packages[package.category][package.name]
-        except KeyError:
-            pass
-        else:
-            for version_id, version in _portage.server_packages[package.category][package.name].items ():
-                bin_buf = binaryPackage (version)
-                self.binaries.pack_start (bin_buf, False, False, 0)
+        self.regen_binaries (_portage, package)
+        
+        self.meta.show_all ()
+        self.desc_top.show_all ()
 
     def get_tree_cell_text(self, col, cell, model, iter, user_data):
         if (col.__index != 0):

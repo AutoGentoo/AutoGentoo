@@ -184,6 +184,8 @@ class ui:
         activate_socket = SocketRequest (Address(self.server.ip, self.server.port))
         activate_socket.send (("SRV ACTIVATE HTTP/1.0\n%s\n" % treeview.get_model().get_value (__iter, 0)).encode ("utf-8"))
         self.server.get_active()
+        self.portage.generate_from_server ()
+        self.portageMeta.rerender ()
         self.regen (False)
     
     def regen (self, server_regen=True):
