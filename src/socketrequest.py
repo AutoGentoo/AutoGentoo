@@ -24,25 +24,24 @@
 
 
 import socket
+from collections import namedtuple
+Address = namedtuple ("Address", ('ip', 'port'))
 
 class SocketRequest:
     socket = None
-    ip = ""
-    port = None
     request = "" # Only the last request, resets after next request
     
-    def __init__ (self, ip, port):
-        self.ip = ip
-        self.port = port
+    def __init__ (self, address):
+        self.address = address
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect ((self.ip, self.port))
+        self.socket.connect ((self.address.ip, self.address.port))
     
     def send (self, request):
         self.request = request
         self.socket.sendall (request)
         res = b""
         while True:
-            data = self.socket.recv(16384)
+            data = self.socket.recv(1024)
             if not data: break
             res += data
         return res

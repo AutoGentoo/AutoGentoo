@@ -37,7 +37,7 @@ class Server:
         self.ip = ip
     
     def regen (self):
-        server_socket = socketrequest.SocketRequest (self.ip, self.port)
+        server_socket = socketrequest.SocketRequest (socketrequest.Address(self.ip, self.port))
         reply = server_socket.send (b"SRV GETCLIENTS HTTP/1.0\n").decode ('utf-8')
         server_socket.close ()
         split = reply.split ("\n")
@@ -53,14 +53,14 @@ class Server:
         self.get_active ()
     
     def get_active (self):
-        active_socket = socketrequest.SocketRequest (self.ip, self.port)
+        active_socket = socketrequest.SocketRequest (socketrequest.Address(self.ip, self.port))
         try:
             self.active = int (self.ids.index (active_socket.send (b"SRV GETACTIVE HTTP/1.0").decode('utf-8').split('\n')[0]))
         except ValueError:
             self.active = -1
     
     def create (self, hostname, profile, chost, cflags, use, extra=""):
-        create_socket = socketrequest.SocketRequest (self.ip, self.port)
+        create_socket = socketrequest.SocketRequest (socketrequest.Address(self.ip, self.port))
         new_id = create_socket.send (("SRV CREATE %s\n%s\n%s\n%s\n%s\n%s\n%s\n" % (
             len(extra) if len(extra) > 0 else "HTTP/1.0",
             hostname,
@@ -95,7 +95,7 @@ class Client:
         self.server = server
     
     def GETCLIENT (self):
-        temp_socket = socketrequest.SocketRequest (self.server.ip, self.server.port)
+        temp_socket = socketrequest.SocketRequest (socketrequest.Address(self.server.ip, self.server.port))
         data = temp_socket.send (("SRV GETCLIENT HTTP/1.0\n%s\n" % self._id).encode('utf-8')).decode ('utf-8')
         b_arr = data.split ("\n")
         sys.stdout.flush()

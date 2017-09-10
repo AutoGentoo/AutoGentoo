@@ -191,11 +191,13 @@ class PackageMeta (Gtk.Box):
     def _parse_package (self, _portage, package):
         self.store.clear()
         self.meta.clear()
+        self.binaries.clear ()
         self.cat_label.set_markup ("<span font='Open Sans 20px' foreground='#777'>%s/</span>" % package.category)
         self.pkg_label.set_markup ("<span font='Open Sans 27px' foreground='#333'>%s</span>" % package.name)
         self.desc_label.set_markup ("<span font='Open Sans 21px' foreground='#333'>%s</span>" % package.description)
         self.desc_label.set_line_wrap (True)
         self.desc_label.set_size_request(450, -1)
+        destroy_children (self.desc_top, 1)
         for x in package.homepage:
             homepkg_label = Gtk.LinkButton ()
             self.desc_top.pack_start (homepkg_label, False, False, 0)
@@ -220,6 +222,15 @@ class PackageMeta (Gtk.Box):
             self.meta.pack_start (self.maintainer, False, False, 0)
         if self.maintainer.longdesc:
             self.meta.pack_start (self.maintainer.longdesc, False, False, 0)
+        
+        try:
+            _portage.server_packages[package.category][package.name]
+        except KeyError:
+            pass
+        else:
+            for version_id, version in _portage.server_packages[package.category][package.name].items ():
+                bin_buf = binaryPackage (version)
+                self.binaries.pack_start (bin_buf, False, False, 0)
 
     def get_tree_cell_text(self, col, cell, model, iter, user_data):
         if (col.__index != 0):
@@ -504,8 +515,8 @@ class useMeta (metaItem):
             pack_local = False
         else: # For package with no localuse
             for x in _portage.local_use[package.category][package.name]:
-                temp_l = Gtk.Label (x.name)
-                temp_l.set_tooltip_text (x.description)
+                temp_l = Gtk.Label (_portage.local_use[package.category][package.name][x].name)
+                temp_l.set_tooltip_text (_portage.local_use[package.category][package.name][x].description)
                 self.local_use.new_pack_start (temp_l, False, False, 6)
         for x in package.globaluse:
             try:
@@ -617,3 +628,62 @@ class packageTabs (Gtk.Box):
             self.pack_start (widget, False, False, 4)
         
         self.show_all ()
+
+from collections import namedtuple
+ControlButton = namedtuple ("ControlButton", ('icon', 'tooltip', 'callback'))
+
+class binaryPackage (metaItem):
+    def __init__ (self, binaryPackage):
+        metaItem.__init__ (self, "%s-%s" % (binaryPackage.name, binaryPackage.version), "../ui/resources/zip.png")
+        
+        self.use_label = Gtk.Label ("USE flags")
+        self.setup_label (self.use_label)
+        
+        self.use = inlineList (6)
+        
+        for x in binaryPackage.use:
+            temp_l = Gtk.Label (x.name)
+            temp_l.set_tooltip_text (x.description)
+            self.use.new_pack_start (temp_l, False, False, 6)
+        
+        if len(binaryPackage.use) > 0:
+            self.pack_right (self.use_label)
+            self.pack_right (self.use)
+        
+        self.size_label = Gtk.Label ("Size")
+        self.setup_label (self.size_label)
+        self.size = Gtk.Label (self.format_size(int(binaryPackage.size)))
+        
+        self.pack_right (self.size_label)
+        self.pack_right (self.size)
+        self.size.set_xalign (0.0)
+        
+        self.size_label = Gtk.Label ("Build On")
+        self.setup_label (self.size_label)
+        import datetime
+        b = datetime.datetime.fromtimestamp(int(binaryPackage.build_time))
+        
+        self.size = Gtk.Label (str(b))
+        
+        self.pack_right (self.size_label)
+        self.pack_right (self.size)
+        self.size.set_xalign (0.0)
+        
+        self.control = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
+        
+    
+    def format_size (self, size):
+        div = 1
+        unit = ""
+        if (size < 10 ** 6):
+            div = 10 ** 3
+            unit = "kiB"
+        else:
+            div = 10 ** 6
+            unit = "miB"
+        return str(round (size/div, 1)) + unit
+    
+    def setup_label (self, label):
+        label.set_xalign (0.0)
+        label.get_style_context ().add_class ("use-flag-info")
+        

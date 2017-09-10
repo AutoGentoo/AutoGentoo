@@ -30,7 +30,7 @@ from gi.repository import Gtk
 from stdio import *
 
 def main(args):
-    server_main = autogentoo.Server ("192.168.1.160")
+    server_main = autogentoo.Server ("kronos")
     ui_main = ui ("../ui/main.ui", server_main)
     ui_main.regen ()
     import signal    # enable Ctrl-C since there is no menu to quit

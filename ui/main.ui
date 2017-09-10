@@ -146,6 +146,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">_img3</property>
                         <property name="use_stock">False</property>
+                        <signal name="activate" handler="srv_upnosync" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -156,6 +157,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">_img4</property>
                         <property name="use_stock">False</property>
+                        <signal name="activate" handler="srv_update" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -1116,9 +1118,6 @@
           </packing>
         </child>
       </object>
-    </child>
-    <child>
-      <placeholder/>
     </child>
   </object>
 </interface>

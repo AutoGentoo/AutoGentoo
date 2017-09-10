@@ -32,7 +32,7 @@ from gi.repository.Vte import Terminal
 from gi.repository import GLib
 from treegrid import TreeGrid
 import os
-from socketrequest import SocketRequest
+from socketrequest import *
 from stdio import *
 from packagemeta import PortageMeta
 import portage
@@ -57,7 +57,7 @@ class ui:
         self.window = self.builder.get_object ("window_main")
         self.window.connect("delete-event", Gtk.main_quit)
         cpuinfo = self.builder.get_object ("_server_spec")
-        ci_sr = SocketRequest (self.server.ip, self.server.port)
+        ci_sr = SocketRequest (Address(self.server.ip, self.server.port))
         res = "\n".join(ci_sr.send (b"SRV GETSPEC HTTP/1.0\n").decode ("utf-8").split ("\n")[:-2]) # Account for \n at end and HTTP/1.0 200 OK
         self.builder.get_object ("_server_spec_scroll").set_vexpand(True)
         ci_sr.close ()
@@ -88,12 +88,28 @@ class ui:
             "new_client_close": self.new_client_close,
             "new_client_create": self.new_client_create,
             "remove_client_open": self.remove_client_open,
-            "pkg_search": self.pkg_search
+            "pkg_search": self.pkg_search,
+            "srv_update": self.update,
+            "srv_upnosync": self.upnosync
         }
         self.builder.connect_signals (self.handlers)
         self.clients_tree.treeview.connect ("row-activated", self.activate)
         
         self.window.show()
+    
+    def update (self, widget):
+        
+        
+        req = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        req.connect ((self.server.ip, self.server.port))
+        req.sendall ("SRV UPDATE HTTP/1.0\n")
+        
+        treestore = Gtk.TreeStore (*b)
+        self.__types = types
+        self.treeview = Gtk.TreeView.new_with_model(self.treestore)
+        
+    def upnosync (self, widget):
+        pass
     
     def pkg_search (self, entry_widget):
         if (self.builder.get_object ("notebook_main").get_current_page () != 2):
@@ -109,7 +125,7 @@ class ui:
             "Removing this client will remove all server side package and chroot environment")
         response = dialog.run()
         if response == Gtk.ResponseType.YES:
-            remove_socket = SocketRequest (self.server.ip, self.server.port)
+            remove_socket = SocketRequest (Address(self.server.ip, self.server.port))
             remove_socket.send (("SRV SCREMOVE HTTP/1.0\n%s\n" % _id).encode ("utf-8"))
         dialog.destroy()
         self.regen()
@@ -165,7 +181,7 @@ class ui:
     
     def activate (self, treeview, path, column):
         __iter = treeview.get_model().get_iter (path)
-        activate_socket = SocketRequest (self.server.ip, self.server.port)
+        activate_socket = SocketRequest (Address(self.server.ip, self.server.port))
         activate_socket.send (("SRV ACTIVATE HTTP/1.0\n%s\n" % treeview.get_model().get_value (__iter, 0)).encode ("utf-8"))
         self.server.get_active()
         self.regen (False)
@@ -215,7 +231,7 @@ class ui:
         end_iter = self.builder.get_object ("extra").get_end_iter()
         extras = self.builder.get_object ("extra").get_text(start_iter, end_iter, True).split ("\n")
         
-        edit_socket = SocketRequest (self.server.ip, self.server.port)
+        edit_socket = SocketRequest (Address(self.server.ip, self.server.port))
         res = edit_socket.send (("SRV EDIT %s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" % (
             len(extras), 
             self.server.clients[self.server.active]._id, 
@@ -248,3 +264,10 @@ class ui:
         self.builder.get_object ("cflags").set_text (active_client.CFLAGS)
         self.builder.get_object ("use").set_text (active_client.USE)
         self.builder.get_object ("extra").set_text ("\n".join(active_client.EXTRAS))
+
+class socketWindow (Gtk.Window):
+    def __init__ (self, transient_parent, title, request, address):
+        self.transient_parent = transient_parent
+        self.title = title
+        self.request = reqeust
+        self.address = address

@@ -54,7 +54,7 @@ class portage:
         self.generate_local_use ()
         self.generate_packages ()
         self.binhost_ip = binhost_ip
-        socket_package = socketrequest.SocketRequest (self.binhost_ip, 9490)
+        socket_package = socketrequest.SocketRequest (socketrequest.Address(self.binhost_ip, 9490))
         res = socket_package.send (b"GET /Packages HTTP/1.0").decode ("utf-8")
         self.generate_server_packages (res.splitlines ()[2:]) # Skip 200 OK and newline
     
@@ -156,8 +156,8 @@ class portage:
             try:
                 self.local_use[c_cat][name]
             except KeyError:
-                self.local_use[c_cat][name] = []
-            self.local_use[c_cat][name].append (Flag (flag_name, desc))
+                self.local_use[c_cat][name] = {}
+            self.local_use[c_cat][name][flag_name] = (Flag (flag_name, desc))
     
     def parse_cpv (self, cpv):
         cat = cpv[:cpv.find("/")]
@@ -165,6 +165,21 @@ class portage:
         vid = self.parse_version_id (namebuf)
         return cat, vid.name, vid.v_id
     
+    def parse_binary_use (self, cat, name, use_string):
+        flags = []
+        for flag_name in use_string.split (' '):
+            try:
+                self.local_use[cat][name][flag_name]
+            except KeyError:
+                try:
+                    self.global_use[cat][name][flag_name]
+                except KeyError:
+                    pass
+                else:
+                    flags.append (self.global_use[cat][name][flag_name])
+            else:
+                flags.append (self.local_use[cat][name][flag_name])
+        return flags
     def generate_server_packages (self, binhost_package_lines):
         self.server_packages = {}
         dirs = self.get_cats ()
@@ -182,7 +197,11 @@ class portage:
                 parsed["SLOT"]
             except KeyError:
                 parsed["SLOT"] = "0"
-            self.server_packages[cat][name][v] = PackageBinary(name, cat, v, parsed["SLOT"], parsed["BUILD_TIME"], parsed["SIZE"], parsed["USE"])
+            try:
+                parsed["USE"]
+            except KeyError:
+                parsed["USE"] = ""
+            self.server_packages[cat][name][v] = PackageBinary(name, cat, v, parsed["SLOT"], parsed["BUILD_TIME"], parsed["SIZE"], self.parse_binary_use(cat, name, parsed["USE"]))
     
     def parse_from_delim (self, lines, delim):
         parsed = {}
@@ -228,12 +247,6 @@ class portage:
             
         return Ebuild(meta.name, meta.v_id, keywords, slot), meta, parsed, _license, parsed["IUSE"]
     
-    def get_flag_names (self, arr):
-        out = []
-        for x in arr:
-            out.append (x.name)
-        return out
-    
     def parse_iuse (self, iuse_list, cat, pkg):
         out = []
         for flag in iuse_list:
@@ -242,7 +255,7 @@ class portage:
             if flag[0] in ("+", "-"):
                 flag = flag[1:]
             try:
-                if (flag not in self.get_flag_names(self.local_use[cat][pkg])):
+                if (flag not in self.local_use[cat][pkg]):
                     out.append (flag)
             except KeyError:
                 out.append (flag)
