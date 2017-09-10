@@ -154,9 +154,7 @@ void server_respond (int n, struct manager * m_man)
             }
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
-            request_t rt = atoi (reqline[1]);
-            
-            res = exec_method (rt, m_man, reqline[2], ip);
+            res = exec_method (reqline[1], m_man, reqline[2], ip);
             rsend (1, res); // Write to stdout instead of socket
         }
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {

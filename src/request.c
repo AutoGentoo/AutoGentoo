@@ -79,10 +79,10 @@ response_t exec_method_client (request_t type, char * command) {
     return OK;
 }
 
-response_t exec_method (request_t type, struct manager * man, char* command, char *ip) {
+response_t exec_method (char *type, struct manager * man, char* command, char *ip) {
     int i;
     for (i=0; i != sizeof (methods) / sizeof (struct method_s); i++) {
-        if (methods[i].type == type) {
+        if (strcmp(request_names[i], type) == 0) {
             int client_no = get_client_from_ip (man, ip);
             if (client_no < 0) {
                 return UNAUTHORIZED;
