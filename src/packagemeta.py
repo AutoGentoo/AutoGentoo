@@ -92,6 +92,8 @@ class PortageMeta (Gtk.Box):
         
         self.pkgtabs.parse_root (False)
         self.searchmeta.parse_search (atom)
+        if self.searchmeta.one_found:
+            return
         self.searchmeta.show_all ()
     
     def parse_root (self):
@@ -345,8 +347,10 @@ class SearchMeta (Gtk.Box):
         self.packages.clear ()
         pkgnum = 0
         pkgfound = sorted(self._portage.search (atom), key=lambda __pkg: len(__pkg.name))
+        self.one_found = False
         if len (pkgfound) == 1:
             self.parent.parse_package (pkgfound[0])
+            self.one_found = True
             return
         for pkg in pkgfound:
             temp = SimplePackage (pkg)
@@ -520,11 +524,13 @@ class useMeta (metaItem):
                 temp_l = Gtk.Label (_portage.local_use[package.category][package.name][x].name)
                 temp_l.set_tooltip_text (_portage.local_use[package.category][package.name][x].description)
                 self.local_use.new_pack_start (temp_l, False, False, 6)
+        total_global = 0
         for x in package.globaluse:
             try:
                 _portage.global_use[x].name
             except KeyError: # For abi_x
                 continue
+            total_global += 1
             temp_l = Gtk.Label (_portage.global_use[x].name)
             temp_l.set_tooltip_text (_portage.global_use[x].description)
             self.global_use.new_pack_start (temp_l, False, False, 6)
@@ -532,7 +538,7 @@ class useMeta (metaItem):
         if pack_local:
             self.pack_right (self.local_use_label)
             self.pack_right (self.local_use)
-        if len(package.globaluse) > 0:
+        if total_global > 0:
             self.pack_right (self.global_use_label)
             self.pack_right (self.global_use)
         elif not pack_local:

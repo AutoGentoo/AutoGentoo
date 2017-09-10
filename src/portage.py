@@ -338,7 +338,7 @@ class portage:
             return (email, name)
     
     def format_long_description (self, desc):
-        return desc.strip().replace ("\t", "").replace ("\n", " ")
+        return desc.strip().replace ("\t", "").replace ("\n", " ").replace ("  ", " ")
     
     def get_cat_info (self, cat):
         tree = _xml._XML ("%s/%s/metadata.xml" % (self.path, cat))

@@ -1,6 +1,7 @@
 .package-center-top {
     border: 1px rgb(221, 221, 221) solid;
     border-radius: 4px;
+    margin-bottom: 6px;
 }
 
 .package-view header button {
