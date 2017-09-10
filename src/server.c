@@ -355,6 +355,8 @@ void server_respond (int n, struct manager * m_man)
                         strcpy(m_man->clients[sc_no].DISTDIR, "/usr/portage/distfiles");
                         strcpy(m_man->clients[sc_no].PKGDIR, "autogentoo/pkg");
                         strcpy(m_man->clients[sc_no].PORT_LOGDIR, "autogentoo/log");
+                        write_make_conf (*m_man, m_man->clients[sc_no]);
+                        
                         if(!m_man->debug) {
                             FILE * _fd = fopen (m_man->_config, "w+");
                             write_serve (fileno(_fd), m_man);

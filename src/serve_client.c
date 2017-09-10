@@ -74,7 +74,8 @@ int get_client_from_hostname  (struct manager * m_man, char * hostname) {
 /* Because a system is just a set of packages
  * All we need here is to setup a make.conf to emerge these packages
  */
-void init_serve_client (struct manager m_man, struct serve_client conf) {
+
+void write_make_conf (struct manager m_man, struct serve_client conf) {
     char make_conf_buff [8192];
     char _ROOT_ [128];
     char EXTRA [2048];
@@ -118,6 +119,22 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
         EXTRA
     );
     
+    char make_conf_file [256];
+    sprintf (make_conf_file, "%s/autogentoo/etc/portage/make.conf", _ROOT_);
+    FILE * fp_mc;
+    
+    fp_mc = fopen (make_conf_file, "w+");
+    if (fp_mc != NULL)
+    {
+        fputs(make_conf_buff, fp_mc);
+        fclose(fp_mc);
+    }
+}
+
+void init_serve_client (struct manager m_man, struct serve_client conf) {
+    char _ROOT_ [128];
+    sprintf (_ROOT_, "%s/%s/", m_man.root, conf.id);
+    
     char *new_dirs [] = {
         conf.PORTAGE_TMPDIR,
         conf.PKGDIR,
@@ -135,16 +152,7 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
         _mkdir(TARGET_DIR);
     }
     
-    char make_conf_file [256];
-    sprintf (make_conf_file, "%s/autogentoo/etc/portage/make.conf", _ROOT_);
-    FILE * fp_mc;
-    
-    fp_mc = fopen (make_conf_file, "w+");
-    if (fp_mc != NULL)
-    {
-        fputs(make_conf_buff, fp_mc);
-        fclose(fp_mc);
-    }
+    write_make_conf (m_man, conf);
     
     // Create the profile symlink
     char sym_buf_p1 [128];
