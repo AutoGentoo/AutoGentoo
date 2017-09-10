@@ -22,6 +22,7 @@
  */
  
 #include <autogentoo.h>
+#include <sys/mman.h>
 
 #ifndef AUTOGENTOO_DATADIR
 #define AUTOGENTOO_DATADIR "/usr/local/share/autogentoo" // Just incase you are doing it manually
@@ -150,7 +151,8 @@ Client Options\n\
     }
     
     if (__opts.s) {
-        struct manager * m_man = malloc (sizeof (struct manager));
+        struct manager * m_man = mmap(NULL, sizeof (struct manager), PROT_READ | PROT_WRITE, 
+            MAP_SHARED | MAP_ANONYMOUS, -1, 0);
         strcpy(m_man->root, __opts.p);
         strcpy(m_man->_config, __opts.f);
         
