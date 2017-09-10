@@ -242,7 +242,9 @@ class PackageMeta (Gtk.Box):
     def get_tree_cell_pixbuf(self, col, cell, model, iter, user_data):
         cell.set_padding (0, 0)
         cell.set_fixed_size (57, 35)
-        cell.set_property('pixbuf', GdkPixbuf.Pixbuf.new_from_file_at_scale(model.get_value(iter, col.__index), 57, -1, True))
+        temp_pxbuf = GdkPixbuf.Pixbuf.new_from_file(model.get_value(iter, col.__index))
+        temp_pxbuf = temp_pxbuf.scale_simple(57, 35, GdkPixbuf.InterpType.BILINEAR)
+        cell.set_property('pixbuf', temp_pxbuf)
 
 class CategoryMeta (Gtk.Box):
     _gtype_name__ = "categoryMeta"
