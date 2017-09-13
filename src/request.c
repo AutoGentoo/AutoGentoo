@@ -49,7 +49,7 @@ response_t m_install (char* command, struct manager * m_man, struct serve_client
     
 }
 
-response_t m_remove (char* command, struct manager * m_man, struct serve_client client) {
+response_t m_remove (char* command, struct manager * m_man, struct serve_client client, char* ip, int fd) {
     char cmd[2048];
     char opts[1024];
     emerges (m_man, client, opts);
@@ -132,7 +132,7 @@ response_t ask_server (char* ip, struct client_request req, char *message) {
     response_nt res_t;
     
     strtok (_m, " ");
-    sscanf (strtok (NULL, " "), "%d", &res_t);
+    sscanf (strtok (NULL, " "), "%d", (int*)&res_t);
     strcpy (message, _m);
     return get_res (res_t);
 }

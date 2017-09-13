@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <chroot.h>
 #include <signal.h>
+#include <unistd.h>
+#include <sys/mount.h>
+#include <sys/mman.h>
 
 static int* current_proc_id;
 static struct process_t* process_buffer = NULL;
@@ -40,9 +43,13 @@ void handle_sig_USR1 (int sig) { // Handle process request
     }
     // Inside process
 
-    res = process_handle (process_buffer);
+    response_t res = process_handle (process_buffer);
     rsend (process_buffer->socket_fd, res);
-    munmap (process_buffer, sizeof struct process_t);
+    munmap (process_buffer, sizeof (struct process_t));
+}
+
+void handle_sig_USR2 (int sig) {
+    ;
 }
 
 response_t process_handle (struct process_t* proc) {
@@ -56,14 +63,15 @@ response_t process_kill (_pid_c pid_kill) {
     return OK;
 }
 
-void chroot_new (struct manager* m_man, int sc_no) {
-    struct chroot_client* chroot = m_man = mmap(NULL, sizeof (struct chroot_client), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+struct chroot_client* chroot_new (struct manager* m_man, int sc_no) {
+    struct chroot_client* chroot = (struct chroot_client*) mmap(NULL, sizeof (struct chroot_client), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     chroot->m_man = m_man;
     chroot->sc_no = sc_no;
-    chroot->proc_list_c = 0
+    chroot->proc_list_c = 0;
     chroot->pid = -1;
-
-    m_man->clients[sc_no].chroot = chroot;
+    chroot->intited = 0;
+    
+    return chroot;
 }
 
 void bind_mount (char* new_root, char* src, char* dest, int recursive) {
@@ -79,21 +87,26 @@ void type_mount (char* new_root, char* src, char* dest, char* type) {
 
 void chroot_mount (struct chroot_client* client) {
     char target[256];
-    sprintf (target, "%s/%s", client->m_man.root, client->m_man.clients[client->sc_no].id);
+    struct serve_client * buffer_client = &client->m_man->clients[client->sc_no];
+    
+    sprintf (target, "%s/%s", client->m_man->root, buffer_client->id);
     type_mount (target, "/proc", "proc", "proc");
     bind_mount (target, "/sys", "sys", 1);
     bind_mount (target, "/dev", "dev", 1);
-
+    bind_mount (target, buffer_client->PORTAGE_DIR, 
+                        buffer_client->PORTDIR, 0);
+    
+    client->intited = 1;
+    
     // ldconfig
     // locale.gen
-    // mount --rbind /usr/portage target/usr/portage
     // Move target/autogentoo/etc/portage to /etc/portage
     // Make SYSROOT in make.conf / because we use chroot now
     // Link etc/resolv.conf
 }
 
 pid_t chroot_start (struct chroot_client* client) {
-    buf_pid = fork ();
+    pid_t buf_pid = fork ();
     if (buf_pid == -1) {
         exit (1);
     }
@@ -101,7 +114,12 @@ pid_t chroot_start (struct chroot_client* client) {
         return (client->pid = buf_pid);
     }
     // Inside the chroot fork;
-
+    char __ROOT[256];
+    sprintf (__ROOT, "%s/%s/", client->m_man->root, client->m_man->clients[client->sc_no].id);
+    if (chroot (__ROOT) == -1) {
+        exit (1);
+    }
+    system ("ls /");
     // Handle signals given by m_install and m_remove
     signal(SIGUSR1, handle_sig_USR1);
     signal(SIGUSR2, handle_sig_USR2);

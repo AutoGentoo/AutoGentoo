@@ -50,6 +50,7 @@ struct chroot_client {
     struct process_t *proc_list[128];
     int proc_list_c;
     pid_t pid; // Process id of the chroot fork()
+    int intited; // Specifies whether directories are mounted to chroot (/proc, /sys, /dev, /usr/portage)
 };
 
 //extern static const struct process_t NO_PROCESS;
@@ -58,9 +59,9 @@ void handle_sig_USR1 (int sig); // Handle process request
 void handle_sig_USR2 (int sig); // Kill process
 
 response_t process_handle (struct process_t*);
-void process_kill (struct process_t*);
+response_t process_kill (_pid_c);
 
-void chroot_new (struct manager* m_man, int sc_no);
+struct chroot_client* chroot_new (struct manager* m_man, int sc_no);
 void chroot_mount (struct chroot_client* client);
 pid_t chroot_start (struct chroot_client* client);
 

@@ -36,13 +36,18 @@ struct serve_client { // Chroot environment
     char USE[512];
     char EXTRA[512][32];
     int extra_c;
-
-    // Portage binhost setup
-    char PORTAGE_TMPDIR[256]; // build dir, relative to sc_root
-    char PORTDIR[256]; // ebuild portage tree, relative to /
-    char DISTDIR[256]; // distfiles, relative to sc_root
-    char PKGDIR[256]; // built bins, relative to sc_root
-    char PORT_LOGDIR[256]; // logs, relative to sc_root
+    
+    // CHROOT setup
+    char PORTAGE_DIR[128]; // Usually /usr/portage, different if you have an overlay
+    char resolv_conf[64]; // Almost always /etc/resolv.conf
+    char locale[16]; // UTF-8 is recommended/default
+    
+    // Portage binhost setup (make.conf)
+    char PORTAGE_TMPDIR[256]; // build dir
+    char PORTDIR[256]; // ebuild portage tree
+    char DISTDIR[256]; // distfiles
+    char PKGDIR[256]; // built bins
+    char PORT_LOGDIR[256]; // logs
 
     struct chroot_client* chroot;
 };
@@ -74,7 +79,9 @@ struct manager {
 
 int get_client_from_ip (struct manager * m_man, char* ip);
 int get_client_from_id (struct manager * m_man, char* ip);
-void init_serve_client (struct manager m_man, struct serve_client conf);
+void write_make_conf (struct manager m_man, struct serve_client conf);
+void init_serve_client (struct manager* m_man, int sc_no);
+void init_serve_client_chroot(struct chroot_client* chr);
 void _mkdir(const char *dir);
 void write_serve (int fd, struct manager * m_man);
 void read_serve (int fd, struct manager * m_man);

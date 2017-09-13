@@ -23,6 +23,8 @@
 
 
 #include <response.h>
+#include <stdio.h>
+#include <unistd.h>
 
 ssize_t rsend (int fd, response_t code) {
     char message[40];

@@ -37,6 +37,7 @@
 #include <request.h>
 #include <_string.h>
 #include <sys/stat.h>
+#include <chroot.h>
 
 static const struct serve_client EMPTY_CLIENT;
 
@@ -96,16 +97,15 @@ CXXFLAGS=\"%s\"\n\
 CHOST=\"%s\"\n\
 \n\
 # Portage system configuration\n\
-SYS_ROOT=\"%s\"\n\
-PORTAGE_TMPDIR=\"${SYS_ROOT}/%s\"\n\
+PORTAGE_TMPDIR=\"%s\"\n\
 PORTDIR=\"%s\"\n\
 DISTDIR=\"%s\"\n\
-PKGDIR=\"${SYS_ROOT}/%s\"\n\
-PORT_LOGDIR=\"${SYS_ROOT}/%s\"\n\
+PKGDIR=\"%s\"\n\
+PORT_LOGDIR=\"%s\"\n\
 \n\
 # Portage package configuration\n\
 USE=\"%s\"\n\
-EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\'${SYS_ROOT}/autogentoo/\' --autounmask-continue\"\n\
+EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --autounmask-continue\"\n\
 \n\
 %s\
 \n\0",  conf.CFLAGS, conf.CXXFLAGS, conf.CHOST,
@@ -120,7 +120,7 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
     );
     
     char make_conf_file [256];
-    sprintf (make_conf_file, "%s/autogentoo/etc/portage/make.conf", _ROOT_);
+    sprintf (make_conf_file, "%s/etc/portage/make.conf", _ROOT_);
     FILE * fp_mc;
     
     fp_mc = fopen (make_conf_file, "w+");
@@ -131,18 +131,23 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --root=\'${SYS_ROOT}\' --config-root=\
     }
 }
 
-void init_serve_client (struct manager m_man, struct serve_client conf) {
+void init_serve_client (struct manager* m_man, int sc_no) {
+    struct serve_client* conf = &m_man->clients[sc_no];
     char _ROOT_ [128];
-    sprintf (_ROOT_, "%s/%s/", m_man.root, conf.id);
+    sprintf (_ROOT_, "%s/%s/", m_man->root, conf->id);
     
     char *new_dirs [] = {
-        conf.PORTAGE_TMPDIR,
-        conf.PKGDIR,
-        conf.PORT_LOGDIR,
-        "autogentoo/etc/portage",
+        conf->PORTAGE_TMPDIR,
+        conf->PKGDIR,
+        conf->PORT_LOGDIR,
+        conf->PORTDIR,
+        "etc/portage",
         "usr",
         "usr/lib32",
-        "usr/lib64"
+        "usr/lib64",
+        "proc",
+        "sys",
+        "dev"
     };
     
     int i;
@@ -152,13 +157,16 @@ void init_serve_client (struct manager m_man, struct serve_client conf) {
         _mkdir(TARGET_DIR);
     }
     
-    write_make_conf (m_man, conf);
+    write_make_conf (*m_man, *conf);
+    
+    conf->chroot = chroot_new (m_man, sc_no);
+    init_serve_client_chroot (conf->chroot);
     
     // Create the profile symlink
     char sym_buf_p1 [128];
     char sym_buf_p2 [128];
-    sprintf (sym_buf_p1, "/usr/portage/profiles/%s/", conf.profile);
-    sprintf (sym_buf_p2, "%s/autogentoo/etc/portage/make.profile", _ROOT_);
+    sprintf (sym_buf_p1, "%s/usr/portage/profiles/%s/", _ROOT_, conf->profile);
+    sprintf (sym_buf_p2, "%s/etc/portage/make.profile", _ROOT_);
     char sym_lib_p1[128];
     char sym_lib_p2[128];
     sprintf (sym_lib_p2, "%s/lib", _ROOT_);
@@ -197,6 +205,10 @@ void init_serve_client (struct manager m_man, struct serve_client conf) {
     if (symlink (sym_lib_p1, sym_lib_p2) != 0) {
         printf ("Failed to symlink /usr/lib!\n");
     }
+}
+
+void init_serve_client_chroot(struct chroot_client* chr) {
+    chroot_mount (chr);
 }
 
 void _mkdir(const char *dir) {

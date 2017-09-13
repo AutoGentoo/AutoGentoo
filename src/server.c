@@ -26,6 +26,7 @@
 #include <_string.h>
 #include <response.h>
 #include <sys/sysinfo.h>
+#include <serve_client.h>
 #include <sys/mman.h>
 #include <stdlib.h>
 
@@ -69,13 +70,13 @@ void server_start (char* port)
 static int *hang_me;
 static int *close_me;
 
-int child_finished (int sig) {
+void child_finished (int sig) {
     if (hang_me > 0) {
         waitpid (*hang_me, 0, WNOHANG);
         *hang_me = -1;
     }
 
-    if (close_me > 2) {
+    if (*close_me > 2) {
         close (*close_me);
     }
 }
@@ -99,7 +100,7 @@ void server_respond (int n, struct manager * m_man)
     dup2(clients[n], STDERR_FILENO);
     close(clients[n]);
 
-    rcvd = recv(1, mesg, 99999, 0);
+    rcvd = recv(1, mesg, 2048, 0);
     int __error = 0;
     if (rcvd < 0) { // receive error
         fprintf(stderr, ("recv() error\n"));
@@ -144,8 +145,8 @@ void server_respond (int n, struct manager * m_man)
                         rsend (1, OK);
                         res = OK;
                         send (1, "\n", 1, 0);
-                        while ((bytes_read = read(fd, data_to_send, BYTES)) > 0)
-                            write(1, data_to_send, bytes_read);
+                        while ((bytes_read = read(fd, (void*)&data_to_send, sizeof(data_to_send))) > 0)
+                            write(1, (void*)&data_to_send, bytes_read);
                     }
                     else {
                         rsend (1, NOT_FOUND);
@@ -235,7 +236,7 @@ void server_respond (int n, struct manager * m_man)
                         sent = 1;
                     }
                     else {
-                        init_serve_client (*m_man, m_man->clients[sc_no]);
+                        init_serve_client (m_man, sc_no);
                     }
                 }
                 else if (rt == GETCLIENT) {
