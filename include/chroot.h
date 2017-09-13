@@ -62,6 +62,7 @@ response_t process_handle (struct process_t*);
 response_t process_kill (_pid_c);
 
 struct chroot_client* chroot_new (struct manager* m_man, int sc_no);
+void eselect_locale (char* loc);
 void chroot_mount (struct chroot_client* client);
 pid_t chroot_start (struct chroot_client* client);
 

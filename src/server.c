@@ -196,9 +196,12 @@ void server_respond (int n, struct manager * m_man)
                     strcpy(m_man->clients[m_man->client_c].DISTDIR, "/usr/portage/distfiles");
                     strcpy(m_man->clients[m_man->client_c].PKGDIR, "autogentoo/pkg");
                     strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "autogentoo/log");
+                    strcpy (m_man->clients[m_man->client_c].PORTAGE_DIR, "/usr/portage");
+                    strcpy (m_man->clients[m_man->client_c].resolv_conf, "/etc/resolv.conf");
+                    strcpy (m_man->clients[m_man->client_c].locale, "en_US.utf8");
+                    
                     gen_id (m_man->clients[m_man->client_c].id, 14); // Leave extra space for buf and 1 for \0
-
-
+                    
                     _ip_activate (m_man, ip, m_man->clients[m_man->client_c].id);
                     m_man->client_c++;
                     if(!m_man->debug) {
@@ -548,7 +551,7 @@ void server_main (unsigned daemon, struct manager * m_man) {
             error ("accept() error\n");
             continue;
         }
-
+        
         pid_t res_pid;
         if ((res_pid = fork ()) == -1)
             exit (-1);

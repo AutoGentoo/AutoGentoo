@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <_string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <time.h>
 
 void expand (char* dest, char** src, char* delim, size_t n) {
@@ -84,4 +86,24 @@ void gen_id (char* id, int len) {
         id[i] = c;
     }
     id[len+1] = '\0';
+}
+
+int cpy(char *src, char *dest)
+{
+    int fd_dest, fd_src;
+    char buffer[1024];
+    int count;
+
+    fd_src = open(src, O_RDONLY);
+    if (fd_src == -1) /* Check if file opened */
+        return -1;
+    fd_dest = open(dest, O_CREAT | S_IRUSR | S_IWUSR | O_WRONLY, 0644);
+    if (fd_dest == -1) /* Check if file opened (permissions problems ...) */
+    {
+        close(fd_src);
+        return -1;
+    }
+
+    while ((count = read(fd_src, buffer, sizeof(buffer))) != 0)
+        write(fd_dest, buffer, count);
 }

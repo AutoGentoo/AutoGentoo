@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <sys/mount.h>
 #include <sys/mman.h>
+#include <_string.h>
 
 static int* current_proc_id;
 static struct process_t* process_buffer = NULL;
@@ -98,11 +99,31 @@ void chroot_mount (struct chroot_client* client) {
     
     client->intited = 1;
     
+    char resolv_conf_chroot [256];
+    sprintf (resolv_conf_chroot, "%s/etc/resolv.conf", client->m_man->root);
+    cpy (buffer_client->resolv_conf, resolv_conf_chroot);
+    eselect_locale (buffer_client->locale);
+    
     // ldconfig
     // locale.gen
     // Move target/autogentoo/etc/portage to /etc/portage
     // Make SYSROOT in make.conf / because we use chroot now
     // Link etc/resolv.conf
+}
+
+void eselect_locale (char* loc) {
+    char buffer[256];
+    sprintf (buffer, "# Configuration file for eselect\n\
+# This file has been automatically generated.\n\
+LANG=\"%s\"", loc);
+    
+    FILE * fp;
+    fp = fopen (loc, "w+");
+    if (fp != NULL)
+    {
+        fputs(buffer, fp);
+        fclose(fp);
+    }
 }
 
 pid_t chroot_start (struct chroot_client* client) {

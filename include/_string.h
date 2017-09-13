@@ -32,5 +32,6 @@ void string_copy (char* dest, char* src);
 int check_in (char * arr[], char * el, size_t size);
 int _strtok_n (char* s, char delim);
 void gen_id (char* id, int len);
+int cpy(char *src, char *dest);
 
 #endif
