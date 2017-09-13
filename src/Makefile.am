@@ -1,11 +1,9 @@
 AM_CFLAGS = ${AUTOGENTOO_CFLAGS} ${PYTHON_CFLAGS} -I$(top_srcdir)/include/ $(PYTHON_LIBS)
 ACLOCAL_AMFLAGS='-I m4'
 
-pkgdata_DATA = update.py
-
 bin_PROGRAMS = autogentoo autogentoo-update
 autogentoo_SOURCES = autogentoo.c
-autogentoo_CFLAGS = -D AUTOGENTOO_DATADIR=$(pkgdatadir) ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/  -Wno-unused-result
+autogentoo_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/  -Wno-unused-result
 autogentoo_LDADD = libautogentoo.la
 
 autogentoo_update_SOURCES = update.c
