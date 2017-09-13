@@ -1,24 +1,24 @@
 /*
  * server.c
- * 
+ *
  * Copyright 2017 Unknown <atuser@Hyperion>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
- * 
+ *
+ *
  */
 
 #include <stdio.h>
@@ -74,7 +74,7 @@ int child_finished (int sig) {
         waitpid (*hang_me, 0, WNOHANG);
         *hang_me = -1;
     }
-    
+
     if (close_me > 2) {
         close (*close_me);
     }
@@ -83,13 +83,14 @@ int child_finished (int sig) {
 // client connection
 void server_respond (int n, struct manager * m_man)
 {
-    char mesg[99999], *reqline[3], data_to_send[BYTES], path[99999];
-    int rcvd, fd, bytes_read;
+    char mesg[2048], *reqline[3], path[2048];
+    int rcvd;
+
     char *ip;
     response_t res;
 
-    memset((void*)mesg, (int)'\0', 99999);
-    
+    memset((void*)mesg, (int)'\0', 2048);
+
     // Create buffs to redirect STDOUT and STDERR
     int stdout_b, stderr_b;
     stdout_b = dup (STDOUT_FILENO);
@@ -110,7 +111,7 @@ void server_respond (int n, struct manager * m_man)
     }
     else // message received
     {
-        
+
         reqline[0] = strtok(mesg, " \t");
         reqline[1] = strtok(NULL, " \t");
         reqline[2] = strtok(NULL, "\n");
@@ -128,7 +129,7 @@ void server_respond (int n, struct manager * m_man)
             else {
                 if (strncmp(reqline[1], "/\0", 2) == 0)
                     reqline[1] = "";
-                
+
                 char *ip = get_ip_from_fd (1);
                 int sc_no = get_client_from_ip (m_man, ip);
                 if (sc_no < 0) {
@@ -137,7 +138,7 @@ void server_respond (int n, struct manager * m_man)
                 }
                 else {
                     sprintf (path, "%s/%s/autogentoo/pkg/%s", m_man->root, m_man->clients[sc_no].id, reqline[1]);
-                
+                    int fd, bytes_read, data_to_send;
                     if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
                     {
                         rsend (1, OK);
@@ -154,7 +155,7 @@ void server_respond (int n, struct manager * m_man)
             }
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
-            res = exec_method (reqline[1], m_man, reqline[2], ip);
+            res = exec_method (reqline[1], m_man, reqline[2], ip, 1);
             rsend (1, res); // Write to stdout instead of socket
         }
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
@@ -167,7 +168,7 @@ void server_respond (int n, struct manager * m_man)
             char *request_opts[32];
             char sent = 0;
             int sc_no;
-            
+
             int i;
             for (i=0; i != (l_argc + linked.argc); i++) {
                 request_opts[i] = strtok (NULL, "\n");
@@ -195,8 +196,8 @@ void server_respond (int n, struct manager * m_man)
                     strcpy(m_man->clients[m_man->client_c].PKGDIR, "autogentoo/pkg");
                     strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "autogentoo/log");
                     gen_id (m_man->clients[m_man->client_c].id, 14); // Leave extra space for buf and 1 for \0
-                    
-                    
+
+
                     _ip_activate (m_man, ip, m_man->clients[m_man->client_c].id);
                     m_man->client_c++;
                     if(!m_man->debug) {
@@ -249,15 +250,15 @@ void server_respond (int n, struct manager * m_man)
                         res = OK;
                         char c_buff[1024];
                         char EXTRA [2048];
-                        
+
                         sprintf (EXTRA, "");
-                        
+
                         int i_c;
                         for (i_c=0; i_c!=m_man->clients[sc_no].extra_c; i_c++) {
                             strcat (EXTRA, m_man->clients[sc_no].EXTRA[i_c]);
                             strcat (EXTRA, "\n");
                         }
-                        sprintf (c_buff, "%d\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n", 
+                        sprintf (c_buff, "%d\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
                                  m_man->clients[sc_no].extra_c,
                                  m_man->clients[sc_no].CFLAGS,
                                  m_man->clients[sc_no].CXXFLAGS,
@@ -292,8 +293,7 @@ void server_respond (int n, struct manager * m_man)
                             strcat (pkgs, " ");
                         }
                         fclose (fp);
-                        
-                        res = m_install (pkgs, m_man, m_man->clients[sc_no]);
+                        res = m_install (pkgs, m_man, m_man->clients[sc_no], ip, 1);
                         rsend (1, res); // Write to stdout instead of socket
                         sent = 1;
                     }
@@ -301,7 +301,7 @@ void server_respond (int n, struct manager * m_man)
                 else if (rt == UNOSYNC) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
-                        res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
+                        res = m_install ("-uDN @world", m_man, m_man->clients[sc_no], ip, 1);
                         rsend (1, res); // Write to stdout instead of socket
                         sent = 1;
                     }
@@ -318,7 +318,7 @@ void server_respond (int n, struct manager * m_man)
                     else {
                         res = OK;
                     }
-                    
+
                     rsend (1, res); // Write to stdout instead of socket
                     sent = 1;
                 }
@@ -326,7 +326,7 @@ void server_respond (int n, struct manager * m_man)
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
                         system ("emerge --sync");
-                        res = m_install ("-uDN @world", m_man, m_man->clients[sc_no]);
+                        res = m_install ("-uDN @world", m_man, m_man->clients[sc_no], ip, 1);
                         rsend (1, res); // Write to stdout instead of socket
                         sent = 1;
                     }
@@ -354,7 +354,7 @@ void server_respond (int n, struct manager * m_man)
                         strcpy(m_man->clients[sc_no].PKGDIR, "autogentoo/pkg");
                         strcpy(m_man->clients[sc_no].PORT_LOGDIR, "autogentoo/log");
                         write_make_conf (*m_man, m_man->clients[sc_no]);
-                        
+
                         if(!m_man->debug) {
                             FILE * _fd = fopen (m_man->_config, "w+");
                             write_serve (fileno(_fd), m_man);
@@ -421,7 +421,7 @@ void server_respond (int n, struct manager * m_man)
                 else if (rt == REGEN) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
-                        res = m_install ("@preserved-rebuild", m_man, m_man->clients[sc_no]);
+                        res = m_install ("@preserved-rebuild", m_man, m_man->clients[sc_no], ip, 1);
                         rsend (1, res); // Write to stdout instead of socket
                         sent = 1;
                     }
@@ -438,18 +438,18 @@ void server_respond (int n, struct manager * m_man)
             }
         }
     }
-    
-    
+
+
     close (STDOUT_FILENO);
     close (STDERR_FILENO);
     dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
     dup2 (stderr_b, STDERR_FILENO);
-    
+
     shutdown(
         clients[n],
         SHUT_RDWR); // All further send and recieve operations are DISABLED...
         close(clients[n]);
-    
+
     printf ("[%s](%s, %s): ", ip, reqline[0], reqline[1]);
     printf ("%d %s\n", res.code, res.message);
     fflush (stdout);
@@ -460,31 +460,31 @@ void server_respond (int n, struct manager * m_man)
 void daemonize(char * _cwd)
 {
     pid_t pid, sid;
-    int fd; 
+    int fd;
 
     /* already a daemon */
     if ( getppid() == 1 ) return;
 
     /* Fork off the parent process */
     pid = fork();
-    if (pid < 0)  
+    if (pid < 0)
     {
         exit(1);
-    }   
+    }
 
-    if (pid > 0)  
+    if (pid > 0)
     {
         printf ("Forked to pid: %d\n", (int)pid);
         printf ("Moving to background\n");
         fflush(stdout);
         exit(0); /*Killing the Parent Process*/
-    }   
+    }
 
     /* At this point we are executing as the child process */
 
     /* Create a new SID for the child process */
     sid = setsid();
-    if (sid < 0)  
+    if (sid < 0)
     {
         exit(1);
     }
@@ -519,35 +519,35 @@ void server_main (unsigned daemon, struct manager * m_man) {
     int slot;
     struct sockaddr_in clientaddr;
     socklen_t addrlen;
-    
-    hang_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE, 
+
+    hang_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE,
         MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    close_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE, 
+    close_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE,
         MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    
+
     int i;
     for (i=0; i<CONNMAX; i++)
         clients[i]=-1;
     server_start("9490");
-    
+
     printf ("Starting server\n");
-    
+
     if (daemon) {
         daemonize (m_man->root);
     }
-    
+
     signal(SIGCHLD, child_finished);
-    
+
     while (1)
     {
         addrlen = sizeof(clientaddr);
         clients[slot] = accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen);
-        
+
         if ((int)clients[slot] < 0) {
             error ("accept() error\n");
             continue;
         }
-        
+
         pid_t res_pid;
         if ((res_pid = fork ()) == -1)
             exit (-1);
@@ -555,7 +555,7 @@ void server_main (unsigned daemon, struct manager * m_man) {
             server_respond(slot, m_man);
             _exit (0);
         }
-    
+
         while (clients[slot]!=-1) slot = (slot+1)%CONNMAX;
     }
 }

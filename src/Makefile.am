@@ -5,7 +5,7 @@ pkgdata_DATA = update.py
 
 bin_PROGRAMS = autogentoo
 autogentoo_SOURCES = autogentoo.c
-autogentoo_CFLAGS = -D AUTOGENTOO_DATADIR=$(pkgdatadir) ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/
+autogentoo_CFLAGS = -D AUTOGENTOO_DATADIR=$(pkgdatadir) ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/  -Wunused-result
 autogentoo_LDADD = libautogentoo.la
 
 #check_PROGRAMS = testlibip testipscan
@@ -24,5 +24,5 @@ testserver_LDADD = libautogentoo.la
 
 lib_LTLIBRARIES = libautogentoo.la
 libautogentoo_la_SOURCES = serve_client.c list.c server.c response.c request.c emerge.c _string.c ip_convert.c ip_scan.c
-libautogentoo_la_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/
+libautogentoo_la_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/  -Wno-unused-result
 libautogentoo_la_LDFLAGS = -version-info 0

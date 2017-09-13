@@ -63,4 +63,5 @@ src/http/http-server
 !*test*.c
 *.dat
 src/autogentoo
+src/*/*
 src/*.config

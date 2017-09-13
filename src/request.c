@@ -23,6 +23,7 @@
 
 
 #include <request.h>
+#include <chroot.h>
 
 char *request_names[] = {
     "INSTALL_S",
@@ -38,16 +39,14 @@ struct method_s methods [] = {
     REMOVE_C,
 };
 
-response_t m_install (char* command, struct manager * m_man, struct serve_client client) {
+response_t m_install (char* command, struct manager * m_man, struct serve_client client, char* ip, int fd) {
     char cmd[2048];
     char opts[1024];
     emerges (m_man, client, opts);
     sprintf (cmd, "%s %s", opts, command);
     printf ("%s\n", cmd);
     fflush (stdout);
-    if (system (cmd) != 0)
-        return INTERNAL_ERROR;
-    return OK;
+    
 }
 
 response_t m_remove (char* command, struct manager * m_man, struct serve_client client) {
@@ -79,7 +78,7 @@ response_t exec_method_client (request_t type, char * command) {
     return OK;
 }
 
-response_t exec_method (char *type, struct manager * man, char* command, char *ip) {
+response_t exec_method (char *type, struct manager * man, char* command, char *ip, int fd) {
     int i;
     for (i=0; i != sizeof (methods) / sizeof (struct method_s); i++) {
         if (strcmp(request_names[i], type) == 0) {
@@ -87,7 +86,7 @@ response_t exec_method (char *type, struct manager * man, char* command, char *i
             if (client_no < 0) {
                 return UNAUTHORIZED;
             }
-            return methods[i].method (command, man, man->clients[client_no]);
+            return methods[i].method (command, man, man->clients[client_no], ip, fd);
         }
     }
     // Method could not be found

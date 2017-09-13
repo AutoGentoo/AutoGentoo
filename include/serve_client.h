@@ -1,34 +1,34 @@
 /*
  * serve_client.h
- * 
+ *
  * Copyright 2017 Unknown <atuser@Hyperion>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
- * 
+ *
+ *
  */
 
 #ifndef __AUTOGENTOO_SERVE_CLIENT__
 #define __AUTOGENTOO_SERVE_CLIENT__
 
-struct serve_client { // Chroot environment 
+struct serve_client { // Chroot environment
     char hostname[64];
     char profile[128];
     char id[16]; // 16 char id for ids
-    
+
     // Architecture configuration
     char CFLAGS[1024];
     char CXXFLAGS[64];
@@ -36,13 +36,15 @@ struct serve_client { // Chroot environment
     char USE[512];
     char EXTRA[512][32];
     int extra_c;
-    
+
     // Portage binhost setup
     char PORTAGE_TMPDIR[256]; // build dir, relative to sc_root
     char PORTDIR[256]; // ebuild portage tree, relative to /
     char DISTDIR[256]; // distfiles, relative to sc_root
     char PKGDIR[256]; // built bins, relative to sc_root
     char PORT_LOGDIR[256]; // logs, relative to sc_root
+
+    struct chroot_client* chroot;
 };
 
 struct _client {
