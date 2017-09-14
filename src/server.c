@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <server.h>
+#include <chroot.h>
 #include <_string.h>
 #include <response.h>
 #include <sys/sysinfo.h>
@@ -156,8 +157,8 @@ void server_respond (int n, struct manager * m_man)
             }
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
-            res = exec_method (reqline[1], m_man, reqline[2], ip, 1);
-            rsend (1, res); // Write to stdout instead of socket
+            int exec_sock = dup(1);
+            res = exec_method (reqline[1], m_man, reqline[2], ip, exec_sock);
         }
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
             int l_argc = 0;
@@ -297,16 +298,19 @@ void server_respond (int n, struct manager * m_man)
                             strcat (pkgs, " ");
                         }
                         fclose (fp);
-                        res = m_install (pkgs, m_man, m_man->clients[sc_no], ip, 1);
-                        rsend (1, res); // Write to stdout instead of socket
+                        
+                        int m_install_sock = dup(1);
+                        res = m_install (pkgs, m_man, sc_no, ip, m_install_sock);
+                        
                         sent = 1;
                     }
                 }
                 else if (rt == UNOSYNC) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
-                        res = m_install ("-uDN @world", m_man, m_man->clients[sc_no], ip, 1);
-                        rsend (1, res); // Write to stdout instead of socket
+                        
+                        int m_install_sock = dup(1);
+                        res = m_install ("-uDN @world", m_man, sc_no, ip, m_install_sock);
                         sent = 1;
                     }
                     else {
@@ -330,8 +334,8 @@ void server_respond (int n, struct manager * m_man)
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
                         system ("emerge --sync");
-                        res = m_install ("-uDN @world", m_man, m_man->clients[sc_no], ip, 1);
-                        rsend (1, res); // Write to stdout instead of socket
+                        int m_install_sock = dup(1);
+                        res = m_install ("-uDN @world", m_man, sc_no, ip, m_install_sock);
                         sent = 1;
                     }
                     else {
@@ -425,8 +429,10 @@ void server_respond (int n, struct manager * m_man)
                 else if (rt == REGEN) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
-                        res = m_install ("@preserved-rebuild", m_man, m_man->clients[sc_no], ip, 1);
-                        rsend (1, res); // Write to stdout instead of socket
+                        
+                        int m_install_sock = dup (1);
+                        res = m_install ("@preserved-rebuild", m_man, sc_no, ip, m_install_sock);
+                        
                         sent = 1;
                     }
                     else {
@@ -523,12 +529,14 @@ void server_main (unsigned daemon, struct manager * m_man) {
     int slot;
     struct sockaddr_in clientaddr;
     socklen_t addrlen;
-
+    
     hang_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE,
         MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     close_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE,
         MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-
+    
+    chroot_main ();
+    
     int i;
     for (i=0; i<CONNMAX; i++)
         clients[i]=-1;

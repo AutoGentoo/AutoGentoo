@@ -30,8 +30,8 @@
 #include <sys/mman.h>
 #include <_string.h>
 
-static int* current_proc_id;
-static struct process_t* process_buffer = NULL;
+volatile static int* current_proc_id;
+volatile struct process_t* process_buffer = NULL;
 
 void handle_sig_USR1 (int sig) { // Handle process request
     pid_t buf_pid = fork ();
@@ -39,22 +39,31 @@ void handle_sig_USR1 (int sig) { // Handle process request
         exit (-1);
     }
     if (buf_pid > 0) {
-        process_buffer->process_id = buf_pid;
+        process_buffer->pid = buf_pid;
         return;
     }
     // Inside process
-
-    response_t res = process_handle (process_buffer);
+    process_buffer->status = RUNNING;
+    response_t res = process_handle ((struct process_t*)process_buffer);
     rsend (process_buffer->socket_fd, res);
-    munmap (process_buffer, sizeof (struct process_t));
+    process_buffer->status = DEFUNCT;
+    process_buffer = NULL;
+    exit (0);
 }
 
 void handle_sig_USR2 (int sig) {
-    ;
+    if (process_buffer->status != RUNNING) {
+        rsend (process_buffer->socket_fd, SERVICE_UNAVAILABLE);
+        return;
+    }
+    response_t res = kill (process_buffer->pid, SIGINT) ? INTERNAL_ERROR : OK;
+    rsend (process_buffer->socket_fd, res);
+    process_buffer->returned = res;
+    process_buffer = NULL;
 }
 
 response_t process_handle (struct process_t* proc) {
-
+    return system (proc->command) ? INTERNAL_ERROR : OK;
 }
 
 response_t process_kill (_pid_c pid_kill) {
@@ -62,6 +71,11 @@ response_t process_kill (_pid_c pid_kill) {
         return INTERNAL_ERROR;
     }
     return OK;
+}
+
+void chroot_main () {
+    current_proc_id = (int*) mmap(NULL, sizeof (int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    *current_proc_id = 0;
 }
 
 struct chroot_client* chroot_new (struct manager* m_man, int sc_no) {
@@ -149,4 +163,17 @@ pid_t chroot_start (struct chroot_client* client) {
     }
 }
 
-_pid_c new_process (struct manager* m_man, int sc_no, char* request);
+struct process_t* new_process (struct chroot_client* chroot, char* request, int sockfd) {
+    chroot->proc_list[chroot->proc_list_c] = mmap(NULL, sizeof (struct process_t), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    struct process_t* n_proc = chroot->proc_list[chroot->proc_list_c];
+    strcpy (n_proc->command, request);
+    n_proc->proc_id = *current_proc_id;
+    n_proc->parent = chroot;
+    n_proc->pid = -1;
+    n_proc->socket_fd = sockfd;
+    n_proc->status = WAITING;
+    
+    *current_proc_id++;
+    chroot->proc_list_c++;
+    return n_proc;
+}

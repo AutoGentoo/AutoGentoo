@@ -39,5 +39,5 @@ void emerges (struct manager * m_man, struct serve_client client, char* out) {
 }
 
 void emergec (char *out) {
-    sprintf (out, "emerge -q --autounmask-continue --usepkgonly");
+    sprintf (out, "emerge -q --autounmask-continue  --buildpkg --usepkg");
 }

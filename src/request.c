@@ -39,20 +39,24 @@ struct method_s methods [] = {
     REMOVE_C,
 };
 
-response_t m_install (char* command, struct manager * m_man, struct serve_client client, char* ip, int fd) {
+response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
     char cmd[2048];
     char opts[1024];
-    emerges (m_man, client, opts);
+    emergec (opts);
     sprintf (cmd, "%s %s", opts, command);
-    printf ("%s\n", cmd);
-    fflush (stdout);
     
+    struct process_t* __run_process = new_process (m_man->clients[sc_no].chroot, cmd, fd);
+    process_buffer = __run_process;
+    kill (__run_process->pid, SIGUSR1);
+    
+    while (__run_process->status != DEFUNCT);
+    return __run_process->returned;
 }
 
-response_t m_remove (char* command, struct manager * m_man, struct serve_client client, char* ip, int fd) {
+response_t m_remove (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
     char cmd[2048];
     char opts[1024];
-    emerges (m_man, client, opts);
+    emergec (opts);
     sprintf (cmd, "%s --unmerge %s", opts, command);
     printf ("%s\n", cmd);
     fflush (stdout);
@@ -86,7 +90,7 @@ response_t exec_method (char *type, struct manager * man, char* command, char *i
             if (client_no < 0) {
                 return UNAUTHORIZED;
             }
-            return methods[i].method (command, man, man->clients[client_no], ip, fd);
+            return methods[i].method (command, man, client_no, ip, fd);
         }
     }
     // Method could not be found

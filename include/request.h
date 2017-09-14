@@ -47,13 +47,13 @@ struct client_request {
 
 struct method_s {
     request_t type;
-    response_t (*method)(char*, struct manager *, struct serve_client, char*, int);
+    response_t (*method)(char*, struct manager *, int sc_no, char*, int);
 };
 
 extern struct method_s methods [];
 
-response_t m_install (char* command, struct manager * m_man, struct serve_client client, char* ip, int fd);
-response_t m_remove  (char* command, struct manager * m_man, struct serve_client client, char* ip, int fd);
+response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd);
+response_t m_remove  (char* command, struct manager * m_man, int sc_no, char* ip, int fd);
 
 response_t exec_method_client (request_t type, char * command);
 response_t exec_method (char *type, struct manager * man, char* command, char *ip, int fd);

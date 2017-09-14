@@ -31,17 +31,27 @@
 #include <request.h>
 
 typedef int _pid_c;
+struct chroot_client;
+struct process_t;
+
+typedef enum {
+    WAITING,
+    RUNNING,
+    DEFUNCT
+} proc_stat;
 
 struct process_t {
-    char command[256]; // Dont even parse anything (raw_command)
-
+    char command[512]; // Dont even parse anything (raw_command)
+    
     _pid_c proc_id;
-
-    pid_t process_id; // pid of the request fork()
-    char *ip; // IP that requested
+    
+    struct chroot_client* parent; // Pointer to mmaped parent
+    pid_t pid; // pid of the request fork()
     int socket_fd;  // The socket file descriptor
                     // This fd will be closed immediatly and duped to stdout
                     // Only used as a buffer
+    proc_stat status;
+    response_t returned;
 };
 
 struct chroot_client {
@@ -53,7 +63,7 @@ struct chroot_client {
     int intited; // Specifies whether directories are mounted to chroot (/proc, /sys, /dev, /usr/portage)
 };
 
-//extern static const struct process_t NO_PROCESS;
+extern volatile struct process_t* process_buffer;
 
 void handle_sig_USR1 (int sig); // Handle process request
 void handle_sig_USR2 (int sig); // Kill process
@@ -65,7 +75,8 @@ struct chroot_client* chroot_new (struct manager* m_man, int sc_no);
 void eselect_locale (char* loc);
 void chroot_mount (struct chroot_client* client);
 pid_t chroot_start (struct chroot_client* client);
+void chroot_main ();
 
-_pid_c new_process (struct manager* m_man, int sc_no, char* request);
+struct process_t* new_process (struct chroot_client* chroot, char* request, int sockfd);
 
 #endif
