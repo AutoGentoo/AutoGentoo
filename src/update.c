@@ -41,25 +41,25 @@ void str_substring (char* dest, char* src, int start, int end) {
 }
 
 int main (int argc, char** argv) {
-    char *line = NULL;
+    char line[512];
     
     printf ("emerge -q --oneshot --nodeps --deep");
     
-    size_t size = 1024;
     
-    while (getline(&line, &size, stdin) != -1) {
+    while (scanf (" %[^\n]s", line) != -1) {
+        getchar();
         if (line[0] != '[') {
             continue;
         }
         
-        if (strncmp (&line[1], "ebuild", 6) != 0) {
+        if (strncmp (line + 1, "ebuild", 6) != 0) {
             continue;
         }
-        
         char pkgbuf[128];
-        str_substring (pkgbuf, line, str_find (line, ']', strlen(line)) + 2, strlen (line) -1);
+        str_substring (pkgbuf, line, str_find (line, ']', 20) + 2, strlen (line));
         char ebuild_update[128];
-        str_substring (ebuild_update, pkgbuf, 0, str_find (pkgbuf, ' ', strlen(pkgbuf)));
+        memset(&ebuild_update[0], 0, sizeof(ebuild_update));
+        strncpy (ebuild_update, pkgbuf, str_find (pkgbuf, ' ', strlen(pkgbuf)));
         printf (" =%s", ebuild_update);
     }
     printf ("\n");
