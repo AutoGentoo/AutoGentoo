@@ -67,6 +67,8 @@ void update_manager (struct old_manager* oman, struct manager* nman) {
         strcpy (nman->clients[i].id, oman->clients[i].id);
         strcpy (nman->clients[i].CFLAGS, oman->clients[i].CFLAGS);
         strcpy (nman->clients[i].USE, oman->clients[i].USE);
+        strcpy (nman->clients[i].CHOST, oman->clients[i].CHOST);
+        strcpy (nman->clients[i].CXXFLAGS, oman->clients[i].CXXFLAGS);
         
         int j;
         for (j=0; j!=oman->clients[i].extra_c; j++) {
