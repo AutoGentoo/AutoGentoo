@@ -235,6 +235,12 @@ void write_serve (int fd, struct manager * m_man) {
 
 void read_serve (int fd, struct manager * m_man) { // You must malloc this pointer first
     read (fd, m_man, sizeof(struct manager));
+    int i;
+    for (i=0; i!=m_man->client_c; i++) {
+        if (m_man->clients[i].state > STAGE3) {
+            
+        }
+    }
 }
 
 struct str_req str_link[] = {

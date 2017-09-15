@@ -29,6 +29,7 @@
 #include <serve_client.h>
 #include <response.h>
 #include <request.h>
+#include <mntent.h>
 
 typedef int _pid_c;
 struct chroot_client;
@@ -39,6 +40,12 @@ typedef enum {
     RUNNING,
     DEFUNCT
 } proc_stat;
+
+typedef enum {
+    NOT_MOUNTED,
+    IS_MOUNTED,
+    NO_MOUNT, // If the parent directory is the child this is set
+} mount_status;
 
 struct process_t {
     char command[512]; // Dont even parse anything (raw_command)
@@ -54,11 +61,28 @@ struct process_t {
     response_t returned;
 };
 
+struct chroot_mount {
+    char parent[128]; // Relative to / of main
+    char child[128]; // Relative to chroot/
+    char type[32]; // Leave empty for auto
+    int recursive; // 0 for --bind, 1 for --rbind (not used if type is specified)
+    mount_status stat;
+};
+
+struct system_mounts {
+    struct mntent mounts[128];
+    int mount_c;
+};
+
 struct chroot_client {
     struct manager * m_man;
     int sc_no; // Index of client
     struct process_t *proc_list[128];
-    int proc_list_c;
+    
+    struct chroot_mount mounts[32];
+    
+    int mount_c;
+    int proc_c;
     pid_t pid; // Process id of the chroot fork()
     int intited; // Specifies whether directories are mounted to chroot (/proc, /sys, /dev, /usr/portage)
 };

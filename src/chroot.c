@@ -32,6 +32,7 @@
 
 volatile static int* current_proc_id;
 volatile struct process_t* process_buffer = NULL;
+static struct system_mounts* sys_mnts;
 
 void handle_sig_USR1 (int sig) { // Handle process request
     pid_t buf_pid = fork ();
@@ -76,15 +77,49 @@ response_t process_kill (_pid_c pid_kill) {
 void chroot_main () {
     current_proc_id = (int*) mmap(NULL, sizeof (int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *current_proc_id = 0;
+    
+    sys_mnts = (struct system_mounts*) mmap(NULL, sizeof (struct system_mounts), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    
+    struct mntent *ent;
+    FILE *mnts_stream;
+
+    mnts_stream = setmntent("/proc/mounts", "r");
+    if (mnts_stream == NULL) {
+        perror("setmntent");
+        exit(1);
+    }
+    while ((ent = getmntent(mnts_stream)) != NULL) {
+        memcpy (&sys_mnts->mounts[sys_mnts->mount_c], ent, sizeof (struct mntent));
+        sys_mnts->mount_c++;
+    }
+    endmntent(mnts_stream);
 }
 
 struct chroot_client* chroot_new (struct manager* m_man, int sc_no) {
     struct chroot_client* chroot = (struct chroot_client*) mmap(NULL, sizeof (struct chroot_client), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     chroot->m_man = m_man;
     chroot->sc_no = sc_no;
-    chroot->proc_list_c = 0;
+    chroot->proc_c = 0;
+    
     chroot->pid = -1;
     chroot->intited = 0;
+    
+    struct serve_client * buffer_client = &m_man->clients[sc_no];
+    
+    char PORTAGE_DIR[128];
+    char PORTDIR[128];
+    strcpy (PORTAGE_DIR, buffer_client->PORTAGE_DIR);
+    strcpy (PORTDIR, buffer_client->PORTDIR);
+    
+    struct chroot_mount mounts[32] = {
+        {"/proc", "proc", "proc", 0, -1},
+        {"/sys", "sys", "", 1, -1},
+        {"/dev", "dev", "", 1, -1},
+        {*PORTAGE_DIR, *PORTDIR, *"", 0, -1},
+    };
+    
+    memcpy (&chroot->mounts, &mounts, sizeof (struct chroot_mount) * 32);
+    chroot->mount_c = 4;
     
     return chroot;
 }
@@ -100,11 +135,33 @@ void type_mount (char* new_root, char* src, char* dest, char* type) {
     mount (src, dest_temp, type, MS_MGC_VAL, NULL);
 }
 
+mount_status mount_check (struct chroot_client* client, char* src, char* target) {
+    char dest_temp[256];
+    sprintf (dest_temp, "%s/%s", new_root, dest);
+    
+    if (strcmp (src, target), "")
+    
+    int i;
+    for (i=0; i!=sys_mnts->mount_c; i++) {
+        if (strcmp (target, sys_mnts->mounts[i].mnt_dir) == 0) {
+            return IS_MOUNTED;
+        }
+    }
+}
+
 void chroot_mount (struct chroot_client* client) {
     char target[256];
     struct serve_client * buffer_client = &client->m_man->clients[client->sc_no];
     
     sprintf (target, "%s/%s", client->m_man->root, buffer_client->id);
+    
+    int i;
+    for (i=0; i!=client->mount_c; i++) {
+        if (strcmp(client->mounts[i].type, "") == 0) {
+            ;
+        }
+    }
+    
     type_mount (target, "/proc", "proc", "proc");
     bind_mount (target, "/sys", "sys", 1);
     bind_mount (target, "/dev", "dev", 1);
@@ -164,8 +221,8 @@ pid_t chroot_start (struct chroot_client* client) {
 }
 
 struct process_t* new_process (struct chroot_client* chroot, char* request, int sockfd) {
-    chroot->proc_list[chroot->proc_list_c] = mmap(NULL, sizeof (struct process_t), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    struct process_t* n_proc = chroot->proc_list[chroot->proc_list_c];
+    chroot->proc_list[chroot->proc_c] = mmap(NULL, sizeof (struct process_t), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    struct process_t* n_proc = chroot->proc_list[chroot->proc_c];
     strcpy (n_proc->command, request);
     n_proc->proc_id = *current_proc_id;
     n_proc->parent = chroot;
@@ -174,6 +231,6 @@ struct process_t* new_process (struct chroot_client* chroot, char* request, int 
     n_proc->status = WAITING;
     
     *current_proc_id++;
-    chroot->proc_list_c++;
+    chroot->proc_c++;
     return n_proc;
 }

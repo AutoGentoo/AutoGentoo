@@ -24,6 +24,15 @@
 #ifndef __AUTOGENTOO_SERVE_CLIENT__
 #define __AUTOGENTOO_SERVE_CLIENT__
 
+typedef enum {
+    NO_INIT, // Directories and make.conf need creation
+    INITED, // Directories have been created but base packages need installation
+    STAGE3, /* Stage3 packages have been installed (chroot_ready).
+             * After every restart the state will reset here if higher
+             */
+    CHROOT // Directories mounted and ready and chroot is running (run_state)
+} client_state;
+
 struct serve_client { // Chroot environment
     char hostname[64];
     char profile[128];
@@ -50,6 +59,7 @@ struct serve_client { // Chroot environment
     char PORT_LOGDIR[256]; // logs
 
     struct chroot_client* chroot;
+    client_state state;
 };
 
 struct _client {
