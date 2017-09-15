@@ -135,22 +135,28 @@ void type_mount (char* new_root, char* src, char* dest, char* type) {
     mount (src, dest_temp, type, MS_MGC_VAL, NULL);
 }
 
-mount_status mount_check (struct chroot_client* client, char* src, char* target) {
+mount_status mount_check (struct chroot_mount* mnt, char* target) {
     char dest_temp[256];
-    //sprintf (dest_temp, "%s/%s", new_root, dest);
+    char src_temp[256];
+    sprintf (dest_temp, "%s/%s", target, mnt->child);
     
-    //normalize_path (dest_temp, dest_temp, strlen (dest_temp));
-    /*
+    normalize_path (dest_temp, dest_temp, strlen (dest_temp));
+    normalize_path (src_temp, mnt->parent, strlen (mnt->parent));
+    
+    if (strcmp (src_temp, dest_temp) == 0) {
+        mnt->stat = NO_MOUNT;
+        return NO_MOUNT;
+    }
+    
     int i;
     for (i=0; i!=sys_mnts->mount_c; i++) {
-        if (strcmp (src, dest_temp) == 0) {
-            return NO_MOUNT;
-        }
-        if (strcmp (target, sys_mnts->mounts[i].mnt_dir) == 0) {
+        if (strcmp (dest_temp, sys_mnts->mounts[i].mnt_dir) == 0) {
+            mnt->stat = IS_MOUNTED;
             return IS_MOUNTED;
         }
-    }*/
+    }
     
+    mnt->stat = NOT_MOUNTED;
     return NOT_MOUNTED;
 }
 
@@ -162,26 +168,26 @@ void chroot_mount (struct chroot_client* client) {
     
     int i;
     for (i=0; i!=client->mount_c; i++) {
+        if (mount_check (&client->mounts[i], target) != NOT_MOUNTED) {
+            continue;
+        }
         
         if (strcmp(client->mounts[i].type, "") == 0) {
-            ;
+            bind_mount (target, client->mounts[i].child, client->mounts[i].parent, client->mounts[i].recursive);
+        }
+        else {
+            type_mount (target, client->mounts[i].child, client->mounts[i].parent, client->mounts[i].type);
         }
     }
     
-    type_mount (target, "/proc", "proc", "proc");
-    bind_mount (target, "/sys", "sys", 1);
-    bind_mount (target, "/dev", "dev", 1);
-    bind_mount (target, buffer_client->PORTAGE_DIR, 
-                        buffer_client->PORTDIR, 0);
-    
-    client->intited = 1;
     
     char resolv_conf_chroot [256];
     sprintf (resolv_conf_chroot, "%s/etc/resolv.conf", client->m_man->root);
     cpy (buffer_client->resolv_conf, resolv_conf_chroot);
     eselect_locale (buffer_client->locale);
     
-    // ldconfig
+    client->intited = 1;
+    
     // locale.gen
     // Move target/autogentoo/etc/portage to /etc/portage
     // Make SYSROOT in make.conf / because we use chroot now
@@ -217,6 +223,8 @@ pid_t chroot_start (struct chroot_client* client) {
     if (chroot (__ROOT) == -1) {
         exit (1);
     }
+    system ("ldconfig"); // Make sure gcc knows where the libraries are
+    system ("source /etc/profile"); // We are in a new environment now
     system ("ls /");
     // Handle signals given by m_install and m_remove
     signal(SIGUSR1, handle_sig_USR1);

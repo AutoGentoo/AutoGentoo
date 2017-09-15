@@ -1,12 +1,16 @@
 AM_CFLAGS = ${AUTOGENTOO_CFLAGS} ${PYTHON_CFLAGS} -I$(top_srcdir)/include/ $(PYTHON_LIBS)
 ACLOCAL_AMFLAGS='-I m4'
 
-bin_PROGRAMS = autogentoo autogentoo-update
+bin_PROGRAMS = autogentoo autogentoo-update autogentoo-update-config
 autogentoo_SOURCES = autogentoo.c
 autogentoo_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/  -Wno-unused-result
 autogentoo_LDADD = libautogentoo.la
 
 autogentoo_update_SOURCES = update.c
+
+autogentoo_update_config_SOURCES = update-config.c
+autogentoo_update_config_LDADD = libautogentoo.la
+autogentoo_update_config_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/  -Wno-unused-result
 
 #check_PROGRAMS = testlibip testipscan
 #testlibip_SOURCES = testhtoip.c

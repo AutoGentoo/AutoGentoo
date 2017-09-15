@@ -62,8 +62,8 @@ struct process_t {
 };
 
 struct chroot_mount {
-    char parent[128]; // Relative to / of main
-    char child[128]; // Relative to chroot/
+    char parent[128]; // Relative to / of main (mount source)
+    char child[128]; // Relative to chroot/ (mnt point)
     char type[32]; // Leave empty for auto
     int recursive; // 0 for --bind, 1 for --rbind (not used if type is specified)
     mount_status stat;
@@ -100,6 +100,10 @@ void eselect_locale (char* loc);
 void chroot_mount (struct chroot_client* client);
 pid_t chroot_start (struct chroot_client* client);
 void chroot_main ();
+mount_status mount_check (struct chroot_mount* mnt, char* target);
+
+void type_mount (char* new_root, char* src, char* dest, char* type);
+void bind_mount (char* new_root, char* src, char* dest, int recursive);
 
 struct process_t* new_process (struct chroot_client* chroot, char* request, int sockfd);
 
