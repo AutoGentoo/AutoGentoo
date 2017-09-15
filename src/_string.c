@@ -107,3 +107,20 @@ int cpy(char *src, char *dest)
     while ((count = read(fd_src, buffer, sizeof(buffer))) != 0)
         write(fd_dest, buffer, count);
 }
+
+static void append(char* s, char c) {
+    int len = strlen(s);
+    s[len] = c;
+    s[len+1] = '\0';
+}
+
+void normalize_path (char* dest, char* src, size_t size) {
+    int i;
+    char last_c = 0;
+    for (i=0; i!=(int)size; i++) {
+        if (src[i] == '/' && last_c == '/') {
+            continue;
+        }
+        append (dest, src[i]);
+    }
+}

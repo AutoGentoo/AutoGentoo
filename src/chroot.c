@@ -137,16 +137,21 @@ void type_mount (char* new_root, char* src, char* dest, char* type) {
 
 mount_status mount_check (struct chroot_client* client, char* src, char* target) {
     char dest_temp[256];
-    sprintf (dest_temp, "%s/%s", new_root, dest);
+    //sprintf (dest_temp, "%s/%s", new_root, dest);
     
-    if (strcmp (src, target), "")
-    
+    //normalize_path (dest_temp, dest_temp, strlen (dest_temp));
+    /*
     int i;
     for (i=0; i!=sys_mnts->mount_c; i++) {
+        if (strcmp (src, dest_temp) == 0) {
+            return NO_MOUNT;
+        }
         if (strcmp (target, sys_mnts->mounts[i].mnt_dir) == 0) {
             return IS_MOUNTED;
         }
-    }
+    }*/
+    
+    return NOT_MOUNTED;
 }
 
 void chroot_mount (struct chroot_client* client) {
@@ -157,6 +162,7 @@ void chroot_mount (struct chroot_client* client) {
     
     int i;
     for (i=0; i!=client->mount_c; i++) {
+        
         if (strcmp(client->mounts[i].type, "") == 0) {
             ;
         }

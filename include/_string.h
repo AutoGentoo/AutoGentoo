@@ -33,5 +33,6 @@ int check_in (char * arr[], char * el, size_t size);
 int _strtok_n (char* s, char delim);
 void gen_id (char* id, int len);
 int cpy(char *src, char *dest);
+void normalize_path (char* dest, char* src, size_t size);
 
 #endif
