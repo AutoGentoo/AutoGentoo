@@ -59,38 +59,8 @@ struct old_manager {
     char _config[256];
 };
 
-struct serve_client update_sc (struct OLD_CLIENT src) {
-    struct serve_client dest;
-    
-    strcpy (dest.hostname, src.hostname);
-    strcpy (dest.profile, src.profile);
-    strcpy (dest.id, src.id);
-    printf ("%s\n", dest.id);
-    strcpy (dest.CFLAGS, src.CFLAGS);
-    strcpy (dest.USE, src.USE);
-    
-    int i;
-    for (i=0; i!=src.extra_c; i++) {
-        strcpy (dest.EXTRA[i], src.EXTRA[i]);
-    }
-    dest.extra_c = src.extra_c;
-    
-    strcpy (dest.PORTAGE_TMPDIR, src.PORTAGE_TMPDIR);
-    strcpy (dest.PORTDIR, src.PORTDIR);
-    strcpy (dest.DISTDIR, src.DISTDIR);
-    strcpy (dest.PKGDIR, src.PKGDIR);
-    strcpy (dest.PORT_LOGDIR, src.PORT_LOGDIR);
-    
-    strcpy (dest.PORTAGE_DIR, "/usr/portage");
-    strcpy (dest.resolv_conf, "/etc/resolv.conf");
-    strcpy (dest.locale, "en_US.utf8");
-}
-
 void update_manager (struct old_manager* oman, struct manager* nman) {
     int i;
-    
-    printf ("%d\n", oman->client_c);
-    
     for (i=0; i!=oman->client_c; i++) {
         strcpy (nman->clients[i].hostname, oman->clients[i].hostname);
         strcpy (nman->clients[i].profile, oman->clients[i].profile);
@@ -98,7 +68,6 @@ void update_manager (struct old_manager* oman, struct manager* nman) {
         strcpy (nman->clients[i].CFLAGS, oman->clients[i].CFLAGS);
         strcpy (nman->clients[i].USE, oman->clients[i].USE);
         
-        printf ("%d e\n", oman->clients[i].extra_c);
         int j;
         for (j=0; j!=oman->clients[i].extra_c; j++) {
             strcpy (nman->clients[i].EXTRA[j], oman->clients[j].EXTRA[j]);
@@ -114,7 +83,6 @@ void update_manager (struct old_manager* oman, struct manager* nman) {
         strcpy (nman->clients[i].PORTAGE_DIR, "/usr/portage");
         strcpy (nman->clients[i].resolv_conf, "/etc/resolv.conf");
         strcpy (nman->clients[i].locale, "en_US.utf8");
-        printf ("%s %d\n", nman->clients[i].id, i);
     }
     nman->client_c = oman->client_c;
     
@@ -129,13 +97,11 @@ void update_manager (struct old_manager* oman, struct manager* nman) {
     strcpy (nman->root, oman->root);
     strcpy (nman->_config, oman->_config);
     
-    printf ("%s\n", nman->clients[0].id);
     fflush (stdout);
 }
 
 
 int main (int argc, char** argv) {
-    printf ("%s\n", argv[1]);
     char* src_file = argv[1];
     char* dest_file = argv[2];
     
@@ -146,8 +112,6 @@ int main (int argc, char** argv) {
     struct manager m_man_new;
     
     read (src_fd, &m_man_old, sizeof(struct old_manager));
-    printf ("%s\n", m_man_old.clients[0].id);
-    printf ("%d\n", m_man_old.client_c);
     
     update_manager (&m_man_old, &m_man_new);
     
