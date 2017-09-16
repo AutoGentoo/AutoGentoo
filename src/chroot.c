@@ -41,6 +41,7 @@ void handle_sig_USR1 (int sig) { // Handle process request
     }
     if (buf_pid > 0) {
         process_buffer->pid = buf_pid;
+        printf ("[%d] %s\n", process_buffer->pid, process_buffer->command);
         return;
     }
     // Inside process

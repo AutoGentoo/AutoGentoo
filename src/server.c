@@ -157,8 +157,9 @@ void server_respond (int n, struct manager * m_man)
             }
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
-            int exec_sock = dup(clients[n]);
-            res = exec_method (reqline[1], m_man, reqline[2], ip, exec_sock);
+            //int exec_sock = dup(clients[n]);
+            res = exec_method (reqline[1], m_man, reqline[2], ip, clients[n]);
+            rsend (clients[n], res);
         }
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
             int l_argc = 0;
@@ -454,6 +455,12 @@ void server_respond (int n, struct manager * m_man)
                         
                         chroot_mount (m_man->clients[sc_no].chroot);
                         pid_t new_chroot_pid = chroot_start (m_man->clients[sc_no].chroot);
+                        m_man->clients[sc_no].state = CHROOT;
+                        if(!m_man->debug) {
+                            FILE * _fd = fopen (m_man->_config, "w+");
+                            write_serve (fileno(_fd), m_man);
+                            fclose (_fd);
+                        }
                     }
                     else {
                         res = FORBIDDEN;
