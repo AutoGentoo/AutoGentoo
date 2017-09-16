@@ -193,11 +193,11 @@ void server_respond (int n, struct manager * m_man)
                     for (m_man->clients[m_man->client_c].extra_c=0; m_man->clients[m_man->client_c].extra_c!=(l_argc);m_man->clients[m_man->client_c].extra_c++) {
                         strcpy (m_man->clients[m_man->client_c].EXTRA[m_man->clients[m_man->client_c].extra_c], request_opts[m_man->clients[m_man->client_c].extra_c+5]);
                     }
-                    strcpy(m_man->clients[m_man->client_c].PORTAGE_TMPDIR, "autogentoo/tmp");
+                    strcpy(m_man->clients[m_man->client_c].PORTAGE_TMPDIR, "/autogentoo/tmp");
                     strcpy(m_man->clients[m_man->client_c].PORTDIR, "/usr/portage");
                     strcpy(m_man->clients[m_man->client_c].DISTDIR, "/usr/portage/distfiles");
-                    strcpy(m_man->clients[m_man->client_c].PKGDIR, "autogentoo/pkg");
-                    strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "autogentoo/log");
+                    strcpy(m_man->clients[m_man->client_c].PKGDIR, "/autogentoo/pkg");
+                    strcpy(m_man->clients[m_man->client_c].PORT_LOGDIR, "/autogentoo/log");
                     strcpy (m_man->clients[m_man->client_c].PORTAGE_DIR, "/usr/portage");
                     strcpy (m_man->clients[m_man->client_c].resolv_conf, "/etc/resolv.conf");
                     strcpy (m_man->clients[m_man->client_c].locale, "en_US.utf8");
@@ -361,11 +361,11 @@ void server_respond (int n, struct manager * m_man)
                         for (m_man->clients[sc_no].extra_c=0; m_man->clients[sc_no].extra_c!=(l_argc);m_man->clients[sc_no].extra_c++) {
                             strcpy (m_man->clients[sc_no].EXTRA[m_man->clients[sc_no].extra_c], request_opts[m_man->clients[sc_no].extra_c+6]);
                         }
-                        strcpy(m_man->clients[sc_no].PORTAGE_TMPDIR, "autogentoo/tmp");
+                        strcpy(m_man->clients[sc_no].PORTAGE_TMPDIR, "/autogentoo/tmp");
                         strcpy(m_man->clients[sc_no].PORTDIR, "/usr/portage");
                         strcpy(m_man->clients[sc_no].DISTDIR, "/usr/portage/distfiles");
-                        strcpy(m_man->clients[sc_no].PKGDIR, "autogentoo/pkg");
-                        strcpy(m_man->clients[sc_no].PORT_LOGDIR, "autogentoo/log");
+                        strcpy(m_man->clients[sc_no].PKGDIR, "/autogentoo/pkg");
+                        strcpy(m_man->clients[sc_no].PORT_LOGDIR, "/autogentoo/log");
                         write_make_conf (*m_man, m_man->clients[sc_no]);
 
                         if(!m_man->debug) {
