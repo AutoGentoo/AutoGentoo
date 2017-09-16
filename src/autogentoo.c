@@ -152,6 +152,7 @@ Client Options\n\
         strcpy(m_man->root, __opts.p);
         strcpy(m_man->_config, __opts.f);
         
+        chroot_main ();
         chdir (m_man->root);
         if (access (__opts.f, F_OK) != -1) {
             int _fd = open (__opts.f, O_RDONLY);

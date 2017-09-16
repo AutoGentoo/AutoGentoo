@@ -273,7 +273,7 @@ void server_respond (int n, struct manager * m_man)
                                  m_man->clients[sc_no].hostname,
                                  m_man->clients[sc_no].profile,
                                  EXTRA);
-                        write (clients[n], c_buff, sizeof (c_buff));
+                        write (clients[n], c_buff, strlen (c_buff));
                     }
                 }
                 else if (rt == STAGE1) {
@@ -561,8 +561,6 @@ void server_main (unsigned daemon, struct manager * m_man) {
         MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     close_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE,
         MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    
-    chroot_main ();
     
     int i;
     for (i=0; i<CONNMAX; i++)

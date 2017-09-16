@@ -35,22 +35,7 @@ volatile struct process_t* process_buffer = NULL;
 static struct system_mounts* sys_mnts;
 
 void handle_sig_USR1 (int sig) { // Handle process request
-    pid_t buf_pid = fork ();
-    if (buf_pid == -1) {
-        exit (-1);
-    }
-    if (buf_pid > 0) {
-        process_buffer->pid = buf_pid;
-        printf ("[%d] %s\n", process_buffer->pid, process_buffer->command);
-        return;
-    }
-    // Inside process
-    process_buffer->status = RUNNING;
-    response_t res = process_handle ((struct process_t*)process_buffer);
-    rsend (process_buffer->socket_fd, res);
-    process_buffer->status = DEFUNCT;
-    process_buffer = NULL;
-    exit (0);
+    
 }
 
 void handle_sig_USR2 (int sig) {
@@ -132,12 +117,8 @@ struct chroot_client* chroot_new (struct manager* m_man, int sc_no) {
 void bind_mount (char* new_root, char* src, char* dest, int recursive) {
     char dest_temp[256];
     sprintf (dest_temp, "%s/%s", new_root, dest);
-    if (!recursive) {
-        mount (src, dest_temp, NULL, MS_BIND, NULL);
-    }
-    else {
-        mount (src, dest_temp, NULL, MS_BIND | MS_REC, NULL);
-    }
+    strcpy (dest_temp, path_normalize (dest_temp));
+    mount (src, dest_temp, NULL, MS_BIND | (recursive ? MS_REC : 0), NULL);
 }
 void type_mount (char* new_root, char* src, char* dest, char* type) {
     char dest_temp[256];
@@ -180,17 +161,18 @@ void chroot_mount (struct chroot_client* client) {
     
     int i;
     for (i=0; i!=client->mount_c; i++) {
-        fflush (stdout);
         mount_status got = mount_check (&client->mounts[i], target);
+        printf ("%s %s/%s %d\n", client->mounts[i].parent, target, client->mounts[i].child, got);
+        fflush (stdout);
         if (got != NOT_MOUNTED) {
             continue;
         }
         
         if (strcmp(client->mounts[i].type, "") == 0) {
-            bind_mount (target, client->mounts[i].child, client->mounts[i].parent, client->mounts[i].recursive);
+            bind_mount (target, client->mounts[i].parent, client->mounts[i].child, client->mounts[i].recursive);
         }
         else {
-            type_mount (target, client->mounts[i].child, client->mounts[i].parent, client->mounts[i].type);
+            type_mount (target, client->mounts[i].parent, client->mounts[i].child, client->mounts[i].type);
         }
     }
     
@@ -242,10 +224,32 @@ pid_t chroot_start (struct chroot_client* client) {
     system ("source /etc/profile"); // We are in a new environment now
     system ("ls /");
     // Handle signals given by m_install and m_remove
-    signal(SIGUSR1, handle_sig_USR1);
-    signal(SIGUSR2, handle_sig_USR2);
+    sigset_t mask, oldmask;
+    sigemptyset (&mask);
+    sigaddset (&mask, SIGUSR1);
+    int usr_interrupt;
     while (1) {
-        pause (); // Wait for signal
+        usr_interrupt = 0;
+        sigprocmask (SIG_BLOCK, &mask, &oldmask);
+        while (!usr_interrupt)
+            sigsuspend (&oldmask);
+        sigprocmask (SIG_UNBLOCK, &mask, NULL);
+        pid_t buf_pid = fork ();
+        if (buf_pid == -1) {
+            exit (-1);
+        }
+        if (buf_pid > 0) {
+            process_buffer->pid = buf_pid;
+            printf ("[%d] %s\n", process_buffer->pid, process_buffer->command);
+            continue;
+        }
+        // Inside process
+        process_buffer->status = RUNNING;
+        response_t res = process_handle ((struct process_t*)process_buffer);
+        rsend (process_buffer->socket_fd, res);
+        process_buffer->status = DEFUNCT;
+        process_buffer = NULL;
+        exit (0);
     }
 }
 
