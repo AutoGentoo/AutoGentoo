@@ -121,7 +121,8 @@ char * path_normalize(const char *path) {
   if (NULL == copy) return NULL;
   char *ptr = copy;
 
-  for (int i = 0; copy[i]; i++) {
+  int i;
+  for (i = 0; copy[i]; i++) {
     *ptr++ = path[i];
     if ('/' == path[i]) {
       i++;
