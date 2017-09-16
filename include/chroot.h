@@ -70,7 +70,7 @@ struct chroot_mount {
 };
 
 struct system_mounts {
-    struct mntent mounts[128];
+    char mounts[32][128];
     int mount_c;
 };
 
