@@ -100,8 +100,8 @@ void server_respond (int n, struct manager * m_man)
     dup2(clients[n], STDOUT_FILENO);
     dup2(clients[n], STDERR_FILENO);
     close(clients[n]);
-
-    rcvd = recv(1, mesg, 2048, 0);
+    
+    rcvd = recv(clients[n], mesg, 2048, 0);
     int __error = 0;
     if (rcvd < 0) { // receive error
         fprintf(stderr, ("recv() error\n"));
@@ -117,25 +117,25 @@ void server_respond (int n, struct manager * m_man)
         reqline[0] = strtok(mesg, " \t");
         reqline[1] = strtok(NULL, " \t");
         reqline[2] = strtok(NULL, "\n");
-        ip = get_ip_from_fd (1);
+        ip = get_ip_from_fd (clients[n]);
         if (reqline[2] == NULL) {
             res = BAD_REQUEST;
-            rsend (1, BAD_REQUEST);
+            rsend (clients[n], BAD_REQUEST);
             reqline[0] = "\0"; // Make sure that the request doesn't continue
         }
         if (strncmp(reqline[0], "GET\0", 4) == 0) {
             if (strncmp(reqline[2], "HTTP/1.0", 8) != 0 && strncmp(reqline[2], "HTTP/1.1", 8) != 0) {
-                rsend (1, BAD_REQUEST);
+                rsend (clients[n], BAD_REQUEST);
                 res = BAD_REQUEST;
             }
             else {
                 if (strncmp(reqline[1], "/\0", 2) == 0)
                     reqline[1] = "";
 
-                char *ip = get_ip_from_fd (1);
+                char *ip = get_ip_from_fd (clients[n]);
                 int sc_no = get_client_from_ip (m_man, ip);
                 if (sc_no < 0) {
-                    rsend (1, FORBIDDEN);
+                    rsend (clients[n], FORBIDDEN);
                     res = FORBIDDEN;
                 }
                 else {
@@ -143,21 +143,21 @@ void server_respond (int n, struct manager * m_man)
                     int fd, bytes_read, data_to_send;
                     if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
                     {
-                        rsend (1, OK);
+                        rsend (clients[n], OK);
                         res = OK;
-                        send (1, "\n", 1, 0);
+                        send (clients[n], "\n", 1, 0);
                         while ((bytes_read = read(fd, (void*)&data_to_send, sizeof(data_to_send))) > 0)
-                            write(1, (void*)&data_to_send, bytes_read);
+                            write(clients[n], (void*)&data_to_send, bytes_read);
                     }
                     else {
-                        rsend (1, NOT_FOUND);
+                        rsend (clients[n], NOT_FOUND);
                         res = NOT_FOUND;
                     }
                 }
             }
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
-            int exec_sock = dup(1);
+            int exec_sock = dup(clients[n]);
             res = exec_method (reqline[1], m_man, reqline[2], ip, exec_sock);
         }
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
@@ -175,7 +175,7 @@ void server_respond (int n, struct manager * m_man)
             for (i=0; i != (l_argc + linked.argc); i++) {
                 request_opts[i] = strtok (NULL, "\n");
                 if (request_opts[i] == NULL) {
-                    rsend (1, BAD_REQUEST);
+                    rsend (clients[n], BAD_REQUEST);
                     res = BAD_REQUEST;
                     sent = 1;
                     break;
@@ -210,16 +210,16 @@ void server_respond (int n, struct manager * m_man)
                         write_serve (fileno(_fd), m_man);
                         fclose (_fd);
                     }
-                    write (1, m_man->clients[m_man->client_c - 1].id, strlen(m_man->clients[m_man->client_c - 1].id));
-                    write (1, "\n", 1);
-                    rsend (1, OK);
+                    write (clients[n], m_man->clients[m_man->client_c - 1].id, strlen(m_man->clients[m_man->client_c - 1].id));
+                    write (clients[n], "\n", 1);
+                    rsend (clients[n], OK);
                     res = OK;
                     sent = 1;
                 }
                 else if (rt == ACTIVATE) {
                     sc_no = get_client_from_id (m_man, request_opts[0]);
                     if (sc_no == -1) {
-                        rsend (1, BAD_REQUEST);
+                        rsend (clients[n], BAD_REQUEST);
                         res = BAD_REQUEST;
                         sent = 1;
                     }
@@ -235,7 +235,7 @@ void server_respond (int n, struct manager * m_man)
                 else if (rt == INIT) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no == -1) {
-                        rsend (1, FORBIDDEN);
+                        rsend (clients[n], FORBIDDEN);
                         res = FORBIDDEN;
                         sent = 1;
                     }
@@ -247,11 +247,11 @@ void server_respond (int n, struct manager * m_man)
                     sc_no = get_client_from_id (m_man, request_opts[0]);
                     sent = 1;
                     if (sc_no == -1) {
-                        rsend (1, NOT_FOUND);
+                        rsend (clients[n], NOT_FOUND);
                         res = NOT_FOUND;
                     }
                     else {
-                        rsend (1, OK);
+                        rsend (clients[n], OK);
                         res = OK;
                         char c_buff[1024];
                         char EXTRA [2048];
@@ -272,13 +272,13 @@ void server_respond (int n, struct manager * m_man)
                                  m_man->clients[sc_no].hostname,
                                  m_man->clients[sc_no].profile,
                                  EXTRA);
-                        write (1, c_buff, sizeof (c_buff));
+                        write (clients[n], c_buff, sizeof (c_buff));
                     }
                 }
                 else if (rt == STAGE1) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no == -1) {
-                        rsend (1, FORBIDDEN);
+                        rsend (clients[n], FORBIDDEN);
                         res = FORBIDDEN;
                         sent = 1;
                     }
@@ -313,13 +313,13 @@ void server_respond (int n, struct manager * m_man)
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
                         
-                        int m_install_sock = dup(1);
+                        int m_install_sock = dup(clients[n]);
                         res = m_install ("-uDN @world", m_man, sc_no, ip, m_install_sock);
                         sent = 1;
                     }
                     else {
                         res = FORBIDDEN;
-                        rsend (1, res); // Write to stdout instead of socket
+                        rsend (clients[n], res); // Write to stdout instead of socket
                     }
                     sent = 1;
                 }
@@ -331,20 +331,20 @@ void server_respond (int n, struct manager * m_man)
                         res = OK;
                     }
 
-                    rsend (1, res); // Write to stdout instead of socket
+                    rsend (clients[n], res); // Write to stdout instead of socket
                     sent = 1;
                 }
                 else if (rt == UPDATE) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
                         system ("emerge --sync");
-                        int m_install_sock = dup(1);
+                        int m_install_sock = dup(clients[n]);
                         res = m_install ("-uDN @world", m_man, sc_no, ip, m_install_sock);
                         sent = 1;
                     }
                     else {
                         res = FORBIDDEN;
-                        rsend (1, res); // Write to stdout instead of socket
+                        rsend (clients[n], res); // Write to stdout instead of socket
                     }
                     sent = 1;
                 }
@@ -375,29 +375,29 @@ void server_respond (int n, struct manager * m_man)
                     }
                     else {
                         res = NOT_FOUND;
-                        rsend (1, res); // Write to stdout instead of socket
+                        rsend (clients[n], res); // Write to stdout instead of socket
                         sent = 1;
                     }
                 }
                 else if (rt == GETCLIENTS) {
                     char n_buff[12];
                     sprintf(n_buff, "%d", m_man->client_c);
-                    write (1, n_buff, strlen(n_buff));
-                    write (1, "\n", sizeof(char));
+                    write (clients[n], n_buff, strlen(n_buff));
+                    write (clients[n], "\n", sizeof(char));
                     int i;
                     for (i=0; i!=m_man->client_c; i++) {
-                        write (1, m_man->clients[i].id, 14);
-                        write (1, "\n", sizeof(char));
+                        write (clients[n], m_man->clients[i].id, 14);
+                        write (clients[n], "\n", sizeof(char));
                     } // No need to rsend, leave it for post scope
                 }
                 else if (rt == GETACTIVE) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
-                        write (1, m_man->clients[sc_no].id, strlen(m_man->clients[sc_no].id));
-                        write (1, "\n", 1);
+                        write (clients[n], m_man->clients[sc_no].id, strlen(m_man->clients[sc_no].id));
+                        write (clients[n], "\n", 1);
                     }
                     else {
-                        write (1, "invalid\n", 8);
+                        write (clients[n], "invalid\n", 8);
                     }
                 }
                 else if (rt == GETSPEC) {
@@ -408,7 +408,7 @@ void server_respond (int n, struct manager * m_man)
                     {
                         while((symbol = getc(lspcu_fp)) != EOF)
                         {
-                            write (1, &symbol, sizeof (char));
+                            write (clients[n], &symbol, sizeof (char));
                         }
                         fclose(lspcu_fp);
                         remove ("build.spec");
@@ -418,7 +418,7 @@ void server_respond (int n, struct manager * m_man)
                     sc_no = get_client_from_id (m_man, request_opts[0]);
                     if (sc_no < 0) {
                         res = NOT_FOUND;
-                        rsend (1, res);
+                        rsend (clients[n], res);
                         sent = 1;
                     }
                     else {
@@ -434,33 +434,37 @@ void server_respond (int n, struct manager * m_man)
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
                         
-                        int m_install_sock = dup (1);
+                        int m_install_sock = dup (clients[n]);
                         res = m_install ("@preserved-rebuild", m_man, sc_no, ip, m_install_sock);
                         
                         sent = 1;
                     }
                     else {
                         res = FORBIDDEN;
-                        rsend (1, res);
+                        rsend (clients[n], res);
                         sent = 1;
                     }
                 }
                 else if (rt == MNTCHROOT) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
+                        close (STDOUT_FILENO);
+                        close (STDERR_FILENO);
+                        dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+                        dup2 (stderr_b, STDERR_FILENO);
                         chroot_mount (m_man->clients[sc_no].chroot);
                         pid_t new_chroot_pid = chroot_start (m_man->clients[sc_no].chroot);
                         printf ("new_chroot started on %d", new_chroot_pid);
                     }
                     else {
                         res = FORBIDDEN;
-                        rsend (1, res);
+                        rsend (clients[n], res);
                         sent = 1;
                     }
                 }
             }
             if (sent == 0) {
-                rsend (1, OK);
+                rsend (clients[n], OK);
                 res = OK;
             }
         }
