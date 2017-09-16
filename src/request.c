@@ -44,7 +44,7 @@ response_t __m_install (char* command, struct manager * m_man, int sc_no, char* 
     char opts[1024];
     emerges (m_man, sc_no, opts);
     sprintf (cmd, "%s %s", opts, command);
-    
+    printf ("%s\n", cmd);
     if (system (cmd) != 0) {
         return INTERNAL_ERROR;
     }
@@ -57,6 +57,7 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     char opts[1024];
     emergec (opts);
     sprintf (cmd, "%s %s", opts, command);
+    printf ("%s\n", cmd);
     
     struct process_t* __run_process = new_process (m_man->clients[sc_no].chroot, cmd, fd);
     process_buffer = __run_process;
