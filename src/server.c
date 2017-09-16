@@ -448,10 +448,6 @@ void server_respond (int n, struct manager * m_man)
                 else if (rt == MNTCHROOT) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
-                        close (STDOUT_FILENO);
-                        close (STDERR_FILENO);
-                        dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
-                        dup2 (stderr_b, STDERR_FILENO);
                         chroot_mount (m_man->clients[sc_no].chroot);
                         pid_t new_chroot_pid = chroot_start (m_man->clients[sc_no].chroot);
                         printf ("new_chroot started on %d", new_chroot_pid);
