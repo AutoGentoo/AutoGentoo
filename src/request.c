@@ -54,18 +54,9 @@ response_t __m_install (char* command, struct manager * m_man, int sc_no, char* 
 
 response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
     char cmd[2048];
-    char opts[1024];
-    emergec (opts);
-    sprintf (cmd, "%s %s", opts, command);
+    sprintf (cmd, "chroot %s/%s/ /usr/bin/emerge %s", m_man->root, m_man->clients[sc_no].id, command);
     
-    char __ROOT[256];
-    sprintf (__ROOT, "%s/%s/", m_man->root, m_man->clients[sc_no].id);
-    if (chroot (__ROOT) == -1) {
-        return INTERNAL_ERROR;
-    }
-    system ("ldconfig"); // Make sure gcc knows where the libraries are
-    system ("source /etc/profile");
-    
+    printf ("%s\n", cmd);
     if (system (cmd) != 0) {
         return INTERNAL_ERROR;
     }

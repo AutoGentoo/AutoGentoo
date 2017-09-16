@@ -39,5 +39,5 @@ void emerges (struct manager * m_man, int sc_no, char* out) {
 }
 
 void emergec (char *out) {
-    sprintf (out, "emerge -q --autounmask-continue  --buildpkg --usepkg");
+    sprintf (out, "emerge");
 }
