@@ -454,7 +454,6 @@ void server_respond (int n, struct manager * m_man)
                         }
                         
                         chroot_mount (m_man->clients[sc_no].chroot);
-                        pid_t new_chroot_pid = chroot_start (m_man->clients[sc_no].chroot);
                         m_man->clients[sc_no].state = CHROOT;
                         if(!m_man->debug) {
                             FILE * _fd = fopen (m_man->_config, "w+");

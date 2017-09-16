@@ -134,6 +134,9 @@ mount_status mount_check (struct chroot_mount* mnt, char* target) {
     strcpy (dest_temp, path_normalize (dest_temp));
     strcpy (src_temp, path_normalize (mnt->parent));
     
+    printf ("src: |%s|", src_temp);
+    printf ("dest: |%s|", dest_temp);
+    return NO_MOUNT;
     if (strcmp (src_temp, dest_temp) == 0) {
         mnt->stat = NO_MOUNT;
         return NO_MOUNT;
