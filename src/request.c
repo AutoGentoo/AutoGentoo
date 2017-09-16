@@ -58,12 +58,18 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     emergec (opts);
     sprintf (cmd, "%s %s", opts, command);
     
-    struct process_t* __run_process = new_process (m_man->clients[sc_no].chroot, cmd, fd);
-    process_buffer = __run_process;
-    kill (__run_process->pid, SIGUSR1);
+    char __ROOT[256];
+    sprintf (__ROOT, "%s/%s/", m_man->root, m_man->clients[sc_no].id);
+    if (chroot (__ROOT) == -1) {
+        return INTERNAL_ERROR;
+    }
+    system ("ldconfig"); // Make sure gcc knows where the libraries are
+    system ("source /etc/profile");
     
-    while (__run_process->status != DEFUNCT);
-    return __run_process->returned;
+    if (system (cmd) != 0) {
+        return INTERNAL_ERROR;
+    }
+    return OK;
 }
 
 response_t m_remove (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
