@@ -445,6 +445,19 @@ void server_respond (int n, struct manager * m_man)
                         sent = 1;
                     }
                 }
+                else if (rt == MNTCHROOT) {
+                    sc_no = get_client_from_ip (m_man, ip);
+                    if (sc_no > -1) {
+                        chroot_mount (m_man->clients[sc_no].chroot);
+                        pid_t new_chroot_pid = chroot_start (m_man->clients[sc_no].chroot);
+                        printf ("new_chroot started on %d", new_chroot_pid);
+                    }
+                    else {
+                        res = FORBIDDEN;
+                        rsend (1, res);
+                        sent = 1;
+                    }
+                }
             }
             if (sent == 0) {
                 rsend (1, OK);

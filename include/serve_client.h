@@ -113,7 +113,8 @@ typedef enum {
     GETSPEC, // Returns specs about the build server
     SYNC, // Run emerge --sync
     SCREMOVE, // Id to remove
-    REGEN // Regenerate libraries with emerge -q @preserved-rebuild
+    REGEN, // Regenerate libraries with emerge -q @preserved-rebuild
+    MNTCHROOT // Mount chroot directories and start the thread
 } serve_c;
 
 struct link_srv {
@@ -143,6 +144,7 @@ extern struct str_req str_link[];
 #define L_SYNC (struct link_srv) {SYNC, 0}
 #define L_SCREMOVE (struct link_srv) {SCREMOVE, 1}
 #define L_REGEN (struct link_srv) {REGEN, 0}
+#define L_MNTCHROOT (struct link_srv) {MNTCHROOT, 0}
 
 #define S_CREATE (struct str_req) {"CREATE", CREATE}
 #define S_INIT (struct str_req) {"INIT", INIT}
@@ -158,6 +160,7 @@ extern struct str_req str_link[];
 #define S_SYNC (struct str_req) {"SYNC", SYNC}
 #define S_SCREMOVE (struct str_req) {"SCREMOVE", SCREMOVE}
 #define S_REGEN (struct str_req) {"REGEN", REGEN}
+#define S_MNTCHROOT (struct str_req) {"MNTCHROOT", MNTCHROOT}
 
 struct link_srv get_link_srv (serve_c);
 struct link_srv get_link_str (char*);
