@@ -229,6 +229,7 @@ pid_t chroot_start (struct chroot_client* client) {
         exit (1);
     }
     if (buf_pid != 0) {
+        printf ("Started chroot on %d\n", buf_pid);
         return (client->pid = buf_pid);
     }
     // Inside the chroot fork;
