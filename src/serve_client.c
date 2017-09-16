@@ -251,7 +251,8 @@ struct str_req str_link[] = {
     S_GETSPEC,
     S_SYNC,
     S_SCREMOVE,
-    S_REGEN
+    S_REGEN,
+    S_MNTCHROOT
 };
 
 struct link_srv link_methods [] = {
@@ -268,7 +269,8 @@ struct link_srv link_methods [] = {
     L_GETSPEC,
     L_SYNC,
     L_SCREMOVE,
-    L_REGEN
+    L_REGEN,
+    L_MNTCHROOT
 };
 
 struct link_srv get_link_srv (serve_c c) {

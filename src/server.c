@@ -446,6 +446,7 @@ void server_respond (int n, struct manager * m_man)
                     }
                 }
                 else if (rt == MNTCHROOT) {
+                    printf ("in chroot request\n");
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
                         chroot_mount (m_man->clients[sc_no].chroot);
