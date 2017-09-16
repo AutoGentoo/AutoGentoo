@@ -114,13 +114,23 @@ static void append(char* s, char c) {
     s[len+1] = '\0';
 }
 
-void normalize_path (char* dest, char* src, size_t size) {
-    int i;
-    char last_c = 0;
-    for (i=0; i!=(int)size; i++) {
-        if (src[i] == '/' && last_c == '/') {
-            continue;
-        }
-        append (dest, src[i]);
+char * path_normalize(const char *path) {
+  if (!path) return NULL;
+
+  char *copy = strdup(path);
+  if (NULL == copy) return NULL;
+  char *ptr = copy;
+
+  for (int i = 0; copy[i]; i++) {
+    *ptr++ = path[i];
+    if ('/' == path[i]) {
+      i++;
+      while ('/' == path[i]) i++;
+      i--;
     }
+  }
+
+  *ptr = '\0';
+
+  return copy;
 }

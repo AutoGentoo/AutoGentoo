@@ -115,8 +115,12 @@ struct chroot_client* chroot_new (struct manager* m_man, int sc_no) {
         {"/proc", "proc", "proc", 0, -1},
         {"/sys", "sys", "", 1, -1},
         {"/dev", "dev", "", 1, -1},
-        {*PORTAGE_DIR, *PORTDIR, *"", 0, -1},
     };
+    
+    strcpy(mounts[3].parent, buffer_client->PORTAGE_DIR);
+    strcpy(mounts[3].child, buffer_client->PORTDIR);
+    mounts[3].recursive = 0;
+    mounts[3].stat = -1;
     
     memcpy (&chroot->mounts, &mounts, sizeof (struct chroot_mount) * 32);
     chroot->mount_c = 4;
@@ -141,12 +145,12 @@ void type_mount (char* new_root, char* src, char* dest, char* type) {
 }
 
 mount_status mount_check (struct chroot_mount* mnt, char* target) {
-    char dest_temp[256];
-    char src_temp[256];
+    char dest_temp[1024];
+    char src_temp[1024];
     sprintf (dest_temp, "%s/%s", target, mnt->child);
     
-    normalize_path (dest_temp, dest_temp, strlen (dest_temp));
-    normalize_path (src_temp, mnt->parent, strlen (mnt->parent));
+    strcpy (dest_temp, path_normalize (dest_temp));
+    strcpy (src_temp, path_normalize (mnt->parent));
     
     if (strcmp (src_temp, dest_temp) == 0) {
         mnt->stat = NO_MOUNT;
@@ -154,6 +158,8 @@ mount_status mount_check (struct chroot_mount* mnt, char* target) {
     }
     
     int i;
+    fflush (stdout);
+    
     for (i=0; i!=sys_mnts->mount_c; i++) {
         if (strcmp (dest_temp, sys_mnts->mounts[i].mnt_dir) == 0) {
             mnt->stat = IS_MOUNTED;
@@ -173,8 +179,8 @@ void chroot_mount (struct chroot_client* client) {
     
     int i;
     for (i=0; i!=client->mount_c; i++) {
+        fflush (stdout);
         mount_status got = mount_check (&client->mounts[i], target);
-        printf ("mount %s %s %d", client->mounts[i].parent, client->mounts[i].child, got);
         if (got != NOT_MOUNTED) {
             continue;
         }
@@ -221,7 +227,7 @@ pid_t chroot_start (struct chroot_client* client) {
     if (buf_pid == -1) {
         exit (1);
     }
-    if (buf_pid > 0) {
+    if (buf_pid != 0) {
         return (client->pid = buf_pid);
     }
     // Inside the chroot fork;
