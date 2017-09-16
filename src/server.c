@@ -300,7 +300,12 @@ void server_respond (int n, struct manager * m_man)
                         fclose (fp);
                         
                         int m_install_sock = dup(1);
-                        res = m_install (pkgs, m_man, sc_no, ip, m_install_sock);
+                        res = __m_install (pkgs, m_man, sc_no, ip, m_install_sock);
+                        m_man->clients[sc_no].state = STAGE3;
+                        
+                        m_man->clients[sc_no].chroot = chroot_new (m_man, i);
+                        chroot_mount (m_man->clients[sc_no].chroot);
+                        m_man->clients[sc_no].state = CHROOT;
                         
                         sent = 1;
                     }

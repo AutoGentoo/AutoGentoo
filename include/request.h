@@ -52,6 +52,7 @@ struct method_s {
 
 extern struct method_s methods [];
 
+response_t __m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd); // Install from outside chroot
 response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd);
 response_t m_remove  (char* command, struct manager * m_man, int sc_no, char* ip, int fd);
 

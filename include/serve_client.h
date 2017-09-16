@@ -91,7 +91,6 @@ int get_client_from_ip (struct manager * m_man, char* ip);
 int get_client_from_id (struct manager * m_man, char* ip);
 void write_make_conf (struct manager m_man, struct serve_client conf);
 void init_serve_client (struct manager* m_man, int sc_no);
-void init_serve_client_chroot(struct chroot_client* chr);
 void _mkdir(const char *dir);
 void write_serve (int fd, struct manager * m_man);
 void read_serve (int fd, struct manager * m_man);

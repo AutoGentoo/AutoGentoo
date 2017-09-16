@@ -159,9 +159,6 @@ void init_serve_client (struct manager* m_man, int sc_no) {
     
     write_make_conf (*m_man, *conf);
     
-    conf->chroot = chroot_new (m_man, sc_no);
-    init_serve_client_chroot (conf->chroot);
-    
     // Create the profile symlink
     char sym_buf_p1 [128];
     char sym_buf_p2 [128];
@@ -207,10 +204,6 @@ void init_serve_client (struct manager* m_man, int sc_no) {
     }
 }
 
-void init_serve_client_chroot(struct chroot_client* chr) {
-    chroot_mount (chr);
-}
-
 void _mkdir(const char *dir) {
         char tmp[256];
         char *p = NULL;
@@ -237,8 +230,10 @@ void read_serve (int fd, struct manager * m_man) { // You must malloc this point
     read (fd, m_man, sizeof(struct manager));
     int i;
     for (i=0; i!=m_man->client_c; i++) {
-        if (m_man->clients[i].state > STAGE3) {
-            
+        if (m_man->clients[i].state >= STAGE3) {
+            m_man->clients[i].chroot = chroot_new (m_man, i);
+            chroot_mount (m_man->clients[i].chroot);
+            m_man->clients[i].state = CHROOT;
         }
     }
 }

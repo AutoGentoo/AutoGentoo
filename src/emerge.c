@@ -33,8 +33,8 @@ char * get_ip_from_fd (int fd) {
     return ip;
 }
 
-void emerges (struct manager * m_man, struct serve_client client, char* out) {
-    sprintf (out, "emerge -q --autounmask-continue --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s'", m_man->root, client.id, m_man->root, client.id);
+void emerges (struct manager * m_man, int sc_no, char* out) {
+    sprintf (out, "emerge -q --autounmask-continue --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s'", m_man->root, m_man->clients[sc_no].id, m_man->root, m_man->clients[sc_no].id);
     //sprintf (out, "emerge -q --autounmask-continue --buildpkg --usepkg");
 }
 

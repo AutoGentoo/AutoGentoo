@@ -39,6 +39,19 @@ struct method_s methods [] = {
     REMOVE_C,
 };
 
+response_t __m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
+    char cmd[2048];
+    char opts[1024];
+    emerges (m_man, sc_no, opts);
+    sprintf (cmd, "%s %s", opts, command);
+    
+    if (system (cmd) != 0) {
+        return INTERNAL_ERROR;
+    }
+    
+    return OK;
+}
+
 response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
     char cmd[2048];
     char opts[1024];
