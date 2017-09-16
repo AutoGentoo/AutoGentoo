@@ -127,7 +127,7 @@ struct chroot_client* chroot_new (struct manager* m_man, int sc_no) {
 void bind_mount (char* new_root, char* src, char* dest, int recursive) {
     char dest_temp[256];
     sprintf (dest_temp, "%s/%s", new_root, dest);
-    mount (src, dest_temp, NULL, MS_MGC_VAL | MS_BIND | (recursive ? MS_REC : 0), NULL);
+    mount (src, dest_temp, "ext4", MS_MGC_VAL | MS_BIND | (recursive ? MS_REC : 0), NULL);
 }
 void type_mount (char* new_root, char* src, char* dest, char* type) {
     char dest_temp[256];
