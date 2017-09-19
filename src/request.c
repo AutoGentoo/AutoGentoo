@@ -72,6 +72,8 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
         cmd_opts_buf = strtok (NULL, " ");
     }
     
+    strcpy (args[i], "\0");
+    
     printf ("/bin/chroot %s /usr/bin/emerge %s\n", root, command);
     
     pid_t install_pid = fork ();
