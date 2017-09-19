@@ -60,21 +60,30 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     
     strcpy (root, path_normalize (root));
     
-    char args[32][256];
+    char *args[32];
+    /*
     strcpy (args[0], "chroot");
     strcpy (args[1], root);
     strcpy (args[2], "/usr/bin/emerge");
+    */
+    printf ("/bin/chroot %s /usr/bin/emerge %s\n", root, command);
+    
+    
+    args[0] = "chroot";
+    args[1] = root;
+    args[2] = "/usr/bin/emerge";
     
     int i;
-    char* cmd_opts_buf;
-    for (i=3, cmd_opts_buf = strtok (command, " "); cmd_opts_buf != NULL; i++) {
-        strcpy(args[i], cmd_opts_buf);
+    char* cmd_opts_buf = strtok (command, " ");
+    for (i=3; cmd_opts_buf != NULL; i++) {
+        args[i] = cmd_opts_buf;
         cmd_opts_buf = strtok (NULL, " ");
+        if (cmd_opts_buf == NULL) {
+            break;
+        }
     }
     
-    strcpy (args[i], "\0");
-    
-    printf ("/bin/chroot %s /usr/bin/emerge %s\n", root, command);
+    args[i] = NULL;
     
     pid_t install_pid = fork ();
     if (install_pid == 0) {

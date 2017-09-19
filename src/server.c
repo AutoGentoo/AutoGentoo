@@ -119,7 +119,7 @@ void server_respond (int n, struct manager * m_man)
 
         reqline[0] = strtok(mesg, " \t");
         reqline[1] = strtok(NULL, " \t");
-        reqline[2] = strtok(NULL, "\n");
+        reqline[2] = strtok(NULL, "\r\n");
         ip = get_ip_from_fd (clients[n]);
         if (reqline[2] == NULL) {
             res = BAD_REQUEST;
