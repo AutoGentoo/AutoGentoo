@@ -64,7 +64,7 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
         "chroot",
         root,
         "/usr/bin/emerge",
-        command
+        command,
         NULL
     };
     
