@@ -71,8 +71,8 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     
     args[0] = "chroot";
     args[1] = root;
-    args[2] = "/usr/bin/emerge";
-    
+    sprintf (args[2], "/usr/bin/emerge %s", command);
+    /*
     int i;
     char* cmd_opts_buf = strtok (command, " ");
     for (i=3; cmd_opts_buf != NULL; i++) {
@@ -84,7 +84,8 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     }
     
     args[i] = NULL;
-    
+    */
+    args[2] = NULL;
     pid_t install_pid = fork ();
     if (install_pid == 0) {
         execve ("/bin/chroot", (char**)args, NULL);
