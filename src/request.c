@@ -24,6 +24,8 @@
 
 #include <request.h>
 #include <chroot.h>
+#include <_string.h>
+#include <unistd.h>
 
 char *request_names[] = {
     "INSTALL_S",
@@ -53,11 +55,30 @@ response_t __m_install (char* command, struct manager * m_man, int sc_no, char* 
 }
 
 response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
-    char cmd[2048];
-    sprintf (cmd, "chroot %s/%s/ /usr/bin/emerge %s", m_man->root, m_man->clients[sc_no].id, command);
+    char root[256];
+    sprintf (root, "%s/%s/", m_man->root, m_man->clients[sc_no].id);
     
-    printf ("%s\n", cmd);
-    if (system (cmd) != 0) {
+    strcpy (root, path_normalize (root));
+    
+    char *args[] = {
+        root,
+        "/usr/bin/emerge",
+        command,
+        NULL
+    };
+    
+    printf ("/bin/chroot %s /usr/bin/emerge %s\n", root, command);
+    
+    pid_t install_pid = fork ();
+    if (install_pid == 0) {
+        execve ("/bin/chroot", args, NULL);
+        exit (-1);
+    }
+    
+    int install_ret;
+    waitpid (install_pid, &install_ret, 0); // Wait until finished
+    
+    if (install_ret != 0) {
         return INTERNAL_ERROR;
     }
     return OK;
