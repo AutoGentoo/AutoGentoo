@@ -66,13 +66,18 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     strcpy (args[1], root);
     strcpy (args[2], "/usr/bin/emerge");
     */
-    printf ("emerge %s\n", root, command);
+    
+    
+    //args[0] = "emerge";
+    args[0] = strtok (command, " ");
+    
+    int i;
+    for (i=1; 1; i++) {
+        args[i] = strtok (NULL, " "); // Will null out the last one
+        if (args[i] == NULL) break;
+    }
     
     /*
-    args[0] = "emerge";
-    args[1] = strtok (command, " ");
-    */
-    
     args[0] = "chroot";
     args[1] = root;
     args[2] = "/bin/bash";
@@ -86,7 +91,9 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
         args[i] = strtok (NULL, " "); // Will null out the last one
         if (args[i] == NULL) break;
     }
+    */
     
+    /*
     pid_t install_pid = fork ();
     if (install_pid == 0) {
         /*chdir (root);
@@ -99,16 +106,30 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
         system ("ls");
         
         execve ("/usr/bin/emerge", (char**) args, NULL);
-        */
+        /
         
         execve ("/bin/chroot", (char**) args, NULL);
         
         exit (-1);
+    }*/
+    
+    char cat_args[1024];
+    int j;
+    for (j = 0; args[j] != NULL; j++) {
+        strcat (cat_args, "'");
+        strcat (cat_args, args[j]);
+        strcat (cat_args, "' ");
     }
     
-    int install_ret;
-    waitpid (install_pid, &install_ret, 0); // Wait until finished
+    char _full_command[2048];
+    sprintf (_full_command, "chroot %s emerge %s", root, cat_args);
+    printf ("%s\n", _full_command);
     
+    int install_ret = system (_full_command);
+    
+    /*int install_ret;
+    waitpid (install_pid, &install_ret, 0); // Wait until finished
+    */
     if (install_ret != 0) {
         return INTERNAL_ERROR;
     }
