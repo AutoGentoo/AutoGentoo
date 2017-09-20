@@ -84,6 +84,10 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
             printf ("chroot() failed\n");
             exit (-1);
         }
+        system ("source /etc/profile");
+        system ("ldconfig");
+        system ("ls");
+        
         execve ("/usr/bin/emerge", (char**) args, NULL);
         exit (-1);
     }

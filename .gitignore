@@ -67,3 +67,4 @@ src/autogentoo-update
 src/autogentoo-update-config
 src/*/*
 src/*.config*
+en_US.utf8
