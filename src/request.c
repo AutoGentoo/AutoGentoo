@@ -56,33 +56,35 @@ response_t __m_install (char* command, struct manager * m_man, int sc_no, char* 
 
 response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
     char root[256];
-    sprintf (root, "%s/%s/", m_man->root, m_man->clients[sc_no].id);
+    char *args[32];
     
+    sprintf (root, "%s/%s/", m_man->root, m_man->clients[sc_no].id);
     strcpy (root, path_normalize (root));
     
-    char *args[32];
     /*
     strcpy (args[0], "chroot");
     strcpy (args[1], root);
     strcpy (args[2], "/usr/bin/emerge");
     */
-    printf ("/bin/chroot %s /usr/bin/emerge %s\n", root, command);
+    printf ("emerge %s\n", root, command);
     
-    
-    args[0] = "chroot";
-    args[1] = root;
-    args[2] = "emerge";
-    args[3] = strtok (command, " ");
+    args[0] = "emerge";
+    args[1] = strtok (command, " ");
     
     int i;
-    for (i=4; 1; i++) {
+    for (i=2; 1; i++) {
         args[i] = strtok (NULL, " "); // Will null out the last one
         if (args[i] == NULL) break;
     }
     
     pid_t install_pid = fork ();
     if (install_pid == 0) {
-        execve ("/bin/chroot", (char**)args, NULL);
+        chdir (root);
+        if (chroot (root) == -1) {
+            printf ("chroot() failed\n");
+            exit (-1);
+        }
+        execve ("/usr/bin/emerge", (char**) args, NULL);
         exit (-1);
     }
     
