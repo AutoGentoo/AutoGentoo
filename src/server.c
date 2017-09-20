@@ -94,9 +94,11 @@ void server_respond (int n, struct manager * m_man)
     memset((void*)mesg, (int)'\0', 2048);
     
     // Create buffs to redirect STDOUT and STDERR
-    int stdout_b;
+    int stdout_b, stderr_b;
     stdout_b = dup (STDOUT_FILENO);
+    stderr_b = dup (STDERR_FILENO);
     dup2(clients[n], STDOUT_FILENO);
+    dup2(clients[n], STDERR_FILENO);
     close(clients[n]);
     
     int b_client = clients[n];
@@ -478,7 +480,9 @@ void server_respond (int n, struct manager * m_man)
 
     
     close (STDOUT_FILENO);
+    close (STDERR_FILENO);
     dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
+    dup2 (stderr_b, STDERR_FILENO);
     
     clients[n] = b_client;
     
