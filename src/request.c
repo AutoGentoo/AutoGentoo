@@ -71,8 +71,8 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     
     args[0] = "chroot";
     args[1] = root;
-    args[2] = "/usr/bin/emerge";
-    args[3] = strtok (command, " ");
+    args[2] = "emerge";
+    args[3] = strtok (commexand, " ");
     
     int i;
     for (i=4; 1; i++) {
