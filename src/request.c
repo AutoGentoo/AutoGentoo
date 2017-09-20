@@ -76,12 +76,13 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     args[0] = "chroot";
     args[1] = root;
     args[2] = "/bin/bash";
-    args[3] = "-c",
-    args[4] = strtok (command, " ");
+    args[3] = "-c";
+    args[4] = "emerge";
+    args[5] = strtok (command, " ");
     
     
     int i;
-    for (i=5; 1; i++) {
+    for (i=6; 1; i++) {
         args[i] = strtok (NULL, " "); // Will null out the last one
         if (args[i] == NULL) break;
     }
