@@ -68,18 +68,27 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     */
     printf ("emerge %s\n", root, command);
     
+    /*
     args[0] = "emerge";
     args[1] = strtok (command, " ");
+    */
+    
+    args[0] = "chroot";
+    args[1] = root;
+    args[2] = "/bin/bash";
+    args[3] = "-c",
+    args[4] = strtok (command, " ");
+    
     
     int i;
-    for (i=2; 1; i++) {
+    for (i=5; 1; i++) {
         args[i] = strtok (NULL, " "); // Will null out the last one
         if (args[i] == NULL) break;
     }
     
     pid_t install_pid = fork ();
     if (install_pid == 0) {
-        chdir (root);
+        /*chdir (root);
         if (chroot (root) == -1) {
             printf ("chroot() failed\n");
             exit (-1);
@@ -89,6 +98,10 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
         system ("ls");
         
         execve ("/usr/bin/emerge", (char**) args, NULL);
+        */
+        
+        execve ("/bin/chroot", (char**) args, NULL);
+        
         exit (-1);
     }
     
