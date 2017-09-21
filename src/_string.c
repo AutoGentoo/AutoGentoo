@@ -135,3 +135,15 @@ char * path_normalize(const char *path) {
 
   return copy;
 }
+
+char* removeChar(char* str, char c){
+    char *dst;
+    int i;
+     
+    for ( i = 0; i < strlen(str) && *str != 0; i++, str++ ){
+        if ( *str != c )
+            *dst++ = *str;
+    }
+     
+    return *str;
+}

@@ -61,75 +61,28 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     sprintf (root, "%s/%s/", m_man->root, m_man->clients[sc_no].id);
     strcpy (root, path_normalize (root));
     
-    /*
-    strcpy (args[0], "chroot");
-    strcpy (args[1], root);
-    strcpy (args[2], "/usr/bin/emerge");
-    */
-    
-    
-    //args[0] = "emerge";
-    args[0] = strtok (command, " ");
-    
     int i;
-    for (i=1; 1; i++) {
+    for (i=2; 1; i++) {
         args[i] = strtok (NULL, " "); // Will null out the last one
         if (args[i] == NULL) break;
     }
     
-    /*
-    args[0] = "chroot";
-    args[1] = root;
-    args[2] = "/bin/bash";
-    args[3] = "-c";
-    args[4] = "emerge";
-    args[5] = strtok (command, " ");
-    
-    
-    int i;
-    for (i=6; 1; i++) {
-        args[i] = strtok (NULL, " "); // Will null out the last one
-        if (args[i] == NULL) break;
-    }
-    */
-    
-    /*
     pid_t install_pid = fork ();
     if (install_pid == 0) {
-        /*chdir (root);
+        chdir (root);
         if (chroot (root) == -1) {
             printf ("chroot() failed\n");
             exit (-1);
         }
-        system ("source /etc/profile");
-        system ("ldconfig");
-        system ("ls");
-        
-        execve ("/usr/bin/emerge", (char**) args, NULL);
-        /
-        
-        execve ("/bin/chroot", (char**) args, NULL);
-        
-        exit (-1);
-    }*/
-    
-    char cat_args[1024];
-    int j;
-    for (j = 0; args[j] != NULL; j++) {
-        strcat (cat_args, "'");
-        strcat (cat_args, args[j]);
-        strcat (cat_args, "' ");
+        char system_call[2048];
+        sprintf (system_call, "emerge %s", command);
+        printf ("chroot %s\n%s", root, system_call);
+        exit(system (system_call));
     }
     
-    char _full_command[2048];
-    sprintf (_full_command, "chroot %s emerge %s", root, cat_args);
-    printf ("%s\n", _full_command);
-    
-    int install_ret = system (_full_command);
-    
-    /*int install_ret;
+    int install_ret;
     waitpid (install_pid, &install_ret, 0); // Wait until finished
-    */
+    
     if (install_ret != 0) {
         return INTERNAL_ERROR;
     }

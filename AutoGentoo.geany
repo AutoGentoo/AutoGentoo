@@ -28,7 +28,7 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=12
+current_page=11
 FILE_NAME_0=1565;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserve_client.h;0;4
 FILE_NAME_1=1854;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Fchroot.c;0;4
 FILE_NAME_2=1537;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fchroot.h;0;4
@@ -41,7 +41,6 @@ FILE_NAME_8=844;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2F_st
 FILE_NAME_9=1386;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fserver.h;0;4
 FILE_NAME_10=1461;C;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Fsrc%2Femerge.c;0;4
 FILE_NAME_11=0;C++;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2Fgit%2FAutoGentoo%2Finclude%2Fresponse.h;0;4
-FILE_NAME_12=1532;Sh;0;EUTF-8;0;1;0;%2Fhome%2Fatuser%2FDownloads%2Fandroid-studio%2Fbin%2Fstudio.sh;0;2
 
 [VTE]
 last_dir=/home/atuser/Documents

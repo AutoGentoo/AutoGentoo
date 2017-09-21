@@ -34,5 +34,6 @@ int _strtok_n (char* s, char delim);
 void gen_id (char* id, int len);
 int cpy(char *src, char *dest);
 char* path_normalize(const char *path);
+char* removeChar(char* str, char c);
 
 #endif
