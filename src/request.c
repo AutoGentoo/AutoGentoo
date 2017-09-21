@@ -76,7 +76,9 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
         }
         char system_call[2048];
         sprintf (system_call, "emerge %s", command);
-        printf ("chroot %s\n%s", root, system_call);
+        printf ("chroot %s\n%s\n\n", root, system_call);
+        printf ("---STARTING EMERGE---\n");
+        fflush (stdout);
         exit(system (system_call));
     }
     
