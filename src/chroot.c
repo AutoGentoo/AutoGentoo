@@ -76,7 +76,6 @@ void chroot_main () {
     }
     while ((ent = getmntent(mnts_stream)) != NULL) {
         strcpy (sys_mnts->mounts[sys_mnts->mount_c], ent->mnt_dir);
-        printf ("current: %s\n", sys_mnts->mounts[sys_mnts->mount_c]);
         sys_mnts->mount_c++;
     }
     endmntent(mnts_stream);
@@ -143,7 +142,6 @@ mount_status mount_check (struct chroot_mount* mnt, char* target) {
     int i;
     fflush (stdout);
     
-    printf ("dest: %s\n", dest_temp);
     for (i=0; i!=sys_mnts->mount_c; i++) {
         if (strcmp (dest_temp, sys_mnts->mounts[i]) == 0) {
             mnt->stat = IS_MOUNTED;
@@ -164,8 +162,6 @@ void chroot_mount (struct chroot_client* client) {
     int i;
     for (i=0; i!=client->mount_c; i++) {
         mount_status got = mount_check (&client->mounts[i], target);
-        printf ("%s %s/%s %d\n", client->mounts[i].parent, target, client->mounts[i].child, got);
-        fflush (stdout);
         if (got != NOT_MOUNTED) {
             continue;
         }
