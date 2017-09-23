@@ -52,7 +52,7 @@ int main (int argc, char** argv) {
             continue;
         }
         
-        if (strncmp (line + 1, "ebuild", 6) != 0) {
+        if (strncmp (line + 1, "ebuild", 6) != 0 && line[10] == 'R') {
             continue;
         }
         char pkgbuf[128];
