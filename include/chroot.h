@@ -89,22 +89,14 @@ struct chroot_client {
 
 extern volatile struct process_t* process_buffer;
 
-void handle_sig_USR1 (int sig); // Handle process request
-void handle_sig_USR2 (int sig); // Kill process
-
-response_t process_handle (struct process_t*);
-response_t process_kill (_pid_c);
-
 struct chroot_client* chroot_new (struct manager* m_man, int sc_no);
 void eselect_locale (char* loc);
 void chroot_mount (struct chroot_client* client);
-pid_t chroot_start (struct chroot_client* client);
+
 void chroot_main ();
 mount_status mount_check (struct chroot_mount* mnt, char* target);
 
 void type_mount (char* new_root, char* src, char* dest, char* type);
 void bind_mount (char* new_root, char* src, char* dest, int recursive);
-
-struct process_t* new_process (struct chroot_client* chroot, char* request, int sockfd);
 
 #endif

@@ -34,32 +34,6 @@ volatile static int* current_proc_id;
 volatile struct process_t* process_buffer = NULL;
 static struct system_mounts* sys_mnts;
 
-void handle_sig_USR1 (int sig) { // Handle process request
-    
-}
-
-void handle_sig_USR2 (int sig) {
-    if (process_buffer->status != RUNNING) {
-        rsend (process_buffer->socket_fd, SERVICE_UNAVAILABLE);
-        return;
-    }
-    response_t res = kill (process_buffer->pid, SIGINT) ? INTERNAL_ERROR : OK;
-    rsend (process_buffer->socket_fd, res);
-    process_buffer->returned = res;
-    process_buffer = NULL;
-}
-
-response_t process_handle (struct process_t* proc) {
-    return system (proc->command) ? INTERNAL_ERROR : OK;
-}
-
-response_t process_kill (_pid_c pid_kill) {
-    if (kill (pid_kill, SIGKILL) != 0) {
-        return INTERNAL_ERROR;
-    }
-    return OK;
-}
-
 void chroot_main () {
     current_proc_id = (int*) mmap(NULL, sizeof (int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *current_proc_id = 0;
@@ -201,67 +175,4 @@ LANG=\"%s\"", loc);
         fputs(buffer, fp);
         fclose(fp);
     }
-}
-
-pid_t chroot_start (struct chroot_client* client) {
-    pid_t buf_pid = fork ();
-    if (buf_pid == -1) {
-        exit (1);
-    }
-    if (buf_pid != 0) {
-        printf ("Started chroot on %d\n", buf_pid);
-        return (client->pid = buf_pid);
-    }
-    // Inside the chroot fork;
-    char __ROOT[256];
-    sprintf (__ROOT, "%s/%s/", client->m_man->root, client->m_man->clients[client->sc_no].id);
-    if (chroot (__ROOT) == -1) {
-        exit (1);
-    }
-    system ("ldconfig"); // Make sure gcc knows where the libraries are
-    system ("source /etc/profile"); // We are in a new environment now
-    system ("ls /");
-    // Handle signals given by m_install and m_remove
-    sigset_t mask, oldmask;
-    sigemptyset (&mask);
-    sigaddset (&mask, SIGUSR1);
-    int usr_interrupt;
-    while (1) {
-        usr_interrupt = 0;
-        sigprocmask (SIG_BLOCK, &mask, &oldmask);
-        while (!usr_interrupt)
-            sigsuspend (&oldmask);
-        sigprocmask (SIG_UNBLOCK, &mask, NULL);
-        pid_t buf_pid = fork ();
-        if (buf_pid == -1) {
-            exit (-1);
-        }
-        if (buf_pid > 0) {
-            process_buffer->pid = buf_pid;
-            printf ("[%d] %s\n", process_buffer->pid, process_buffer->command);
-            continue;
-        }
-        // Inside process
-        process_buffer->status = RUNNING;
-        response_t res = process_handle ((struct process_t*)process_buffer);
-        rsend (process_buffer->socket_fd, res);
-        process_buffer->status = DEFUNCT;
-        process_buffer = NULL;
-        exit (0);
-    }
-}
-
-struct process_t* new_process (struct chroot_client* chroot, char* request, int sockfd) {
-    chroot->proc_list[chroot->proc_c] = mmap(NULL, sizeof (struct process_t), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    struct process_t* n_proc = chroot->proc_list[chroot->proc_c];
-    strcpy (n_proc->command, request);
-    n_proc->proc_id = *current_proc_id;
-    n_proc->parent = chroot;
-    n_proc->pid = -1;
-    n_proc->socket_fd = sockfd;
-    n_proc->status = WAITING;
-    
-    *current_proc_id++;
-    chroot->proc_c++;
-    return n_proc;
 }
