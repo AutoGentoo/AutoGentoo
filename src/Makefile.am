@@ -27,6 +27,6 @@ testserver_SOURCES = testserver.c
 testserver_LDADD = libautogentoo.la
 
 lib_LTLIBRARIES = libautogentoo.la
-libautogentoo_la_SOURCES = serve_client.c list.c server.c response.c request.c emerge.c _string.c ip_convert.c ip_scan.c chroot.c
+libautogentoo_la_SOURCES = serve_client.c list.c server.c response.c request.c emerge.c _string.c ip_convert.c ip_scan.c chroot.c kernel.c hash.c
 libautogentoo_la_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/  -Wno-unused-result
 libautogentoo_la_LDFLAGS = -version-info 0

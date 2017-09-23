@@ -23,6 +23,7 @@
  
 #include <autogentoo.h>
 #include <sys/mman.h>
+#include <chroot.h>
 
 char IS_CLIENT = 0;
 
