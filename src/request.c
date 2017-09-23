@@ -61,7 +61,7 @@ response_t m_install (char* command, struct manager * m_man, int sc_no) {
     
     char buff[512];
     strncpy (buff, command, 512 >= strlen(command) ? strlen(command) : 512);
-    args[1] = strtok (command, " ");
+    args[1] = strtok (buff, " ");
     
     int i;
     for (i=2; i <= 128; i++) {
