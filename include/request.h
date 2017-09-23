@@ -45,14 +45,14 @@ struct client_request {
 
 struct method_s {
     request_t type;
-    response_t (*method)(char*, struct manager *, int sc_no, char*, int);
+    response_t (*method)(char*, struct manager *, int sc_no);
 };
 
 extern struct method_s methods [];
 
 response_t __m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd); // Install from outside chroot
-response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd);
-response_t m_remove  (char* command, struct manager * m_man, int sc_no, char* ip, int fd);
+response_t m_install (char* command, struct manager * m_man, int sc_no);
+response_t m_remove  (char* command, struct manager * m_man, int sc_no);
 
 response_t exec_method (char *type, struct manager * man, char* command, char *ip, int fd);
 

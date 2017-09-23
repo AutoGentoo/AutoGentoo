@@ -50,7 +50,7 @@ response_t __m_install (char* command, struct manager * m_man, int sc_no, char* 
     return OK;
 }
 
-response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
+response_t m_install (char* command, struct manager * m_man, int sc_no) {
     char root[256];
     char *args[128];
     
@@ -59,6 +59,8 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     
     args[0] = "emerge";
     
+    char buff[512];
+    strncpy (buff, command, 512 >= strlen(command) ? strlen(command) : 512);
     args[1] = strtok (command, " ");
     
     int i;
@@ -78,7 +80,7 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
         printf ("chroot %s\nemerge %s\n\n", root, command);
         printf ("---STARTING EMERGE---\n");
         fflush (stdout);
-        execv ("/usr/bin/emerge", args);
+        execv ("emerge", args);
         exit(-1);
     }
     
@@ -91,7 +93,7 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     return OK;
 }
 
-response_t m_remove (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
+response_t m_remove (char* command, struct manager * m_man, int sc_no) {
     char cmd[2048];
     char opts[1024];
     emergec (opts);
@@ -128,7 +130,7 @@ response_t exec_method (char *type, struct manager * man, char* command, char *i
             if (client_no < 0) {
                 return UNAUTHORIZED;
             }
-            return methods[i].method (command, man, client_no, ip, fd);
+            return methods[i].method (command, man, client_no);
         }
     }
     // Method could not be found
