@@ -61,8 +61,10 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     sprintf (root, "%s/%s/", m_man->root, m_man->clients[sc_no].id);
     strcpy (root, path_normalize (root));
     
+    args[0] = "emerge";
+    
     int i;
-    for (i=2; 1; i++) {
+    for (i=1; 1; i++) {
         args[i] = strtok (NULL, " "); // Will null out the last one
         if (args[i] == NULL) break;
     }
@@ -74,12 +76,11 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
             printf ("chroot() failed\n");
             exit (-1);
         }
-        char system_call[2048];
-        sprintf (system_call, "emerge %s", command);
-        printf ("chroot %s\n%s\n\n", root, system_call);
+        
+        printf ("chroot %s\nemerge %s\n\n", root, command);
         printf ("---STARTING EMERGE---\n");
         fflush (stdout);
-        exit(system (system_call));
+        execve ("/usr/bin/emerge", args, NULL);
     }
     
     int install_ret;
