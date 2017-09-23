@@ -121,6 +121,7 @@ void server_respond (int n, struct manager * m_man)
         reqline[1] = strtok(NULL, " \t");
         reqline[2] = strtok(NULL, "\r\n");
         ip = get_ip_from_fd (clients[n]);
+        printf ("[%s](%s, %s)\n", ip, reqline[0], reqline[1]);
         if (reqline[2] == NULL) {
             res = BAD_REQUEST;
             rsend (clients[n], BAD_REQUEST);
