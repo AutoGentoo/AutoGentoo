@@ -63,8 +63,10 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     
     args[0] = "emerge";
     
+    args[1] = strtok (command, " ");
+    
     int i;
-    for (i=1; 1; i++) {
+    for (i=2; 1; i++) {
         args[i] = strtok (NULL, " "); // Will null out the last one
         if (args[i] == NULL) break;
     }
