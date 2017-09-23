@@ -269,7 +269,7 @@ struct link_srv get_link_str (char* s) {
     int i;
     for (i=0; i!=sizeof(link_methods) / sizeof (struct link_srv); i++) {
         if (strcmp (s, link_methods[i].ID) == 0) {
-            return get_link_srv (link_methods[i].command);
+            return link_methods[i];
         }
     }
     return (struct link_srv) {-1, 0}; // Invalid but go anyway
