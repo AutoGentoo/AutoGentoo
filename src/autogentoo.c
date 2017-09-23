@@ -24,8 +24,10 @@
 #include <autogentoo.h>
 #include <sys/mman.h>
 #include <chroot.h>
-
-char IS_CLIENT = 0;
+#include <serve_client.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 void _getcwd (char* out, size_t size) {
     if (getcwd(out, size) == NULL)
@@ -55,7 +57,7 @@ struct _opts {
     char f[64];
     unsigned d:1;
     unsigned s:1;
-    unsigned c:1;
+    unsigned c:2; // Bit field to 2 because we might as well complete the padding
     request_t t;
     char atom[64];
     char a[32];
@@ -68,8 +70,9 @@ int main (int argc, char ** argv) {
     struct client_request req;
     req.type = -1;
     int c;
+    int a = 0; // Address specified
     
-    while ((c = getopt (argc, argv, "p:f:dhsci:I:r:R:a:")) != -1) {
+    while ((c = getopt (argc, argv, "p:f:dhsci:r:a:")) != -1) {
         switch (c) {
             case 'p':
                 strcpy(__opts.p, optarg);
@@ -82,7 +85,6 @@ int main (int argc, char ** argv) {
                 break;
             case 's':
                 __opts.s = 1;
-                IS_CLIENT = 0;
                 break;
             case 'h':
                 printf ("AutoGentoo help page\n\
@@ -96,44 +98,34 @@ Server Options (-s):\n\
 \n\
 Client Options\n\
   -c\t\tSetup /etc/portage/make.conf for portage binhost and flags\n\
-  -i pkg\tInstall package on client\n\
-  -I pkg\tInstall package only on server. use for\n\
+  -i pkg\tInstall package (in the build chroot)\n\
   \t\tbuild dependencies only such as autotools\n\
-  -r pkg\tRemove package from the client\n\
-  -R pkg\tRemove package from both client and server\n\
-  -a address\tIP Address of server (must input)\n\
+  -r pkg\tRemove package (in the build chroot)\n\
+  -a address\tConfigure the build server ip address\n\
+\n\
+All changes to the client must be made through emerge\n\
 ");
                 return 0;
                 break;
             case 'a':
                 strcpy (__opts.a, optarg);
+                a = 1;
                 break;
             case 'c':
                 __opts.c = 1;
-                IS_CLIENT = 1;
                 break;
             case 'i':
                 strcpy(__opts.atom, optarg);
                 __opts.t = install;
                 set_request (&req, __opts.t, __opts.atom);
                 break;
-            case 'I':
-                strcpy(__opts.atom, optarg);
-                __opts.t = install_s;
-                set_request (&req, __opts.t, __opts.atom);
-                break;
             case 'r':
-                strcpy (__opts.atom, optarg);
-                __opts.t = remove_c;
-                set_request (&req, __opts.t, __opts.atom);
-                break;
-            case 'R':
                 strcpy (__opts.atom, optarg);
                 __opts.t = _remove;
                 set_request (&req, __opts.t, __opts.atom);
                 break;
             case '?':
-                if (optopt == 'r' || optopt == 'f' || optopt == 'i' || optopt == 'I' || optopt == 'r' || optopt == 'R' || optopt == 'a')
+                if (optopt == 'r' || optopt == 'f' || optopt == 'i'  || optopt == 'r' || optopt == 'a')
                     fprintf (stderr, "Option -%c requires an argument.\n", optopt);
                 else if (isprint (optopt))
                     fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -165,6 +157,37 @@ Client Options\n\
     }
     else {
         // Client
+        char s_ip[32];
+        struct passwd *pw = getpwuid(getuid());
+        
+        const char *homedir = pw->pw_dir;
+        
+        char configpath[256];
+        char new_dir[256];
+        sprintf (configpath, "%s/.config/autogentoo/ip.config", homedir);
+        sprintf (new_dir, "%s/.config/autogentoo", homedir);
+        
+        _mkdir (new_dir);
+        
+        if (!a) { // Address not specified
+            if (access (configpath, F_OK) != -1) {
+                FILE* ip_c_fd = fopen (configpath, "r");
+                fread (s_ip, sizeof (char), 32, ip_c_fd);
+                fclose (ip_c_fd);
+            }
+            else {
+                printf ("An address was not configured or specified\n");
+                return 1;
+            }
+        }
+        else {
+            strcpy (s_ip, __opts.a);
+            FILE* ip_c_fd = fopen (configpath, "w+");
+            fwrite (s_ip, sizeof (char), 32, ip_c_fd);
+            fclose (ip_c_fd);
+            printf ("Saved ip address successfuly\n");
+        }
+        
         if ((int)req.type == -1) {
             printf ("Nothing to do. Exiting...\n");
             return 0;
@@ -172,7 +195,6 @@ Client Options\n\
         
         char _hostname[100]; // To find the ip
         char _ip [16]; // current ip to define the range
-        char s_ip[32];
         gethostname(_hostname, (size_t)100);
         hostname_to_ip(_hostname , _ip);
         
@@ -182,19 +204,12 @@ Client Options\n\
             fflush(stdout);
             strcpy (s_ip, "127.0.0.1");
         }
-        else {
-            strcpy (s_ip, __opts.a);
-        }
+        
+        
         response_t res;
         
-        if (req.type != remove_c) { // A client only remove
-            char message[256];
-            res = ask_server (s_ip, req, &message[0]);
-        }
-        
-        if (req.type > 0) {
-            res = exec_method_client (req.type, req.atom);
-        }
+        char message[256];
+        res = ask_server (s_ip, req, &message[0]);
         
         printf ("%s\n", res.message);
     }

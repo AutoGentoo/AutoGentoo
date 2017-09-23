@@ -32,10 +32,8 @@
 #include <autogentoo.h>
 
 typedef enum {
-    install_s,  // Install only on the server (used for build tools)
-    _remove,   // Remove package from server removes from client if possible
-    install,  // Install on the client and server
-    remove_c,   // Remove from the client
+    _remove,   // Remove package from server
+    install,  // Install on the server
 } request_t;
 
 extern char *request_names[];
@@ -56,14 +54,12 @@ response_t __m_install (char* command, struct manager * m_man, int sc_no, char* 
 response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd);
 response_t m_remove  (char* command, struct manager * m_man, int sc_no, char* ip, int fd);
 
-response_t exec_method_client (request_t type, char * command);
 response_t exec_method (char *type, struct manager * man, char* command, char *ip, int fd);
 
+void serve_req(char* ip, char* req);
 response_t ask_server (char* ip, struct client_request req, char* message);
 
-#define INSTALL_S (struct method_s) {install_s,m_install}
 #define REMOVE (struct method_s) {_remove,m_remove}
 #define INSTALL (struct method_s) {install,m_install}
-#define REMOVE_C (struct method_s) {remove_c,m_remove}
 
 #endif

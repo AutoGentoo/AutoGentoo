@@ -49,6 +49,7 @@ response_t res_list[] = {
 };
 
 response_t get_res (response_nt x) {
+    fflush (stdout);
     int i;
     for (i=0;i != sizeof (res_list) / sizeof (res_list[0]); i++) {
         if (res_list[i].code == x) {

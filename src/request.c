@@ -28,17 +28,13 @@
 #include <unistd.h>
 
 char *request_names[] = {
-    "INSTALL_S",
     "REMOVE",
     "INSTALL",
-    "REMOVE_C"
 };
 
 struct method_s methods [] = {
-    INSTALL_S,
     REMOVE,
     INSTALL,
-    REMOVE_C,
 };
 
 response_t __m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
@@ -139,7 +135,7 @@ response_t exec_method (char *type, struct manager * man, char* command, char *i
     return NOT_IMPLEMENTED;
 }
 
-void serve_req(char* ip, char* req, char *message) {
+void serve_req(char* ip, char* req) {
     int sockfd, n;
     struct sockaddr_in server;
     
@@ -161,24 +157,24 @@ void serve_req(char* ip, char* req, char *message) {
     
     write (sockfd, req, strlen(req));
     
-    char _m[256];
-    recv (sockfd, _m, sizeof (_m), 0);
+    int length = 0;
+    char buffers[256][32];
+    int cread;
+    int i;
     
-    strcpy (message, _m);
+    for (i=0; cread = recv (sockfd, buffers[i], 256, 0) != 0 && i <= 32; i++) {
+        length += cread;
+        printf ("%s", buffers[i]);
+    }
+    fflush (stdout);
+    
     close (sockfd);
 }
 
 response_t ask_server (char* ip, struct client_request req, char *message) {
     char buffer[256];
-    char _m[256];
-    sprintf (buffer, "CMD %d %s", (int)req.type, req.atom);
+    sprintf (buffer, "CMD %s %s", request_names[(int)req.type], req.atom);
+    serve_req (ip, buffer);
     
-    serve_req (ip, buffer, &_m[0]);
-    
-    response_nt res_t;
-    
-    strtok (_m, " ");
-    sscanf (strtok (NULL, " "), "%d", (int*)&res_t);
-    strcpy (message, _m);
-    return get_res (res_t);
+    return get_res (HTTP_OK);
 }
