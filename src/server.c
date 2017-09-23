@@ -115,13 +115,13 @@ void server_respond (int n, struct manager * m_man)
         ip = get_ip_from_fd (clients[n]);
         printf ("[%s](%s, %s)\n", ip, reqline[0], reqline[1]);
         
-        clients[n] = 1;
         // Create buffs to redirect STDOUT and STDERR
         stdout_b = dup (STDOUT_FILENO);
         stderr_b = dup (STDERR_FILENO);
         dup2(clients[n], STDOUT_FILENO);
         dup2(clients[n], STDERR_FILENO);
         close(clients[n]);
+        clients[n] = 1;
         
         if (reqline[2] == NULL) {
             res = BAD_REQUEST;
