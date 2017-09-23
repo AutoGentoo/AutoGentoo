@@ -83,6 +83,7 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
         printf ("---STARTING EMERGE---\n");
         fflush (stdout);
         execv ("/usr/bin/emerge", args);
+        exit(-1);
     }
     
     int install_ret;
