@@ -56,7 +56,7 @@ response_t __m_install (char* command, struct manager * m_man, int sc_no, char* 
 
 response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip, int fd) {
     char root[256];
-    char *args[32];
+    char *args[128];
     
     sprintf (root, "%s/%s/", m_man->root, m_man->clients[sc_no].id);
     strcpy (root, path_normalize (root));
@@ -66,7 +66,7 @@ response_t m_install (char* command, struct manager * m_man, int sc_no, char* ip
     args[1] = strtok (command, " ");
     
     int i;
-    for (i=2; 1; i++) {
+    for (i=2; i <= 128; i++) {
         args[i] = strtok (NULL, " "); // Will null out the last one
         if (args[i] == NULL) break;
     }
