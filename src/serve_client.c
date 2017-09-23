@@ -244,15 +244,12 @@ struct link_srv link_methods [] = {
     L_ACTIVATE,
     L_GETCLIENT,
     L_STAGE1,
-    L_UNOSYNC,
-    L_UPDATE,
     L_EDIT,
     L_GETCLIENTS,
     L_GETACTIVE,
     L_GETSPEC,
     L_SYNC,
     L_SCREMOVE,
-    L_REGEN,
     L_MNTCHROOT
 };
 

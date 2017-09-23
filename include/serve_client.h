@@ -105,15 +105,12 @@ typedef enum {
     ACTIVATE, // Active ip to id
     GETCLIENT, // Get client information (CFLAGS, CHOST etc.)
     STAGE1, // Emerge system base packages
-    UNOSYNC, // emerge -uDN @world
-    UPDATE, // emerge --sync && emerge -uDN @world
     EDIT, // Edit your make.conf and serve_client configuration
     GETCLIENTS, // Not to be confused with GETCLIENTS, first return line will be client_c followed by \n delimed ids
     GETACTIVE, // Returns id of active client from the ip of request
     GETSPEC, // Returns specs about the build server
     SYNC, // Run emerge --sync
     SCREMOVE, // Id to remove
-    REGEN, // Regenerate libraries with emerge -q @preserved-rebuild
     MNTCHROOT // Mount chroot directories and start the thread
 } serve_c;
 
@@ -130,15 +127,12 @@ extern struct link_srv link_methods [];
 #define L_ACTIVATE (struct link_srv) {ACTIVATE, 1, "ACTIVATE"} // ID of serve_client
 #define L_GETCLIENT (struct link_srv) {GETCLIENT, 1, "GETCLIENT"} // Ask for id
 #define L_STAGE1 (struct link_srv) {STAGE1, 0, "STAGE1"}
-#define L_UNOSYNC (struct link_srv) {UNOSYNC, 0, "UNOSYNC"}
-#define L_UPDATE (struct link_srv) {UPDATE, 0, "UPDATE"}
 #define L_EDIT (struct link_srv) {EDIT, 6, "EDIT"}
 #define L_GETCLIENTS (struct link_srv) {GETCLIENTS, 0, "GETCLIENTS"}
 #define L_GETACTIVE (struct link_srv) {GETACTIVE, 0, "GETACTIVE"}
 #define L_GETSPEC (struct link_srv) {GETSPEC, 0, "GETSPEC"}
 #define L_SYNC (struct link_srv) {SYNC, 0, "SYNC"}
 #define L_SCREMOVE (struct link_srv) {SCREMOVE, 1, "SCREMOVE"}
-#define L_REGEN (struct link_srv) {REGEN, 0, "REGEN"}
 #define L_MNTCHROOT (struct link_srv) {MNTCHROOT, 0, "MNTCHROOT"}
 
 struct link_srv get_link_srv (serve_c);

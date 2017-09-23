@@ -163,7 +163,7 @@ void server_respond (int n, struct manager * m_man)
         }
         else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
             //int exec_sock = dup(clients[n]);
-            res = exec_method (reqline[1], m_man, reqline[2], ip, clients[n]);
+            res = exec_method (reqline[1], m_man, reqline[2], ip);
             rsend (clients[n], res);
         }
         else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
@@ -315,19 +315,7 @@ void server_respond (int n, struct manager * m_man)
                         sent = 1;
                     }
                 }
-                else if (rt == UNOSYNC) {
-                    sc_no = get_client_from_ip (m_man, ip);
-                    if (sc_no > -1) {
-                        
-                        res = m_install ("-uDN @world", m_man, sc_no);
-                        rsend (clients[n], res);
-                    }
-                    else {
-                        res = FORBIDDEN;
-                        rsend (clients[n], res); // Write to stdout instead of socket
-                    }
-                    sent = 1;
-                }
+                
                 else if (rt == SYNC) {
                     if (system("emerge --sync") != 0) {
                         res = INTERNAL_ERROR;
@@ -337,19 +325,6 @@ void server_respond (int n, struct manager * m_man)
                     }
 
                     rsend (clients[n], res); // Write to stdout instead of socket
-                    sent = 1;
-                }
-                else if (rt == UPDATE) {
-                    sc_no = get_client_from_ip (m_man, ip);
-                    if (sc_no > -1) {
-                        system ("emerge --sync");
-                        res = m_install ("-uDN @world", m_man, sc_no);
-                        sent = 1;
-                    }
-                    else {
-                        res = FORBIDDEN;
-                        rsend (clients[n], res); // Write to stdout instead of socket
-                    }
                     sent = 1;
                 }
                 else if (rt == EDIT) {
@@ -434,21 +409,6 @@ void server_respond (int n, struct manager * m_man)
                         }
                     }
                 }
-                else if (rt == REGEN) {
-                    sc_no = get_client_from_ip (m_man, ip);
-                    if (sc_no > -1) {
-                        
-                        int m_install_sock = dup (clients[n]);
-                        res = m_install ("@preserved-rebuild", m_man, sc_no);
-                        
-                        sent = 1;
-                    }
-                    else {
-                        res = FORBIDDEN;
-                        rsend (clients[n], res);
-                        sent = 1;
-                    }
-                }
                 else if (rt == MNTCHROOT) {
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
@@ -469,6 +429,11 @@ void server_respond (int n, struct manager * m_man)
                         rsend (clients[n], res);
                         sent = 1;
                     }
+                }
+                else {
+                    res = METHOD_NOT_ALLOWED;
+                    rsend (clients[n], res);
+                    sent = 1;
                 }
             }
             if (sent == 0) {

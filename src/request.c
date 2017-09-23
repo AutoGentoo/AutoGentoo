@@ -125,7 +125,7 @@ response_t exec_method_client (request_t type, char * command) {
     return OK;
 }
 
-response_t exec_method (char *type, struct manager * man, char* command, char *ip, int fd) {
+response_t exec_method (char *type, struct manager * man, char* command, char *ip) {
     int i;
     for (i=0; i != sizeof (methods) / sizeof (struct method_s); i++) {
         if (strcmp(request_names[i], type) == 0) {

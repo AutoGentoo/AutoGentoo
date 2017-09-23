@@ -54,7 +54,7 @@ response_t __m_install (char* command, struct manager * m_man, int sc_no, char* 
 response_t m_install (char* command, struct manager * m_man, int sc_no);
 response_t m_remove  (char* command, struct manager * m_man, int sc_no);
 
-response_t exec_method (char *type, struct manager * man, char* command, char *ip, int fd);
+response_t exec_method (char *type, struct manager * man, char* command, char *ip);
 
 void serve_req(char* ip, char* req);
 response_t ask_server (char* ip, struct client_request req, char* message);
