@@ -62,7 +62,6 @@ response_t m_install (char* command, struct manager * m_man, int sc_no) {
     char buff[512];
     strncpy (buff, command, 512 >= strlen(command) ? strlen(command) : 512);
     args[1] = strtok (buff, " ");
-    
     int i;
     for (i=2; i <= 128; i++) {
         args[i] = strtok (NULL, " "); // Will null out the last one
@@ -71,7 +70,10 @@ response_t m_install (char* command, struct manager * m_man, int sc_no) {
     
     pid_t install_pid = fork ();
     if (install_pid == 0) {
-        chdir (root);
+        if (chdir (root) == -1) {
+            printf ("chdir() failed\n");
+            exit (-1);
+        }
         if (chroot (root) == -1) {
             printf ("chroot() failed\n");
             exit (-1);
