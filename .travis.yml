@@ -10,3 +10,4 @@ addons:
      - libtool
      - autoconf
      - automake
+     - libssl-dev
