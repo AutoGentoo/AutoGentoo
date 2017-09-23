@@ -29,7 +29,11 @@
 ssize_t rsend (int fd, response_t code) {
     char message[40];
     sprintf (message, "HTTP/1.0 %d %s\n", code.code, code.message);
-    return write(fd, message, 14 + code.len);
+    FILE * newfile = fdopen(fd, "rw");
+    fflush (newfile);
+    ssize_t res = write(fd, message, 14 + code.len);
+    
+    return ;
 }
 
 response_t res_list[] = {
@@ -49,7 +53,6 @@ response_t res_list[] = {
 };
 
 response_t get_res (response_nt x) {
-    fflush (stdout);
     int i;
     for (i=0;i != sizeof (res_list) / sizeof (res_list[0]); i++) {
         if (res_list[i].code == x) {
