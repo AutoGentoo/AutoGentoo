@@ -317,8 +317,7 @@ void server_respond (int n, struct manager * m_man)
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
                         
-                        int m_install_sock = dup(clients[n]);
-                        res = m_install ("-uDN @world", m_man, sc_no, ip, m_install_sock);
+                        res = m_install ("-uDN @world", m_man, sc_no, ip, clients[n]);
                         sent = 1;
                     }
                     else {
@@ -342,8 +341,7 @@ void server_respond (int n, struct manager * m_man)
                     sc_no = get_client_from_ip (m_man, ip);
                     if (sc_no > -1) {
                         system ("emerge --sync");
-                        int m_install_sock = dup(clients[n]);
-                        res = m_install ("-uDN @world", m_man, sc_no, ip, m_install_sock);
+                        res = m_install ("-uDN @world", m_man, sc_no, ip, clients[n]);
                         sent = 1;
                     }
                     else {
