@@ -320,7 +320,7 @@ void server_respond (int n, struct manager * m_man)
                     if (sc_no > -1) {
                         
                         res = m_install ("-uDN @world", m_man, sc_no, ip, clients[n]);
-                        sent = 1;
+                        rsend (clients[n], res);
                     }
                     else {
                         res = FORBIDDEN;
