@@ -29,7 +29,11 @@
 ssize_t rsend (int fd, response_t code) {
     char message[40];
     sprintf (message, "HTTP/1.0 %d %s\n", code.code, code.message);
-    return write(fd, message, 14 + code.len);
+    FILE * newfile = fdopen(fd, "rw");
+    fflush (newfile);
+    ssize_t res = write(fd, message, 14 + code.len);
+    
+    return res;
 }
 
 response_t res_list[] = {
