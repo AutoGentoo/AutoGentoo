@@ -90,19 +90,11 @@ void server_respond (int n, struct manager * m_man)
 
     char *ip;
     response_t res;
+    
+    int stdout_b, stderr_b;
+    int b_client = clients[n];
 
     memset((void*)mesg, (int)'\0', 2048);
-    
-    // Create buffs to redirect STDOUT and STDERR
-    int stdout_b, stderr_b;
-    stdout_b = dup (STDOUT_FILENO);
-    stderr_b = dup (STDERR_FILENO);
-    dup2(clients[n], STDOUT_FILENO);
-    dup2(clients[n], STDERR_FILENO);
-    close(clients[n]);
-    
-    int b_client = clients[n];
-    clients[n] = 1;
     
     rcvd = recv(clients[n], mesg, 2048, 0);
     int __error = 0;
@@ -122,6 +114,15 @@ void server_respond (int n, struct manager * m_man)
         reqline[2] = strtok(NULL, "\r\n");
         ip = get_ip_from_fd (clients[n]);
         printf ("[%s](%s, %s)\n", ip, reqline[0], reqline[1]);
+        
+        clients[n] = 1;
+        // Create buffs to redirect STDOUT and STDERR
+        stdout_b = dup (STDOUT_FILENO);
+        stderr_b = dup (STDERR_FILENO);
+        dup2(clients[n], STDOUT_FILENO);
+        dup2(clients[n], STDERR_FILENO);
+        close(clients[n]);
+        
         if (reqline[2] == NULL) {
             res = BAD_REQUEST;
             rsend (clients[n], BAD_REQUEST);
