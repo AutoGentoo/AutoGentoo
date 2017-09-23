@@ -238,24 +238,6 @@ void read_serve (int fd, struct manager * m_man) { // You must malloc this point
     }
 }
 
-struct str_req str_link[] = {
-    S_CREATE,
-    S_INIT,
-    S_ACTIVATE,
-    S_GETCLIENT,
-    S_STAGE1,
-    S_UNOSYNC,
-    S_UPDATE,
-    S_EDIT,
-    S_GETCLIENTS,
-    S_GETACTIVE,
-    S_GETSPEC,
-    S_SYNC,
-    S_SCREMOVE,
-    S_REGEN,
-    S_MNTCHROOT
-};
-
 struct link_srv link_methods [] = {
     L_CREATE,
     L_INIT,
@@ -285,9 +267,9 @@ struct link_srv get_link_srv (serve_c c) {
 
 struct link_srv get_link_str (char* s) {
     int i;
-    for (i=0; i!=sizeof(str_link) / sizeof (struct str_req); i++) {
-        if (strcmp (s, str_link[i].ID) == 0) {
-            return get_link_srv (str_link[i].BIND);
+    for (i=0; i!=sizeof(link_methods) / sizeof (struct link_srv); i++) {
+        if (strcmp (s, link_methods[i].ID) == 0) {
+            return get_link_srv (link_methods[i].command);
         }
     }
     return (struct link_srv) {-1, 0}; // Invalid but go anyway

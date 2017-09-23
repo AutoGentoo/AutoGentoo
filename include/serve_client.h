@@ -120,47 +120,26 @@ typedef enum {
 struct link_srv {
     serve_c command;
     int argc;
-};
-
-struct str_req {
     char* ID;
-    serve_c BIND;
 };
 
 extern struct link_srv link_methods [];
-extern struct str_req str_link[];
 
-#define L_CREATE (struct link_srv) {CREATE, 5}
-#define L_INIT (struct link_srv) {INIT, 0}
-#define L_ACTIVATE (struct link_srv) {ACTIVATE, 1} // ID of serve_client
-#define L_GETCLIENT (struct link_srv) {GETCLIENT, 1} // Ask for id
-#define L_STAGE1 (struct link_srv) {STAGE1, 0}
-#define L_UNOSYNC (struct link_srv) {UNOSYNC, 0}
-#define L_UPDATE (struct link_srv) {UPDATE, 0}
-#define L_EDIT (struct link_srv) {EDIT, 6}
-#define L_GETCLIENTS (struct link_srv) {GETCLIENTS, 0}
-#define L_GETACTIVE (struct link_srv) {GETACTIVE, 0}
-#define L_GETSPEC (struct link_srv) {GETSPEC, 0}
-#define L_SYNC (struct link_srv) {SYNC, 0}
-#define L_SCREMOVE (struct link_srv) {SCREMOVE, 1}
-#define L_REGEN (struct link_srv) {REGEN, 0}
-#define L_MNTCHROOT (struct link_srv) {MNTCHROOT, 0}
-
-#define S_CREATE (struct str_req) {"CREATE", CREATE}
-#define S_INIT (struct str_req) {"INIT", INIT}
-#define S_ACTIVATE (struct str_req) {"ACTIVATE", ACTIVATE}
-#define S_GETCLIENT (struct str_req) {"GETCLIENT", GETCLIENT}
-#define S_STAGE1 (struct str_req) {"STAGE1", STAGE1}
-#define S_UNOSYNC (struct str_req) {"UNOSYNC", UNOSYNC}
-#define S_UPDATE (struct str_req) {"UPDATE", UPDATE}
-#define S_EDIT (struct str_req) {"EDIT", EDIT}
-#define S_GETCLIENTS (struct str_req) {"GETCLIENTS", GETCLIENTS}
-#define S_GETACTIVE (struct str_req) {"GETACTIVE", GETACTIVE}
-#define S_GETSPEC (struct str_req) {"GETSPEC", GETSPEC}
-#define S_SYNC (struct str_req) {"SYNC", SYNC}
-#define S_SCREMOVE (struct str_req) {"SCREMOVE", SCREMOVE}
-#define S_REGEN (struct str_req) {"REGEN", REGEN}
-#define S_MNTCHROOT (struct str_req) {"MNTCHROOT", MNTCHROOT}
+#define L_CREATE (struct link_srv) {CREATE, 5, "CREATE"}
+#define L_INIT (struct link_srv) {INIT, 0, "INIT"}
+#define L_ACTIVATE (struct link_srv) {ACTIVATE, 1, "ACTIVATE"} // ID of serve_client
+#define L_GETCLIENT (struct link_srv) {GETCLIENT, 1, "GETCLIENT"} // Ask for id
+#define L_STAGE1 (struct link_srv) {STAGE1, 0, "STAGE1"}
+#define L_UNOSYNC (struct link_srv) {UNOSYNC, 0, "UNOSYNC"}
+#define L_UPDATE (struct link_srv) {UPDATE, 0, "UPDATE"}
+#define L_EDIT (struct link_srv) {EDIT, 6, "EDIT"}
+#define L_GETCLIENTS (struct link_srv) {GETCLIENTS, 0, "GETCLIENTS"}
+#define L_GETACTIVE (struct link_srv) {GETACTIVE, 0, "GETACTIVE"}
+#define L_GETSPEC (struct link_srv) {GETSPEC, 0, "GETSPEC"}
+#define L_SYNC (struct link_srv) {SYNC, 0, "SYNC"}
+#define L_SCREMOVE (struct link_srv) {SCREMOVE, 1, "SCREMOVE"}
+#define L_REGEN (struct link_srv) {REGEN, 0, "REGEN"}
+#define L_MNTCHROOT (struct link_srv) {MNTCHROOT, 0, "MNTCHROOT"}
 
 struct link_srv get_link_srv (serve_c);
 struct link_srv get_link_str (char*);
