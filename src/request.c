@@ -61,7 +61,8 @@ response_t m_install (char* command, struct manager * m_man, int sc_no) {
     
     char buff[512];
     strncpy (buff, command, 512 >= strlen(command) ? strlen(command) : 512);
-    args[1] = strtok (buff, " ");
+    args[1] = strtok (command, " ");
+    
     int i;
     for (i=2; i <= 128; i++) {
         args[i] = strtok (NULL, " "); // Will null out the last one
@@ -79,10 +80,10 @@ response_t m_install (char* command, struct manager * m_man, int sc_no) {
             exit (-1);
         }
         
-        printf ("chroot %s\nemerge %s\n\n", root, command);
+        printf ("chroot %s\nemerge %s\n\n", root, buff);
         printf ("---STARTING EMERGE---\n");
         fflush (stdout);
-        execv ("emerge", args);
+        execv ("/usr/bin/emerge", args);
         exit(-1);
     }
     
