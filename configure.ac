@@ -10,7 +10,7 @@ AM_PROG_AR
 LT_INIT
 
 AC_SUBST([LIBTOOL_DEPS])
-AC_CHECK_LIB([ssl], [SSL_library_init])
+
 AC_CHECK_LIB([crypto], [SHA256_Init])
 AC_CHECK_LIB([crypto], [SHA256_Final])
 AC_CHECK_LIB([crypto], [SHA256_Update])
