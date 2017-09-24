@@ -29,7 +29,6 @@
 #include <autogentoo.h>
 #include <sys/socket.h>
 
-char * get_ip_from_fd (int);
 void emerges (struct manager * m_man, int sc_no, char* out);
 void emergec (char *out);
 

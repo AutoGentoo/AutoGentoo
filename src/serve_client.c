@@ -41,6 +41,15 @@
 
 static const struct serve_client EMPTY_CLIENT;
 
+char * get_ip_from_fd (int fd) {
+    struct sockaddr_in addr;
+    socklen_t addr_size = sizeof(struct sockaddr_in);
+    int res = getpeername(fd, (struct sockaddr *)&addr, &addr_size);
+    char *ip;
+    ip = inet_ntoa(addr.sin_addr);
+    return ip;
+}
+
 int get_client_from_ip (struct manager * m_man, char* ip) {
     int i;
     for (i=0; i!=m_man->_iptosc_c; i++) {

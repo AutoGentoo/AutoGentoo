@@ -87,6 +87,7 @@ struct manager {
     char _config[256];
 };
 
+char * get_ip_from_fd (int);
 int get_client_from_ip (struct manager * m_man, char* ip);
 int get_client_from_id (struct manager * m_man, char* ip);
 void write_make_conf (struct manager m_man, struct serve_client conf);
