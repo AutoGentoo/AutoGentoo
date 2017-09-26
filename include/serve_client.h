@@ -30,7 +30,6 @@ typedef enum {
     STAGE3, /* Stage3 packages have been installed (chroot_ready).
              * After every restart the state will reset here if higher
              */
-    CHROOT // Directories mounted and ready and chroot is running (run_state)
 } client_state;
 
 struct serve_client { // Chroot environment

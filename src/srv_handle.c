@@ -174,7 +174,6 @@ response_t _STAGE1 (struct manager* m_man, char* ip, int sockfd, char** args, in
     
     m_man->clients[sc_no].chroot = chroot_new (m_man, sc_no);
     chroot_mount (m_man->clients[sc_no].chroot);
-    m_man->clients[sc_no].state = CHROOT;
     
     update_config (m_man);
     
@@ -274,7 +273,6 @@ response_t _MNTCHROOT (struct manager* m_man, char* ip, int sockfd, char** args,
     }
     
     chroot_mount (m_man->clients[sc_no].chroot);
-    m_man->clients[sc_no].state = CHROOT;
     
     update_config (m_man);
     return OK;
