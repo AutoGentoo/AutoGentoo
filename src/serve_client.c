@@ -117,7 +117,7 @@ USE=\"%s\"\n\
 EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --autounmask-continue\"\n\
 \n\
 %s\
-\n\0",  conf.CFLAGS, conf.CXXFLAGS, conf.CHOST,
+\n",  conf.CFLAGS, conf.CXXFLAGS, conf.CHOST,
         conf.PORTAGE_TMPDIR,
         conf.PORTDIR,
         conf.DISTDIR,

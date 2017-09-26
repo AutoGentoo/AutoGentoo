@@ -26,3 +26,6 @@
 #include <openssl/sha.h>
 #include <hash.h>
 
+/*struct machine_spec spec_list[] = {
+    {"arm", }
+};*/

@@ -26,7 +26,7 @@
 #define __AUTOGENTOO_KERNEL_H__
 
 #include <stdio.h>
-#include <openssl/sha.h>
+#include <hash.h>
 
 struct kernel;
 struct kconfig;
@@ -47,8 +47,30 @@ struct kbinary {
 struct kernel {
     char name[32]; // suffix of version (gentoo, none for vanilla)
     char version[32];
-}
+    spec kspec; // Index of spec_list
+};
 
+struct chost {
+    char arch[16];
+    char vendor[16];
+    char os[32];
+    char c_lib[32];
+};
 
+typedef enum spec {
+    i386,
+    i486,
+    i586,
+    i686,
+    x86_64,
+    arm,
+    armv4,
+    armv4t,
+    armv5te,
+    armv6j,
+    armv7a
+};
+
+//extern struct machine_spec spec_list[];
 
 #endif
