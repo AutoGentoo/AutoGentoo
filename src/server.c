@@ -113,7 +113,7 @@ void server_respond (int n, struct manager * m_man)
         reqline[1] = strtok(NULL, " \t");
         reqline[2] = strtok(NULL, "\r\n");
         ip = get_ip_from_fd (clients[n]);
-        printf ("\r[%s](%s, %s)", ip, reqline[0], reqline[1]);
+        printf ("[%s](%s, %s)", ip, reqline[0], reqline[1]);
         
         // Create buffs to redirect STDOUT and STDERR
         stdout_b = dup (STDOUT_FILENO);

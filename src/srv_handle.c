@@ -155,7 +155,7 @@ response_t _STAGE1 (struct manager* m_man, char* ip, int sockfd, char** args, in
     char pkgs[8192];
     FILE * fp = fopen ("/usr/portage/profiles/default/linux/packages.build", "r");
     char line[255];
-    strcat (pkgs, "-u "); // Dont emerge packages that are already binaries
+    strcat (pkgs, "-e "); // Emerge the entire tree
     
     while (fgets(line, sizeof(line), fp) != NULL) {
         char *pos;

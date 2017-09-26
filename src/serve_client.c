@@ -157,7 +157,7 @@ void init_serve_client (struct manager* m_man, int sc_no) {
         "usr/lib32",
         "usr/lib64",
         "usr/lib32",
-        "usr/lib64"
+        "usr/lib64",
         "proc",
         "sys",
         "dev"
