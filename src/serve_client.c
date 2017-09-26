@@ -108,10 +108,10 @@ CHOST=\"%s\"\n\
 \n\
 # Portage system configuration\n\
 SYS_ROOT=\"%s\"\n\
-PORTAGE_TMPDIR=\"{SYS_ROOT}%s\"\n\
-PORTDIR=\"{SYS_ROOT}%s\"\n\
-DISTDIR=\"{SYS_ROOT}%s\"\n\
-PKGDIR=\"{SYS_ROOT}%s\"\n\
+PORTAGE_TMPDIR=\"${SYS_ROOT}%s\"\n\
+PORTDIR=\"${SYS_ROOT}%s\"\n\
+DISTDIR=\"${SYS_ROOT}%s\"\n\
+PKGDIR=\"${SYS_ROOT}%s\"\n\
 PORT_LOGDIR=\"%s\"\n\
 \n\
 # Portage package configuration\n\
