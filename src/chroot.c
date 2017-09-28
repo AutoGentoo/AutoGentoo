@@ -89,20 +89,20 @@ struct chroot_client* chroot_new (struct manager* m_man, int sc_no) {
 }
 
 void bind_mount (char* new_root, char* src, char* dest, int recursive) {
-    char dest_temp[256];
+    char dest_temp[2048];
     sprintf (dest_temp, "%s/%s", new_root, dest);
     strcpy (dest_temp, path_normalize (dest_temp));
     mount (src, dest_temp, NULL, MS_BIND | (recursive ? MS_REC : 0), NULL);
 }
 void type_mount (char* new_root, char* src, char* dest, char* type) {
-    char dest_temp[256];
+    char dest_temp[2048];
     sprintf (dest_temp, "%s/%s", new_root, dest);
     mount (src, dest_temp, type, MS_MGC_VAL, NULL);
 }
 
 mount_status mount_check (struct chroot_mount* mnt, char* target) {
-    char dest_temp[1024];
-    char src_temp[1024];
+    char dest_temp[2048];
+    char src_temp[2048];
     sprintf (dest_temp, "%s/%s", target, mnt->child);
     
     strcpy (dest_temp, path_normalize (dest_temp));

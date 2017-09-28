@@ -79,7 +79,7 @@ struct chroot_client {
     int sc_no; // Index of client
     struct process_t *proc_list[128];
     
-    struct chroot_mount mounts[32];
+    struct chroot_mount mounts[128];
     
     int mount_c;
     int proc_c;
