@@ -280,17 +280,19 @@ response_t _MNTCHROOT (struct manager* m_man, char* ip, int sockfd, char** args,
 }
 
 response_t _DEVCREATE (struct manager* m_man, char* ip, int sockfd, char** args, int n) {
-    int sc_no;
+    int sc_no = get_client_from_id (m_man, args[0]);
     struct serve_client* current_client;
-    if ((sc_no = get_client_from_id (m_man, args[0])) == -1) {
-        current_client = &m_man->clients[m_man->client_c];
+    if (sc_no == -1) {
+        current_client = &(m_man->clients[m_man->client_c]);
         m_man->client_c++;
     }
     else {
-        current_client = &m_man->clients[sc_no];
+        current_client = &(m_man->clients[sc_no]);
     }
     
-    strncpy (m_man->clients[m_man->client_c].id, args[0], 14);
+    printf ("client: %p\nm_man: %p\n", current_client, m_man);
+    
+    strncpy (current_client->id, args[0], 14);
     
     strcpy(current_client->hostname, args[1]);
     strcpy(current_client->profile, args[2]);
@@ -308,9 +310,8 @@ response_t _DEVCREATE (struct manager* m_man, char* ip, int sockfd, char** args,
     strcpy (current_client->resolv_conf, "/etc/resolv.conf");
     strcpy (current_client->locale, "en_US.utf8");
     
-    int* total_extra = &current_client->extra_c;
-    for (*total_extra=0; *total_extra != n - 6; *total_extra++) {
-        strcpy (current_client->EXTRA[*total_extra], args[*total_extra+6]);
+    for (current_client->extra_c=0; current_client->extra_c != n - 6; current_client->extra_c++) {
+        strcpy (current_client->EXTRA[current_client->extra_c], args[current_client->extra_c+6]);
     }
     
     update_config (m_man);

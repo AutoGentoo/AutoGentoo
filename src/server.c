@@ -113,7 +113,7 @@ void server_respond (int n, struct manager * m_man)
         reqline[1] = strtok(NULL, " \t");
         reqline[2] = strtok(NULL, "\r\n");
         ip = get_ip_from_fd (clients[n]);
-        printf ("[%s](%s, %s)", ip, reqline[0], reqline[1]);
+        printf ("[%s](%s, %s): %d\n", ip, reqline[0], reqline[1], (int)getpid());
         
         // Create buffs to redirect STDOUT and STDERR
         stdout_b = dup (STDOUT_FILENO);
@@ -206,7 +206,7 @@ void server_respond (int n, struct manager * m_man)
         SHUT_RDWR); // All further send and recieve operations are DISABLED...
         close(clients[n]);
 
-    printf ("[%s](%s, %s): ", ip, reqline[0], reqline[1]);
+    printf ("%d: ", (int)getpid());
     printf ("%d %s\n", res.code, res.message);
     fflush (stdout);
     *hang_me = getpid ();
