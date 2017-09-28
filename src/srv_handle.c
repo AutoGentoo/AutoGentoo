@@ -37,7 +37,8 @@ struct srv_f_link srv_methods[] = {
     {GETACTIVE, _GETACTIVE},
     {GETSPEC, _GETSPEC},
     {SCREMOVE, _SCREMOVE},
-    {MNTCHROOT, _MNTCHROOT}
+    {MNTCHROOT, _MNTCHROOT},
+    {DEVCREATE, _DEVCREATE}
 };
 
 void update_config (struct manager* m_man) {
