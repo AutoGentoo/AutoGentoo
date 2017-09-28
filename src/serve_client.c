@@ -277,7 +277,8 @@ struct link_srv link_methods [] = {
     L_GETSPEC,
     L_SYNC,
     L_SCREMOVE,
-    L_MNTCHROOT
+    L_MNTCHROOT,
+    L_DEVCREATE
 };
 
 struct link_srv get_link_srv (serve_c c) {

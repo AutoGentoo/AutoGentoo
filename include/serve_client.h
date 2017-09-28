@@ -111,7 +111,8 @@ typedef enum {
     GETSPEC, // Returns specs about the build server
     SYNC, // Run emerge --sync
     SCREMOVE, // Id to remove
-    MNTCHROOT // Mount chroot directories and start the thread
+    MNTCHROOT, // Mount chroot directories and start the thread
+    DEVCREATE // Specify ID on creation, if ID exists edit that client
 } serve_c;
 
 struct link_srv {
@@ -134,6 +135,7 @@ extern struct link_srv link_methods [];
 #define L_SYNC (struct link_srv) {SYNC, 0, "SYNC"}
 #define L_SCREMOVE (struct link_srv) {SCREMOVE, 1, "SCREMOVE"}
 #define L_MNTCHROOT (struct link_srv) {MNTCHROOT, 0, "MNTCHROOT"}
+#define L_DEVCREATE (struct link_srv) {DEVCREATE, 6, "DEVCREATE"}
 
 struct link_srv get_link_srv (serve_c);
 struct link_srv get_link_str (char*);
