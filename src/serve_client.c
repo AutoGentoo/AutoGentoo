@@ -194,7 +194,7 @@ void init_serve_client (struct manager* m_man, int sc_no) {
         // Create the profile symlink
         char sym_buf_p1 [128];
         char sym_buf_p2 [128];
-        sprintf (sym_buf_p1, "../../usr/portage/profiles/%s/", conf->profile);
+        sprintf (sym_buf_p1, "/usr/portage/profiles/%s/", conf->profile);
         strcpy (sym_buf_p2, "./etc/portage/make.profile");
         char sym_lib_p1[128];
         char sym_lib_p2[128];
