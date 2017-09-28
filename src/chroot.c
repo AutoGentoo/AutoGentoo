@@ -152,7 +152,7 @@ void chroot_mount (struct chroot_client* client) {
     char resolv_conf_chroot [256];
     sprintf (resolv_conf_chroot, "%s/etc/resolv.conf", client->m_man->root);
     cpy (buffer_client->resolv_conf, resolv_conf_chroot);
-    eselect_locale (buffer_client->locale);
+    eselect_locale (buffer_client->locale, client->m_man->root);
     
     client->intited = 1;
     
@@ -162,14 +162,18 @@ void chroot_mount (struct chroot_client* client) {
     // Link etc/resolv.conf
 }
 
-void eselect_locale (char* loc) {
+void eselect_locale (char* loc, char* root) {
     char buffer[256];
     sprintf (buffer, "# Configuration file for eselect\n\
 # This file has been automatically generated.\n\
 LANG=\"%s\"", loc);
     
     FILE * fp;
-    fp = fopen (loc, "w+");
+    
+    char path[256];
+    sprintf (path, "%s/etc/locale.gen", root);
+    
+    fp = fopen (path, "a");
     if (fp != NULL)
     {
         fputs(buffer, fp);

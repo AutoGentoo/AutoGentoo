@@ -90,7 +90,7 @@ struct chroot_client {
 extern volatile struct process_t* process_buffer;
 
 struct chroot_client* chroot_new (struct manager* m_man, int sc_no);
-void eselect_locale (char* loc);
+void eselect_locale (char* loc, char* root);
 void chroot_mount (struct chroot_client* client);
 
 void chroot_main ();

@@ -277,3 +277,45 @@ response_t _MNTCHROOT (struct manager* m_man, char* ip, int sockfd, char** args,
     update_config (m_man);
     return OK;
 }
+
+response_t _DEVCREATE (struct manager* m_man, char* ip, int sockfd, char** args, int n) {
+    int sc_no;
+    struct serve_client* current_client;
+    if ((sc_no = get_client_from_id (m_man, args[0])) == -1) {
+        current_client = &m_man->clients[m_man->client_c];
+        m_man->client_c++;
+    }
+    else {
+        current_client = &m_man->clients[sc_no];
+    }
+    
+    strncpy (m_man->clients[m_man->client_c].id, args[0], 14);
+    
+    strcpy(current_client->hostname, args[1]);
+    strcpy(current_client->profile, args[2]);
+    strcpy(current_client->CHOST, args[3]);
+    strcpy(current_client->CFLAGS, args[4]);
+    strcpy(current_client->CXXFLAGS, "${CFLAGS}");
+    strcpy(current_client->USE, args[5]);
+    
+    strcpy(current_client->PORTAGE_TMPDIR, "/autogentoo/tmp");
+    strcpy(current_client->PORTDIR, "/usr/portage");
+    strcpy(current_client->DISTDIR, "/usr/portage/distfiles");
+    strcpy(current_client->PKGDIR, "/autogentoo/pkg");
+    strcpy(current_client->PORT_LOGDIR, "/autogentoo/log");
+    strcpy (current_client->PORTAGE_DIR, "/usr/portage");
+    strcpy (current_client->resolv_conf, "/etc/resolv.conf");
+    strcpy (current_client->locale, "en_US.utf8");
+    
+    int* total_extra = &current_client->extra_c;
+    for (*total_extra=0; *total_extra != n - 6; *total_extra++) {
+        strcpy (current_client->EXTRA[*total_extra], args[*total_extra+6]);
+    }
+    
+    update_config (m_man);
+    
+    write (sockfd, current_client->id, strlen(current_client->id));
+    write (sockfd, "\n", 1);
+    
+    return OK;
+}
