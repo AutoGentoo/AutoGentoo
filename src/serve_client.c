@@ -119,12 +119,11 @@ CHOST=\"%s\"\n\
 CBUILD=\"%s\"\n\
 \n\
 # Portage system configuration\n\
-SYS_ROOT=\"%s\"\n\
 PORTAGE_TMPDIR=\"${SYS_ROOT}%s\"\n\
-PORTDIR=\"${SYS_ROOT}%s\"\n\
-DISTDIR=\"${SYS_ROOT}%s\"\n\
+PORTDIR=\"%s\"\n\
+DISTDIR=\"%s\"\n\
 PKGDIR=\"${SYS_ROOT}%s\"\n\
-PORT_LOGDIR=\"%s\"\n\
+PORT_LOGDIR=\"${SYS_ROOT}%s\"\n\
 \n\
 # Portage package configuration\n\
 USE=\"%s\"\n\
@@ -132,7 +131,6 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --autounmask-continue\"\n\
 \n\
 %s\
 \n",    conf.CFLAGS, conf.CXXFLAGS, conf.CHOST, cbuild,
-        (conf.state >= STAGE3) ? "" : _ROOT_,// If chroot is true SYS_ROOT will be ""
         conf.PORTAGE_TMPDIR,
         conf.PORTDIR,
         conf.DISTDIR,
