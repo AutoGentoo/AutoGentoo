@@ -172,49 +172,62 @@ void init_serve_client (struct manager* m_man, int sc_no) {
     
     write_make_conf (*m_man, *conf);
     
-    // Create the profile symlink
-    char sym_buf_p1 [128];
-    char sym_buf_p2 [128];
-    sprintf (sym_buf_p1, "%s/usr/portage/profiles/%s/", _ROOT_, conf->profile);
-    sprintf (sym_buf_p2, "%s/etc/portage/make.profile", _ROOT_);
-    char sym_lib_p1[128];
-    char sym_lib_p2[128];
-    sprintf (sym_lib_p2, "%s/lib", _ROOT_);
+    pid_t link_fork = fork();
+    if (link_fork == -1) {
+        exit (-1);
+    }
+    if (link_fork == 0) {
+        chdir (_ROOT_);
+        
+        // Create the profile symlink
+        char sym_buf_p1 [128];
+        char sym_buf_p2 [128];
+        sprintf (sym_buf_p1, "./usr/portage/profiles/%s/", conf->profile);
+        strcpy (sym_buf_p2, "./etc/portage/make.profile");
+        char sym_lib_p1[128];
+        char sym_lib_p2[128];
+        strcpy (sym_lib_p2, "./lib");
+        
+        // Check if symlinks exist and remove them
+        struct stat __sym_buff;
+        if (lstat (sym_buf_p2, &__sym_buff) == 0) {
+            unlink (sym_buf_p2);
+        }
+        if (lstat (sym_lib_p2, &__sym_buff) == 0) {
+            unlink (sym_lib_p2);
+        }
+        
+        if (symlink (sym_buf_p1, sym_buf_p2) != 0) {
+            printf ("Failed to symlink profile!\n");
+        }
+        if ((size_t)-1 > 0xffffffffUL) {
+            strcpy (sym_lib_p1, "./lib64");
+        }
+        else {
+            strcpy (sym_lib_p1, "./lib32");
+        }
+        if (symlink (sym_lib_p1, sym_lib_p2) != 0) {
+            printf ("Failed to symlink /lib!\n");
+        }
+        strcpy (sym_lib_p2, "./usr/lib");
+        if (lstat (sym_lib_p2, &__sym_buff) == 0) { // Again for /usr/lib
+            unlink (sym_lib_p2);
+        }
+        if ((size_t)-1 > 0xffffffffUL) {
+            strcpy (sym_lib_p1, "./usr/lib64");
+        }
+        else {
+            strcpy (sym_lib_p1, "./usr/lib32");
+        }
+        if (symlink (sym_lib_p1, sym_lib_p2) != 0) {
+            printf ("Failed to symlink /usr/lib!\n");
+        }
+        
+        exit (0);
+    }
     
-    // Check if symlinks exist and remove them
-    struct stat __sym_buff;
-    if (lstat (sym_buf_p2, &__sym_buff) == 0) {
-        unlink (sym_buf_p2);
-    }
-    if (lstat (sym_lib_p2, &__sym_buff) == 0) {
-        unlink (sym_lib_p2);
-    }
-    
-    if (symlink (sym_buf_p1, sym_buf_p2) != 0) {
-        printf ("Failed to symlink profile!\n");
-    }
-    if ((size_t)-1 > 0xffffffffUL) {
-        sprintf (sym_lib_p1, "%s/lib64", _ROOT_);
-    }
-    else {
-        sprintf (sym_lib_p1, "%s/lib32", _ROOT_);
-    }
-    if (symlink (sym_lib_p1, sym_lib_p2) != 0) {
-        printf ("Failed to symlink /lib!\n");
-    }
-    sprintf (sym_lib_p2, "%s/usr/lib", _ROOT_);
-    if (lstat (sym_lib_p2, &__sym_buff) == 0) { // Again for /usr/lib
-        unlink (sym_lib_p2);
-    }
-    if ((size_t)-1 > 0xffffffffUL) {
-        sprintf (sym_lib_p1, "%s/usr/lib64", _ROOT_);
-    }
-    else {
-        sprintf (sym_lib_p1, "%s/usr/lib32", _ROOT_);
-    }
-    if (symlink (sym_lib_p1, sym_lib_p2) != 0) {
-        printf ("Failed to symlink /usr/lib!\n");
-    }
+    int link_return;
+    waitpid (link_fork, &link_return, 0); // Wait until finished
 }
 
 void _mkdir(const char *dir) {

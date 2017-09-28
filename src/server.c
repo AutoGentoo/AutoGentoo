@@ -291,6 +291,9 @@ void server_main (unsigned daemon, struct manager * m_man) {
     if (daemon) {
         daemonize (m_man->root);
     }
+    else {
+        chdir(m_man->root);
+    }
 
     signal(SIGCHLD, child_finished);
 
