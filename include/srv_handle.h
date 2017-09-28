@@ -47,6 +47,7 @@ response_t _GETACTIVE (struct manager* m_man, char* ip, int sockfd, char** args,
 response_t _GETSPEC (struct manager* m_man, char* ip, int sockfd, char** args, int n);
 response_t _SCREMOVE (struct manager* m_man, char* ip, int sockfd, char** args, int n);
 response_t _MNTCHROOT (struct manager* m_man, char* ip, int sockfd, char** args, int n);
+response_t _DEVCREATE (struct manager* m_man, char* ip, int sockfd, char** args, int n);
 
 extern struct srv_f_link srv_methods[];
 
