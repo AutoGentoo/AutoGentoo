@@ -41,7 +41,7 @@ void str_substring (char* dest, char* src, int start, int end) {
 }
 
 int main (int argc, char** argv) {
-    char line[512];
+    char line[1024];
     
     printf ("emerge -q --oneshot --nodeps --deep");
     
@@ -55,9 +55,9 @@ int main (int argc, char** argv) {
         if (strncmp (line + 1, "ebuild", 6) != 0 && line[10] == 'R') {
             continue;
         }
-        char pkgbuf[128];
+        char pkgbuf[1024];
         str_substring (pkgbuf, line, str_find (line, ']', 20) + 2, strlen (line));
-        char ebuild_update[128];
+        char ebuild_update[1024];
         memset(&ebuild_update[0], 0, sizeof(ebuild_update));
         strncpy (ebuild_update, pkgbuf, str_find (pkgbuf, ' ', strlen(pkgbuf)));
         printf (" =%s", ebuild_update);
