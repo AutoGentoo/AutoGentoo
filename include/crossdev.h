@@ -1,5 +1,5 @@
 /*
- * kernel.h
+ * crossdev.h
  * 
  * Copyright 2017 Unknown <atuser@Hyperion>
  * 
@@ -22,39 +22,37 @@
  */
 
 
-#ifndef __AUTOGENTOO_KERNEL_H__
-#define __AUTOGENTOO_KERNEL_H__
+#ifndef __AUTOGENTOO_CROSSDEV_H__
+#define __AUTOGENTOO_CROSSDEV_H__
 
-#include <stdio.h>
-#include <hash.h>
-#include <crossdev.h>
+typedef enum {
+    alpha = 0x1,
+    aarch64 = 0x2,
+    arm = 0x4,
+    i386 = 0x8,
+    mips = 0x10,
+    mips64 = 0x20,
+    mips64el = 0x40,
+    mipsel = 0x80,
+    ppc = 0x100,
+    ppc64 = 0x200,
+    s390x = 0x400,
+    sh4 = 0x800,
+    sh4eb = 0x1000,
+    sparc = 0x2000,
+    sparc64 = 0x4000,
+    x86_64 = 0x8000
+} cross_arch;
 
-struct kernel;
-struct kconfig;
-struct kbinary;
+int select_architecture (int current, cross_arch arch);
+int deselect_architecture (int current, cross_arch arch);
+char* get_architecture_name (cross_arch arch);
 
-struct kconfig {
-    char config_path[256];
-    struct kernel parent_kernel;
-}
-
-struct kbinary {
-    unsigned char sha256_hash[SHA256_DIGEST_LENGTH];
-    size_t binary_size;
-    char binary_path[256];
-    struct kernel parent_kernel;
-}
-
-struct kernel {
-    char name[32]; // suffix of version (gentoo, none for vanilla)
-    char version[32];
-    spec kspec; // Index of spec_list
+struct arch_select {
+    cross_arch arch;
+    char str[16];
 };
 
-struct chost_arch_map {
-    char portage_arch[16];
-    char chost[32];
-    cross_arch arch;
-}
+extern struct arch_select architectures[];
 
 #endif

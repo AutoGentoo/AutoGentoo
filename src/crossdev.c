@@ -1,5 +1,5 @@
 /*
- * kernel.h
+ * crossdev.c
  * 
  * Copyright 2017 Unknown <atuser@Hyperion>
  * 
@@ -22,39 +22,42 @@
  */
 
 
-#ifndef __AUTOGENTOO_KERNEL_H__
-#define __AUTOGENTOO_KERNEL_H__
-
 #include <stdio.h>
-#include <hash.h>
 #include <crossdev.h>
 
-struct kernel;
-struct kconfig;
-struct kbinary;
-
-struct kconfig {
-    char config_path[256];
-    struct kernel parent_kernel;
-}
-
-struct kbinary {
-    unsigned char sha256_hash[SHA256_DIGEST_LENGTH];
-    size_t binary_size;
-    char binary_path[256];
-    struct kernel parent_kernel;
-}
-
-struct kernel {
-    char name[32]; // suffix of version (gentoo, none for vanilla)
-    char version[32];
-    spec kspec; // Index of spec_list
+struct arch_select architectures[] = {
+    {alpha, "alpha"},
+    {aarch64, "aarch64"},
+    {arm, "arm"},
+    {i386, "i386"},
+    {mips, "mips"},
+    {mips64, "mips64"},
+    {mips64el, "mips64el"},
+    {mipsel, "mipsel"},
+    {ppc, "ppc"},
+    {ppc64, "ppc64"},
+    {s390x, "s390x"},
+    {sh4, "sh4"},
+    {sh4eb, "sh4eb"},
+    {sparc, "sparc"},
+    {sparc64, "sparc64"},
+    {x86_64, "x86_64"}
 };
 
-struct chost_arch_map {
-    char portage_arch[16];
-    char chost[32];
-    cross_arch arch;
+int select_architecture (int current, cross_arch arch) {
+    return current | arch;
 }
 
-#endif
+int deselect_architecture (int current, cross_arch arch) {
+    return current ^ arch;
+}
+
+char* get_architecture_name (cross_arch arch) {
+    int i;
+    for (i = 0; i != sizeof(architectures) / sizeof (struct arch_select); i++) {
+        if (architectures[i].arch == arch) {
+            return architectures[i].str;
+        }
+    }
+    return "";
+}
