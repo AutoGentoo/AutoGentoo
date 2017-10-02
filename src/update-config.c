@@ -200,16 +200,15 @@ int main (int argc, char** argv) {
     if (strncmp (old_version, "1\0", 2) == 0) {
         old_size = sizeof (struct manager_v1);
         m_man_old = malloc (old_size);
-        update_manager_v1 (m_man_old, &m_man_new);
+        read (src_fd, (struct manager_v1*)m_man_old, old_size);
+        update_manager_v1 ((struct manager_v1*)m_man_old, &m_man_new);
     }
     else if (strncmp (old_version, "2\0", 2) == 0) {
         old_size = sizeof (struct manager_v2);
         m_man_old = malloc (old_size);
-        update_manager_v2 (m_man_old, &m_man_new);
+        read (src_fd, (struct manager_v2*)m_man_old, old_size);
+        update_manager_v2 ((struct manager_v2*)m_man_old, &m_man_new);
     }
-    
-    
-    read (src_fd, m_man_old, old_size);
     
     write_serve (dest_fd, &m_man_new);
     
