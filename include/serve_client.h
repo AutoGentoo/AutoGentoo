@@ -59,13 +59,8 @@ struct serve_client { // Chroot environment
 
     struct chroot_client* chroot;
     client_state state;
-};
-
-struct _client {
-    char CFLAGS[1024];
-    char CXXFLAGS[64];
-    char CHOST[32];
-    char USE[128];
+    
+    struct kernel_client* kernel;
 };
 
 struct _iptosc {
@@ -73,7 +68,9 @@ struct _iptosc {
     char id[16];
 };
 
+#ifndef MAX_CLIENTS
 #define MAX_CLIENTS 32
+#endif
 
 struct manager {
     struct serve_client clients[MAX_CLIENTS];
@@ -95,7 +92,6 @@ void _mkdir(const char *dir);
 void write_serve (int fd, struct manager * m_man);
 void read_serve (int fd, struct manager * m_man);
 int get_client_from_hostname  (struct manager * m_man, char * hostname);
-void write_client (char*);
 void _ip_activate (struct manager* m_man, char* ip, char* id);
 void remove_client (struct manager* m_man, int index);
 

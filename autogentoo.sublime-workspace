@@ -4,6 +4,146 @@
 		"selected_items":
 		[
 			[
+				"mana",
+				"manager_v1"
+			],
+			[
+				"cross",
+				"cross_arch"
+			],
+			[
+				"serv",
+				"serve_client"
+			],
+			[
+				"old",
+				"old_size"
+			],
+			[
+				"old_",
+				"old_size"
+			],
+			[
+				"m_man",
+				"m_man_old"
+			],
+			[
+				"client",
+				"client_v1"
+			],
+			[
+				"req",
+				"reqline"
+			],
+			[
+				"reque",
+				"request_file"
+			],
+			[
+				"bt",
+				"bytes_recieved"
+			],
+			[
+				"re",
+				"recv"
+			],
+			[
+				"arc",
+				"architectures"
+			],
+			[
+				"arch",
+				"arch_select"
+			],
+			[
+				"cr",
+				"crossdev"
+			],
+			[
+				"cros",
+				"cross_arch"
+			],
+			[
+				"c",
+				"cbuild"
+			],
+			[
+				"cbui",
+				"cbuild_stream"
+			],
+			[
+				"get",
+				"get_client_from_id"
+			],
+			[
+				"lin",
+				"link_fork"
+			],
+			[
+				"__",
+				"_ROOT_"
+			],
+			[
+				"_GET",
+				"_GETSPEC"
+			],
+			[
+				"GET",
+				"_GETCLIENTS"
+			],
+			[
+				"reques",
+				"request_t"
+			],
+			[
+				"serve",
+				"serve_req"
+			],
+			[
+				"request",
+				"request_names"
+			],
+			[
+				"config",
+				"configpath"
+			],
+			[
+				"ip",
+				"ip_c_fd"
+			],
+			[
+				"inc",
+				"include"
+			],
+			[
+				"file",
+				"filehash"
+			],
+			[
+				"hash",
+				"hash_sha256"
+			],
+			[
+				"SHA",
+				"SHA256_DIGEST_LENGTH"
+			],
+			[
+				"syste",
+				"system_call"
+			],
+			[
+				"instal",
+				"install_ret"
+			],
+			[
+				"com",
+				"cmd_opts_buf"
+			],
+			[
+				"cmd",
+				"cmd_opts_buf"
+			],
+			[
 				"chroot",
 				"chroot"
 			],
@@ -20,24 +160,12 @@
 				"CHOST"
 			],
 			[
-				"m_man",
-				"m_man_new"
-			],
-			[
 				"upda",
 				"update_manager"
 			],
 			[
-				"ip",
-				"_iptosc"
-			],
-			[
 				"upad",
 				"update_sc"
-			],
-			[
-				"client",
-				"client_c"
 			],
 			[
 				"dest_",
@@ -45,10 +173,6 @@
 			],
 			[
 				"resol",
-				"resolv_conf"
-			],
-			[
-				"re",
 				"resolv_conf"
 			],
 			[
@@ -128,28 +252,37 @@
 	"buffers":
 	[
 		{
-			"file": "src/server.c",
+			"file": "include/kernel.h",
 			"settings":
 			{
-				"buffer_size": 22641,
+				"buffer_size": 1531,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/chroot.c",
+			"file": "src/crossdev.c",
 			"settings":
 			{
-				"buffer_size": 8479,
+				"buffer_size": 1947,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "include/chroot.h",
+			"file": "src/kernel.c",
 			"settings":
 			{
-				"buffer_size": 3170,
+				"buffer_size": 1702,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/update-config.c",
+			"settings":
+			{
+				"buffer_size": 7483,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -158,33 +291,7 @@
 			"file": "include/serve_client.h",
 			"settings":
 			{
-				"buffer_size": 5994,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/request.c",
-			"settings":
-			{
-				"buffer_size": 3996,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/_string.c",
-			"settings":
-			{
-				"buffer_size": 3245,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/emerge.c",
-			"settings":
-			{
-				"buffer_size": 1461,
+				"buffer_size": 4947,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -193,16 +300,78 @@
 			"file": "src/serve_client.c",
 			"settings":
 			{
-				"buffer_size": 9821,
+				"buffer_size": 9101,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "/*\n * serve_client.c\n * \n * Copyright 2017 Unknown <atuser@Hyperion>\n * \n * This program is free software; you can redistribute it and/or modify\n * it under the terms of the GNU General Public License as published by\n * the Free Software Foundation; either version 2 of the License, or\n * (at your option) any later version.\n * \n * This program is distributed in the hope that it will be useful,\n * but WITHOUT ANY WARRANTY; without even the implied warranty of\n * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n * GNU General Public License for more details.\n * \n * You should have received a copy of the GNU General Public License\n * along with this program; if not, write to the Free Software\n * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,\n * MA 02110-1301, USA.\n * \n * \n */\n\n\n#include <stdio.h>\n\nstruct kernel {\n    char name[32]; // suffix of version (gentoo, none for vanilla)\n    char version[32];\n    \n}",
+			"file": "src/autogentoo.c",
 			"settings":
 			{
-				"buffer_size": 941,
+				"buffer_size": 6719,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/server.c",
+			"settings":
+			{
+				"buffer_size": 9536,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/hash.c",
+			"settings":
+			{
+				"buffer_size": 1930,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/srv_handle.c",
+			"settings":
+			{
+				"buffer_size": 10892,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "include/srv_handle.h",
+			"settings":
+			{
+				"buffer_size": 2355,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "nc localhost 9490 <<< \"SRV DEVCREATE 2\nUXFISpOJbWJoVa\nCeres\ndefault/linux/amd64/13.0/desktop/gnome/systemd/\naarch64-unknown-linux-gnu\n-lm -lrt -march=armv8-a -mtune=cortex-a53 -O2 -pipe\nwayland gnome systemd gtk gtk3 -kde -qt -qt4 -qt5 mmx sse sse2\nINPUT_DEVICES=\\\"evdev\\\"\nVIDEO_CARDS=\\\"vc4\\\"\"\n",
+			"settings":
+			{
+				"buffer_size": 294,
+				"line_ending": "Unix",
+				"name": "nc localhost 9490 <<< \"SRV DEVCREATE 2"
+			}
+		},
+		{
+			"file": "src/request.c",
+			"settings":
+			{
+				"buffer_size": 4972,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/emerge.c",
+			"settings":
+			{
+				"buffer_size": 1265,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
@@ -210,16 +379,7 @@
 			"file": "include/request.h",
 			"settings":
 			{
-				"buffer_size": 2269,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/response.c",
-			"settings":
-			{
-				"buffer_size": 1510,
+				"buffer_size": 1934,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -291,16 +451,47 @@
 	},
 	"expanded_folders":
 	[
-		"/home/atuser/git/AutoGentoo",
-		"/home/atuser/git/AutoGentoo/src"
+		"/home/atuser/git/AutoGentoo"
 	],
 	"file_history":
 	[
+		"/home/atuser/git/AutoGentoo/include/crossdev.h",
+		"/home/atuser/git/AutoGentoo/src/chroot.c",
+		"/home/atuser/git/AutoGentoo/include/hash.h",
+		"/home/atuser/git/AutoGentoo/src/hash.c",
+		"/home/atuser/git/AutoGentoo/src/crossdev.c",
+		"/home/atuser/git/AutoGentoo/src/server.c",
+		"/home/atuser/git/AutoGentoo/src/update.c",
+		"/home/atuser/git/AutoGentoo/src/serve_client.c",
+		"/home/atuser/git/AutoGentoo/include/chroot.h",
 		"/home/atuser/Documents/bin_test.c",
-		"/home/atuser/git/AutoGentoo/src/request.c",
+		"/home/atuser/git/AutoGentoo/src/Makefile.am",
+		"/home/atuser/Documents/test_bitshift.c",
+		"/home/atuser/git/AutoGentoo/include/Makefile.am",
 		"/home/atuser/git/AutoGentoo/src/_string.c",
-		"/home/atuser/git/AutoGentoo/src/update-config.c",
+		"/home/atuser/git/AutoGentoo/src/kernel.c",
+		"/home/atuser/Documents/testcbuild.c",
+		"/home/atuser/git/AutoGentoo/.git/COMMIT_EDITMSG",
+		"/home/atuser/git/AutoGentoo/include/kernel.h",
+		"/home/atuser/git/AutoGentoo/src/emerge.c",
+		"/home/atuser/git/AutoGentoo/src/request.c",
+		"/home/atuser/git/AutoGentoo/configure.ac",
+		"/home/atuser/git/AutoGentoo/src/srv_handle.c",
+		"/home/atuser/git/AutoGentoo/include/srv_handle.h",
+		"/home/atuser/git/AutoGentoo/src/autogentoo.c",
+		"/home/atuser/git/AutoGentoo/src/response.c",
+		"/home/atuser/git/AutoGentoo/include/emerge.h",
+		"/home/atuser/git/AutoGentoo/Makefile.am",
+		"/home/atuser/Documents/hash.c",
+		"/home/atuser/git/AutoGentoo/include/request.h",
 		"/home/atuser/git/AutoGentoo/include/_string.h",
+		"/home/atuser/git/AutoGentoo/include/serve_client.h",
+		"/home/atuser/Downloads/sha256_example.c",
+		"/home/atuser/Downloads/sha256.c",
+		"/usr/share/applications/subl.desktop",
+		"/usr/share/applications/geany.desktop",
+		"/home/atuser/eclipse-workspace/CS_IO_L1/src/CoordGeom.java",
+		"/home/atuser/git/AutoGentoo/src/update-config.c",
 		"/home/atuser/git/AutoGentoo/src/autogentoo-update",
 		"/home/atuser/git/AutoGentoo/src/autogentoo-update-config",
 		"/home/atuser/git/AutoGentoo/src/autogentoo-autogentoo.o",
@@ -308,23 +499,13 @@
 		"/home/atuser/git/AutoGentoo/include/ip_convert.h",
 		"/home/atuser/git/AutoGentoo/include/ip_scan.h",
 		"/home/atuser/git/AutoGentoo/include/autogentoo.h",
-		"/home/atuser/git/AutoGentoo/src/autogentoo.c",
-		"/home/atuser/git/AutoGentoo/include/emerge.h",
 		"/home/atuser/Documents/mount_check.c",
-		"/home/atuser/git/AutoGentoo/src/Makefile.am",
 		"/home/atuser/git/AutoGentoo-GClient/src/main.py",
-		"/home/atuser/git/AutoGentoo/include/chroot.h",
-		"/home/atuser/git/AutoGentoo/src/emerge.c",
-		"/home/atuser/git/AutoGentoo/src/chroot.c",
 		"/home/atuser/git/AutoGentoo/src/temp",
-		"/home/atuser/git/AutoGentoo/src/update.c",
 		"/home/atuser/git/AutoGentoo/src/update.py",
 		"/home/atuser/git/AutoGentoo/src/temp.emg",
-		"/home/atuser/git/AutoGentoo/src/server.c",
 		"/home/atuser/git/AutoGentoo/src/ip_scan.c",
-		"/home/atuser/git/AutoGentoo/include/serve_client.h",
 		"/home/atuser/git/AutoGentoo/include/response.h",
-		"/home/atuser/git/AutoGentoo/include/request.h",
 		"/home/atuser/git/AutoGentoo/src/list.c",
 		"/home/atuser/git/AutoGentoo/src/libautogentoo_la-server.lo"
 	],
@@ -344,6 +525,25 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"struct _client",
+			"_client",
+			" ",
+			"\\n",
+			"locale",
+			"CREATE",
+			"(struct manager* m_man, char* ip, int sockfd, char** args)",
+			"clients[n]",
+			"(struct manager* m_man, char* ip, char** args)",
+			"request_opts",
+			"(struct manager* m_man, char** args",
+			"request_opts",
+			"char**",
+			"STAGE1",
+			"m_install",
+			"stat",
+			"write (",
+			"_mkdir",
+			"args[i]",
 			"autogentoo",
 			"EDIT",
 			"CREATE",
@@ -383,6 +583,16 @@
 		"regex": false,
 		"replace_history":
 		[
+			"\n",
+			"",
+			"(struct manager* m_man, char* ip, int sockfd, char** args, int n)",
+			"sockfd",
+			"(struct manager* m_man, char* ip, int sockfd, char** args)",
+			"args",
+			"(struct manager* m_man, char* ip, char** args",
+			"args",
+			"struct manager* m_man, char**",
+			"in",
 			"(clients[n]",
 			"clients[n]",
 			"oman->clients[i]",
@@ -398,55 +608,24 @@
 	"groups":
 	[
 		{
-			"selected": 7,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/server.c",
+					"file": "include/kernel.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 22641,
+						"buffer_size": 1531,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								20527,
-								20527
-							]
-						],
-						"settings":
-						{
-							"history_list_is_closing": true,
-							"syntax": "Packages/C Improved/C Improved.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 7791.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/chroot.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8479,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4267,
-								4267
+								1493,
+								1493
 							]
 						],
 						"settings":
@@ -454,198 +633,363 @@
 							"syntax": "Packages/C Improved/C Improved.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 2108.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "include/chroot.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3170,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1964,
-								1964
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C Improved/C Improved.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 500.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "include/serve_client.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5994,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5041,
-								5041
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C Improved/C Improved.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 697.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "src/request.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3996,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1573,
-								1573
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C Improved/C Improved.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 612.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/_string.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3245,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2671,
-								2671
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C Improved/C Improved.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 1326.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/emerge.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1461,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1402,
-								1402
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C Improved/C Improved.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 476.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "src/serve_client.c",
+					"buffer": 1,
+					"file": "src/crossdev.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9821,
+						"buffer_size": 1947,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6016,
-								6016
+								1870,
+								1870
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C Improved/C Improved.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1006.0,
+						"translation.y": 602.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/kernel.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1702,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1555,
+								1555
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 263.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/update-config.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7483,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7336,
+								7336
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 3135.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 4,
+					"file": "include/serve_client.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 941,
+						"buffer_size": 4947,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								939,
-								939
+								3058,
+								3058
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1122.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/serve_client.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9101,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8264,
+								8264
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 5236.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/autogentoo.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6719,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								853,
+								831
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 255.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "src/server.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9536,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2934,
+								2934
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1457.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/hash.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1930,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								845,
+								820
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 102.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/srv_handle.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10892,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10694,
+								10694
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 255.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "include/srv_handle.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2355,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2306,
+								2306
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 280.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 294,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								59,
+								59
+							]
+						],
+						"settings":
+						{
+							"auto_name": "nc localhost 9490 <<< \"SRV DEVCREATE 2",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "src/request.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4972,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2469,
+								2381
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1122.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "src/emerge.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1265,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1047,
+								1047
 							]
 						],
 						"settings":
@@ -656,65 +1000,35 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
+					"buffer": 14,
 					"file": "include/request.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2269,
+						"buffer_size": 1934,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1625,
-								1625
+								1740,
+								1740
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.sublime-syntax"
+							"syntax": "Packages/C Improved/C Improved.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 535.0,
+						"translation.y": 714.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "src/response.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1510,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1303,
-								1303
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 349.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
+					"stack_index": 14,
 					"type": "text"
 				}
 			]
@@ -763,7 +1077,7 @@
 	"project": "autogentoo.sublime-project",
 	"replace":
 	{
-		"height": 64.0
+		"height": 102.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -773,28 +1087,116 @@
 		"selected_items":
 		[
 			[
-				"string.",
-				"include/_string.h"
+				"cors",
+				"include/crossdev.h"
+			],
+			[
+				"cross",
+				"src/crossdev.c"
 			],
 			[
 				"chroot",
-				"include/chroot.h"
+				"src/chroot.c"
 			],
 			[
-				"requ",
+				"hsah.c",
+				"src/hash.c"
+			],
+			[
+				"autogentoo.c",
+				"src/autogentoo.c"
+			],
+			[
+				"serve",
+				"src/serve_client.c"
+			],
+			[
+				"update",
+				"src/update-config.c"
+			],
+			[
+				"server",
+				"src/server.c"
+			],
+			[
+				"srv",
+				"src/srv_handle.c"
+			],
+			[
+				"req",
 				"src/request.c"
+			],
+			[
+				"request.c",
+				"src/request.c"
+			],
+			[
+				"request",
+				"include/request.h"
+			],
+			[
+				"hash.c",
+				"src/hash.c"
+			],
+			[
+				"hash.h",
+				"include/hash.h"
+			],
+			[
+				"kern",
+				"include/kernel.h"
+			],
+			[
+				"makefile.am",
+				"src/Makefile.am"
+			],
+			[
+				"kernl",
+				"include/kernel.h"
+			],
+			[
+				"emerge.c",
+				"src/emerge.c"
+			],
+			[
+				"chroot.h",
+				"include/chroot.h"
 			],
 			[
 				"chroot.c",
 				"src/chroot.c"
 			],
 			[
-				"emerge",
-				"src/emerge.c"
+				"make",
+				"include/Makefile.am"
 			],
 			[
 				"",
-				"src/autogentoo.c"
+				"src/serve_client.c"
+			],
+			[
+				"ser",
+				"include/serve_client.h"
+			],
+			[
+				"reque",
+				"include/request.h"
+			],
+			[
+				"requ",
+				"src/request.c"
+			],
+			[
+				"string",
+				"include/_string.h"
+			],
+			[
+				"string.",
+				"include/_string.h"
+			],
+			[
+				"emerge",
+				"src/emerge.c"
 			]
 		],
 		"width": 0.0
