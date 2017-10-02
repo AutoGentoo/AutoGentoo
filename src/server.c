@@ -123,8 +123,6 @@ void server_respond (int n, struct manager * m_man)
     }
     
     fclose (request_file);
-    printf ("closed\n");
-    fflush(stdout);
     int __error = 0;
     if (bytes_recieved < 0) { // receive error
         fprintf(stderr, ("recv() error\n"));
