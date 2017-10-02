@@ -101,7 +101,7 @@ size_t frecv (int fd, int sockfd, char* buf, size_t size, int flags) {
 void server_respond (int n, struct manager * m_man)
 {
     char mesg[2048], *reqline[3], path[2048];
-    int bytes_recieved = 0;
+    unsigned int bytes_recieved = 0;
 
     char *ip;
     response_t res;
@@ -109,15 +109,22 @@ void server_respond (int n, struct manager * m_man)
     int stdout_b, stderr_b;
     int b_client = clients[n];
     
-    FILE* request_file = fopen ("current.request", "w+");
+    char file_name[32];
+    sprintf (file_name, "%d.request", (int)getpid());
+    FILE* request_file = fopen (file_name, "w+");
     
     memset((void*)mesg, 0, 2048);
     
-    bytes_recieved += frecv(fileno(request_file), clients[n], mesg, 2048, 0);
-    while (bytes_recieved += frecv(fileno(request_file), clients[n], NULL, 2048, 0) > 0);
+    ssize_t current_bytes;
+    bytes_recieved += current_bytes = frecv(fileno(request_file), clients[n], mesg, 2048, 0);
+    while (current_bytes == 2048) {
+        current_bytes = frecv(fileno(request_file), clients[n], NULL, 2048, 0);
+        bytes_recieved += current_bytes;
+    }
     
     fclose (request_file);
-    
+    printf ("closed\n");
+    fflush(stdout);
     int __error = 0;
     if (bytes_recieved < 0) { // receive error
         fprintf(stderr, ("recv() error\n"));
@@ -221,6 +228,8 @@ void server_respond (int n, struct manager * m_man)
     close (STDERR_FILENO);
     dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
     dup2 (stderr_b, STDERR_FILENO);
+    
+    remove (file_name);
     
     clients[n] = b_client;
     

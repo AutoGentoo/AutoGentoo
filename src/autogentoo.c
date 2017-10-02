@@ -151,7 +151,6 @@ All changes to the client must be made through emerge\n\
             read_serve (_fd, m_man);
             close (_fd);
         }
-        
         chroot_main ();
         
         server_main (__opts.d, m_man);
