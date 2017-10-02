@@ -213,6 +213,7 @@ int main (int argc, char** argv) {
     write_serve (dest_fd, &m_man_new);
     
     close (dest_fd);
+    close (src_fd);
     free (m_man_old);
     
     return 0;
