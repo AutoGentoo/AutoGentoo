@@ -145,13 +145,14 @@ All changes to the client must be made through emerge\n\
         strcpy(m_man->root, __opts.p);
         strcpy(m_man->_config, __opts.f);
         
-        chroot_main ();
         chdir (m_man->root);
         if (access (__opts.f, F_OK) != -1) {
             int _fd = open (__opts.f, O_RDONLY);
             read_serve (_fd, m_man);
             close (_fd);
         }
+        
+        chroot_main ();
         
         server_main (__opts.d, m_man);
     }
