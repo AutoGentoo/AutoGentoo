@@ -83,27 +83,47 @@ void child_finished (int sig) {
     }
 }
 
+size_t frecv (int fd, int sockfd, char* buf, size_t size, int flags) {
+    size_t bytes_recieved;
+    if (buf == NULL) {
+        char _buf[size];
+        bytes_recieved = recv(sockfd, _buf, size, flags);
+        write (fd, _buf, bytes_recieved);
+    }
+    else {
+        bytes_recieved = recv(sockfd, buf, size, flags);
+        write (fd, buf, bytes_recieved);
+    }
+    return bytes_recieved;
+}
+
 // client connection
 void server_respond (int n, struct manager * m_man)
 {
     char mesg[2048], *reqline[3], path[2048];
-    int rcvd;
+    int bytes_recieved = 0;
 
     char *ip;
     response_t res;
     
     int stdout_b, stderr_b;
     int b_client = clients[n];
-
-    memset((void*)mesg, (int)'\0', 2048);
     
-    rcvd = recv(clients[n], mesg, 2048, 0);
+    FILE* request_file = fopen ("current.request", "w+");
+    
+    memset((void*)mesg, 0, 2048);
+    
+    bytes_recieved += frecv(fileno(request_file), clients[n], mesg, 2048, 0);
+    while (bytes_recieved += frecv(fileno(request_file), clients[n], NULL, 2048, 0) > 0);
+    
+    fclose (request_file);
+    
     int __error = 0;
-    if (rcvd < 0) { // receive error
+    if (bytes_recieved < 0) { // receive error
         fprintf(stderr, ("recv() error\n"));
         __error = 1;
     }
-    else if (rcvd == 0) { // receive socket closed
+    else if (bytes_recieved == 0) { // receive socket closed
         fprintf(stderr, "Client disconnected upexpectedly.\n");
         __error = 2;
     }
@@ -190,6 +210,9 @@ void server_respond (int n, struct manager * m_man)
             if (!sent) {
                 res = srv_handle (clients[n], rt, m_man, request_opts, l_argc + linked.argc);
             }
+        }
+        else if (strncmp(reqline[0], "KERNEL\0", 7) == 0) {
+            
         }
     }
 

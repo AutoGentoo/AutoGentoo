@@ -80,7 +80,7 @@ response_t m_install (char* command, struct manager * m_man, int sc_no) {
             exit (-1);
         }
         
-        printf ("chroot %s\nemerge %s\n\n", root, buff);
+        printf ("chroot %s\nemerge %s\n\n", root, command);
         printf ("---STARTING EMERGE---\n");
         fflush (stdout);
         execv ("/usr/bin/emerge", args);
@@ -140,7 +140,7 @@ response_t exec_method (char *type, struct manager * man, char* command, char *i
     return NOT_IMPLEMENTED;
 }
 
-void serve_req(char* ip, char* req) {
+void serve_req(char* ip, char* req, char* message) {
     int sockfd, n;
     struct sockaddr_in server;
     
@@ -169,7 +169,12 @@ void serve_req(char* ip, char* req) {
     
     for (i=0; cread = recv (sockfd, buffers[i], 256, 0) != 0 && i <= 32; i++) {
         length += cread;
-        printf ("%s", buffers[i]);
+        if (message != NULL) {
+            strcat (message, buffers[i]);
+        }
+        else {
+            printf ("%s", buffers[i]);
+        }
     }
     fflush (stdout);
     
@@ -179,7 +184,7 @@ void serve_req(char* ip, char* req) {
 response_t ask_server (char* ip, struct client_request req, char *message) {
     char buffer[256];
     sprintf (buffer, "CMD %s %s", request_names[(int)req.type], req.atom);
-    serve_req (ip, buffer);
+    serve_req (ip, buffer, NULL);
     
     return get_res (HTTP_OK);
 }

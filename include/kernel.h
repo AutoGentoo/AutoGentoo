@@ -28,33 +28,30 @@
 #include <stdio.h>
 #include <hash.h>
 #include <crossdev.h>
+#include <serve_client.h>
+#include <response.h>
+#include <openssl/sha.h>
 
 struct kernel;
-struct kconfig;
 struct kbinary;
-
-struct kconfig {
-    char config_path[256];
-    struct kernel parent_kernel;
-}
 
 struct kbinary {
     unsigned char sha256_hash[SHA256_DIGEST_LENGTH];
     size_t binary_size;
     char binary_path[256];
-    struct kernel parent_kernel;
-}
-
-struct kernel {
-    char name[32]; // suffix of version (gentoo, none for vanilla)
-    char version[32];
-    spec kspec; // Index of spec_list
+    char id[16]; // Serve client ID
 };
 
-struct chost_arch_map {
+struct kernel_client {
+    char release[32];
     char portage_arch[16];
     char chost[32];
     cross_arch arch;
-}
+};
+
+struct kernel_client* init_kernel (struct manager* m_man, int sc_no, char* architecture);
+
+response_t kernel_config (struct manager* m_man, int sc_no);
+response_t kernel_build (struct manager* m_man, int sc_no);
 
 #endif

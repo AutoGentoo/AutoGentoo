@@ -56,7 +56,7 @@ response_t m_remove  (char* command, struct manager * m_man, int sc_no);
 
 response_t exec_method (char *type, struct manager * man, char* command, char *ip);
 
-void serve_req(char* ip, char* req);
+void serve_req(char* ip, char* req, char* message);
 response_t ask_server (char* ip, struct client_request req, char* message);
 
 #define REMOVE (struct method_s) {_remove,m_remove}

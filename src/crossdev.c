@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <crossdev.h>
+#include <string.h>
 
 struct arch_select architectures[] = {
     {alpha, "alpha"},
@@ -60,4 +61,14 @@ char* get_architecture_name (cross_arch arch) {
         }
     }
     return "";
+}
+
+cross_arch get_architecture (char* name) {
+    int i;
+    for (i = 0; i != sizeof(architectures) / sizeof (struct arch_select); i++) {
+        if (strcmp (architectures[i].str, name) == 0) {
+            return architectures[i].arch;
+        }
+    }
+    return -1;
 }

@@ -23,9 +23,31 @@
 
 
 #include <stdio.h>
-#include <openssl/sha.h>
 #include <hash.h>
+#include <request.h>
+#include <sys/mman.h>
+#include <kernel.h>
 
-/*struct machine_spec spec_list[] = {
-    {"arm", }
-};*/
+struct kernel_client* init_kernel (struct manager* m_man, int sc_no, char* architecture) {
+    struct kernel_client* out_k = mmap(NULL, sizeof (struct kernel_client), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    
+    pid_t k_info_pid = fork();
+    if (k_info_pid == 0) {
+        chdir ("/usr/src/linux");
+        FILE* fd_krelease = popen("make -s kernelversion 2> /dev/null", "r");
+        fgets(out_k->release, 32, fd_krelease);
+        pclose (fd_krelease);
+        exit (0);
+    }
+    
+    int kernel_ret;
+    waitpid (k_info_pid, &kernel_ret, 0); // Wait until finished
+    
+    strcpy(out_k->portage_arch, architecture);
+    
+    
+    return out_k;
+}
+
+response_t kernel_config (struct manager* m_man, int sc_no);
+response_t kernel_build (struct manager* m_man, int sc_no);
