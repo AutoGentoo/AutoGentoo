@@ -29,7 +29,7 @@ import socketrequest
 import _xml
 
 global current_keywords
-current_keywords = ["amd64", "x86", "alpha", "arm", "hppa", "ia64", "ppc", "ppc64", "sparc"]
+current_keywords = ["amd64", "x86", "alpha", "arm", "arm64", "hppa", "ia64", "ppc", "ppc64", "sparc"]
 
 Ebuild = namedtuple ("Ebuild", ('name', 'id', 'keywords', 'slot'))
 PackageBinary = namedtuple ("PackageBinary", ("name", "category", "version", "slot", "build_time", "size", "use"))

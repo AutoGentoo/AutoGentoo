@@ -1,0 +1,677 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"reque",
+				"request_opts"
+			],
+			[
+				"_GET",
+				"_GETSPEC"
+			],
+			[
+				"GET",
+				"_GETCLIENTS"
+			],
+			[
+				"reques",
+				"request_t"
+			],
+			[
+				"serve",
+				"serve_req"
+			],
+			[
+				"request",
+				"request_names"
+			],
+			[
+				"config",
+				"configpath"
+			],
+			[
+				"ip",
+				"ip_c_fd"
+			],
+			[
+				"inc",
+				"include"
+			],
+			[
+				"file",
+				"filehash"
+			],
+			[
+				"hash",
+				"hash_sha256"
+			],
+			[
+				"SHA",
+				"SHA256_DIGEST_LENGTH"
+			],
+			[
+				"syste",
+				"system_call"
+			],
+			[
+				"instal",
+				"install_ret"
+			],
+			[
+				"com",
+				"cmd_opts_buf"
+			],
+			[
+				"cmd",
+				"cmd_opts_buf"
+			],
+			[
+				"chroot",
+				"chroot"
+			],
+			[
+				"FOR",
+				"FORBIDDEN"
+			],
+			[
+				"byte",
+				"byte_string"
+			],
+			[
+				"C",
+				"CHOST"
+			],
+			[
+				"m_man",
+				"m_man_new"
+			],
+			[
+				"upda",
+				"update_manager"
+			],
+			[
+				"upad",
+				"update_sc"
+			],
+			[
+				"client",
+				"client_c"
+			],
+			[
+				"dest_",
+				"dest_file"
+			],
+			[
+				"resol",
+				"resolv_conf"
+			],
+			[
+				"re",
+				"resolv_conf"
+			],
+			[
+				"src",
+				"src_temp"
+			],
+			[
+				"dest",
+				"dest_temp"
+			],
+			[
+				"chroot_",
+				"chroot_client"
+			],
+			[
+				"mount",
+				"mount_status"
+			],
+			[
+				"client_",
+				"client_state"
+			],
+			[
+				"res",
+				"response_t"
+			],
+			[
+				"m_install",
+				"m_install_sock"
+			],
+			[
+				"proce",
+				"process_buffer"
+			],
+			[
+				"ebuil",
+				"ebuild_update"
+			],
+			[
+				"update",
+				"ebuild_update"
+			],
+			[
+				"eselec",
+				"eselect_locale"
+			],
+			[
+				"init_",
+				"init_serve_client_chroot"
+			],
+			[
+				"sc_",
+				"sc_no"
+			],
+			[
+				"bu",
+				"buf_pid"
+			],
+			[
+				"pid",
+				"pid_kill"
+			],
+			[
+				"proces",
+				"process_t"
+			],
+			[
+				"process",
+				"process_buffer"
+			],
+			[
+				"ha",
+				"handle_sig_USR1"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "src/ui.py",
+			"settings":
+			{
+				"buffer_size": 11791,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/main.py",
+			"settings":
+			{
+				"buffer_size": 1330,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/packagemeta.py",
+			"settings":
+			{
+				"buffer_size": 27592,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/portage.py",
+			"settings":
+			{
+				"buffer_size": 12540,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/autogentoo.py",
+			"settings":
+			{
+				"buffer_size": 3586,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				]
+			],
+			[
+				"Packages/Makefile/Make.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 159.0,
+		"last_filter": "pkginst",
+		"selected_items":
+		[
+			[
+				"pkginst",
+				"Package Control: Install Package"
+			],
+			[
+				"cimp",
+				"Package Control: List Unmanaged Packages"
+			]
+		],
+		"width": 401.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"sublime.installed_packages_path()",
+			"import urllib.request,os,hashlib; h = '6f4c264a24d933ce70df5dedcf1dcaee' + 'ebe013ee18cced0ef93d5f746d80ef60'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/atuser/git/AutoGentoo-GClient"
+	],
+	"file_history":
+	[
+		"/home/atuser/git/AutoGentoo/src/srv_handle.c",
+		"/home/atuser/git/AutoGentoo/src/Makefile.am",
+		"/home/atuser/git/AutoGentoo/include/Makefile.am",
+		"/home/atuser/git/AutoGentoo/src/emerge.c",
+		"/home/atuser/git/AutoGentoo/src/update.c",
+		"/home/atuser/git/AutoGentoo/src/serve_client.c",
+		"/home/atuser/git/AutoGentoo/include/emerge.h",
+		"/home/atuser/git/AutoGentoo/configure.ac",
+		"/home/atuser/git/AutoGentoo/src/chroot.c",
+		"/home/atuser/git/AutoGentoo/include/chroot.h",
+		"/home/atuser/git/AutoGentoo/src/request.c",
+		"/home/atuser/git/AutoGentoo/src/autogentoo.c",
+		"/home/atuser/git/AutoGentoo/Makefile.am",
+		"/home/atuser/git/AutoGentoo/include/hash.h",
+		"/home/atuser/Documents/hash.c",
+		"/home/atuser/git/AutoGentoo/src/server.c",
+		"/home/atuser/git/AutoGentoo/src/response.c",
+		"/home/atuser/git/AutoGentoo/include/request.h",
+		"/home/atuser/git/AutoGentoo/include/_string.h",
+		"/home/atuser/git/AutoGentoo/src/_string.c",
+		"/home/atuser/git/AutoGentoo/include/serve_client.h",
+		"/home/atuser/Downloads/sha256_example.c",
+		"/home/atuser/Downloads/sha256.c",
+		"/usr/share/applications/subl.desktop",
+		"/usr/share/applications/geany.desktop",
+		"/home/atuser/eclipse-workspace/CS_IO_L1/src/CoordGeom.java",
+		"/home/atuser/Documents/bin_test.c",
+		"/home/atuser/git/AutoGentoo/src/update-config.c",
+		"/home/atuser/git/AutoGentoo/src/autogentoo-update",
+		"/home/atuser/git/AutoGentoo/src/autogentoo-update-config",
+		"/home/atuser/git/AutoGentoo/src/autogentoo-autogentoo.o",
+		"/home/atuser/git/AutoGentoo/include/list.h",
+		"/home/atuser/git/AutoGentoo/include/ip_convert.h",
+		"/home/atuser/git/AutoGentoo/include/ip_scan.h",
+		"/home/atuser/git/AutoGentoo/include/autogentoo.h",
+		"/home/atuser/Documents/mount_check.c",
+		"/home/atuser/git/AutoGentoo-GClient/src/main.py",
+		"/home/atuser/git/AutoGentoo/src/temp",
+		"/home/atuser/git/AutoGentoo/src/update.py",
+		"/home/atuser/git/AutoGentoo/src/temp.emg",
+		"/home/atuser/git/AutoGentoo/src/ip_scan.c",
+		"/home/atuser/git/AutoGentoo/include/response.h",
+		"/home/atuser/git/AutoGentoo/src/list.c",
+		"/home/atuser/git/AutoGentoo/src/libautogentoo_la-server.lo"
+	],
+	"find":
+	{
+		"height": 39.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"*11"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 4,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "src/ui.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11791,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 765.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1330,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1039,
+								1039
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 408.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/packagemeta.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 27592,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5725,
+								5725
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 2535.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/portage.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 12540,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1074,
+								1074
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 306.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/autogentoo.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3586,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1584,
+								1584
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 867.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 31.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 112.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "autogentoo-gclient.sublime-project",
+	"replace":
+	{
+		"height": 58.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				".py",
+				"src/autogentoo.py"
+			],
+			[
+				"",
+				"src/ui.py"
+			],
+			[
+				"srv",
+				"src/srv_handle.c"
+			],
+			[
+				"chroot",
+				"include/chroot.h"
+			],
+			[
+				"makefile.am",
+				"src/Makefile.am"
+			],
+			[
+				"make",
+				"include/Makefile.am"
+			],
+			[
+				"emerge.c",
+				"src/emerge.c"
+			],
+			[
+				"ser",
+				"include/serve_client.h"
+			],
+			[
+				"reque",
+				"include/request.h"
+			],
+			[
+				"requ",
+				"src/request.c"
+			],
+			[
+				"chroot.c",
+				"src/chroot.c"
+			],
+			[
+				"hash.h",
+				"include/hash.h"
+			],
+			[
+				"string",
+				"include/_string.h"
+			],
+			[
+				"string.",
+				"include/_string.h"
+			],
+			[
+				"emerge",
+				"src/emerge.c"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 199.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

@@ -62,7 +62,7 @@ class Server:
     def create (self, hostname, profile, chost, cflags, use, extra=""):
         create_socket = socketrequest.SocketRequest (socketrequest.Address(self.ip, self.port))
         new_id = create_socket.send (("SRV CREATE %s\n%s\n%s\n%s\n%s\n%s\n%s\n" % (
-            len(extra) if len(extra) > 0 else "HTTP/1.0",
+            len(extra.split ('\n')) if len(extra.split ('\n')) > 0 else "HTTP/1.0",
             hostname,
             profile,
             chost,
@@ -99,16 +99,16 @@ class Client:
         data = temp_socket.send (("SRV GETCLIENT HTTP/1.0\n%s\n" % self._id).encode('utf-8')).decode ('utf-8')
         b_arr = data.split ("\n")
         sys.stdout.flush()
-        extra_c = int (b_arr[1])
+        extra_c = int (b_arr[0])
         
-        self.CFLAGS = b_arr[2]
-        self.CXXFLAGS = b_arr[3]
-        self.CHOST = b_arr[4]
-        self.USE = b_arr[5]
+        self.CFLAGS = b_arr[1]
+        self.CXXFLAGS = b_arr[2]
+        self.CHOST = b_arr[3]
+        self.USE = b_arr[4]
         self.EXTRAS = []
         
-        self.hostname = b_arr[6];
-        self.profile = b_arr[7];
+        self.hostname = b_arr[5];
+        self.profile = b_arr[6];
         for k in range (0, extra_c):
-            self.EXTRAS.append( b_arr[k+8]);
+            self.EXTRAS.append( b_arr[k+7]);
 

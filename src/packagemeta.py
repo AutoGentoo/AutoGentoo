@@ -155,7 +155,7 @@ class PackageMeta (Gtk.Box):
             "masked": "../ui/resources/masked.svg",
             "unknown": "../ui/resources/unknown.svg"
         }
-        self.store = Gtk.ListStore (*([str] * 10))
+        self.store = Gtk.ListStore (*([str] * (len(portage.current_keywords) + 1)))
         self.sorted_model = Gtk.TreeModelSort(model=self.store)
         self.sorted_model.set_sort_column_id(0, Gtk.SortType.DESCENDING)
 
@@ -164,7 +164,6 @@ class PackageMeta (Gtk.Box):
         self.view.set_grid_lines (Gtk.TreeViewGridLines.BOTH)
         self.view.override_background_color(Gtk.StateType.NORMAL, css_rgba(255, 255, 255, 1))
         self.level_view.pack_start (self.view, True, False, 0)
-        headers = ["amd64", "x86", "alpha", "arm", "hppa", "ia64", "ppc", "ppc64", "sparc"]
         
         sel = self.view.get_selection()
         sel.set_mode(Gtk.SelectionMode.NONE)
@@ -177,7 +176,7 @@ class PackageMeta (Gtk.Box):
         column.set_cell_data_func(renderer, self.get_tree_cell_text)
         self.view.append_column(column)
         
-        for i, column_title in enumerate(headers):
+        for i, column_title in enumerate(portage.current_keywords):
             px_renderer = Gtk.CellRendererPixbuf()
             px_column = Gtk.TreeViewColumn(column_title)
             px_column.set_fixed_width (57)
