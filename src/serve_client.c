@@ -275,41 +275,6 @@ void read_serve (int fd, struct manager * m_man) { // You must malloc this point
     }
 }
 
-struct link_srv link_methods [] = {
-    L_CREATE,
-    L_INIT,
-    L_ACTIVATE,
-    L_GETCLIENT,
-    L_STAGE1,
-    L_EDIT,
-    L_GETCLIENTS,
-    L_GETACTIVE,
-    L_GETSPEC,
-    L_SYNC,
-    L_SCREMOVE,
-    L_MNTCHROOT,
-    L_DEVCREATE
-};
-
-struct link_srv get_link_srv (serve_c c) {
-    int i;
-    for (i=0; i!=sizeof (link_methods) / sizeof (struct link_srv); i++) {
-        if (c == link_methods[i].command)
-            return link_methods[i];
-    }
-    return (struct link_srv) {c, 0}; // command out of range
-}
-
-struct link_srv get_link_str (char* s) {
-    int i;
-    for (i=0; i!=sizeof(link_methods) / sizeof (struct link_srv); i++) {
-        if (strcmp (s, link_methods[i].ID) == 0) {
-            return link_methods[i];
-        }
-    }
-    return (struct link_srv) {-1, 0}; // Invalid but go anyway
-}
-
 void _ip_activate (struct manager* m_man, char* ip, char* id) {
     // Get index of ip
     int i;

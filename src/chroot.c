@@ -75,6 +75,7 @@ struct chroot_client* chroot_new (struct manager* m_man, int sc_no) {
         {"/proc", "proc", "proc", 0, -1},
         {"/sys", "sys", "", 1, -1},
         {"/dev", "dev", "", 1, -1},
+        {"/usr/portage", "usr/portage", "", 0, -1}
     };
     
     strcpy(mounts[3].parent, buffer_client->PORTAGE_DIR);

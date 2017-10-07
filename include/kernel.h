@@ -49,9 +49,8 @@ struct kernel_client {
     cross_arch arch;
 };
 
-struct kernel_client* init_kernel (struct manager* m_man, int sc_no, char* architecture);
-
-response_t kernel_config (struct manager* m_man, int sc_no);
+struct kernel_client* init_kernel (struct manager* m_man, int sc_no, char* architecture); // Run from chroot or client
+response_t kernel_config (struct manager* m_man, int sc_no); // Run on the client (runs make menuconfig)
 response_t kernel_build (struct manager* m_man, int sc_no);
 
 #endif

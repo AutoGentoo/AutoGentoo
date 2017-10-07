@@ -25,6 +25,44 @@
 #include <chroot.h>
 #include <_string.h>
 
+struct link_srv link_methods [] = {
+    L_CREATE,
+    L_INIT,
+    L_ACTIVATE,
+    L_GETCLIENT,
+    L_STAGE1,
+    L_EDIT,
+    L_GETCLIENTS,
+    L_GETACTIVE,
+    L_GETSPEC,
+    L_SYNC,
+    L_SCREMOVE,
+    L_MNTCHROOT,
+    L_DEVCREATE,
+    L_HKBUILD,
+    L_GKBUILD,
+    L_GETKERNEL
+};
+
+struct link_srv get_link_srv (serve_c c) {
+    int i;
+    for (i=0; i!=sizeof (link_methods) / sizeof (struct link_srv); i++) {
+        if (c == link_methods[i].command)
+            return link_methods[i];
+    }
+    return (struct link_srv) {c, 0}; // command out of range
+}
+
+struct link_srv get_link_str (char* s) {
+    int i;
+    for (i=0; i!=sizeof(link_methods) / sizeof (struct link_srv); i++) {
+        if (strcmp (s, link_methods[i].ID) == 0) {
+            return link_methods[i];
+        }
+    }
+    return (struct link_srv) {-1, 0}; // Invalid but go anyway
+}
+
 struct srv_f_link srv_methods[] = {
     {CREATE, _CREATE},
     {ACTIVATE, _ACTIVATE},
@@ -38,7 +76,10 @@ struct srv_f_link srv_methods[] = {
     {GETSPEC, _GETSPEC},
     {SCREMOVE, _SCREMOVE},
     {MNTCHROOT, _MNTCHROOT},
-    {DEVCREATE, _DEVCREATE}
+    {DEVCREATE, _DEVCREATE},
+    {HKBUILD, _HKBUILD},
+    {GKBUILD, _GKBUILD},
+    {GETKERNEL, _GETKERNEL}
 };
 
 void update_config (struct manager* m_man) {
@@ -320,4 +361,31 @@ response_t _DEVCREATE (struct manager* m_man, char* ip, int sockfd, char** args,
     write (sockfd, "\n", 1);
     
     return OK;
+}
+
+// HEAD for the built kernel binary
+response_t _HKBUILD (struct manager* m_man, char* ip, int sockfd, char** args, int n) {
+    int sc_no = get_client_from_ip (m_man, ip);
+    if (sc_no == -1) {
+        return NOT_FOUND;
+    }
+    
+    return OK;
+}
+
+// The buit kernel binary
+response_t _GKBUILD (struct manager* m_man, char* ip, int sockfd, char** args, int n) {
+    int sc_no = get_client_from_ip (m_man, ip);
+    if (sc_no == -1) {
+        return NOT_FOUND;
+    }
+    
+    
+    
+    return OK;
+}
+
+// Get the kernel struct for the respective ip (create if necessary)
+response_t _GETKERNEL (struct manager* m_man, char* ip, int sockfd, char** args, int n) {
+    
 }
