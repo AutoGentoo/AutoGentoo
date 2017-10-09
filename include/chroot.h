@@ -47,26 +47,11 @@ typedef enum {
     NO_MOUNT, // If the parent directory is the child this is set
 } mount_status;
 
-struct process_t {
-    char command[512]; // Dont even parse anything (raw_command)
-    
-    _pid_c proc_id;
-    
-    struct chroot_client* parent; // Pointer to mmaped parent
-    pid_t pid; // pid of the request fork()
-    int socket_fd;  // The socket file descriptor
-                    // This fd will be closed immediatly and duped to stdout
-                    // Only used as a buffer
-    proc_stat status;
-    response_t returned;
-};
-
 struct chroot_mount {
     char parent[128]; // Relative to / of main (mount source)
     char child[128]; // Relative to chroot/ (mnt point)
     char type[32]; // Leave empty for auto
     int recursive; // 0 for --bind, 1 for --rbind (not used if type is specified)
-    mount_status stat;
 };
 
 struct system_mounts {
@@ -79,7 +64,7 @@ struct chroot_client {
     int sc_no; // Index of client
     struct process_t *proc_list[128];
     
-    struct chroot_mount mounts[256];
+    struct chroot_mount mounts[16];
     
     int mount_c;
     int proc_c;
@@ -94,9 +79,10 @@ void eselect_locale (char* loc, char* root);
 void chroot_mount (struct chroot_client* client);
 
 void chroot_main ();
-mount_status mount_check (struct chroot_mount* mnt, char* target);
+int mount_check (struct chroot_mount mnt, char* target);
 
 void type_mount (char* new_root, char* src, char* dest, char* type);
 void bind_mount (char* new_root, char* src, char* dest, int recursive);
+int get_mounts (struct manager* m_man, int sc_no, struct chroot_mount* mounts, int mount_c);
 
 #endif

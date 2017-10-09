@@ -227,6 +227,7 @@ void server_respond (int n, struct manager * m_man)
     dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
     dup2 (stderr_b, STDERR_FILENO);
     
+    fclose (request_file);
     remove (file_name);
     
     clients[n] = b_client;

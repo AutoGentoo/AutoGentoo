@@ -30,19 +30,26 @@
 #include <sys/mman.h>
 #include <_string.h>
 
-volatile static int* current_proc_id;
-volatile struct process_t* process_buffer = NULL;
 static struct system_mounts* sys_mnts;
 
-void chroot_main () {
-    current_proc_id = (int*) mmap(NULL, sizeof (int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    *current_proc_id = 0;
+int mount_to_sc (struct manager* m_man, char** client_roots, char* path) {
+    int i;
+    for (i = 0; i != m_man->client_c; i++) {
+        if (strncmp (client_roots[i], path, strlen(client_roots[i])) == 0) {
+            
+        }
+    }
     
+    char check_id[32];
+    sscanf (path, "^(.*/)([^/]*)$", NULL, check_id);
+}
+
+void chroot_main (struct manager* m_man) {
     sys_mnts = (struct system_mounts*) mmap(NULL, sizeof (struct system_mounts), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     
     struct mntent *ent;
     FILE *mnts_stream;
-
+    
     mnts_stream = setmntent("/proc/mounts", "r");
     if (mnts_stream == NULL) {
         perror("setmntent");
@@ -71,19 +78,14 @@ struct chroot_client* chroot_new (struct manager* m_man, int sc_no) {
     strcpy (PORTAGE_DIR, buffer_client->PORTAGE_DIR);
     strcpy (PORTDIR, buffer_client->PORTDIR);
     
-    struct chroot_mount mounts[32] = {
-        {"/proc", "proc", "proc", 0, -1},
-        {"/sys", "sys", "", 1, -1},
-        {"/dev", "dev", "", 1, -1},
-        {"/usr/portage", "usr/portage", "", 0, -1}
+    struct chroot_mount mounts[4] = {
+        {"/proc", "proc", "proc", 0},
+        {"/sys", "sys", "", 1},
+        {"/dev", "dev", "", 1},
+        {"/usr/portage", "usr/portage", "", 0}
     };
     
-    strcpy(mounts[3].parent, buffer_client->PORTAGE_DIR);
-    strcpy(mounts[3].child, buffer_client->PORTDIR);
-    mounts[3].recursive = 0;
-    mounts[3].stat = -1;
-    
-    memcpy (&chroot->mounts, &mounts, sizeof (struct chroot_mount) * 32);
+    memcpy (&chroot->mounts, &mounts, sizeof (struct chroot_mount) * 4);
     chroot->mount_c = 4;
     
     return chroot;
@@ -101,32 +103,51 @@ void type_mount (char* new_root, char* src, char* dest, char* type) {
     mount (src, dest_temp, type, MS_MGC_VAL, NULL);
 }
 
-mount_status mount_check (struct chroot_mount* mnt, char* target) {
-    char dest_temp[2048];
-    char src_temp[2048];
-    sprintf (dest_temp, "%s/%s", target, mnt->child);
-    
-    strcpy (dest_temp, path_normalize (dest_temp));
-    strcpy (src_temp, path_normalize (mnt->parent));
-    
-    if (strcmp (src_temp, dest_temp) == 0) {
-        mnt->stat = NO_MOUNT;
-        return NO_MOUNT;
-    }
+int get_mounts (struct manager* m_man, int sc_no, struct chroot_mount* mounts, int mount_c) {
+    int out = 0; // Zero out all of the bits
+    char sc_root[256];
+    sprintf (sc_root, "%s/%s", m_man->root, m_man->clients[sc_no].id);
+    strcpy (sc_root, path_normalize(sc_root));
+    int sc_root_l = strlen(sc_root);
     
     int i;
-    fflush (stdout);
-    
-    for (i=0; i!=sys_mnts->mount_c; i++) {
-        if (strcmp (dest_temp, sys_mnts->mounts[i]) == 0) {
-            mnt->stat = IS_MOUNTED;
-            return IS_MOUNTED;
+    for (i = 0; i != sys_mnts->mount_c; i++) {
+        if (strncmp (sys_mnts->mounts[i], sc_root, sc_root_l) != 0)
+            continue;
+        
+        // We know that the current mount path is part of this client
+        // Find which mount this is pointing to
+        char dest_temp[2048];
+        int j;
+        for (j = 0; j != mount_c; j++) {
+            sprintf (dest_temp, "%s/%s", sc_root, mounts[j].child);
+            strcpy (dest_temp, path_normalize (dest_temp));
+            
+            if (strcmp (sys_mnts->mounts[i], dest_temp) == 0) {
+                out |= 1 << j;
+                break;
+            }
         }
     }
     
-    mnt->stat = NOT_MOUNTED;
-    return NOT_MOUNTED;
+    return out;
 }
+
+int mount_check (struct chroot_mount mnt, char* target) {
+    /*
+    if (strcmp (src_temp, dest_temp) == 0) {
+        return 1;
+    }
+    
+    int i;
+    for (i=0; i!=sys_mnts->mount_c; i++) {
+        if (strcmp (dest_temp, sys_mnts->mounts[i]) == 0) {
+            return 1;
+        }
+    }*/
+    return 0;
+}
+
 
 void chroot_mount (struct chroot_client* client) {
     char target[256];
@@ -136,7 +157,7 @@ void chroot_mount (struct chroot_client* client) {
     
     int i;
     for (i=0; i!=client->mount_c; i++) {
-        mount_status got = mount_check (&client->mounts[i], target);
+        mount_status got = mount_check (client->mounts[i], target);
         if (got != NOT_MOUNTED) {
             continue;
         }

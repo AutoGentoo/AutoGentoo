@@ -24,6 +24,7 @@
 #include <srv_handle.h>
 #include <chroot.h>
 #include <_string.h>
+#include <kernel.h>
 
 struct link_srv link_methods [] = {
     L_CREATE,
@@ -373,14 +374,22 @@ response_t _HKBUILD (struct manager* m_man, char* ip, int sockfd, char** args, i
     return OK;
 }
 
-// The buit kernel binary
+// The built kernel binary
 response_t _GKBUILD (struct manager* m_man, char* ip, int sockfd, char** args, int n) {
     int sc_no = get_client_from_ip (m_man, ip);
     if (sc_no == -1) {
         return NOT_FOUND;
     }
     
+    struct serve_client* current_client = &(m_man->clients[sc_no]);
+    if (current_client->kernel == NULL) {
+        char new_arch[32];
+        
+        current_client->kernel = init_kernel(m_man, sc_no, new_arch);
+    }
     
+    char kernel_path[256];
+    sprintf (kernel_path, "%s/%s/kernel/", m_man->root, current_client->id);
     
     return OK;
 }

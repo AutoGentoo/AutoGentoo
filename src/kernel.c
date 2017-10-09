@@ -39,6 +39,7 @@ struct kernel_client* init_kernel (struct manager* m_man, int sc_no, char* archi
         FILE* fd_krelease = popen("make -s kernelversion 2> /dev/null", "r");
         fgets(out_k->release, 32, fd_krelease);
         pclose (fd_krelease);
+        
         exit (0);
     }
     

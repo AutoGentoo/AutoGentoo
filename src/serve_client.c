@@ -272,6 +272,8 @@ void read_serve (int fd, struct manager * m_man) { // You must malloc this point
             chroot_mount (m_man->clients[i].chroot);
             m_man->clients[i].state = STAGE3;
         }
+        m_man->clients[i].kernel = NULL;
+        
     }
 }
 
