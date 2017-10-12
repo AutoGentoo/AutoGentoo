@@ -60,12 +60,11 @@ struct system_mounts {
 };
 
 struct chroot_client {
-    struct manager * m_man;
-    int sc_no; // Index of client
     struct process_t *proc_list[128];
-    
     struct chroot_mount mounts[16];
+    struct manager * m_man;
     
+    int sc_no; // Index of client
     int mount_c;
     int proc_c;
     pid_t pid; // Process id of the chroot fork()

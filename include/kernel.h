@@ -37,15 +37,15 @@ struct kbinary;
 
 struct kbinary {
     unsigned char sha256_hash[SHA256_DIGEST_LENGTH];
-    size_t binary_size;
     char binary_path[256];
     char id[16]; // Serve client ID
+    size_t binary_size;
 };
 
 struct kernel_client {
     char release[32];
-    char portage_arch[16];
     char chost[32];
+    char portage_arch[16];
     cross_arch arch;
 };
 
