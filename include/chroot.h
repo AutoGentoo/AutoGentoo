@@ -31,21 +31,20 @@
 #include <request.h>
 #include <mntent.h>
 
-typedef int _pid_c;
 struct chroot_client;
-struct process_t;
 
-typedef enum {
-    WAITING,
-    RUNNING,
-    DEFUNCT
-} proc_stat;
-
-typedef enum {
+typedef enum mount_status {
     NOT_MOUNTED,
     IS_MOUNTED,
     NO_MOUNT, // If the parent directory is the child this is set
 } mount_status;
+
+typedef enum chroot_mounts {
+    PROC = 0x1,
+    DEV = 0x2,
+    SYS = 0x4,
+    PORTAGE = 0x8
+} chroot_mounts;
 
 struct chroot_mount {
     char parent[128]; // Relative to / of main (mount source)
@@ -55,19 +54,16 @@ struct chroot_mount {
 };
 
 struct system_mounts {
-    char mounts[256][256];
+    char mounts[MAX_CLIENTS][16][256];
     int mount_c;
 };
 
 struct chroot_client {
-    struct process_t *proc_list[128];
     struct chroot_mount mounts[16];
     struct manager * m_man;
-    
+
     int sc_no; // Index of client
     int mount_c;
-    int proc_c;
-    pid_t pid; // Process id of the chroot fork()
     int intited; // Specifies whether directories are mounted to chroot (/proc, /sys, /dev, /usr/portage)
 };
 

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="AutoGentoo" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option default_target="main" />
+		<Option compiler="null" />
+		<MakeCommands>
+			<Build command="make" />
+			<CompileFile command="" />
+			<Clean command="make clean" />
+			<DistClean command="$make -f $makefile distclean$target" />
+			<AskRebuildNeeded command="make" />
+			<SilentBuild command="make &gt; $(CMD_NULL)" />
+		</MakeCommands>
+		<Build>
+			<Target title="all">
+				<Option type="4" />
+				<Option compiler="null" />
+				<Option projectCompilerOptionsRelation="0" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Makefile.am" />
+		<Unit filename="include/Makefile.am" />
+		<Unit filename="include/_string.h" />
+		<Unit filename="include/autogentoo.h" />
+		<Unit filename="include/chroot.h" />
+		<Unit filename="include/crossdev.h" />
+		<Unit filename="include/emerge.h" />
+		<Unit filename="include/hash.h" />
+		<Unit filename="include/ip_convert.h" />
+		<Unit filename="include/ip_scan.h" />
+		<Unit filename="include/kernel.h" />
+		<Unit filename="include/list.h" />
+		<Unit filename="include/request.h" />
+		<Unit filename="include/response.h" />
+		<Unit filename="include/serve_client.h" />
+		<Unit filename="include/server.h" />
+		<Unit filename="include/srv_handle.h" />
+		<Unit filename="resources/autogentoo.png" />
+		<Unit filename="resources/autogentoo.svg" />
+		<Unit filename="src/Makefile.am" />
+		<Unit filename="src/_string.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/autogentoo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/chroot.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/crossdev.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/emerge.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/hash.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ip_convert.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ip_scan.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/kernel.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/list.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/request.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/response.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/serve_client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/server.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/srv_handle.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/testserveclient.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/testserver.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/update-config.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/update.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

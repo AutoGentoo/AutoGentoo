@@ -1,26 +1,26 @@
 /*
  * autogentoo.c
- * 
+ *
  * Copyright 2017 Unknown <atuser@Hyperion>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
- * 
+ *
+ *
  */
- 
+
 #include <autogentoo.h>
 #include <sys/mman.h>
 #include <chroot.h>
@@ -66,12 +66,12 @@ struct _opts {
 int main (int argc, char ** argv) {
     struct _opts __opts = {"", ".autogentoo.config", 0,0,0,-1,""};
     _getcwd(__opts.p, sizeof __opts.p);
-    
+
     struct client_request req;
     req.type = -1;
     int c;
     int a = 0; // Address specified
-    
+
     while ((c = getopt (argc, argv, "p:f:dhsci:r:a:")) != -1) {
         switch (c) {
             case 'p':
@@ -138,37 +138,36 @@ All changes to the client must be made through emerge\n\
                 break;
         }
     }
-    
+
     if (__opts.s) {
-        struct manager * m_man = mmap(NULL, sizeof (struct manager), PROT_READ | PROT_WRITE, 
+        struct manager * m_man = mmap(NULL, sizeof (struct manager), PROT_READ | PROT_WRITE,
             MAP_SHARED | MAP_ANONYMOUS, -1, 0);
         strcpy(m_man->root, __opts.p);
         strcpy(m_man->_config, __opts.f);
-        
+
         chdir (m_man->root);
         if (access (__opts.f, F_OK) != -1) {
             int _fd = open (__opts.f, O_RDONLY);
             read_serve (_fd, m_man);
             close (_fd);
         }
-        chroot_main ();
-        
+
         server_main (__opts.d, m_man);
     }
     else {
         // Client
         char s_ip[32];
         struct passwd *pw = getpwuid(getuid());
-        
+
         const char *homedir = pw->pw_dir;
-        
+
         char configpath[256];
         char new_dir[256];
         sprintf (configpath, "%s/.config/autogentoo/ip.config", homedir);
         sprintf (new_dir, "%s/.config/autogentoo", homedir);
-        
+
         _mkdir (new_dir);
-        
+
         if (!a) { // Address not specified
             if (access (configpath, F_OK) != -1) {
                 FILE* ip_c_fd = fopen (configpath, "r");
@@ -187,30 +186,30 @@ All changes to the client must be made through emerge\n\
             fclose (ip_c_fd);
             printf ("Saved ip address successfuly\n");
         }
-        
+
         if ((int)req.type == -1) {
             printf ("Nothing to do. Exiting...\n");
             return 0;
         }
-        
+
         char _hostname[100]; // To find the ip
         char _ip [16]; // current ip to define the range
         gethostname(_hostname, (size_t)100);
         hostname_to_ip(_hostname , _ip);
-        
+
         printf ("%s package %s\n", request_names[(int)req.type], req.atom);
         if (strncmp (_ip, "127.0.0", 7) == 0) {
             printf ("Not connected to network, using localhost\n");
             fflush(stdout);
             strcpy (s_ip, "127.0.0.1");
         }
-        
-        
+
+
         response_t res;
-        
+
         char message[256];
         res = ask_server (s_ip, req, &message[0]);
-        
+
         printf ("%s\n", res.message);
     }
     return 0;

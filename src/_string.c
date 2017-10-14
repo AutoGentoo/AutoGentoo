@@ -145,5 +145,5 @@ char* removeChar(char* str, char c){
             *dst++ = *str;
     }
      
-    return *str;
+    return &(*str);
 }
