@@ -172,7 +172,7 @@ void chroot_mount (struct chroot_client* client) {
     
     
     char resolv_conf_chroot [256];
-    sprintf (resolv_conf_chroot, "%s/etc/resolv.conf", client->m_man->root);
+    sprintf (resolv_conf_chroot, "%s/%s/etc/resolv.conf", client->m_man->root, buffer_client->id);
     cpy (buffer_client->resolv_conf, resolv_conf_chroot);
     eselect_locale (buffer_client->locale, client->m_man->root);
     
