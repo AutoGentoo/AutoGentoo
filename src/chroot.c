@@ -30,8 +30,6 @@
 #include <sys/mman.h>
 #include <_string.h>
 
-static struct system_mounts* sys_mnts;
-
 int mount_to_sc (struct manager* m_man, char** client_roots, char* path) {
     int i;
     for (i = 0; i != m_man->client_c; i++) {
@@ -42,21 +40,6 @@ int mount_to_sc (struct manager* m_man, char** client_roots, char* path) {
 
     char check_id[32];
     sscanf (path, "^(.*/)([^/]*)$", NULL, check_id);
-}
-
-int chroot_check (struct chroot_client* client, struct manager* m_man, int sc_no) {
-    struct mntent *ent;
-    FILE *mnts_stream;
-
-    mnts_stream = setmntent("/proc/mounts", "r");
-    if (mnts_stream == NULL) {
-        perror("setmntent");
-        exit(1);
-    }
-    while ((ent = getmntent(mnts_stream)) != NULL) {
-        ;
-    }
-    endmntent(mnts_stream);
 }
 
 struct chroot_client* chroot_new (struct manager* m_man, int sc_no) {
@@ -103,11 +86,27 @@ int get_mounts (struct manager* m_man, int sc_no, struct chroot_mount* mounts, i
     char sc_root[256];
     sprintf (sc_root, "%s/%s", m_man->root, m_man->clients[sc_no].id);
     strcpy (sc_root, path_normalize(sc_root));
-    int sc_root_l = strlen(sc_root);
+    size_t sc_root_l = strlen(sc_root);
+
+    int path_mount_c;
+    char path_mounts[128][256];
+
+    struct mntent *ent;
+    FILE *mnts_stream;
+
+    mnts_stream = setmntent("/proc/mounts", "r");
+    if (mnts_stream == NULL) {
+        perror("setmntent");
+        exit(1);
+    }
+    while ((ent = getmntent(mnts_stream)) != NULL) {
+        ;
+    }
+    endmntent(mnts_stream);
 
     int i;
-    for (i = 0; i != sys_mnts->mount_c; i++) {
-        if (strncmp (sys_mnts->mounts[sc_no], sc_root, sc_root_l) != 0)
+    for (i = 0; i != path_mount_c; i++) {
+        if (strncmp (path_mounts[i], sc_root, sc_root_l) != 0)
             continue;
 
         // We know that the current mount path is part of this client
@@ -118,7 +117,7 @@ int get_mounts (struct manager* m_man, int sc_no, struct chroot_mount* mounts, i
             sprintf (dest_temp, "%s/%s", sc_root, mounts[j].child);
             strcpy (dest_temp, path_normalize (dest_temp));
 
-            if (strcmp (sys_mnts->mounts[i], dest_temp) == 0) {
+            if (strcmp (path_mounts[i], dest_temp) == 0) {
                 out |= 1 << j;
                 break;
             }
@@ -128,22 +127,6 @@ int get_mounts (struct manager* m_man, int sc_no, struct chroot_mount* mounts, i
     return out;
 }
 
-int mount_check (struct chroot_mount mnt, char* target) {
-    /*
-    if (strcmp (src_temp, dest_temp) == 0) {
-        return 1;
-    }
-
-    int i;
-    for (i=0; i!=sys_mnts->mount_c; i++) {
-        if (strcmp (dest_temp, sys_mnts->mounts[i]) == 0) {
-            return 1;
-        }
-    }*/
-    return 0;
-}
-
-
 void chroot_mount (struct chroot_client* client) {
     char target[256];
     struct serve_client * buffer_client = &client->m_man->clients[client->sc_no];
@@ -151,17 +134,15 @@ void chroot_mount (struct chroot_client* client) {
     sprintf (target, "%s/%s", client->m_man->root, buffer_client->id);
 
     int i;
+    int got = get_mounts(client->m_man, client->sc_no, client->mounts, client->mount_c);
     for (i=0; i!=client->mount_c; i++) {
-        mount_status got = mount_check (client->mounts[i], target);
-        if (got != NOT_MOUNTED) {
-            continue;
-        }
-
-        if (strcmp(client->mounts[i].type, "") == 0) {
-            bind_mount (target, client->mounts[i].parent, client->mounts[i].child, client->mounts[i].recursive);
-        }
-        else {
-            type_mount (target, client->mounts[i].parent, client->mounts[i].child, client->mounts[i].type);
+        if ((got & i) == 0) {
+            if (strcmp(client->mounts[i].type, "") == 0) {
+                bind_mount (target, client->mounts[i].parent, client->mounts[i].child, client->mounts[i].recursive);
+            }
+            else {
+                type_mount (target, client->mounts[i].parent, client->mounts[i].child, client->mounts[i].type);
+            }
         }
     }
 

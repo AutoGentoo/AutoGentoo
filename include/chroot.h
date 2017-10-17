@@ -39,13 +39,6 @@ typedef enum mount_status {
     NO_MOUNT, // If the parent directory is the child this is set
 } mount_status;
 
-typedef enum chroot_mounts {
-    PROC = 0x1,
-    DEV = 0x2,
-    SYS = 0x4,
-    PORTAGE = 0x8
-} chroot_mounts;
-
 struct chroot_mount {
     char parent[128]; // Relative to / of main (mount source)
     char child[128]; // Relative to chroot/ (mnt point)
@@ -53,13 +46,8 @@ struct chroot_mount {
     int recursive; // 0 for --bind, 1 for --rbind (not used if type is specified)
 };
 
-struct system_mounts {
-    char mounts[MAX_CLIENTS][16][256];
-    int mount_c;
-};
-
 struct chroot_client {
-    struct chroot_mount mounts[16];
+    struct chroot_mount mounts [16];
     struct manager * m_man;
 
     int sc_no; // Index of client
@@ -67,14 +55,9 @@ struct chroot_client {
     int intited; // Specifies whether directories are mounted to chroot (/proc, /sys, /dev, /usr/portage)
 };
 
-extern volatile struct process_t* process_buffer;
-
 struct chroot_client* chroot_new (struct manager* m_man, int sc_no);
 void eselect_locale (char* loc, char* root);
 void chroot_mount (struct chroot_client* client);
-
-void chroot_main ();
-int mount_check (struct chroot_mount mnt, char* target);
 
 void type_mount (char* new_root, char* src, char* dest, char* type);
 void bind_mount (char* new_root, char* src, char* dest, int recursive);
