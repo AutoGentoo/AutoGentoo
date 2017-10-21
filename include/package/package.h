@@ -20,7 +20,7 @@ struct __Category {
  * The manifest
  */
 struct __Package {
-    char category[64];
+    Category* category;
     char name[128];
 
     Manifest manifest;

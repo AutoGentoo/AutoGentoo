@@ -13,6 +13,9 @@
   <component name="ChangeListManager">
     <list default="true" id="b7e5da42-7220-46c2-b30e-8a0eaf774a52" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/package/package.h" afterPath="$PROJECT_DIR$/include/package/package.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/tools/vector.h" afterPath="$PROJECT_DIR$/include/tools/vector.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vector.c" afterPath="$PROJECT_DIR$/src/vector.c" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -39,8 +42,8 @@
       <file leaf-file-name="package.h" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/include/package/package.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="333">
-              <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+            <state relative-caret-position="239">
+              <caret line="22" column="4" lean-forward="true" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -49,7 +52,7 @@
       <file leaf-file-name="repository.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/include/portage/repository.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="567">
+            <state relative-caret-position="239">
               <caret line="51" column="51" lean-forward="false" selection-start-line="51" selection-start-column="51" selection-end-line="51" selection-end-column="51" />
               <folding>
                 <element signature="e#100#125#0" expanded="true" />
@@ -61,8 +64,8 @@
       <file leaf-file-name="vector.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/vector.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-271">
-              <caret line="26" column="21" lean-forward="false" selection-start-line="26" selection-start-column="21" selection-end-line="26" selection-end-column="21" />
+            <state relative-caret-position="1242">
+              <caret line="69" column="89" lean-forward="false" selection-start-line="69" selection-start-column="89" selection-end-line="69" selection-end-column="89" />
               <folding>
                 <element signature="e#41#66#0" expanded="true" />
               </folding>
@@ -73,15 +76,15 @@
       <file leaf-file-name="manifest.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/include/package/manifest.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+            <state relative-caret-position="-625">
+              <caret line="5" column="8" lean-forward="true" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
-                <marker date="1508539087206" expanded="true" signature="337:526" ph="{...}" />
-                <marker date="1508539087206" expanded="true" signature="543:615" ph="{...}" />
-                <marker date="1508539087206" expanded="true" signature="637:682" ph="{...}" />
-                <marker date="1508539087206" expanded="true" signature="703:815" ph="{...}" />
-                <marker date="1508539087206" expanded="true" signature="841:948" ph="{...}" />
+                <marker date="1508548940966" expanded="true" signature="337:526" ph="{...}" />
+                <marker date="1508548940966" expanded="true" signature="543:615" ph="{...}" />
+                <marker date="1508548940966" expanded="true" signature="637:682" ph="{...}" />
+                <marker date="1508548940966" expanded="true" signature="703:815" ph="{...}" />
+                <marker date="1508548940966" expanded="true" signature="841:948" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -90,8 +93,8 @@
       <file leaf-file-name="vector.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/include/tools/vector.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="593">
-              <caret line="34" column="39" lean-forward="false" selection-start-line="34" selection-start-column="39" selection-end-line="34" selection-end-column="39" />
+            <state relative-caret-position="161">
+              <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -152,15 +155,15 @@
       <list>
         <option value="$PROJECT_DIR$/ebuild.h" />
         <option value="$PROJECT_DIR$/include/package/Manifest.h" />
-        <option value="$PROJECT_DIR$/include/tools/vector.h" />
         <option value="$PROJECT_DIR$/main.c" />
         <option value="$PROJECT_DIR$/src/manifest.c.c" />
         <option value="$PROJECT_DIR$/include/package/ebuild.h" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/src/vector.c" />
         <option value="$PROJECT_DIR$/src/manifest.c" />
-        <option value="$PROJECT_DIR$/include/package/manifest.h" />
         <option value="$PROJECT_DIR$/include/portage/repository.h" />
+        <option value="$PROJECT_DIR$/include/tools/vector.h" />
+        <option value="$PROJECT_DIR$/src/vector.c" />
+        <option value="$PROJECT_DIR$/include/package/manifest.h" />
         <option value="$PROJECT_DIR$/include/package/package.h" />
       </list>
     </option>
@@ -280,12 +283,12 @@
       <workItem from="1508382818958" duration="6493000" />
       <workItem from="1508419878526" duration="3998000" />
       <workItem from="1508504470837" duration="5399000" />
-      <workItem from="1508536913861" duration="7159000" />
+      <workItem from="1508536913861" duration="8177000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="24742000" />
+    <option name="totallyTimeSpent" value="25760000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1600" height="794" extended-state="7" />
@@ -365,11 +368,11 @@
           <caret line="32" column="2" lean-forward="false" selection-start-line="32" selection-start-column="2" selection-end-line="32" selection-end-column="2" />
           <folding>
             <element signature="e#0#28#0" expanded="true" />
-            <marker date="1508539087206" expanded="true" signature="337:526" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="543:615" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="637:682" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="703:815" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="841:948" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="337:526" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="543:615" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="637:682" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="703:815" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="841:948" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -456,11 +459,11 @@
           <caret line="7" column="37" lean-forward="true" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
           <folding>
             <element signature="e#0#28#0" expanded="true" />
-            <marker date="1508539087206" expanded="true" signature="337:526" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="543:615" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="637:682" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="703:815" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="841:948" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="337:526" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="543:615" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="637:682" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="703:815" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="841:948" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -528,11 +531,11 @@
           <caret line="30" column="1" lean-forward="false" selection-start-line="30" selection-start-column="1" selection-end-line="30" selection-end-column="1" />
           <folding>
             <element signature="e#0#28#0" expanded="true" />
-            <marker date="1508539087206" expanded="true" signature="337:526" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="543:615" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="637:682" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="703:815" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="841:948" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="337:526" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="543:615" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="637:682" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="703:815" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="841:948" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -665,16 +668,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/vector.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-271">
-          <caret line="26" column="21" lean-forward="false" selection-start-line="26" selection-start-column="21" selection-end-line="26" selection-end-column="21" />
-          <folding>
-            <element signature="e#41#66#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/portage/gnome-base/gdm/Manifest">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="162">
@@ -699,29 +692,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/package/manifest.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-            <marker date="1508539087206" expanded="true" signature="337:526" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="543:615" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="637:682" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="703:815" ph="{...}" />
-            <marker date="1508539087206" expanded="true" signature="841:948" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/tools/vector.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="593">
-          <caret line="34" column="39" lean-forward="false" selection-start-line="34" selection-start-column="39" selection-end-line="34" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/include/package/ebuild.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="108">
@@ -738,9 +708,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/include/tools/vector.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="161">
+          <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/include/portage/repository.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="567">
+        <state relative-caret-position="239">
           <caret line="51" column="51" lean-forward="false" selection-start-line="51" selection-start-column="51" selection-end-line="51" selection-end-column="51" />
           <folding>
             <element signature="e#100#125#0" expanded="true" />
@@ -748,10 +726,35 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/vector.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1242">
+          <caret line="69" column="89" lean-forward="false" selection-start-line="69" selection-start-column="89" selection-end-line="69" selection-end-column="89" />
+          <folding>
+            <element signature="e#41#66#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/package/manifest.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-625">
+          <caret line="5" column="8" lean-forward="true" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+            <marker date="1508548940966" expanded="true" signature="337:526" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="543:615" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="637:682" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="703:815" ph="{...}" />
+            <marker date="1508548940966" expanded="true" signature="841:948" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/include/package/package.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+        <state relative-caret-position="239">
+          <caret line="22" column="4" lean-forward="true" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
           <folding />
         </state>
       </provider>

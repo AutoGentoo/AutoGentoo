@@ -23,9 +23,9 @@ enum __vector_opts {
 
 struct __Vector {
     void* ptr; // Location where elements are stored
-    int n; // Number of allocated places
+    int n; // Number of filled places
     int s; // Max number of elements (increments by HACKSAW_VECTOR_SIZE_INC)
-    size_t size; // number of bytes each element has
+    size_t size; // size of each element
 
     int ordered;
     int keep;
@@ -35,6 +35,7 @@ Vector* vector_new (size_t el_size, vector_opts opts);
 void vector_add(Vector* vec, void* el);
 void vector_remove(Vector* vec, int index);
 void vector_insert(Vector* vec, void* el, int index);
+void* vector_get(Vector* vec, unsigned int i);
 void vector_free(Vector* vec);
 
 #endif //HACKSAW_VECTOR_H

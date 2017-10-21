@@ -24,7 +24,7 @@ void vector_add(Vector* vec, void* el) {
     if (vec->s == (vec->n + 1)) {
         vector_allocate(vec);
     }
-    memcpy (&vec->ptr[vec->n * vec->size], el, vec->size);
+    memcpy (vector_get(vec, vec->n), el, vec->size);
     vec->n++;
 }
 
@@ -33,23 +33,23 @@ void vector_remove(Vector* vec, int index) {
 
     if (!vec->keep) {
         if (vec->ordered) {
-            memcpy(&vec->ptr[index * vec->size],
-                        &vec->ptr[(index + 1) * vec->size],
-                        vec->size * (vec->n - index)
+            memcpy(vector_get(vec, index),
+                   vector_get(vec, index + 1),
+                   vec->size * (vec->n - index)
             ); // Moves everything back by vec->size
         }
         else {
-            memcpy(&vec->ptr[index * vec->size],
-                        &vec->ptr[vec->n * vec->size],
+            memcpy(vector_get(vec, index),
+                   vector_get(vec, vec->n),
                         vec->size
             ); // Moves the last element into the open place
         }
 
-        memcpy(&vec->ptr[index*vec->n], zero, vec->size);
+        memcpy(vector_get(vec, vec->n), zero, vec->size);
         vec->n--;
     }
     else {
-        memcpy(&vec->ptr[index*vec->size], zero, vec->size);
+        memcpy(vector_get(vec, index), zero, vec->size);
     }
 
     free (zero);
@@ -64,6 +64,10 @@ void vector_insert(Vector* vec, void* el, int index) {
 void vector_allocate(Vector* vec) { // A private function
     vec->s += HACKSAW_VECTOR_SIZE_INC;
     vec->ptr = realloc (vec->ptr, vec->size * vec->s);
+}
+
+void* vector_get(Vector* vec, unsigned int i) {
+    return (void*) &(((char*)vec->ptr)[i * vec->size]); // Casting to get rid of warnings
 }
 
 void vector_free(Vector* vec) {
