@@ -10,7 +10,8 @@ void vector_allocate(Vector* vec);
 
 Vector* vector_new (size_t el_size, vector_opts opts) {
     Vector* out_ptr = malloc(sizeof(Vector));
-    out_ptr->s = HACKSAW_VECTOR_SIZE_INC;
+    out_ptr->s = HACKSAW_VECTOR_INCREMENT;
+    out_ptr->increment = HACKSAW_VECTOR_INCREMENT;
     out_ptr->size = el_size;
     out_ptr->ptr = malloc (out_ptr->size * out_ptr->s);
     out_ptr->n = 0;
@@ -30,6 +31,7 @@ void vector_add(Vector* vec, void* el) {
 
 void vector_remove(Vector* vec, int index) {
     void* zero = malloc (vec->size);
+    memset(zero, 0, vec->size);
 
     if (!vec->keep) {
         if (vec->ordered) {
@@ -59,10 +61,12 @@ void vector_insert(Vector* vec, void* el, int index) {
     if (vec->s == (vec->n + 1)) {
         vector_allocate(vec);
     }
+    memmove(vector_get (vec, index) + vec->size, vector_get(vec, index), (vec->n - index) * vec->size);
+    memcpy(vector_get (vec, index), el, vec->size);
 }
 
 void vector_allocate(Vector* vec) { // A private function
-    vec->s += HACKSAW_VECTOR_SIZE_INC;
+    vec->s += vec->increment;
     vec->ptr = realloc (vec->ptr, vec->size * vec->s);
 }
 

@@ -14,6 +14,7 @@ void manifest_parse (Manifest* manifest, FILE* fp) {
         if (strncmp (line, "-----", 5) == 0) {
             if (strncmp (line, "-----BEGIN PGP SIGNED MESSAGE-----", 34) == 0) {
                 pgp_status = 1;
+                manifest->is_signed = 1;
             }
             else if (strncmp(line, "-----BEGIN PGP SIGNATURE-----", 29) == 0) {
                 pgp_status = 2;

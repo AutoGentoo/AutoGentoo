@@ -2,13 +2,15 @@
 // Created by atuser on 10/20/17.
 //
 
-#ifndef HACKSAW_REPOSITORY_H
-#define HACKSAW_REPOSITORY_H
-
 #include <tools/vector.h>
 #include <stdbool.h>
 #include <unitypes.h>
 #include <sys/stat.h>
+#include <stdio.h>
+#include <tools/string_vector.h>
+
+#ifndef HACKSAW_REPOSITORY_H
+#define HACKSAW_REPOSITORY_H
 
 typedef struct __RepoConfig RepoConfig;
 typedef struct __Repository Repository;
@@ -25,7 +27,7 @@ enum __repo_t {
 struct __RepoConfig {
     Repository* main_repo;
     bool eclass_overides;
-    Vector* force; // Essentially just char[][]
+    StringVector* force; // Essentially just char[][]
     Vector* repositories;
 
 };
@@ -42,7 +44,7 @@ struct __Repository {
 
     bool auto_sync;
     bool eclass_overrides; // Override the eclass definition (NOT RECOMMENDED)
-    Vector* force;
+    StringVector* force;
 
     char location[256];
     int priority;
@@ -51,5 +53,9 @@ struct __Repository {
     mode_t sync_mask;
     char sync_uri[256]; // Empty to disable syncing
 };
+
+void parse_repo_config (RepoConfig* repo_config, FILE* fp);
+void parse_repository (Repository* repo, FILE* fp);
+repo_t get_sync_type (char* str);
 
 #endif //HACKSAW_REPOSITORY_H

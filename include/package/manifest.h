@@ -1,4 +1,7 @@
-#include <package/package.h>
+//
+// Created by atuser on 10/20/17.
+//
+
 #include <tools/vector.h>
 #include <stdio.h>
 
@@ -38,7 +41,6 @@ struct __Manifest {
     /* If the Manifest PGP signed use these */
     int is_signed;
     HashEntry hash;
-
 };
 
 struct __ManifestEntry {
