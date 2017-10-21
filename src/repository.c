@@ -11,6 +11,8 @@ void parse_repo_config (RepoConfig* repo_config, FILE* fp) {
     ssize_t read;
 
     repo_config->repositories = vector_new(sizeof(Repository), REMOVE | UNORDERED);
+    repo_config->force = string_vector_new();
+    repo_config->eclass_overides = false;
     while ((read = getline(&line, &len, fp))) {
         line[strlen(line) - 1] = '\0'; // Remove the newline
         //if ()

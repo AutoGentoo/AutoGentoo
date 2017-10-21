@@ -5,9 +5,14 @@
 #ifndef HACKSAW_REGULAR_EXPRESSION_H_H
 #define HACKSAW_REGULAR_EXPRESSION_H_H
 
-#include <tools/vector.h>
+#include <tools/string_vector.h>
 
 int re_match (char* string, char* pattern);
-void re_group_match (Vector** vec, char* string, char* pattern, int max_groups);
+
+// Creates a vector of all the group matches
+void re_group_match (StringVector* vec, char* string, char* pattern, int max_groups);
+
+// Looks for the first match and copies it to dest
+void re_group_get (char* dest, char* string, char* pattern);
 
 #endif //HACKSAW_REGULAR_EXPRESSION_H_H

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <tools/vector.h>
 #include <tools/string_vector.h>
+#include <tools/regular_expression.h>
 
 void print_bin (void* ptr, int n, size_t size) {
     int i;
@@ -81,5 +82,15 @@ int main() {
 
     string_vector_free (strvec);
 
+    printf ("Test regex\n");
+    StringVector* testregex = string_vector_new();
+    re_group_match (testregex, "[DEFAULT]", "\\[(.*?)\\]", 1);
+    re_group_match (testregex, "[gentoo]", "\\[(.*?)\\]", 1);
+    re_group_match (testregex, "main-repo = gentoo", "\\[(.*?)\\]", 1);
+    print_string_vec(testregex);
+
+    char dest[12];
+    re_group_get (dest, "[DEFAULT]", "\\[(.*?)\\]");
+    printf("%s\n", dest);
     return 0;
 }
