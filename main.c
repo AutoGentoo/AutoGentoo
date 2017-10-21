@@ -48,7 +48,7 @@ int main() {
     vector_insert(testVec, &el_1_5, 1);
     print_vec(testVec);
 
-    vector_remove(testVec, 2);
+    vector_remove(testVec, 1);
     print_vec(testVec);
     vector_add(testVec, &el_two);
     print_vec(testVec);
