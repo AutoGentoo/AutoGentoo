@@ -26,7 +26,7 @@ enum __repo_t {
 
 struct __RepoConfig {
     Repository* main_repo;
-    bool eclass_overides;
+    StringVector* eclass_overides;
     StringVector* force; // Essentially just char[][]
     Vector* repositories;
 
@@ -43,7 +43,7 @@ struct __Repository {
     */
 
     bool auto_sync;
-    bool eclass_overrides; // Override the eclass definition (NOT RECOMMENDED)
+    StringVector* eclass_overrides; // Override the eclass definition (NOT RECOMMENDED)
     StringVector* force;
 
     char location[256];
