@@ -1,0 +1,17 @@
+{
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "(gdb) Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceRoot}/src/.libs/autogentoo",
+                "args": ["-s"],
+                "stopAtEntry": false,
+                "cwd": "${workspaceRoot}/src/.libs",
+                "environment": [],
+                "externalConsole": true,
+                "MIMode": "gdb"
+            }
+        ]
+    }

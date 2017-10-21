@@ -134,9 +134,12 @@ void chroot_mount (struct chroot_client* client) {
     sprintf (target, "%s/%s", client->m_man->root, buffer_client->id);
 
     int i;
-    int got = get_mounts(client->m_man, client->sc_no, client->mounts, client->mount_c);
+    //int got = get_mounts(client->m_man, client->sc_no, client->mounts, client->mount_c);
+    int got = 0x8;
     for (i=0; i!=client->mount_c; i++) {
         if ((got & i) == 0) {
+            print_bin(&got, sizeof(int));
+            continue;
             if (strcmp(client->mounts[i].type, "") == 0) {
                 bind_mount (target, client->mounts[i].parent, client->mounts[i].child, client->mounts[i].recursive);
             }

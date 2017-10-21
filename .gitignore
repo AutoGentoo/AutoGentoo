@@ -68,3 +68,6 @@ src/autogentoo-update-config
 src/*/*
 src/*.config*
 en_US.utf8
+*.request
+Debug/*
+*~
