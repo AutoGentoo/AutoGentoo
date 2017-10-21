@@ -11,15 +11,29 @@ StringVector* string_vector_new () {
     return vector_new(sizeof(char*), ORDERED | REMOVE);
 }
 
-void string_vector_set_increment(StringVector* vec, int inc) {
-    vec->increment = inc;
-}
-
 void string_vector_add (StringVector* vec, char* string) {
     char* new_ptr = malloc (sizeof(char) * strlen(string));
     strcpy(new_ptr, string);
 
-    vector_add(vec, new_ptr);
+    ((char**)vec->ptr)[vec->n] = new_ptr;
+    vec->n++;
+}
+
+void string_vector_insert(StringVector* vec, char* string, int index) {
+    char* new_ptr = malloc (sizeof(char) * strlen(string));
+    strcpy(new_ptr, string);
+
+    if (vec->n + 1 >= vec->size) {
+        vector_allocate(vec);
+    }
+
+    int i;
+    for (i=vec->n; i>=index; i--) {
+        ((char**)vec->ptr)[i] = ((char**)vec->ptr)[i-1];
+    }
+
+    ((char**)vec->ptr)[index] = new_ptr;
+    vec->n++;
 }
 
 void string_vector_remove (StringVector* vec, int index) {

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <tools/vector.h>
+#include <tools/string_vector.h>
 
 void print_bin (void* ptr, int n, size_t size) {
     int i;
@@ -21,6 +22,14 @@ void print_vec(Vector* vec) {
     fflush(stdout);
 }
 
+void print_string_vec(StringVector* vec) {
+    int i;
+    for (i=0; i!=vec->n; i++) {
+        printf("%p (%s) ", string_vector_get(vec, i), string_vector_get(vec, i));
+    }
+    printf("\n");
+}
+
 struct __test1 {
     int a;
     int b;
@@ -33,6 +42,7 @@ struct __test2 {
 };
 
 int main() {
+    printf ("Test Vector");
     Vector* testVec = vector_new(sizeof(int), UNORDERED | REMOVE);
     print_vec(testVec);
 
@@ -54,6 +64,22 @@ int main() {
     print_vec(testVec);
 
     vector_free(testVec);
+
+    printf ("Test StringVector\n");
+    StringVector* strvec = string_vector_new();
+    char n1[] = "NewString1";
+    string_vector_add(strvec, n1);
+    print_string_vec(strvec);
+    char n2[] = "NewString2";
+    string_vector_add(strvec, n2);
+    print_string_vec(strvec);
+    string_vector_remove (strvec, 0);
+    print_string_vec(strvec);
+
+    string_vector_insert (strvec, "TestInsert", 0);
+    print_string_vec(strvec);
+
+    string_vector_free (strvec);
 
     return 0;
 }
