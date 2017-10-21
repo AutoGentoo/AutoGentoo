@@ -63,6 +63,7 @@ void vector_insert(Vector* vec, void* el, int index) {
     }
     memmove(vector_get (vec, index) + vec->size, vector_get(vec, index), (vec->n - index) * vec->size);
     memcpy(vector_get (vec, index), el, vec->size);
+    vec->n++;
 }
 
 void vector_allocate(Vector* vec) { // A private function
