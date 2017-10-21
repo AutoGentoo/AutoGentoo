@@ -148,17 +148,20 @@ char* removeChar(char* str, char c){
     return &(*str);
 }
 
-#define BINMASK 0x14 // 1110
+void print_bin (void* ptr, size_t size) {
+    int i;
+    for (i=size-1; i>=0; i--) {
+        int j;
+        for (j=0; j<8; j++) {
+            printf("%d",  !!((((char*)ptr)[i] << j) & 0x80));
+        }
 
-void print_byte(char c) {
-    for (int i=7; i!=0; i--) {
-        printf("%d", c >> i);
+        if (i % 2) {
+            printf (" ");
+        }
+        else{
+            printf("|");
+        }
     }
-}
-
-void print_bin(void* ptr, size_t s) {
-    size_t i;
-    for (i=0; i!=s; i++) {
-        print_byte(((char*)ptr)[i]);
-    }
+    printf("\n");
 }
