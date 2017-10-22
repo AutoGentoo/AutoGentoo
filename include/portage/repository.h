@@ -3,11 +3,11 @@
 //
 
 #include <tools/vector.h>
-#include <stdbool.h>
 #include <unitypes.h>
 #include <sys/stat.h>
 #include <stdio.h>
-#include <tools/string_vector.h>
+#include <tools/config.h>
+#include <tools/boolean.h>
 
 #ifndef HACKSAW_REPOSITORY_H
 #define HACKSAW_REPOSITORY_H
@@ -27,8 +27,10 @@ enum __repo_t {
 struct __RepoConfig {
     Repository* main_repo;
     StringVector* eclass_overides;
-    StringVector* force; // Essentially just char[][]
+    StringVector* force;
     Vector* repositories;
+    Config* config;
+
 };
 
 struct __Repository {
@@ -53,8 +55,8 @@ struct __Repository {
     char sync_uri[256]; // Empty to disable syncing
 };
 
-void parse_repo_config (RepoConfig* repo_config, FILE* fp);
-Repository* parse_repository (FILE* fp, size_t stop);
+void parse_repo_config (RepoConfig* repo_config);
+Repository* parse_repository (ConfigSection*);
 repo_t get_sync_type (char* str);
 
 #endif //HACKSAW_REPOSITORY_H

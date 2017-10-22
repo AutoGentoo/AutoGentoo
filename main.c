@@ -3,6 +3,7 @@
 #include <tools/string_vector.h>
 #include <tools/regular_expression.h>
 #include <tools/config.h>
+#include <test/debug.h>
 
 void print_bin (void* ptr, int n, size_t size) {
     int i;
@@ -85,17 +86,16 @@ int main() {
 
     printf ("Test regex\n");
     StringVector* testregex = string_vector_new();
-    re_group_match (testregex, "[DEFAULT]", "\\[(.*?)\\]", 1);
-    re_group_match (testregex, "[gentoo]", "\\[(.*?)\\]", 1);
-    re_group_match (testregex, "main-repo = gentoo", "\\[(.*?)\\]", 1);
     print_string_vec(testregex);
 
-    char dest[12];
-    re_group_get (dest, "[DEFAULT]", "\\[(.*?)\\]");
-    printf("%s\n", dest);
 
-    Config* test_config = config_read("test/config.ini");
-    printf("section1.dd = %s\n", config_get(test_config, "section1", "dd"));
+    Config* test_config = config_read("/etc/portage/make.conf");
+    printf("CFLAGS = %s\n", config_get(test_config, NULL, "CFLAGS"));
+    printf("PORTDIR = %s\n", config_get(test_config, NULL, "PORTDIR"));
     config_free(test_config);
+
+    Config* test_repo = config_read("/etc/portage/repos.conf/rrr");
+
+
     return 0;
 }

@@ -13,7 +13,6 @@ typedef struct __ConfigVariable ConfigVariable;
 
 struct __Config {
     char path[256];
-    FILE* fp;
     Vector* sections;
     Vector* default_variables;
 };
@@ -29,6 +28,8 @@ struct __ConfigSection {
 };
 
 Config* config_read (char* config_path);
+void config_add (Config* config, char* path);
+void config_section_read (FILE* fp, Vector* variable, long start, long stop);
 ConfigSection* config_section_new (char* name);
 void config_variable_new (ConfigVariable* var, StringVector* data);
 void config_free (Config* config);

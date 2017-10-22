@@ -1,0 +1,43 @@
+//
+// Created by atuser on 10/22/17.
+//
+
+#include <tools/string.h>
+#include <stdlib.h>
+#include <string.h>
+
+String* string_new (size_t start) {
+    String* out = malloc (sizeof(String));
+    out->increment = HACKSAW_STRING_INCREMENT;
+    out->size = start;
+    out->n = 0;
+    out->ptr = malloc(sizeof(char) * out->size);
+    return out;
+}
+
+void string_set_from (String* dest, char* source, size_t start) {
+    size_t append_size = strlen(source);
+    for (; append_size + start >= dest->size; string_allocate(dest));
+
+    memcpy(&dest->ptr[start], source, append_size);
+    dest->n = start + append_size;
+}
+
+void string_append(String* dest, char* str) {
+    string_set_from(dest, str, dest->n);
+}
+
+void string_append_c(String* dest, int c) {
+    dest->ptr[dest->n] = (char)c;
+    dest->n++;
+}
+
+void string_allocate (String* string) {
+    string->size += string->increment;
+    string->ptr = realloc(string->ptr, string->size);
+}
+
+void string_free (String* string) {
+    free(string->ptr);
+    free(string);
+}
