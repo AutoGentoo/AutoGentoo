@@ -29,7 +29,6 @@ struct __RepoConfig {
     StringVector* eclass_overides;
     StringVector* force; // Essentially just char[][]
     Vector* repositories;
-
 };
 
 struct __Repository {
@@ -55,7 +54,7 @@ struct __Repository {
 };
 
 void parse_repo_config (RepoConfig* repo_config, FILE* fp);
-void parse_repository (Repository* repo, FILE* fp);
+Repository* parse_repository (FILE* fp, size_t stop);
 repo_t get_sync_type (char* str);
 
 #endif //HACKSAW_REPOSITORY_H

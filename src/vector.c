@@ -71,7 +71,7 @@ void vector_allocate(Vector* vec) { // A private function
     vec->ptr = realloc (vec->ptr, vec->size * vec->s);
 }
 
-void* vector_get(Vector* vec, unsigned int i) {
+void* vector_get(Vector* vec, int i) {
     return (void*) &(((char*)vec->ptr)[i * vec->size]); // Casting to get rid of warnings
 }
 

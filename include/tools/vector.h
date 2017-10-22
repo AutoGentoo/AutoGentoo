@@ -5,7 +5,7 @@
 #ifndef HACKSAW_VECTOR_H
 #define HACKSAW_VECTOR_H
 
-#include <glob.h>
+#include <stdio.h>
 
 typedef enum __vector_opts vector_opts;
 typedef struct __Vector Vector;
@@ -39,7 +39,7 @@ void vector_remove(Vector* vec, int index);
 void vector_insert(Vector* vec, void* el, int index);
 void vector_allocate(Vector* vec);
 void vector_set_increment(Vector* vec, int inc);
-void* vector_get(Vector* vec, unsigned int i);
+void* vector_get(Vector* vec, int i);
 void vector_free(Vector* vec);
 
 #endif //HACKSAW_VECTOR_H

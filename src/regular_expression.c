@@ -22,14 +22,16 @@ int re_match(char *string, char *pattern)
     return !status;
 }
 
-void re_group_match (StringVector* vec, char* string, char* pattern, int max_groups) {
+int re_group_match (StringVector* vec, char* string, char* pattern, int max_groups) {
     regex_t regexCompiled;
     regmatch_t groupArray[max_groups+1];
+
+    int out = 0;
 
     if (regcomp(&regexCompiled, pattern, REG_EXTENDED))
     {
         printf("Could not compile regular expression.\n");
-        return;
+        return out;
     };
 
     if (regexec(&regexCompiled, string, max_groups+1, groupArray, 0) == 0)
@@ -44,13 +46,15 @@ void re_group_match (StringVector* vec, char* string, char* pattern, int max_gro
             strcpy(sourceCopy, string);
             sourceCopy[groupArray[g].rm_eo] = 0;
             string_vector_add(vec, sourceCopy + groupArray[g].rm_so);
+            out++;
         }
     }
 
     regfree(&regexCompiled);
+    return out;
 }
 
-void re_group_get (char* dest, char* string, char* pattern) {
+int re_group_get (char* dest, char* string, char* pattern) {
     int max_groups = 1;
     regex_t regexCompiled;
     regmatch_t groupArray[max_groups+1];
@@ -58,7 +62,7 @@ void re_group_get (char* dest, char* string, char* pattern) {
     if (regcomp(&regexCompiled, pattern, REG_EXTENDED))
     {
         printf("Could not compile regular expression.\n");
-        return;
+        return 0;
     };
     int found = 0;
     if (regexec(&regexCompiled, string, max_groups+1, groupArray, 0) == 0)
@@ -79,7 +83,9 @@ void re_group_get (char* dest, char* string, char* pattern) {
 
     if (!found) {
         strcpy(dest, "");
+        return 0;
     }
 
     regfree(&regexCompiled);
+    return 1;
 }

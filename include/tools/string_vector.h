@@ -9,11 +9,6 @@
 
 typedef Vector StringVector;
 
-struct __StringIndex { // Make sure that we still have a valid ptr even after element removal
-    StringVector* parent;
-    int index;
-};
-
 StringVector* string_vector_new ();
 void string_vector_add (StringVector* vec, char* string);
 void string_vector_remove (StringVector* vec, int index);
