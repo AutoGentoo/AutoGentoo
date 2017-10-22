@@ -15,16 +15,15 @@ Config* config_read (char* config_path) {
     ssize_t read;
 
     strcpy(new_config->path, config_path);
-    new_config->fp = fopen(new_config->path, "w+");
+    new_config->fp = fopen(new_config->path, "r");
     new_config->sections = vector_new(sizeof(ConfigSection), REMOVE | UNORDERED);
     new_config->default_variables = vector_new(sizeof(ConfigVariable), REMOVE | UNORDERED);
 
     ConfigSection* current_section = NULL;
     char current_section_name[32];
 
-    while ((read = getline(&line, &len, new_config->fp))) {
+    while ((read = getline(&line, &len, new_config->fp)) != -1) {
         line[strlen(line) - 1] = '\0'; // Remove the newline
-
         if (line[0] == '#')
             continue;
 
@@ -50,11 +49,15 @@ Config* config_read (char* config_path) {
         }
         string_vector_free(variable_vector);
     }
+    fclose(new_config->fp);
+    new_config->fp = NULL;
+    return new_config;
 }
 
 ConfigSection* config_section_new (char* name) {
     ConfigSection* out = malloc (sizeof (ConfigSection));
     strcpy(out->name, name);
+    out->variables = vector_new(sizeof(ConfigVariable), UNORDERED | REMOVE);
     return out;
 }
 
@@ -102,7 +105,7 @@ char* config_get (Config* config, char* section, char* variable_name) {
             int j;
             for (j=0; j!=current_section->variables->n; j++) {
                 if (strcmp(variable_name, vector_get(current_section->variables, j)) == 0) {
-                    return vector_get(current_section->variables, j);
+                    return ((ConfigVariable*)vector_get(current_section->variables, j))->value;
                 }
             }
         }

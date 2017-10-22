@@ -2,6 +2,7 @@
 #include <tools/vector.h>
 #include <tools/string_vector.h>
 #include <tools/regular_expression.h>
+#include <tools/config.h>
 
 void print_bin (void* ptr, int n, size_t size) {
     int i;
@@ -92,5 +93,9 @@ int main() {
     char dest[12];
     re_group_get (dest, "[DEFAULT]", "\\[(.*?)\\]");
     printf("%s\n", dest);
+
+    Config* test_config = config_read("test/config.ini");
+    printf("section1.dd = %s\n", config_get(test_config, "section1", "dd"));
+    config_free(test_config);
     return 0;
 }
