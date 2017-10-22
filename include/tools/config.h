@@ -28,9 +28,12 @@ struct __ConfigSection {
     Vector* variables;
 };
 
-void config_read (Config* new_config, char* config_path);
+Config* config_read (char* config_path);
 ConfigSection* config_section_new (char* name);
 void config_variable_new (ConfigVariable* var, StringVector* data);
+void config_free (Config* config);
+void config_section_free (ConfigSection* section);
+void config_variable_free (ConfigVariable* var);
 char* config_get (Config* config, char* section, char* variable_name);
 
 #endif //HACKSAW_CONFIG_H_H

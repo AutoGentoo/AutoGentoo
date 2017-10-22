@@ -8,7 +8,8 @@
 #include <portage/repository.h>
 #include <stdlib.h>
 
-void config_read (Config* new_config, char* config_path) {
+Config* config_read (char* config_path) {
+    Config* new_config = malloc (sizeof(Config));
     char* line;
     size_t len = 0;
     ssize_t read;
@@ -64,6 +65,47 @@ void config_variable_new (ConfigVariable* var, StringVector* data) {
     strcpy(var->value, value_buf);
 }
 
-char* config_get (Config* config, char* section, char* variable_name) {
+void config_free (Config* config) {
+    int i;
+    for (i=0; i!=config->default_variables->n; i++) {
+        config_variable_free(vector_get(config->default_variables, i));
+    }
+    vector_free(config->default_variables);
+    for (i=0; i!=config->sections->n; i++) {
+        config_section_free(vector_get(config->sections, i));
+    }
+    vector_free(config->sections);
 
+    if (config->fp != NULL) { // Check if still open
+        fclose(config->fp);
+    }
+    free(config);
+}
+
+void config_section_free (ConfigSection* section) {
+    int i;
+    for (i=0; i!=section->variables->n; i++) {
+        config_variable_free(vector_get(section->variables, i));
+    }
+    vector_free(section->variables);
+}
+
+void config_variable_free (ConfigVariable* var) {
+    free(var->value);
+}
+
+char* config_get (Config* config, char* section, char* variable_name) {
+    int i;
+    for (i=0; i!=config->sections->n; i++) {
+        if (strcmp(section, vector_get(config->sections, i)) == 0) {
+            ConfigSection* current_section = vector_get(config->sections, i);
+            int j;
+            for (j=0; j!=current_section->variables->n; j++) {
+                if (strcmp(variable_name, vector_get(current_section->variables, j)) == 0) {
+                    return vector_get(current_section->variables, j);
+                }
+            }
+        }
+    }
+    return NULL;
 }
