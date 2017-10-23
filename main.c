@@ -65,48 +65,6 @@ struct __test2 {
 };
 
 int main() {
-    printf ("Test Vector\n");
-    Vector* testVec = vector_new(sizeof(long), UNORDERED | REMOVE);
-
-    long el_one = 0x0;
-    long el_two = 0xAAAAAAAAAAAAAAAA;
-
-    vector_add(testVec, &el_one);
-    vector_add(testVec, &el_two);
-    print_vec(testVec);
-
-    long el_1_5 = 0xFFFFFFFFFFFFFFFF;
-    vector_insert(testVec, &el_1_5, 1);
-    print_vec(testVec);
-
-    vector_remove(testVec, 1);
-    print_vec(testVec);
-    vector_add(testVec, &el_two);
-    print_vec(testVec);
-
-    vector_free(testVec);
-
-    printf ("Test StringVector\n");
-    StringVector* strvec = string_vector_new();
-    char n1[] = "NewString1";
-    string_vector_add(strvec, n1);
-    print_string_vec(strvec);
-    char n2[] = "NewString2";
-    string_vector_add(strvec, n2);
-    print_string_vec(strvec);
-    string_vector_remove (strvec, 0);
-    print_string_vec(strvec);
-
-    string_vector_insert (strvec, "TestInsert", 0);
-    print_string_vec(strvec);
-
-    string_vector_free (strvec);
-
-    printf ("Test regex\n");
-    StringVector* testregex = string_vector_new();
-    print_string_vec(testregex);
-
-
     Config* test_config = config_new("/etc/portage/make.conf");
     printf("CFLAGS = %s\n", config_get(test_config, NULL, "CFLAGS"));
     printf("PORTDIR = %s\n", config_get(test_config, NULL, "PORTDIR"));

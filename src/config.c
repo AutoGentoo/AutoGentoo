@@ -6,8 +6,7 @@
 #include <string.h>
 #include <tools/regular_expression.h>
 #include <stdlib.h>
-#include <tools/string.h>
-#include <test/debug.h>
+#include <tools/log.h>
 
 Config* config_new (char* path) {
     Config* config = malloc (sizeof(Config));
@@ -20,6 +19,11 @@ Config* config_new (char* path) {
     size_t len = 0;
     ssize_t read;
     FILE* fp = fopen(path, "r");
+
+    if (fp == NULL) {
+        lerror("no such file or directory: %s", path);
+        exit(1);
+    }
 
     ConfigSection* current_section = NULL;
     Vector* section_locations = vector_new(sizeof(long), ORDERED | KEEP);

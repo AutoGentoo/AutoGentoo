@@ -7,7 +7,7 @@
 #include <stdarg.h>
 
 void lerror (char* format, ...) {
-    fprintf (stderr, ANSI_BOLD ANSI_RED " * ");
+    fprintf (stderr, ANSI_BOLD ANSI_RED " * " ANSI_COLOR);
     va_list args;
     va_start (args, format);
     vfprintf (stderr, format, args);
@@ -16,7 +16,7 @@ void lerror (char* format, ...) {
 }
 
 void lwarning (char* format, ...) {
-    printf (ANSI_BOLD ANSI_YELLOW " * ");
+    printf (ANSI_BOLD ANSI_YELLOW " * " ANSI_COLOR);
     va_list args;
     va_start (args, format);
     vprintf (format, args);
@@ -25,7 +25,7 @@ void lwarning (char* format, ...) {
 }
 
 void linfo (char* format, ...) {
-    printf (ANSI_BOLD ANSI_GREEN " * ");
+    printf (ANSI_BOLD ANSI_GREEN " * " ANSI_COLOR);
     va_list args;
     va_start (args, format);
     vprintf (format, args);

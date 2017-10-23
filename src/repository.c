@@ -19,9 +19,6 @@ char* sync_types[] = {
 
 RepoConfig* repo_config_new () {
     RepoConfig* repo_config = malloc(sizeof(RepoConfig));
-    char* line;
-    size_t len = 0;
-    ssize_t read;
 
     repo_config->config = vector_new(sizeof(Config*), REMOVE | UNORDERED);
     repo_config->repositories = vector_new(sizeof(Repository*), REMOVE | UNORDERED);

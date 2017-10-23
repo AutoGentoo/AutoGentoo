@@ -15,6 +15,7 @@ typedef enum __bash_t bash_t;
 #define ANSI_CYAN    "\x1b[36m"
 #define ANSI_RESET   "\x1b[0m"
 #define ANSI_BOLD    "\x1b[1m"
+#define ANSI_COLOR   "\x1b[39m"
 
 void lerror (char* format, ...);
 void lwarning(char* format, ...);
