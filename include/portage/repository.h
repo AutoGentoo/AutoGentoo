@@ -6,7 +6,7 @@
 #include <unitypes.h>
 #include <sys/stat.h>
 #include <stdio.h>
-#include <tools/config.h>
+#include <config/config.h>
 #include <tools/boolean.h>
 
 #ifndef HACKSAW_REPOSITORY_H

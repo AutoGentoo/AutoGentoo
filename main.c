@@ -2,7 +2,7 @@
 #include <tools/vector.h>
 #include <tools/string_vector.h>
 #include <tools/regular_expression.h>
-#include <tools/config.h>
+#include <config/config.h>
 #include <test/debug.h>
 #include <portage/repository.h>
 
