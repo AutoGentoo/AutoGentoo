@@ -38,26 +38,29 @@ void config_add (Config* config, char* path) {
             vector_add(section_locations, &ftell_last);
             current_section = config_section_new(current_section_name);
             vector_add(config->sections, &current_section);
+            current_section->parent = config;
         }
         ftell_last = ftell(fp);
     }
     ftell_last = ftell(fp);
     vector_add(section_locations, &ftell_last);
-    config_section_read(fp, config->default_variables,
+    config_section_read(config, NULL,
+                        config->default_variables,
                         0,
-                        *(long*)vector_get(section_locations, 0));
+                        *(long*)vector_get(section_locations, 0), fp);
     int i;
     for (i = 0; i < config->sections->n; i++) {
-        config_section_read(fp, (*(ConfigSection**)vector_get(config->sections, i))->variables,
+        config_section_read(config, *(ConfigSection**)vector_get(config->sections, i),
+                            (*(ConfigSection**)vector_get(config->sections, i))->variables,
                             *(long*)vector_get(section_locations, i),
-                            *(long*)vector_get(section_locations, i + 1));
+                            *(long*)vector_get(section_locations, i + 1), fp);
     }
 
     fclose(fp);
     fp = NULL;
 }
 
-void config_section_read (FILE* fp, Vector* variables, long start, long stop) {
+void config_section_read (Config* config, ConfigSection* section, Vector* variables, long start, long stop, FILE* fp) {
     fseek(fp, start, SEEK_SET);
     size_t size = (size_t) (stop - start);
 
@@ -69,7 +72,7 @@ void config_section_read (FILE* fp, Vector* variables, long start, long stop) {
     for (i=0; i!=var_buff->n; i++) {
         StringVector* current_vector = *(StringVector**)vector_get(var_buff, i);
         ConfigVariable var;
-        config_variable_new(&var, current_vector);
+        config_variable_new(config, section, &var, current_vector);
         vector_add(variables, &var);
         string_vector_free(current_vector);
     }
@@ -83,12 +86,14 @@ ConfigSection* config_section_new (char* name) {
     return out;
 }
 
-void config_variable_new (ConfigVariable* var, StringVector* data) {
+void config_variable_new (Config* config, ConfigSection* section, ConfigVariable* var, StringVector* data) {
     strcpy (var->identifier, string_vector_get(data, 0));
     char* value_buf = string_vector_get(data, 1);
     size_t len = strlen(value_buf);
     var->value = malloc (sizeof(char) * (len + (len % 16)));
     strcpy(var->value, value_buf);
+    var->parent = config;
+    var->parent_section = section;
 }
 
 void config_free (Config* config) {
