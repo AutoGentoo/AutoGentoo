@@ -39,15 +39,14 @@ void vector_remove(Vector* vec, int index) {
                    vector_get(vec, index + 1),
                    vec->size * (vec->n - index)
             ); // Moves everything back by vec->size
+            memcpy(vector_get(vec, vec->n), zero, vec->size);
         }
         else {
-            memcpy(vector_get(vec, index),
-                   vector_get(vec, vec->n),
+            memmove(vector_get(vec, index),
+                   vector_get(vec, vec->n-1),
                         vec->size
             ); // Moves the last element into the open place
         }
-
-        memcpy(vector_get(vec, vec->n), zero, vec->size);
         vec->n--;
     }
     else {

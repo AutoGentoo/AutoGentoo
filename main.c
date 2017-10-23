@@ -33,6 +33,25 @@ void print_string_vec(StringVector* vec) {
     printf("\n");
 }
 
+void print_config_variable (ConfigVariable* var) {
+    printf ("%s = %s\n", var->identifier, var->value);
+}
+
+void print_config (Config* config) {
+    int i;
+    for (i=0; i!=config->default_variables->n; i++) {
+        print_config_variable(vector_get(config->default_variables, i));
+    }
+    for (i=0; i!=config->sections->n; i++) {
+        ConfigSection* current_section = *(ConfigSection**)vector_get(config->sections, i);
+        printf("[%s]\n", current_section->name);
+        int j;
+        for (j=0; j!=current_section->variables->n; j++) {
+            print_config_variable(vector_get(current_section->variables, j));
+        }
+    }
+}
+
 struct __test1 {
     int a;
     int b;
@@ -45,19 +64,17 @@ struct __test2 {
 };
 
 int main() {
-    printf ("Test Vector");
-    Vector* testVec = vector_new(sizeof(int), UNORDERED | REMOVE);
-    print_vec(testVec);
+    printf ("Test Vector\n");
+    Vector* testVec = vector_new(sizeof(long), UNORDERED | REMOVE);
 
-    int el_one = 0x0;
-    int el_two = 0xAAAAAAAA;
+    long el_one = 0x0;
+    long el_two = 0xAAAAAAAAAAAAAAAA;
 
     vector_add(testVec, &el_one);
     vector_add(testVec, &el_two);
-    printf("%d\n", testVec->n);
     print_vec(testVec);
 
-    int el_1_5 = 0xFFFFFFFF;
+    long el_1_5 = 0xFFFFFFFFFFFFFFFF;
     vector_insert(testVec, &el_1_5, 1);
     print_vec(testVec);
 
@@ -95,7 +112,9 @@ int main() {
     config_free(test_config);
 
     Config* test_repo = config_read("/etc/portage/repos.conf/rrr");
-
+    printf("DEFAULT.main-repo = %s\n", config_get(test_repo, "DEFAULT", "main-repo"));
+    //print_config(test_repo);
+    config_free(test_repo);
 
     return 0;
 }

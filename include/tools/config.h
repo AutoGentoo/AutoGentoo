@@ -29,7 +29,7 @@ struct __ConfigSection {
 
 Config* config_read (char* config_path);
 void config_add (Config* config, char* path);
-void config_section_read (FILE* fp, Vector* variable, long start, long stop);
+void config_section_read (FILE* fp, Vector* variables, long start, long stop);
 ConfigSection* config_section_new (char* name);
 void config_variable_new (ConfigVariable* var, StringVector* data);
 void config_free (Config* config);

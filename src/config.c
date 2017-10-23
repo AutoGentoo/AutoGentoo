@@ -30,14 +30,12 @@ void config_add (Config* config, char* path) {
     Vector* section_locations = vector_new(sizeof(long), ORDERED | KEEP);
     char current_section_name[32];
     long ftell_last = ftell(fp);
-    vector_add(section_locations, &ftell_last);
     while ((read = getline(&line, &len, fp)) != -1) {
         line[strlen(line) - 1] = '\0'; // Remove the newline
         if (line[0] == '#')
             continue;
         if (regex_simple(current_section_name, line, "^\\[(.*?)\\]$") != 0) {
             vector_add(section_locations, &ftell_last);
-            printf ("%ld\n", ftell_last);
             current_section = config_section_new(current_section_name);
             vector_add(config->sections, &current_section);
         }
@@ -46,10 +44,10 @@ void config_add (Config* config, char* path) {
     ftell_last = ftell(fp);
     vector_add(section_locations, &ftell_last);
     config_section_read(fp, config->default_variables,
-                        *(long*)vector_get(section_locations, 0),
-                        *(long*)vector_get(section_locations, 1));
+                        0,
+                        *(long*)vector_get(section_locations, 0));
     int i;
-    for (i = 1; i + 1 < config->sections->n; i++) {
+    for (i = 0; i < config->sections->n; i++) {
         config_section_read(fp, (*(ConfigSection**)vector_get(config->sections, i))->variables,
                             *(long*)vector_get(section_locations, i),
                             *(long*)vector_get(section_locations, i + 1));
@@ -66,14 +64,16 @@ void config_section_read (FILE* fp, Vector* variables, long start, long stop) {
     char* buffer = malloc (size+1);
     fread (buffer, sizeof(char), size, fp);
     buffer[size] = 0;
-    Vector* var_buff = regex_full(buffer, "(\\w+)[\\s*]?=(?:(?=.*\\\")\\s*\\\"([^\\\"|]*)\\\"|(?=.*\\')\\s*\\'([^\\']*)\\'|(?!.*[\\\"|\\'])\\s*(.*))");
+    Vector* var_buff = regex_full(buffer, "(\\S+)[\\s*]?=(?:(?=.*\\\")\\s*\\\"([^\\\"|]*)\\\"|(?=.*\\')\\s*\\'([^\\']*)\\'|(?!.*[\\\"|\\'])\\s*(.*))");
     int i;
     for (i=0; i!=var_buff->n; i++) {
+        StringVector* current_vector = *(StringVector**)vector_get(var_buff, i);
         ConfigVariable var;
-        config_variable_new(&var, *(StringVector**)vector_get(var_buff, i));
+        config_variable_new(&var, current_vector);
         vector_add(variables, &var);
+        string_vector_free(current_vector);
     }
-
+    vector_free(var_buff);
 }
 
 ConfigSection* config_section_new (char* name) {
@@ -130,12 +130,12 @@ char* config_get (Config* config, char* section, char* variable_name) {
 
     int i;
     for (i=0; i!=config->sections->n; i++) {
-        if (strcmp(section, vector_get(config->sections, i)) == 0) {
-            ConfigSection** current_section = vector_get(config->sections, i);
+        ConfigSection* current_section = *(ConfigSection**)vector_get(config->sections, i);
+        if (strcmp(section, current_section->name) == 0) {
             int j;
-            for (j=0; j!=(*current_section)->variables->n; j++) {
-                if (strcmp(variable_name, vector_get((*current_section)->variables, j)) == 0) {
-                    return ((ConfigVariable*)vector_get((*current_section)->variables, j))->value;
+            for (j=0; j!=current_section->variables->n; j++) {
+                if (strcmp(variable_name, vector_get(current_section->variables, j)) == 0) {
+                    return ((ConfigVariable*)vector_get(current_section->variables, j))->value;
                 }
             }
         }

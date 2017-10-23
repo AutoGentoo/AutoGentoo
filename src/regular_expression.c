@@ -10,7 +10,7 @@
 #include <tools/string_vector.h>
 #include <regex.h>
 
-Vector* regex_full (char* value, char* pattern) {
+Vector* regex_full (const char* value, char* pattern) {
     pcre2_code *re;
     pcre2_match_data *match_data;
     PCRE2_SIZE erroffset, *ovector;
