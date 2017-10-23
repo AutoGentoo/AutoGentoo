@@ -5,6 +5,6 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_COMPILER gcc)
 include_directories(include)
 
-set(SOURCE_FILES main.c include/package/package.h include/Hacksaw.h include/package/manifest.h include/tools/vector.h src/vector.c src/manifest.c include/portage/repository.h src/repository.c include/tools/regular_expression.h src/regular_expression.c include/tools/string_vector.h src/string_vector.c include/tools/config.h src/config.c include/tools/boolean.h include/tools/string.h src/string.c include/test/debug.h)
+set(SOURCE_FILES main.c include/package/package.h include/Hacksaw.h include/package/manifest.h include/tools/vector.h src/vector.c src/manifest.c include/portage/repository.h src/repository.c include/tools/regular_expression.h src/regular_expression.c include/tools/string_vector.h src/string_vector.c include/tools/config.h src/config.c include/tools/boolean.h include/tools/string.h src/string.c include/test/debug.h include/tools/log.h src/log.c)
 add_executable(Hacksaw ${SOURCE_FILES})
 target_link_libraries(Hacksaw -lpcre2-8)

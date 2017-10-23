@@ -9,18 +9,13 @@
 #include <tools/string.h>
 #include <test/debug.h>
 
-Config* config_read (char* config_path) {
-    Config* new_config = malloc (sizeof(Config));
+Config* config_read (char* path) {
+    Config* config = malloc (sizeof(Config));
 
-    strcpy(new_config->path, config_path);
-    new_config->sections = vector_new(sizeof(ConfigSection*), REMOVE | UNORDERED);
-    new_config->default_variables = vector_new(sizeof(ConfigVariable), REMOVE | UNORDERED);
+    strcpy(config->path, path);
+    config->sections = vector_new(sizeof(ConfigSection*), REMOVE | UNORDERED);
+    config->default_variables = vector_new(sizeof(ConfigVariable), REMOVE | UNORDERED);
 
-    config_add(new_config, new_config->path);
-    return new_config;
-}
-
-void config_add (Config* config, char* path) {
     char* line;
     size_t len = 0;
     ssize_t read;
@@ -58,6 +53,7 @@ void config_add (Config* config, char* path) {
 
     fclose(fp);
     fp = NULL;
+    return config;
 }
 
 void config_section_read (Config* config, ConfigSection* section, Vector* variables, long start, long stop, FILE* fp) {
@@ -146,4 +142,19 @@ char* config_get (Config* config, char* section, char* variable_name) {
         }
     }
     return NULL;
+}
+
+int config_get_convert (Config* config, char** dest, char* section, char* variable_name) {
+    char* buffer = config_get(config, section, variable_name);
+    if (buffer != NULL) {
+        strcpy(*dest, buffer);
+        return 1;
+    }
+    return 0;
+}
+
+StringVector* config_get_vector (Config* config, char* section, char* variable_name) {
+    StringVector* out = string_vector_new();
+    string_vector_split(out, config_get(config, section, variable_name), " ");
+    return out;
 }

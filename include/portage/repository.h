@@ -41,6 +41,7 @@ struct __Repository {
     Vector* masters;
     int clone-depth;
     char* sync_user;
+    mode_t sync_mask;
     */
 
     bool auto_sync;
@@ -51,12 +52,12 @@ struct __Repository {
     int priority;
     char sync_cvs_repo[256];
     repo_t sync_type;
-    mode_t sync_mask;
     char sync_uri[256]; // Empty to disable syncing
 };
 
 void parse_repo_config (RepoConfig* repo_config);
 Repository* parse_repository (ConfigSection*);
+void repository_sync (Repository* repo);
 repo_t get_sync_type (char* str);
 
 #endif //HACKSAW_REPOSITORY_H

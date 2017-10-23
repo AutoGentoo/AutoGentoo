@@ -42,6 +42,9 @@ void string_vector_remove (StringVector* vec, int index) {
 }
 
 void string_vector_split(StringVector* vec, char* string, char* delim) {
+    if (string == NULL) {
+        return;
+    }
     char* buff;
     for (buff = strtok(string, delim); buff != NULL; string_vector_add(vec, buff));
 }
