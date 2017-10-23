@@ -4,6 +4,7 @@
 #include <tools/regular_expression.h>
 #include <tools/config.h>
 #include <test/debug.h>
+#include <portage/repository.h>
 
 void print_bin (void* ptr, int n, size_t size) {
     int i;
@@ -106,15 +107,21 @@ int main() {
     print_string_vec(testregex);
 
 
-    Config* test_config = config_read("/etc/portage/make.conf");
+    Config* test_config = config_new("/etc/portage/make.conf");
     printf("CFLAGS = %s\n", config_get(test_config, NULL, "CFLAGS"));
     printf("PORTDIR = %s\n", config_get(test_config, NULL, "PORTDIR"));
     config_free(test_config);
 
-    Config* test_repo = config_read("/etc/portage/repos.conf/rrr");
+    Config* test_repo = config_new("/etc/portage/repos.conf/rrr");
     printf("DEFAULT.main-repo = %s\n", config_get(test_repo, "DEFAULT", "main-repo"));
     //print_config(test_repo);
     config_free(test_repo);
+
+    RepoConfig* configrepo = repo_config_new();
+    repo_config_read (configrepo, "/etc/portage/repos.conf/rrr");
+    printf ("repo1->name: %s\n", (*(Repository**)vector_get(configrepo->repositories, 0))->name);
+    printf ("repo1->sync-uri: %s\n", (*(Repository**)vector_get(configrepo->repositories, 0))->sync_uri);
+    repo_config_free(configrepo);
 
     return 0;
 }

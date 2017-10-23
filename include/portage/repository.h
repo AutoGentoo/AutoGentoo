@@ -26,10 +26,10 @@ enum __repo_t {
 
 struct __RepoConfig {
     Repository* main_repo;
-    StringVector* eclass_overides;
+    StringVector* eclass_overrides;
     StringVector* force;
     Vector* repositories;
-    Config* config;
+    Vector* config;
 
 };
 
@@ -55,9 +55,11 @@ struct __Repository {
     char sync_uri[256]; // Empty to disable syncing
 };
 
-void parse_repo_config (RepoConfig* repo_config);
+RepoConfig* repo_config_new ();
+void repo_config_read (RepoConfig* repo_config, char* filepath);
 Repository* parse_repository (ConfigSection*);
 void repository_sync (Repository* repo);
-repo_t get_sync_type (char* str);
+void repo_config_free(RepoConfig* ptr);
+void repository_free (Repository* ptr);
 
 #endif //HACKSAW_REPOSITORY_H

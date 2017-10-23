@@ -9,7 +9,7 @@
 #include <tools/string.h>
 #include <test/debug.h>
 
-Config* config_read (char* path) {
+Config* config_new (char* path) {
     Config* config = malloc (sizeof(Config));
 
     strcpy(config->path, path);
@@ -122,7 +122,7 @@ char* config_get (Config* config, char* section, char* variable_name) {
     if (section == NULL) {
         int j;
         for (j=0; j!=config->default_variables->n; j++) {
-            if (strcmp(variable_name, vector_get(config->default_variables, j)) == 0) {
+            if (strcmp(variable_name, ((ConfigVariable*)vector_get(config->default_variables, j))->identifier) == 0) {
                 return ((ConfigVariable*)vector_get(config->default_variables, j))->value;
             }
         }
@@ -135,7 +135,7 @@ char* config_get (Config* config, char* section, char* variable_name) {
         if (strcmp(section, current_section->name) == 0) {
             int j;
             for (j=0; j!=current_section->variables->n; j++) {
-                if (strcmp(variable_name, vector_get(current_section->variables, j)) == 0) {
+                if (strcmp(variable_name, ((ConfigVariable*)vector_get(current_section->variables, j))->identifier) == 0) {
                     return ((ConfigVariable*)vector_get(current_section->variables, j))->value;
                 }
             }
@@ -144,10 +144,10 @@ char* config_get (Config* config, char* section, char* variable_name) {
     return NULL;
 }
 
-int config_get_convert (Config* config, char** dest, char* section, char* variable_name) {
+int config_get_convert (Config* config, char* dest, char* section, char* variable_name) {
     char* buffer = config_get(config, section, variable_name);
     if (buffer != NULL) {
-        strcpy(*dest, buffer);
+        strcpy(dest, buffer);
         return 1;
     }
     return 0;

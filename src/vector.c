@@ -21,12 +21,15 @@ Vector* vector_new (size_t el_size, vector_opts opts) {
     return out_ptr;
 }
 
-void vector_add(Vector* vec, void* el) {
+void* vector_add(Vector* vec, void* el) {
     if (vec->s == (vec->n + 1)) {
         vector_allocate(vec);
     }
-    memcpy (vector_get(vec, vec->n), el, vec->size);
+    void* out = vector_get(vec, vec->n);
+    memcpy (out , el, vec->size);
+
     vec->n++;
+    return out;
 }
 
 void vector_remove(Vector* vec, int index) {
