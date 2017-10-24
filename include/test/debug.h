@@ -2,8 +2,8 @@
 // Created by atuser on 10/22/17.
 //
 
-#ifndef HACKSAW_DEBUG_H_H
-#define HACKSAW_DEBUG_H_H
+#ifndef HACKSAW_DEBUG_H
+#define HACKSAW_DEBUG_H
 
 #include <stddef.h>
 #include <tools/vector.h>
@@ -15,5 +15,15 @@ void print_vec(Vector* vec);
 void print_string_vec(StringVector* vec);
 void print_conf (Conf* config);
 
+struct __test1 {
+    int a;
+    int b;
+};
 
-#endif //HACKSAW_DEBUG_H_H
+struct __test2 {
+    int a;
+    int b;
+    int c;
+};
+
+#endif //HACKSAW_DEBUG_H
