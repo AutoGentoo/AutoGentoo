@@ -6,7 +6,7 @@
 #include <unitypes.h>
 #include <sys/stat.h>
 #include <stdio.h>
-#include <config/config.h>
+#include <config/conf.h>
 #include <tools/boolean.h>
 
 #ifndef HACKSAW_REPOSITORY_H
@@ -57,7 +57,7 @@ struct __Repository {
 
 RepoConfig* repo_config_new ();
 void repo_config_read (RepoConfig* repo_config, char* filepath);
-Repository* parse_repository (ConfigSection*);
+Repository* parse_repository (ConfSection*);
 void repository_sync (Repository* repo);
 void repo_config_free(RepoConfig* ptr);
 void repository_free (Repository* ptr);

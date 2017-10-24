@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <tools/vector.h>
 #include <tools/string_vector.h>
-#include <tools/regular_expression.h>
-#include <config/config.h>
+#include <config/conf.h>
 #include <test/debug.h>
 #include <portage/repository.h>
 
@@ -34,17 +33,17 @@ void print_string_vec(StringVector* vec) {
     printf("\n");
 }
 
-void print_config_variable (ConfigVariable* var) {
+void print_config_variable (ConfVariable* var) {
     printf ("%s = %s\n", var->identifier, var->value);
 }
 
-void print_config (Config* config) {
+void print_config (Conf* config) {
     int i;
     for (i=0; i!=config->default_variables->n; i++) {
         print_config_variable(vector_get(config->default_variables, i));
     }
     for (i=0; i!=config->sections->n; i++) {
-        ConfigSection* current_section = *(ConfigSection**)vector_get(config->sections, i);
+        ConfSection* current_section = *(ConfSection**)vector_get(config->sections, i);
         printf("[%s]\n", current_section->name);
         int j;
         for (j=0; j!=current_section->variables->n; j++) {
@@ -65,15 +64,15 @@ struct __test2 {
 };
 
 int main() {
-    Config* test_config = config_new("/etc/portage/make.conf");
-    printf("CFLAGS = %s\n", config_get(test_config, NULL, "CFLAGS"));
-    printf("PORTDIR = %s\n", config_get(test_config, NULL, "PORTDIR"));
-    config_free(test_config);
+    Conf* test_config = conf_new("/etc/portage/make.conf");
+    printf("CFLAGS = %s\n", conf_get(test_config, NULL, "CFLAGS"));
+    printf("PORTDIR = %s\n", conf_get(test_config, NULL, "PORTDIR"));
+    conf_free(test_config);
 
-    Config* test_repo = config_new("/etc/portage/repos.conf/rrr");
-    printf("DEFAULT.main-repo = %s\n", config_get(test_repo, "DEFAULT", "main-repo"));
+    Conf* test_repo = conf_new("/etc/portage/repos.conf/rrr");
+    printf("DEFAULT.main-repo = %s\n", conf_get(test_repo, "DEFAULT", "main-repo"));
     //print_config(test_repo);
-    config_free(test_repo);
+    conf_free(test_repo);
 
     RepoConfig* configrepo = repo_config_new();
     repo_config_read (configrepo, "/etc/portage/repos.conf/rrr");

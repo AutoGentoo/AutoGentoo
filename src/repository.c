@@ -4,7 +4,6 @@
 
 #include <portage/repository.h>
 #include <string.h>
-#include <tools/regular_expression.h>
 #include <stdlib.h>
 #include <tools/string.h>
 #include <tools/log.h>
@@ -18,48 +17,48 @@ char* sync_types[] = {
 };
 
 RepoConfig* repo_config_new () {
-    RepoConfig* repo_config = malloc(sizeof(RepoConfig));
+    RepoConfig* repo_conf = malloc(sizeof(RepoConfig));
 
-    repo_config->config = vector_new(sizeof(Config*), REMOVE | UNORDERED);
-    repo_config->repositories = vector_new(sizeof(Repository*), REMOVE | UNORDERED);
-    repo_config->eclass_overrides = NULL;
-    repo_config->force = NULL;
+    repo_conf->config = vector_new(sizeof(Conf*), REMOVE | UNORDERED);
+    repo_conf->repositories = vector_new(sizeof(Repository*), REMOVE | UNORDERED);
+    repo_conf->eclass_overrides = NULL;
+    repo_conf->force = NULL;
 }
 
-void repo_config_read (RepoConfig* repo_config, char* filepath) {
-    Config* config = config_new(filepath);
-    vector_add(repo_config->config, &config);
-    if (repo_config->eclass_overrides != NULL) {
-        string_vector_free(repo_config->eclass_overrides);
+void repo_config_read (RepoConfig* repo_conf, char* filepath) {
+    Conf* conf = conf_new(filepath);
+    vector_add(repo_conf->config, &conf);
+    if (repo_conf->eclass_overrides != NULL) {
+        string_vector_free(repo_conf->eclass_overrides);
     }
-    if (repo_config->force != NULL) {
-        string_vector_free(repo_config->force);
+    if (repo_conf->force != NULL) {
+        string_vector_free(repo_conf->force);
     }
-    repo_config->eclass_overrides = config_get_vector(config, "DEFAULT", "eclass-overrides");
-    repo_config->force = config_get_vector(config, "DEFAULT", "force");
+    repo_conf->eclass_overrides = conf_get_vector(conf, "DEFAULT", "eclass-overrides");
+    repo_conf->force = conf_get_vector(conf, "DEFAULT", "force");
 
     int i;
-    for (i = 0; i != config->sections->n; i++) {
-        ConfigSection* current_section = *(ConfigSection**)vector_get(config->sections, i);
+    for (i = 0; i != conf->sections->n; i++) {
+        ConfSection* current_section = *(ConfSection**)vector_get(conf->sections, i);
         if (strcmp(current_section->name, "DEFAULT") == 0) {
             continue;
         }
         Repository* temp = parse_repository(current_section);
-        vector_add(repo_config->repositories, &temp);
+        vector_add(repo_conf->repositories, &temp);
     }
 }
 
-Repository* parse_repository (ConfigSection* section) {
+Repository* parse_repository (ConfSection* section) {
     Repository* repo = malloc (sizeof(Repository));
     strcpy(repo->name, section->name);
 
-    repo->eclass_overrides = config_get_vector(section->parent, section->name, "eclass-overrides");
-    repo->force = config_get_vector(section->parent, section->name, "force");
-    config_get_convert(section->parent, (char*)repo->location, section->name, "location");
-    config_get_convert(section->parent, (char*)repo->sync_cvs_repo, section->name, "sync-cvs-repo");
-    config_get_convert(section->parent, (char*)repo->sync_uri, section->name, "sync-uri");
+    repo->eclass_overrides = conf_get_vector(section->parent, section->name, "eclass-overrides");
+    repo->force = conf_get_vector(section->parent, section->name, "force");
+    conf_get_convert(section->parent, (char*)repo->location, section->name, "location");
+    conf_get_convert(section->parent, (char*)repo->sync_cvs_repo, section->name, "sync-cvs-repo");
+    conf_get_convert(section->parent, (char*)repo->sync_uri, section->name, "sync-uri");
     char sync_type_buff[32];
-    int has = config_get_convert(section->parent, (char*)sync_type_buff, section->name, "sync-type");
+    int has = conf_get_convert(section->parent, (char*)sync_type_buff, section->name, "sync-type");
     if (has) {
         if ((repo->sync_type = (repo_t)string_find(sync_types, sync_type_buff, 5)) == -1) {
             lerror("error in file %s", section->parent->path);
@@ -69,7 +68,7 @@ Repository* parse_repository (ConfigSection* section) {
     }
 
     char auto_sync_buff[16];
-    if (config_get_convert(section->parent, (char*)auto_sync_buff, section->name, "auto-sync")) {
+    if (conf_get_convert(section->parent, (char*)auto_sync_buff, section->name, "auto-sync")) {
         if (strcmp ("yes", auto_sync_buff) == 0) {
             repo->auto_sync = true;
         }
@@ -82,7 +81,7 @@ Repository* parse_repository (ConfigSection* section) {
     }
 
     char priority_buff[8];
-    if (config_get_convert(section->parent, (char*)priority_buff, section->name, "priority")) {
+    if (conf_get_convert(section->parent, (char*)priority_buff, section->name, "priority")) {
         repo->priority = (int)strtol(priority_buff, NULL, 10);
     }
 
@@ -92,7 +91,7 @@ Repository* parse_repository (ConfigSection* section) {
 void repo_config_free(RepoConfig* ptr) {
     int i;
     for (i=0; i != ptr->config->n; i++) {
-        config_free (*(Config**)vector_get(ptr->config, i));
+        conf_free (*(Conf**)vector_get(ptr->config, i));
     }
     for (i=0; i != ptr->repositories->n; i++) {
         repository_free (*(Repository**)vector_get(ptr->repositories, i));
