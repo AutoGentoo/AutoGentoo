@@ -49,8 +49,8 @@
     <File Name="src/regular_expression.c"/>
     <File Name="src/string.c"/>
     <File Name="src/repository.c"/>
-    <File Name="src/Makefile.am"/>
     <File Name="src/debug.c"/>
+    <File Name="src/Makefile.am"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -143,4 +143,19 @@ make</RebuildCommand>
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="autotools">
+    <File Name="configure.ac"/>
+    <File Name="Makefile.am"/>
+    <File Name="autogen.sh"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="dist">
+    <File Name="INSTALL"/>
+    <File Name="LICENSE"/>
+    <File Name="README"/>
+    <File Name="README.md"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="git">
+    <File Name=".gitattributes"/>
+    <File Name=".gitignore"/>
+  </VirtualDirectory>
 </CodeLite_Project>
