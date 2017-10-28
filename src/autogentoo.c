@@ -28,18 +28,11 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <_string.h>
 
 void _getcwd (char* out, size_t size) {
     if (getcwd(out, size) == NULL)
        perror("getcwd() error");
-}
-
-void print_bin (void * ptr, size_t size) {
-    int i;
-    for (i=0; i!=(int)size; i++) {
-        unsigned char c = ((char*)ptr)[i] ;
-        printf ("%02x ", c);
-    }
 }
 
 void set_request (struct client_request * req, int type, char* atom) {

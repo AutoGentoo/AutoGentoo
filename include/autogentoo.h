@@ -37,6 +37,5 @@
 extern char IS_CLIENT;
 
 void _getcwd (char* out, size_t size);
-void print_bin (void * ptr, size_t size);
 
 #endif

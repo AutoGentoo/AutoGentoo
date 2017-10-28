@@ -267,13 +267,8 @@ void read_serve (int fd, struct manager * m_man) { // You must malloc this point
     read (fd, m_man, sizeof(struct manager));
     int i;
     for (i=0; i!=m_man->client_c; i++) {
-        if (m_man->clients[i].state >= STAGE3) {
-            m_man->clients[i].chroot = chroot_new (m_man, i);
-            chroot_mount (m_man->clients[i].chroot);
-            m_man->clients[i].state = STAGE3;
-        }
         m_man->clients[i].kernel = NULL;
-        
+        m_man->clients[i].chroot = NULL;
     }
 }
 

@@ -138,7 +138,7 @@ void server_respond (int n, struct manager * m_man)
         reqline[2] = strtok(NULL, "\r\n");
         ip = get_ip_from_fd (clients[n]);
         printf ("[%s](%s, %s): %d\n", ip, reqline[0], reqline[1], (int)getpid());
-        printf("predup\n");
+
         fflush(stdout);
         // Create buffs to redirect STDOUT and STDERR
         stdout_b = dup (STDOUT_FILENO);
@@ -147,16 +147,13 @@ void server_respond (int n, struct manager * m_man)
         dup2(clients[n], STDERR_FILENO);
         close(clients[n]);
         clients[n] = 1;
-        printf("postdup %s\n", reqline[2]);
         fflush(stdout);
         if (reqline[2] == NULL) {
             res = BAD_REQUEST;
             rsend (clients[n], BAD_REQUEST);
             reqline[0] = "\0"; // Make sure that the request doesn't continue
         }
-        printf("passed bad-req\n");
         if (strncmp(reqline[0], "GET", 3) == 0) {
-            printf("in get\n");
             if (strncmp(reqline[2], "HTTP/1.0", 8) != 0 && strncmp(reqline[2], "HTTP/1.1", 8) != 0) {
                 rsend (clients[n], BAD_REQUEST);
                 res = BAD_REQUEST;

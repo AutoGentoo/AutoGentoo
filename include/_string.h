@@ -35,5 +35,6 @@ void gen_id (char* id, int len);
 int cpy(char *src, char *dest);
 char* path_normalize(const char *path);
 char* removeChar(char* str, char c);
+void print_bin (void* ptr, int n, size_t size);
 
 #endif

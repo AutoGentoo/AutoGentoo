@@ -148,19 +148,16 @@ char* removeChar(char* str, char c){
     return &(*str);
 }
 
-void print_bin (void* ptr, size_t size) {
+void print_bin (void* ptr, int n, size_t size) {
     int i;
-    for (i=size-1; i>=0; i--) {
+    for (i=(size * n) - 1; i >= 0; i--) {
         int j;
         for (j=0; j<8; j++) {
             printf("%d",  !!((((char*)ptr)[i] << j) & 0x80));
         }
 
-        if (i % 2) {
+        if (!(i % size)) {
             printf (" ");
-        }
-        else{
-            printf("|");
         }
     }
     printf("\n");

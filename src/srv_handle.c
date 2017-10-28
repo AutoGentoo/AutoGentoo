@@ -311,15 +311,11 @@ response_t _MNTCHROOT (struct manager* m_man, char* ip, int sockfd, char** args,
         return FORBIDDEN;
     }
     
-    int d = 8;
-    print_bin(&d, sizeof(int));
-    return OK;
-    
-    
     if (m_man->clients[sc_no].chroot == NULL) {
         m_man->clients[sc_no].chroot = chroot_new (m_man, sc_no);
+        fflush(stdout);
     }
-    
+    fflush (stdout);
     chroot_mount (m_man->clients[sc_no].chroot);
     
     update_config (m_man);

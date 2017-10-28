@@ -99,6 +99,7 @@ int get_mounts (struct manager* m_man, int sc_no, struct chroot_mount* mounts, i
         perror("setmntent");
         exit(1);
     }
+    
     while ((ent = getmntent(mnts_stream)) != NULL) {
         ;
     }
@@ -129,17 +130,16 @@ int get_mounts (struct manager* m_man, int sc_no, struct chroot_mount* mounts, i
 
 void chroot_mount (struct chroot_client* client) {
     char target[256];
-    struct serve_client * buffer_client = &client->m_man->clients[client->sc_no];
+    struct serve_client * buffer_client = &(client->m_man->clients[client->sc_no]);
 
     sprintf (target, "%s/%s", client->m_man->root, buffer_client->id);
-
+    
     int i;
-    //int got = get_mounts(client->m_man, client->sc_no, client->mounts, client->mount_c);
-    int got = 0x8;
-    for (i=0; i!=client->mount_c; i++) {
-        if ((got & i) == 0) {
-            print_bin(&got, sizeof(int));
-            continue;
+    int got = get_mounts(client->m_man, client->sc_no, client->mounts, client->mount_c);
+    for (i=0; i != client->mount_c; i++) {
+        int shifted = got >> i;
+        print_bin(&shifted, 4, 1);
+        if ((shifted & 0x1) == 0) {
             if (strcmp(client->mounts[i].type, "") == 0) {
                 bind_mount (target, client->mounts[i].parent, client->mounts[i].child, client->mounts[i].recursive);
             }
