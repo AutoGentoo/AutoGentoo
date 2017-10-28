@@ -2,8 +2,8 @@
 // Created by atuser on 10/21/17.
 //
 
-#ifndef HACKSAW_CONFIG_H_H
-#define HACKSAW_CONFIG_H_H
+#ifndef HACKSAW_CONFIG_H
+#define HACKSAW_CONFIG_H
 
 #include <tools/string_vector.h>
 

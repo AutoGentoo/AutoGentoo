@@ -5,6 +5,11 @@
 #ifndef HACKSAW_DIRECTORY_H
 #define HACKSAW_DIRECTORY_H
 
+typedef struct __PortageDirectory PortageDirectory;
 
+struct __PortageDirectory {
+    char* path;
+    char* 
+}
 
 #endif //HACKSAW_DIRECTORY_H
