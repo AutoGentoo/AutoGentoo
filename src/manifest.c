@@ -1,6 +1,7 @@
 #include <package/manifest.h>
 #include <string.h>
 #include <stdlib.h>
+#include <tools/string_vector.h>
 
 void manifest_parse (Manifest* manifest, FILE* fp) {
     char* line;
@@ -46,31 +47,33 @@ void manifest_parse (Manifest* manifest, FILE* fp) {
 }
 
 void entry_parse (ManifestEntry* entry, char* str) {
-    char* tokens[24];
+    StringVector* tokens = string_vector_new();
     char* i;
     int j;
     for (j=0, i = strtok(str, " \n");
             i != NULL;
             i = strtok(NULL, " \n"), j++) {
-        strcpy(tokens[j], i);
+        string_vector_add(tokens, i);
     }
 
-    entry->type = get_entry_type(tokens[0]);
-    strcpy(entry->filename, tokens[1]);
-    sscanf(tokens[2], "%u", (unsigned int*)&entry->size);
-
+    entry->type = get_entry_type(string_vector_get(tokens, 0));
+    strcpy(entry->filename, string_vector_get(tokens, 1));
+    sscanf(string_vector_get(tokens, 2), "%u", (unsigned int*)&entry->size);
     entry->hashes = vector_new(sizeof(HashEntry), UNORDERED | REMOVE);
 
     int n;
-    for (n=3; (n + 1) != j; n += 2) {
-        hash_t t = get_hash_type(tokens[n]);
+    printf ("n = ");
+    for (n=3; (n + 1) < j; n += 2) {
+        printf ("%d, ", n);
+        fflush(stdout);
+        hash_t t = get_hash_type(string_vector_get(tokens, n));
         if (t < 0) {
-            fprintf(stderr, "Hash: %s could not be found!", tokens[n]);
+            fprintf(stderr, "Hash: %s could not be found!", string_vector_get(tokens, n));
             break;
         }
         HashEntry en;
         en.hash_type = t;
-        strcpy(en.hash, tokens[n+1]);
+        strcpy(en.hash, string_vector_get(tokens, n+1));
         vector_add(entry->hashes, &en);
     }
 }

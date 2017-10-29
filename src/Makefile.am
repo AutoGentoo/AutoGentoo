@@ -11,4 +11,5 @@ hacksaw_SOURCES =       main.c \
                         repository.c  \
                         string.c  \
                         string_vector.c  \
-                        vector.c
+                        vector.c \
+                        debug.c
