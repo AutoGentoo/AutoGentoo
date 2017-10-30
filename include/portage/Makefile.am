@@ -1,2 +1,2 @@
 portageincludedir = $(mainincludedir)/portage
-portageinclude_HEADERS = directory.h repository.h
+portageinclude_HEADERS = directory.h repository.h hash.h

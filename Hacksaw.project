@@ -10,6 +10,7 @@
       <File Name="include/portage/repository.h"/>
       <File Name="include/portage/directory.h"/>
       <File Name="include/portage/Makefile.am"/>
+      <File Name="include/portage/hash.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="tools">
       <File Name="include/tools/regular_expression.h"/>
@@ -36,6 +37,9 @@
     </VirtualDirectory>
     <File Name="include/Hacksaw.h"/>
     <File Name="include/Makefile.am"/>
+    <VirtualDirectory Name="hash">
+      <File Name="include/hash/Makefile.am"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <Description/>
   <Dependencies/>
@@ -51,7 +55,26 @@
     <File Name="src/repository.c"/>
     <File Name="src/debug.c"/>
     <File Name="src/Makefile.am"/>
+    <File Name="src/hash.c"/>
+    <File Name="src/package.c"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="autotools">
+    <File Name="configure.ac"/>
+    <File Name="Makefile.am"/>
+    <File Name="autogen.sh"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="dist">
+    <File Name="INSTALL"/>
+    <File Name="LICENSE"/>
+    <File Name="README"/>
+    <File Name="README.md"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="git">
+    <File Name=".gitattributes"/>
+    <File Name=".gitignore"/>
+  </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -99,7 +122,7 @@ make</RebuildCommand>
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
-        <SearchPaths/>
+        <SearchPaths>include</SearchPaths>
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
@@ -143,21 +166,4 @@ make</RebuildCommand>
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="autotools">
-    <File Name="configure.ac"/>
-    <File Name="Makefile.am"/>
-    <File Name="autogen.sh"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="dist">
-    <File Name="INSTALL"/>
-    <File Name="LICENSE"/>
-    <File Name="README"/>
-    <File Name="README.md"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="git">
-    <File Name=".gitattributes"/>
-    <File Name=".gitignore"/>
-  </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>
