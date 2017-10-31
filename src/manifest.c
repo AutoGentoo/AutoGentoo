@@ -6,7 +6,7 @@
 
 void manifest_parse (Package* pkg) {
     char manifest_file[256];
-    pkg->get_path(manifest_file);
+    package_get_file(pkg, manifest_file);
     printf ("%s\n", manifest_file);
     
     FILE* fp = fopen (manifest_file, "r");

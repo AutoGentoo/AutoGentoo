@@ -6,8 +6,6 @@
 #include <string.h>
 #include <tools/vector.h>
 
-#define LAMBDA(c_) ({ c_ _;})
-
 Category* category_new (Repository* repo, char* name) {
     Category* cat = malloc (sizeof (Category));
     
@@ -40,14 +38,7 @@ Package* package_new (Repository* repo, Category* category, char* name) {
     pkg->repo = repo;
     pkg->manifest = malloc (sizeof (Manifest));
     
-    void* get_path_ptr (char* dest) {
-        package_get_file (pkg, dest);
-    }
-    
-    pkg->get_path = get_path_ptr;
-    
     manifest_parse(pkg);
-    
 }
 
 void package_get_file (Package* pkg, char* filename) {

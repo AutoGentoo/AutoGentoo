@@ -5,9 +5,8 @@
 
 StringVector* get_directories (char* path) {
     StringVector* out = string_vector_new();
-    struct dirent *de;  // Pointer for directory entry
- 
-    // opendir() returns a pointer of DIR type. 
+    struct dirent *de;
+    
     DIR *dr = opendir(path);
  
     if (dr == NULL)  {
