@@ -12,7 +12,7 @@
 
 int main() {
     RepoConfig* repoconf = repo_config_new();
-    repo_config_read(repoconf, "/etc/portage/repos.conf/gentoo.conf");
+    repo_config_read(repoconf, "/etc/portage/repos.conf");
     repo_config_free(repoconf);
     return 0;
 }

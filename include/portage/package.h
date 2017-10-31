@@ -12,6 +12,8 @@
 
 typedef struct __Package Package;
 typedef struct __Category Category;
+typedef struct __Ebuild Ebuild;
+typedef struct __Version Version;
 
 struct __Category {
     char name[32];
@@ -28,6 +30,14 @@ struct __Package {
     Category* category;
     Manifest* manifest;
     char name[128];
+    
+    void (*get_path) (char* dest);
+};
+
+struct __Ebuild {
+    Package* parent;
+    Vector* v; // {3, 24, 0}
+    int revision; // -r{0} (-r1)
 };
 
 Category* category_new (Repository* repo, char* name);

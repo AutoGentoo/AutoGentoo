@@ -13,6 +13,7 @@
       <File Name="include/portage/hash.h"/>
       <File Name="include/portage/manifest.h"/>
       <File Name="include/portage/package.h"/>
+      <File Name="include/portage/use.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="tools">
       <File Name="include/tools/regular_expression.h"/>

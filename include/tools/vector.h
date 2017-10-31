@@ -38,7 +38,6 @@ void* vector_add(Vector* vec, void* el);
 void vector_remove(Vector* vec, int index);
 void vector_insert(Vector* vec, void* el, int index);
 void vector_allocate(Vector* vec);
-void vector_set_increment(Vector* vec, int inc);
 void* vector_get(Vector* vec, int i);
 void vector_free(Vector* vec);
 

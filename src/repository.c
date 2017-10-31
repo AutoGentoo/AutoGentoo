@@ -55,9 +55,7 @@ Repository* parse_repository (ConfSection* section) {
     Repository* repo = malloc (sizeof(Repository));
     repo->categories = vector_new(sizeof(Category*), REMOVE | UNORDERED);
     strcpy(repo->name, section->name);
-    printf ("repo: %s\n", repo->name);
-    fflush(stdout);
-
+    
     repo->eclass_overrides = conf_get_vector(section->parent, section->name, "eclass-overrides");
     repo->force = conf_get_vector(section->parent, section->name, "force");
     conf_get_convert(section->parent, (char*)repo->location, section->name, "location");
@@ -92,19 +90,21 @@ Repository* parse_repository (ConfSection* section) {
     }
     
     
-    char cat_dir[256];
-    sprintf (cat_dir, "/%s", repo->location);
-    fix_path (cat_dir);
-    StringVector* dirs = get_directories (cat_dir);
+    char cat_file[256];
+    sprintf (cat_file, "/%s/profiles/categories", repo->location);
+    fix_path (cat_file);
     
-    int i;
-    for (i = 0; i != dirs->n; i++) {
-        printf ("%d\n", i);
-        Category* c = category_new(repo, string_vector_get(dirs, i));
+    FILE* fp = fopen (cat_file, "r");
+    char* line;
+    size_t len = 0;
+    ssize_t read;
+
+    int pgp_status = 0; // 0: no, 1: message, 2: signature
+    while ((read = getline(&line, &len, fp)) != -1) {
+        line[strlen(line) - 1] = 0; // Remove the newline
+        Category* c = category_new(repo, line);
         vector_add(repo->categories, &c);
     }
-    
-    string_vector_free(dirs);
     
     return repo;
 }
