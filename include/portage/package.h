@@ -3,7 +3,7 @@
 //
 
 
-#include <package/manifest.h>
+#include <portage/manifest.h>
 
 #ifndef HACKSAW_PACKAGE_H
 #define HACKSAW_PACKAGE_H
@@ -16,6 +16,7 @@ typedef struct __Category Category;
 struct __Category {
     char name[32];
     Vector* packages; // Package* to points in the
+    Repository* repo;
 };
 
 /**
@@ -29,6 +30,7 @@ struct __Package {
     char name[128];
 };
 
+Category* category_new (Repository* repo, char* name);
 Package* package_new (Repository* repo, Category* category, char* name);
 void package_get_file (Package* pkg, char* filename);
 

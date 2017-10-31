@@ -8,9 +8,11 @@
 #include <config/conf.h>
 #include <test/debug.h>
 #include <portage/repository.h>
-#include <package/manifest.h>
+#include <portage/manifest.h>
 
 int main() {
-    
+    RepoConfig* repoconf = repo_config_new();
+    repo_config_read(repoconf, "/etc/portage/repos.conf/gentoo.conf");
+    repo_config_free(repoconf);
     return 0;
 }

@@ -11,6 +11,8 @@
       <File Name="include/portage/directory.h"/>
       <File Name="include/portage/Makefile.am"/>
       <File Name="include/portage/hash.h"/>
+      <File Name="include/portage/manifest.h"/>
+      <File Name="include/portage/package.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="tools">
       <File Name="include/tools/regular_expression.h"/>
@@ -29,11 +31,6 @@
     <VirtualDirectory Name="test">
       <File Name="include/test/debug.h"/>
       <File Name="include/test/Makefile.am"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="package">
-      <File Name="include/package/manifest.h"/>
-      <File Name="include/package/package.h"/>
-      <File Name="include/package/Makefile.am"/>
     </VirtualDirectory>
     <File Name="include/Hacksaw.h"/>
     <File Name="include/Makefile.am"/>
@@ -57,6 +54,7 @@
     <File Name="src/Makefile.am"/>
     <File Name="src/hash.c"/>
     <File Name="src/package.c"/>
+    <File Name="src/directory.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="autotools">
     <File Name="configure.ac"/>

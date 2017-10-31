@@ -12,4 +12,6 @@ hacksaw_SOURCES =       main.c \
                         string.c  \
                         string_vector.c  \
                         vector.c \
-                        debug.c
+                        debug.c \
+                        package.c \
+                        directory.c

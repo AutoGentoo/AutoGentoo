@@ -26,5 +26,6 @@ void string_append_c(String* dest, int c);
 void string_allocate (String* string);
 int string_find (char** array, char* element, size_t n);
 void string_free (String* string);
+void fix_path (char* ptr);
 
 #endif //HACKSAW_STRING_H

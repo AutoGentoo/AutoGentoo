@@ -5,7 +5,6 @@
 #ifndef HACKSAW_MANIFEST_H
 #define HACKSAW_MANIFEST_H
 
-
 typedef enum __manifest_t manifest_t;
 typedef struct __Manifest Manifest;
 typedef struct __ManifestEntry ManifestEntry;
@@ -13,7 +12,7 @@ typedef struct __ManifestEntry ManifestEntry;
 #include <tools/vector.h>
 #include <stdio.h>
 #include <portage/hash.h>
-#include <package/package.h>
+#include <portage/package.h>
 
 
 enum __manifest_t {
@@ -41,7 +40,7 @@ struct __ManifestEntry {
     size_t size;
 };
 
-void manifest_parse (Package* pkg, FILE* fp);
+void manifest_parse (Package* pkg);
 void entry_parse (ManifestEntry* entry, char* str);
 hash_t get_hash_type (char* hash);
 manifest_t get_entry_type (char* str);

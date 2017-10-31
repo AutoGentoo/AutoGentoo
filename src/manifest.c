@@ -1,10 +1,14 @@
-#include <package/manifest.h>
+#include <portage/manifest.h>
 #include <string.h>
 #include <stdlib.h>
 #include <tools/string_vector.h>
-#include <package/package.h>
+#include <portage/package.h>
 
-void manifest_parse (Package* pkg, FILE* fp) {
+void manifest_parse (Package* pkg) {
+    char manifest_file[256];
+    package_get_file(pkg, manifest_file);
+    
+    FILE* fp = fopen (manifest_file, "r");
     char* line;
     size_t len = 0;
     ssize_t read;
@@ -46,6 +50,7 @@ void manifest_parse (Package* pkg, FILE* fp) {
         entry_parse(&temp, line);
         vector_add(pkg->manifest->entries, &temp);
     }
+    fclose (fp);
 }
 
 void entry_parse (ManifestEntry* entry, char* str) {

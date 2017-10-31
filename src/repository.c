@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <tools/string.h>
 #include <tools/log.h>
+#include <portage/directory.h>
 
 char* sync_types[] = {
         "cvs",
@@ -23,6 +24,8 @@ RepoConfig* repo_config_new () {
     repo_conf->repositories = vector_new(sizeof(Repository*), REMOVE | UNORDERED);
     repo_conf->eclass_overrides = NULL;
     repo_conf->force = NULL;
+    
+    return repo_conf;
 }
 
 void repo_config_read (RepoConfig* repo_conf, char* filepath) {
@@ -50,7 +53,10 @@ void repo_config_read (RepoConfig* repo_conf, char* filepath) {
 
 Repository* parse_repository (ConfSection* section) {
     Repository* repo = malloc (sizeof(Repository));
+    repo->categories = vector_new(sizeof(Category*), REMOVE | UNORDERED);
     strcpy(repo->name, section->name);
+    printf ("repo: %s\n", repo->name);
+    fflush(stdout);
 
     repo->eclass_overrides = conf_get_vector(section->parent, section->name, "eclass-overrides");
     repo->force = conf_get_vector(section->parent, section->name, "force");
@@ -84,7 +90,22 @@ Repository* parse_repository (ConfSection* section) {
     if (conf_get_convert(section->parent, (char*)priority_buff, section->name, "priority")) {
         repo->priority = (int)strtol(priority_buff, NULL, 10);
     }
-
+    
+    
+    char cat_dir[256];
+    sprintf (cat_dir, "/%s", repo->location);
+    fix_path (cat_dir);
+    StringVector* dirs = get_directories (cat_dir);
+    
+    int i;
+    for (i = 0; i != dirs->n; i++) {
+        printf ("%d\n", i);
+        Category* c = category_new(repo, string_vector_get(dirs, i));
+        vector_add(repo->categories, &c);
+    }
+    
+    string_vector_free(dirs);
+    
     return repo;
 }
 

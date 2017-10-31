@@ -14,6 +14,10 @@ StringVector* string_vector_new () {
 void string_vector_add (StringVector* vec, char* string) {
     char* new_ptr = malloc (sizeof(char) * strlen(string));
     strcpy(new_ptr, string);
+    
+    if (vec->s == (vec->n + 1)) {
+        vector_allocate(vec);
+    }
 
     ((char**)vec->ptr)[vec->n] = new_ptr;
     vec->n++;
@@ -23,7 +27,7 @@ void string_vector_insert(StringVector* vec, char* string, int index) {
     char* new_ptr = malloc (sizeof(char) * strlen(string));
     strcpy(new_ptr, string);
 
-    if (vec->n + 1 >= vec->size) {
+    if (vec->s == (vec->n + 1)) {
         vector_allocate(vec);
     }
 

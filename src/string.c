@@ -51,3 +51,15 @@ int string_find (char** array, char* element, size_t n) {
     }
     return -1;
 }
+
+void fix_path (char* ptr) {
+    int n = strlen (ptr);
+    int i;
+    for (i = 1; i != n; i++) {
+        if (ptr[i] == '/' && ptr[i-1] == '/') {
+            strcpy (&ptr[i-1], &ptr[i]);
+            ptr[n-1] = 0;
+            n--;
+        }
+    }
+}

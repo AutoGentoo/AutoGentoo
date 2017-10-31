@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <config/conf.h>
 #include <tools/boolean.h>
+#include <portage/package.h>
 
 #ifndef HACKSAW_REPOSITORY_H
 #define HACKSAW_REPOSITORY_H
@@ -30,7 +31,6 @@ struct __RepoConfig {
     StringVector* force;
     Vector* repositories;
     Vector* config;
-
 };
 
 struct __Repository {
@@ -53,6 +53,8 @@ struct __Repository {
     char sync_cvs_repo[256];
     repo_t sync_type;
     char sync_uri[256]; // Empty to disable syncing
+    
+    Vector* categories;
 };
 
 RepoConfig* repo_config_new ();
