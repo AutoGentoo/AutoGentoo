@@ -6,6 +6,8 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_CC
 AM_PROG_AR
+AC_PROG_YACC
+AC_PROG_LEX
 LT_INIT
 
 AC_SUBST([LIBTOOL_DEPS])
@@ -28,6 +30,7 @@ AC_CHECK_FUNCS([memmove memset regcomp strtol])
 AC_CONFIG_FILES([
   Makefile
   src/Makefile
+  language/Makefile
   include/Makefile
   include/config/Makefile
   include/package/Makefile
