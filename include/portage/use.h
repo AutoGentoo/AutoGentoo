@@ -12,16 +12,15 @@ typedef struct __UseFlag use_t;
 typedef struct __UseDep UseDep;
 
 struct __UseFlag {
-    char enabled[16];
+    char name[16];
     char enabled;
     char forced;
-}
+};
 
 struct __UseDep {
     use_t flag;
     Vector* packages;
-}
-
+};
 
 
 #endif //HACKSAW_USE_H

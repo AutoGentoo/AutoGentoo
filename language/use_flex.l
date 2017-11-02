@@ -1,20 +1,29 @@
 %{
 #include "use_bison.h"
+#include <stdio.h>
 %}
 
 %option noyywrap
-%option always-interactive
 
 %%
 
-[0-9]+     { yylval.number = atoi(yytext); return NUMBER; }
+["!"][\w]*[\?]          {return(NO_USE);}
+[[\w]*[\?]]               {printf("yes %s\n", yytext); return(YES_USE);}
 
-[a-z][a-zA-Z0-9]+      { yylval.var = *yytext - 'a'; return VAR; }
+"<="[\w\-.\/]+          {return(LE_ATOM);}
+">="([\w\-\.\/]+)       {return(GE_ATOM);}
+"="([\w\-\.\/]+)        {return(E_ATOM);}
+"<"([\w\-\.\/]+)        {return(L_ATOM);}
+">"[\S]+                {return(G_ATOM);}
+[\S]+                   {return(ATOM);}
 
-[-+()*\n=] { return *yytext; }
+"^^"                    {return(EXACT_ONE);}
+"||"                    {return(EXACT_ONE);}
+"??"                    {return(MOST_ONE);}
 
-[ \t]      ;
+[\(\)]                ;
+[ \n\t]               ;
 
-.          yyerror("Unknown character");
+.                       {printf("Unknown character: %s\n", yytext);}
 
 %%

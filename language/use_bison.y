@@ -12,23 +12,29 @@ int sym[26];
   int number;
   int var;
 };
-
-%type <number> expression
-%token <var> VAR
-%token <number> NUMBER
+%token NO_USE YES_USE
+%token EXACT_ONE LEAST_ONE MOST_ONE
+%token ATOM LE_ATOM GE_ATOM L_ATOM G_ATOM E_ATOM
 
 %%
 
-start: expression '\n' { printf("%d\n\n", $1); } start
-     | /* NULL */
+expr : use '(' expr ')'
+     | select expr
+     | expr select
+     | select
      ;
 
-expression: NUMBER
-          | VAR                       { $$ = sym[$1]; }
-          | '-' expression            { $$ = -$2; }
-          | expression '+' expression { $$ = $1 + $3; }
-          | expression '-' expression { $$ = $1 - $3; }
-          | expression '*' expression { $$ = $1 * $3; }
-          | '(' expression ')'        { $$ = $2; }
-          | VAR '=' expression        { sym[$1] = $3; $$ = $3; }
-          ;
+use : NO_USE
+    | YES_USE
+    | EXACT_ONE
+    | LEAST_ONE
+    | MOST_ONE
+    ;
+
+select  : ATOM
+        | LE_ATOM
+        | GE_ATOM
+        | L_ATOM
+        | G_ATOM
+        | E_ATOM
+        ;
