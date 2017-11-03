@@ -7,7 +7,7 @@ bin_PROGRAMS = hacksaw-uc
 hacksaw_uc_SOURCES =    use.c \
                         use_bison.y \
                         use_flex.l
-hacksaw_uc_LDADD   =    libhacksaw.la
+hacksaw_uc_LDADD   =    ../src/libhacksaw.la
 
 noinst_HEADERS = use.h
 BUILT_SOURCES = use_bison.h
