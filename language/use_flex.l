@@ -1,29 +1,35 @@
 %{
 #include "use_bison.h"
 #include <stdio.h>
+
 %}
 
 %option noyywrap
 
+letter  [a-zA-Z]
+digit   [0-9]
+atom    ({letter}|[\-\.\/])*
+
 %%
-
-["!"][\w]*[\?]          {return(NO_USE);}
-[[\w]*[\?]]               {printf("yes %s\n", yytext); return(YES_USE);}
-
-"<="[\w\-.\/]+          {return(LE_ATOM);}
-">="([\w\-\.\/]+)       {return(GE_ATOM);}
-"="([\w\-\.\/]+)        {return(E_ATOM);}
-"<"([\w\-\.\/]+)        {return(L_ATOM);}
-">"[\S]+                {return(G_ATOM);}
-[\S]+                   {return(ATOM);}
 
 "^^"                    {return(EXACT_ONE);}
 "||"                    {return(EXACT_ONE);}
 "??"                    {return(MOST_ONE);}
 
-[\(\)]                ;
-[ \n\t]               ;
+"!"[\w]*"?"             {return(NO_USE);}
+{letter}*"?"            {return(YES_USE);}
 
+"<="{atom}              {return(LE_ATOM);}
+">="{atom}              {return(GE_ATOM);}
+"="{atom}               {return(E_ATOM);}
+"<"{atom}               {return(L_ATOM);}
+">"{atom}               {return(G_ATOM);}
+{atom}                  {return(ATOM);}
+
+"("                     {return (L_PAREN);}
+")"                     {return (R_PAREN);}
+[ \n\t]                 ;
 .                       {printf("Unknown character: %s\n", yytext);}
+<<EOF>>  return(END_OF_FILE);
 
 %%
