@@ -13,5 +13,4 @@ noinst_HEADERS = use.h
 BUILT_SOURCES = use_bison.h
 
 USE_CLEAN=use_bison.h use_bison.c use_flex.c
-
 CLEANFILES = *~ $(USE_CLEAN)

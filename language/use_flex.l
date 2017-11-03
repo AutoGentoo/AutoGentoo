@@ -16,7 +16,7 @@ atom    ({letter}|[\-\.\/])*
 "||"                    {return(EXACT_ONE);}
 "??"                    {return(MOST_ONE);}
 
-"!"[\w]*"?"             {return(NO_USE);}
+"!"{letter}*"?"         {return(NO_USE);}
 {letter}*"?"            {return(YES_USE);}
 
 "<="{atom}              {return(LE_ATOM);}
@@ -26,8 +26,8 @@ atom    ({letter}|[\-\.\/])*
 ">"{atom}               {return(G_ATOM);}
 {atom}                  {return(ATOM);}
 
-"("                     {return (L_PAREN);}
-")"                     {return (R_PAREN);}
+"("                     {return ('(');}
+")"                     {return (')');}
 [ \n\t]                 ;
 .                       {printf("Unknown character: %s\n", yytext);}
 <<EOF>>  return(END_OF_FILE);

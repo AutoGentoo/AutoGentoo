@@ -23,18 +23,18 @@ int sym[26];
 %token EXACT_ONE LEAST_ONE MOST_ONE
 %token ATOM LE_ATOM GE_ATOM L_ATOM G_ATOM E_ATOM
 %token END_OF_FILE
-%token L_PAREN R_PAREN
 
 %%
 
-program:        /* empty */
-                | expr {}
-                | END_OF_FILE {printf("Encountered EOF\n");}
-                ;
+program:
+        | expr {}
+        | END_OF_FILE {printf("Encountered EOF\n");}
+        ;
 
-expr : use L_PAREN expr R_PAREN
+expr : use '(' expr ')' {printf ("usecheck %d %d", @1.last_line, @1.last_column);}
      | select expr
      | expr select
+     | expr expr
      | select
      ;
 
