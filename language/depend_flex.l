@@ -42,13 +42,30 @@ atom    ({letter}|{digit}|[\-\.\/_])*
                             return(YES_USE);
                         }
 
-"<="{atom}              {dependlval.atom = new_atom (&dependtext[2], LESS_E); return(LE_ATOM);}
-">="{atom}              {dependlval.atom = new_atom (&dependtext[2], GREAT_E); return(GE_ATOM);}
-"="{atom}               {dependlval.atom = new_atom (&dependtext[1], EQUAL); return(E_ATOM);}
-"<"{atom}               {dependlval.atom = new_atom (&dependtext[1], LESS); return(L_ATOM);}
-">"{atom}               {dependlval.atom = new_atom (&dependtext[1], GREAT); return(G_ATOM);}
-"~"{atom}               {dependlval.atom = new_atom (&dependtext[1], REVISION); return(R_ATOM);}
-{atom}                  {dependlval.atom = new_atom (dependtext, ALL); return(ATOM);}
+
+"!!<="{atom}            {dependlval.atom = new_atom (&dependtext[4], LESS_E, HARD_BLOCK); return(ATOM);}
+"!!>="{atom}            {dependlval.atom = new_atom (&dependtext[4], GREAT_E, HARD_BLOCK); return(ATOM);}
+"!!="{atom}             {dependlval.atom = new_atom (&dependtext[3], EQUAL, HARD_BLOCK); return(ATOM);}
+"!!<"{atom}             {dependlval.atom = new_atom (&dependtext[3], LESS, HARD_BLOCK); return(ATOM);}
+"!!>"{atom}             {dependlval.atom = new_atom (&dependtext[3], GREAT, HARD_BLOCK); return(ATOM);}
+"!!~"{atom}             {dependlval.atom = new_atom (&dependtext[3], REVISION, HARD_BLOCK); return(ATOM);}
+"!!"{atom}              {dependlval.atom = new_atom (&dependtext[2], ALL, HARD_BLOCK); return(ATOM);}
+
+"!<="{atom}             {dependlval.atom = new_atom (&dependtext[3], LESS_E, SOFT_BLOCK); return(ATOM);}
+"!>="{atom}             {dependlval.atom = new_atom (&dependtext[3], GREAT_E, SOFT_BLOCK); return(ATOM);}
+"!="{atom}              {dependlval.atom = new_atom (&dependtext[2], EQUAL, SOFT_BLOCK); return(ATOM);}
+"!<"{atom}              {dependlval.atom = new_atom (&dependtext[2], LESS, SOFT_BLOCK); return(ATOM);}
+"!>"{atom}              {dependlval.atom = new_atom (&dependtext[2], GREAT, SOFT_BLOCK); return(ATOM);}
+"!~"{atom}              {dependlval.atom = new_atom (&dependtext[2], REVISION, SOFT_BLOCK); return(ATOM);}
+"!"{atom}               {dependlval.atom = new_atom (&dependtext[1], ALL, SOFT_BLOCK); return(ATOM);}
+
+"<="{atom}              {dependlval.atom = new_atom (&dependtext[2], LESS_E, NO_BLOCK); return(ATOM);}
+">="{atom}              {dependlval.atom = new_atom (&dependtext[2], GREAT_E, NO_BLOCK); return(ATOM);}
+"="{atom}               {dependlval.atom = new_atom (&dependtext[1], EQUAL, NO_BLOCK); return(ATOM);}
+"<"{atom}               {dependlval.atom = new_atom (&dependtext[1], LESS, NO_BLOCK); return(ATOM);}
+">"{atom}               {dependlval.atom = new_atom (&dependtext[1], GREAT, NO_BLOCK); return(ATOM);}
+"~"{atom}               {dependlval.atom = new_atom (&dependtext[1], REVISION, NO_BLOCK); return(ATOM);}
+{atom}                  {dependlval.atom = new_atom (dependtext, ALL, NO_BLOCK); return(ATOM);}
 
 "("                     {return ('(');}
 ")"                     {return (')');}

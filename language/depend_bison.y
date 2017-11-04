@@ -33,13 +33,7 @@ void dependerror(const char *message);
 %token <use> LEAST_ONE
 %token <use> MOST_ONE
 
-%token <atom> ATOM 
-%token <atom> LE_ATOM
-%token <atom> GE_ATOM
-%token <atom> L_ATOM
-%token <atom> G_ATOM
-%token <atom> E_ATOM
-%token <atom> R_ATOM
+%token <atom> ATOM
 
 %token END_OF_FILE
 
@@ -68,7 +62,7 @@ expr :  use[out] '(' expr[in] ')'       {
                                             };
                                             $$ = new_dependexpression (ar, EXPR_EXPR);
                                         }
-        | select                        {
+        | ATOM                          {
                                             $$ = new_dependexpression($1, SEL_EXPR);
                                         }
      ;
@@ -79,12 +73,3 @@ use : NO_USE
     | LEAST_ONE
     | MOST_ONE
     ;
-
-select  : ATOM
-        | LE_ATOM
-        | GE_ATOM
-        | L_ATOM
-        | G_ATOM
-        | E_ATOM
-        | R_ATOM
-        ;

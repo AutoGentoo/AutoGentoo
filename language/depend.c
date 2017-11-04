@@ -53,10 +53,11 @@ void add_dependexpression (Vector* list, Vector* exp) {
     
 }
 
-Atom* new_atom (char* str, atom_st status) {
+Atom* new_atom (char* str, atom_t status, block_t block) {
     Atom* out = malloc (sizeof (Atom));
     out->atom = strdup(str);
     out->status = status;
+    out->block = block;
     return out;
 }
 
@@ -100,8 +101,9 @@ void debug_dependexpression (DependExpression* expr) {
 void print_sel (Atom* selection) {
     printf_with_index ("Atom {\n");
     indent += 4;
-    printf_with_index("Status: %d\n", selection->status);
     printf_with_index("Atom: %s\n", selection->atom);
+    printf_with_index("Status: %d\n", selection->status);
+    printf_with_index("Block: %d\n", selection->block);
     indent -= 4;
     printf_with_index("}\n");
 }

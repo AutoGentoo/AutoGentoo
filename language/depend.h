@@ -20,8 +20,14 @@ typedef enum {
     LESS_E,
     GREAT_E,
     LESS,
-    GREAT
-} atom_st;
+    GREAT,
+} atom_t;
+
+typedef enum {
+    NO_BLOCK,
+    SOFT_BLOCK,
+    HARD_BLOCK
+} block_t;
 
 typedef enum {
     USE_EXPR,
@@ -51,7 +57,8 @@ struct __expr {
 
 struct __atom {
     char* atom;
-    atom_st status;
+    atom_t status;
+    block_t block;
 };
 
 struct __use {
@@ -62,7 +69,7 @@ struct __use {
 CheckUse* new_check_use (Use* use, DependExpression* inner);
 void add_dependexpression (Vector* list, Vector* exp);
 DependExpression* new_dependexpression(void* ptr, expr_t type);
-Atom* new_atom (char* str, atom_st status);
+Atom* new_atom (char* str, atom_t status, block_t block);
 Use* new_use (char* str, use_t type);
 
 /* Debug */
