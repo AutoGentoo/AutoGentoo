@@ -23,23 +23,26 @@ void dependerror(const char *message);
 
 %union {
     Atom* atom;
+    char* atom_str;
+    AtomOpts atom_opts;
     DependExpression* dependexpression;
     Use* use;
+    block_t block;
+    atom_t version;
 }
 
-%token <use> NO_USE
-%token <use> YES_USE
-%token <use> EXACT_ONE
-%token <use> LEAST_ONE
-%token <use> MOST_ONE
+%token <use> USE
 
-%token <atom> ATOM
+%token <atom_str> ATOM
+
+%token <block> BLOCKS
+%token <version> VERSION
 
 %token END_OF_FILE
 
 %type <dependexpression> expr
 %type <atom> select
-%type <use> use
+%type <atom_opts> opts
 
 %%
 
@@ -49,7 +52,7 @@ program:    | expr  {
             | END_OF_FILE
             ;
 
-expr :  use[out] '(' expr[in] ')'       {
+expr :  USE[out] '(' expr[in] ')'       {
                                             $$ = new_dependexpression(
                                                 new_check_use($out, $in), 
                                                 USE_EXPR
@@ -62,14 +65,24 @@ expr :  use[out] '(' expr[in] ')'       {
                                             };
                                             $$ = new_dependexpression (ar, EXPR_EXPR);
                                         }
-        | ATOM                          {
+        | select                        {
                                             $$ = new_dependexpression($1, SEL_EXPR);
                                         }
      ;
 
-use : NO_USE
-    | YES_USE
-    | EXACT_ONE
-    | LEAST_ONE
-    | MOST_ONE
-    ;
+select :    opts ATOM                   {
+                                            $$ = new_atom($2, $1);
+                                        }
+
+opts :                                  {
+                                            set_atom_opts(&$$, ALL, NO_BLOCK); 
+                                        }
+        | BLOCKS VERSION                {
+                                            set_atom_opts(&$$, $2, $1);
+                                        }
+        | VERSION                       {
+                                            set_atom_opts(&$$, $1, NO_BLOCK);
+                                        }
+        | BLOCKS                        {
+                                            set_atom_opts(&$$, ALL, $1);
+                                        }

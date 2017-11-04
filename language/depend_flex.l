@@ -27,45 +27,33 @@ atom    ({letter}|{digit}|[\-\.\/_])*
 
 [ \n\t\r\\]+             ;
 
-"^^"                    {dependlval.use = new_use (dependtext, EXACTLY_ONE); return(EXACT_ONE);}
-"||"                    {dependlval.use = new_use (dependtext, AT_LEAST_ONE); return(LEAST_ONE);}
-"??"                    {dependlval.use = new_use (dependtext, AT_MOST_ONE); return(MOST_ONE);}
+"^^"                    {dependlval.use = new_use (dependtext, EXACTLY_ONE); return(USE);}
+"||"                    {dependlval.use = new_use (dependtext, AT_LEAST_ONE); return(USE);}
+"??"                    {dependlval.use = new_use (dependtext, AT_MOST_ONE); return(USE);}
 
 "!"{letter}*"?"         {
                             dependtext[strlen(dependtext) - 1] = 0; // Get rid of '?'
-                            dependlval.use = new_use (&dependtext[1], NOT_USE); 
-                            return(NO_USE);
+                            dependlval.use = new_use (&dependtext[1], NO_USE); 
+                            return(USE);
                         }
 {letter}*"?"            {
                             dependtext[strlen(dependtext) - 1] = 0; // Get rid of '?'
-                            dependlval.use = new_use (&dependtext[0], USE); 
-                            return(YES_USE);
+                            dependlval.use = new_use (&dependtext[0], YES_USE); 
+                            return(USE);
                         }
 
 
-"!!<="{atom}            {dependlval.atom = new_atom (&dependtext[4], LESS_E, HARD_BLOCK); return(ATOM);}
-"!!>="{atom}            {dependlval.atom = new_atom (&dependtext[4], GREAT_E, HARD_BLOCK); return(ATOM);}
-"!!="{atom}             {dependlval.atom = new_atom (&dependtext[3], EQUAL, HARD_BLOCK); return(ATOM);}
-"!!<"{atom}             {dependlval.atom = new_atom (&dependtext[3], LESS, HARD_BLOCK); return(ATOM);}
-"!!>"{atom}             {dependlval.atom = new_atom (&dependtext[3], GREAT, HARD_BLOCK); return(ATOM);}
-"!!~"{atom}             {dependlval.atom = new_atom (&dependtext[3], REVISION, HARD_BLOCK); return(ATOM);}
-"!!"{atom}              {dependlval.atom = new_atom (&dependtext[2], ALL, HARD_BLOCK); return(ATOM);}
+"!!"                    {dependlval.block = HARD_BLOCK; return (BLOCKS);}
+"!"                     {dependlval.block = SOFT_BLOCK; return (BLOCKS);}
 
-"!<="{atom}             {dependlval.atom = new_atom (&dependtext[3], LESS_E, SOFT_BLOCK); return(ATOM);}
-"!>="{atom}             {dependlval.atom = new_atom (&dependtext[3], GREAT_E, SOFT_BLOCK); return(ATOM);}
-"!="{atom}              {dependlval.atom = new_atom (&dependtext[2], EQUAL, SOFT_BLOCK); return(ATOM);}
-"!<"{atom}              {dependlval.atom = new_atom (&dependtext[2], LESS, SOFT_BLOCK); return(ATOM);}
-"!>"{atom}              {dependlval.atom = new_atom (&dependtext[2], GREAT, SOFT_BLOCK); return(ATOM);}
-"!~"{atom}              {dependlval.atom = new_atom (&dependtext[2], REVISION, SOFT_BLOCK); return(ATOM);}
-"!"{atom}               {dependlval.atom = new_atom (&dependtext[1], ALL, SOFT_BLOCK); return(ATOM);}
+"<="                    {dependlval.version = LESS_E; return (VERSION);} 
+">="                    {dependlval.version = GREAT_E; return (VERSION);} 
+"<"                     {dependlval.version = LESS; return (VERSION);} 
+">"                     {dependlval.version = GREAT; return (VERSION);} 
+"="                     {dependlval.version = EQUAL; return (VERSION);} 
+"~"                     {dependlval.version = REVISION; return (VERSION);} 
 
-"<="{atom}              {dependlval.atom = new_atom (&dependtext[2], LESS_E, NO_BLOCK); return(ATOM);}
-">="{atom}              {dependlval.atom = new_atom (&dependtext[2], GREAT_E, NO_BLOCK); return(ATOM);}
-"="{atom}               {dependlval.atom = new_atom (&dependtext[1], EQUAL, NO_BLOCK); return(ATOM);}
-"<"{atom}               {dependlval.atom = new_atom (&dependtext[1], LESS, NO_BLOCK); return(ATOM);}
-">"{atom}               {dependlval.atom = new_atom (&dependtext[1], GREAT, NO_BLOCK); return(ATOM);}
-"~"{atom}               {dependlval.atom = new_atom (&dependtext[1], REVISION, NO_BLOCK); return(ATOM);}
-{atom}                  {dependlval.atom = new_atom (dependtext, ALL, NO_BLOCK); return(ATOM);}
+{atom}                  {dependlval.atom_str = strdup (dependtext); return (ATOM);}
 
 "("                     {return ('(');}
 ")"                     {return (')');}

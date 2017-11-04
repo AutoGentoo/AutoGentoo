@@ -10,6 +10,7 @@ typedef struct __check_use CheckUse;
 typedef struct __expr DependExpression;
 typedef struct __atom Atom;
 typedef struct __use Use;
+typedef struct __atom_opts AtomOpts;
 
 #include <tools/vector.h>
 
@@ -36,8 +37,8 @@ typedef enum {
 } expr_t;
 
 typedef enum {
-    USE,
-    NOT_USE,
+    YES_USE,
+    NO_USE,
     EXACTLY_ONE,
     AT_LEAST_ONE,
     AT_MOST_ONE
@@ -55,10 +56,15 @@ struct __expr {
     Vector* dependexpressions; // Use if type == EXPR_EXPR
 };
 
-struct __atom {
-    char* atom;
+struct __atom_opts {
     atom_t status;
     block_t block;
+    Vector* required_use;
+};
+
+struct __atom {
+    char* atom;
+    AtomOpts opts;
 };
 
 struct __use {
@@ -69,7 +75,8 @@ struct __use {
 CheckUse* new_check_use (Use* use, DependExpression* inner);
 void add_dependexpression (Vector* list, Vector* exp);
 DependExpression* new_dependexpression(void* ptr, expr_t type);
-Atom* new_atom (char* str, atom_t status, block_t block);
+Atom* new_atom (char* str, AtomOpts opts);
+void set_atom_opts (AtomOpts* opts, atom_t status, block_t block);
 Use* new_use (char* str, use_t type);
 
 /* Debug */
