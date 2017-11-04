@@ -16,6 +16,7 @@ typedef struct __use Use;
 typedef enum {
     ALL,
     EQUAL,
+    REVISION,
     LESS_E,
     GREAT_E,
     LESS,

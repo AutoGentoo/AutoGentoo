@@ -39,6 +39,7 @@ void dependerror(const char *message);
 %token <atom> L_ATOM
 %token <atom> G_ATOM
 %token <atom> E_ATOM
+%token <atom> R_ATOM
 
 %token END_OF_FILE
 
@@ -85,4 +86,5 @@ select  : ATOM
         | L_ATOM
         | G_ATOM
         | E_ATOM
+        | R_ATOM
         ;

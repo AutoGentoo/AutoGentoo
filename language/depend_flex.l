@@ -7,14 +7,14 @@
 
 int dependerror(char *s)
 {
-    fprintf(stderr, "%s in line %d near <%s>\n", s, dependlineno, dependtext);
+    fprintf(stderr, "%s in line %d near '%s'\n", s, dependlineno, dependtext);
 }
 
 DependExpression* depend_parse (char* buffer) {
     YY_BUFFER_STATE bs = yy_scan_string(buffer);
     depend_switch_to_buffer(bs);
     dependparse();
-    return dependout;
+    return (DependExpression*)dependout;
 }
 
 %}
@@ -47,6 +47,7 @@ atom    ({letter}|{digit}|[\-\.\/_])*
 "="{atom}               {dependlval.atom = new_atom (&dependtext[1], EQUAL); return(E_ATOM);}
 "<"{atom}               {dependlval.atom = new_atom (&dependtext[1], LESS); return(L_ATOM);}
 ">"{atom}               {dependlval.atom = new_atom (&dependtext[1], GREAT); return(G_ATOM);}
+"~"{atom}               {dependlval.atom = new_atom (&dependtext[1], REVISION); return(R_ATOM);}
 {atom}                  {dependlval.atom = new_atom (dependtext, ALL); return(ATOM);}
 
 "("                     {return ('(');}
