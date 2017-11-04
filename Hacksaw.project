@@ -167,9 +167,9 @@ make</RebuildCommand>
   </Settings>
   <VirtualDirectory Name="language">
     <File Name="language/Makefile.am"/>
-    <File Name="language/use.c"/>
-    <File Name="language/use.h"/>
-    <File Name="language/use_bison.y"/>
-    <File Name="language/use_flex.l"/>
+    <File Name="language/depend.c"/>
+    <File Name="language/depend.h"/>
+    <File Name="language/depend_bison.y"/>
+    <File Name="language/depend_flex.l"/>
   </VirtualDirectory>
 </CodeLite_Project>

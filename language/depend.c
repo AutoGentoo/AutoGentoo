@@ -1,18 +1,18 @@
 #include <stdio.h>
-#include <use.h>
+#include <depend.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 
-CheckUse* new_check_use (Use* use, Expression* inner) {
+CheckUse* new_check_use (Use* use, DependExpression* inner) {
     CheckUse* out = malloc(sizeof(CheckUse));
     out->to_check = use;
     out->inner = inner;
     return out;
 }
 
-Expression* new_expression(void* ptr, expr_t type) {
-    Expression* out = malloc (sizeof (Expression));
+DependExpression* new_dependexpression(void* ptr, expr_t type) {
+    DependExpression* out = malloc (sizeof (DependExpression));
     out->type = type;
     if (out->type == USE_EXPR) {
         out->c_use = (CheckUse*)ptr;
@@ -21,33 +21,33 @@ Expression* new_expression(void* ptr, expr_t type) {
         out->select = (Atom*)ptr;
     }
     else if (out->type == EXPR_EXPR) {
-        Expression** temp = (Expression**)ptr;
-        out->expressions = vector_new(sizeof(Expression), REMOVE | UNORDERED);
+        DependExpression** temp = (DependExpression**)ptr;
+        out->dependexpressions = vector_new(sizeof(DependExpression), REMOVE | UNORDERED);
         if (temp[0]->type == EXPR_EXPR) {
-            add_expression(out->expressions, temp[0]->expressions);
+            add_dependexpression(out->dependexpressions, temp[0]->dependexpressions);
         }
         else {
-            vector_add (out->expressions, temp[0]);
+            vector_add (out->dependexpressions, temp[0]);
         }
         if (temp[1]->type == EXPR_EXPR) {
-            add_expression(out->expressions, temp[1]->expressions);
+            add_dependexpression(out->dependexpressions, temp[1]->dependexpressions);
         }
         else {
-            vector_add (out->expressions, temp[1]);
+            vector_add (out->dependexpressions, temp[1]);
         }
     }
     return out;
 }
 
-void add_expression (Vector* list, Vector* exp) {
+void add_dependexpression (Vector* list, Vector* exp) {
     int i;
     for (i = 0; i != exp->n; i++) {
-        Expression* current_expr = (Expression*)vector_get(exp, i);
+        DependExpression* current_expr = (DependExpression*)vector_get(exp, i);
         if (current_expr->type != EXPR_EXPR) {
             vector_add (list, current_expr);
         }
         else {
-            add_expression (list, current_expr->expressions);
+            add_dependexpression (list, current_expr->dependexpressions);
         }
     }
     
@@ -69,8 +69,8 @@ Use* new_use (char* str, use_t type) {
 
 static int indent = 0;
 
-void debug_expression (Expression* expr) {
-    printf_with_index ("Expression {\n");
+void debug_dependexpression (DependExpression* expr) {
+    printf_with_index ("DependExpression {\n");
     indent += 4;
     switch(expr->type) {
         case USE_EXPR:
@@ -82,10 +82,10 @@ void debug_expression (Expression* expr) {
         case EXPR_EXPR:
         printf_with_index ("[\n");
         indent += 4;
-        printf_with_index ("len: %d\n", expr->expressions->n);
+        printf_with_index ("len: %d\n", expr->dependexpressions->n);
         int i;
-        for (i = 0; i != expr->expressions->n; i++) {
-            debug_expression((Expression*)vector_get(expr->expressions, i));
+        for (i = 0; i != expr->dependexpressions->n; i++) {
+            debug_dependexpression((DependExpression*)vector_get(expr->dependexpressions, i));
         }
         indent -= 4;
         printf_with_index ("]\n");
@@ -115,7 +115,7 @@ void print_c_use (CheckUse* c_use) {
     printf_with_index("Type: %d\n", c_use->to_check->type);
     indent -= 4;
     printf_with_index("}\n");
-    debug_expression(c_use->inner);
+    debug_dependexpression(c_use->inner);
     indent -= 4;
     printf_with_index("}\n");
 }
@@ -127,7 +127,7 @@ void printf_with_index (char* format, ...) {
     vprintf(format, args);
 }
 
-void free_expression (Expression* expr) {
+void free_dependexpression (DependExpression* expr) {
     if (expr->type == USE_EXPR) {
         free_check_use (expr->c_use);
     }
@@ -136,16 +136,16 @@ void free_expression (Expression* expr) {
     }
     else if (expr->type == EXPR_EXPR) {
         int i;
-        for (i=0; i != expr->expressions->n; i++) {
-            free_expression (vector_get(expr->expressions, i));
+        for (i=0; i != expr->dependexpressions->n; i++) {
+            free_dependexpression (vector_get(expr->dependexpressions, i));
         }
     }
-    vector_free(expr->expressions);
+    vector_free(expr->dependexpressions);
     free (expr);
 }
 
 void free_check_use (CheckUse* ptr) {
-    free_expression (ptr->inner);
+    free_dependexpression (ptr->inner);
     free_use (ptr->to_check);
     free(ptr);
 }

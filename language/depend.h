@@ -7,7 +7,7 @@
 #define HACKSAW_COMPILER_USE_H
 
 typedef struct __check_use CheckUse;
-typedef struct __expr Expression;
+typedef struct __expr DependExpression;
 typedef struct __atom Atom;
 typedef struct __use Use;
 
@@ -38,14 +38,14 @@ typedef enum {
 
 struct __check_use {
     Use* to_check;
-    Expression* inner;
+    DependExpression* inner;
 };
 
 struct __expr {
     expr_t type;
     CheckUse* c_use; // Use if type == USE_EXPR
     Atom* select; // Use if type == SEL_EXPR
-    Vector* expressions; // Use if type == EXPR_EXPR
+    Vector* dependexpressions; // Use if type == EXPR_EXPR
 };
 
 struct __atom {
@@ -58,20 +58,20 @@ struct __use {
     char* str;
 };
 
-CheckUse* new_check_use (Use* use, Expression* inner);
-void add_expression (Vector* list, Vector* exp);
-Expression* new_expression(void* ptr, expr_t type);
+CheckUse* new_check_use (Use* use, DependExpression* inner);
+void add_dependexpression (Vector* list, Vector* exp);
+DependExpression* new_dependexpression(void* ptr, expr_t type);
 Atom* new_atom (char* str, atom_st status);
 Use* new_use (char* str, use_t type);
 
 /* Debug */
 void printf_with_index (char* format, ...);
-void debug_expression (Expression* expr);
+void debug_dependexpression (DependExpression* expr);
 void print_c_use (CheckUse* c_use);
 void print_sel (Atom* selection);
 
 /* Free */
-void free_expression (Expression* expr);
+void free_dependexpression (DependExpression* expr);
 void free_check_use (CheckUse* ptr);
 void free_use (Use* ptr);
 void free_selection (Atom* ptr);

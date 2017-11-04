@@ -1,24 +1,27 @@
 %{
 #include <stdio.h>
 
-int yyparse(void);
-int yywrap() { return 1; }
-extern int yylineno;
-extern char* yytext;
+int dependparse(void);
+int dependwrap() { return 1; }
+int dependlex();
+extern int dependlineno;
+extern char* dependtext;
 
-void yyerror(const char *message);
+void dependerror(const char *message);
 %}
 
 %code requires {
-  #include "use.h"
+  #include "depend.h"
   #include <stdlib.h>
 }
+
+%define api.prefix {depend}
 
 %start program
 
 %union {
     Atom* atom;
-    Expression* expression;
+    DependExpression* dependexpression;
     Use* use;
 }
 
@@ -37,31 +40,31 @@ void yyerror(const char *message);
 
 %token END_OF_FILE
 
-%type <expression> expr
+%type <dependexpression> expr
 %type <atom> select
 %type <use> use
 
 %%
 
-program:    | expr {debug_expression($1);}
+program:    | expr {debug_dependexpression($1);}
             | END_OF_FILE {printf("End\n");}
             ;
 
 expr :  use[out] '(' expr[in] ')'       {
-                                            $$ = new_expression(
+                                            $$ = new_dependexpression(
                                                 new_check_use($out, $in), 
                                                 USE_EXPR
                                             );
                                         }
         | expr expr                     {
-                                            Expression* ar[] = {
+                                            DependExpression* ar[] = {
                                                 $1,
                                                 $2
                                             };
-                                            $$ = new_expression (ar, EXPR_EXPR);
+                                            $$ = new_dependexpression (ar, EXPR_EXPR);
                                         }
         | select                        {
-                                            $$ = new_expression($1, SEL_EXPR);
+                                            $$ = new_dependexpression($1, SEL_EXPR);
                                         }
      ;
 
