@@ -3,10 +3,18 @@
 %{
 #include "depend_bison.h"
 #include <stdio.h>
+#include <depend.h>
 
 int dependerror(char *s)
 {
     fprintf(stderr, "%s in line %d near <%s>\n", s, dependlineno, dependtext);
+}
+
+DependExpression* depend_parse (char* buffer) {
+    YY_BUFFER_STATE bs = yy_scan_string(buffer);
+    depend_switch_to_buffer(bs);
+    dependparse();
+    return dependout;
 }
 
 %}
@@ -47,15 +55,3 @@ atom    ({letter}|{digit}|[\-\.\/_])*
 .                       {printf("Unknown character: %s\n", dependtext);}
 
 %%
-
-/*
-int main(int argc, char** argv) {
-    if (argc < 2) {
-        fprintf (stderr, "Enter a string to parse!\n");
-        return 1;
-    }
-    printf ("%s\n", argv[1]);
-    YY_BUFFER_STATE bs = yy_scan_string(argv[1]);
-    depend_switch_to_buffer(bs);
-    dependparse();
-}*/

@@ -1,21 +1,23 @@
 %define api.prefix {depend}
 
+%code requires {
+  #include "depend.h"
+  #include <stdlib.h>
+}
+
 %{
 #include <stdio.h>
+#include <depend.h>
 
 int dependparse(void);
 int dependwrap() { return 1; }
 int dependlex();
 extern int dependlineno;
 extern char* dependtext;
+extern DependExpression* dependout;
 
 void dependerror(const char *message);
 %}
-
-%code requires {
-  #include "depend.h"
-  #include <stdlib.h>
-}
 
 %start program
 
@@ -46,8 +48,10 @@ void dependerror(const char *message);
 
 %%
 
-program:    | expr {debug_dependexpression($1);}
-            | END_OF_FILE {printf("End\n");}
+program:    | expr  {
+                        dependout = $1;
+                    }
+            | END_OF_FILE
             ;
 
 expr :  use[out] '(' expr[in] ')'       {

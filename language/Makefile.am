@@ -17,3 +17,8 @@ BUILT_SOURCES = depend_bison.h
 
 USE_CLEAN=depend_bison.h depend_bison.c depend_flex.c
 CLEANFILES = *~ $(USE_CLEAN)
+
+check_PROGRAMS = test-depend
+test_depend_SOURCES = depend-main.c
+test_depend_LDADD = libhacksaw-languages.la ../src/libhacksaw.la
+test_depend_CFLAGS  = ${AM_CFLAGS} -Wno-unused-result -g

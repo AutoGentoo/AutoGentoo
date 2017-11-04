@@ -1,5 +1,5 @@
 # USE compiler
-hacksaw-uc
 depend_bison.h
 depend_bison.c
 depend_flex.c
+test-depend
