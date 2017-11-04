@@ -1,4 +1,4 @@
-SUBDIRS = include src language
+SUBDIRS = include language src
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 

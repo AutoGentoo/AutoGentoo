@@ -48,6 +48,7 @@ atom    ({letter}|{digit}|[\-\.\/_])*
 
 %%
 
+/*
 int main(int argc, char** argv) {
     if (argc < 2) {
         fprintf (stderr, "Enter a string to parse!\n");
@@ -55,6 +56,6 @@ int main(int argc, char** argv) {
     }
     printf ("%s\n", argv[1]);
     YY_BUFFER_STATE bs = yy_scan_string(argv[1]);
-    yy_switch_to_buffer(bs);
+    depend_switch_to_buffer(bs);
     dependparse();
-}
+}*/
