@@ -1,3 +1,5 @@
+%define api.prefix {depend}
+
 %{
 #include <stdio.h>
 
@@ -14,8 +16,6 @@ void dependerror(const char *message);
   #include "depend.h"
   #include <stdlib.h>
 }
-
-%define api.prefix {depend}
 
 %start program
 
