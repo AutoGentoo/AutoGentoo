@@ -65,10 +65,10 @@ expr :  USE[out] '(' expr[in] ')'       {
                                             );
                                         }
         | expr expr                     {
-                                            DependExpression* ar[] = {
-                                                $1,
-                                                $2
-                                            };
+                                            Vector* ar = vector_new (sizeof (DependExpression),
+                                                                    REMOVE | UNORDERED);
+                                            vector_add(ar, $1);
+                                            vector_add(ar, $2);
                                             $$ = new_dependexpression (ar, EXPR_EXPR);
                                         }
         | select                        {

@@ -97,7 +97,6 @@ void set_atom_opts (AtomOpts* opts, atom_t status, block_t block);
 Use* new_use (char* str, use_t type);
 
 /* Debug */
-void printf_with_indent (char* format, ...);
 void debug_dependexpression (DependExpression* expr);
 void print_c_use (CheckUse* c_use);
 void print_sel (Atom* selection);
@@ -108,7 +107,5 @@ void free_dependexpression (DependExpression* expr);
 void free_check_use (CheckUse* ptr);
 void free_use (Use* ptr);
 void free_selection (Atom* ptr);
-
-int yyparse(void);
 
 #endif //HACKSAW_COMPILER_USE_H

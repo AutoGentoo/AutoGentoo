@@ -3,3 +3,9 @@ depend_bison.h
 depend_bison.c
 depend_flex.c
 test-depend
+
+# USE compiler
+package_bison.h
+package_bison.c
+package_flex.c
+test-package

@@ -2,7 +2,7 @@
 #include <depend.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
+#include <share.h>
 
 CheckUse* new_check_use (Use* use, DependExpression* inner) {
     CheckUse* out = malloc(sizeof(CheckUse));
@@ -21,20 +21,8 @@ DependExpression* new_dependexpression(void* ptr, expr_t type) {
         out->select = (Atom*)ptr;
     }
     else if (out->type == EXPR_EXPR) {
-        DependExpression** temp = (DependExpression**)ptr;
         out->dependexpressions = vector_new(sizeof(DependExpression), REMOVE | UNORDERED);
-        if (temp[0]->type == EXPR_EXPR) {
-            add_dependexpression(out->dependexpressions, temp[0]->dependexpressions);
-        }
-        else {
-            vector_add (out->dependexpressions, temp[0]);
-        }
-        if (temp[1]->type == EXPR_EXPR) {
-            add_dependexpression(out->dependexpressions, temp[1]->dependexpressions);
-        }
-        else {
-            vector_add (out->dependexpressions, temp[1]);
-        }
+        add_dependexpression (out->dependexpressions, ptr);
     }
     return out;
 }
@@ -42,12 +30,12 @@ DependExpression* new_dependexpression(void* ptr, expr_t type) {
 void add_dependexpression (Vector* list, Vector* exp) {
     int i;
     for (i = 0; i != exp->n; i++) {
-        DependExpression* current_expr = (DependExpression*)vector_get(exp, i);
-        if (current_expr->type != EXPR_EXPR) {
-            vector_add (list, current_expr);
+        DependExpression* current_expr = vector_get(exp, i);
+        if (current_expr->type == EXPR_EXPR) {
+            add_dependexpression (list, current_expr->dependexpressions);
         }
         else {
-            add_dependexpression (list, current_expr->dependexpressions);
+            vector_add (list, current_expr);
         }
     }
     
@@ -73,11 +61,10 @@ void set_atom_opts (AtomOpts* opts, atom_t status, block_t block) {
     opts->block = block;
 }
 
-static int indent = 0;
-
 void debug_dependexpression (DependExpression* expr) {
     printf_with_indent ("DependExpression {\n");
     indent += 4;
+    printf_with_indent ("type: %d\n", expr->type);
     switch(expr->type) {
         case USE_EXPR:
         print_c_use(expr->c_use);
@@ -118,9 +105,9 @@ void print_sel (Atom* selection) {
         }
         indent -= 4;
         printf_with_indent("}\n");
-        indent -= 4;
-        printf_with_indent("}\n");
     }
+    indent -= 4;
+    printf_with_indent("}\n");
 }
 
 void print_c_use (CheckUse* c_use) {
@@ -143,32 +130,24 @@ void print_require_use (RequireUse r) {
     printf_with_indent("status: %d\n", r.status);
 }
 
-void printf_with_indent (char* format, ...) {
-    va_list(args);
-    int i;
-    for (i=0; i!=indent; i++) {
-        if (i % 4 == 0) {
-            printf ("|");
-            continue;
-        }
-        printf (" ");
-    }
-    va_start(args, format);
-    vprintf(format, args);
-}
-
 void free_dependexpression (DependExpression* expr) {
     if (expr->type == USE_EXPR) {
         free_check_use (expr->c_use);
+        return;
     }
     else if (expr->type == SEL_EXPR) {
         free_selection(expr->select);
+        return;
     }
     else if (expr->type == EXPR_EXPR) {
         int i;
         for (i=0; i != expr->dependexpressions->n; i++) {
             free_dependexpression (vector_get(expr->dependexpressions, i));
         }
+        vector_free (expr->dependexpressions);
+    }
+    else {
+        return;
     }
     free (expr);
 }
@@ -185,6 +164,9 @@ void free_use (Use* ptr) {
 }
 
 void free_selection (Atom* ptr) {
+    if (ptr->opts.required_use != NULL) {
+        vector_free (ptr->opts.required_use);
+    }
     free(ptr->atom);
     free (ptr);
 }

@@ -85,6 +85,9 @@
     <File Name="language/package_bison.y"/>
     <File Name="language/package.h"/>
     <File Name="language/package.c"/>
+    <File Name="language/share.h"/>
+    <File Name="language/share.c"/>
+    <File Name="language/package-main.c"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
