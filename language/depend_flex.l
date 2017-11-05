@@ -7,7 +7,7 @@
 
 int dependerror(char *s)
 {
-    fprintf(stderr, "%s in line %d near '%s'\n", s, dependlineno, dependtext);
+    fprintf(stderr, "%s in line %d near '%s' at column %d\n", s, dependlineno, dependtext, dependlloc.first_column);
 }
 
 DependExpression* depend_parse (char* buffer) {
@@ -17,38 +17,47 @@ DependExpression* depend_parse (char* buffer) {
     return (DependExpression*)dependout;
 }
 
+
 %}
+
+
 
 letter  [a-zA-Z]
 digit   [0-9]
-atom    {letter}({letter}|{digit}|[\-\.\/_])*
+flag    {letter}({letter}|"_"|{digit})*
+slot    ({letter}|{digit}|"_")({letter}|{digit}|"_"|"-"|"."|"+")*
+atom    {letter}({letter}|{digit}|"_"|"-"|"."|"+"|"/")*
 
 %%
 
-[ \n\t\r\\]+            ;
 "-"                     {return '-';}
 "+"                     {return '+';}
 "="                     {return '=';}
 "!"                     {return '!';}
 "?"                     {return '?';}
+":"                     {return ':';}
+"("                     {return ('(');}
+")"                     {return (')');}
+"["                     {return ('[');}
+"]"                     {return (']');}
+","                     {return (',');}
 
 "^^"                    {dependlval.use = new_use (dependtext, EXACTLY_ONE); return(USE);}
 "||"                    {dependlval.use = new_use (dependtext, AT_LEAST_ONE); return(USE);}
 "??"                    {dependlval.use = new_use (dependtext, AT_MOST_ONE); return(USE);}
 
-"!"{letter}*"?"         {
+"!"{flag}"?"            {
                             dependtext[strlen(dependtext) - 1] = 0; // Get rid of '?'
                             dependlval.use = new_use (&dependtext[1], NO_USE); 
                             return(USE);
                         }
-{letter}*"?"            {
+{flag}"?"               {
                             dependtext[strlen(dependtext) - 1] = 0; // Get rid of '?'
-                            dependlval.use = new_use (&dependtext[0], YES_USE); 
+                            dependlval.use = new_use (dependtext, YES_USE); 
                             return(USE);
                         }
 
 "!!"                    {dependlval.block = HARD_BLOCK; return (BLOCKS);}
-"!"                     {dependlval.block = SOFT_BLOCK; return (BLOCKS);}
 
 "<="                    {dependlval.version = LESS_E; return (VERSION);} 
 ">="                    {dependlval.version = GREAT_E; return (VERSION);} 
@@ -59,13 +68,9 @@ atom    {letter}({letter}|{digit}|[\-\.\/_])*
 
 {atom}                  {dependlval.atom_str = strdup (dependtext); return (ATOM);}
 [:alpha:]*              {dependlval.atom_str = strdup (dependtext); return (ATOM_USE);}
+{slot}                  {dependlval.atom_str = strdup (dependtext); return (SLOT);}
+[ \n\t\r\\]+            ;
 
-
-"("                     {return ('(');}
-")"                     {return (')');}
-"["                     {return ('[');}
-"]"                     {return (']');}
-","                     {return (',');}
 [<<EOF>>|'']            {return END_OF_FILE;}
 .                       {printf("Unknown character: %s\n", dependtext);}
 

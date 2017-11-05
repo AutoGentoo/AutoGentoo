@@ -106,6 +106,11 @@ void print_sel (Atom* selection) {
         indent -= 4;
         printf_with_indent("}\n");
     }
+    if (selection->slot.rebuild != -1) {
+        printf_with_indent("Rebuild: %d\n", selection->slot.rebuild);
+        printf_with_indent("main_slot: %s\n", selection->slot.main_slot);
+        printf_with_indent("sub_slot: %s\n", selection->slot.sub_slot);
+    }
     indent -= 4;
     printf_with_indent("}\n");
 }

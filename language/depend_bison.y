@@ -20,6 +20,7 @@ extern DependExpression* dependout;
 void dependerror(const char *message);
 %}
 
+%locations
 %start program
 
 %union {
@@ -32,11 +33,13 @@ void dependerror(const char *message);
     atom_t version;
     RequireUse use_req;
     Vector* vec;
+    AtomSlot slot;
 }
 
 %token <use> USE
 %token <atom_str> ATOM_USE
 %token <atom_str> ATOM
+%token <atom_str> SLOT
 
 %token <block> BLOCKS
 %token <version> VERSION
@@ -50,6 +53,10 @@ void dependerror(const char *message);
 %type <use_req> use_flag
 %type <use_req> use_token;
 %type <use_req> default_use_flag;
+%type <slot> slot
+%type <atom_str> slot_select
+%type <block> block
+%type <atom> useselect
 
 %%
 
@@ -72,18 +79,58 @@ expr :  USE[out] '(' expr[in] ')'       {
                                             vector_add(ar, $2);
                                             $$ = new_dependexpression (ar, EXPR_EXPR);
                                         }
-        | select                        {
+        | useselect                     {
                                             $$ = new_dependexpression($1, SEL_EXPR);
                                         }
-     ;
+        ;
 
-select :    opts ATOM                   {
-                                            $$ = new_atom($2, $1);
-                                        }
+
+useselect : select
             | select '[' req_use ']'    {
                                             $$->opts.required_use = $3;
                                         }
+
+select :    opts ATOM                   {
+                                            $$ = new_atom($2, $1);
+                                            $$->slot.rebuild = -1; // Disable slot checking
+                                        }
+            | opts ATOM ':' slot        {
+                                            $$ = new_atom($2, $1);
+                                            $$->slot = $4;
+                                        }
             ;
+
+slot :  '='                             {
+                                            $$.rebuild = SLOT_REBUILD;
+                                            $$.main_slot = NULL;
+                                            $$.sub_slot = NULL;
+                                        }
+        | '*'                           {
+                                            $$.rebuild = SLOT_NO_REBUILD;
+                                            $$.main_slot = NULL;
+                                            $$.sub_slot = NULL;
+                                        }
+        | slot_select                   {
+                                            $$.rebuild = SLOT_NO_REBUILD;
+                                            $$.main_slot = strdup ($1);
+                                            $$.sub_slot = NULL;
+                                        }
+        | slot_select '='               {
+                                            $$.rebuild = SLOT_REBUILD;
+                                            $$.main_slot = strdup ($1);
+                                            $$.sub_slot = NULL;
+                                        }
+        | slot_select '/' slot_select   {
+                                            $$.rebuild = SLOT_REBUILD;
+                                            $$.main_slot = strdup ($1);
+                                            $$.sub_slot = strdup ($3);
+                                        }
+        ;
+
+slot_select :   SLOT
+                | ATOM_USE
+                | ATOM
+                ;
 
 req_use :   req_use ',' req_use         {
                                             vector_extend($1, $3);
@@ -92,13 +139,13 @@ req_use :   req_use ',' req_use         {
                                         }
             | default_use_flag '?'      {
                                             $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
-                                            $1.status = CHECK;
+                                            if ($1.status == DISABLED) {
+                                                $1.status = OPPOSOTE_CHECK;
+                                            }
+                                            else {
+                                                $1.status = CHECK;
+                                            }
                                             vector_add($$, &$1);
-                                        }
-            | '!' default_use_flag '?'  {
-                                            $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
-                                            $2.status = OPPOSOTE_CHECK;
-                                            vector_add($$, &$2);
                                         }
             | use_flag                  {
                                             $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
@@ -125,7 +172,10 @@ req_use :   req_use ',' req_use         {
                                         }
             ;
 
-use_flag : '-' use_token                {
+use_flag :  use_token                   {
+                                            $$ = $1;
+                                        }
+            | '-' use_token             {
                                             $$ = $2;
                                             $$.status = DISABLED;
                                         }
@@ -151,6 +201,7 @@ default_use_flag :  use_token '(' '-' ')'       {
                                                     $$ = $2;
                                                     $$.status = DISABLED;
                                                 }
+                    ;
 
 use_token :   ATOM_USE                  {
                                             $$.flag = strdup ($1);
@@ -162,17 +213,22 @@ use_token :   ATOM_USE                  {
                                             $$.status = ENABLED;
                                             $$._default = DEFAULT_NONE;
                                         }
+            ;
 
 opts :                                  {
                                             set_atom_opts(&$$, ALL, NO_BLOCK); 
                                         } 
-        | BLOCKS VERSION                {
+        | block VERSION                 {
                                             set_atom_opts(&$$, $2, $1);
                                         }
         | VERSION                       {
                                             set_atom_opts(&$$, $1, NO_BLOCK);
                                         }
-        | BLOCKS                        {
+        | block                         {
                                             set_atom_opts(&$$, ALL, $1);
                                         }
+        ;
+
+block : '!'                             {$$ = SOFT_BLOCK;}
+        | BLOCKS                        {$$ = HARD_BLOCK;}
         ;

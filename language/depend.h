@@ -12,6 +12,7 @@ typedef struct __atom Atom;
 typedef struct __use Use;
 typedef struct __atom_opts AtomOpts;
 typedef struct __require_use RequireUse;
+typedef struct __atom_slot AtomSlot;
 
 #include <tools/vector.h>
 
@@ -60,6 +61,11 @@ typedef enum {
     DEFAULT_ENABLE
 } druse_t;
 
+typedef enum {
+    SLOT_NO_REBUILD,
+    SLOT_REBUILD
+} slot_t;
+
 struct __check_use {
     Use* to_check;
     DependExpression* inner;
@@ -78,11 +84,6 @@ struct __expr {
     Vector* dependexpressions; // Use if type == EXPR_EXPR
 };
 
-struct __atom {
-    char* atom;
-    AtomOpts opts;
-};
-
 struct __use {
     use_t type;
     char* str;
@@ -92,6 +93,18 @@ struct __require_use {
     char* flag;
     ruse_t status;
     druse_t _default;
+};
+
+struct __atom_slot {
+    slot_t rebuild;
+    char* main_slot;
+    char* sub_slot;
+};
+
+struct __atom {
+    char* atom;
+    AtomOpts opts;
+    AtomSlot slot;
 };
 
 CheckUse* new_check_use (Use* use, DependExpression* inner);
