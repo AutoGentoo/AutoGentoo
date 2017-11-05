@@ -25,12 +25,12 @@ DependExpression* depend_parse (char* buffer) {
 letter  [a-zA-Z]
 digit   [0-9]
 flag    {letter}({letter}|"_"|{digit})*
-slot    ({letter}|{digit}|"_")({letter}|{digit}|"_"|"-"|"."|"+")*
-atom    {letter}({letter}|{digit}|"_"|"-"|"."|"+"|"/")*
+atom    ({letter}|{digit}|"_"|"-"|"."|"+")+
 
 %%
 
 "-"                     {return '-';}
+"/"                     {return '/';}
 "+"                     {return '+';}
 "="                     {return '=';}
 "!"                     {return '!';}
@@ -66,9 +66,7 @@ atom    {letter}({letter}|{digit}|"_"|"-"|"."|"+"|"/")*
 "="                     {dependlval.version = EQUAL; return (VERSION);} 
 "~"                     {dependlval.version = DEP_REVISION; return (VERSION);} 
 
-{atom}                  {dependlval.atom_str = strdup (dependtext); return (ATOM);}
-[:alpha:]*              {dependlval.atom_str = strdup (dependtext); return (ATOM_USE);}
-{slot}                  {dependlval.atom_str = strdup (dependtext); return (SLOT);}
+{atom}                 {dependlval.atom_str = strdup (dependtext); return (IDENT);}
 [ \n\t\r\\]+            ;
 
 [<<EOF>>|'']            {return END_OF_FILE;}

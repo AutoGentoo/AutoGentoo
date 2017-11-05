@@ -37,9 +37,7 @@ void dependerror(const char *message);
 }
 
 %token <use> USE
-%token <atom_str> ATOM_USE
-%token <atom_str> ATOM
-%token <atom_str> SLOT
+%token <atom_str> IDENT
 
 %token <block> BLOCKS
 %token <version> VERSION
@@ -54,7 +52,6 @@ void dependerror(const char *message);
 %type <use_req> use_token;
 %type <use_req> default_use_flag;
 %type <slot> slot
-%type <atom_str> slot_select
 %type <block> block
 %type <atom> useselect
 
@@ -90,47 +87,46 @@ useselect : select
                                             $$->opts.required_use = $3;
                                         }
 
-select :    opts ATOM                   {
-                                            $$ = new_atom($2, $1);
+select :    opts IDENT '/' IDENT        {
+                                            char current[128];
+                                            sprintf (current, "%s/%s", $2, $4);
+                                            $$ = new_atom(current, $1);
                                             $$->slot.rebuild = -1; // Disable slot checking
                                         }
-            | opts ATOM ':' slot        {
-                                            $$ = new_atom($2, $1);
-                                            $$->slot = $4;
+            | opts IDENT '/' IDENT slot {
+                                            char current[128];
+                                            sprintf (current, "%s/%s", $2, $4);
+                                            $$ = new_atom(current, $1);
+                                            $$->slot = $5;
                                         }
             ;
 
-slot :  '='                             {
+slot :  ':' '='                         {
                                             $$.rebuild = SLOT_REBUILD;
                                             $$.main_slot = NULL;
                                             $$.sub_slot = NULL;
                                         }
-        | '*'                           {
+        | ':' '*'                       {
                                             $$.rebuild = SLOT_NO_REBUILD;
                                             $$.main_slot = NULL;
                                             $$.sub_slot = NULL;
                                         }
-        | slot_select                   {
+        | ':' IDENT                     {
                                             $$.rebuild = SLOT_NO_REBUILD;
-                                            $$.main_slot = strdup ($1);
+                                            $$.main_slot = strdup ($2);
                                             $$.sub_slot = NULL;
                                         }
-        | slot_select '='               {
+        | ':' IDENT '='                     {
                                             $$.rebuild = SLOT_REBUILD;
-                                            $$.main_slot = strdup ($1);
+                                            $$.main_slot = strdup ($2);
                                             $$.sub_slot = NULL;
                                         }
-        | slot_select '/' slot_select   {
+        | ':' IDENT '/' IDENT           {
                                             $$.rebuild = SLOT_REBUILD;
-                                            $$.main_slot = strdup ($1);
-                                            $$.sub_slot = strdup ($3);
+                                            $$.main_slot = strdup ($2);
+                                            $$.sub_slot = strdup ($4);
                                         }
         ;
-
-slot_select :   SLOT
-                | ATOM_USE
-                | ATOM
-                ;
 
 req_use :   req_use ',' req_use         {
                                             vector_extend($1, $3);
@@ -203,12 +199,7 @@ default_use_flag :  use_token '(' '-' ')'       {
                                                 }
                     ;
 
-use_token :   ATOM_USE                  {
-                                            $$.flag = strdup ($1);
-                                            $$.status = ENABLED;
-                                            $$._default = DEFAULT_NONE;
-                                        }
-            | ATOM                      {
+use_token : IDENT                       {
                                             $$.flag = strdup ($1);
                                             $$.status = ENABLED;
                                             $$._default = DEFAULT_NONE;
