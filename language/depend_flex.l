@@ -27,6 +27,7 @@ atom    {letter}({letter}|{digit}|[\-\.\/_])*
 
 [ \n\t\r\\]+             ;
 "-"                     {return '-';}
+"+"                     {return '+';}
 "="                     {return '=';}
 "!"                     {return '!';}
 

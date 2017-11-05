@@ -122,6 +122,14 @@ use_flag : '-' use_token                {
                                             $$ = $2;
                                             $$.status = OPPOSITE;
                                         }
+            | use_token '(' '-' ')'     {
+                                            $$ = $1;
+                                            $$.status = DEFAULT_DISABLE;
+                                        }
+            | use_token '(' '+' ')'     {
+                                            $$ = $1;
+                                            $$.status = DEFAULT_ENABLE;
+                                        }
             ;
 
 use_token :   ATOM_USE                  {

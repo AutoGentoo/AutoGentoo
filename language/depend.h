@@ -51,7 +51,9 @@ typedef enum {
     SAME, //foo[bar=] bar? ( app-misc/foo[bar] ) !bar? ( app-misc/foo[-bar] )
     OPPOSITE,
     CHECK,
-    OPPOSOTE_CHECK
+    OPPOSOTE_CHECK,
+    DEFAULT_DISABLE,
+    DEFAULT_ENABLE
 } ruse_t;
 
 struct __check_use {
