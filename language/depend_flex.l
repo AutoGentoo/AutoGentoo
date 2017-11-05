@@ -21,11 +21,14 @@ DependExpression* depend_parse (char* buffer) {
 
 letter  [a-zA-Z]
 digit   [0-9]
-atom    ({letter}|{digit}|[\-\.\/_])*
+atom    {letter}({letter}|{digit}|[\-\.\/_])*
 
 %%
 
 [ \n\t\r\\]+             ;
+"-"                     {return '-';}
+"="                     {return '=';}
+"!"                     {return '!';}
 
 "^^"                    {dependlval.use = new_use (dependtext, EXACTLY_ONE); return(USE);}
 "||"                    {dependlval.use = new_use (dependtext, AT_LEAST_ONE); return(USE);}
@@ -42,7 +45,6 @@ atom    ({letter}|{digit}|[\-\.\/_])*
                             return(USE);
                         }
 
-
 "!!"                    {dependlval.block = HARD_BLOCK; return (BLOCKS);}
 "!"                     {dependlval.block = SOFT_BLOCK; return (BLOCKS);}
 
@@ -54,9 +56,14 @@ atom    ({letter}|{digit}|[\-\.\/_])*
 "~"                     {dependlval.version = REVISION; return (VERSION);} 
 
 {atom}                  {dependlval.atom_str = strdup (dependtext); return (ATOM);}
+[:alpha:]*              {dependlval.atom_str = strdup (dependtext); return (ATOM_USE);}
+
 
 "("                     {return ('(');}
 ")"                     {return (')');}
+"["                     {return ('[');}
+"]"                     {return (']');}
+","                     {return (',');}
 [<<EOF>>|'']            {return END_OF_FILE;}
 .                       {printf("Unknown character: %s\n", dependtext);}
 

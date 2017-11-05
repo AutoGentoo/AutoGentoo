@@ -11,6 +11,7 @@ typedef struct __expr DependExpression;
 typedef struct __atom Atom;
 typedef struct __use Use;
 typedef struct __atom_opts AtomOpts;
+typedef struct __require_use RequireUse;
 
 #include <tools/vector.h>
 
@@ -44,9 +45,24 @@ typedef enum {
     AT_MOST_ONE
 } use_t;
 
+typedef enum {
+    DISABLED,
+    ENABLED,
+    SAME, //foo[bar=] bar? ( app-misc/foo[bar] ) !bar? ( app-misc/foo[-bar] )
+    OPPOSITE,
+    CHECK,
+    OPPOSOTE_CHECK
+} ruse_t;
+
 struct __check_use {
     Use* to_check;
     DependExpression* inner;
+};
+
+struct __atom_opts {
+    atom_t status;
+    block_t block;
+    Vector* required_use;
 };
 
 struct __expr {
@@ -54,12 +70,6 @@ struct __expr {
     CheckUse* c_use; // Use if type == USE_EXPR
     Atom* select; // Use if type == SEL_EXPR
     Vector* dependexpressions; // Use if type == EXPR_EXPR
-};
-
-struct __atom_opts {
-    atom_t status;
-    block_t block;
-    Vector* required_use;
 };
 
 struct __atom {
@@ -72,6 +82,11 @@ struct __use {
     char* str;
 };
 
+struct __require_use {
+    char* flag;
+    ruse_t status;
+};
+
 CheckUse* new_check_use (Use* use, DependExpression* inner);
 void add_dependexpression (Vector* list, Vector* exp);
 DependExpression* new_dependexpression(void* ptr, expr_t type);
@@ -80,10 +95,11 @@ void set_atom_opts (AtomOpts* opts, atom_t status, block_t block);
 Use* new_use (char* str, use_t type);
 
 /* Debug */
-void printf_with_index (char* format, ...);
+void printf_with_indent (char* format, ...);
 void debug_dependexpression (DependExpression* expr);
 void print_c_use (CheckUse* c_use);
 void print_sel (Atom* selection);
+void print_require_use (RequireUse r);
 
 /* Free */
 void free_dependexpression (DependExpression* expr);

@@ -68,6 +68,13 @@ void vector_insert(Vector* vec, void* el, int index) {
     vec->n++;
 }
 
+void vector_extend(Vector* dest, Vector* ex) {
+    int i;
+    for (i = 0; i != ex->n; i++) {
+        vector_add(dest, vector_get(ex, i));
+    }
+}
+
 void vector_allocate(Vector* vec) { // A private function
     vec->s += vec->increment;
     vec->ptr = realloc (vec->ptr, vec->size * vec->s);

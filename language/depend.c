@@ -57,6 +57,7 @@ Atom* new_atom (char* str, AtomOpts opts) {
     Atom* out = malloc (sizeof (Atom));
     out->atom = strdup(str);
     out->opts = opts;
+    out->opts.required_use = NULL;
     return out;
 }
 
@@ -75,7 +76,7 @@ void set_atom_opts (AtomOpts* opts, atom_t status, block_t block) {
 static int indent = 0;
 
 void debug_dependexpression (DependExpression* expr) {
-    printf_with_index ("DependExpression {\n");
+    printf_with_indent ("DependExpression {\n");
     indent += 4;
     switch(expr->type) {
         case USE_EXPR:
@@ -85,48 +86,64 @@ void debug_dependexpression (DependExpression* expr) {
         print_sel (expr->select);
         break;
         case EXPR_EXPR:
-        printf_with_index ("[\n");
+        printf_with_indent ("[\n");
         indent += 4;
-        printf_with_index ("len: %d\n", expr->dependexpressions->n);
+        printf_with_indent ("len: %d\n", expr->dependexpressions->n);
         int i;
         for (i = 0; i != expr->dependexpressions->n; i++) {
             debug_dependexpression((DependExpression*)vector_get(expr->dependexpressions, i));
         }
         indent -= 4;
-        printf_with_index ("]\n");
+        printf_with_indent ("]\n");
         break;
         default:
-        printf_with_index ("not initialized\n");
+        printf_with_indent ("not initialized\n");
     }
     indent -= 4;
-    printf_with_index("}\n");
+    printf_with_indent("}\n");
 }
 
 void print_sel (Atom* selection) {
-    printf_with_index ("Atom {\n");
+    printf_with_indent ("Atom {\n");
     indent += 4;
-    printf_with_index("Atom: %s\n", selection->atom);
-    printf_with_index("Status: %d\n", selection->opts.status);
-    printf_with_index("Block: %d\n", selection->opts.block);
-    indent -= 4;
-    printf_with_index("}\n");
+    printf_with_indent("Atom: %s\n", selection->atom);
+    printf_with_indent("Status: %d\n", selection->opts.status);
+    printf_with_indent("Block: %d\n", selection->opts.block);
+    if (selection->opts.required_use != NULL) {
+        printf_with_indent("Use {\n");
+        indent += 4;
+        int i;
+        for (i=0; i != selection->opts.required_use->n; i++) {
+            print_require_use (*(RequireUse*)vector_get(selection->opts.required_use, i));
+        }
+        indent -= 4;
+        printf_with_indent("}\n");
+        indent -= 4;
+        printf_with_indent("}\n");
+    }
 }
 
 void print_c_use (CheckUse* c_use) {
-    printf_with_index ("CheckUse {\n");
+    printf_with_indent ("CheckUse {\n");
     indent += 4;
-    printf_with_index ("Use {\n");
+    printf_with_indent ("Use {\n");
     indent += 4;
-    printf_with_index("Flag: %s\n", c_use->to_check->str);
-    printf_with_index("Type: %d\n", c_use->to_check->type);
+    printf_with_indent("Flag: %s\n", c_use->to_check->str);
+    printf_with_indent("Type: %d\n", c_use->to_check->type);
     indent -= 4;
-    printf_with_index("}\n");
+    printf_with_indent("}\n");
+    printf_with_indent("Child: \n");
     debug_dependexpression(c_use->inner);
     indent -= 4;
-    printf_with_index("}\n");
+    printf_with_indent("}\n");
 }
 
-void printf_with_index (char* format, ...) {
+void print_require_use (RequireUse r) {
+    printf_with_indent("flag: %s\n", r.flag);
+    printf_with_indent("status: %d\n", r.status);
+}
+
+void printf_with_indent (char* format, ...) {
     va_list(args);
     printf("%*c", indent, ' ');
     va_start(args, format);
