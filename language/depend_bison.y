@@ -52,9 +52,9 @@ void dependerror(const char *message);
 
 %%
 
-program:    | expr  {
-                        dependout = $1;
-                    }
+program:    | expr                      {
+                                            dependout = $1;
+                                        }
             | END_OF_FILE
             ;
 

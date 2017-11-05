@@ -10,5 +10,6 @@ int main(int argc, char** argv) {
     }
     DependExpression* temp = depend_parse (argv[1]);
     debug_dependexpression(temp);
+    free_dependexpression(temp);
     return 0;
 }

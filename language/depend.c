@@ -170,7 +170,6 @@ void free_dependexpression (DependExpression* expr) {
             free_dependexpression (vector_get(expr->dependexpressions, i));
         }
     }
-    vector_free(expr->dependexpressions);
     free (expr);
 }
 
