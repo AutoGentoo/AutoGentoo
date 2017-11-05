@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <package.h>
 
-int packageerror(char *s)
-{
+int packageerror(char *s) {
     fprintf(stderr, "%s in line %d near '%s'\n", s, packagelineno, packagetext);
 }
 
@@ -21,17 +20,29 @@ PackageSelector* package_parse (char* buffer) {
 
 letter          [a-zA-Z]
 digit           [0-9]
-version_section ({letter}|{digit})*
-version         (({version_section}"."{version_section})|{version_section})+
-identifier      {version}
+version_suf     ("_alpha"|"_beta"|"_pre"|"_rc"|""|"_p")
+version         {digit}+("."{digit}+)*{version_suf}
+identifier      ({letter}|{digit}|"_"|"+")+
 
 %%
 
 [ \n\t\r\\]+            ;
 "/"                     {return '/';}
 "-"                     {return '-';}
+"-r"{digit}+            {
+                            char* b = &packagetext[2];
+                            sscanf(b, "%d", &packagelval.r);
+                            return (REVISION);
+                        }
+{version}               {
+                            set_package_selector_version(&packagelval.version, packagetext, 0);
+                            return VERSION;
+                        }
 
-{identifier}            {packagelval.identifier = strdup (packagetext); return (IDENTIFIER);}
+{identifier}            {
+                            packagelval.identifier = strdup (packagetext);
+                            return (IDENTIFIER);
+                        }
 
 [<<EOF>>|'']            {return END_OF_FILE;}
 .                       {printf("Unknown character: %s\n", packagetext);}

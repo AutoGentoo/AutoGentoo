@@ -9,14 +9,23 @@
 #include <tools/vector.h>
 
 typedef struct __package PackageSelector;
+typedef struct __package_version PackageSelectorVersion;
+
+
+struct __package_version {
+    Vector* version;
+    char* suffix;
+    unsigned char revision; // 0 to disable
+};
 
 struct __package {
     char* category;
     char* name;
-    Vector* version;
+    PackageSelectorVersion version;
 };
 
 PackageSelector* package_selector_new (char* cat, char* name);
+void set_package_selector_version (PackageSelectorVersion* v, char* version_str, int r);
 Vector* parse_version (char* v_str);
 void print_package_selector (PackageSelector* pkg);
 void print_package_version (Vector* ver);
