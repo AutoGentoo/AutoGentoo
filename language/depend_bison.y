@@ -122,6 +122,11 @@ slot :  ':' '='                         {
                                             $$.sub_slot = NULL;
                                         }
         | ':' IDENT '/' IDENT           {
+                                            $$.rebuild = SLOT_NO_REBUILD;
+                                            $$.main_slot = strdup ($2);
+                                            $$.sub_slot = strdup ($4);
+                                        }
+        | ':' IDENT '/' IDENT '='       {
                                             $$.rebuild = SLOT_REBUILD;
                                             $$.main_slot = strdup ($2);
                                             $$.sub_slot = strdup ($4);

@@ -66,7 +66,7 @@ atom    ({letter}|{digit}|"_"|"-"|"."|"+")+
 "="                     {dependlval.version = EQUAL; return (VERSION);} 
 "~"                     {dependlval.version = DEP_REVISION; return (VERSION);} 
 
-{atom}                 {dependlval.atom_str = strdup (dependtext); return (IDENT);}
+{atom}                  {dependlval.atom_str = strdup (dependtext); return (IDENT);}
 [ \n\t\r\\]+            ;
 
 [<<EOF>>|'']            {return END_OF_FILE;}
