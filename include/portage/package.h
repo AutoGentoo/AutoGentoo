@@ -13,7 +13,7 @@
 typedef struct __Package Package;
 typedef struct __Category Category;
 typedef struct __Ebuild Ebuild;
-typedef struct __Version Version;
+typedef struct __EbuildVersion EbuildVersion;
 
 struct __Category {
     char name[32];
@@ -29,15 +29,22 @@ struct __Package {
     Repository* repo;
     Category* category;
     Manifest* manifest;
-    char name[128];
+    Vector* ebuilds; // Vector<EbuildVersion>, just create version not the entire ebuild
     
-    void (*get_path) (char* dest);
+    char name[128];
+};
+
+
+struct __EbuildVersion {
+    Vector* version;
+    char* suffix;
+    unsigned char revision; // 0 to disable
 };
 
 struct __Ebuild {
     Package* parent;
-    Vector* v; // {3, 24, 0}
-    int revision; // -r{0} (-r1)
+    Conf* metadata;
+    EbuildVersion* version; // Pointer to parent->ebuilds
 };
 
 Category* category_new (Repository* repo, char* name);

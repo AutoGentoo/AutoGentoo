@@ -13,7 +13,7 @@ typedef struct __ManifestEntry ManifestEntry;
 #include <stdio.h>
 #include <portage/hash.h>
 #include <portage/package.h>
-
+#include <language/share.h>
 
 enum __manifest_t {
     EBUILD, // An ebuild file
@@ -41,7 +41,7 @@ struct __ManifestEntry {
 };
 
 void manifest_parse (Package* pkg);
-void entry_parse (ManifestEntry* entry, char* str);
+manifest_t entry_parse (ManifestEntry* entry, char* str); // Returns the manifest_t of the entry
 hash_t get_hash_type (char* hash);
 manifest_t get_entry_type (char* str);
 

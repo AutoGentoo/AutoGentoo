@@ -7,7 +7,6 @@
 void manifest_parse (Package* pkg) {
     char manifest_file[256];
     package_get_file(pkg, manifest_file);
-    printf ("%s\n", manifest_file);
     
     FILE* fp = fopen (manifest_file, "r");
     char* line;
@@ -48,13 +47,28 @@ void manifest_parse (Package* pkg) {
         }
 
         ManifestEntry temp;
-        entry_parse(&temp, line);
+        if (entry_parse(&temp, line) == EBUILD) {
+            EbuildVersion v_temp;
+            char* filename_temp = malloc(strlen (pkg->category->name) + strlen(temp.filename) + 1);
+            filename_temp[0] = 0;
+            strcat (filename_temp, pkg->category->name);
+            strcat (filename_temp, "/");
+            strncat (filename_temp, temp.filename, strrchr (temp.filename, '.') - temp.filename);
+            EbuildVersion* t = &package_parse(filename_temp)->version;
+            if (error == 1) {
+                printf ("%s\n", filename_temp);
+                error = 0;
+            }else {
+                vector_add (pkg->ebuilds, t);
+            }
+            free (filename_temp);
+        }
         vector_add(pkg->manifest->entries, &temp);
     }
     fclose (fp);
 }
 
-void entry_parse (ManifestEntry* entry, char* str) {
+manifest_t entry_parse (ManifestEntry* entry, char* str) {
     StringVector* tokens = string_vector_new();
     char* i;
     int j;
@@ -63,12 +77,12 @@ void entry_parse (ManifestEntry* entry, char* str) {
             i = strtok(NULL, " \n"), j++) {
         string_vector_add(tokens, i);
     }
-
+    
     entry->type = get_entry_type(string_vector_get(tokens, 0));
     strcpy(entry->filename, string_vector_get(tokens, 1));
     sscanf(string_vector_get(tokens, 2), "%u", (unsigned int*)&entry->size);
     entry->hashes = vector_new(sizeof(HashEntry), UNORDERED | REMOVE);
-
+    
     int n;
     for (n=3; (n + 1) < j; n += 2) {
         hash_t t = get_hash_type(string_vector_get(tokens, n));
@@ -82,6 +96,7 @@ void entry_parse (ManifestEntry* entry, char* str) {
         vector_add(entry->hashes, &en);
     }
     free (tokens);
+    return entry->type;
 }
 
 hash_t get_hash_type (char* hash) {
