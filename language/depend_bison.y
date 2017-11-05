@@ -49,6 +49,7 @@ void dependerror(const char *message);
 %type <vec> req_use
 %type <use_req> use_flag
 %type <use_req> use_token;
+%type <use_req> default_use_flag;
 
 %%
 
@@ -89,7 +90,21 @@ req_use :   req_use ',' req_use         {
                                             $$ = $1;
                                             vector_free ($3);
                                         }
+            | default_use_flag '?'      {
+                                            $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
+                                            $1.status = CHECK;
+                                            vector_add($$, &$1);
+                                        }
+            | '!' default_use_flag '?'  {
+                                            $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
+                                            $2.status = OPPOSOTE_CHECK;
+                                            vector_add($$, &$2);
+                                        }
             | use_flag                  {
+                                            $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
+                                            vector_add($$, &$1);
+                                        }
+            | default_use_flag          {
                                             $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
                                             vector_add($$, &$1);
                                         }
@@ -122,23 +137,30 @@ use_flag : '-' use_token                {
                                             $$ = $2;
                                             $$.status = OPPOSITE;
                                         }
-            | use_token '(' '-' ')'     {
-                                            $$ = $1;
-                                            $$.status = DEFAULT_DISABLE;
-                                        }
-            | use_token '(' '+' ')'     {
-                                            $$ = $1;
-                                            $$.status = DEFAULT_ENABLE;
-                                        }
             ;
+
+default_use_flag :  use_token '(' '-' ')'       {
+                                                    $$ = $1;
+                                                    $$._default = DEFAULT_DISABLE;
+                                                }
+                    | use_token '(' '+' ')'     {
+                                                    $$ = $1;
+                                                    $$._default = DEFAULT_ENABLE;
+                                                }
+                    | '-' default_use_flag      {
+                                                    $$ = $2;
+                                                    $$.status = DISABLED;
+                                                }
 
 use_token :   ATOM_USE                  {
                                             $$.flag = strdup ($1);
                                             $$.status = ENABLED;
+                                            $$._default = DEFAULT_NONE;
                                         }
             | ATOM                      {
                                             $$.flag = strdup ($1);
                                             $$.status = ENABLED;
+                                            $$._default = DEFAULT_NONE;
                                         }
 
 opts :                                  {

@@ -128,6 +128,7 @@ void print_c_use (CheckUse* c_use) {
 void print_require_use (RequireUse r) {
     printf_with_indent("flag: %s\n", r.flag);
     printf_with_indent("status: %d\n", r.status);
+    printf_with_indent("default: %d\n", r._default);
 }
 
 void free_dependexpression (DependExpression* expr) {

@@ -30,6 +30,7 @@ atom    {letter}({letter}|{digit}|[\-\.\/_])*
 "+"                     {return '+';}
 "="                     {return '=';}
 "!"                     {return '!';}
+"?"                     {return '?';}
 
 "^^"                    {dependlval.use = new_use (dependtext, EXACTLY_ONE); return(USE);}
 "||"                    {dependlval.use = new_use (dependtext, AT_LEAST_ONE); return(USE);}

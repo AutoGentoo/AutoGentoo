@@ -52,9 +52,13 @@ typedef enum {
     OPPOSITE,
     CHECK,
     OPPOSOTE_CHECK,
+} ruse_t;
+
+typedef enum {
+    DEFAULT_NONE,
     DEFAULT_DISABLE,
     DEFAULT_ENABLE
-} ruse_t;
+} druse_t;
 
 struct __check_use {
     Use* to_check;
@@ -87,6 +91,7 @@ struct __use {
 struct __require_use {
     char* flag;
     ruse_t status;
+    druse_t _default;
 };
 
 CheckUse* new_check_use (Use* use, DependExpression* inner);
