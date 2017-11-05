@@ -25,7 +25,7 @@ void packageerror(const char *message);
 %union {
     char* identifier;
     PackageSelector* sel;
-    PackageSelectorVersion version;
+    EbuildVersion version;
     int r;
 }
 
@@ -53,17 +53,53 @@ atom :  pkg_name[cat] '/' pkg_name[name] '-' pkg_version[version] {
         ;
             
 pkg_name :  pkg_name '-' IDENTIFIER     {
-                                            $$ = $1;;
+                                            $$ = $1;
                                             strcat ($$, "-");
                                             strcat ($$, $3);
+                                        }
+            | pkg_name '-' VERSION      {
+                                            $$ = $1;
+                                            int i;
+                                            char buf[16];
+                                            for (i = 0; i != $3.version->n; i++) {
+                                                sprintf (buf, "%d", *(int*)vector_get($3.version, i));
+                                                strcat ($$, buf);
+                                                if (i + 1 != $3.version->n) {
+                                                    strcat ($$, ".");
+                                                }
+                                            }
+                                        }
+            | pkg_name REVISION         {
+                                            $$ = $1;
+                                            strcat ($$, "-");
+                                            char temp[32];
+                                            sprintf (temp, "r%d", $2);
+                                            strcat ($$, temp);
                                         }
             | IDENTIFIER                {
                                             $$ = malloc (256);
                                             strcat ($$, $1);
+                                            free ($1);
+                                        }
+            | VERSION                   {
+                                            $$ = malloc (256);
+                                            int i;
+                                            char buf[16];
+                                            for (i = 0; i != $1.version->n; i++) {
+                                                sprintf (buf, "%d", *(int*)vector_get($1.version, i));
+                                                strcat ($$, buf);
+                                                if (i + 1 != $1.version->n) {
+                                                    strcat ($$, ".");
+                                                }
+                                            }
+                                        }
+            | REVISION                  {
+                                            $$ = malloc (256);
+                                            sprintf ($$, "r%d", $1);
                                         }
             ;
 
-pkg_version : VERSION REVISION      {
+pkg_version : VERSION REVISION          {
                                             $$ = $1;
                                             $$.revision = $2;
                                         }

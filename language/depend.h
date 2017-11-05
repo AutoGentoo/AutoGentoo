@@ -19,7 +19,7 @@ typedef struct __atom_slot AtomSlot;
 typedef enum {
     ALL,
     EQUAL,
-    REVISION,
+    DEP_REVISION,
     LESS_E,
     GREAT_E,
     LESS,

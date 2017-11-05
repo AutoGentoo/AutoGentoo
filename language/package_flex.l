@@ -4,9 +4,13 @@
 #include "package_bison.h"
 #include <stdio.h>
 #include <package.h>
+#include <share.h>
+
+int error = 0;
 
 int packageerror(char *s) {
     fprintf(stderr, "%s in line %d near '%s'\n", s, packagelineno, packagetext);
+    error = 1;
 }
 
 PackageSelector* package_parse (char* buffer) {
@@ -21,7 +25,7 @@ PackageSelector* package_parse (char* buffer) {
 letter          [a-zA-Z]
 digit           [0-9]
 version_suf     ("_alpha"|"_beta"|"_pre"|"_rc"|""|"_p")
-version         {digit}+("."{digit}+)*{version_suf}
+version         {digit}+("."{digit}+)*{letter}?({version_suf}{digit}*)*
 identifier      ({letter}|{digit}|"_"|"+")+
 
 %%

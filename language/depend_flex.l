@@ -64,7 +64,7 @@ atom    {letter}({letter}|{digit}|"_"|"-"|"."|"+"|"/")*
 "<"                     {dependlval.version = LESS; return (VERSION);} 
 ">"                     {dependlval.version = GREAT; return (VERSION);} 
 "="                     {dependlval.version = EQUAL; return (VERSION);} 
-"~"                     {dependlval.version = REVISION; return (VERSION);} 
+"~"                     {dependlval.version = DEP_REVISION; return (VERSION);} 
 
 {atom}                  {dependlval.atom_str = strdup (dependtext); return (ATOM);}
 [:alpha:]*              {dependlval.atom_str = strdup (dependtext); return (ATOM_USE);}

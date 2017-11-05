@@ -11,7 +11,7 @@ PackageSelector* package_selector_new (char* cat, char* name) {
     return out;
 }
 
-void set_package_selector_version (PackageSelectorVersion* v, char* version_str, int r) {
+void set_package_selector_version (EbuildVersion* v, char* version_str, int r) {
     char* to_use = strchr (version_str, '_');
     if (to_use != NULL) {
         *to_use = 0;
