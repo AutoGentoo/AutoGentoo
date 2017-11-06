@@ -8,7 +8,7 @@ Map* new_map (size_t new_size, int threshhold) {
     Map* out = malloc (sizeof (Map));
     out->size = new_size;
     out->threshhold = threshhold;
-    out->hash_table = malloc (sizeof (void*) * out->size);
+    out->hash_table = malloc (sizeof (Key*) * out->size);
     
     out->filled = 0;
     return out;
@@ -25,7 +25,7 @@ void* map_get_value(Map* map, void* key) {
     if (map->hash_table[offset] == 0) {
         return NULL;
     }
-    while (memcmp((((Key**)map->hash_table)[offset])->key, key, sizeof (void*)) != 0) {
+    while (memcmp(map->hash_table[offset]->key, key, sizeof (void*)) != 0) {
         offset += sizeof(Key*);
         offset %= map->size; // Make sure it doesn't go map of bounds
     }
@@ -43,11 +43,9 @@ void* map_insert (Map* map, void* key, void* data) {
     to_copy->data = data;
     
     unsigned long offset = get_hash (key) % map->size;
-    if (map->hash_table[offset] != 0) {        
-        while (map->hash_table[offset] != 0) {
-            offset += sizeof(void*);
-            offset %= map->size; // Make sure it doesn't go map of bounds
-        }
+    while (map->hash_table[offset] != 0) { // If collided go to next
+        offset += sizeof(void*);
+        offset %= map->size; // Make sure it doesn't go map of bounds
     }
     memcpy (&map->hash_table[offset], &to_copy, sizeof(void*));
     map->filled++;
@@ -60,5 +58,6 @@ unsigned long get_hash (void* key) {
     MD5_Init(&context);
     MD5_Update(&context, key, sizeof(void*));
     MD5_Final(digest, &context);
-    return (unsigned long) digest;
+    unsigned long out = (unsigned long) digest; 
+    return out;
 }

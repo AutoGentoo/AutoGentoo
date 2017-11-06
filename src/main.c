@@ -2,13 +2,9 @@
 // Created by atuser on 10/18/17.
 //
 
-#include <stdio.h>
-#include <portage/repository.h>
-#include <stdlib.h>
-#include <string.h>
-#include <tools/map.h>
+#include <Hacksaw.h>
 
-int main() {
+int main(int argc, char* argv[]) {
     RepoConfig* repoconf = repo_config_new();
     repo_config_read(repoconf, "/etc/portage/repos.conf");
     repo_config_free(repoconf);

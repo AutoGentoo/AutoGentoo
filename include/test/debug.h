@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <tools/vector.h>
 #include <tools/string_vector.h>
-#include <config/conf.h>
+#include <tools/conf.h>
 
 void print_bin (void* ptr, int n, size_t size);
 void print_vec(Vector* vec);

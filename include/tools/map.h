@@ -19,7 +19,7 @@ typedef struct __Key Key;
  *          Only support array of pointers
  */
 struct __Map {
-    void** hash_table; // similar to Vector position are arbitrary
+    Key** hash_table; // similar to Vector position are arbitrary
     int filled; // Only need if we need to resize the array
     size_t size; // Maximum number of keys
     int threshhold;

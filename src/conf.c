@@ -2,7 +2,7 @@
 // Created by atuser on 10/21/17.
 //
 
-#include <config/conf.h>
+#include <tools/conf.h>
 #include <string.h>
 #include <tools/regular_expression.h>
 #include <stdlib.h>

@@ -13,7 +13,6 @@
       <File Name="include/portage/hash.h"/>
       <File Name="include/portage/manifest.h"/>
       <File Name="include/portage/package.h"/>
-      <File Name="include/portage/use.h"/>
       <File Name="include/portage/dependency.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="tools">
@@ -25,11 +24,7 @@
       <File Name="include/tools/boolean.h"/>
       <File Name="include/tools/Makefile.am"/>
       <File Name="include/tools/map.h"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="config">
-      <File Name="include/config/conf.h"/>
-      <File Name="include/config/use.h"/>
-      <File Name="include/config/Makefile.am"/>
+      <File Name="include/tools/conf.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="test">
       <File Name="include/test/debug.h"/>
@@ -37,9 +32,6 @@
     </VirtualDirectory>
     <File Name="include/Hacksaw.h"/>
     <File Name="include/Makefile.am"/>
-    <VirtualDirectory Name="hash">
-      <File Name="include/hash/Makefile.am"/>
-    </VirtualDirectory>
   </VirtualDirectory>
   <Description/>
   <Dependencies/>

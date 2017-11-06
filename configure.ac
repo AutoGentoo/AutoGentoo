@@ -39,7 +39,6 @@ AC_CONFIG_FILES([
   src/Makefile
   language/Makefile
   include/Makefile
-  include/config/Makefile
   include/package/Makefile
   include/portage/Makefile
   include/test/Makefile

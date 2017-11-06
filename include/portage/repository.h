@@ -6,7 +6,7 @@
 #include <unitypes.h>
 #include <sys/stat.h>
 #include <stdio.h>
-#include <config/conf.h>
+#include <tools/conf.h>
 #include <tools/boolean.h>
 #include <portage/package.h>
 

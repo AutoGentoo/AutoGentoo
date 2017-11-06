@@ -1,2 +1,2 @@
 configincludedir = $(mainincludedir)/config
-configinclude_HEADERS = conf.h use.h
+configinclude_HEADERS = conf.h
