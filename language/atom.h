@@ -8,7 +8,7 @@
 
 #include <tools/vector.h>
 
-typedef struct __package PackageSelector;
+typedef struct __package AtomSelector;
 
 #include <portage/package.h>
 
@@ -18,11 +18,11 @@ struct __package {
     EbuildVersion version;
 };
 
-PackageSelector* package_selector_new (char* cat, char* name);
-void set_package_selector_version (EbuildVersion* v, char* version_str, int r);
+AtomSelector* atom_selector_new (char* cat, char* name);
+void set_atom_selector_version (EbuildVersion* v, char* version_str, int r);
 Vector* parse_version (char* v_str);
-void print_package_selector (PackageSelector* pkg);
-void print_package_version (Vector* ver);
-void free_package_selector (PackageSelector* ptr);
+void print_atom_selector (AtomSelector* pkg);
+void print_ebuild_version (Vector* ver);
+void free_atom_selector (AtomSelector* ptr);
 
 #endif // HACKSAW_COMPILER_PACKAGE_H

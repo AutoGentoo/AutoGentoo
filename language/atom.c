@@ -1,17 +1,17 @@
 #include <stdio.h>
-#include <package.h>
+#include <atom.h>
 #include <stdlib.h>
 #include <string.h>
 #include <share.h>
 
-PackageSelector* package_selector_new (char* cat, char* name) {
-    PackageSelector* out = malloc (sizeof (PackageSelector));
+AtomSelector* atom_selector_new (char* cat, char* name) {
+    AtomSelector* out = malloc (sizeof (AtomSelector));
     out->category = strdup (cat);
     out->name = strdup (name);
     return out;
 }
 
-void set_package_selector_version (EbuildVersion* v, char* version_str, int r) {
+void set_atom_selector_version (EbuildVersion* v, char* version_str, int r) {
     char* to_use = strchr (version_str, '_');
     if (to_use != NULL) {
         *to_use = 0;
@@ -33,19 +33,19 @@ Vector* parse_version (char* v_str) {
     return out;
 }
 
-void print_package_selector (PackageSelector* pkg) {
-    printf_with_indent("PackageSelector {\n");
+void print_atom_selector (AtomSelector* pkg) {
+    printf_with_indent("AtomSelector {\n");
     indent += 4;
     printf_with_indent ("category: %s\n", pkg->category);
     printf_with_indent ("name: %s\n", pkg->name);
-    print_package_version (pkg->version.version);
+    print_ebuild_version (pkg->version.version);
     printf_with_indent ("revision: %d\n", pkg->version.revision);
     printf_with_indent ("suffix: %s\n", pkg->version.suffix);
     indent -= 4;
     printf_with_indent ("}\n");
 }
 
-void print_package_version (Vector* ver) {
+void print_ebuild_version (Vector* ver) {
     int i;
     if (ver == NULL) {
         return;
@@ -59,7 +59,7 @@ void print_package_version (Vector* ver) {
     printf ("\n");
 }
 
-void free_package_selector (PackageSelector* ptr) {
+void free_atom_selector (AtomSelector* ptr) {
     if (ptr->version.version != NULL) {
         vector_free (ptr->version.version);
     }

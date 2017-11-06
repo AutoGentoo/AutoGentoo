@@ -54,7 +54,7 @@ void manifest_parse (Package* pkg) {
             strcat (filename_temp, pkg->category->name);
             strcat (filename_temp, "/");
             strncat (filename_temp, temp.filename, strrchr (temp.filename, '.') - temp.filename);
-            EbuildVersion* t = &package_parse(filename_temp)->version;
+            EbuildVersion* t = &atom_parse(filename_temp)->version;
             if (error == 1) {
                 printf ("%s\n", filename_temp);
                 error = 0;

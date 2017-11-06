@@ -1,30 +1,30 @@
-%define api.prefix {package}
+%define api.prefix {atom}
 
 %code requires {
-  #include "package.h"
+  #include "atom.h"
   #include <stdlib.h>
   #include <string.h>
 }
 
 %{
 #include <stdio.h>
-#include <package.h>
+#include <atom.h>
 
-int packageparse(void);
-int packagewrap() { return 1; }
-int packagelex();
-extern int packagelineno;
-extern char* packagetext;
-extern PackageSelector* packageout;
+int atomparse(void);
+int atomwrap() { return 1; }
+int atomlex();
+extern int atomlineno;
+extern char* atomtext;
+extern AtomSelector* atomout;
 
-void packageerror(const char *message);
+void atomerror(const char *message);
 %}
 
 %start program
 
 %union {
     char* identifier;
-    PackageSelector* sel;
+    AtomSelector* sel;
     EbuildVersion version;
     int r;
 }
@@ -41,13 +41,13 @@ void packageerror(const char *message);
 %%
 
 program:    | atom                      {
-                                            packageout = $1;
+                                            atomout = $1;
                                         }
             | END_OF_FILE
             ;
 
 atom :  pkg_name[cat] '/' pkg_name[name] '-' pkg_version[version] {
-                                            $$ = package_selector_new ($cat, $name);
+                                            $$ = atom_selector_new ($cat, $name);
                                             $$->version = $version;
                                         }
         ;

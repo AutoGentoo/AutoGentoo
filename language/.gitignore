@@ -5,7 +5,7 @@ depend_flex.c
 test-depend
 
 # USE compiler
-package_bison.h
-package_bison.c
-package_flex.c
-test-package
+atom_bison.h
+atom_bison.c
+atom_flex.c
+test-atom

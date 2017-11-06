@@ -71,19 +71,18 @@
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="language">
-    <File Name="language/Makefile.am"/>
+    <File Name="language/atom.c"/>
+    <File Name="language/atom.h"/>
+    <File Name="language/atom-main.c"/>
+    <File Name="language/atom_bison.y"/>
+    <File Name="language/atom_flex.l"/>
     <File Name="language/depend.c"/>
     <File Name="language/depend.h"/>
+    <File Name="language/depend-main.c"/>
     <File Name="language/depend_bison.y"/>
     <File Name="language/depend_flex.l"/>
-    <File Name="language/depend-main.c"/>
-    <File Name="language/package_flex.l"/>
-    <File Name="language/package_bison.y"/>
-    <File Name="language/package.h"/>
-    <File Name="language/package.c"/>
-    <File Name="language/share.h"/>
     <File Name="language/share.c"/>
-    <File Name="language/package-main.c"/>
+    <File Name="language/share.h"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

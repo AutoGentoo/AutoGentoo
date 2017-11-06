@@ -1,23 +1,23 @@
-%option prefix="package"
+%option prefix="atom"
 
 %{
-#include "package_bison.h"
+#include "atom_bison.h"
 #include <stdio.h>
-#include <package.h>
+#include <atom.h>
 #include <share.h>
 
 int error = 0;
 
-int packageerror(char *s) {
-    fprintf(stderr, "%s in line %d near '%s'\n", s, packagelineno, packagetext);
+int atomerror(char *s) {
+    fprintf(stderr, "%s in line %d near '%s'\n", s, atomlineno, atomtext);
     error = 1;
 }
 
-PackageSelector* package_parse (char* buffer) {
+AtomSelector* atom_parse (char* buffer) {
     YY_BUFFER_STATE bs = yy_scan_string(buffer);
-    package_switch_to_buffer(bs);
-    packageparse();
-    return (PackageSelector*)packageout;
+    atom_switch_to_buffer(bs);
+    atomparse();
+    return (AtomSelector*)atomout;
 }
 
 %}
@@ -34,21 +34,21 @@ identifier      ({letter}|{digit}|"_"|"+")+
 "/"                     {return '/';}
 "-"                     {return '-';}
 "-r"{digit}+            {
-                            char* b = &packagetext[2];
-                            sscanf(b, "%d", &packagelval.r);
+                            char* b = &atomtext[2];
+                            sscanf(b, "%d", &atomlval.r);
                             return (REVISION);
                         }
 {version}               {
-                            set_package_selector_version(&packagelval.version, packagetext, 0);
+                            set_atom_selector_version(&atomlval.version, atomtext, 0);
                             return VERSION;
                         }
 
 {identifier}            {
-                            packagelval.identifier = strdup (packagetext);
+                            atomlval.identifier = strdup (atomtext);
                             return (IDENTIFIER);
                         }
 
 [<<EOF>>|'']            {return END_OF_FILE;}
-.                       {printf("Unknown character: %s\n", packagetext);}
+.                       {printf("Unknown character: %s\n", atomtext);}
 
 %%

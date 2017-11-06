@@ -8,6 +8,7 @@
 #include <portage/package.h>
 
 typedef struct __Dependency Dependency;
+typedef struct __Package
 
 typedef enum {
     INSTALLED = 0x0,
@@ -15,9 +16,15 @@ typedef enum {
     REQUIRE_REBUILD = 0x2
 } depend_t;
 
+
+
 struct __Dependency {
-    Ebuild* dep;
+    Vector* dependencies; // Vector<Dependency>
+    Ebuild* package;
     int status;
-}
+};
+
+Dependency* dependency_scan (Ebuild* package);
+Ebuild* get_ebuild_from_atom_select (PackageSelector* selector);
 
 #endif // HACKSAW_DEPENDENCY_H
