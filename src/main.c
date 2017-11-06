@@ -3,12 +3,10 @@
 //
 
 #include <stdio.h>
-#include <tools/vector.h>
-#include <tools/string_vector.h>
-#include <config/conf.h>
-#include <test/debug.h>
 #include <portage/repository.h>
-#include <portage/manifest.h>
+#include <stdlib.h>
+#include <string.h>
+#include <tools/map.h>
 
 int main() {
     RepoConfig* repoconf = repo_config_new();

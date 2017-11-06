@@ -14,6 +14,13 @@ AC_SUBST([LIBTOOL_DEPS])
 
 AC_CHECK_LIB(pcre2-8, pcre2_compile_8)
 
+AC_CHECK_LIB([crypto], [SHA256_Init])
+AC_CHECK_LIB([crypto], [SHA256_Final])
+AC_CHECK_LIB([crypto], [SHA256_Update])
+AC_CHECK_LIB([crypto], [MD5_Init])
+AC_CHECK_LIB([crypto], [MD5_Final])
+AC_CHECK_LIB([crypto], [MD5_Update])
+
 # Checks for header files.
 AC_CHECK_HEADERS([memory.h stddef.h stdlib.h string.h])
 

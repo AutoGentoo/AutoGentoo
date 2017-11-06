@@ -14,7 +14,8 @@ libhacksaw_la_SOURCES =    conf.c \
                         vector.c \
                         debug.c \
                         package.c \
-                        directory.c
+                        directory.c \
+                        map.c
 
 bin_PROGRAMS = hacksaw
 hacksaw_CFLAGS  = ${AM_CFLAGS} -Wno-unused-result -g

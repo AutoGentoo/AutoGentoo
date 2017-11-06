@@ -12,12 +12,12 @@ typedef struct __HashEntry HashEntry;
 typedef HashEntry Hash;
 
 enum __hash_t {
-    MD5,
-    SHA1,
-    SHA256,
-    SHA512,
-    RMD160,
-    WHIRLPOOL
+    ENTRY_MD5,
+    ENTRY_SHA1,
+    ENTRY_SHA256,
+    ENTRY_SHA512,
+    ENTRY_RMD160,
+    ENTRY_WHIRLPOOL
 };
 
 struct __HashEntry {

@@ -14,6 +14,7 @@
       <File Name="include/portage/manifest.h"/>
       <File Name="include/portage/package.h"/>
       <File Name="include/portage/use.h"/>
+      <File Name="include/portage/dependency.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="tools">
       <File Name="include/tools/regular_expression.h"/>
@@ -23,6 +24,7 @@
       <File Name="include/tools/string_vector.h"/>
       <File Name="include/tools/boolean.h"/>
       <File Name="include/tools/Makefile.am"/>
+      <File Name="include/tools/map.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="config">
       <File Name="include/config/conf.h"/>
@@ -56,6 +58,8 @@
     <File Name="src/hash.c"/>
     <File Name="src/package.c"/>
     <File Name="src/directory.c"/>
+    <File Name="src/dependency.c"/>
+    <File Name="src/map.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="autotools">
     <File Name="configure.ac"/>
@@ -105,10 +109,10 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="./src/hacksaw" IntermediateDirectory="" Command="./src/hacksaw" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="./src/.libs/hacksaw" IntermediateDirectory="" Command="./src/.libs/hacksaw" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <BuildSystem Name="GNU makefile onestep build"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
+        <![CDATA[LD_LIBRARY_PATH ="$LD_LIBRARY_PATH ./src/.libs"]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
         <DebuggerSearchPaths/>
@@ -166,48 +170,6 @@ make</RebuildCommand>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
         <ThirdPartyToolName>None</ThirdPartyToolName>
-        <WorkingDirectory/>
-      </CustomBuild>
-      <AdditionalRules>
-        <CustomPostBuild/>
-        <CustomPreBuild/>
-      </AdditionalRules>
-      <Completion EnableCpp11="no" EnableCpp14="no">
-        <ClangCmpFlagsC/>
-        <ClangCmpFlags/>
-        <ClangPP/>
-        <SearchPaths/>
-      </Completion>
-    </Configuration>
-    <Configuration Name="depend_language" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g -Wall" C_Options="" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
-        <IncludePath Value="."/>
-      </Compiler>
-      <Linker Options="-O0" Required="yes">
-        <LibraryPath Value="."/>
-        <LibraryPath Value="Debug"/>
-      </Linker>
-      <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="./language/test-depend" IntermediateDirectory="" Command="./language/test-depend" CommandArguments="&quot;&gt;=gnome-base/gdm-3.24.0[gtk(+),systemd?]&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
-      <BuildSystem Name="GNU makefile onestep build"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
-      </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
-        <DebuggerSearchPaths/>
-        <PostConnectCommands/>
-        <StartupCommands/>
-      </Debugger>
-      <PreBuild/>
-      <PostBuild/>
-      <CustomBuild Enabled="yes">
-        <RebuildCommand>make clean; make</RebuildCommand>
-        <CleanCommand>make clean</CleanCommand>
-        <BuildCommand>make</BuildCommand>
-        <PreprocessFileCommand/>
-        <SingleFileCommand/>
-        <MakefileGenerationCommand/>
-        <ThirdPartyToolName/>
         <WorkingDirectory/>
       </CustomBuild>
       <AdditionalRules>
