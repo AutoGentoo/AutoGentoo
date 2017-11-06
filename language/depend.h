@@ -3,8 +3,8 @@
 //
 
 
-#ifndef HACKSAW_COMPILER_USE_H
-#define HACKSAW_COMPILER_USE_H
+#ifndef HACKSAW_COMPILER_DEPEND_H
+#define HACKSAW_COMPILER_DEPEND_H
 
 typedef struct __check_use CheckUse;
 typedef struct __expr DependExpression;
@@ -126,4 +126,4 @@ void free_check_use (CheckUse* ptr);
 void free_use (Use* ptr);
 void free_selection (Atom* ptr);
 
-#endif //HACKSAW_COMPILER_USE_H
+#endif //HACKSAW_COMPILER_DEPEND_H

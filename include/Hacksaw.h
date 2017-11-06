@@ -13,5 +13,6 @@
 #include <tools/string_vector.h>
 #include <tools/map.h>
 #include <tools/log.h>
+#include <portage/dependency.h>
 
 #endif //HACKSAW_HACKSAW_H
