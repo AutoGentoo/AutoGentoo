@@ -56,9 +56,9 @@ typedef enum {
 } ruse_t;
 
 typedef enum {
-    DEFAULT_NONE,
     DEFAULT_DISABLE,
-    DEFAULT_ENABLE
+    DEFAULT_ENABLE,
+    DEFAULT_NONE
 } druse_t;
 
 typedef enum {
