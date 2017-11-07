@@ -9,6 +9,6 @@ int main(int argc, char* argv[]) {
     repo_config_read(repoconf, "/etc/portage/repos.conf");
     repo_config_free(repoconf);
     */
-    print_package_selector(get_selector_from_depend (">=gnome-base/gnome-3.22.0-r4:3[gtk, wayland?]"));
+    print_package_selector(get_selector_from_depend ("!>=gnome-base/gnome-3.22.0_alpha-r4:3/3=[gtk, wayland?,-sql(-)]"));
     return 0;
 }

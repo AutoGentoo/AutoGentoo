@@ -25,7 +25,7 @@ DependExpression* depend_parse (char* buffer) {
 letter  [a-zA-Z]
 digit   [0-9]
 flag    {letter}({letter}|"_"|{digit})*
-atom    ({letter}|{digit}|"_"|"-"|"."|"+")+
+atom    ({letter}|{digit}|"_"|"."|"+")+
 
 %%
 

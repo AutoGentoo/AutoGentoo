@@ -54,6 +54,7 @@ void dependerror(const char *message);
 %type <slot> slot
 %type <block> block
 %type <atom> useselect
+%type <atom_str> ident;
 
 %%
 
@@ -87,13 +88,13 @@ useselect : select
                                             $$->opts.required_use = $3;
                                         }
 
-select :    opts IDENT '/' IDENT        {
+select :    opts ident '/' ident        {
                                             char current[128];
                                             sprintf (current, "%s/%s", $2, $4);
                                             $$ = new_atom(current, $1);
                                             $$->slot.rebuild = -1; // Disable slot checking
                                         }
-            | opts IDENT '/' IDENT slot {
+            | opts ident '/' ident slot {
                                             char current[128];
                                             sprintf (current, "%s/%s", $2, $4);
                                             $$ = new_atom(current, $1);
@@ -111,22 +112,22 @@ slot :  ':' '='                         {
                                             $$.main_slot = NULL;
                                             $$.sub_slot = NULL;
                                         }
-        | ':' IDENT                     {
+        | ':' ident                     {
                                             $$.rebuild = SLOT_NO_REBUILD;
                                             $$.main_slot = strdup ($2);
                                             $$.sub_slot = NULL;
                                         }
-        | ':' IDENT '='                     {
+        | ':' ident '='                     {
                                             $$.rebuild = SLOT_REBUILD;
                                             $$.main_slot = strdup ($2);
                                             $$.sub_slot = NULL;
                                         }
-        | ':' IDENT '/' IDENT           {
+        | ':' ident '/' ident           {
                                             $$.rebuild = SLOT_NO_REBUILD;
                                             $$.main_slot = strdup ($2);
                                             $$.sub_slot = strdup ($4);
                                         }
-        | ':' IDENT '/' IDENT '='       {
+        | ':' ident '/' ident '='       {
                                             $$.rebuild = SLOT_REBUILD;
                                             $$.main_slot = strdup ($2);
                                             $$.sub_slot = strdup ($4);
@@ -190,17 +191,23 @@ use_flag :  use_token                   {
                                         }
             ;
 
-default_use_flag :  use_token '(' '-' ')'       {
+default_use_flag :  '-' use_token '(' '-' ')'   {
+                                                    $$ = $2;
+                                                    $$.status = DISABLED;
+                                                    $$._default = DEFAULT_DISABLE;
+                                                }
+                    | '-' use_token '(' '+' ')' {
+                                                    $$ = $2;
+                                                    $$.status = DISABLED;
+                                                    $$._default = DEFAULT_ENABLE;
+                                                }
+                    | use_token '(' '-' ')'     {
                                                     $$ = $1;
                                                     $$._default = DEFAULT_DISABLE;
                                                 }
                     | use_token '(' '+' ')'     {
                                                     $$ = $1;
                                                     $$._default = DEFAULT_ENABLE;
-                                                }
-                    | '-' default_use_flag      {
-                                                    $$ = $2;
-                                                    $$.status = DISABLED;
                                                 }
                     ;
 
@@ -210,6 +217,13 @@ use_token : IDENT                       {
                                             $$._default = DEFAULT_NONE;
                                         }
             ;
+
+ident : IDENT                           {$$ = strdup ($$);}
+        | ident '-' IDENT               {
+                                            $$ = realloc ($$, strlen($$) + strlen($3) + 1);
+                                            strcat($$, "-");
+                                            strcat($$, $3);
+                                        }
 
 opts :                                  {
                                             set_atom_opts(&$$, ALL, NO_BLOCK); 
