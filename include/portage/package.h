@@ -11,15 +11,8 @@
 #include <portage/repository.h>
 
 typedef struct __Package Package;
-typedef struct __Category Category;
 typedef struct __Ebuild Ebuild;
 typedef struct __EbuildVersion EbuildVersion;
-
-struct __Category {
-    char name[32];
-    Vector* packages; // Package* to points in the
-    Repository* repo;
-};
 
 /**
  * Package - The main wrapper for a set of ebuilds
@@ -27,11 +20,11 @@ struct __Category {
  */
 struct __Package {
     Repository* repo;
-    Category* category;
     Manifest* manifest;
     Vector* ebuilds; // Vector<EbuildVersion>, just create version not the entire ebuild
     
-    char name[128];
+    char* category;
+    char* name;
 };
 
 
@@ -47,8 +40,8 @@ struct __Ebuild {
     EbuildVersion* version; // Pointer to parent->ebuilds
 };
 
-Category* category_new (Repository* repo, char* name);
-Package* package_new (Repository* repo, Category* category, char* name);
+void category_read (Repository* repo, char* name);
+Package* package_new (Repository* repo, char* category, char* name);
 void package_get_file (Package* pkg, char* filename);
 
 

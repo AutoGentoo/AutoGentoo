@@ -34,7 +34,7 @@ struct __Vector {
 };
 
 Vector* vector_new (size_t el_size, vector_opts opts);
-void* vector_add(Vector* vec, void* el);
+int  vector_add(Vector* vec, void* el);
 void vector_remove(Vector* vec, int index);
 void vector_insert(Vector* vec, void* el, int index);
 void vector_extend(Vector* dest, Vector* ex);

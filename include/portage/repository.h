@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <tools/conf.h>
 #include <tools/boolean.h>
+#include <tools/map.h>
 #include <portage/package.h>
 
 #ifndef HACKSAW_REPOSITORY_H
@@ -54,7 +55,7 @@ struct __Repository {
     repo_t sync_type;
     char sync_uri[256]; // Empty to disable syncing
     
-    Vector* categories;
+    Map* packages;
 };
 
 RepoConfig* repo_config_new ();

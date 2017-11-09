@@ -6,46 +6,39 @@
 #include <string.h>
 #include <tools/vector.h>
 
-Category* category_new (Repository* repo, char* name) {
-    Category* cat = malloc (sizeof (Category));
-    
-    cat->repo = repo;
-    cat->packages = vector_new(sizeof (Package*), REMOVE | UNORDERED);
-    cat->packages->increment = 16;
-    strcpy (cat->name, name);
-    
+void category_read (Repository* repo, char* name) {
     char cat_dir[256];
-    sprintf (cat_dir, "/%s/%s", repo->location, cat->name);
+    sprintf (cat_dir, "/%s/%s", repo->location, name);
     fix_path (cat_dir);
 
     StringVector* dirs = get_directories (cat_dir);
     
     int i;
     for (i = 0; i != dirs->n; i++) {
-        Package* p = package_new(repo, cat, string_vector_get(dirs, i));
-        vector_add(cat->packages, &p);
+        char key[128];
+        char* pkg_name = string_vector_get(dirs, i);
+        sprintf (key, "%s/%s", name, pkg_name);
+        Package* p = package_new(repo, name, pkg_name);
+        map_insert(repo->packages, &pkg_name, (void**)&p);
     }
     
     string_vector_free(dirs);
-    
-    return cat;
 }
 
-Package* package_new (Repository* repo, Category* category, char* name) {
+Package* package_new (Repository* repo, char* category, char* name) {
     Package* pkg = malloc (sizeof (Package));
-    strcpy (pkg->name, name);
-    pkg->category = category;
+    pkg->name = strdup(name);
+    pkg->category = strdup(category);
     pkg->repo = repo;
     pkg->manifest = malloc (sizeof (Manifest));
     pkg->ebuilds = vector_new (sizeof(EbuildVersion), REMOVE | UNORDERED);
-    
-    manifest_parse(pkg);
+    return pkg;
 }
 
 void package_get_file (Package* pkg, char* filename) {
     sprintf (filename, "%s/%s/%s/Manifest", 
         pkg->repo->location,
-        pkg->category->name,
+        pkg->category,
         pkg->name
     );
     fix_path (filename);
@@ -77,7 +70,7 @@ void ebuild_get_metadata (Ebuild* ebuild, char* dest) {
     ebuild_get_version (ebuild, version_temp);
     sprintf (dest, "%s/metadata/md5-cache/%s/%s-%s", 
             ebuild->parent->repo->location,
-            ebuild->parent->category->name,
+            ebuild->parent->category,
             ebuild->parent->name,
             version_temp);
     fix_path (dest);

@@ -3,14 +3,13 @@
 //
 
 
-#ifndef HACKSAW_COMPILER_PACKAGE_H
-#define HACKSAW_COMPILER_PACKAGE_H
+#ifndef HACKSAW_COMPILER_ATOM_H
+#define HACKSAW_COMPILER_ATOM_H
 
 #include <tools/vector.h>
+#include <portage/package.h>
 
 typedef struct __package AtomSelector;
-
-#include <portage/package.h>
 
 struct __package {
     char* category;

@@ -47,6 +47,8 @@ void manifest_parse (Package* pkg) {
         }
 
         ManifestEntry temp;
+        entry_parse(&temp, line);
+        /** Dont initialize versions anymore (moved to package_new ());
         if (entry_parse(&temp, line) == EBUILD) {
             EbuildVersion v_temp;
             char* filename_temp = malloc(strlen (pkg->category->name) + strlen(temp.filename) + 1);
@@ -54,6 +56,7 @@ void manifest_parse (Package* pkg) {
             strcat (filename_temp, pkg->category->name);
             strcat (filename_temp, "/");
             strncat (filename_temp, temp.filename, strrchr (temp.filename, '.') - temp.filename);
+            
             EbuildVersion* t = &atom_parse(filename_temp)->version;
             if (error == 1) {
                 printf ("%s\n", filename_temp);
@@ -63,6 +66,7 @@ void manifest_parse (Package* pkg) {
             }
             free (filename_temp);
         }
+        */
         vector_add(pkg->manifest->entries, &temp);
     }
     fclose (fp);

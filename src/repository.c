@@ -53,7 +53,6 @@ void repo_config_read (RepoConfig* repo_conf, char* filepath) {
 
 Repository* parse_repository (ConfSection* section) {
     Repository* repo = malloc (sizeof(Repository));
-    repo->categories = vector_new(sizeof(Category*), REMOVE | UNORDERED);
     strcpy(repo->name, section->name);
     
     repo->eclass_overrides = conf_get_vector(section->parent, section->name, "eclass-overrides");
@@ -93,19 +92,19 @@ Repository* parse_repository (ConfSection* section) {
     char cat_file[256];
     sprintf (cat_file, "/%s/profiles/categories", repo->location);
     fix_path (cat_file);
+    repo->packages = new_map (1024, 128);
     
     FILE* fp = fopen (cat_file, "r");
     char* line;
     size_t len = 0;
     ssize_t read;
 
-    int pgp_status = 0; // 0: no, 1: message, 2: signature
     while ((read = getline(&line, &len, fp)) != -1) {
         line[strlen(line) - 1] = 0; // Remove the newline
-        Category* c = category_new(repo, line);
-        vector_add(repo->categories, &c);
+        category_read (repo, line);
     }
     
+    fclose (fp);
     return repo;
 }
 

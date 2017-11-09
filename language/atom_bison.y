@@ -1,14 +1,14 @@
 %define api.prefix {atom}
 
 %code requires {
-  #include "atom.h"
+  #include "share.h"
   #include <stdlib.h>
   #include <string.h>
 }
 
 %{
 #include <stdio.h>
-#include <atom.h>
+#include <share.h>
 
 int atomparse(void);
 int atomwrap() { return 1; }
@@ -78,11 +78,13 @@ pkg_name :  pkg_name '-' IDENTIFIER     {
                                         }
             | IDENTIFIER                {
                                             $$ = malloc (256);
+                                            $$[0] = 0;
                                             strcat ($$, $1);
                                             free ($1);
                                         }
             | VERSION                   {
                                             $$ = malloc (256);
+                                            $$[0] = 0;
                                             int i;
                                             char buf[16];
                                             for (i = 0; i != $1.version->n; i++) {
@@ -95,6 +97,7 @@ pkg_name :  pkg_name '-' IDENTIFIER     {
                                         }
             | REVISION                  {
                                             $$ = malloc (256);
+                                            $$[0] = 0;
                                             sprintf ($$, "r%d", $1);
                                         }
             ;

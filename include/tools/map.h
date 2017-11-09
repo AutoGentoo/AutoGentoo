@@ -6,6 +6,7 @@
 #define HACKSAW_MAP_H
 
 #include <stdio.h>
+#include <tools/string_vector.h>
 
 typedef struct __Map Map;
 typedef struct __Key Key;
@@ -19,14 +20,16 @@ typedef struct __Key Key;
  *          Only support array of pointers
  */
 struct __Map {
-    Key** hash_table; // similar to Vector position are arbitrary
+    Key* hash_table; // similar to Vector position are arbitrary
     int filled; // Only need if we need to resize the array
     size_t size; // Maximum number of keys
-    int threshhold;
+    int threshold;
+    
+    StringVector* keys;
 };
 
 struct __Key {
-    void* key;
+    char* key;
     void* data;
 };
 
@@ -36,7 +39,7 @@ struct __Key {
  * @param key Key to search for
  * @return Location in hash_table
  */
-void* map_get_value(Map* map, void* key);
+void* map_get_value(Map* map, char* key);
 
 /**
  * @brief Inserts data pointer in to array and 
@@ -45,10 +48,10 @@ void* map_get_value(Map* map, void* key);
  * @param data Pointer to data that will be copied
  * @return returns a pointer to the location on hash_table
  */
-void* map_insert(Map* map, void* key, void* data);
+void* map_insert(Map* map, char** key, void** data);
 
-Map* new_map (size_t new_size, int threshhold);
+Map* new_map (size_t new_size, int threshold);
 void map_realloc (Map* map, size_t size);
-unsigned long get_hash (void* key); // Returns offset from hash_table[0]
+size_t get_hash (char* key); // Returns offset from hash_table[0]
 
 #endif // HACKSAW_MAP_H

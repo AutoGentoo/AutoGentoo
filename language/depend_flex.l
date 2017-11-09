@@ -17,10 +17,7 @@ DependExpression* depend_parse (char* buffer) {
     return (DependExpression*)dependout;
 }
 
-
 %}
-
-
 
 letter  [a-zA-Z]
 digit   [0-9]

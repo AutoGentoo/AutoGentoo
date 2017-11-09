@@ -21,7 +21,7 @@ Vector* vector_new (size_t el_size, vector_opts opts) {
     return out_ptr;
 }
 
-void* vector_add(Vector* vec, void* el) {
+int vector_add(Vector* vec, void* el) {
     if (vec->s == (vec->n + 1)) {
         vector_allocate(vec);
     }
@@ -29,7 +29,7 @@ void* vector_add(Vector* vec, void* el) {
     memcpy (out , el, vec->size);
 
     vec->n++;
-    return out;
+    return vec->n - 1; // Return index of item
 }
 
 void vector_remove(Vector* vec, int index) {
