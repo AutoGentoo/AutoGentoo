@@ -26,9 +26,11 @@ struct __PackageSelector {
 };
 
 struct __Dependency {
-    Vector* dependencies; // Vector<Dependency>
+    Vector* DEPEND;  // Vector<Dependency>
+    Vector* RDEPEND; // Vector<Dependency>
+    Vector* PDEPEND; // Vector<Dependency>
     Ebuild* package;
-    int status;
+    depend_t status;
 };
 
 Dependency* dependency_scan (Ebuild* package);

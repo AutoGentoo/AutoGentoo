@@ -5,7 +5,40 @@
 #include <string.h>
 
 Dependency* dependency_scan (Ebuild* package) {
-    return NULL;
+    Dependency* out = malloc (sizeof (Dependency));
+    
+    Dependency** ar[] = {
+        &out->DEPEND,
+        &out->RDEPEND,
+        &out->PDEPEND
+    };
+    
+    char* ar_str[] {
+        "DEPEND",
+        "RDEPEND",
+        "PDEPEND"
+    };
+    
+    int i;
+    for (i=0; i!=3; i++) {
+        char* temp_str = conf_get(package->metadata, "", ar_str);
+        DependExpression* temp = depend_parse(temp_str);
+        *ar[i] = parse_depend_expression(temp);
+    }
+}
+
+Vector* parse_depend_expression (DependExpression* expr) {
+    switch (expr->type) {
+        case USE_EXPR:
+        //if ()
+        break;
+        case SEL_EXPR:
+        
+        break;
+        case EXPR_EXPR:
+        
+        break;
+    }
 }
 
 PackageSelector* get_selector_from_depend (char* dependency_selection) {
