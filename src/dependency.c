@@ -7,13 +7,13 @@
 Dependency* dependency_scan (Ebuild* package) {
     Dependency* out = malloc (sizeof (Dependency));
     
-    Dependency** ar[] = {
-        &out->DEPEND,
-        &out->RDEPEND,
-        &out->PDEPEND
+    DependencyVec ar[] = {
+        out->DEPEND,
+        out->RDEPEND,
+        out->PDEPEND
     };
     
-    char* ar_str[] {
+    char* ar_str[] = {
         "DEPEND",
         "RDEPEND",
         "PDEPEND"
@@ -21,16 +21,16 @@ Dependency* dependency_scan (Ebuild* package) {
     
     int i;
     for (i=0; i!=3; i++) {
-        char* temp_str = conf_get(package->metadata, "", ar_str);
+        char* temp_str = conf_get(package->metadata, "", ar_str[i]);
         DependExpression* temp = depend_parse(temp_str);
-        parse_depend_expression(temp, *ar[i]);
+        parse_depend_expression(temp, ar[i]);
     }
 }
 
 void parse_depend_expression (DependExpression* expr, DependencyVec out_deps) {
     switch (expr->type) {
         case USE_EXPR:
-        expr->c_use->to_check
+        //expr->c_use->to_check
         break;
         case SEL_EXPR:
         

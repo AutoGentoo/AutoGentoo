@@ -35,6 +35,7 @@ struct __Dependency {
 };
 
 Dependency* dependency_scan (Ebuild* package);
+void parse_depend_expression (DependExpression* expr, DependencyVec out_deps);
 PackageSelector* get_selector_from_depend (char* dependency_selection);
 void print_package_selector (PackageSelector* p);
 
