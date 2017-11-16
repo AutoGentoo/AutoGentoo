@@ -53,6 +53,7 @@
     <File Name="src/directory.c"/>
     <File Name="src/dependency.c"/>
     <File Name="src/map.c"/>
+    <File Name="src/use_flag.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="autotools">
     <File Name="configure.ac"/>

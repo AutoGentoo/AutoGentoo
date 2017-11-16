@@ -8,7 +8,8 @@
 #include <portage/package.h>
 
 typedef struct __Dependency Dependency;
-typedef struct __PackageSelector PackageSelector; 
+typedef struct __PackageSelector PackageSelector;
+typedef struct Vector* DependencyVec;  
 
 typedef enum {
     INSTALLED = 0x0,
@@ -26,9 +27,9 @@ struct __PackageSelector {
 };
 
 struct __Dependency {
-    Vector* DEPEND;  // Vector<Dependency>
-    Vector* RDEPEND; // Vector<Dependency>
-    Vector* PDEPEND; // Vector<Dependency>
+    DependencyVec DEPEND;  // Vector<Dependency>
+    DependencyVec RDEPEND; // Vector<Dependency>
+    DependencyVec PDEPEND; // Vector<Dependency>
     Ebuild* package;
     depend_t status;
 };

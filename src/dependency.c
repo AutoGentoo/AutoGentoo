@@ -23,20 +23,21 @@ Dependency* dependency_scan (Ebuild* package) {
     for (i=0; i!=3; i++) {
         char* temp_str = conf_get(package->metadata, "", ar_str);
         DependExpression* temp = depend_parse(temp_str);
-        *ar[i] = parse_depend_expression(temp);
+        parse_depend_expression(temp, *ar[i]);
     }
 }
 
-Vector* parse_depend_expression (DependExpression* expr) {
+void parse_depend_expression (DependExpression* expr, DependencyVec out_deps) {
     switch (expr->type) {
         case USE_EXPR:
-        //if ()
+        expr->c_use->to_check
         break;
         case SEL_EXPR:
         
         break;
         case EXPR_EXPR:
-        
+        parse_depend_expression (vector_get(expr->dependexpressions, 0), out_deps);
+        parse_depend_expression (vector_get(expr->dependexpressions, 1), out_deps);
         break;
     }
 }
