@@ -85,6 +85,7 @@
     <File Name="language/depend_flex.l"/>
     <File Name="language/share.c"/>
     <File Name="language/share.h"/>
+    <File Name="language/Makefile.am"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

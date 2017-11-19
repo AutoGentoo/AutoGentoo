@@ -1,4 +1,4 @@
-AM_CFLAGS = ${HACKSAW_CFLAGS} -I$(top_srcdir)/include/
+AM_CFLAGS = ${HACKSAW_CFLAGS} -I$(top_srcdir)/include/ $(CFLAGS)
 ACLOCAL_AMFLAGS='-I m4'
 
 AM_YFLAGS = -d

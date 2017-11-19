@@ -8,9 +8,8 @@
 
 void category_read (Repository* repo, char* name) {
     char cat_dir[256];
-    sprintf (cat_dir, "/%s/%s", repo->location, name);
-    fix_path (cat_dir);
-
+    sprintf (cat_dir, "%s/%s", repo->location, name);
+    
     StringVector* dirs = get_directories (cat_dir);
     
     int i;
@@ -19,7 +18,7 @@ void category_read (Repository* repo, char* name) {
         char* pkg_name = string_vector_get(dirs, i);
         sprintf (key, "%s/%s", name, pkg_name);
         Package* p = package_new(repo, name, pkg_name);
-        map_insert(repo->packages, &pkg_name, (void**)&p);
+        map_insert(repo->packages, pkg_name, (void*)p);
     }
     
     string_vector_free(dirs);

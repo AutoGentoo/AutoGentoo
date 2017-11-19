@@ -11,8 +11,15 @@ AC_PROG_LEX
 LT_INIT
 
 AC_SUBST([LIBTOOL_DEPS])
+AC_SUBST(CFLAGS)
 
 AC_CHECK_LIB(pcre2-8, pcre2_compile_8)
+AC_CHECK_LIB(pcre2-8, pcre2_match_data_create_8)
+AC_CHECK_LIB(pcre2-8, pcre2_match_8)
+AC_CHECK_LIB(pcre2-8, pcre2_get_error_message_8)
+AC_CHECK_LIB(pcre2-8, pcre2_get_ovector_pointer_8)
+AC_CHECK_LIB(pcre2-8, pcre2_match_data_free_8)
+AC_CHECK_LIB(pcre2-8, pcre2_code_free_8)
 
 AC_CHECK_LIB([crypto], [SHA256_Init])
 AC_CHECK_LIB([crypto], [SHA256_Final])

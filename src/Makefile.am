@@ -1,4 +1,4 @@
-AM_CFLAGS = ${HACKSAW_CFLAGS} -I$(top_srcdir)/include/ -I$(top_srcdir)/
+AM_CFLAGS = ${HACKSAW_CFLAGS} -I$(top_srcdir)/include/ -I$(top_srcdir)/ $(CFLAGS)
 ACLOCAL_AMFLAGS='-I m4'
 
 lib_LTLIBRARIES=libhacksaw.la
