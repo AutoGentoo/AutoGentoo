@@ -30,6 +30,7 @@ struct __Dependency {
     DependencyVec DEPEND;  // Vector<Dependency>
     DependencyVec RDEPEND; // Vector<Dependency>
     DependencyVec PDEPEND; // Vector<Dependency>
+    DependencyVec HDEPEND; // Vector<Dependency> (EAPI >=5-expirimental)
     Ebuild* package;
     depend_t status;
 };

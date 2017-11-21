@@ -15,6 +15,7 @@
       <File Name="include/portage/package.h"/>
       <File Name="include/portage/dependency.h"/>
       <File Name="include/portage/use_flags.h"/>
+      <File Name="include/portage/package_use.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="tools">
       <File Name="include/tools/regular_expression.h"/>
