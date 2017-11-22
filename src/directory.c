@@ -3,6 +3,7 @@
 #include <portage/directory.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
 
 
 StringVector* get_directories (char* path) {
@@ -12,8 +13,8 @@ StringVector* get_directories (char* path) {
     DIR *dr = opendir(path);
  
     if (dr == NULL) {
-        printf("Could not open %s\n", path);
-        exit(1);
+        fprintf(stderr, "Could not open %s\n", path);
+        return out;
     }
     
     while ((de = readdir(dr)) != NULL) {
@@ -94,14 +95,14 @@ PortageDirectory* read_directory (Portage* portage, char* location) {
 
 void portage_directory_close (PortageDirectory* pdir) {
     int i;
-    for (i = 0; i != pdir->fp_list; i++) {
+    for (i = 0; i != pdir->fp_list->n; i++) {
         fclose (*(FILE**)vector_get (pdir->fp_list, i));
     }
-    out->status = PD_CLOSED;
+    pdir->status = PD_CLOSED;
 }
 
 void portage_directory_free (PortageDirectory* pdir) {
-    if (out->status == PD_OPEN) {
+    if (pdir->status == PD_OPEN) {
         portage_directory_close(pdir);
     }
     

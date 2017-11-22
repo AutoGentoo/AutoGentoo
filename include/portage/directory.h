@@ -27,7 +27,7 @@ struct __PortageDirectory {
     portdir_t status;
     Vector* fp_list;    // List of FILE* structs, 
                         //if directory is a file then length will be 1
-}
+};
 
 StringVector* get_directories (char* path);
 StringVector* get_files (char* path);
