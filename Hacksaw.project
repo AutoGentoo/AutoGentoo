@@ -15,7 +15,8 @@
       <File Name="include/portage/package.h"/>
       <File Name="include/portage/dependency.h"/>
       <File Name="include/portage/use_flags.h"/>
-      <File Name="include/portage/package_use.h"/>
+      <File Name="include/portage/portage.h"/>
+      <File Name="include/portage/package_config.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="tools">
       <File Name="include/tools/regular_expression.h"/>
@@ -106,7 +107,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="./src/.libs/hacksaw" IntermediateDirectory="" Command="./src/.libs/hacksaw" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="./src/.libs/hacksaw" IntermediateDirectory="" Command="./src/.libs/hacksaw" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./src/.libs/" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <BuildSystem Name="GNU makefile onestep build"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[LD_LIBRARY_PATH ="$LD_LIBRARY_PATH ./src/.libs"]]>
