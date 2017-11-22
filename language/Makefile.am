@@ -25,7 +25,7 @@ noinst_HEADERS = depend.h share.h
 BUILT_SOURCES = depend_bison.h atom_bison.h
 
 DEPEND_CLEAN=depend_bison.h depend_bison.c depend_flex.c
-PACKAGE_CLEAN=package_bison.h package_bison.c package_flex.c
+ATOM_CLEAN=atom_bison.h atom_bison.c atom_flex.c
 CLEANFILES = *~ $(DEPEND_CLEAN) $(ATOM_CLEAN)
 
 check_PROGRAMS = test-depend test-atom
