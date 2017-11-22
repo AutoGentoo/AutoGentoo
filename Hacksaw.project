@@ -27,6 +27,7 @@
       <File Name="include/tools/Makefile.am"/>
       <File Name="include/tools/map.h"/>
       <File Name="include/tools/conf.h"/>
+      <File Name="include/tools/small_map.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="test">
       <File Name="include/test/debug.h"/>
@@ -55,6 +56,7 @@
     <File Name="src/dependency.c"/>
     <File Name="src/map.c"/>
     <File Name="src/use_flag.c"/>
+    <File Name="src/small_map.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="autotools">
     <File Name="configure.ac"/>

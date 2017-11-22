@@ -12,6 +12,7 @@
 #include <tools/vector.h>
 #include <tools/string_vector.h>
 #include <tools/map.h>
+#include <tools/small_map.h>
 #include <tools/log.h>
 #include <portage/dependency.h>
 
