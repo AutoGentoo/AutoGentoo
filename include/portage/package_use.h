@@ -5,11 +5,11 @@
 #ifndef HACKSAW_PACKAGE_USE_H
 #define HACKSAW_PACKAGE_USE_H
 
-#include <tools/map.h>
+#include <tools/small_map.h>
 #include <share.h>
 
-typedef Map* PackageUseConf; // Map category/name to PackageUse pointer
-                             // Make every package that found a loc 
+typedef SmallMap PackageUseConf;    // Map category/name to PackageUse pointer
+                                    // Make every package that found a loc 
 typedef struct __PackageUse PackageUse;
 
 struct __PackageUse {
