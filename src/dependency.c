@@ -3,6 +3,7 @@
 #include <portage/dependency.h>
 #include <language/share.h>
 #include <string.h>
+#include <stdlib.h>
 
 Dependency* dependency_scan (Ebuild* package) {
     Dependency* out = malloc (sizeof (Dependency));
@@ -10,13 +11,15 @@ Dependency* dependency_scan (Ebuild* package) {
     DependencyVec ar[] = {
         out->DEPEND,
         out->RDEPEND,
-        out->PDEPEND
+        out->PDEPEND,
+        out->HDEPEND
     };
     
     char* ar_str[] = {
         "DEPEND",
         "RDEPEND",
-        "PDEPEND"
+        "PDEPEND",
+        "HDEPEND"
     };
     
     int i;

@@ -21,6 +21,4 @@ struct __PackageUse {
     Vector* use;
 };
 
-
-
 #endif
