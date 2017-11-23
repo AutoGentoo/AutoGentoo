@@ -212,11 +212,13 @@ response_t _STAGE1 (struct manager* m_man, char* ip, int sockfd, char** args, in
     }
     fclose (fp);
     
+    write_make_conf(*m_man, m_man->clients[sc_no], PRE_CHROOT);
     response_t res = __m_install (pkgs, m_man, sc_no, ip, 1);
     m_man->clients[sc_no].state = STAGE3;
     
     m_man->clients[sc_no].chroot = chroot_new (m_man, sc_no);
-    chroot_mount (m_man->clients[sc_no].chroot);
+    
+    write_make_conf(*m_man, m_man->clients[sc_no], CUR_CHROOT);
     
     update_config (m_man);
     
@@ -247,7 +249,7 @@ response_t _EDIT (struct manager* m_man, char* ip, int sockfd, char** args, int 
     strcpy(m_man->clients[sc_no].DISTDIR, "/usr/portage/distfiles");
     strcpy(m_man->clients[sc_no].PKGDIR, "/autogentoo/pkg");
     strcpy(m_man->clients[sc_no].PORT_LOGDIR, "/autogentoo/log");
-    write_make_conf (*m_man, m_man->clients[sc_no]);
+    write_make_conf (*m_man, m_man->clients[sc_no], m_man->clients[sc_no].state < STAGE3 ? PRE_CHROOT : CUR_CHROOT);
     
     update_config (m_man);
 }

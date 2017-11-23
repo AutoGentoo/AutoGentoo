@@ -25,8 +25,7 @@
 #include <emerge.h>
 
 void emerges (struct manager * m_man, int sc_no, char* out) {
-    sprintf (out, "SYS_ROOT='%s/%s' emerge -q --autounmask-continue --buildpkg --usepkg --root='%s/%s' --config-root='%s/%s'", m_man->root, m_man->clients[sc_no].id, m_man->root, m_man->clients[sc_no].id, m_man->root, m_man->clients[sc_no].id);
-    //sprintf (out, "emerge -q --autounmask-continue --buildpkg --usepkg");
+    sprintf (out, "emerge --autounmask-continue --buildpkg --root='%s/%s'", m_man->root, m_man->clients[sc_no].id, m_man->root, m_man->clients[sc_no].id, m_man->root, m_man->clients[sc_no].id);
 }
 
 void emergec (char *out) {

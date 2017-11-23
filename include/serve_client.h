@@ -32,6 +32,11 @@ typedef enum {
              */
 } client_state;
 
+typedef enum {
+    PRE_CHROOT,
+    CUR_CHROOT
+} make_conf_t;
+
 struct serve_client { // Chroot environment
     char hostname[64];
     char profile[128];
@@ -86,7 +91,7 @@ struct manager {
 char * get_ip_from_fd (int);
 int get_client_from_ip (struct manager * m_man, char* ip);
 int get_client_from_id (struct manager * m_man, char* ip);
-void write_make_conf (struct manager m_man, struct serve_client conf);
+void write_make_conf (struct manager m_man, struct serve_client conf, make_conf_t type);
 void init_serve_client (struct manager* m_man, int sc_no);
 void _mkdir(const char *dir);
 void write_serve (int fd, struct manager * m_man);

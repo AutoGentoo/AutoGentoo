@@ -52,7 +52,7 @@ response_t __m_install (char* command, struct manager * m_man, int sc_no, char* 
 
 response_t m_install (char* command, struct manager * m_man, int sc_no) {
     char root[256];
-    char *args[128];
+    char *args[1024];
     
     sprintf (root, "%s/%s/", m_man->root, m_man->clients[sc_no].id);
     strcpy (root, path_normalize (root));
