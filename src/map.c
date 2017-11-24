@@ -9,7 +9,7 @@ Map* map_new (size_t new_size, int threshold) {
     
     out->size = new_size;
     out->threshold = threshold;
-    out->hash_table = malloc (sizeof (Key) * new_size);
+    out->hash_table = calloc (sizeof (Key), new_size);
     out->keys = vector_new (sizeof (char*), REMOVE | UNORDERED);
     
     out->filled = 0;
@@ -21,7 +21,7 @@ void map_realloc (Map* map, size_t size) {
     Key* old_hash_table = map->hash_table;
     size_t old_size = map->size;
     
-    map->hash_table = malloc (sizeof(Key) * size);
+    map->hash_table = calloc (sizeof(Key), size);
     map->size = size;
     
     char* key;
@@ -61,6 +61,9 @@ void* map_get_value(Map* map, char* key) {
     while (memcmp(map->hash_table[offset].key, key, sizeof (void*)) != 0) {
         offset += sizeof(Key*);
         offset %= map->size; // Make sure it doesn't go map of bounds
+        if (*(char*)(&map->hash_table[offset]) == 0) { // Empty byte
+            return NULL;
+        }
     }
     
     return map->hash_table[offset].data;
