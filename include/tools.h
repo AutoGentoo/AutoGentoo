@@ -1,4 +1,3 @@
-#include <hacksaw/tools/boolean.h>
 #include <hacksaw/tools/conf.h>
 #include <hacksaw/tools/debug.h>
 #include <hacksaw/tools/log.h>

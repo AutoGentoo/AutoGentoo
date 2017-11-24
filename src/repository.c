@@ -73,10 +73,10 @@ Repository* parse_repository (ConfSection* section) {
     char auto_sync_buff[16];
     if (conf_get_convert(section->parent, (char*)auto_sync_buff, section->name, "auto-sync")) {
         if (strcmp ("yes", auto_sync_buff) == 0) {
-            repo->auto_sync = true;
+            repo->auto_sync = 0;
         }
         else if(strcmp ("no", auto_sync_buff) == 0) {
-            repo->auto_sync = false;
+            repo->auto_sync = 1;
         }
         else {
             lwarning("invalid token: '%s' (%s)", auto_sync_buff, section->parent->path);

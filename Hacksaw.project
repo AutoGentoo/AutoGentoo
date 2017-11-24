@@ -26,7 +26,6 @@
       <File Name="include/tools/string.h"/>
       <File Name="include/tools/vector.h"/>
       <File Name="include/tools/string_vector.h"/>
-      <File Name="include/tools/boolean.h"/>
       <File Name="include/tools/Makefile.am"/>
       <File Name="include/tools/map.h"/>
       <File Name="include/tools/conf.h"/>

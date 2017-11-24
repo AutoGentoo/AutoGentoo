@@ -7,7 +7,6 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <tools/conf.h>
-#include <tools/boolean.h>
 #include <tools/map.h>
 #include <portage/package.h>
 
@@ -45,7 +44,7 @@ struct __Repository {
     mode_t sync_mask;
     */
 
-    bool auto_sync;
+    int auto_sync;
     StringVector* eclass_overrides; // Override the eclass definition (NOT RECOMMENDED)
     StringVector* force;
 
