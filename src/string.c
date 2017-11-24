@@ -63,3 +63,15 @@ void fix_path (char* ptr) {
         }
     }
 }
+
+void string_overwrite (char** dest, char* src, int dup) {
+    if (*dest != NULL) {
+        free (*dest);
+    }
+    if (dup) {
+        *dest = strdup (src);
+    }
+    else {
+        *dest = src;
+    }
+}
