@@ -39,7 +39,7 @@ struct __Key {
  * @param key Key to search for
  * @return Location in hash_table
  */
-void* map_get_value(Map* map, char* key);
+void* map_get (Map* map, char* key);
 
 /**
  * @brief Inserts data pointer in to array and 
@@ -48,7 +48,7 @@ void* map_get_value(Map* map, char* key);
  * @param data Pointer to data that will be copied
  * @return returns a pointer to the location on hash_table
  */
-void* map_insert(Map* map, char* key, void* data);
+void* map_insert (Map* map, char* key, void* data);
 
 Map* map_new (size_t new_size, int threshold);
 void map_realloc (Map* map, size_t size);

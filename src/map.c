@@ -53,7 +53,7 @@ void map_realloc (Map* map, size_t size) {
 }
 
 
-void* map_get_value(Map* map, char* key) {
+void* map_get (Map* map, char* key) {
     size_t offset = get_hash (key) % map->size;
     if (map->hash_table[offset].key == 0) {
         return NULL;
