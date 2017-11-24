@@ -6,6 +6,7 @@
     </Plugin>
   </Plugins>
   <VirtualDirectory Name="include">
+    <File Name="include/tools.h"/>
     <VirtualDirectory Name="portage">
       <File Name="include/portage/repository.h"/>
       <File Name="include/portage/directory.h"/>
@@ -19,6 +20,7 @@
       <File Name="include/portage/package_config.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="tools">
+      <File Name="include/tools/debug.h"/>
       <File Name="include/tools/regular_expression.h"/>
       <File Name="include/tools/log.h"/>
       <File Name="include/tools/string.h"/>
@@ -29,10 +31,6 @@
       <File Name="include/tools/map.h"/>
       <File Name="include/tools/conf.h"/>
       <File Name="include/tools/small_map.h"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="test">
-      <File Name="include/test/debug.h"/>
-      <File Name="include/test/Makefile.am"/>
     </VirtualDirectory>
     <File Name="include/Hacksaw.h"/>
     <File Name="include/Makefile.am"/>

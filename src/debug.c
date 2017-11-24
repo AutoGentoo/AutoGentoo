@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <tools/vector.h>
 #include <tools/string_vector.h>
-#include <test/debug.h>
+#include <tools/debug.h>
 
 void print_bin (void* ptr, int n, size_t size) {
     int i;

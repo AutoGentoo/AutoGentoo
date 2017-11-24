@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <portage/package_config.h>
+#include <portage/directory.h>
 
 PackageMeta* package_meta_new () {
     PackageMeta* out = malloc (sizeof (PackageMeta));
@@ -13,17 +15,17 @@ PackageMeta* package_meta_new () {
     return out;
 }
 
-void package_conf_add (PackageConf* pconf, char* key, void* data, packagemeta_t dest); {
+void package_conf_add (PackageConf* pconf, char* key, void* data, packagemeta_t dest) {
     if (small_map_get((SmallMap*)pconf, key) == NULL) {
         PackageMeta* new_meta_temp = package_meta_new ();
-        small_map_insert((SmallMap*)pconf, key)
+        small_map_insert((SmallMap*)pconf, key, &new_meta_temp);
     }
     
     Vector* destvec;
     
     switch (dest) {
         case PM_LICENSE:
-        destvec = pconf
+        destvec = pconf;
         break;
         case PM_USE:
         break;
@@ -34,7 +36,7 @@ void package_conf_add (PackageConf* pconf, char* key, void* data, packagemeta_t 
     }
 }
 
-void read_package_use (Portage* portage, PackageConf* dest); {
+void read_package_use (Portage* portage, PackageConf* dest) {
     PortageDirectory* pdir = portage_directory_read(portage, "package.use");
     
     char* line;
@@ -59,7 +61,6 @@ void read_package_use (Portage* portage, PackageConf* dest); {
     portage_directory_free (pdir);
 }
 
-
-PackageLicense* read_package_license (Portage* portage);
-PackageMask* read_package_mask (Portage* portage);
-PackageUnmask* read_package_unmask (Portage* portage);
+void read_package_license (Portage* portage, PackageConf* dest);
+void read_package_mask (Portage* portage, PackageConf* dest);
+void read_package_unmask (Portage* portage, PackageConf* dest);

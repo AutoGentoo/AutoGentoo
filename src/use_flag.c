@@ -1,5 +1,8 @@
 #include <portage/use_flags.h>
 #include <tools/map.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 IUSE read_iuse (Ebuild* ebuild) {
     char* temp_use = conf_get(ebuild->metadata, "", "IUSE");
@@ -10,7 +13,7 @@ IUSE read_iuse (Ebuild* ebuild) {
 }
 
 IUSE iuse_new () {
-    return new_map (sizeof (Use), 16);
+    return map_new (sizeof (Use), 16);
 }
 
 void iuse_parse (IUSE to_update, char* iuse_str) {
