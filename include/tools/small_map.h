@@ -6,7 +6,7 @@
 #define HACKSAW_SMALL_MAP_H
 
 #include <stdio.h>
-#include <tools/vector.h>
+#include "vector.h"
 
 /**
  * Vector has list of char*

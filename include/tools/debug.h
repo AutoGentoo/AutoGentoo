@@ -6,9 +6,9 @@
 #define HACKSAW_DEBUG_H
 
 #include <stddef.h>
-#include <tools/vector.h>
-#include <tools/string_vector.h>
-#include <tools/conf.h>
+#include "vector.h"
+#include "string_vector.h"
+#include "conf.h"
 
 void print_bin (void* ptr, int n, size_t size);
 void print_vec(Vector* vec);

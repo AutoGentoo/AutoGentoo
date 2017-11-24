@@ -6,7 +6,7 @@
 #define HACKSAW_MAP_H
 
 #include <stdio.h>
-#include <tools/string_vector.h>
+#include "string_vector.h"
 
 typedef struct __Map Map;
 typedef struct __Key Key;

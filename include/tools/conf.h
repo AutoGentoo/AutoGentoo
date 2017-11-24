@@ -5,7 +5,7 @@
 #ifndef HACKSAW_CONFIG_H
 #define HACKSAW_CONFIG_H
 
-#include <tools/string_vector.h>
+#include "string_vector.h"
 
 typedef struct __Conf Conf;
 typedef struct __ConfSection ConfSection;

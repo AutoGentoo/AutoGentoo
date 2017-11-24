@@ -5,7 +5,7 @@
 #ifndef HACKSAW_STRING_VECTOR_H
 #define HACKSAW_STRING_VECTOR_H
 
-#include <tools/vector.h>
+#include "vector.h"
 
 typedef Vector StringVector;
 
