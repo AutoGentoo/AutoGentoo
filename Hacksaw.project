@@ -58,6 +58,7 @@
     <File Name="src/map.c"/>
     <File Name="src/use_flag.c"/>
     <File Name="src/small_map.c"/>
+    <File Name="src/package_config.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="autotools">
     <File Name="configure.ac"/>

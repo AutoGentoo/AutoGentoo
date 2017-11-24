@@ -32,7 +32,7 @@ struct __PortageDirectory {
 StringVector* get_directories (char* path);
 StringVector* get_files (char* path);
 path_t check_is_dir (char* path);
-PortageDirectory* read_directory (Portage* portage, char* location);
+PortageDirectory* portage_directory_read (Portage* portage, char* location);
 void portage_directory_close (PortageDirectory* pdir);
 void portage_directory_free (PortageDirectory* pdir);
 

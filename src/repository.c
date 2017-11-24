@@ -92,7 +92,7 @@ Repository* parse_repository (ConfSection* section) {
     char cat_file[256];
     sprintf (cat_file, "/%s/profiles/categories", repo->location);
     fix_path (cat_file);
-    repo->packages = new_map (1024, 128);
+    repo->packages = map_new (1024, 128);
     
     FILE* fp = fopen (cat_file, "r");
     char* line;

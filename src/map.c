@@ -4,7 +4,7 @@
 #include <string.h>
 #include <openssl/md5.h>
 
-Map* new_map (size_t new_size, int threshold) {
+Map* map_new (size_t new_size, int threshold) {
     Map* out = malloc (sizeof (Map));
     
     out->size = new_size;

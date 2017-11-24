@@ -50,7 +50,7 @@ void* map_get_value(Map* map, char* key);
  */
 void* map_insert(Map* map, char* key, void* data);
 
-Map* new_map (size_t new_size, int threshold);
+Map* map_new (size_t new_size, int threshold);
 void map_realloc (Map* map, size_t size);
 size_t get_hash (char* key); // Returns offset from hash_table[0]
 

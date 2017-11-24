@@ -60,7 +60,7 @@ path_t check_is_dir (char* path) {
 }
 
 
-PortageDirectory* read_directory (Portage* portage, char* location) {
+PortageDirectory* portage_directory_read (Portage* portage, char* location) {
     PortageDirectory* out = malloc (sizeof (PortageDirectory));
     out->parent = portage;
     out->status = PD_CLOSED;
