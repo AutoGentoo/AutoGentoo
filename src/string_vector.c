@@ -49,7 +49,7 @@ void string_vector_split(StringVector* vec, char* string, char* delim) {
         return;
     }
     char* buff;
-    for (buff = strtok(string, delim); buff != NULL; string_vector_add(vec, buff));
+    for (buff = strtok(string, delim); buff != NULL; buff = strtok(NULL, delim), string_vector_add(vec, buff));
 }
 
 void string_vector_free (StringVector* vec) {
