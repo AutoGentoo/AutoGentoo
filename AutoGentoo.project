@@ -5,45 +5,28 @@
       <![CDATA[00010001N0005Debug000000000000]]>
     </Plugin>
   </Plugins>
+  <VirtualDirectory Name="autotools">
+    <File Name="configure.ac"/>
+    <File Name="autogen.sh"/>
+    <File Name="Makefile.am"/>
+  </VirtualDirectory>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="src/_string.c"/>
+    <File Name="src/host.c"/>
     <File Name="src/autogentoo.c"/>
-    <File Name="src/chroot.c"/>
-    <File Name="src/crossdev.c"/>
-    <File Name="src/emerge.c"/>
-    <File Name="src/hash.c"/>
-    <File Name="src/ip_convert.c"/>
-    <File Name="src/ip_scan.c"/>
-    <File Name="src/kernel.c"/>
-    <File Name="src/list.c"/>
-    <File Name="src/request.c"/>
+    <File Name="src/handle.c"/>
     <File Name="src/response.c"/>
-    <File Name="src/serve_client.c"/>
     <File Name="src/server.c"/>
-    <File Name="src/srv_handle.c"/>
-    <File Name="src/testserveclient.c"/>
-    <File Name="src/testserver.c"/>
-    <File Name="src/update.c"/>
-    <File Name="src/update-config.c"/>
+    <File Name="src/Makefile.am"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
-    <File Name="include/_string.h"/>
     <File Name="include/autogentoo.h"/>
-    <File Name="include/chroot.h"/>
-    <File Name="include/crossdev.h"/>
-    <File Name="include/emerge.h"/>
-    <File Name="include/hash.h"/>
-    <File Name="include/ip_convert.h"/>
-    <File Name="include/ip_scan.h"/>
-    <File Name="include/kernel.h"/>
-    <File Name="include/list.h"/>
-    <File Name="include/request.h"/>
+    <File Name="include/handle.h"/>
     <File Name="include/response.h"/>
-    <File Name="include/serve_client.h"/>
+    <File Name="include/host.h"/>
     <File Name="include/server.h"/>
-    <File Name="include/srv_handle.h"/>
+    <File Name="include/Makefile.am"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

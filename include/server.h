@@ -1,62 +1,54 @@
-/*
- * server.h
- * 
- * Copyright 2017 Unknown <atuser@Hyperion>
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
- * 
- * 
- */
+#ifndef __AUTOGENTOO_SERVER_H__
+#define __AUTOGENTOO_SERVER_H__
 
-#ifndef __AUTOGENTOO_HTTP_SERVER__
-#define __AUTOGENTOO_HTTP_SERVER__
+typedef struct __Server Server;
+typedef struct __Connection Connection;
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <hacksaw/tools.h>
+#include "host.h"
 #include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <ifaddrs.h>
-#include <netinet/in.h>
-#include <request.h>
-#include <serve_client.h>
-#include <response.h>
-#include <sys/wait.h>
-#include <autogentoo.h>
 
-#define CONNMAX 1000
-#define BYTES 102400
-#define BUFSIZE 1024
+typedef enum {
+    ASYNC = 0x0,
+    DAEMON = 0x1,
+    NO_DEBUG = 0x0,
+    DEBUG = 0x2
+} server_t;
 
-int  listenfd, clients[CONNMAX];
+typedef enum {
+    SERVER_ERROR, // recv() error
+    CONNECTED,
+    FAILED, // Client disconnected closing the connection
+    CLOSED // Closed successfully with connection_free()
+} con_t;
 
-void daemonize (char*);
-void server_main (unsigned, struct manager * m_man);
+struct __Server {
+    char* location;
+    SmallMap* host_bindings;
+    Vector* hosts;
+    Vector* connections;
+    char port[5];
+    server_t opts;
+};
 
-void error         (char *);
-void server_start  (char *);
-void server_respond(int, struct manager * m_man);
-void handle_exit   (int a);
-void strrev        (char *p);
-void send_request  (char *request, char* res);
+struct __Connection {
+    Server* parent;
+    Host* bounded_host; // NULL if unbounded
+    char* request;
+    char* ip;
+    int fd;
+    pid_t pid;
+    con_t status;
+};
+
+Server* server_new (char* location, char* port, server_t opts);
+Connection* connection_new (Server* server, int conn_fd);
+void server_start (Server* server);
+void server_bind (Connection* conn, Host** host);
+int server_init (char* port);
+void server_respond (Connection* conn);
+void connection_free (Connection* conn);
+void kill_finished (int sig);
+void daemonize(char* _cwd);
 
 #endif

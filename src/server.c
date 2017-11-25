@@ -1,48 +1,112 @@
-/*
- * server.c
- *
- * Copyright 2017 Unknown <atuser@Hyperion>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
- *
- *
- */
-
 #include <stdio.h>
-#include <server.h>
-#include <chroot.h>
-#include <_string.h>
-#include <response.h>
-#include <sys/sysinfo.h>
-#include <serve_client.h>
-#include <sys/mman.h>
 #include <stdlib.h>
-#include <srv_handle.h>
+#include <server.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/mman.h>
+#include <string.h>
+#include <sys/sysinfo.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <handle.h>
+#include <errno.h>
 
-void server_start (char* port)
-{
+static Connection** finished_connection;
+
+Server* server_new (char* location, char* port, server_t opts) {
+    Server* out = malloc (sizeof (Server));
+    out->connections = vector_new (sizeof (Connection*), REMOVE | UNORDERED);
+    out->hosts = vector_new (sizeof (Host*), REMOVE | UNORDERED);
+    out->host_bindings = small_map_new(15, 5);
+    out->location = strdup (location);
+    out->opts = opts;
+    strcpy(out->port, port);
+    
+    return out;
+}
+
+Connection* connection_new (Server* server, int conn_fd) {
+    if (conn_fd < 0) {
+        lwarning ("accept() error");
+        return NULL;
+    }
+    
+    Connection* out = mmap(NULL, sizeof (Connection), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    out->parent = server;
+    out->fd = conn_fd;
+    
+    struct sockaddr_in addr;
+    socklen_t addr_size = sizeof (struct sockaddr_in);
+    int res = getpeername (out->fd, (struct sockaddr*)&addr, &addr_size);
+    out->ip = inet_ntoa(addr.sin_addr);
+    
+    Host** temp = small_map_get (out->parent->host_bindings, out->ip);
+    
+    if (temp != NULL) { // Cant dereference NULL
+        out->bounded_host = *temp;
+    }
+    else {
+        out->bounded_host = NULL;
+    }
+    
+    return out;
+}
+
+void server_start (Server* server) {
+    struct sockaddr_in clientaddr;
+    socklen_t addrlen;
+    
+    finished_connection = mmap(NULL, sizeof (Connection*), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    
+    int listenfd = server_init(server->port);
+
+    linfo("Server started on port %s", server->port);
+
+    if (server->opts & DAEMON) {
+        daemonize (server->location);
+    }
+
+    signal(SIGCHLD, kill_finished);
+
+    addrlen = sizeof(clientaddr);
+    
+    while (1) { // Main accept loop
+        Connection* current_conn = connection_new (server, accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen));
+        
+        if (current_conn == NULL)
+            continue;
+        
+        pid_t res_pid;
+        if ((res_pid = fork ()) == -1)
+            exit (-1);
+        else if (res_pid == 0) {
+            current_conn->pid = getpid();
+            server_respond(current_conn);
+            *finished_connection = current_conn;
+            _exit (0);
+        }
+    }
+}
+
+int server_init (char* port) {
     struct addrinfo hints, *res, *p;
-
+    int listenfd;
+    
     // getaddrinfo for host
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     if (getaddrinfo(NULL, port, &hints, &res) != 0) {
-        perror("getaddrinfo() error");
+        lerror("getaddrinfo() error");
         exit(1);
     }
     // socket and bind
@@ -51,299 +115,157 @@ void server_start (char* port)
         if (listenfd == -1)
             continue;
         if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0)
-            error("setsockopt(SO_REUSEADDR) failed");
+            lerror("setsockopt(SO_REUSEADDR) failed");
         if (bind(listenfd, p->ai_addr, p->ai_addrlen) == 0)
             break;
     }
     if (p == NULL) {
-        perror("socket() or bind()");
+        lerror("socket() or bind()");
+        switch (errno) {
+            case EADDRINUSE:
+            lerror ("Port %s in use", port);
+            break;
+            case EACCES:
+            lerror ("Permission denied");
+            break;
+            case ENETUNREACH:
+            lerror ("Network unreachable");
+            break;
+        }
         exit(1);
     }
 
     freeaddrinfo(res);
 
     // listen for incoming connections
-    if (listen(listenfd, 1000000) != 0) {
-        perror("listen() error");
+    
+    if (listen(listenfd, 64) != 0) {
+        lerror("listen() error");
         exit(1);
     }
+    
+    return listenfd;
 }
 
-static int *hang_me;
-static int *close_me;
-
-void child_finished (int sig) {
-    if (hang_me > 0) {
-        waitpid (*hang_me, 0, WNOHANG);
-        *hang_me = -1;
+void connection_free (Connection* conn) {
+    if (conn->status != CLOSED) {
+        shutdown(conn->fd, SHUT_RDWR);
+        close(conn->fd);
+        conn->status = CLOSED;
     }
-
-    if (*close_me > 2) {
-        close (*close_me);
-    }
+    
+    free (conn->request);
+    free (conn->ip);
+    // Don't unmap here (done in kill_finished)
 }
 
-size_t frecv (int fd, int sockfd, char* buf, size_t size, int flags) {
-    size_t bytes_recieved;
-    if (buf == NULL) {
-        char _buf[size];
-        bytes_recieved = recv(sockfd, _buf, size, flags);
-        write (fd, _buf, bytes_recieved);
+void kill_finished (int sig) {
+    if ((*finished_connection)->pid > 0) {
+        waitpid ((*finished_connection)->pid, 0, WNOHANG);
+        (*finished_connection)->pid = -1;
+    }
+
+    if ((*finished_connection)->fd > 2) { // Dont close stdout, stdin or stderr
+        close ((*finished_connection)->fd);
+    }
+    
+    munmap (*finished_connection, sizeof(Connection*));
+}
+
+void server_respond (Connection* conn) {
+    
+    /* Read the request */
+    conn->request = malloc (2048);
+    ssize_t total_read, current_bytes = 0;
+    size_t buffer_size = 2048;
+    total_read += current_bytes = read (conn->fd, conn->request, 2048);
+    while (current_bytes == 2048) {
+        buffer_size += 2048;
+        conn->request = realloc (conn->request, buffer_size);
+        current_bytes = read (conn->fd, conn->request + total_read, 2048);
+        total_read += current_bytes;
+    }
+    
+    if (total_read < 0) { // receive error
+        lerror("recv() error");
+        conn->status = SERVER_ERROR;
+        return;
+    }
+    else if (total_read == 0) { // receive socket closed
+        lwarning("Client disconnected upexpectedly.");
+        conn->status = FAILED;
+        return;
     }
     else {
-        bytes_recieved = recv(sockfd, buf, size, flags);
-        write (fd, buf, bytes_recieved);
+        conn->status = CONNECTED;
     }
-    return bytes_recieved;
+    
+    char* args[4]; // Written to by parse_request
+    
+    char* request_line;
+    int split_i = strchr (conn->request, '\n') - conn->request;
+    request_line = malloc (split_i);
+    strncpy (request_line, conn->request, split_i);
+    
+    SHFP call = parse_request (request_line, args);
+    
+    linfo("handle %s on pid %d (%s)", conn->ip, conn->pid, request_line);
+    
+    response_t res = (*call) (conn, args, split_i + 1);
+    linfo ("request %d: %s (%d)", conn->pid, res.message, res.code);
 }
 
-// client connection
-void server_respond (int n, struct manager * m_man)
-{
-    char mesg[2048], *reqline[3], path[2048];
-    unsigned int bytes_recieved = 0;
-
-    char *ip;
-    response_t res;
-    
-    int stdout_b, stderr_b;
-    int b_client = clients[n];
-    
-    char file_name[32];
-    sprintf (file_name, "%d.request", (int)getpid());
-    FILE* request_file = fopen (file_name, "w+");
-    
-    memset((void*)mesg, 0, 2048);
-    
-    ssize_t current_bytes;
-    bytes_recieved += current_bytes = frecv(fileno(request_file), clients[n], mesg, 2048, 0);
-    while (current_bytes == 2048) {
-        current_bytes = frecv(fileno(request_file), clients[n], NULL, 2048, 0);
-        bytes_recieved += current_bytes;
-    }
-    
-    int __error = 0;
-    if (bytes_recieved < 0) { // receive error
-        fprintf(stderr, ("recv() error\n"));
-        __error = 1;
-    }
-    else if (bytes_recieved == 0) { // receive socket closed
-        fprintf(stderr, "Client disconnected upexpectedly.\n");
-        __error = 2;
-    }
-    else // message received
-    {
-        reqline[0] = strtok(mesg, " \t");
-        reqline[1] = strtok(NULL, " \t");
-        reqline[2] = strtok(NULL, "\r\n");
-        ip = get_ip_from_fd (clients[n]);
-        printf ("[%s](%s, %s): %d\n", ip, reqline[0], reqline[1], (int)getpid());
-
-        fflush(stdout);
-        // Create buffs to redirect STDOUT and STDERR
-        stdout_b = dup (STDOUT_FILENO);
-        stderr_b = dup (STDERR_FILENO);
-        dup2(clients[n], STDOUT_FILENO);
-        dup2(clients[n], STDERR_FILENO);
-        close(clients[n]);
-        clients[n] = 1;
-        fflush(stdout);
-        if (reqline[2] == NULL) {
-            res = BAD_REQUEST;
-            rsend (clients[n], BAD_REQUEST);
-            reqline[0] = "\0"; // Make sure that the request doesn't continue
-        }
-        if (strncmp(reqline[0], "GET", 3) == 0) {
-            if (strncmp(reqline[2], "HTTP/1.0", 8) != 0 && strncmp(reqline[2], "HTTP/1.1", 8) != 0) {
-                rsend (clients[n], BAD_REQUEST);
-                res = BAD_REQUEST;
-            }
-            else {
-                if (strncmp(reqline[1], "/\0", 2) == 0)
-                    reqline[1] = "";
-
-                char *ip = get_ip_from_fd (clients[n]);
-                int sc_no = get_client_from_ip (m_man, ip);
-                if (sc_no < 0) {
-                    rsend (clients[n], FORBIDDEN);
-                    res = FORBIDDEN;
-                }
-                else {
-                    sprintf (path, "%s/%s/autogentoo/pkg/%s", m_man->root, m_man->clients[sc_no].id, reqline[1]);
-                    int fd, bytes_read, data_to_send;
-                    if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
-                    {
-                        rsend (clients[n], OK);
-                        res = OK;
-                        send (clients[n], "\n", 1, 0);
-                        while ((bytes_read = read(fd, (void*)&data_to_send, sizeof(data_to_send))) > 0)
-                            write(clients[n], (void*)&data_to_send, bytes_read);
-                    }
-                    else {
-                        rsend (clients[n], NOT_FOUND);
-                        res = NOT_FOUND;
-                    }
-                }
-            }
-        }
-        else if (strncmp(reqline[0], "CMD\0", 4) == 0) {
-            //int exec_sock = dup(clients[n]);
-            res = exec_method (reqline[1], m_man, reqline[2], ip);
-            rsend (clients[n], res);
-        }
-        else if (strncmp(reqline[0], "SRV\0", 4) == 0) {
-            int l_argc = 0;
-            if (strncmp (reqline[2], "HTTP", 4) != 0) {
-                l_argc = atoi (reqline[2]);
-            }
-            struct link_srv linked = get_link_str (reqline[1]);
-            serve_c rt = linked.command;
-            char *request_opts[32];
-            char sent = 0;
-            
-            int i;
-            for (i=0; i != (l_argc + linked.argc); i++) {
-                request_opts[i] = strtok (NULL, "\n");
-                if (request_opts[i] == NULL) {
-                    rsend (clients[n], BAD_REQUEST);
-                    res = BAD_REQUEST;
-                    sent = 1;
-                    break;
-                }
-            }
-            
-            if (!sent) {
-                res = srv_handle (clients[n], rt, m_man, request_opts, l_argc + linked.argc);
-            }
-        }
-        else if (strncmp(reqline[0], "KERNEL\0", 7) == 0) {
-            
-        }
-    }
-
-    
-    close (STDOUT_FILENO);
-    close (STDERR_FILENO);
-    dup2 (stdout_b, STDOUT_FILENO); // Restore stdout/stderr to terminal
-    dup2 (stderr_b, STDERR_FILENO);
-    
-    fclose (request_file);
-    remove (file_name);
-    
-    clients[n] = b_client;
-    
-    shutdown(
-        clients[n],
-        SHUT_RDWR); // All further send and recieve operations are DISABLED...
-        close(clients[n]);
-
-    printf ("%d: ", (int)getpid());
-    printf ("%d %s\n", res.code, res.message);
-    fflush (stdout);
-    *hang_me = getpid ();
-    *close_me = clients[n];
+void server_bind (Connection* conn, Host** host) {
+    small_map_insert (conn->parent->host_bindings, conn->ip, &host);
 }
 
-void daemonize(char * _cwd)
-{
+void daemonize(char* _cwd) {
     pid_t pid, sid;
     int fd;
 
     /* already a daemon */
-    if ( getppid() == 1 ) return;
+    if (getppid () == 1)
+        return;
 
     /* Fork off the parent process */
-    pid = fork();
-    if (pid < 0)
-    {
+    pid = fork ();
+    if (pid < 0) {
         exit(1);
     }
 
-    if (pid > 0)
-    {
+    if (pid > 0) {
         printf ("Forked to pid: %d\n", (int)pid);
         printf ("Moving to background\n");
-        fflush(stdout);
+        fflush (stdout);
         exit(0); /*Killing the Parent Process*/
     }
 
     /* At this point we are executing as the child process */
 
     /* Create a new SID for the child process */
-    sid = setsid();
-    if (sid < 0)
-    {
+    sid = setsid ();
+    if (sid < 0) {
         exit(1);
     }
 
     /* Change the current working directory. */
-    if ((chdir(_cwd)) < 0)
-    {
+    if ((chdir (_cwd)) < 0) {
         exit(1);
     }
 
 
-    fd = open("/dev/null",O_RDWR, 0);
+    fd = open ("/dev/null",O_RDWR, 0);
 
-    if (fd != -1)
-    {
+    if (fd != -1) {
         dup2 (fd, STDIN_FILENO);
         dup2 (fd, STDOUT_FILENO);
         dup2 (fd, STDERR_FILENO);
 
-        if (fd > 2)
-        {
+        if (fd > 2) {
             close (fd);
         }
     }
 
     /*resettign File Creation Mask */
-    umask(027);
-}
-
-
-void server_main (unsigned daemon, struct manager * m_man) {
-    int slot;
-    struct sockaddr_in clientaddr;
-    socklen_t addrlen;
-    
-    hang_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE,
-        MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    close_me = mmap(NULL, sizeof *hang_me, PROT_READ | PROT_WRITE,
-        MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    
-    int i;
-    for (i=0; i<CONNMAX; i++)
-        clients[i]=-1;
-    server_start("9490");
-
-    printf ("Starting server\n");
-
-    if (daemon) {
-        daemonize (m_man->root);
-    }
-
-    signal(SIGCHLD, child_finished);
-
-    addrlen = sizeof(clientaddr);
-    
-    while (1)
-    {
-        clients[slot] = accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen);
-
-        if ((int)clients[slot] < 0) {
-            error ("accept() error\n");
-            continue;
-        }
-        
-        pid_t res_pid;
-        if ((res_pid = fork ()) == -1)
-            exit (-1);
-        else if (res_pid == 0) {
-            server_respond(slot, m_man);
-            _exit (0);
-        }
-
-        while (clients[slot]!=-1) slot = (slot+1)%CONNMAX;
-    }
+    umask (027);
 }
