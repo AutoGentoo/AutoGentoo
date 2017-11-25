@@ -14,4 +14,4 @@ will be kept separate from the client computer. This means if an update breaks y
 affect your client computer, only the chroot environment on the build server.
 
 ### How it works
-![alt text](https://raw.githubusercontent.com/AutoGentoo/AutoGentoo/dev-2/resources/autogentoo.png)
+![alt text](https://raw.githubusercontent.com/AutoGentoo/AutoGentoo/master/resources/autogentoo.png)
