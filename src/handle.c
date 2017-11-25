@@ -19,8 +19,8 @@ RequestLink requests[] = {
     {"SRV INIT", SRV_INIT},
     {"SRV STAGE1", SRV_STAGE1},
     {"SRV MNTCHROOT", SRV_MNTCHROOT},
-    {"SRV GETHOST", SRV_GETHOST},
     {"SRV GETHOSTS", SRV_GETHOSTS},
+    {"SRV GETHOST", SRV_GETHOST},
     {"SRV GETACTIVE", SRV_GETACTIVE},
     {"SRV GETSPEC", SRV_GETSPEC}
 };
@@ -32,7 +32,7 @@ SHFP parse_request (char* parse_line, char** args) {
         if (strncmp (parse_line, requests[i].request_ident, current_length) == 0) {
             char* temp = parse_line + current_length;
             int j;
-            for (j = 0, args[j] = strtok (temp, " "); args[j] != NULL; j++, args[j] = strtok (NULL, " "));
+            for (j = 0, args[j] = strtok (temp, " \t\n"); args[j] != NULL; j++, args[j] = strtok (NULL, " \t\n"));
             return requests[i].call;
         }
     }
@@ -41,18 +41,22 @@ SHFP parse_request (char* parse_line, char** args) {
 }
 
 response_t GET (Connection* conn, char** args, int start) {
-    if (strncmp(args[1], "HTTP/1.0", 8) != 0 && strncmp(args[1], "HTTP/1.1", 8) != 0) {
+    response_t res;
+    if (strcmp(args[1], "HTTP/1.0") != 0 && strcmp(args[1], "HTTP/1.1") != 0) {
         rsend (conn, BAD_REQUEST);
-        return BAD_REQUEST;
+        res = BAD_REQUEST;
+        res.len = 0;
+        return res;
     }
     
     if (conn->bounded_host == NULL) {
         rsend (conn, FORBIDDEN);
-        return FORBIDDEN;
+        res = FORBIDDEN;
+        res.len = 0;
+        return res;
     }
     
     char path[256];
-    response_t res;
     
     sprintf (path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->binhost.pkgdir, args[0]);
     int fd, bytes_read, data_to_send;
@@ -69,6 +73,7 @@ response_t GET (Connection* conn, char** args, int start) {
         res = NOT_FOUND;
     }
     
+    res.len = 0;
     return res;
 }
 
@@ -95,6 +100,7 @@ int prv_host_edit (Host* host, int argc, StringVector* data) {
     enum {
         HOSTNAME,
         PROFILE,
+        CHOST,
         CFLAGS,
         USE
     };
@@ -103,11 +109,12 @@ int prv_host_edit (Host* host, int argc, StringVector* data) {
         return 1;
     }
     
-    host->hostname = strdup (string_vector_get (data, HOSTNAME));
-    host->profile = strdup (string_vector_get (data, PROFILE));
-    host->makeconf.cflags = strdup (string_vector_get (data, CFLAGS));
+    string_overwrite (&host->hostname, string_vector_get (data, HOSTNAME), 1);
+    string_overwrite (&host->profile, string_vector_get (data, PROFILE), 1);
+    string_overwrite (&host->makeconf.cflags, string_vector_get (data, CFLAGS), 1);
+    string_overwrite (&host->makeconf.chost, string_vector_get (data, CHOST), 1);
     string_overwrite (&host->makeconf.cxxflags, "${CFLAGS}", 1);
-    host->makeconf.use = strdup (string_vector_get (data, USE));
+    string_overwrite (&host->makeconf.use, string_vector_get (data, USE), 1);
     
     if (host->makeconf.extra != NULL) {
         string_vector_free(host->makeconf.extra);
@@ -135,7 +142,11 @@ int prv_host_edit (Host* host, int argc, StringVector* data) {
 
 Host* prv_host_new (Server* server, int argc, StringVector* data) {
     Host* host = host_new (server, host_id_new ());
-    prv_host_edit (host, argc, data);
+    if (prv_host_edit (host, argc, data) == 1) {
+        free (host->id);
+        free (host);
+        return NULL;
+    }
     return host;
 }
 
@@ -157,7 +168,8 @@ response_t SRV_CREATE (Connection* conn, char** args, int start) {
     }
     
     // Added the host and bind it
-    server_bind (conn, vector_get (conn->parent->hosts, vector_add (conn->parent->hosts, &new_host)));
+    vector_add (conn->parent->hosts, &new_host);
+    server_bind (conn, new_host);
     
     write (conn->fd, new_host->id, strlen(new_host->id));
     write (conn->fd, "\n", 1);
@@ -192,27 +204,15 @@ response_t SRV_EDIT (Connection* conn, char** args, int start) {
 }
 
 response_t SRV_ACTIVATE (Connection* conn, char** args, int start) {
-    Host** found = NULL;
-    int i;
-    for (i = 0; i != conn->parent->hosts->n; i++) {
-        Host** c_host = (Host**)vector_get (conn->parent->hosts, i);
-        if (strcmp ((*c_host)->id, args[0]) == 0) {
-            found = c_host;
-            break;
-        }
-    }
+    Host* found = server_host_search(conn->parent, args[0]);
     
     if (found == NULL) {
         return NOT_FOUND;
     }
     
-    if (conn->bounded_host != NULL) { // IP has a binding meaning we dont want to do another
-        Host** to_write = small_map_get (conn->parent->host_bindings, conn->ip);
-        to_write = found;
-    }
-    else {
-        server_bind (conn, found);
-    }
+    server_bind (conn, found);
+    
+    return OK;
 }
 
 response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start) {
@@ -249,18 +249,86 @@ response_t SRV_MNTCHROOT (Connection* conn, char** args, int start) {
     return OK;
 }
 
+void prv_fd_write_str (int fd, char* str) {
+    if (str == NULL) {
+        return;
+    }
+    write (fd, str, strlen(str));
+    write (fd, "\n", 1);
+}
+
 /* SRV Metadata requests */
 response_t SRV_GETHOST (Connection* conn, char** args, int start) {
+    Host* host = server_host_search(conn->parent, args[0]);
+    
+    if (host == NULL) {
+        return NOT_FOUND;
+    }
+    
+    if (host->makeconf.extra != NULL) {
+        char t[8];
+        sprintf (t, "%d", host->makeconf.extra->n);
+        prv_fd_write_str (conn->fd, t);
+    
+    }
+    prv_fd_write_str (conn->fd, host->makeconf.cflags);
+    prv_fd_write_str (conn->fd, host->makeconf.cxxflags);
+    prv_fd_write_str (conn->fd, host->makeconf.chost);
+    prv_fd_write_str (conn->fd, host->hostname);
+    prv_fd_write_str (conn->fd, host->profile);
+    
+    if (host->makeconf.extra != NULL) {
+        int i;
+        for (i = 0; i != host->makeconf.extra->n; i++) {
+            char* current_str = string_vector_get(host->makeconf.extra, i);
+            write (conn->fd, current_str, strlen(current_str));
+            write (conn->fd, "\n", 1);
+        }
+    }
+    
     return OK;
 }
 
 response_t SRV_GETHOSTS (Connection* conn, char** args, int start) {
+    char t[8];
+    sprintf (t, "%d\n", conn->parent->hosts->n);
+    write (conn->fd, t, strlen(t));
+    
+    int i;
+    for (i = 0; i != conn->parent->hosts->n; i++) {
+        char* temp = (*(Host**)vector_get(conn->parent->hosts, i))->id;
+        write (conn->fd, temp, strlen (temp));
+        write (conn->fd, "\n", 1);
+    }
+    
     return OK;
 }
 
 response_t SRV_GETACTIVE (Connection* conn, char** args, int start) {
+    if (conn->bounded_host == NULL) {
+        char* out = "invalid\n";
+        write (conn->fd, out, strlen(out));
+        return OK;
+    }
+    
+    write (conn->fd, conn->bounded_host->id, 16);
+    write (conn->fd, "\n", 1);
+    
     return OK;
 }
 response_t SRV_GETSPEC (Connection* conn, char** args, int start) {
+    system ("lscpu > build.spec");
+    FILE* lspcu_fp = fopen("build.spec", "r");
+    char symbol;
+    if(lspcu_fp != NULL)
+    {
+        while((symbol = getc(lspcu_fp)) != EOF)
+        {
+            write (conn->fd, &symbol, sizeof (char));
+        }
+        fclose(lspcu_fp);
+        remove ("build.spec");
+    }
+    
     return OK;
 }

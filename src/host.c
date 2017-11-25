@@ -6,12 +6,12 @@
 
 host_id host_id_new () {
     int len = 15;
-    host_id out = malloc (len);
+    host_id out = malloc (len + 1);
     
     srandom(time(NULL));  // Correct seeding function for random()
     char c;
     int i;
-    for (i=0; i != len - 1; i++) {
+    for (i=0; i != len; i++) {
         c = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[random () % 62];
         out[i] = c;
     }
@@ -25,7 +25,7 @@ Host* host_new (Server* server, host_id id) {
     out->parent = server;
     out->id = id; // Dont need to dup, never accessed elsewhere
     
-    out->id = NULL;
+    out->hostname = NULL;
     out->profile = NULL;
     out->makeconf.cflags = NULL;
     out->makeconf.cxxflags = NULL;

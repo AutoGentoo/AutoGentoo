@@ -18,14 +18,12 @@
 #include <unistd.h>
 #include <handle.h>
 #include <errno.h>
-
-static Connection** finished_connection;
+#include <pthread.h>
 
 Server* server_new (char* location, char* port, server_t opts) {
     Server* out = malloc (sizeof (Server));
-    out->connections = vector_new (sizeof (Connection*), REMOVE | UNORDERED);
     out->hosts = vector_new (sizeof (Host*), REMOVE | UNORDERED);
-    out->host_bindings = small_map_new(15, 5);
+    out->host_bindings = vector_new (sizeof (HostBind), REMOVE | UNORDERED);
     out->location = strdup (location);
     out->opts = opts;
     strcpy(out->port, port);
@@ -33,29 +31,40 @@ Server* server_new (char* location, char* port, server_t opts) {
     return out;
 }
 
-Connection* connection_new (Server* server, int conn_fd) {
-    if (conn_fd < 0) {
-        lwarning ("accept() error");
-        return NULL;
+Host* server_get_active (Server* server, char* ip) {
+    int i;
+    for (i = 0; i != server->host_bindings->n; i++) {
+        HostBind* current_bind = (HostBind*)vector_get (server->host_bindings, i);
+        if (strcmp ((char*)ip, current_bind->ip) == 0) {
+            return current_bind->host;
+        }
     }
     
-    Connection* out = mmap(NULL, sizeof (Connection), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    return NULL;
+}
+
+HostBind* prv_server_get_active_location (Server* server, char* ip) {
+    int i;
+    for (i = 0; i != server->host_bindings->n; i++) {
+        HostBind* current_bind = (HostBind*)vector_get (server->host_bindings, i);
+        if (strcmp ((char*)ip, current_bind->ip) == 0) {
+            return current_bind;
+        }
+    }
+    
+    return NULL;
+}
+
+Connection* connection_new (Server* server, int conn_fd) {
+    Connection* out = malloc (sizeof (Connection));
     out->parent = server;
     out->fd = conn_fd;
     
     struct sockaddr_in addr;
     socklen_t addr_size = sizeof (struct sockaddr_in);
     int res = getpeername (out->fd, (struct sockaddr*)&addr, &addr_size);
-    out->ip = inet_ntoa(addr.sin_addr);
-    
-    Host** temp = small_map_get (out->parent->host_bindings, out->ip);
-    
-    if (temp != NULL) { // Cant dereference NULL
-        out->bounded_host = *temp;
-    }
-    else {
-        out->bounded_host = NULL;
-    }
+    out->ip = strdup (inet_ntoa(addr.sin_addr));
+    out->bounded_host = server_get_active (out->parent, out->ip);
     
     return out;
 }
@@ -63,8 +72,6 @@ Connection* connection_new (Server* server, int conn_fd) {
 void server_start (Server* server) {
     struct sockaddr_in clientaddr;
     socklen_t addrlen;
-    
-    finished_connection = mmap(NULL, sizeof (Connection*), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     
     int listenfd = server_init(server->port);
 
@@ -74,24 +81,23 @@ void server_start (Server* server) {
         daemonize (server->location);
     }
 
-    signal(SIGCHLD, kill_finished);
-
     addrlen = sizeof(clientaddr);
     
     while (1) { // Main accept loop
-        Connection* current_conn = connection_new (server, accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen));
+        int temp_fd = accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen);
         
-        if (current_conn == NULL)
+        if (temp_fd < 0) {
+            lwarning ("accept() error");
             continue;
+        }
         
-        pid_t res_pid;
-        if ((res_pid = fork ()) == -1)
-            exit (-1);
-        else if (res_pid == 0) {
-            current_conn->pid = getpid();
-            server_respond(current_conn);
-            *finished_connection = current_conn;
-            _exit (0);
+        pthread_t p_pid;
+        
+        Connection* current_conn = connection_new (server, temp_fd);
+        
+        if(pthread_create(&p_pid, NULL, (void* (*)(void*))server_respond, current_conn)) {
+            lerror ("Error creating thread");
+            exit (1);
         }
     }
 }
@@ -156,23 +162,11 @@ void connection_free (Connection* conn) {
     
     free (conn->request);
     free (conn->ip);
-    // Don't unmap here (done in kill_finished)
-}
-
-void kill_finished (int sig) {
-    if ((*finished_connection)->pid > 0) {
-        waitpid ((*finished_connection)->pid, 0, WNOHANG);
-        (*finished_connection)->pid = -1;
-    }
-
-    if ((*finished_connection)->fd > 2) { // Dont close stdout, stdin or stderr
-        close ((*finished_connection)->fd);
-    }
-    
-    munmap (*finished_connection, sizeof(Connection*));
+    free (conn);
 }
 
 void server_respond (Connection* conn) {
+    conn->pid = pthread_self();
     
     /* Read the request */
     conn->request = malloc (2048);
@@ -204,19 +198,54 @@ void server_respond (Connection* conn) {
     
     char* request_line;
     int split_i = strchr (conn->request, '\n') - conn->request;
-    request_line = malloc (split_i);
+    request_line = malloc (split_i + 1);
     strncpy (request_line, conn->request, split_i);
+    request_line [split_i] = 0;
     
     SHFP call = parse_request (request_line, args);
     
-    linfo("handle %s on pid %d (%s)", conn->ip, conn->pid, request_line);
+    linfo("handle %s on pthread_t 0x%llx (%s)", conn->ip, conn->pid, request_line);
     
-    response_t res = (*call) (conn, args, split_i + 1);
-    linfo ("request %d: %s (%d)", conn->pid, res.message, res.code);
+    response_t res;
+    
+    if (call == NULL) {
+        res = BAD_REQUEST;
+    }
+    else {
+        res = (*call) (conn, args, split_i + 1);
+    }
+    
+    free (request_line);
+    
+    if (res.len != 0) {
+        rsend (conn, res);
+    }
+    linfo ("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
+    
+    connection_free(conn);
 }
 
-void server_bind (Connection* conn, Host** host) {
-    small_map_insert (conn->parent->host_bindings, conn->ip, &host);
+void server_bind (Connection* conn, Host* host) {
+    HostBind* loc = prv_server_get_active_location(conn->parent, conn->ip);
+    if (loc == NULL) {
+        HostBind new_binding = {.ip = strdup (conn->ip), .host = host};
+        vector_add (conn->parent->host_bindings, &new_binding);
+    }
+    else {
+        loc->host = host;
+    }
+}
+
+Host* server_host_search (Server* server, host_id id) {
+    int i;
+    for (i = 0; i != server->hosts->n; i++) {
+        Host* current_host = *(Host**)vector_get (server->hosts, i);
+        if (strcmp ((char*)id, current_host->id) == 0) {
+            return current_host;
+        }
+    }
+    
+    return NULL;
 }
 
 void daemonize(char* _cwd) {
@@ -234,8 +263,8 @@ void daemonize(char* _cwd) {
     }
 
     if (pid > 0) {
-        printf ("Forked to pid: %d\n", (int)pid);
-        printf ("Moving to background\n");
+        linfo ("Forked to pid: %d", (int)pid);
+        linfo ("Moving to background");
         fflush (stdout);
         exit(0); /*Killing the Parent Process*/
     }

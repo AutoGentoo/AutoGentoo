@@ -2,11 +2,13 @@
 #define __AUTOGENTOO_SERVER_H__
 
 typedef struct __Server Server;
+typedef struct __HostBind HostBind;
 typedef struct __Connection Connection;
 
 #include <hacksaw/tools.h>
 #include "host.h"
 #include <sys/types.h>
+#include <pthread.h>
 
 typedef enum {
     ASYNC = 0x0,
@@ -24,11 +26,15 @@ typedef enum {
 
 struct __Server {
     char* location;
-    SmallMap* host_bindings;
+    Vector* host_bindings;
     Vector* hosts;
-    Vector* connections;
     char port[5];
     server_t opts;
+};
+
+struct __HostBind {
+    char* ip;
+    Host* host;
 };
 
 struct __Connection {
@@ -37,18 +43,19 @@ struct __Connection {
     char* request;
     char* ip;
     int fd;
-    pid_t pid;
+    pthread_t pid;
     con_t status;
 };
 
 Server* server_new (char* location, char* port, server_t opts);
 Connection* connection_new (Server* server, int conn_fd);
+Host* server_get_active (Server* server, char* ip);
 void server_start (Server* server);
-void server_bind (Connection* conn, Host** host);
+void server_bind (Connection* conn, Host* host);
+Host* server_host_search (Server* server, host_id id);
 int server_init (char* port);
 void server_respond (Connection* conn);
 void connection_free (Connection* conn);
-void kill_finished (int sig);
 void daemonize(char* _cwd);
 
 #endif
