@@ -25,6 +25,7 @@ Server* server_new (char* location, char* port, server_t opts) {
     out->hosts = vector_new (sizeof (Host*), REMOVE | UNORDERED);
     out->host_bindings = vector_new (sizeof (HostBind), REMOVE | UNORDERED);
     out->location = strdup (location);
+    chdir (out->location);
     out->opts = opts;
     strcpy(out->port, port);
     

@@ -11,6 +11,7 @@
 RequestLink requests[] = {
     {"GET", GET},
     {"INSTALL", INSTALL},
+    {"CMD INSTALL", INSTALL},
     {"SRV CREATE", SRV_CREATE},
     //{"SRV DEVCREATE", SRV_DEVCREATE},
     {"SRV EDIT", SRV_EDIT},
@@ -238,7 +239,11 @@ response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start) {
 
 /* SRV Utility request */
 response_t SRV_INIT (Connection* conn, char** args, int start) {
-    return OK;
+    if (conn->bounded_host == NULL) {
+        return FORBIDDEN;
+    }
+    
+    return host_init(conn->bounded_host);
 }
 
 response_t SRV_STAGE1 (Connection* conn, char** args, int start) {

@@ -7,6 +7,11 @@ typedef char* host_id;
 #include "response.h"
 #include "server.h"
 
+typedef enum {
+    _32BIT,
+    _64BIT,
+    _INVALIDBIT
+} arch_t;
 
 typedef enum {
     NOT_INITED,
@@ -59,11 +64,13 @@ struct __Host {
 
 host_id host_id_new ();
 Host* host_new (Server* server, host_id id);
-void host_set_status (Server* server, Host* host);
+void host_set_status (Host* host);
+void host_get_path (Host* host, char* dest);
 void host_free (Host* host);
+arch_t determine_arch (char* chost);
 
 /* System calls */
-void host_write_make_conf (Host* host);
+int host_write_make_conf (Host* host, char* path);
 void host_write (Host* host, int fd); // Write to file fd
 void host_read (Host* host, int fd); // Read from file fd
 

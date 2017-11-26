@@ -1,12 +1,17 @@
 #include <autogentoo.h>
 
 int main (int argc, char** argv) {
-    Server* server = server_new ("/media/autogentoo", "9491", 0);
+    Server* server = server_new (".", "9491", 0);
     
     Host* test;
     
     StringVector* data = string_vector_new();
-    string_vector_split(data, strdup("Kronos\namd64/default\nfda\n-O2 -pipe\n-bindist"), "\n");
+    string_vector_split(data, strdup("\
+Kronos\n\
+default/linux/amd64/13.0/desktop/gnome/systemd\n\
+x86_64-pc-linux-gnu\n\
+-O2 -pipe\n\
+-bindist"), "\n");
     
     test = prv_host_new(server, 0, data);
     linfo ("Created host at %p", test);
