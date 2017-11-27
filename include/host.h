@@ -31,7 +31,6 @@ struct __Host {
     char* profile;
     char* hostname;
     host_t status;
-    chroot_t chroot_status;
     
     // Architecture configuration
     struct {
@@ -43,9 +42,9 @@ struct __Host {
     } makeconf;
     
     struct {
-        char* portage_dir;
+        char* portage_dir; // Usually /usr/portage (mounted with the chroot)
         char* resolv_conf; // Always /etc/resolv.conf
-        char* locale;
+        chroot_t chroot_status;
     } chroot_info;
     
     struct {

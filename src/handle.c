@@ -136,7 +136,7 @@ int prv_host_edit (Host* host, int argc, StringVector* data) {
     
     string_overwrite (&host->chroot_info.portage_dir, "/usr/portage", 1);
     string_overwrite (&host->chroot_info.resolv_conf, "/etc/resolv.conf", 1);
-    string_overwrite (&host->chroot_info.locale, "en_US.utf8", 1);
+    //string_overwrite (&host->chroot_info.locale, "en_US.utf8", 1);
     
     return 0;
 }
@@ -235,6 +235,8 @@ response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start) {
             break; // Two hosts cant have the same id (at least they are not support to...)
         }
     }
+    
+    return OK;
 }
 
 /* SRV Utility request */

@@ -27,6 +27,7 @@
     <File Name="include/host.h"/>
     <File Name="include/server.h"/>
     <File Name="include/Makefile.am"/>
+    <File Name="include/chroot.h"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

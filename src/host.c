@@ -30,6 +30,7 @@ Host* host_new (Server* server, host_id id) {
     out->parent = server;
     out->id = id; // Dont need to dup, never accessed elsewhere
     out->status = NOT_INITED;
+    out->chroot_info.chroot_status = NOT_MOUNTED;
     
     out->hostname = NULL;
     out->profile = NULL;
@@ -40,7 +41,6 @@ Host* host_new (Server* server, host_id id) {
     out->makeconf.extra = NULL;
     out->chroot_info.portage_dir = NULL;
     out->chroot_info.resolv_conf = NULL;
-    out->chroot_info.locale = NULL;
     out->binhost.portage_tmpdir = NULL;
     out->binhost.portdir = NULL;
     out->binhost.distdir = NULL;
@@ -71,7 +71,7 @@ void host_free (Host* host) {
     string_vector_free (host->makeconf.extra);
     free(host->chroot_info.portage_dir);
     free(host->chroot_info.resolv_conf);
-    free(host->chroot_info.locale);
+    //free(host->chroot_info.locale);
     free(host->binhost.portage_tmpdir);
     free(host->binhost.portdir);
     free(host->binhost.distdir);
