@@ -13,6 +13,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="src/writeconfig.c"/>
     <File Name="src/host.c"/>
     <File Name="src/autogentoo.c"/>
     <File Name="src/handle.c"/>
@@ -22,6 +23,7 @@
     <File Name="src/chroot.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="include/writeconfig.h"/>
     <File Name="include/autogentoo.h"/>
     <File Name="include/handle.h"/>
     <File Name="include/response.h"/>

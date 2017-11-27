@@ -183,8 +183,13 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --autounmask-continue\"\n\
     return 0;
 }
 
-void host_write (Host* host, int fd); // Write to file fd
-void host_read (Host* host, int fd); // Read from file fd
+void host_write (Host* host, int fd) {
+    
+}
+
+void host_read (Host* host, int fd) {
+    
+}
 
 /* Request calls */
 void prv_mkdir(const char *dir) {
@@ -304,10 +309,72 @@ response_t host_init (Host* host) {
     return link_return ? INTERNAL_ERROR : OK;
 }
 
-response_t host_stage1_install (Host* host) {
+response_t host_stage1_install (Host* host, char* arg) {
+    String* cmd_full = string_new (128);
+    string_append(cmd_full, "emerge --autounmask-continue --buildpkg --root=\'");
+    string_append(cmd_full, host->parent->location);
+    string_append_c(cmd_full, '/');
+    string_append(cmd_full, host->parent->location);
+    string_append(cmd_full, "\' ");
+    string_append(cmd_full, arg);
     
+    char* args[64];
+    int i;
+    for (i = 0, args[i] = strtok(cmd_full->ptr, " "); args[i] != NULL; i++, args[i] = strtok (NULL, " "));
+    
+    pid_t install_pid = fork ();
+    if (install_pid == 0) {
+        linfo (cmd_full->ptr);
+        linfo ("Starting emerge...");
+        fflush (stdout);
+        
+        execv ("/usr/bin/emerge", args);
+        exit(-1);
+    }
+    
+    int install_ret;
+    waitpid (install_pid, &install_ret, 0); // Wait until finished
+    
+    string_free (cmd_full);
+    
+    return install_ret == 0 ? OK : INTERNAL_ERROR;
 }
 
 response_t host_install (Host* host, char* arg) {
+    String* cmd_full = string_new (128);
+    string_append(cmd_full, "emerge --autounmask-continue --buildpkg ");
+    string_append(cmd_full, arg);
+    
+    char* args[64];
+    int i;
+    for (i = 0, args[i] = strtok(cmd_full->ptr, " "); args[i] != NULL; i++, args[i] = strtok (NULL, " "));
+    
+    pid_t install_pid = fork ();
+    if (install_pid == 0) {
+        char root[256];
+        host_get_path(host, root);
+        if (chdir (root) == -1) {
+            printf ("chdir() failed\n");
+            exit (-1);
+        }
+        if (chroot (root) == -1) {
+            printf ("chroot() failed\n");
+            exit (-1);
+        }
+        
+        linfo (cmd_full->ptr);
+        linfo ("Starting emerge...");
+        fflush (stdout);
+        
+        execv ("/usr/bin/emerge", args);
+        exit(-1);
+    }
+    
+    int install_ret;
+    waitpid (install_pid, &install_ret, 0); // Wait until finished
+    
+    string_free (cmd_full);
+    
+    return install_ret == 0 ? OK : INTERNAL_ERROR;
     
 }

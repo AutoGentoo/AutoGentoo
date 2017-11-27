@@ -75,7 +75,7 @@ void host_read (Host* host, int fd); // Read from file fd
 
 /* Request calls */
 response_t host_init (Host* host);
-response_t host_stage1_install (Host* host);
+response_t host_stage1_install (Host* host, char* arg);
 response_t host_install (Host* host, char* arg);
 
 #endif

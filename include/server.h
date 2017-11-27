@@ -26,10 +26,10 @@ typedef enum {
 
 struct __Server {
     char* location;
-    Vector* host_bindings;
-    Vector* hosts;
-    char port[5];
+    int port;
     server_t opts;
+    Vector* hosts;
+    Vector* host_bindings;
 };
 
 struct __HostBind {
@@ -47,7 +47,7 @@ struct __Connection {
     con_t status;
 };
 
-Server* server_new (char* location, char* port, server_t opts);
+Server* server_new (char* location, int port, server_t opts);
 Connection* connection_new (Server* server, int conn_fd);
 Host* server_get_active (Server* server, char* ip);
 void server_start (Server* server);

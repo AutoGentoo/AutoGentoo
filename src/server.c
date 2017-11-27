@@ -20,14 +20,14 @@
 #include <errno.h>
 #include <pthread.h>
 
-Server* server_new (char* location, char* port, server_t opts) {
+Server* server_new (char* location, int port, server_t opts) {
     Server* out = malloc (sizeof (Server));
     out->hosts = vector_new (sizeof (Host*), REMOVE | UNORDERED);
     out->host_bindings = vector_new (sizeof (HostBind), REMOVE | UNORDERED);
     out->location = strdup (location);
     chdir (out->location);
     out->opts = opts;
-    strcpy(out->port, port);
+    out->port = port;
     
     return out;
 }
@@ -74,9 +74,12 @@ void server_start (Server* server) {
     struct sockaddr_in clientaddr;
     socklen_t addrlen;
     
-    int listenfd = server_init(server->port);
+    char port[5];
+    sprintf (port, "%d", server->port);
+    
+    int listenfd = server_init(port);
 
-    linfo("Server started on port %s", server->port);
+    linfo("Server started on port %d", server->port);
 
     if (server->opts & DAEMON) {
         daemonize (server->location);

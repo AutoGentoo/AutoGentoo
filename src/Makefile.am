@@ -5,7 +5,9 @@ lib_LTLIBRARIES = libautogentoo.la
 libautogentoo_la_SOURCES =  handle.c \
                             response.c \
                             server.c \
-                            host.c
+                            host.c \
+                            chroot.c \
+                            writeconfig.c
 libautogentoo_la_CFLAGS = ${AM_CFLAGS}
 libautogentoo_la_LDFLAGS = -version-info 0
 

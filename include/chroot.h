@@ -1,6 +1,8 @@
 #ifndef __AUTOGENTOO_CHROOT_H__
 #define __AUTOGENTOO_CHROOT_H__
 
+#include "host.h"
+
 typedef struct __Chroot Chroot;
 typedef struct __ChrootMount ChrootMount;
 
@@ -10,7 +12,7 @@ typedef enum {
 } mount_t;
 
 typedef enum {
-    FAILED = 0x0,
+    MNT_FAILED = 0x0,
     PORTAGE = 0x1,
     SYS = 0x2,
     DEV = 0x4,
@@ -28,9 +30,8 @@ struct __ChrootMount {
     char* dest;
     char* type; // NULL for default
     mount_t opts;
-}
+};
 
-response_t enter (Chroot* chroot, (response_t*)(void*));
 Chroot* chroot_new (Host* parent);
 mounts_t chroot_mount (Chroot* chroot);
 

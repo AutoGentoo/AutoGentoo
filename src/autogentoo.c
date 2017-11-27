@@ -1,7 +1,7 @@
 #include <autogentoo.h>
 
 int main (int argc, char** argv) {
-    Server* server = server_new (".", "9491", 0);
+    Server* server = server_new (".", 9491, 0);
     
     Host* test;
     
