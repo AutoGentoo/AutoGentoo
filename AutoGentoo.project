@@ -19,6 +19,7 @@
     <File Name="src/response.c"/>
     <File Name="src/server.c"/>
     <File Name="src/Makefile.am"/>
+    <File Name="src/chroot.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
     <File Name="include/autogentoo.h"/>
