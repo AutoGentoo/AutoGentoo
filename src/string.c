@@ -75,3 +75,18 @@ void string_overwrite (char** dest, char* src, int dup) {
         *dest = src;
     }
 }
+
+char* string_join (char** src, char* delim, int n) {
+    String* buff = string_new (strlen(src[0]));
+    
+    int i;
+    for (i = 0; i != n; i++) {
+        string_append (buff, src[i]);
+        string_append (buff, delim);
+    }
+    
+    char* out = buff->ptr;
+    
+    free (buff);
+    return out;
+}
