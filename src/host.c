@@ -337,23 +337,39 @@ response_t host_stage1_install (Host* host, char* arg) {
 
 response_t host_install (Host* host, char* arg) {
     String* cmd_full = string_new (128);
+    
+    char* new_line;
+    if ((new_line = strchr (arg, '\n')) != NULL) {
+        *new_line = 0;
+    }
+    
     string_append(cmd_full, "emerge --autounmask-continue --buildpkg ");
     string_append(cmd_full, arg);
     
-    char* args[64];
-    int i;
-    for (i = 0, args[i] = strtok(cmd_full->ptr, " "); args[i] != NULL; i++, args[i] = strtok (NULL, " "));
+    
+    StringVector* args = string_vector_new ();
+    char* temp = strdup ((char*)cmd_full->ptr);
+    
+    string_vector_split (args, temp, " ");
+    
+    if (string_vector_get(args, args->n - 1) != NULL) {
+        if (args->n + 1 == args->s) {
+            vector_allocate(args);
+        }
+        ((char**)args->ptr)[args->n] = NULL;
+        args->n++;
+    }
     
     pid_t install_pid = fork ();
     if (install_pid == 0) {
         char root[256];
         host_get_path(host, root);
         if (chdir (root) == -1) {
-            printf ("chdir() failed\n");
+            lerror ("chdir() failed");
             exit (-1);
         }
         if (chroot (root) == -1) {
-            printf ("chroot() failed\n");
+            lerror ("chroot() failed");
             exit (-1);
         }
         
@@ -361,7 +377,7 @@ response_t host_install (Host* host, char* arg) {
         linfo ("Starting emerge...");
         fflush (stdout);
         
-        execv ("/usr/bin/emerge", args);
+        execv ("/usr/bin/emerge", args->ptr);
         exit(-1);
     }
     

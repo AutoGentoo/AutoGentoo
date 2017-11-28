@@ -43,13 +43,15 @@ response_t chroot_mount (Host* host) {
         fix_path (dest_temp);
         
         if (string_find (mounted->ptr, dest_temp, mounted->n) == -1) {
+            /*
             if (mount (mnt.src, dest_temp, mnt.type, mnt.opts, NULL) == -1) {
                 lerror ("Failed to mount %s", dest_temp);
                 string_vector_free (mounted);
                 free (dest_temp);
                 host->chroot_status = CHR_NOT_MOUNTED;
                 return INTERNAL_ERROR;
-            }
+            }*/
+            lwarning ("mounting %s to %s", mnt.src, dest_temp);
         }
         free (dest_temp);
     }

@@ -71,10 +71,6 @@ Server* read_server (char* location) {
     int opts = read_int (fp);
     int port = read_int (fp);
     
-    lwarning ("location = %s", new_location);
-    lwarning ("opts = %d", opts);
-    lwarning ("port = %d", port);
-    
     Server* out = server_new (new_location, port, opts);
     free (new_location);
     

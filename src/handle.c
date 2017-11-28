@@ -86,15 +86,12 @@ response_t INSTALL (Connection* conn, char** args, int start) {
         return FORBIDDEN;
     }
     
-    String* arg = string_new (32);
-    int i;
-    for (i = 0; i != sizeof(args) / sizeof(args[0]); string_append (arg, args[i]), i++);
+    if ((conn->request + start)[0] == 0) {
+        return BAD_REQUEST;
+    }
     
-    response_t res;
-    //= host_install (conn->bounded_host, arg->ptr);
-    rsend (conn, res);
+    response_t res = host_install (conn->bounded_host, conn->request + start);
     
-    string_free (arg);
     return res;
 }
 
