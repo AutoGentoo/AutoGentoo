@@ -1,7 +1,7 @@
 #include <autogentoo.h>
 
 int main (int argc, char** argv) {
-    Server* server = server_new (".", 9491, 0);
+    /*Server* server = server_new (".", 9491, 0);
     
     Host* test;
     
@@ -27,7 +27,11 @@ int main (int argc, char** argv) {
     temp.ip = "192.168.1.160";
     temp.parent = server;
     temp.bounded_host = NULL;
+    
     server_bind (&temp, test);
+    write_server(server);*/
+    
+    Server* server = read_server (".");
     
     server_start (server);
 }

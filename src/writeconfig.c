@@ -10,8 +10,10 @@ void write_server (Server* server) {
     char* config_file = malloc (strlen (server->location) + strlen(config_file_name) + 2);
     sprintf (config_file, "%s/%s", server->location, config_file_name);
     
-    FILE* to_write = fopen (config_file, "wb");
+    FILE* to_write = fopen (config_file, "wb+");
     write_server_fp (server, to_write);
+    
+    fclose (to_write);
 }
 
 void write_server_fp (Server* server, FILE* fp) {
@@ -26,7 +28,7 @@ void write_server_fp (Server* server, FILE* fp) {
     }
     write_int (server->host_bindings->n, fp);
     for (i = 0; i != server->host_bindings->n; i++) {
-        write_host_binding_fp (*(HostBind**)vector_get (server->host_bindings, i), fp);
+        write_host_binding_fp ((HostBind*)vector_get (server->host_bindings, i), fp);
     }
 }
 void write_host_fp (Host* host, FILE* fp) {
@@ -68,7 +70,12 @@ Server* read_server (char* location) {
     char* new_location = read_string (fp);
     int opts = read_int (fp);
     int port = read_int (fp);
-    Server* out = server_new (new_location, opts, port);
+    
+    lwarning ("location = %s", new_location);
+    lwarning ("opts = %d", opts);
+    lwarning ("port = %d", port);
+    
+    Server* out = server_new (new_location, port, opts);
     free (new_location);
     
     int n, i;
@@ -85,6 +92,8 @@ Server* read_server (char* location) {
         read_host_binding (out, &temp, fp);
         vector_add (out->host_bindings, &temp);
     }
+    
+    fclose (fp);
     
     return out;
 }
@@ -137,9 +146,9 @@ char* read_string (FILE* fp) {
     char c;
     int i;
     for (i = 0, c = fgetc (fp); c != 0; i++, c = fgetc(fp));
-    fseek (fp, -i, SEEK_CUR);
+    fseek (fp, -i - 1, SEEK_CUR);
     char* out = malloc (i + 1);
-    fread (out, 1, i, fp);
+    fread (out, 1, i + 1, fp);
     
     return out;
 }

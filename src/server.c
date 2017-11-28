@@ -19,6 +19,7 @@
 #include <handle.h>
 #include <errno.h>
 #include <pthread.h>
+#include "writeconfig.h"
 
 Server* server_new (char* location, int port, server_t opts) {
     Server* out = malloc (sizeof (Server));
@@ -225,6 +226,7 @@ void server_respond (Connection* conn) {
         rsend (conn, res);
     }
     linfo ("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
+    write_server(conn->parent);
     
     connection_free(conn);
 }
