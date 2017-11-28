@@ -21,8 +21,8 @@ typedef enum {
 } host_t;
 
 typedef enum {
-    NOT_MOUNTED,
-    MOUNTED
+    CHR_NOT_MOUNTED,
+    CHR_MOUNTED
 } chroot_t;
 
 struct __Host {
@@ -31,6 +31,7 @@ struct __Host {
     char* profile;
     char* hostname;
     host_t status;
+    chroot_t chroot_status;
     
     // Architecture configuration
     struct {
@@ -40,12 +41,6 @@ struct __Host {
         char* use;
         StringVector* extra;
     } makeconf;
-    
-    struct {
-        char* portage_dir; // Usually /usr/portage (mounted with the chroot)
-        char* resolv_conf; // Always /etc/resolv.conf
-        chroot_t chroot_status;
-    } chroot_info;
     
     struct {
         char* portage_tmpdir; // build dir

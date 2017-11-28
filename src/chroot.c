@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <mntent.h>
+#include "host.h"
 
 void prv_get_mounted (StringVector* dest) {
     struct mntent* fs;
@@ -46,6 +47,7 @@ response_t chroot_mount (Host* host) {
                 lerror ("Failed to mount %s", dest_temp);
                 string_vector_free (mounted);
                 free (dest_temp);
+                host->chroot_status = CHR_NOT_MOUNTED;
                 return INTERNAL_ERROR;
             }
         }
@@ -53,5 +55,6 @@ response_t chroot_mount (Host* host) {
     }
     
     string_vector_free (mounted);
+    host->chroot_status = CHR_MOUNTED;
     return OK;
 }

@@ -32,7 +32,7 @@ void write_server_fp (Server* server, FILE* fp) {
 void write_host_fp (Host* host, FILE* fp) {
     write_string (host->id, fp);
     write_int (host->status, fp);
-    write_int (host->chroot_info.chroot_status, fp);
+    write_int (CHR_NOT_MOUNTED, fp); // What if system restarted (might as well assume unmounted)
     
     write_string (host->hostname, fp);
     write_string (host->profile, fp);
@@ -48,8 +48,6 @@ void write_host_fp (Host* host, FILE* fp) {
         write_string (string_vector_get (host->makeconf.extra, i), fp);
     }
     
-    write_string (host->chroot_info.portage_dir, fp);
-    write_string (host->chroot_info.resolv_conf, fp);
     write_string (host->binhost.portage_tmpdir, fp);
     write_string (host->binhost.portdir, fp);
     write_string (host->binhost.distdir, fp);
@@ -96,7 +94,7 @@ Host* read_host (FILE* fp) {
     
     out->id = read_string (fp);
     out->status = read_int (fp);
-    out->chroot_info.chroot_status = read_int (fp);
+    out->chroot_status = read_int (fp);
     
     out->hostname = read_string (fp);
     out->profile = read_string (fp);
@@ -114,8 +112,6 @@ Host* read_host (FILE* fp) {
         free (temp);
     }
     
-    out->chroot_info.portage_dir = read_string (fp);
-    out->chroot_info.resolv_conf = read_string (fp);
     out->binhost.portage_tmpdir = read_string (fp);
     out->binhost.portdir = read_string (fp);
     out->binhost.distdir = read_string (fp);

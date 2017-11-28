@@ -136,10 +136,6 @@ int prv_host_edit (Host* host, int argc, StringVector* data) {
     string_overwrite (&host->binhost.pkgdir, "/autogentoo/pkg", 1);
     string_overwrite (&host->binhost.port_logdir, "/autogentoo/log", 1);
     
-    string_overwrite (&host->chroot_info.portage_dir, "/usr/portage", 1);
-    string_overwrite (&host->chroot_info.resolv_conf, "/etc/resolv.conf", 1);
-    //string_overwrite (&host->chroot_info.locale, "en_US.utf8", 1);
-    
     return 0;
 }
 
