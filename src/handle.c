@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "server.h"
 #include "handle.h"
+#include "chroot.h"
+#include "host.h"
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -253,7 +255,11 @@ response_t SRV_STAGE1 (Connection* conn, char** args, int start) {
 }
 
 response_t SRV_MNTCHROOT (Connection* conn, char** args, int start) {
-    return OK;
+    if (conn->bounded_host == NULL) {
+        return FORBIDDEN;
+    }
+    
+    return chroot_mount(conn->bounded_host);
 }
 
 void prv_fd_write_str (int fd, char* str) {

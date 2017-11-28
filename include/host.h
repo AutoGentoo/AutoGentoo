@@ -55,10 +55,7 @@ struct __Host {
         char* port_logdir; // logs
     } binhost;
     
-    /*
-    Chroot* chroot;
-    Kernel* kernel;
-    */
+    //Kernel* kernel;
 };
 
 host_id host_id_new ();
