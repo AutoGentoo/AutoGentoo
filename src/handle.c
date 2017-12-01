@@ -244,6 +244,35 @@ response_t SRV_INIT (Connection* conn, char** args, int start) {
 }
 
 response_t SRV_STAGE1 (Connection* conn, char** args, int start) {
+    if (conn->bounded_host == NULL) {
+        return FORBIDDEN;
+    }
+    
+    StringVector* packages = string_vector_new ();
+    
+    char* line;
+    string_vector_add (packages, "-e");
+    
+    FILE* fp = fopen ("/usr/portage/profiles/default/linux/packages.build", "r");
+    
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        char *pos;
+        if ((pos=strchr(line, '\n')) != NULL)
+            *pos = '\0';
+        if (line[0] == '#' || line[0] == '\n' || strcmp (line, "") == 0) {
+            continue;
+        }
+        
+        string_vector_add (packages, line);
+    }
+    
+    fclose (fp);
+    char* emerge_args = string_join (packages->ptr, " ", packages->n);
+    printf ("%s\n", emerge_args);
+    string_vector_free (packages);
+    free (emerge_args);
+    fclose (fp);
+    
     return OK;
 }
 

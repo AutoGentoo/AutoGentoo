@@ -67,6 +67,9 @@ Server* read_server (char* location) {
     sprintf (config_file, "%s/%s", location, config_file_name);
     
     FILE* fp = fopen (config_file, "rb");
+    if (fp == NULL) {
+        return server_new (location, 9491, 0);
+    }
     char* new_location = read_string (fp);
     int opts = read_int (fp);
     int port = read_int (fp);

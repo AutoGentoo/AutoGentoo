@@ -108,7 +108,6 @@ arch_t determine_arch (char* chost) {
     return _INVALIDBIT;
 }
 
-/* System calls */
 int host_write_make_conf (Host* host, char* path) {
     char cbuild[64];
     FILE* cbuild_stream = popen ("gcc -dumpmachine", "r");
@@ -176,14 +175,6 @@ EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --autounmask-continue\"\n\
     fclose(fp_mc);
     
     return 0;
-}
-
-void host_write (Host* host, int fd) {
-    
-}
-
-void host_read (Host* host, int fd) {
-    
 }
 
 /* Request calls */

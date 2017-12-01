@@ -59,11 +59,7 @@ void host_set_status (Host* host);
 void host_get_path (Host* host, char* dest);
 void host_free (Host* host);
 arch_t determine_arch (char* chost);
-
-/* System calls */
 int host_write_make_conf (Host* host, char* path);
-void host_write (Host* host, int fd); // Write to file fd
-void host_read (Host* host, int fd); // Read from file fd
 
 /* Request calls */
 response_t host_init (Host* host);
