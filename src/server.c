@@ -90,18 +90,22 @@ void server_start (Server* server) {
     
     while (1) { // Main accept loop
         int temp_fd = accept (listenfd, (struct sockaddr *) &clientaddr, &addrlen);
-        
-        if (temp_fd < 0) {
+        if (temp_fd < 3) {
             lwarning ("accept() error");
+            continue;
+        }
+        if (fcntl(temp_fd, F_GETFD) == -1 || errno == EBADF) {
+            lwarning("Bad fd on accept()");
+            fflush (stdout);
             continue;
         }
         
         pthread_t p_pid;
         
         Connection* current_conn = connection_new (server, temp_fd);
-        
         if(pthread_create(&p_pid, NULL, (void* (*)(void*))server_respond, current_conn)) {
             lerror ("Error creating thread");
+            fflush (stdout);
             exit (1);
         }
     }
@@ -161,7 +165,9 @@ int server_init (char* port) {
 void connection_free (Connection* conn) {
     if (conn->status != CLOSED) {
         shutdown(conn->fd, SHUT_RDWR);
-        close(conn->fd);
+        if (fcntl(conn->fd, F_GETFD) != -1 || errno != EBADF) {
+            close(conn->fd);
+        }
         conn->status = CLOSED;
     }
     

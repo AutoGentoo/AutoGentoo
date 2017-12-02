@@ -105,7 +105,7 @@ int prv_host_edit (Host* host, int argc, StringVector* data) {
         USE
     };
     
-    if (data->n != USE + 1 + argc) {
+    if (data->n < USE + 1 + argc) {
         return 1;
     }
     
@@ -181,12 +181,11 @@ response_t SRV_EDIT (Connection* conn, char** args, int start) {
         sscanf (args[0], "%d", &argc);
     }
     
-    char id_to_edit[15];
-    int i_split = strchr (conn->request, '\n') - conn->request;
-    strncpy (id_to_edit, conn->request, i_split);
+    char id_to_edit[16];
+    int i_split = strchr (conn->request + start, '\n') - (conn->request + start);
+    strncpy (id_to_edit, conn->request + start, i_split);
     
     char* request = conn->request + start + i_split + 1;
-    
     StringVector* data = string_vector_new ();
     string_vector_split (data, request, "\n");
     
@@ -250,11 +249,14 @@ response_t SRV_STAGE1 (Connection* conn, char** args, int start) {
     
     StringVector* packages = string_vector_new ();
     
-    char* line;
+    char line[256];
     string_vector_add (packages, "-e");
     
     FILE* fp = fopen ("/usr/portage/profiles/default/linux/packages.build", "r");
-    
+    if (fp == NULL) {
+        lerror ("failed to open: /usr/portage/profiles/default/linux/packages.build");
+        return INTERNAL_ERROR;
+    }
     while (fgets(line, sizeof(line), fp) != NULL) {
         char *pos;
         if ((pos=strchr(line, '\n')) != NULL)
@@ -266,9 +268,8 @@ response_t SRV_STAGE1 (Connection* conn, char** args, int start) {
         string_vector_add (packages, line);
     }
     
-    fclose (fp);
     char* emerge_args = string_join (packages->ptr, " ", packages->n);
-    printf ("%s\n", emerge_args);
+    host_stage1_install(conn->bounded_host, emerge_args);
     string_vector_free (packages);
     free (emerge_args);
     fclose (fp);
@@ -309,6 +310,7 @@ response_t SRV_GETHOST (Connection* conn, char** args, int start) {
     prv_fd_write_str (conn->fd, host->makeconf.cflags);
     prv_fd_write_str (conn->fd, host->makeconf.cxxflags);
     prv_fd_write_str (conn->fd, host->makeconf.chost);
+    prv_fd_write_str (conn->fd, host->makeconf.use);
     prv_fd_write_str (conn->fd, host->hostname);
     prv_fd_write_str (conn->fd, host->profile);
     
@@ -346,7 +348,7 @@ response_t SRV_GETACTIVE (Connection* conn, char** args, int start) {
         return OK;
     }
     
-    write (conn->fd, conn->bounded_host->id, 16);
+    write (conn->fd, conn->bounded_host->id, strlen(conn->bounded_host->id));
     write (conn->fd, "\n", 1);
     
     return OK;
@@ -355,15 +357,13 @@ response_t SRV_GETSPEC (Connection* conn, char** args, int start) {
     system ("lscpu > build.spec");
     FILE* lspcu_fp = fopen("build.spec", "r");
     char symbol;
-    if(lspcu_fp != NULL)
-    {
-        while((symbol = getc(lspcu_fp)) != EOF)
-        {
+    if(lspcu_fp != NULL) {
+        while((symbol = getc(lspcu_fp)) != EOF) {
             write (conn->fd, &symbol, sizeof (char));
         }
         fclose(lspcu_fp);
-        remove ("build.spec");
     }
+    remove ("build.spec");
     
     return OK;
 }

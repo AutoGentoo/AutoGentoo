@@ -300,9 +300,11 @@ response_t host_stage1_install (Host* host, char* arg) {
     string_append(cmd_full, "emerge --autounmask-continue --buildpkg --root=\'");
     string_append(cmd_full, host->parent->location);
     string_append_c(cmd_full, '/');
-    string_append(cmd_full, host->parent->location);
+    string_append(cmd_full, host->id);
     string_append(cmd_full, "\' ");
     string_append(cmd_full, arg);
+    
+    printf ("%s\n", cmd_full->ptr);
     
     char* args[64];
     int i;
@@ -310,7 +312,6 @@ response_t host_stage1_install (Host* host, char* arg) {
     
     pid_t install_pid = fork ();
     if (install_pid == 0) {
-        linfo (cmd_full->ptr);
         linfo ("Starting emerge...");
         fflush (stdout);
         
@@ -375,6 +376,7 @@ response_t host_install (Host* host, char* arg) {
     int install_ret;
     waitpid (install_pid, &install_ret, 0); // Wait until finished
     
+    string_vector_free (args);
     string_free (cmd_full);
     
     return install_ret == 0 ? OK : INTERNAL_ERROR;
