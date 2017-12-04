@@ -235,6 +235,8 @@ void server_respond (Connection* conn) {
     write_server(conn->parent);
     
     connection_free(conn);
+    printf ("freed\n");
+    fflush(stdout);
 }
 
 void server_bind (Connection* conn, Host* host) {

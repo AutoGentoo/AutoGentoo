@@ -41,6 +41,7 @@ void write_host_fp (Host* host, FILE* fp) {
     write_string (host->makeconf.cflags, fp);
     write_string (host->makeconf.cxxflags, fp);
     write_string (host->makeconf.use, fp);
+    write_string (host->makeconf.arch, fp);
     write_string (host->makeconf.chost, fp);
     
     write_int (host->makeconf.extra->n, fp);
@@ -109,6 +110,7 @@ Host* read_host (FILE* fp) {
     out->makeconf.cflags = read_string (fp);
     out->makeconf.cxxflags = read_string (fp);
     out->makeconf.use = read_string (fp);
+    out->makeconf.arch = read_string (fp);
     out->makeconf.chost = read_string (fp);
     
     out->makeconf.extra = string_vector_new ();

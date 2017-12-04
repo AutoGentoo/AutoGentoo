@@ -2,6 +2,7 @@
 #define __AUTOGENTOO_HOST_H__
 
 typedef struct __Host Host;
+typedef struct __HostTemplate HostTemplate;
 typedef char* host_id;
 
 #include "response.h"
@@ -25,6 +26,24 @@ typedef enum {
     CHR_MOUNTED
 } chroot_t;
 
+typedef enum {
+    CXXFLAGS = 0x01,
+    TMPDIR = 0x02,
+    PORTDIR = 0x04,
+    DISTDIR = 0x08,
+    PKGDIR = 0x10,
+    LOGDIR = 0x20
+} template_selects;
+
+struct __HostTemplate {
+    char* id;
+    char* arch;
+    char* cflags;
+    char* chost;
+    char** make_extras;
+    template_selects select;
+};
+
 struct __Host {
     Server* parent;
     host_id id;
@@ -37,6 +56,7 @@ struct __Host {
     struct {
         char* cflags;
         char* cxxflags;
+        char* arch;
         char* chost;
         char* use;
         StringVector* extra;
@@ -63,7 +83,8 @@ int host_write_make_conf (Host* host, char* path);
 
 /* Request calls */
 response_t host_init (Host* host);
-response_t host_stage1_install (Host* host, char* arg);
+response_t host_stage3 (Host* host);
+//response_t host_stage1_install (Host* host, char* arg);
 response_t host_install (Host* host, char* arg);
 
 #endif

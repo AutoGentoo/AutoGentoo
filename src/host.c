@@ -9,6 +9,19 @@
 #include <errno.h>
 #include <limits.h>
 
+HostTemplate host_templates[] = {
+    {"alpha", "alpha", "-mieee -pipe -O2 -mcpu=ev4", "alpha-unknown-linux-gnu", {"PORTDIR=\"/space/catalyst/portage\""}, PORTDIR},
+    {"amd64", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", {"CPU_FLAGS_X86=\"mmx sse sse2\""}, 0},
+    {"armv4tl", "arm", ""}
+    {"armv5tel", "arm"}
+    {"armv6j", "arm"}
+    {"armv6j_hardfp", "arm"}
+    {"armv7a", "arm"}
+    {"armv7a_hardfp", "arm", "-O2 -pipe -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard", "armv7a-hardfloat-linux-gnueabi", NULL, 0}
+    {"arm64", "-O2 -pipe", "aarch64-unknown-linux-gnu", NULL, 0},
+    {"hppa", "-O2 -pipe -march=1.1", "hppa1.1-unknown-linux-gnu", {"CXXFLAGS=\"-O2 -pipe\""}, CXXFLAGS},
+}
+
 host_id host_id_new () {
     int len = 15;
     host_id out = malloc (len + 1);
@@ -294,10 +307,14 @@ response_t host_init (Host* host) {
     
     return link_return ? INTERNAL_ERROR : OK;
 }
-
+/*
 response_t host_stage1_install (Host* host, char* arg) {
     String* cmd_full = string_new (128);
     string_append(cmd_full, "emerge --autounmask-continue --buildpkg --root=\'");
+    string_append(cmd_full, host->parent->location);
+    string_append_c(cmd_full, '/');
+    string_append(cmd_full, host->id);
+    string_append(cmd_full, "\' --config-root=\'");
     string_append(cmd_full, host->parent->location);
     string_append_c(cmd_full, '/');
     string_append(cmd_full, host->id);
@@ -325,7 +342,7 @@ response_t host_stage1_install (Host* host, char* arg) {
     string_free (cmd_full);
     
     return install_ret == 0 ? OK : INTERNAL_ERROR;
-}
+}*/
 
 response_t host_install (Host* host, char* arg) {
     String* cmd_full = string_new (128);
