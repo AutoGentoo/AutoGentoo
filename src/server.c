@@ -5,7 +5,6 @@
 #include <sys/socket.h>
 #include <sys/mman.h>
 #include <string.h>
-#include <sys/sysinfo.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
