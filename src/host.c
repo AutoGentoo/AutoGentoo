@@ -9,19 +9,6 @@
 #include <errno.h>
 #include <limits.h>
 
-HostTemplate host_templates[] = {
-    {"alpha", "alpha", "-mieee -pipe -O2 -mcpu=ev4", "alpha-unknown-linux-gnu", {"PORTDIR=\"/space/catalyst/portage\""}, PORTDIR},
-    {"amd64", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", {"CPU_FLAGS_X86=\"mmx sse sse2\""}, 0},
-    {"armv4tl", "arm", ""},
-    {"armv5tel", "arm"},
-    {"armv6j", "arm"},
-    {"armv6j_hardfp", "arm"},
-    {"armv7a", "arm"},
-    {"armv7a_hardfp", "arm", "-O2 -pipe -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard", "armv7a-hardfloat-linux-gnueabi", NULL, 0},
-    {"arm64", "-O2 -pipe", "aarch64-unknown-linux-gnu", NULL, 0},
-    {"hppa", "-O2 -pipe -march=1.1", "hppa1.1-unknown-linux-gnu", {"CXXFLAGS=\"-O2 -pipe\""}, CXXFLAGS},
-};
-
 host_id host_id_new () {
     int len = 15;
     host_id out = malloc (len + 1);

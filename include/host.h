@@ -2,7 +2,6 @@
 #define __AUTOGENTOO_HOST_H__
 
 typedef struct __Host Host;
-typedef struct __HostTemplate HostTemplate;
 typedef char* host_id;
 
 #include "response.h"
@@ -25,24 +24,6 @@ typedef enum {
     CHR_NOT_MOUNTED,
     CHR_MOUNTED
 } chroot_t;
-
-typedef enum {
-    CXXFLAGS = 0x01,
-    TMPDIR = 0x02,
-    PORTDIR = 0x04,
-    DISTDIR = 0x08,
-    PKGDIR = 0x10,
-    LOGDIR = 0x20
-} template_selects;
-
-struct __HostTemplate {
-    char* id;
-    char* arch;
-    char* cflags;
-    char* chost;
-    char** make_extras;
-    template_selects select;
-};
 
 struct __Host {
     Server* parent;

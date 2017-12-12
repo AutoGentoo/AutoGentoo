@@ -5,4 +5,5 @@ maininclude_HEADERS =   autogentoo.h \
                         response.h \
                         server.h \
                         writeconfig.h \
-                        chroot.h
+                        chroot.h \
+                        stage.h
