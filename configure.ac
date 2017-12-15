@@ -14,7 +14,9 @@ AC_CHECK_HEADERS([archive.h archive_entry.h], [], [
     AC_MSG_ERROR(["Missing libarchive headers"])
 ])
 
-AC_CHECK_LIB([archive], [])
+AC_CHECK_LIB([archive], [archive_read_new], [], [
+    AC_MSG_ERROR(["libarchive could not be found"])
+])
 
 AC_CHECK_LIB([hacksaw-tools], [vector_new])
 AC_CHECK_LIB([hacksaw-tools], [string_vector_new])

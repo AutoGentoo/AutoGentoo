@@ -8,6 +8,26 @@
 #include <archive.h>
 #include <archive_entry.h>
 
+static int prv_copy_data (struct archive *ar, struct archive *aw) {
+    int r;
+    const void *buff;
+    size_t size;
+    la_int64_t offset;
+
+    for (;;) {
+        r = archive_read_data_block(ar, &buff, &size, &offset);
+        if (r == ARCHIVE_EOF)
+            return (ARCHIVE_OK);
+        if (r < ARCHIVE_OK)
+            return (r);
+        r = archive_write_data_block(aw, buff, size, offset);
+        if (r < ARCHIVE_OK) {
+        fprintf(stderr, "%s\n", archive_error_string(aw));
+            return (r);
+        }
+    }
+}
+
 response_t prv_extract_stage3 (HostTemplate* t) {
     char fname[256];
     sprintf (fname, "%s/distfiles/stage3-%s.tar.bz2", t->parent->location, t->id);
@@ -16,38 +36,56 @@ response_t prv_extract_stage3 (HostTemplate* t) {
         lerror ("distfile 'stage3-%s.tar.bz2' does not exist (please download)", t->id);
         return INTERNAL_ERROR;
     }
-    
+
+    struct archive *a;
+    struct archive *ext;
+    struct archive_entry *entry;
+    int flags;
     int r;
-    ssize_t size;
 
-    struct archive *a = archive_read_new();
+    /* Select which attributes we want to restore. */
+    flags = ARCHIVE_EXTRACT_TIME;
+    flags |= ARCHIVE_EXTRACT_PERM;
+    flags |= ARCHIVE_EXTRACT_ACL;
+    flags |= ARCHIVE_EXTRACT_FFLAGS;
+    
+    a = archive_read_new();
+    archive_read_support_format_all(a);
     archive_read_support_compression_all(a);
-    archive_read_support_format_raw(a);
-    r = archive_read_open_filename(a, fname, 16384);
-    
-    if (r != ARCHIVE_OK) {
-        archive_read_free (a);
+    ext = archive_write_disk_new();
+    archive_write_disk_set_options(ext, flags);
+    archive_write_disk_set_standard_lookup(ext);
+    if ((r = archive_read_open_filename(a, fname, 10240)))
         return INTERNAL_ERROR;
-    }
-    
-    r = archive_read_next_header(a, &ae);
-    if (r != ARCHIVE_OK) {
-        archive_read_free (a);
-        return INTERNAL_ERROR;
-    }
-
     for (;;) {
-        size = archive_read_data(a, buff, buffsize);
-        if (size < 0) {
-            archive_read_free (a);
-            return INTERNAL_ERROR;
-        }
-        if (size == 0)
+        r = archive_read_next_header(a, &entry);
+        if (r == ARCHIVE_EOF)
             break;
-        write(1, buff, size);
+        if (r < ARCHIVE_OK)
+            fprintf(stderr, "%s\n", archive_error_string(a));
+        if (r < ARCHIVE_WARN)
+            return INTERNAL_ERROR;
+        r = archive_write_header(ext, entry);
+        if (r < ARCHIVE_OK)
+            fprintf(stderr, "%s\n", archive_error_string(ext));
+        else if (archive_entry_size(entry) > 0) {
+            r = prv_copy_data(a, ext);
+            if (r < ARCHIVE_OK)
+                fprintf(stderr, "%s\n", archive_error_string(ext));
+            if (r < ARCHIVE_WARN)
+                return INTERNAL_ERROR;
+        }
+        r = archive_write_finish_entry(ext);
+        if (r < ARCHIVE_OK)
+            fprintf(stderr, "%s\n", archive_error_string(ext));
+        if (r < ARCHIVE_WARN)
+            return INTERNAL_ERROR;
     }
-
-    archive_read_free(a));
+    archive_read_close(a);
+    archive_read_free(a);
+    archive_write_close(ext);
+    archive_write_free(ext);
+    
     return OK;
 }
 
@@ -60,7 +98,7 @@ HostTemplate host_templates[] = {
     {"armv6j_hardfp", "arm"},
     {"armv7a", "arm"},
     {"armv7a_hardfp", "arm", "-O2 -pipe -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard", "armv7a-hardfloat-linux-gnueabi"},
-    {"arm64", "arm64", "-O2 -pipe", "aarch64-unknown-linux-gnu"},
+    {"arm64", "arm", "-O2 -pipe", "aarch64-unknown-linux-gnu"},
     {"hppa", "hppa", "-O2 -pipe -march=1.1", "hppa1.1-unknown-linux-gnu", "CXXFLAGS=\"-O2 -pipe\"", CXXFLAGS},
 };
 
@@ -83,11 +121,14 @@ HostTemplate* host_template_init (Server* parent, HostTemplate t) {
 
 void host_template_stage (HostTemplate* t) {
     char distfile_dir[256];
-    sprintf ("%s/distfiles", t->parent->location);
+    sprintf (distfile_dir, "%s/distfiles", t->parent->location);
     
     if (!opendir(distfile_dir)) {
         mkdir(t->dest_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     }
+    
+    char distfile_meta_url[256];
+    sprintf (distfile_meta_url,"http://distfiles.gentoo.org/%s/autobuilds/latest-stage3-%s.txt", t->arch, t->id);
     
     
 }
