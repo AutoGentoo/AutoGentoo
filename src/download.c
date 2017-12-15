@@ -1,45 +1,36 @@
 #include <download.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
+#include <hacksaw/tools/debug.h>
+#include <curl/curl.h>
 
-response_t download (char* url, down_progress p) {
-    response_t out;
+struct curlprog {
+  double lastruntime;
+  CURL *curl;
+};
+
+response_t download (char* url, char* dest, down_progress p) {
+    CURL* curl = curl_easy_init ();
     
-    char* protocol_splt = strchr (url, "://");
-    char protocal[16];
-    strncpy (protocal, url, protocol_splt - url);
-    
-    if (strncmp (protocal, "http") != 0) {
+    struct curlprog prog;
+    if (!curl) {
+        lerror ("Could not initialize CURL request!");
         return INTERNAL_ERROR;
     }
     
-    url += 3;
-    
-    int sockfd;
-    struct sockaddr_in dest;
-    char buffer[MAXBUF];
-    
-    if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) {
-        perror("Socket");
-        exit(errno);
+    if (p & SHOW_PROGRESS) {
+        curl_easy_setopt (curl, CURLOPT_PROGRESSDATA, &prog);
     }
     
-    bzero(&dest, sizeof(dest));
-    dest.sin_family = AF_INET;
-    dest.sin_port = htons(PORT_FTP);
-    if ( inet_aton(SERVER_ADDR, &dest.sin_addr.s_addr) == 0 ) {
-        perror(SERVER_ADDR);
-        exit(errno);
+    curl_easy_setopt (curl, CURLOPT_URL, url);
+    CURLcode res = curl_easy_perform (curl);
+    
+    curl_easy_cleanup (curl);
+    
+    if (res != CURLE_OK) {
+        lerror ("curl_easy_perform() failed: %s\n", curl_easy_strerror (res));
+        return INTERNAL_ERROR;
     }
     
-    if ( connect(sockfd, (struct sockaddr*)&dest, sizeof(dest)) != 0 ) {
-        perror("Connect ");
-        exit(errno);
-    }
-    
-    bzero(buffer, MAXBUF);
-    
-    size_t trans = write (sockfd, )
-    
-    close(sockfd);
+    return OK;
 }

@@ -10,6 +10,12 @@ LT_INIT
 
 AC_SUBST([LIBTOOL_DEPS])
 
+AC_CHECK_HEADERS([archive.h archive_entry.h], [], [
+    AC_MSG_ERROR(["Missing libarchive headers"])
+])
+
+AC_CHECK_LIB([archive], [])
+
 AC_CHECK_LIB([hacksaw-tools], [vector_new])
 AC_CHECK_LIB([hacksaw-tools], [string_vector_new])
 AC_CHECK_LIB([hacksaw-tools], [map_new])

@@ -3,6 +3,53 @@
 #include <host.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <archive.h>
+#include <archive_entry.h>
+
+response_t prv_extract_stage3 (HostTemplate* t) {
+    char fname[256];
+    sprintf (fname, "%s/distfiles/stage3-%s.tar.bz2", t->parent->location, t->id);
+    
+    if (access(fname, F_OK) == -1) {
+        lerror ("distfile 'stage3-%s.tar.bz2' does not exist (please download)", t->id);
+        return INTERNAL_ERROR;
+    }
+    
+    int r;
+    ssize_t size;
+
+    struct archive *a = archive_read_new();
+    archive_read_support_compression_all(a);
+    archive_read_support_format_raw(a);
+    r = archive_read_open_filename(a, fname, 16384);
+    
+    if (r != ARCHIVE_OK) {
+        archive_read_free (a);
+        return INTERNAL_ERROR;
+    }
+    
+    r = archive_read_next_header(a, &ae);
+    if (r != ARCHIVE_OK) {
+        archive_read_free (a);
+        return INTERNAL_ERROR;
+    }
+
+    for (;;) {
+        size = archive_read_data(a, buff, buffsize);
+        if (size < 0) {
+            archive_read_free (a);
+            return INTERNAL_ERROR;
+        }
+        if (size == 0)
+            break;
+        write(1, buff, size);
+    }
+
+    archive_read_free(a));
+    return OK;
+}
 
 HostTemplate host_templates[] = {
     {"alpha", "alpha", "-mieee -pipe -O2 -mcpu=ev4", "alpha-unknown-linux-gnu", "PORTDIR=\"/space/catalyst/portage\"", PORTDIR},
@@ -17,7 +64,7 @@ HostTemplate host_templates[] = {
     {"hppa", "hppa", "-O2 -pipe -march=1.1", "hppa1.1-unknown-linux-gnu", "CXXFLAGS=\"-O2 -pipe\"", CXXFLAGS},
 };
 
-HostTemplate* host_template_init (Server parent, HostTemplate t) {
+HostTemplate* host_template_init (Server* parent, HostTemplate t) {
     HostTemplate* out = malloc (sizeof(HostTemplate));
     out->parent = parent;
     memcpy (out, &t, sizeof (HostTemplate));
@@ -39,10 +86,12 @@ void host_template_stage (HostTemplate* t) {
     sprintf ("%s/distfiles", t->parent->location);
     
     if (!opendir(distfile_dir)) {
-        mkdir(t->dest_dir);
+        mkdir(t->dest_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     }
     
     
 }
+
+
 
 response_t host_template_handoff (Host* dest, HostTemplate* src);
