@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <archive.h>
 #include <archive_entry.h>
+#include <download.h>
 
 static int prv_copy_data (struct archive *ar, struct archive *aw) {
     int r;
@@ -37,9 +38,9 @@ response_t prv_extract_stage3 (HostTemplate* t) {
         return INTERNAL_ERROR;
     }
 
-    struct archive *a;
-    struct archive *ext;
-    struct archive_entry *entry;
+    struct archive* a;
+    struct archive* ext;
+    struct archive_entry* entry;
     int flags;
     int r;
 
@@ -130,7 +131,7 @@ void host_template_stage (HostTemplate* t) {
     char distfile_meta_url[256];
     sprintf (distfile_meta_url,"http://distfiles.gentoo.org/%s/autobuilds/latest-stage3-%s.txt", t->arch, t->id);
     
-    
+    download (distfile_meta_url, "temp_dest", NO_PROGRESS);
 }
 
 

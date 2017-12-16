@@ -18,11 +18,13 @@ AC_CHECK_LIB([archive], [archive_read_new], [], [
     AC_MSG_ERROR(["libarchive could not be found"])
 ])
 
-AC_CHECK_LIB([hacksaw-tools], [vector_new])
-AC_CHECK_LIB([hacksaw-tools], [string_vector_new])
-AC_CHECK_LIB([hacksaw-tools], [map_new])
-AC_CHECK_LIB([hacksaw-tools], [small_map_new])
-AC_CHECK_LIB([hacksaw-tools], [conf_new])
+AC_CHECK_LIB([curl], [curl_easy_init], [], [
+    AC_MSG_ERROR(["libcurl could not be found"])
+])
+
+AC_CHECK_LIB([hacksaw-tools], [vector_new], [], [
+    AC_MSG_ERROR(["libhacksaw could not be found"])
+])
 
 
 AC_CONFIG_FILES([
