@@ -3,41 +3,43 @@
 #include <stdio.h>
 #include <hacksaw/tools/debug.h>
 #include <curl/curl.h>
+#include <string.h>
 
 struct curlprog {
-  double lastruntime;
-  CURL *curl;
+    double lastruntime;
+    CURL *curl;
+    char* dest;
 };
 
-int download_progress (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
-    struct ttysize ts;
-    ioctl(0, TIOCGSIZE, &ts);
+int download_progress (void *clientp, curl_off_t dltotal, 
+            curl_off_t dlnow, 
+            curl_off_t ultotal, 
+            curl_off_t ulnow) {
     
-    int first_part_n = 32
-    
-    char first_part[64];
-    sprintf (first_part, "\r [ %d / %d ] ", dlnow, dltotal);
-    
-    strncpy (first_part + strlen (first_part), 32 - strlen (first_part), )
-    
+    printf ("%" CURL_FORMAT_CURL_OFF_T " / %" CURL_FORMAT_CURL_OFF_T " (%.2f%%)", dlnow, dltotal, (((double)dlnow/dltotal)*100));
+    putchar ('\r');
     return 0;
 }
 
 response_t download (char* url, char* dest, down_progress p) {
     CURL* curl = curl_easy_init ();
-    FILE* out = fopen (dest, "wb+");
     
     linfo ("Downloading from %s...\n", url);
     
     struct curlprog prog;
+    prog.dest = dest;
     if (!curl) {
         lerror ("Could not initialize CURL request!");
-        fclose (out);
         return INTERNAL_ERROR;
     }
+    FILE* out = fopen (dest, "wb+");
     
     if (p == SHOW_PROGRESS) {
-        curl_easy_setopt (curl, CURLOPT_PROGRESSDATA, &prog);
+        printf ("Showing progress\n");
+        curl_easy_setopt(curl, CURLOPT_XFERINFODATA, &prog);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, out);
+        curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, download_progress);
     }
     
     curl_easy_setopt (curl, CURLOPT_URL, url);

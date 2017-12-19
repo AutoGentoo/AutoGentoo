@@ -15,5 +15,5 @@ libautogentoo_la_LDFLAGS = -version-info 0
 
 bin_PROGRAMS = autogentoo
 autogentoo_SOURCES = autogentoo.c
-autogentoo_CFLAGS = ${AM_CFLAGS} -arch x86_64
+autogentoo_CFLAGS = ${AM_CFLAGS}
 autogentoo_LDADD = libautogentoo.la

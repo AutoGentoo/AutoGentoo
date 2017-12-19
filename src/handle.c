@@ -269,7 +269,7 @@ response_t SRV_STAGE1 (Connection* conn, char** args, int start) {
     }
     
     char* emerge_args = string_join (packages->ptr, " ", packages->n);
-    host_stage1_install(conn->bounded_host, emerge_args);
+    //host_stage1_install(conn->bounded_host, emerge_args);
     string_vector_free (packages);
     free (emerge_args);
     fclose (fp);
