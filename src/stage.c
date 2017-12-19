@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stage.h>
 #include <host.h>
@@ -93,6 +94,7 @@ response_t prv_extract_stage3 (HostTemplate* t) {
 HostTemplate host_templates[] = {
     {"alpha", "alpha", "-mieee -pipe -O2 -mcpu=ev4", "alpha-unknown-linux-gnu", "PORTDIR=\"/space/catalyst/portage\"", PORTDIR},
     {"amd64", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", "CPU_FLAGS_X86=\"mmx sse sse2\""},
+    {"amd64-systemd", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", "CPU_FLAGS_X86=\"mmx sse sse2\""},
     {"armv4tl", "arm"},
     {"armv5tel", "arm"},
     {"armv6j", "arm"},
@@ -131,7 +133,33 @@ void host_template_stage (HostTemplate* t) {
     char distfile_meta_url[256];
     sprintf (distfile_meta_url,"http://distfiles.gentoo.org/%s/autobuilds/latest-stage3-%s.txt", t->arch, t->id);
     
-    download (distfile_meta_url, "temp_dest", NO_PROGRESS);
+    if (download (distfile_meta_url, "temp_dest", NO_PROGRESS).code != 200) {
+        lerror ("Could not download metadata for stage3!");
+        return;
+    }
+    
+    FILE* fp_temp = fopen ("temp_dest", "r");
+    
+    char* line;
+    ssize_t len;
+    char* stage3_dest;
+    size_t read = 0;
+    while ((read = getline(&line, &len, fp_temp)) != -1) {
+        if (line[0] == '#')
+            continue;
+        line[strlen(line) - 1] = '\0'; // Remove the newline
+        char* s = strtok (line, " ");
+        asprintf (&stage3_dest, "http://distfiles.gentoo.org/%s/autobuilds/%s", t->arch, s);
+        break;
+    }
+    
+    fclose (fp_temp);
+    
+    char fname[256];
+    sprintf (fname, "%s/distfiles/stage3-%s.tar.bz2", t->parent->location, t->id);
+    
+    linfo ("Downloading stage3 from %s", stage3_dest);
+    download (stage3_dest, fname, SHOW_PROGRESS);
 }
 
 
