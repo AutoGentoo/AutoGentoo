@@ -4,7 +4,6 @@ AC_PROG_CC
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
-AC_PROG_CC
 AM_PROG_AR
 LT_INIT
 
@@ -29,7 +28,7 @@ AC_CHECK_LIB([hacksaw-tools], [vector_new], [], [
 
 AC_CONFIG_FILES([
   Makefile
-  src/Makefile
+  service/Makefile
   include/Makefile
 ])
 

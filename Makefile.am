@@ -1,4 +1,4 @@
-SUBDIRS = include src
+SUBDIRS = include service
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 

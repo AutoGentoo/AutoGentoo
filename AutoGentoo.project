@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="AutoGentoo" Version="10.0.0" InternalType="Console">
+  <VirtualDirectory Name="client">
+    <File Name="client/binpkg.c"/>
+    <File Name="client/Makefile.am"/>
+  </VirtualDirectory>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -12,19 +16,20 @@
   </VirtualDirectory>
   <Description/>
   <Dependencies/>
-  <VirtualDirectory Name="src">
-    <File Name="src/download.c"/>
-    <File Name="src/stage.c"/>
-    <File Name="src/writeconfig.c"/>
-    <File Name="src/host.c"/>
-    <File Name="src/autogentoo.c"/>
-    <File Name="src/handle.c"/>
-    <File Name="src/response.c"/>
-    <File Name="src/server.c"/>
-    <File Name="src/Makefile.am"/>
-    <File Name="src/chroot.c"/>
+  <VirtualDirectory Name="service">
+    <File Name="service/Makefile.am"/>
+    <File Name="service/writeconfig.c"/>
+    <File Name="service/stage.c"/>
+    <File Name="service/server.c"/>
+    <File Name="service/response.c"/>
+    <File Name="service/host.c"/>
+    <File Name="service/handle.c"/>
+    <File Name="service/download.c"/>
+    <File Name="service/chroot.c"/>
+    <File Name="service/autogentoo.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="include/binpkg.h"/>
     <File Name="include/download.h"/>
     <File Name="include/stage.h"/>
     <File Name="include/writeconfig.h"/>
