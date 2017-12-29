@@ -42,6 +42,7 @@ struct __Ebuild {
 
 void category_read (Repository* repo, char* name);
 Package* package_new (Repository* repo, char* category, char* name);
+void package_get_ebuilds (Package* pkg);
 void package_get_file (Package* pkg, char* filename);
 
 
