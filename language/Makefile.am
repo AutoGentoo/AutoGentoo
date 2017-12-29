@@ -21,7 +21,9 @@ depend_flex.c: depend_flex.l
 atom_flex.c: atom_flex.l
 	$(LEX) -o atom_flex.c atom_flex.l
 
-noinst_HEADERS = depend.h share.h
+
+langdir=$(pkgincludedir)/language
+lang_HEADERS = depend.h share.h atom.h
 BUILT_SOURCES = depend_bison.h atom_bison.h
 
 DEPEND_CLEAN=depend_bison.h depend_bison.c depend_flex.c
