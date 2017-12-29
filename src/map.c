@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <openssl/md5.h>
 
 Map* map_new (size_t new_size, int threshold) {
     Map* out = malloc (sizeof (Map));
