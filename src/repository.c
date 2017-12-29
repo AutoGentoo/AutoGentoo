@@ -88,7 +88,6 @@ Repository* parse_repository (ConfSection* section) {
         repo->priority = (int)strtol(priority_buff, NULL, 10);
     }
     
-    
     char cat_file[256];
     sprintf (cat_file, "/%s/profiles/categories", repo->location);
     fix_path (cat_file);

@@ -73,8 +73,6 @@
     <File Name=".gitattributes"/>
     <File Name=".gitignore"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="language">
     <File Name="language/atom.c"/>
     <File Name="language/atom.h"/>
@@ -181,4 +179,6 @@ make</RebuildCommand>
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

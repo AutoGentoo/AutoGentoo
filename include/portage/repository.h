@@ -53,6 +53,9 @@ struct __Repository {
     repo_t sync_type;
     char sync_uri[256]; // Empty to disable syncing
     
+    /*
+     *   cat/pkgname : Package*
+     */
     Map* packages;
 };
 
