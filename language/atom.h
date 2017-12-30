@@ -3,7 +3,7 @@
 //
 
 
-#ifndef HACKSAW_COMPILER_ATOM_H
+#if !defined(HACKSAW_COMPILER_ATOM_H) && !defined(HACKSAW_LANGUAGE_H)
 #define HACKSAW_COMPILER_ATOM_H
 
 #include <tools/vector.h>

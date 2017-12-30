@@ -1,3 +1,2 @@
-pkginclude_HEADERS = hacksaw.h tools.h
-noinst_HEADERS = _hacksaw.h
+pkginclude_HEADERS = hacksaw.h tools.h language.h
 SUBDIRS = portage tools

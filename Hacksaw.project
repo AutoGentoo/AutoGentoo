@@ -6,8 +6,8 @@
     </Plugin>
   </Plugins>
   <VirtualDirectory Name="include">
+    <File Name="include/language.h"/>
     <File Name="include/hacksaw.h"/>
-    <File Name="include/_hacksaw.h"/>
     <File Name="include/tools.h"/>
     <VirtualDirectory Name="portage">
       <File Name="include/portage/repository.h"/>
