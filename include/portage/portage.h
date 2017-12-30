@@ -5,7 +5,9 @@
 #ifndef HACKSAW_PORTAGE_H
 #define HACKSAW_PORTAGE_H
 
-#include <portage/repository.h>
+#include "../tools.h"
+#include "../language.h"
+#include "repository.h"
 
 typedef struct __Portage Portage;
 

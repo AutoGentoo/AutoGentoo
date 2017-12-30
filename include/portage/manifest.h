@@ -9,11 +9,10 @@ typedef enum __manifest_t manifest_t;
 typedef struct __Manifest Manifest;
 typedef struct __ManifestEntry ManifestEntry;
 
-#include <tools/vector.h>
+#include "portage.h"
 #include <stdio.h>
-#include <portage/hash.h>
-#include <portage/package.h>
-#include <language/share.h>
+#include "hash.h"
+#include "package.h"
 
 enum __manifest_t {
     EBUILD, // An ebuild file

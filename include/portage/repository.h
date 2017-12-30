@@ -2,12 +2,10 @@
 // Created by atuser on 10/20/17.
 //
 
-#include <tools/vector.h>
+#include "portage.h"
 #include <sys/stat.h>
 #include <stdio.h>
-#include <tools/conf.h>
-#include <tools/map.h>
-#include <portage/package.h>
+#include "package.h"
 
 #ifndef HACKSAW_REPOSITORY_H
 #define HACKSAW_REPOSITORY_H

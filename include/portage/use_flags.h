@@ -6,8 +6,7 @@
 #ifndef HACKSAW_USE_FLAGS_H
 #define HACKSAW_USE_FLAGS_H
 
-#include <language/share.h>
-#include <tools/map.h>
+#include "portage.h"
 
 typedef Map* IUSE;
 

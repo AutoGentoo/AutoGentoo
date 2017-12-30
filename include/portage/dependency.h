@@ -5,7 +5,7 @@
 #ifndef HACKSAW_DEPENDENCY_H
 #define HACKSAW_DEPENDENCY_H
 
-#include <portage/package.h>
+#include "package.h"
 
 typedef struct __Dependency Dependency;
 typedef struct __PackageSelector PackageSelector;

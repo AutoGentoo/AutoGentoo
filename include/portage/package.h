@@ -3,12 +3,12 @@
 //
 
 
-#include <portage/manifest.h>
+#include "manifest.h"
 
 #ifndef HACKSAW_PACKAGE_H
 #define HACKSAW_PACKAGE_H
 
-#include <portage/repository.h>
+#include "repository.h"
 
 typedef struct __Package Package;
 typedef struct __Ebuild Ebuild;

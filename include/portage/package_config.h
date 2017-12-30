@@ -5,9 +5,8 @@
 #ifndef HACKSAW_PACKAGE_USE_H
 #define HACKSAW_PACKAGE_USE_H
 
-#include <tools/small_map.h>
-#include <portage/dependency.h>
-#include <portage/portage.h>
+#include "portage.h"
+#include "dependency.h"
 
 typedef SmallMap PackageConf;   // Map category/name to PackageMeta pointer
                                 // Make every package that found a loc

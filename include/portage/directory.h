@@ -5,8 +5,7 @@
 #ifndef HACKSAW_DIRECTORY_H
 #define HACKSAW_DIRECTORY_H
 
-#include <tools/string_vector.h>
-#include <portage/portage.h>
+#include "portage.h"
 
 typedef struct __PortageDirectory PortageDirectory;
 
