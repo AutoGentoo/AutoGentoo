@@ -32,4 +32,5 @@ response_t get_res (response_nt x) {
             return res_list[i];
         }
     }
+    return OK;
 }

@@ -11,7 +11,7 @@
 #include <download.h>
 
 static int prv_copy_data (struct archive *ar, struct archive *aw) {
-    int r;
+    la_ssize_t r;
     const void *buff;
     size_t size;
     la_int64_t offset;
@@ -21,11 +21,11 @@ static int prv_copy_data (struct archive *ar, struct archive *aw) {
         if (r == ARCHIVE_EOF)
             return (ARCHIVE_OK);
         if (r < ARCHIVE_OK)
-            return (r);
+            return ((int)r);
         r = archive_write_data_block(aw, buff, size, offset);
         if (r < ARCHIVE_OK) {
         fprintf(stderr, "%s\n", archive_error_string(aw));
-            return (r);
+            return ((int)r);
         }
     }
 }
@@ -85,6 +85,7 @@ response_t prv_extract_stage3 (HostTemplate* t) {
     }
     archive_read_close(a);
     archive_read_free(a);
+    
     archive_write_close(ext);
     archive_write_free(ext);
     
@@ -141,12 +142,14 @@ void host_template_stage (HostTemplate* t) {
     FILE* fp_temp = fopen ("temp_dest", "r");
     
     char* line;
-    ssize_t len;
-    char* stage3_dest;
-    size_t read = 0;
+    size_t len;
+    char* stage3_dest = NULL;
+    ssize_t read = 0;
     while ((read = getline(&line, &len, fp_temp)) != -1) {
         if (line[0] == '#')
             continue;
+        // The first non-comment line will be our target stage3
+
         line[strlen(line) - 1] = '\0'; // Remove the newline
         char* s = strtok (line, " ");
         asprintf (&stage3_dest, "http://distfiles.gentoo.org/%s/autobuilds/%s", t->arch, s);
@@ -155,13 +158,13 @@ void host_template_stage (HostTemplate* t) {
     
     fclose (fp_temp);
     
-    char fname[256];
-    sprintf (fname, "%s/distfiles/stage3-%s.tar.bz2", t->parent->location, t->id);
+    char* fname;
+    asprintf (&fname, "%s/distfiles/stage3-%s.tar.bz2", t->parent->location, t->id);
     
     linfo ("Downloading stage3 from %s", stage3_dest);
     download (stage3_dest, fname, SHOW_PROGRESS);
+    
+    
 }
-
-
 
 response_t host_template_handoff (Host* dest, HostTemplate* src);
