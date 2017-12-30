@@ -4,4 +4,7 @@ portage_HEADERS =   directory.h \
                     hash.h \
                     package.h \
                     manifest.h \
-                    dependency.h
+                    dependency.h \
+                    portage.h \
+                    package_config.h \
+                    use_flags.h
