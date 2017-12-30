@@ -29,6 +29,7 @@ AC_CHECK_LIB([hacksaw-tools], [vector_new], [], [
 AC_CONFIG_FILES([
   Makefile
   service/Makefile
+  client/Makefile
   include/Makefile
 ])
 

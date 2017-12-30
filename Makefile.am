@@ -1,4 +1,4 @@
-SUBDIRS = include service
+SUBDIRS = include service client
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 

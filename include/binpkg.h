@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <hacksaw/tools.h>
+#include <hacksaw/language.h>
 
 typedef struct __BinaryPackage BinaryPackage;
 
@@ -25,9 +26,9 @@ REPO: gentoo
 
 struct __BinaryPackage {
     char* cpv;
+    
     long build_time;
     StringVector* defined_phases;
-    
 };
 
 #endif
