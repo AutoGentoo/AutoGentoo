@@ -5,12 +5,12 @@
 \begin{DoxyCompactItemize}
 \item 
 struct \mbox{\hyperlink{struct_____command}{\+\_\+\+\_\+\+Command}}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Holds information regarding a commandline call. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
 typedef struct \mbox{\hyperlink{struct_____command}{\+\_\+\+\_\+\+Command}} \mbox{\hyperlink{command_8h_ade38f8bb88790360aa19962fcd401aca}{Command}}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Holds information regarding a commandline call. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -22,6 +22,11 @@ void \mbox{\hyperlink{command_8h_ad706fc66113165386d2b394caa3b6093}{command\+\_\
 \item 
 void \mbox{\hyperlink{command_8h_a09b1d7bed8c4f5faa3ccee7fbbd8138e}{command}} (char $\ast$top, char $\ast$bottom, char $\ast$$\ast$output, int $\ast$ret)
 \end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+Small\+Map $\ast$ \mbox{\hyperlink{command_8h_a67767d4755385e273ec24dc0f7c1b9ad}{tar}}
+\begin{DoxyCompactList}\small\item\em Extract and Compress files Valid commands. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Typedef Documentation}
@@ -30,6 +35,10 @@ void \mbox{\hyperlink{command_8h_a09b1d7bed8c4f5faa3ccee7fbbd8138e}{command}} (c
 \index{Command@{Command}!command.\+h@{command.\+h}}
 \subsubsection{\texorpdfstring{Command}{Command}}
 {\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____command}{\+\_\+\+\_\+\+Command}} \mbox{\hyperlink{command_8h_ade38f8bb88790360aa19962fcd401aca}{Command}}}
+
+
+
+Holds information regarding a commandline call. 
 
 
 
@@ -88,6 +97,29 @@ Run a command given its arguments
 \begin{DoxyParams}{Parameters}
 {\em cmd} & the command to run \\
 \hline
+{\em output} & A pointer to the string to which the output is written \\
+\hline
+{\em ret} & a pointer to which the return value of the command is written \\
+\hline
 {\em ...} & the arguments to pass to the command \\
 \hline
 \end{DoxyParams}
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{command_8h_a67767d4755385e273ec24dc0f7c1b9ad}\label{command_8h_a67767d4755385e273ec24dc0f7c1b9ad}} 
+\index{command.\+h@{command.\+h}!tar@{tar}}
+\index{tar@{tar}!command.\+h@{command.\+h}}
+\subsubsection{\texorpdfstring{tar}{tar}}
+{\footnotesize\ttfamily Small\+Map$\ast$ tar}
+
+
+
+Extract and Compress files Valid commands. 
+
+
+\begin{DoxyItemize}
+\item extract \{file.\+tar\} \+: Extract file.\+tar to the current directory
+\item extract to \{file.\+tar, path\} \+: Extract file.\+tar to path
+\item compress \{file.\+tar, selector\} \+: Compress files found through selector into file.\+tar 
+\end{DoxyItemize}

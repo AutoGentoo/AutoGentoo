@@ -2,20 +2,20 @@
 #define __AUTOGENTOO_SERVER_H__
 
 /**
- * @breif The main struct that hold hosts/bindings and other information
+ * @brief The main struct that hold hosts/bindings and other information
  *  - This is pretty much required throughout the entire program so keep it!
  */
 typedef struct __Server Server;
 
 /**
- * @breif Bind an IP to a host
+ * @brief Bind an IP to a host
  *  - This is used when a request is made. 
  *  - The IP of the request is matched to a Host using this struct
  */
 typedef struct __HostBind HostBind;
 
 /**
- * @breif Holds information about a connection
+ * @brief Holds information about a connection
  *  - A new connection will initilized after the return of accept().
  *  - The request is immediately after the connection is made
  *  - The bounded_host will be set as well (NULL if the IP is not bounded)
@@ -32,86 +32,62 @@ typedef struct __Connection Connection;
  * Server options for enabling/disabling server features
  */
 typedef enum {
-    ASYNC = 0x0,
-    DAEMON = 0x1,
-    NO_DEBUG = 0x0,
-    DEBUG = 0x2
+    ASYNC = 0x0, //!< Run the server in the terminal
+    DAEMON = 0x1, //!< Run the server in background as a service
+    NO_DEBUG = 0x0, //!< Turn off debug information
+    DEBUG = 0x2 //!< Turn on debug information
 } server_t;
 
 /**
  * Holds the status of a connection
  */
 typedef enum {
-    SERVER_ERROR, // recv() error
-    CONNECTED,
-    FAILED, // Client disconnected closing the connection
-    CLOSED // Closed successfully with connection_free()
+    SERVER_ERROR, //!< recv() error 
+    CONNECTED, //!< Successfully connected
+    FAILED, //!< Client disconnected closing the connection
+    CLOSED //!< Closed successfully with connection_free()
 } con_t;
 
 /**
- * The main struct that hold hosts/bindings and other information
+ * @brief The main struct that hold hosts/bindings and other information
  * 
  * This is pretty much required throughout the entire program so keep it!
  */
 struct __Server {
-    /// The working directory of the server
-    char* location;
-    
-    /// The port to bind to
-    int port;
-    
-    /// The options that the server was initilized with
-    server_t opts;
-    
-    /// A list of hosts
-    Vector* hosts;
-    
-    /// A list of host bindings
-    Vector* host_bindings;
+    char* location; //!< The working directory of the server
+    int port;  //!< The port to bind to
+    server_t opts; //!< The options that the server was initilized with
+    Vector* hosts; //!< A list of hosts
+    Vector* host_bindings; //!< A list of host bindings
 };
 
 /**
- * Bind an IP to a host
+ * @brief Bind an IP to a host
  * 
  * This is used when a request is made. 
  * The IP of the request is matched to a Host using this struct
  */
 struct __HostBind {
-    /// The IP to bind the host to
-    char* ip;
-    
-    /// The target of the host binding
-    Host* host;
+    char* ip; //!< The IP to bind the host to
+    Host* host; //!< The target of the host binding
 };
 
 /**
- * @breif Holds information about a connection
+ * @brief Holds information about a connection
+ * 
  * A new connection will initilized after the return of accept().
  * The request is immediately after the connection is made
  * The bounded_host will be set as well (NULL if the IP is not bounded)
  * Since every connection runs in its own thread the pthread_t is kept here as well
  */
 struct __Connection {
-    /// The parent server of the connection
-    Server* parent;
-    
-    /// The Host bounded to the connections IP address (NULL if unbounded)
-    Host* bounded_host;
-    
-    /// The entire request
-    char* request;
-    
-    /// The IP of the connected client
-    char* ip;
-    
-    /// The file descriptor that points to the open connections
-    int fd;
-    
-    /// The pid of the pthread that the handle is runnning in
-    pthread_t pid;
-    
-    /// The status of the current Connection
-    con_t status;
+    Server* parent; //!< The parent server of the connection
+    Host* bounded_host; //!< The Host bounded to the connections IP address (NULL if unbounded)
+    char* request; //!< The entire request
+    char* ip; //!< The IP of the connected client
+    int fd; //!< The file descriptor that points to the open connections
+    pthread_t pid; //!< The pid of the pthread that the handle is runnning in
+    con_t status; //!< The status of the current Connection
 };
 
 /**

@@ -8,20 +8,20 @@
 \begin{DoxyCompactItemize}
 \item 
 struct \mbox{\hyperlink{struct_____server}{\+\_\+\+\_\+\+Server}}
-\item 
+\begin{DoxyCompactList}\small\item\em The main struct that hold hosts/bindings and other information. \end{DoxyCompactList}\item 
 struct \mbox{\hyperlink{struct_____host_bind}{\+\_\+\+\_\+\+Host\+Bind}}
-\item 
+\begin{DoxyCompactList}\small\item\em Bind an IP to a host. \end{DoxyCompactList}\item 
 struct \mbox{\hyperlink{struct_____connection}{\+\_\+\+\_\+\+Connection}}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Holds information about a connection. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
 typedef struct \mbox{\hyperlink{struct_____server}{\+\_\+\+\_\+\+Server}} \mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}}
-\item 
+\begin{DoxyCompactList}\small\item\em The main struct that hold hosts/bindings and other information. \end{DoxyCompactList}\item 
 typedef struct \mbox{\hyperlink{struct_____host_bind}{\+\_\+\+\_\+\+Host\+Bind}} \mbox{\hyperlink{server_8h_a3820b5acb10235e163b4c7f742769d59}{Host\+Bind}}
-\item 
+\begin{DoxyCompactList}\small\item\em Bind an IP to a host. \end{DoxyCompactList}\item 
 typedef struct \mbox{\hyperlink{struct_____connection}{\+\_\+\+\_\+\+Connection}} \mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Holds information about a connection. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Enumerations}
 \begin{DoxyCompactItemize}
 \item 
@@ -69,7 +69,11 @@ void \mbox{\hyperlink{server_8h_ab51751375888672dc4fc96d6265b66f6}{daemonize}} (
 \subsubsection{\texorpdfstring{Connection}{Connection}}
 {\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____connection}{\+\_\+\+\_\+\+Connection}} \mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}}}
 
-Holds information about a connection
+
+
+Holds information about a connection. 
+
+
 \begin{DoxyItemize}
 \item A new connection will initilized after the return of accept().
 \item The request is immediately after the connection is made
@@ -81,7 +85,11 @@ Holds information about a connection
 \subsubsection{\texorpdfstring{Host\+Bind}{HostBind}}
 {\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____host_bind}{\+\_\+\+\_\+\+Host\+Bind}} \mbox{\hyperlink{server_8h_a3820b5acb10235e163b4c7f742769d59}{Host\+Bind}}}
 
-Bind an IP to a host
+
+
+Bind an IP to a host. 
+
+
 \begin{DoxyItemize}
 \item This is used when a request is made.
 \item The IP of the request is matched to a Host using this struct 
@@ -91,7 +99,11 @@ Bind an IP to a host
 \subsubsection{\texorpdfstring{Server}{Server}}
 {\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____server}{\+\_\+\+\_\+\+Server}} \mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}}}
 
-The main struct that hold hosts/bindings and other information
+
+
+The main struct that hold hosts/bindings and other information. 
+
+
 \begin{DoxyItemize}
 \item This is pretty much required throughout the entire program so keep it! 
 \end{DoxyItemize}
@@ -105,19 +117,19 @@ The main struct that hold hosts/bindings and other information
 
 Holds the status of a connection \begin{DoxyEnumFields}{Enumerator}
 \raisebox{\heightof{T}}[0pt][0pt]{\index{S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR@{S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR@{S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR}}}\mbox{\Hypertarget{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a5849612cb4b71af31eebaeaadea322c5}\label{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a5849612cb4b71af31eebaeaadea322c5}} 
-S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR&\\
+S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR&recv() error \\
 \hline
 
 \raisebox{\heightof{T}}[0pt][0pt]{\index{C\+O\+N\+N\+E\+C\+T\+ED@{C\+O\+N\+N\+E\+C\+T\+ED}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!C\+O\+N\+N\+E\+C\+T\+ED@{C\+O\+N\+N\+E\+C\+T\+ED}}}\mbox{\Hypertarget{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a7a691a2430ec26878897b5fbc9c22a4c}\label{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a7a691a2430ec26878897b5fbc9c22a4c}} 
-C\+O\+N\+N\+E\+C\+T\+ED&\\
+C\+O\+N\+N\+E\+C\+T\+ED&Successfully connected. \\
 \hline
 
 \raisebox{\heightof{T}}[0pt][0pt]{\index{F\+A\+I\+L\+ED@{F\+A\+I\+L\+ED}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!F\+A\+I\+L\+ED@{F\+A\+I\+L\+ED}}}\mbox{\Hypertarget{server_8h_adff1af7110b02fbef1d43e5a4b638ee8aecedb56d1405a60c6069f4a0139bdec5}\label{server_8h_adff1af7110b02fbef1d43e5a4b638ee8aecedb56d1405a60c6069f4a0139bdec5}} 
-F\+A\+I\+L\+ED&\\
+F\+A\+I\+L\+ED&Client disconnected closing the connection. \\
 \hline
 
 \raisebox{\heightof{T}}[0pt][0pt]{\index{C\+L\+O\+S\+ED@{C\+L\+O\+S\+ED}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!C\+L\+O\+S\+ED@{C\+L\+O\+S\+ED}}}\mbox{\Hypertarget{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a929f0327e17604ce9713b2a6117bd603}\label{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a929f0327e17604ce9713b2a6117bd603}} 
-C\+L\+O\+S\+ED&\\
+C\+L\+O\+S\+ED&Closed successfully with \mbox{\hyperlink{server_8h_adb7090575d251c47a887352574f15622}{connection\+\_\+free()}} \\
 \hline
 
 \end{DoxyEnumFields}
@@ -129,19 +141,19 @@ C\+L\+O\+S\+ED&\\
 
 Server options for enabling/disabling server features \begin{DoxyEnumFields}{Enumerator}
 \raisebox{\heightof{T}}[0pt][0pt]{\index{A\+S\+Y\+NC@{A\+S\+Y\+NC}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!A\+S\+Y\+NC@{A\+S\+Y\+NC}}}\mbox{\Hypertarget{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725ab5468e005ffe03733c26f12419ff0a94}\label{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725ab5468e005ffe03733c26f12419ff0a94}} 
-A\+S\+Y\+NC&\\
+A\+S\+Y\+NC&Run the server in the terminal. \\
 \hline
 
 \raisebox{\heightof{T}}[0pt][0pt]{\index{D\+A\+E\+M\+ON@{D\+A\+E\+M\+ON}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!D\+A\+E\+M\+ON@{D\+A\+E\+M\+ON}}}\mbox{\Hypertarget{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a4279fa865cddeda769528246147df162}\label{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a4279fa865cddeda769528246147df162}} 
-D\+A\+E\+M\+ON&\\
+D\+A\+E\+M\+ON&Run the server in background as a service. \\
 \hline
 
 \raisebox{\heightof{T}}[0pt][0pt]{\index{N\+O\+\_\+\+D\+E\+B\+UG@{N\+O\+\_\+\+D\+E\+B\+UG}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!N\+O\+\_\+\+D\+E\+B\+UG@{N\+O\+\_\+\+D\+E\+B\+UG}}}\mbox{\Hypertarget{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a8a940829337d73440d4227fe2d2fa950}\label{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a8a940829337d73440d4227fe2d2fa950}} 
-N\+O\+\_\+\+D\+E\+B\+UG&\\
+N\+O\+\_\+\+D\+E\+B\+UG&Turn off debug information. \\
 \hline
 
 \raisebox{\heightof{T}}[0pt][0pt]{\index{D\+E\+B\+UG@{D\+E\+B\+UG}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!D\+E\+B\+UG@{D\+E\+B\+UG}}}\mbox{\Hypertarget{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a0593585da9181e972974c1274d8f2b4f}\label{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a0593585da9181e972974c1274d8f2b4f}} 
-D\+E\+B\+UG&\\
+D\+E\+B\+UG&Turn on debug information. \\
 \hline
 
 \end{DoxyEnumFields}

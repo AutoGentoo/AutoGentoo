@@ -17,9 +17,12 @@ typedef response_t (*SHFP)(Connection* conn, char** args, int start);
  */
 typedef struct __RequestLink RequestLink;
 
+/**
+ * Links a string to a request handler
+ */
 struct __RequestLink {
-    char* request_ident;
-    SHFP call;
+    char* request_ident; //!< The string that matches the request
+    SHFP call; //!< A pointer to the function handler
 };
 
 /**

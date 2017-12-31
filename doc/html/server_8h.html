@@ -84,19 +84,25 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_____server.html">__Server</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The main struct that hold hosts/bindings and other information.  <a href="struct_____server.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_____host_bind.html">__HostBind</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind an IP to a host.  <a href="struct_____host_bind.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_____connection.html">__Connection</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds information about a connection.  <a href="struct_____connection.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a705d964b8a67edeeb3943273a397e4c2"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="struct_____server.html">__Server</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="server_8h.html#a705d964b8a67edeeb3943273a397e4c2">Server</a></td></tr>
+<tr class="memdesc:a705d964b8a67edeeb3943273a397e4c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The main struct that hold hosts/bindings and other information.  <a href="#a705d964b8a67edeeb3943273a397e4c2">More...</a><br /></td></tr>
 <tr class="separator:a705d964b8a67edeeb3943273a397e4c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3820b5acb10235e163b4c7f742769d59"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="struct_____host_bind.html">__HostBind</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="server_8h.html#a3820b5acb10235e163b4c7f742769d59">HostBind</a></td></tr>
+<tr class="memdesc:a3820b5acb10235e163b4c7f742769d59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind an IP to a host.  <a href="#a3820b5acb10235e163b4c7f742769d59">More...</a><br /></td></tr>
 <tr class="separator:a3820b5acb10235e163b4c7f742769d59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69a3fe08611a85e34c7a5a3ed93da235"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="struct_____connection.html">__Connection</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="server_8h.html#a69a3fe08611a85e34c7a5a3ed93da235">Connection</a></td></tr>
+<tr class="memdesc:a69a3fe08611a85e34c7a5a3ed93da235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds information about a connection.  <a href="#a69a3fe08611a85e34c7a5a3ed93da235">More...</a><br /></td></tr>
 <tr class="separator:a69a3fe08611a85e34c7a5a3ed93da235"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -149,7 +155,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Holds information about a connection</p><ul>
+
+<p>Holds information about a connection. </p>
+<ul>
 <li>A new connection will initilized after the return of accept().</li>
 <li>The request is immediately after the connection is made</li>
 <li>The bounded_host will be set as well (NULL if the IP is not bounded)</li>
@@ -169,7 +177,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Bind an IP to a host</p><ul>
+
+<p>Bind an IP to a host. </p>
+<ul>
 <li>This is used when a request is made.</li>
 <li>The IP of the request is matched to a Host using this struct </li>
 </ul>
@@ -187,7 +197,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The main struct that hold hosts/bindings and other information</p><ul>
+
+<p>The main struct that hold hosts/bindings and other information. </p>
+<ul>
 <li>This is pretty much required throughout the entire program so keep it! </li>
 </ul>
 
@@ -207,10 +219,14 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Holds the status of a connection </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="adff1af7110b02fbef1d43e5a4b638ee8a5849612cb4b71af31eebaeaadea322c5"></a>SERVER_ERROR&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="adff1af7110b02fbef1d43e5a4b638ee8a7a691a2430ec26878897b5fbc9c22a4c"></a>CONNECTED&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="adff1af7110b02fbef1d43e5a4b638ee8aecedb56d1405a60c6069f4a0139bdec5"></a>FAILED&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="adff1af7110b02fbef1d43e5a4b638ee8a929f0327e17604ce9713b2a6117bd603"></a>CLOSED&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="adff1af7110b02fbef1d43e5a4b638ee8a5849612cb4b71af31eebaeaadea322c5"></a>SERVER_ERROR&#160;</td><td class="fielddoc"><p>recv() error </p>
+</td></tr>
+<tr><td class="fieldname"><a id="adff1af7110b02fbef1d43e5a4b638ee8a7a691a2430ec26878897b5fbc9c22a4c"></a>CONNECTED&#160;</td><td class="fielddoc"><p>Successfully connected. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="adff1af7110b02fbef1d43e5a4b638ee8aecedb56d1405a60c6069f4a0139bdec5"></a>FAILED&#160;</td><td class="fielddoc"><p>Client disconnected closing the connection. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="adff1af7110b02fbef1d43e5a4b638ee8a929f0327e17604ce9713b2a6117bd603"></a>CLOSED&#160;</td><td class="fielddoc"><p>Closed successfully with <a class="el" href="server_8h.html#adb7090575d251c47a887352574f15622">connection_free()</a> </p>
+</td></tr>
 </table>
 
 </div>
@@ -228,10 +244,14 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Server options for enabling/disabling server features </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ac716a2b0d74f0b48cf81937cb7b3f725ab5468e005ffe03733c26f12419ff0a94"></a>ASYNC&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="ac716a2b0d74f0b48cf81937cb7b3f725a4279fa865cddeda769528246147df162"></a>DAEMON&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="ac716a2b0d74f0b48cf81937cb7b3f725a8a940829337d73440d4227fe2d2fa950"></a>NO_DEBUG&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="ac716a2b0d74f0b48cf81937cb7b3f725a0593585da9181e972974c1274d8f2b4f"></a>DEBUG&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ac716a2b0d74f0b48cf81937cb7b3f725ab5468e005ffe03733c26f12419ff0a94"></a>ASYNC&#160;</td><td class="fielddoc"><p>Run the server in the terminal. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac716a2b0d74f0b48cf81937cb7b3f725a4279fa865cddeda769528246147df162"></a>DAEMON&#160;</td><td class="fielddoc"><p>Run the server in background as a service. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac716a2b0d74f0b48cf81937cb7b3f725a8a940829337d73440d4227fe2d2fa950"></a>NO_DEBUG&#160;</td><td class="fielddoc"><p>Turn off debug information. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ac716a2b0d74f0b48cf81937cb7b3f725a0593585da9181e972974c1274d8f2b4f"></a>DEBUG&#160;</td><td class="fielddoc"><p>Turn on debug information. </p>
+</td></tr>
 </table>
 
 </div>

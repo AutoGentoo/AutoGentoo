@@ -68,7 +68,8 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">command.h File Reference</div>  </div>
 </div><!--header-->
@@ -80,11 +81,13 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_____command.html">__Command</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds information regarding a commandline call.  <a href="struct_____command.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:ade38f8bb88790360aa19962fcd401aca"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="struct_____command.html">__Command</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#ade38f8bb88790360aa19962fcd401aca">Command</a></td></tr>
+<tr class="memdesc:ade38f8bb88790360aa19962fcd401aca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds information regarding a commandline call.  <a href="#ade38f8bb88790360aa19962fcd401aca">More...</a><br /></td></tr>
 <tr class="separator:ade38f8bb88790360aa19962fcd401aca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -97,6 +100,12 @@ Functions</h2></td></tr>
 <tr class="separator:ad706fc66113165386d2b394caa3b6093"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09b1d7bed8c4f5faa3ccee7fbbd8138e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#a09b1d7bed8c4f5faa3ccee7fbbd8138e">command</a> (char *top, char *bottom, char **output, int *ret)</td></tr>
 <tr class="separator:a09b1d7bed8c4f5faa3ccee7fbbd8138e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a67767d4755385e273ec24dc0f7c1b9ad"><td class="memItemLeft" align="right" valign="top">SmallMap *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#a67767d4755385e273ec24dc0f7c1b9ad">tar</a></td></tr>
+<tr class="memdesc:a67767d4755385e273ec24dc0f7c1b9ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract and Compress files Valid commands.  <a href="#a67767d4755385e273ec24dc0f7c1b9ad">More...</a><br /></td></tr>
+<tr class="separator:a67767d4755385e273ec24dc0f7c1b9ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="ade38f8bb88790360aa19962fcd401aca"></a>
@@ -110,6 +119,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Holds information regarding a commandline call. </p>
 
 </div>
 </div>
@@ -263,10 +274,34 @@ Functions</h2></td></tr>
 <p>Run a command given its arguments </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">cmd</td><td>the command to run </td></tr>
+    <tr><td class="paramname">output</td><td>A pointer to the string to which the output is written </td></tr>
+    <tr><td class="paramname">ret</td><td>a pointer to which the return value of the command is written </td></tr>
     <tr><td class="paramname">...</td><td>the arguments to pass to the command </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a67767d4755385e273ec24dc0f7c1b9ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67767d4755385e273ec24dc0f7c1b9ad">&#9670;&nbsp;</a></span>tar</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SmallMap* tar</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extract and Compress files Valid commands. </p>
+<ul>
+<li>extract {file.tar} : Extract file.tar to the current directory</li>
+<li>extract to {file.tar, path} : Extract file.tar to path</li>
+<li>compress {file.tar, selector} : Compress files found through selector into file.tar </li>
+</ul>
 
 </div>
 </div>
