@@ -5,4 +5,4 @@
 *.sh linguist-vendored
 *.ac linguist-vendored
 doc/* linguist-vendored
-CMakeList.txt linguist-vendored
+CMakeLists.txt linguist-vendored
