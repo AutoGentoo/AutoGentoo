@@ -13,9 +13,9 @@ Command* command_new (char* fmt, int argc) {
     out->output = NULL;
     out->ret = -1;
 }
-void command_run (Command* cmd, ...) {
+void command_run (Command* cmd, char** output, int* ret, ...) {
     va_list args;
-    va_start (args, cmd);
+    va_start (args, ret);
     
     char* dest;
     vasprintf(&dest, cmd->format, args);
@@ -57,4 +57,8 @@ void command_free (Command* cmd) {
     command_reset(cmd);
     free(cmd->format);
     free (cmd);
+}
+
+void command(char *top, char *bottom, char **output, int *ret, ...) {
+    
 }

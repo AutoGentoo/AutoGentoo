@@ -1,0 +1,55 @@
+\hypertarget{download_8h}{}\section{include/download.h File Reference}
+\label{download_8h}\index{include/download.\+h@{include/download.\+h}}
+{\ttfamily \#include $<$response.\+h$>$}\newline
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{download_8h_a786aee38a475e8b2e78c31540bb39dd2}{down\+\_\+progress}} \{ \mbox{\hyperlink{download_8h_a786aee38a475e8b2e78c31540bb39dd2a0bfc7f81db63c23b1463d2bda746d174}{N\+O\+\_\+\+P\+R\+O\+G\+R\+E\+SS}}, 
+\mbox{\hyperlink{download_8h_a786aee38a475e8b2e78c31540bb39dd2a2e11ab673cd1c3aab4f76240a3449260}{S\+H\+O\+W\+\_\+\+P\+R\+O\+G\+R\+E\+SS}}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{download_8h_ad06fe6d46c8d93dc4e1c785c72c460d7}{download}} (char $\ast$url, char $\ast$dest, \mbox{\hyperlink{download_8h_a786aee38a475e8b2e78c31540bb39dd2}{down\+\_\+progress}} p)
+\end{DoxyCompactItemize}
+
+
+\subsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{download_8h_a786aee38a475e8b2e78c31540bb39dd2}\label{download_8h_a786aee38a475e8b2e78c31540bb39dd2}} 
+\index{download.\+h@{download.\+h}!down\+\_\+progress@{down\+\_\+progress}}
+\index{down\+\_\+progress@{down\+\_\+progress}!download.\+h@{download.\+h}}
+\subsubsection{\texorpdfstring{down\+\_\+progress}{down\_progress}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{download_8h_a786aee38a475e8b2e78c31540bb39dd2}{down\+\_\+progress}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{N\+O\+\_\+\+P\+R\+O\+G\+R\+E\+SS@{N\+O\+\_\+\+P\+R\+O\+G\+R\+E\+SS}!download.\+h@{download.\+h}}\index{download.\+h@{download.\+h}!N\+O\+\_\+\+P\+R\+O\+G\+R\+E\+SS@{N\+O\+\_\+\+P\+R\+O\+G\+R\+E\+SS}}}\mbox{\Hypertarget{download_8h_a786aee38a475e8b2e78c31540bb39dd2a0bfc7f81db63c23b1463d2bda746d174}\label{download_8h_a786aee38a475e8b2e78c31540bb39dd2a0bfc7f81db63c23b1463d2bda746d174}} 
+N\+O\+\_\+\+P\+R\+O\+G\+R\+E\+SS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{S\+H\+O\+W\+\_\+\+P\+R\+O\+G\+R\+E\+SS@{S\+H\+O\+W\+\_\+\+P\+R\+O\+G\+R\+E\+SS}!download.\+h@{download.\+h}}\index{download.\+h@{download.\+h}!S\+H\+O\+W\+\_\+\+P\+R\+O\+G\+R\+E\+SS@{S\+H\+O\+W\+\_\+\+P\+R\+O\+G\+R\+E\+SS}}}\mbox{\Hypertarget{download_8h_a786aee38a475e8b2e78c31540bb39dd2a2e11ab673cd1c3aab4f76240a3449260}\label{download_8h_a786aee38a475e8b2e78c31540bb39dd2a2e11ab673cd1c3aab4f76240a3449260}} 
+S\+H\+O\+W\+\_\+\+P\+R\+O\+G\+R\+E\+SS&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{download_8h_ad06fe6d46c8d93dc4e1c785c72c460d7}\label{download_8h_ad06fe6d46c8d93dc4e1c785c72c460d7}} 
+\index{download.\+h@{download.\+h}!download@{download}}
+\index{download@{download}!download.\+h@{download.\+h}}
+\subsubsection{\texorpdfstring{download()}{download()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} download (\begin{DoxyParamCaption}\item[{char $\ast$}]{url,  }\item[{char $\ast$}]{dest,  }\item[{\mbox{\hyperlink{download_8h_a786aee38a475e8b2e78c31540bb39dd2}{down\+\_\+progress}}}]{p }\end{DoxyParamCaption})}
+
+Download a file from the internet 
+\begin{DoxyParams}{Parameters}
+{\em url} & the url to download from \\
+\hline
+{\em dest} & the file to download to \\
+\hline
+{\em p} & Show/hide the progress bar \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The H\+T\+TP response status 
+\end{DoxyReturn}

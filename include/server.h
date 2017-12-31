@@ -1,8 +1,26 @@
 #ifndef __AUTOGENTOO_SERVER_H__
 #define __AUTOGENTOO_SERVER_H__
 
+/**
+ * @breif The main struct that hold hosts/bindings and other information
+ *  - This is pretty much required throughout the entire program so keep it!
+ */
 typedef struct __Server Server;
+
+/**
+ * @breif Bind an IP to a host
+ *  - This is used when a request is made. 
+ *  - The IP of the request is matched to a Host using this struct
+ */
 typedef struct __HostBind HostBind;
+
+/**
+ * @breif Holds information about a connection
+ *  - A new connection will initilized after the return of accept().
+ *  - The request is immediately after the connection is made
+ *  - The bounded_host will be set as well (NULL if the IP is not bounded)
+ *  - Since every connection runs in its own thread the pthread_t is kept here as well
+ */
 typedef struct __Connection Connection;
 
 #include <hacksaw/tools.h>
@@ -10,6 +28,9 @@ typedef struct __Connection Connection;
 #include <sys/types.h>
 #include <pthread.h>
 
+/**
+ * Server options for enabling/disabling server features
+ */
 typedef enum {
     ASYNC = 0x0,
     DAEMON = 0x1,
@@ -17,6 +38,9 @@ typedef enum {
     DEBUG = 0x2
 } server_t;
 
+/**
+ * Holds the status of a connection
+ */
 typedef enum {
     SERVER_ERROR, // recv() error
     CONNECTED,
@@ -24,26 +48,69 @@ typedef enum {
     CLOSED // Closed successfully with connection_free()
 } con_t;
 
+/**
+ * The main struct that hold hosts/bindings and other information
+ * 
+ * This is pretty much required throughout the entire program so keep it!
+ */
 struct __Server {
+    /// The working directory of the server
     char* location;
+    
+    /// The port to bind to
     int port;
+    
+    /// The options that the server was initilized with
     server_t opts;
+    
+    /// A list of hosts
     Vector* hosts;
+    
+    /// A list of host bindings
     Vector* host_bindings;
 };
 
+/**
+ * Bind an IP to a host
+ * 
+ * This is used when a request is made. 
+ * The IP of the request is matched to a Host using this struct
+ */
 struct __HostBind {
+    /// The IP to bind the host to
     char* ip;
+    
+    /// The target of the host binding
     Host* host;
 };
 
+/**
+ * @breif Holds information about a connection
+ * A new connection will initilized after the return of accept().
+ * The request is immediately after the connection is made
+ * The bounded_host will be set as well (NULL if the IP is not bounded)
+ * Since every connection runs in its own thread the pthread_t is kept here as well
+ */
 struct __Connection {
+    /// The parent server of the connection
     Server* parent;
-    Host* bounded_host; // NULL if unbounded
+    
+    /// The Host bounded to the connections IP address (NULL if unbounded)
+    Host* bounded_host;
+    
+    /// The entire request
     char* request;
+    
+    /// The IP of the connected client
     char* ip;
+    
+    /// The file descriptor that points to the open connections
     int fd;
+    
+    /// The pid of the pthread that the handle is runnning in
     pthread_t pid;
+    
+    /// The status of the current Connection
     con_t status;
 };
 

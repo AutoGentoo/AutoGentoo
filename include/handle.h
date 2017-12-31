@@ -4,7 +4,17 @@
 #include "server.h"
 #include "response.h"
 
-typedef response_t (*SHFP)(Connection*, char**, int);
+/**
+ * A function pointer for to handle requests
+ * @param conn the connection of the request
+ * @param args a list of arguments passed to the handler
+ * @param the index to start reading the request at
+ */
+typedef response_t (*SHFP)(Connection* conn, char** args, int start);
+
+/**
+ * Links a string to a request handler
+ */
 typedef struct __RequestLink RequestLink;
 
 struct __RequestLink {
@@ -12,6 +22,9 @@ struct __RequestLink {
     SHFP call;
 };
 
+/**
+ * Holds all of the valid requests
+ */
 extern RequestLink requests[];
 
 /**
@@ -43,7 +56,8 @@ response_t INSTALL (Connection* conn, char** args, int start);
 /* SRV Configure requests */
 
 /**
- * Create a new client \
+ * Create a new client
+ * 
  * ARGUMENTS ARE SEPARATED BY NEW LINES!
  * @param conn the connection that holds the request
  * @param args [argc of ETC] [HOSTNAME] [PROFILE] [CHOST] [CFLAGS] [USE] [ETC]
@@ -56,6 +70,8 @@ response_t SRV_CREATE (Connection* conn, char** args, int start);
 
 /**
  * Edit an existing Host
+ * 
+ * ARGUMENTS ARE SEPARATED BY NEW LINES!
  * @param conn the connection that holds the request
  * @param args [argc of ETC] [ID] [HOSTNAME] [PROFILE] [CHOST] [CFLAGS] [USE] [ETC]
  * @param start Start index to read from request
@@ -73,7 +89,8 @@ response_t SRV_EDIT (Connection* conn, char** args, int start);
 response_t SRV_ACTIVATE (Connection* conn, char** args, int start);
 
 /**
- * Delete a host (currently all users can do this) \
+ * Delete a host (currently all users can do this)
+ * 
  * This will be changed
  * @param conn the connection that holds the request
  * @param args [HOST_ID]
@@ -85,7 +102,8 @@ response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start);
 /* SRV Utility request */
 
 /**
- * Initialize a host \
+ * Initialize a host
+ * 
  * This has a scheduled deprecation due to HostTemplate implementations
  * @param conn the connection that holds the request
  * @param args (none)
@@ -95,7 +113,8 @@ response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start);
 response_t SRV_INIT (Connection* conn, char** args, int start);
 
 /**
- * Initilize the STAGE1 of the bounded host \
+ * Initilize the STAGE1 of the bounded host
+ * 
  * This has a scheduled deprecation due to HostTemplate implementations
  * @param conn the connection that holds the request
  * @param args (none)
@@ -125,7 +144,8 @@ response_t SRV_MNTCHROOT (Connection* conn, char** args, int start);
 response_t SRV_GETHOST (Connection* conn, char** args, int start);
 
 /**
- * Returns an int (host count) followed by a list of the created hosts \
+ * Returns an int (host count) followed by a list of the created hosts
+ * 
  * All of these are newline separated
  * @param conn the connection that holds the request
  * @param args (none)

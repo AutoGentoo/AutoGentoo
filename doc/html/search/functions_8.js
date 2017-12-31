@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['server_5fbind',['server_bind',['../server_8h.html#af7cfef1360464e5a420893ce09ed7a0a',1,'server.h']]],
+  ['server_5fget_5factive',['server_get_active',['../server_8h.html#aceac80287d5de9797cddc63d4cd8c0dc',1,'server.h']]],
+  ['server_5fhost_5fsearch',['server_host_search',['../server_8h.html#a2cba2ae5ab1ed23fefd786668bf7aa24',1,'server.h']]],
+  ['server_5finit',['server_init',['../server_8h.html#aee998aa54fa5b6549c88f6fdc7fee00e',1,'server.h']]],
+  ['server_5fnew',['server_new',['../server_8h.html#a8c231191b8f9e0dc86106531e9bb7188',1,'server.h']]],
+  ['server_5frespond',['server_respond',['../server_8h.html#a25540ebc50cda0846620399b6ad57552',1,'server.h']]],
+  ['server_5fstart',['server_start',['../server_8h.html#afbb706811c16aaf6468534d9f6c926e8',1,'server.h']]],
+  ['srv_5factivate',['SRV_ACTIVATE',['../handle_8h.html#af697e982bfd6b752964886a462db94f4',1,'handle.h']]],
+  ['srv_5fcreate',['SRV_CREATE',['../handle_8h.html#a42965bce36dd220872858b589c910dcb',1,'handle.h']]],
+  ['srv_5fedit',['SRV_EDIT',['../handle_8h.html#a4cbc61797a220e268fa1026139761a2c',1,'handle.h']]],
+  ['srv_5fgetactive',['SRV_GETACTIVE',['../handle_8h.html#a9c51da135ba177f921c7f349d19e1c40',1,'handle.h']]],
+  ['srv_5fgethost',['SRV_GETHOST',['../handle_8h.html#a8543d889b8b615ef27a31c499f2f3d0f',1,'handle.h']]],
+  ['srv_5fgethosts',['SRV_GETHOSTS',['../handle_8h.html#aa4bf5e0ff6fad8100a3a26d63b24f702',1,'handle.h']]],
+  ['srv_5fgetspec',['SRV_GETSPEC',['../handle_8h.html#ac8410cb248b646464d3e3d7032d9d58c',1,'handle.h']]],
+  ['srv_5fhostremove',['SRV_HOSTREMOVE',['../handle_8h.html#a8135b2e84b2feb7a155a3342b1434d25',1,'handle.h']]],
+  ['srv_5finit',['SRV_INIT',['../handle_8h.html#ac6b4eb93f78442868c163f88c61347fc',1,'handle.h']]],
+  ['srv_5fmntchroot',['SRV_MNTCHROOT',['../handle_8h.html#a7ad72aefcb7a522761044b505853adad',1,'handle.h']]],
+  ['srv_5fstage1',['SRV_STAGE1',['../handle_8h.html#ab3ead660b6cff42c4801d94918c9e61f',1,'handle.h']]]
+];

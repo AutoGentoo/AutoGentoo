@@ -23,7 +23,7 @@ Command* command_new (char* fmt, int argc);
  * @param cmd the command to run
  * @param ... the arguments to pass to the command
  */
-void command_run (Command* cmd, ...);
+void command_run (Command* cmd, char** output, int* ret, ...);
 
 /**
  * Free a command

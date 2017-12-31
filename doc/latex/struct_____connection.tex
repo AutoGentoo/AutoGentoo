@@ -1,0 +1,104 @@
+\hypertarget{struct_____connection}{}\section{\+\_\+\+\_\+\+Connection Struct Reference}
+\label{struct_____connection}\index{\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}}
+
+
+{\ttfamily \#include $<$server.\+h$>$}
+
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$ \mbox{\hyperlink{struct_____connection_ad4b092dd27ad2126d0a6ee313e14c430}{parent}}
+\begin{DoxyCompactList}\small\item\em The parent server of the connection. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$ \mbox{\hyperlink{struct_____connection_a141d30c3e0a43c1a460797bfd4e4d581}{bounded\+\_\+host}}
+\begin{DoxyCompactList}\small\item\em The Host bounded to the connections IP address (N\+U\+LL if unbounded) \end{DoxyCompactList}\item 
+char $\ast$ \mbox{\hyperlink{struct_____connection_aee994fd59229c469bc2489350a981590}{request}}
+\begin{DoxyCompactList}\small\item\em The entire request. \end{DoxyCompactList}\item 
+char $\ast$ \mbox{\hyperlink{struct_____connection_a4612124e8b89da32e748c7a5377ad554}{ip}}
+\begin{DoxyCompactList}\small\item\em The IP of the connected client. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{struct_____connection_a49433c1edd3dd2f86a724047f9de2414}{fd}}
+\begin{DoxyCompactList}\small\item\em The file descriptor that points to the open connections. \end{DoxyCompactList}\item 
+pthread\+\_\+t \mbox{\hyperlink{struct_____connection_a14f7aa2d4815a0292b0e0579ea3ffec3}{pid}}
+\begin{DoxyCompactList}\small\item\em The pid of the pthread that the handle is runnning in. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{server_8h_adff1af7110b02fbef1d43e5a4b638ee8}{con\+\_\+t}} \mbox{\hyperlink{struct_____connection_ab68ce7496aed662e1431a1c29d7c2a10}{status}}
+\begin{DoxyCompactList}\small\item\em The status of the current Connection. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Holds information about a connection A new connection will initilized after the return of accept(). The request is immediately after the connection is made The bounded\+\_\+host will be set as well (N\+U\+LL if the IP is not bounded) Since every connection runs in its own thread the pthread\+\_\+t is kept here as well 
+
+\subsection{Field Documentation}
+\mbox{\Hypertarget{struct_____connection_a141d30c3e0a43c1a460797bfd4e4d581}\label{struct_____connection_a141d30c3e0a43c1a460797bfd4e4d581}} 
+\index{\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}!bounded\+\_\+host@{bounded\+\_\+host}}
+\index{bounded\+\_\+host@{bounded\+\_\+host}!\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}}
+\subsubsection{\texorpdfstring{bounded\+\_\+host}{bounded\_host}}
+{\footnotesize\ttfamily \mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}}$\ast$ \+\_\+\+\_\+\+Connection\+::bounded\+\_\+host}
+
+
+
+The Host bounded to the connections IP address (N\+U\+LL if unbounded) 
+
+\mbox{\Hypertarget{struct_____connection_a49433c1edd3dd2f86a724047f9de2414}\label{struct_____connection_a49433c1edd3dd2f86a724047f9de2414}} 
+\index{\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}!fd@{fd}}
+\index{fd@{fd}!\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}}
+\subsubsection{\texorpdfstring{fd}{fd}}
+{\footnotesize\ttfamily int \+\_\+\+\_\+\+Connection\+::fd}
+
+
+
+The file descriptor that points to the open connections. 
+
+\mbox{\Hypertarget{struct_____connection_a4612124e8b89da32e748c7a5377ad554}\label{struct_____connection_a4612124e8b89da32e748c7a5377ad554}} 
+\index{\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}!ip@{ip}}
+\index{ip@{ip}!\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}}
+\subsubsection{\texorpdfstring{ip}{ip}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Connection\+::ip}
+
+
+
+The IP of the connected client. 
+
+\mbox{\Hypertarget{struct_____connection_ad4b092dd27ad2126d0a6ee313e14c430}\label{struct_____connection_ad4b092dd27ad2126d0a6ee313e14c430}} 
+\index{\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}!parent@{parent}}
+\index{parent@{parent}!\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}}
+\subsubsection{\texorpdfstring{parent}{parent}}
+{\footnotesize\ttfamily \mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}}$\ast$ \+\_\+\+\_\+\+Connection\+::parent}
+
+
+
+The parent server of the connection. 
+
+\mbox{\Hypertarget{struct_____connection_a14f7aa2d4815a0292b0e0579ea3ffec3}\label{struct_____connection_a14f7aa2d4815a0292b0e0579ea3ffec3}} 
+\index{\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}!pid@{pid}}
+\index{pid@{pid}!\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}}
+\subsubsection{\texorpdfstring{pid}{pid}}
+{\footnotesize\ttfamily pthread\+\_\+t \+\_\+\+\_\+\+Connection\+::pid}
+
+
+
+The pid of the pthread that the handle is runnning in. 
+
+\mbox{\Hypertarget{struct_____connection_aee994fd59229c469bc2489350a981590}\label{struct_____connection_aee994fd59229c469bc2489350a981590}} 
+\index{\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}!request@{request}}
+\index{request@{request}!\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}}
+\subsubsection{\texorpdfstring{request}{request}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Connection\+::request}
+
+
+
+The entire request. 
+
+\mbox{\Hypertarget{struct_____connection_ab68ce7496aed662e1431a1c29d7c2a10}\label{struct_____connection_ab68ce7496aed662e1431a1c29d7c2a10}} 
+\index{\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}!status@{status}}
+\index{status@{status}!\+\_\+\+\_\+\+Connection@{\+\_\+\+\_\+\+Connection}}
+\subsubsection{\texorpdfstring{status}{status}}
+{\footnotesize\ttfamily \mbox{\hyperlink{server_8h_adff1af7110b02fbef1d43e5a4b638ee8}{con\+\_\+t}} \+\_\+\+\_\+\+Connection\+::status}
+
+
+
+The status of the current Connection. 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/\mbox{\hyperlink{server_8h}{server.\+h}}\end{DoxyCompactItemize}

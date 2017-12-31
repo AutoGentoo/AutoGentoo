@@ -1,0 +1,351 @@
+\hypertarget{handle_8h}{}\section{include/handle.h File Reference}
+\label{handle_8h}\index{include/handle.\+h@{include/handle.\+h}}
+{\ttfamily \#include \char`\"{}server.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}response.\+h\char`\"{}}\newline
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_____request_link}{\+\_\+\+\_\+\+Request\+Link}}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{structresponse__t}{response\+\_\+t}}($\ast$ \mbox{\hyperlink{handle_8h_a21ced4481879f31088fa333eedee03e1}{S\+H\+FP}}) (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+typedef struct \mbox{\hyperlink{struct_____request_link}{\+\_\+\+\_\+\+Request\+Link}} \mbox{\hyperlink{handle_8h_a8860479dab18c478c6e6b074b9962be9}{Request\+Link}}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{handle_8h_a21ced4481879f31088fa333eedee03e1}{S\+H\+FP}} \mbox{\hyperlink{handle_8h_a6c0bb96e1be13ffdc56a876d2efbee03}{parse\+\_\+request}} (char $\ast$parse\+\_\+line, char $\ast$$\ast$args)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_a2c300ae9a3267d96fb2b8af2944b26de}{G\+ET}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_a0647c16171e5dde0d6e6a5e8be3f4f7c}{I\+N\+S\+T\+A\+LL}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_a42965bce36dd220872858b589c910dcb}{S\+R\+V\+\_\+\+C\+R\+E\+A\+TE}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_a4cbc61797a220e268fa1026139761a2c}{S\+R\+V\+\_\+\+E\+D\+IT}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_af697e982bfd6b752964886a462db94f4}{S\+R\+V\+\_\+\+A\+C\+T\+I\+V\+A\+TE}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_a8135b2e84b2feb7a155a3342b1434d25}{S\+R\+V\+\_\+\+H\+O\+S\+T\+R\+E\+M\+O\+VE}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_ac6b4eb93f78442868c163f88c61347fc}{S\+R\+V\+\_\+\+I\+N\+IT}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_ab3ead660b6cff42c4801d94918c9e61f}{S\+R\+V\+\_\+\+S\+T\+A\+G\+E1}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_a7ad72aefcb7a522761044b505853adad}{S\+R\+V\+\_\+\+M\+N\+T\+C\+H\+R\+O\+OT}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_a8543d889b8b615ef27a31c499f2f3d0f}{S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+ST}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_aa4bf5e0ff6fad8100a3a26d63b24f702}{S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+S\+TS}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_a9c51da135ba177f921c7f349d19e1c40}{S\+R\+V\+\_\+\+G\+E\+T\+A\+C\+T\+I\+VE}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{handle_8h_ac8410cb248b646464d3e3d7032d9d58c}{S\+R\+V\+\_\+\+G\+E\+T\+S\+P\+EC}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{handle_8h_a8860479dab18c478c6e6b074b9962be9}{Request\+Link}} \mbox{\hyperlink{handle_8h_a9a944ff028a3f522a4bfad69dbe69ef4}{requests}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{handle_8h_a8860479dab18c478c6e6b074b9962be9}\label{handle_8h_a8860479dab18c478c6e6b074b9962be9}} 
+\index{handle.\+h@{handle.\+h}!Request\+Link@{Request\+Link}}
+\index{Request\+Link@{Request\+Link}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{Request\+Link}{RequestLink}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____request_link}{\+\_\+\+\_\+\+Request\+Link}} \mbox{\hyperlink{handle_8h_a8860479dab18c478c6e6b074b9962be9}{Request\+Link}}}
+
+Links a string to a request handler \mbox{\Hypertarget{handle_8h_a21ced4481879f31088fa333eedee03e1}\label{handle_8h_a21ced4481879f31088fa333eedee03e1}} 
+\index{handle.\+h@{handle.\+h}!S\+H\+FP@{S\+H\+FP}}
+\index{S\+H\+FP@{S\+H\+FP}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+H\+FP}{SHFP}}
+{\footnotesize\ttfamily typedef \mbox{\hyperlink{structresponse__t}{response\+\_\+t}}($\ast$ S\+H\+FP) (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, char $\ast$$\ast$args, int start)}
+
+A function pointer for to handle requests 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection of the request \\
+\hline
+{\em args} & a list of arguments passed to the handler \\
+\hline
+{\em the} & index to start reading the request at \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{handle_8h_a2c300ae9a3267d96fb2b8af2944b26de}\label{handle_8h_a2c300ae9a3267d96fb2b8af2944b26de}} 
+\index{handle.\+h@{handle.\+h}!G\+ET@{G\+ET}}
+\index{G\+ET@{G\+ET}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{G\+E\+T()}{GET()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} G\+ET (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+H\+T\+TP request to download file 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & \mbox{[}path\mbox{]} \mbox{[}H\+T\+T\+P/1.\+0 or 1.\+1\mbox{]} \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_a0647c16171e5dde0d6e6a5e8be3f4f7c}\label{handle_8h_a0647c16171e5dde0d6e6a5e8be3f4f7c}} 
+\index{handle.\+h@{handle.\+h}!I\+N\+S\+T\+A\+LL@{I\+N\+S\+T\+A\+LL}}
+\index{I\+N\+S\+T\+A\+LL@{I\+N\+S\+T\+A\+LL}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{I\+N\+S\+T\+A\+L\+L()}{INSTALL()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} I\+N\+S\+T\+A\+LL (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Install a packages to the bounded host 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & \mbox{[}emerge argument\mbox{[}s\mbox{]}\mbox{]} \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_a6c0bb96e1be13ffdc56a876d2efbee03}\label{handle_8h_a6c0bb96e1be13ffdc56a876d2efbee03}} 
+\index{handle.\+h@{handle.\+h}!parse\+\_\+request@{parse\+\_\+request}}
+\index{parse\+\_\+request@{parse\+\_\+request}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{parse\+\_\+request()}{parse\_request()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{handle_8h_a21ced4481879f31088fa333eedee03e1}{S\+H\+FP}} parse\+\_\+request (\begin{DoxyParamCaption}\item[{char $\ast$}]{parse\+\_\+line,  }\item[{char $\ast$$\ast$}]{args }\end{DoxyParamCaption})}
+
+Parse the request and write the arguemnts to args 
+\begin{DoxyParams}{Parameters}
+{\em parse\+\_\+line} & the input request to read from \\
+\hline
+{\em args} & the arguments parsed from the request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer to function that should be called 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_af697e982bfd6b752964886a462db94f4}\label{handle_8h_af697e982bfd6b752964886a462db94f4}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+A\+C\+T\+I\+V\+A\+TE@{S\+R\+V\+\_\+\+A\+C\+T\+I\+V\+A\+TE}}
+\index{S\+R\+V\+\_\+\+A\+C\+T\+I\+V\+A\+TE@{S\+R\+V\+\_\+\+A\+C\+T\+I\+V\+A\+TE}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+A\+C\+T\+I\+V\+A\+T\+E()}{SRV\_ACTIVATE()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+A\+C\+T\+I\+V\+A\+TE (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Bind the connections ip address to the specified Host$\ast$ 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & \mbox{[}H\+O\+S\+T\+\_\+\+ID\mbox{]} \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_a42965bce36dd220872858b589c910dcb}\label{handle_8h_a42965bce36dd220872858b589c910dcb}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+C\+R\+E\+A\+TE@{S\+R\+V\+\_\+\+C\+R\+E\+A\+TE}}
+\index{S\+R\+V\+\_\+\+C\+R\+E\+A\+TE@{S\+R\+V\+\_\+\+C\+R\+E\+A\+TE}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+C\+R\+E\+A\+T\+E()}{SRV\_CREATE()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+C\+R\+E\+A\+TE (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Create a new client
+
+A\+R\+G\+U\+M\+E\+N\+TS A\+RE S\+E\+P\+A\+R\+A\+T\+ED BY N\+EW L\+I\+N\+E\+S! 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & \mbox{[}argc of E\+TC\mbox{]} \mbox{[}H\+O\+S\+T\+N\+A\+ME\mbox{]} \mbox{[}P\+R\+O\+F\+I\+LE\mbox{]} \mbox{[}C\+H\+O\+ST\mbox{]} \mbox{[}C\+F\+L\+A\+GS\mbox{]} \mbox{[}U\+SE\mbox{]} \mbox{[}E\+TC\mbox{]} \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_a4cbc61797a220e268fa1026139761a2c}\label{handle_8h_a4cbc61797a220e268fa1026139761a2c}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+E\+D\+IT@{S\+R\+V\+\_\+\+E\+D\+IT}}
+\index{S\+R\+V\+\_\+\+E\+D\+IT@{S\+R\+V\+\_\+\+E\+D\+IT}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+E\+D\+I\+T()}{SRV\_EDIT()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+E\+D\+IT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Edit an existing Host
+
+A\+R\+G\+U\+M\+E\+N\+TS A\+RE S\+E\+P\+A\+R\+A\+T\+ED BY N\+EW L\+I\+N\+E\+S! 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & \mbox{[}argc of E\+TC\mbox{]} \mbox{[}ID\mbox{]} \mbox{[}H\+O\+S\+T\+N\+A\+ME\mbox{]} \mbox{[}P\+R\+O\+F\+I\+LE\mbox{]} \mbox{[}C\+H\+O\+ST\mbox{]} \mbox{[}C\+F\+L\+A\+GS\mbox{]} \mbox{[}U\+SE\mbox{]} \mbox{[}E\+TC\mbox{]} \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_a9c51da135ba177f921c7f349d19e1c40}\label{handle_8h_a9c51da135ba177f921c7f349d19e1c40}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+G\+E\+T\+A\+C\+T\+I\+VE@{S\+R\+V\+\_\+\+G\+E\+T\+A\+C\+T\+I\+VE}}
+\index{S\+R\+V\+\_\+\+G\+E\+T\+A\+C\+T\+I\+VE@{S\+R\+V\+\_\+\+G\+E\+T\+A\+C\+T\+I\+VE}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+G\+E\+T\+A\+C\+T\+I\+V\+E()}{SRV\_GETACTIVE()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+G\+E\+T\+A\+C\+T\+I\+VE (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Returns the ID of the bounded host of the IP from the current request 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & (none) \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_a8543d889b8b615ef27a31c499f2f3d0f}\label{handle_8h_a8543d889b8b615ef27a31c499f2f3d0f}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+ST@{S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+ST}}
+\index{S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+ST@{S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+ST}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+S\+T()}{SRV\_GETHOST()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+ST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Returns metadata of the Host selected 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & \mbox{[}H\+O\+S\+T\+\_\+\+ID\mbox{]} \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_aa4bf5e0ff6fad8100a3a26d63b24f702}\label{handle_8h_aa4bf5e0ff6fad8100a3a26d63b24f702}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+S\+TS@{S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+S\+TS}}
+\index{S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+S\+TS@{S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+S\+TS}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+S\+T\+S()}{SRV\_GETHOSTS()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+G\+E\+T\+H\+O\+S\+TS (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Returns an int (host count) followed by a list of the created hosts
+
+All of these are newline separated 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & (none) \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_ac8410cb248b646464d3e3d7032d9d58c}\label{handle_8h_ac8410cb248b646464d3e3d7032d9d58c}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+G\+E\+T\+S\+P\+EC@{S\+R\+V\+\_\+\+G\+E\+T\+S\+P\+EC}}
+\index{S\+R\+V\+\_\+\+G\+E\+T\+S\+P\+EC@{S\+R\+V\+\_\+\+G\+E\+T\+S\+P\+EC}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+G\+E\+T\+S\+P\+E\+C()}{SRV\_GETSPEC()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+G\+E\+T\+S\+P\+EC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Returns information outputed from \textquotesingle{}lscpu\textquotesingle{} of the build server 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & (none) \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_a8135b2e84b2feb7a155a3342b1434d25}\label{handle_8h_a8135b2e84b2feb7a155a3342b1434d25}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+H\+O\+S\+T\+R\+E\+M\+O\+VE@{S\+R\+V\+\_\+\+H\+O\+S\+T\+R\+E\+M\+O\+VE}}
+\index{S\+R\+V\+\_\+\+H\+O\+S\+T\+R\+E\+M\+O\+VE@{S\+R\+V\+\_\+\+H\+O\+S\+T\+R\+E\+M\+O\+VE}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+H\+O\+S\+T\+R\+E\+M\+O\+V\+E()}{SRV\_HOSTREMOVE()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+H\+O\+S\+T\+R\+E\+M\+O\+VE (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Delete a host (currently all users can do this)
+
+This will be changed 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & \mbox{[}H\+O\+S\+T\+\_\+\+ID\mbox{]} \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_ac6b4eb93f78442868c163f88c61347fc}\label{handle_8h_ac6b4eb93f78442868c163f88c61347fc}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+I\+N\+IT@{S\+R\+V\+\_\+\+I\+N\+IT}}
+\index{S\+R\+V\+\_\+\+I\+N\+IT@{S\+R\+V\+\_\+\+I\+N\+IT}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+I\+N\+I\+T()}{SRV\_INIT()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+I\+N\+IT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Initialize a host
+
+This has a scheduled deprecation due to Host\+Template implementations 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & (none) \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_a7ad72aefcb7a522761044b505853adad}\label{handle_8h_a7ad72aefcb7a522761044b505853adad}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+M\+N\+T\+C\+H\+R\+O\+OT@{S\+R\+V\+\_\+\+M\+N\+T\+C\+H\+R\+O\+OT}}
+\index{S\+R\+V\+\_\+\+M\+N\+T\+C\+H\+R\+O\+OT@{S\+R\+V\+\_\+\+M\+N\+T\+C\+H\+R\+O\+OT}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+M\+N\+T\+C\+H\+R\+O\+O\+T()}{SRV\_MNTCHROOT()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+M\+N\+T\+C\+H\+R\+O\+OT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Mount all the directories required to chroot() to Host 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & (none) \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{handle_8h_ab3ead660b6cff42c4801d94918c9e61f}\label{handle_8h_ab3ead660b6cff42c4801d94918c9e61f}} 
+\index{handle.\+h@{handle.\+h}!S\+R\+V\+\_\+\+S\+T\+A\+G\+E1@{S\+R\+V\+\_\+\+S\+T\+A\+G\+E1}}
+\index{S\+R\+V\+\_\+\+S\+T\+A\+G\+E1@{S\+R\+V\+\_\+\+S\+T\+A\+G\+E1}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{S\+R\+V\+\_\+\+S\+T\+A\+G\+E1()}{SRV\_STAGE1()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} S\+R\+V\+\_\+\+S\+T\+A\+G\+E1 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{char $\ast$$\ast$}]{args,  }\item[{int}]{start }\end{DoxyParamCaption})}
+
+Initilize the S\+T\+A\+G\+E1 of the bounded host
+
+This has a scheduled deprecation due to Host\+Template implementations 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds the request \\
+\hline
+{\em args} & (none) \\
+\hline
+{\em start} & Start index to read from request \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+T\+TP standard codes 
+\end{DoxyReturn}
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{handle_8h_a9a944ff028a3f522a4bfad69dbe69ef4}\label{handle_8h_a9a944ff028a3f522a4bfad69dbe69ef4}} 
+\index{handle.\+h@{handle.\+h}!requests@{requests}}
+\index{requests@{requests}!handle.\+h@{handle.\+h}}
+\subsubsection{\texorpdfstring{requests}{requests}}
+{\footnotesize\ttfamily \mbox{\hyperlink{handle_8h_a8860479dab18c478c6e6b074b9962be9}{Request\+Link}} requests\mbox{[}$\,$\mbox{]}}
+
+Holds all of the valid requests 

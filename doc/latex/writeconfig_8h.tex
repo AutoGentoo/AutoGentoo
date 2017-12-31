@@ -1,0 +1,180 @@
+\hypertarget{writeconfig_8h}{}\section{include/writeconfig.h File Reference}
+\label{writeconfig_8h}\index{include/writeconfig.\+h@{include/writeconfig.\+h}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}server.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}host.\+h\char`\"{}}\newline
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{writeconfig_8h_a353e6b44fef2c3f9b5abab0876991357}{write\+\_\+server}} (\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$server)
+\item 
+void \mbox{\hyperlink{writeconfig_8h_adcc2e7864fb6e0d6d10d8afa9f9eb590}{write\+\_\+server\+\_\+fp}} (\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$server, F\+I\+LE $\ast$fp)
+\item 
+void \mbox{\hyperlink{writeconfig_8h_af2c06bb40cc926b9b88c9b18902a3e81}{write\+\_\+host\+\_\+fp}} (\mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$host, F\+I\+LE $\ast$fp)
+\item 
+void \mbox{\hyperlink{writeconfig_8h_af6a607d2f8d9f489452134716ca84844}{write\+\_\+host\+\_\+binding\+\_\+fp}} (\mbox{\hyperlink{server_8h_a3820b5acb10235e163b4c7f742769d59}{Host\+Bind}} $\ast$bind, F\+I\+LE $\ast$fp)
+\item 
+\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$ \mbox{\hyperlink{writeconfig_8h_ad3909d5fc0e482b517b0b69c437cec97}{read\+\_\+server}} (char $\ast$location)
+\item 
+\mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$ \mbox{\hyperlink{writeconfig_8h_a5f43867ba5d2efd340748d20f7591647}{read\+\_\+host}} (F\+I\+LE $\ast$fp)
+\item 
+void \mbox{\hyperlink{writeconfig_8h_aa6fe40162ca55184b55139d4703cf3f3}{read\+\_\+host\+\_\+binding}} (\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$server, \mbox{\hyperlink{server_8h_a3820b5acb10235e163b4c7f742769d59}{Host\+Bind}} $\ast$dest, F\+I\+LE $\ast$fp)
+\item 
+void \mbox{\hyperlink{writeconfig_8h_ad61459a7dcc310e643a8ed8d8c6f8de2}{write\+\_\+string}} (char $\ast$src, F\+I\+LE $\ast$fp)
+\item 
+char $\ast$ \mbox{\hyperlink{writeconfig_8h_a094319f4978cff61cdde2ea320ff66d6}{read\+\_\+string}} (F\+I\+LE $\ast$fp)
+\item 
+void \mbox{\hyperlink{writeconfig_8h_a4e67c464e6e30bbe0160c1e7ee74d20b}{write\+\_\+int}} (int src, F\+I\+LE $\ast$fp)
+\item 
+int \mbox{\hyperlink{writeconfig_8h_a8f115d50e71cbe3c5c3f3c0570070543}{read\+\_\+int}} (F\+I\+LE $\ast$fp)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{writeconfig_8h_a5f43867ba5d2efd340748d20f7591647}\label{writeconfig_8h_a5f43867ba5d2efd340748d20f7591647}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!read\+\_\+host@{read\+\_\+host}}
+\index{read\+\_\+host@{read\+\_\+host}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{read\+\_\+host()}{read\_host()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}}$\ast$ read\+\_\+host (\begin{DoxyParamCaption}\item[{F\+I\+LE $\ast$}]{fp }\end{DoxyParamCaption})}
+
+Read host from file 
+\begin{DoxyParams}{Parameters}
+{\em fp} & the open file to read from \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the new host created after reading the file 
+\end{DoxyReturn}
+\mbox{\Hypertarget{writeconfig_8h_aa6fe40162ca55184b55139d4703cf3f3}\label{writeconfig_8h_aa6fe40162ca55184b55139d4703cf3f3}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!read\+\_\+host\+\_\+binding@{read\+\_\+host\+\_\+binding}}
+\index{read\+\_\+host\+\_\+binding@{read\+\_\+host\+\_\+binding}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{read\+\_\+host\+\_\+binding()}{read\_host\_binding()}}
+{\footnotesize\ttfamily void read\+\_\+host\+\_\+binding (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$}]{server,  }\item[{\mbox{\hyperlink{server_8h_a3820b5acb10235e163b4c7f742769d59}{Host\+Bind}} $\ast$}]{dest,  }\item[{F\+I\+LE $\ast$}]{fp }\end{DoxyParamCaption})}
+
+Read host binding from file 
+\begin{DoxyParams}{Parameters}
+{\em server} & The server to read into \\
+\hline
+{\em dest} & the binding destination \\
+\hline
+{\em fp} & the file to read from \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{writeconfig_8h_a8f115d50e71cbe3c5c3f3c0570070543}\label{writeconfig_8h_a8f115d50e71cbe3c5c3f3c0570070543}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!read\+\_\+int@{read\+\_\+int}}
+\index{read\+\_\+int@{read\+\_\+int}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{read\+\_\+int()}{read\_int()}}
+{\footnotesize\ttfamily int read\+\_\+int (\begin{DoxyParamCaption}\item[{F\+I\+LE $\ast$}]{fp }\end{DoxyParamCaption})}
+
+Read an integer from file 
+\begin{DoxyParams}{Parameters}
+{\em fp} & the file to read from \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the integer that has been read 
+\end{DoxyReturn}
+\mbox{\Hypertarget{writeconfig_8h_ad3909d5fc0e482b517b0b69c437cec97}\label{writeconfig_8h_ad3909d5fc0e482b517b0b69c437cec97}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!read\+\_\+server@{read\+\_\+server}}
+\index{read\+\_\+server@{read\+\_\+server}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{read\+\_\+server()}{read\_server()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}}$\ast$ read\+\_\+server (\begin{DoxyParamCaption}\item[{char $\ast$}]{location }\end{DoxyParamCaption})}
+
+Read server from localtion 
+\begin{DoxyParams}{Parameters}
+{\em location} & the localtion of the file \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a new server that was read from the file 
+\end{DoxyReturn}
+\mbox{\Hypertarget{writeconfig_8h_a094319f4978cff61cdde2ea320ff66d6}\label{writeconfig_8h_a094319f4978cff61cdde2ea320ff66d6}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!read\+\_\+string@{read\+\_\+string}}
+\index{read\+\_\+string@{read\+\_\+string}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{read\+\_\+string()}{read\_string()}}
+{\footnotesize\ttfamily char$\ast$ read\+\_\+string (\begin{DoxyParamCaption}\item[{F\+I\+LE $\ast$}]{fp }\end{DoxyParamCaption})}
+
+Reads a string from file \textbackslash{} reads until the it reaches a N\+U\+LL terminator 
+\begin{DoxyParams}{Parameters}
+{\em fp} & the file to read from \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a dynamically allocated string that has been read from file 
+\end{DoxyReturn}
+\mbox{\Hypertarget{writeconfig_8h_af6a607d2f8d9f489452134716ca84844}\label{writeconfig_8h_af6a607d2f8d9f489452134716ca84844}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!write\+\_\+host\+\_\+binding\+\_\+fp@{write\+\_\+host\+\_\+binding\+\_\+fp}}
+\index{write\+\_\+host\+\_\+binding\+\_\+fp@{write\+\_\+host\+\_\+binding\+\_\+fp}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{write\+\_\+host\+\_\+binding\+\_\+fp()}{write\_host\_binding\_fp()}}
+{\footnotesize\ttfamily void write\+\_\+host\+\_\+binding\+\_\+fp (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a3820b5acb10235e163b4c7f742769d59}{Host\+Bind}} $\ast$}]{bind,  }\item[{F\+I\+LE $\ast$}]{fp }\end{DoxyParamCaption})}
+
+Write a binding to file 
+\begin{DoxyParams}{Parameters}
+{\em bind} & the binding to write to file \\
+\hline
+{\em fp} & the file to write to \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{writeconfig_8h_af2c06bb40cc926b9b88c9b18902a3e81}\label{writeconfig_8h_af2c06bb40cc926b9b88c9b18902a3e81}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!write\+\_\+host\+\_\+fp@{write\+\_\+host\+\_\+fp}}
+\index{write\+\_\+host\+\_\+fp@{write\+\_\+host\+\_\+fp}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{write\+\_\+host\+\_\+fp()}{write\_host\_fp()}}
+{\footnotesize\ttfamily void write\+\_\+host\+\_\+fp (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$}]{host,  }\item[{F\+I\+LE $\ast$}]{fp }\end{DoxyParamCaption})}
+
+Write a host to file 
+\begin{DoxyParams}{Parameters}
+{\em host} & the host to write to file \\
+\hline
+{\em fp} & the file to write to \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{writeconfig_8h_a4e67c464e6e30bbe0160c1e7ee74d20b}\label{writeconfig_8h_a4e67c464e6e30bbe0160c1e7ee74d20b}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!write\+\_\+int@{write\+\_\+int}}
+\index{write\+\_\+int@{write\+\_\+int}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{write\+\_\+int()}{write\_int()}}
+{\footnotesize\ttfamily void write\+\_\+int (\begin{DoxyParamCaption}\item[{int}]{src,  }\item[{F\+I\+LE $\ast$}]{fp }\end{DoxyParamCaption})}
+
+Write an integer to file 
+\begin{DoxyParams}{Parameters}
+{\em src} & the integer to write \\
+\hline
+{\em fp} & the file to write to \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{writeconfig_8h_a353e6b44fef2c3f9b5abab0876991357}\label{writeconfig_8h_a353e6b44fef2c3f9b5abab0876991357}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!write\+\_\+server@{write\+\_\+server}}
+\index{write\+\_\+server@{write\+\_\+server}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{write\+\_\+server()}{write\_server()}}
+{\footnotesize\ttfamily void write\+\_\+server (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$}]{server }\end{DoxyParamCaption})}
+
+Write the server to file 
+\begin{DoxyParams}{Parameters}
+{\em server} & the server to write \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{writeconfig_8h_adcc2e7864fb6e0d6d10d8afa9f9eb590}\label{writeconfig_8h_adcc2e7864fb6e0d6d10d8afa9f9eb590}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!write\+\_\+server\+\_\+fp@{write\+\_\+server\+\_\+fp}}
+\index{write\+\_\+server\+\_\+fp@{write\+\_\+server\+\_\+fp}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{write\+\_\+server\+\_\+fp()}{write\_server\_fp()}}
+{\footnotesize\ttfamily void write\+\_\+server\+\_\+fp (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$}]{server,  }\item[{F\+I\+LE $\ast$}]{fp }\end{DoxyParamCaption})}
+
+Write server to file given an open fp 
+\begin{DoxyParams}{Parameters}
+{\em server} & the server to write \\
+\hline
+{\em fp} & the fp open to write to \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{writeconfig_8h_ad61459a7dcc310e643a8ed8d8c6f8de2}\label{writeconfig_8h_ad61459a7dcc310e643a8ed8d8c6f8de2}} 
+\index{writeconfig.\+h@{writeconfig.\+h}!write\+\_\+string@{write\+\_\+string}}
+\index{write\+\_\+string@{write\+\_\+string}!writeconfig.\+h@{writeconfig.\+h}}
+\subsubsection{\texorpdfstring{write\+\_\+string()}{write\_string()}}
+{\footnotesize\ttfamily void write\+\_\+string (\begin{DoxyParamCaption}\item[{char $\ast$}]{src,  }\item[{F\+I\+LE $\ast$}]{fp }\end{DoxyParamCaption})}
+
+Writes a string to file (also writes the N\+U\+LL terminator) 
+\begin{DoxyParams}{Parameters}
+{\em src} & the string to write \\
+\hline
+{\em fp} & the file to write to \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,287 @@
+\hypertarget{server_8h}{}\section{include/server.h File Reference}
+\label{server_8h}\index{include/server.\+h@{include/server.\+h}}
+{\ttfamily \#include $<$hacksaw/tools.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}host.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_____server}{\+\_\+\+\_\+\+Server}}
+\item 
+struct \mbox{\hyperlink{struct_____host_bind}{\+\_\+\+\_\+\+Host\+Bind}}
+\item 
+struct \mbox{\hyperlink{struct_____connection}{\+\_\+\+\_\+\+Connection}}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \mbox{\hyperlink{struct_____server}{\+\_\+\+\_\+\+Server}} \mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}}
+\item 
+typedef struct \mbox{\hyperlink{struct_____host_bind}{\+\_\+\+\_\+\+Host\+Bind}} \mbox{\hyperlink{server_8h_a3820b5acb10235e163b4c7f742769d59}{Host\+Bind}}
+\item 
+typedef struct \mbox{\hyperlink{struct_____connection}{\+\_\+\+\_\+\+Connection}} \mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725}{server\+\_\+t}} \{ \mbox{\hyperlink{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725ab5468e005ffe03733c26f12419ff0a94}{A\+S\+Y\+NC}} = 0x0, 
+\mbox{\hyperlink{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a4279fa865cddeda769528246147df162}{D\+A\+E\+M\+ON}} = 0x1, 
+\mbox{\hyperlink{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a8a940829337d73440d4227fe2d2fa950}{N\+O\+\_\+\+D\+E\+B\+UG}} = 0x0, 
+\mbox{\hyperlink{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a0593585da9181e972974c1274d8f2b4f}{D\+E\+B\+UG}} = 0x2
+ \}
+\item 
+enum \mbox{\hyperlink{server_8h_adff1af7110b02fbef1d43e5a4b638ee8}{con\+\_\+t}} \{ \mbox{\hyperlink{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a5849612cb4b71af31eebaeaadea322c5}{S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR}}, 
+\mbox{\hyperlink{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a7a691a2430ec26878897b5fbc9c22a4c}{C\+O\+N\+N\+E\+C\+T\+ED}}, 
+\mbox{\hyperlink{server_8h_adff1af7110b02fbef1d43e5a4b638ee8aecedb56d1405a60c6069f4a0139bdec5}{F\+A\+I\+L\+ED}}, 
+\mbox{\hyperlink{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a929f0327e17604ce9713b2a6117bd603}{C\+L\+O\+S\+ED}}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$ \mbox{\hyperlink{server_8h_a8c231191b8f9e0dc86106531e9bb7188}{server\+\_\+new}} (char $\ast$location, int port, \mbox{\hyperlink{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725}{server\+\_\+t}} opts)
+\item 
+\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$ \mbox{\hyperlink{server_8h_a8253ac77e5f85b1f8c01ed1333d3e679}{connection\+\_\+new}} (\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$server, int conn\+\_\+fd)
+\item 
+\mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$ \mbox{\hyperlink{server_8h_aceac80287d5de9797cddc63d4cd8c0dc}{server\+\_\+get\+\_\+active}} (\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$server, char $\ast$ip)
+\item 
+void \mbox{\hyperlink{server_8h_afbb706811c16aaf6468534d9f6c926e8}{server\+\_\+start}} (\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$server)
+\item 
+void \mbox{\hyperlink{server_8h_af7cfef1360464e5a420893ce09ed7a0a}{server\+\_\+bind}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, \mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$host)
+\item 
+\mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$ \mbox{\hyperlink{server_8h_a2cba2ae5ab1ed23fefd786668bf7aa24}{server\+\_\+host\+\_\+search}} (\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$server, \mbox{\hyperlink{host_8h_ad9a5413d8b4376a70706368c97972c2b}{host\+\_\+id}} id)
+\item 
+int \mbox{\hyperlink{server_8h_aee998aa54fa5b6549c88f6fdc7fee00e}{server\+\_\+init}} (char $\ast$port)
+\item 
+void \mbox{\hyperlink{server_8h_a25540ebc50cda0846620399b6ad57552}{server\+\_\+respond}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn)
+\item 
+void \mbox{\hyperlink{server_8h_adb7090575d251c47a887352574f15622}{connection\+\_\+free}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn)
+\item 
+void \mbox{\hyperlink{server_8h_ab51751375888672dc4fc96d6265b66f6}{daemonize}} (char $\ast$\+\_\+cwd)
+\end{DoxyCompactItemize}
+
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}\label{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}} 
+\index{server.\+h@{server.\+h}!Connection@{Connection}}
+\index{Connection@{Connection}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{Connection}{Connection}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____connection}{\+\_\+\+\_\+\+Connection}} \mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}}}
+
+Holds information about a connection
+\begin{DoxyItemize}
+\item A new connection will initilized after the return of accept().
+\item The request is immediately after the connection is made
+\item The bounded\+\_\+host will be set as well (N\+U\+LL if the IP is not bounded)
+\item Since every connection runs in its own thread the pthread\+\_\+t is kept here as well 
+\end{DoxyItemize}\mbox{\Hypertarget{server_8h_a3820b5acb10235e163b4c7f742769d59}\label{server_8h_a3820b5acb10235e163b4c7f742769d59}} 
+\index{server.\+h@{server.\+h}!Host\+Bind@{Host\+Bind}}
+\index{Host\+Bind@{Host\+Bind}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{Host\+Bind}{HostBind}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____host_bind}{\+\_\+\+\_\+\+Host\+Bind}} \mbox{\hyperlink{server_8h_a3820b5acb10235e163b4c7f742769d59}{Host\+Bind}}}
+
+Bind an IP to a host
+\begin{DoxyItemize}
+\item This is used when a request is made.
+\item The IP of the request is matched to a Host using this struct 
+\end{DoxyItemize}\mbox{\Hypertarget{server_8h_a705d964b8a67edeeb3943273a397e4c2}\label{server_8h_a705d964b8a67edeeb3943273a397e4c2}} 
+\index{server.\+h@{server.\+h}!Server@{Server}}
+\index{Server@{Server}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{Server}{Server}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____server}{\+\_\+\+\_\+\+Server}} \mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}}}
+
+The main struct that hold hosts/bindings and other information
+\begin{DoxyItemize}
+\item This is pretty much required throughout the entire program so keep it! 
+\end{DoxyItemize}
+
+\subsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{server_8h_adff1af7110b02fbef1d43e5a4b638ee8}\label{server_8h_adff1af7110b02fbef1d43e5a4b638ee8}} 
+\index{server.\+h@{server.\+h}!con\+\_\+t@{con\+\_\+t}}
+\index{con\+\_\+t@{con\+\_\+t}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{con\+\_\+t}{con\_t}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{server_8h_adff1af7110b02fbef1d43e5a4b638ee8}{con\+\_\+t}}}
+
+Holds the status of a connection \begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR@{S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR@{S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR}}}\mbox{\Hypertarget{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a5849612cb4b71af31eebaeaadea322c5}\label{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a5849612cb4b71af31eebaeaadea322c5}} 
+S\+E\+R\+V\+E\+R\+\_\+\+E\+R\+R\+OR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{C\+O\+N\+N\+E\+C\+T\+ED@{C\+O\+N\+N\+E\+C\+T\+ED}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!C\+O\+N\+N\+E\+C\+T\+ED@{C\+O\+N\+N\+E\+C\+T\+ED}}}\mbox{\Hypertarget{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a7a691a2430ec26878897b5fbc9c22a4c}\label{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a7a691a2430ec26878897b5fbc9c22a4c}} 
+C\+O\+N\+N\+E\+C\+T\+ED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{F\+A\+I\+L\+ED@{F\+A\+I\+L\+ED}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!F\+A\+I\+L\+ED@{F\+A\+I\+L\+ED}}}\mbox{\Hypertarget{server_8h_adff1af7110b02fbef1d43e5a4b638ee8aecedb56d1405a60c6069f4a0139bdec5}\label{server_8h_adff1af7110b02fbef1d43e5a4b638ee8aecedb56d1405a60c6069f4a0139bdec5}} 
+F\+A\+I\+L\+ED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{C\+L\+O\+S\+ED@{C\+L\+O\+S\+ED}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!C\+L\+O\+S\+ED@{C\+L\+O\+S\+ED}}}\mbox{\Hypertarget{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a929f0327e17604ce9713b2a6117bd603}\label{server_8h_adff1af7110b02fbef1d43e5a4b638ee8a929f0327e17604ce9713b2a6117bd603}} 
+C\+L\+O\+S\+ED&\\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\Hypertarget{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725}\label{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725}} 
+\index{server.\+h@{server.\+h}!server\+\_\+t@{server\+\_\+t}}
+\index{server\+\_\+t@{server\+\_\+t}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{server\+\_\+t}{server\_t}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725}{server\+\_\+t}}}
+
+Server options for enabling/disabling server features \begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{A\+S\+Y\+NC@{A\+S\+Y\+NC}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!A\+S\+Y\+NC@{A\+S\+Y\+NC}}}\mbox{\Hypertarget{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725ab5468e005ffe03733c26f12419ff0a94}\label{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725ab5468e005ffe03733c26f12419ff0a94}} 
+A\+S\+Y\+NC&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{D\+A\+E\+M\+ON@{D\+A\+E\+M\+ON}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!D\+A\+E\+M\+ON@{D\+A\+E\+M\+ON}}}\mbox{\Hypertarget{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a4279fa865cddeda769528246147df162}\label{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a4279fa865cddeda769528246147df162}} 
+D\+A\+E\+M\+ON&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{N\+O\+\_\+\+D\+E\+B\+UG@{N\+O\+\_\+\+D\+E\+B\+UG}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!N\+O\+\_\+\+D\+E\+B\+UG@{N\+O\+\_\+\+D\+E\+B\+UG}}}\mbox{\Hypertarget{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a8a940829337d73440d4227fe2d2fa950}\label{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a8a940829337d73440d4227fe2d2fa950}} 
+N\+O\+\_\+\+D\+E\+B\+UG&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{D\+E\+B\+UG@{D\+E\+B\+UG}!server.\+h@{server.\+h}}\index{server.\+h@{server.\+h}!D\+E\+B\+UG@{D\+E\+B\+UG}}}\mbox{\Hypertarget{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a0593585da9181e972974c1274d8f2b4f}\label{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725a0593585da9181e972974c1274d8f2b4f}} 
+D\+E\+B\+UG&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{server_8h_adb7090575d251c47a887352574f15622}\label{server_8h_adb7090575d251c47a887352574f15622}} 
+\index{server.\+h@{server.\+h}!connection\+\_\+free@{connection\+\_\+free}}
+\index{connection\+\_\+free@{connection\+\_\+free}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{connection\+\_\+free()}{connection\_free()}}
+{\footnotesize\ttfamily void connection\+\_\+free (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn }\end{DoxyParamCaption})}
+
+Free the completed connection 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection to free \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{server_8h_a8253ac77e5f85b1f8c01ed1333d3e679}\label{server_8h_a8253ac77e5f85b1f8c01ed1333d3e679}} 
+\index{server.\+h@{server.\+h}!connection\+\_\+new@{connection\+\_\+new}}
+\index{connection\+\_\+new@{connection\+\_\+new}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{connection\+\_\+new()}{connection\_new()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}}$\ast$ connection\+\_\+new (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$}]{server,  }\item[{int}]{conn\+\_\+fd }\end{DoxyParamCaption})}
+
+Creates a new Connection given a file desciptor from accept() 
+\begin{DoxyParams}{Parameters}
+{\em server} & the parent server \\
+\hline
+{\em conn\+\_\+fd} & the fd taken from accept() \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer to the newly created Connection 
+\end{DoxyReturn}
+\mbox{\Hypertarget{server_8h_ab51751375888672dc4fc96d6265b66f6}\label{server_8h_ab51751375888672dc4fc96d6265b66f6}} 
+\index{server.\+h@{server.\+h}!daemonize@{daemonize}}
+\index{daemonize@{daemonize}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{daemonize()}{daemonize()}}
+{\footnotesize\ttfamily void daemonize (\begin{DoxyParamCaption}\item[{char $\ast$}]{\+\_\+cwd }\end{DoxyParamCaption})}
+
+Fork this process to a daemon and disconnect from the terminal 
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+cwd} & The working directory to cd to \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{server_8h_af7cfef1360464e5a420893ce09ed7a0a}\label{server_8h_af7cfef1360464e5a420893ce09ed7a0a}} 
+\index{server.\+h@{server.\+h}!server\+\_\+bind@{server\+\_\+bind}}
+\index{server\+\_\+bind@{server\+\_\+bind}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{server\+\_\+bind()}{server\_bind()}}
+{\footnotesize\ttfamily void server\+\_\+bind (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{\mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$}]{host }\end{DoxyParamCaption})}
+
+Bind an IP address to a host 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection that holds our IP \\
+\hline
+{\em host} & the host to bind to \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{server_8h_aceac80287d5de9797cddc63d4cd8c0dc}\label{server_8h_aceac80287d5de9797cddc63d4cd8c0dc}} 
+\index{server.\+h@{server.\+h}!server\+\_\+get\+\_\+active@{server\+\_\+get\+\_\+active}}
+\index{server\+\_\+get\+\_\+active@{server\+\_\+get\+\_\+active}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{server\+\_\+get\+\_\+active()}{server\_get\_active()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}}$\ast$ server\+\_\+get\+\_\+active (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$}]{server,  }\item[{char $\ast$}]{ip }\end{DoxyParamCaption})}
+
+Get the host that is bounded to the given IP address 
+\begin{DoxyParams}{Parameters}
+{\em server} & the parent server to look in \\
+\hline
+{\em ip} & the ip to search for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer to the bounded host, N\+U\+LL if was not found 
+\end{DoxyReturn}
+\mbox{\Hypertarget{server_8h_a2cba2ae5ab1ed23fefd786668bf7aa24}\label{server_8h_a2cba2ae5ab1ed23fefd786668bf7aa24}} 
+\index{server.\+h@{server.\+h}!server\+\_\+host\+\_\+search@{server\+\_\+host\+\_\+search}}
+\index{server\+\_\+host\+\_\+search@{server\+\_\+host\+\_\+search}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{server\+\_\+host\+\_\+search()}{server\_host\_search()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}}$\ast$ server\+\_\+host\+\_\+search (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$}]{server,  }\item[{\mbox{\hyperlink{host_8h_ad9a5413d8b4376a70706368c97972c2b}{host\+\_\+id}}}]{id }\end{DoxyParamCaption})}
+
+Search for a host given an ID 
+\begin{DoxyParams}{Parameters}
+{\em server} & the server to look in \\
+\hline
+{\em id} & the ID to search for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer to the Host that was found, N\+U\+LL if not found 
+\end{DoxyReturn}
+\mbox{\Hypertarget{server_8h_aee998aa54fa5b6549c88f6fdc7fee00e}\label{server_8h_aee998aa54fa5b6549c88f6fdc7fee00e}} 
+\index{server.\+h@{server.\+h}!server\+\_\+init@{server\+\_\+init}}
+\index{server\+\_\+init@{server\+\_\+init}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{server\+\_\+init()}{server\_init()}}
+{\footnotesize\ttfamily int server\+\_\+init (\begin{DoxyParamCaption}\item[{char $\ast$}]{port }\end{DoxyParamCaption})}
+
+Meta-\/function called by server\+\_\+start (DO N\+OT C\+A\+LL T\+H\+IS) 
+\begin{DoxyParams}{Parameters}
+{\em port} & the port to bind on \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the fd to read from 
+\end{DoxyReturn}
+\mbox{\Hypertarget{server_8h_a8c231191b8f9e0dc86106531e9bb7188}\label{server_8h_a8c231191b8f9e0dc86106531e9bb7188}} 
+\index{server.\+h@{server.\+h}!server\+\_\+new@{server\+\_\+new}}
+\index{server\+\_\+new@{server\+\_\+new}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{server\+\_\+new()}{server\_new()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}}$\ast$ server\+\_\+new (\begin{DoxyParamCaption}\item[{char $\ast$}]{location,  }\item[{int}]{port,  }\item[{\mbox{\hyperlink{server_8h_ac716a2b0d74f0b48cf81937cb7b3f725}{server\+\_\+t}}}]{opts }\end{DoxyParamCaption})}
+
+Creates a new server ready to start 
+\begin{DoxyParams}{Parameters}
+{\em location} & The working directory of the server (Hosts are installed here) \\
+\hline
+{\em port} & the port to start on (default\+: 9490, debug\+: 9491) \\
+\hline
+{\em opts} & here you are able to enable the D\+A\+E\+M\+ON or D\+E\+B\+UG features \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer to the newly created server 
+\end{DoxyReturn}
+\mbox{\Hypertarget{server_8h_a25540ebc50cda0846620399b6ad57552}\label{server_8h_a25540ebc50cda0846620399b6ad57552}} 
+\index{server.\+h@{server.\+h}!server\+\_\+respond@{server\+\_\+respond}}
+\index{server\+\_\+respond@{server\+\_\+respond}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{server\+\_\+respond()}{server\_respond()}}
+{\footnotesize\ttfamily void server\+\_\+respond (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn }\end{DoxyParamCaption})}
+
+Handle the conn\textquotesingle{}s request 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection to read request from \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{server_8h_afbb706811c16aaf6468534d9f6c926e8}\label{server_8h_afbb706811c16aaf6468534d9f6c926e8}} 
+\index{server.\+h@{server.\+h}!server\+\_\+start@{server\+\_\+start}}
+\index{server\+\_\+start@{server\+\_\+start}!server.\+h@{server.\+h}}
+\subsubsection{\texorpdfstring{server\+\_\+start()}{server\_start()}}
+{\footnotesize\ttfamily void server\+\_\+start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$}]{server }\end{DoxyParamCaption})}
+
+Start the server and allow connections 
+\begin{DoxyParams}{Parameters}
+{\em server} & the server to start \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,93 @@
+\hypertarget{command_8h}{}\section{include/command.h File Reference}
+\label{command_8h}\index{include/command.\+h@{include/command.\+h}}
+{\ttfamily \#include $<$hacksaw/tools.\+h$>$}\newline
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_____command}{\+\_\+\+\_\+\+Command}}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \mbox{\hyperlink{struct_____command}{\+\_\+\+\_\+\+Command}} \mbox{\hyperlink{command_8h_ade38f8bb88790360aa19962fcd401aca}{Command}}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{command_8h_ade38f8bb88790360aa19962fcd401aca}{Command}} $\ast$ \mbox{\hyperlink{command_8h_a1bedd9a9a01e740f37f2be0085c0350a}{command\+\_\+new}} (char $\ast$fmt, int argc)
+\item 
+void \mbox{\hyperlink{command_8h_ac92e392e148eac53fe61b676172df0c8}{command\+\_\+run}} (\mbox{\hyperlink{command_8h_ade38f8bb88790360aa19962fcd401aca}{Command}} $\ast$cmd, char $\ast$$\ast$output, int $\ast$ret,...)
+\item 
+void \mbox{\hyperlink{command_8h_ad706fc66113165386d2b394caa3b6093}{command\+\_\+free}} (\mbox{\hyperlink{command_8h_ade38f8bb88790360aa19962fcd401aca}{Command}} $\ast$cmd)
+\item 
+void \mbox{\hyperlink{command_8h_a09b1d7bed8c4f5faa3ccee7fbbd8138e}{command}} (char $\ast$top, char $\ast$bottom, char $\ast$$\ast$output, int $\ast$ret)
+\end{DoxyCompactItemize}
+
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{command_8h_ade38f8bb88790360aa19962fcd401aca}\label{command_8h_ade38f8bb88790360aa19962fcd401aca}} 
+\index{command.\+h@{command.\+h}!Command@{Command}}
+\index{Command@{Command}!command.\+h@{command.\+h}}
+\subsubsection{\texorpdfstring{Command}{Command}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____command}{\+\_\+\+\_\+\+Command}} \mbox{\hyperlink{command_8h_ade38f8bb88790360aa19962fcd401aca}{Command}}}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{command_8h_a09b1d7bed8c4f5faa3ccee7fbbd8138e}\label{command_8h_a09b1d7bed8c4f5faa3ccee7fbbd8138e}} 
+\index{command.\+h@{command.\+h}!command@{command}}
+\index{command@{command}!command.\+h@{command.\+h}}
+\subsubsection{\texorpdfstring{command()}{command()}}
+{\footnotesize\ttfamily void command (\begin{DoxyParamCaption}\item[{char $\ast$}]{top,  }\item[{char $\ast$}]{bottom,  }\item[{char $\ast$$\ast$}]{output,  }\item[{int $\ast$}]{ret }\end{DoxyParamCaption})}
+
+Call a registered command 
+\begin{DoxyParams}{Parameters}
+{\em top} & the main class of command to call (eg. tar) \\
+\hline
+{\em bottom} & the sub-\/level class of command to call (eg. extract) \\
+\hline
+{\em output} & a pointer to where the output will be written \\
+\hline
+{\em ret} & a pointer to where the return value will be stored \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{command_8h_ad706fc66113165386d2b394caa3b6093}\label{command_8h_ad706fc66113165386d2b394caa3b6093}} 
+\index{command.\+h@{command.\+h}!command\+\_\+free@{command\+\_\+free}}
+\index{command\+\_\+free@{command\+\_\+free}!command.\+h@{command.\+h}}
+\subsubsection{\texorpdfstring{command\+\_\+free()}{command\_free()}}
+{\footnotesize\ttfamily void command\+\_\+free (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{command_8h_ade38f8bb88790360aa19962fcd401aca}{Command}} $\ast$}]{cmd }\end{DoxyParamCaption})}
+
+Free a command 
+\begin{DoxyParams}{Parameters}
+{\em cmd} & the command to free \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{command_8h_a1bedd9a9a01e740f37f2be0085c0350a}\label{command_8h_a1bedd9a9a01e740f37f2be0085c0350a}} 
+\index{command.\+h@{command.\+h}!command\+\_\+new@{command\+\_\+new}}
+\index{command\+\_\+new@{command\+\_\+new}!command.\+h@{command.\+h}}
+\subsubsection{\texorpdfstring{command\+\_\+new()}{command\_new()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{command_8h_ade38f8bb88790360aa19962fcd401aca}{Command}}$\ast$ command\+\_\+new (\begin{DoxyParamCaption}\item[{char $\ast$}]{fmt,  }\item[{int}]{argc }\end{DoxyParamCaption})}
+
+Creates a new command given a format and argument count 
+\begin{DoxyParams}{Parameters}
+{\em fmt} & printf command passed to terminal \\
+\hline
+{\em argc} & argument count to pass to fmt \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer to the new command 
+\end{DoxyReturn}
+\mbox{\Hypertarget{command_8h_ac92e392e148eac53fe61b676172df0c8}\label{command_8h_ac92e392e148eac53fe61b676172df0c8}} 
+\index{command.\+h@{command.\+h}!command\+\_\+run@{command\+\_\+run}}
+\index{command\+\_\+run@{command\+\_\+run}!command.\+h@{command.\+h}}
+\subsubsection{\texorpdfstring{command\+\_\+run()}{command\_run()}}
+{\footnotesize\ttfamily void command\+\_\+run (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{command_8h_ade38f8bb88790360aa19962fcd401aca}{Command}} $\ast$}]{cmd,  }\item[{char $\ast$$\ast$}]{output,  }\item[{int $\ast$}]{ret,  }\item[{}]{... }\end{DoxyParamCaption})}
+
+Run a command given its arguments 
+\begin{DoxyParams}{Parameters}
+{\em cmd} & the command to run \\
+\hline
+{\em ...} & the arguments to pass to the command \\
+\hline
+\end{DoxyParams}

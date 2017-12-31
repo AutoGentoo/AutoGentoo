@@ -1,0 +1,125 @@
+\hypertarget{stage_8h}{}\section{include/stage.h File Reference}
+\label{stage_8h}\index{include/stage.\+h@{include/stage.\+h}}
+{\ttfamily \#include $<$response.\+h$>$}\newline
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_____host_template}{\+\_\+\+\_\+\+Host\+Template}}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \mbox{\hyperlink{struct_____host_template}{\+\_\+\+\_\+\+Host\+Template}} \mbox{\hyperlink{stage_8h_a86ecaade04cb75e6a583c73b22a21415}{Host\+Template}}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06}{template\+\_\+selects}} \{ \newline
+\mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06a585dd072ae3118ac5772930701129d0c}{C\+X\+X\+F\+L\+A\+GS}} = 0x01, 
+\mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06adf1543ab15a98526c80e385823a323bf}{T\+M\+P\+D\+IR}} = 0x02, 
+\mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06acb18d06e341553a35f5d4a366c19f2da}{P\+O\+R\+T\+D\+IR}} = 0x04, 
+\mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06ad8a20d8dcf4abda50bb5e56b05d5a1c9}{D\+I\+S\+T\+D\+IR}} = 0x08, 
+\newline
+\mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06a841bf499d725562d9926368260645c4b}{P\+K\+G\+D\+IR}} = 0x10, 
+\mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06a952b81d9296d352d3954e119f8b0a4d5}{L\+O\+G\+D\+IR}} = 0x20
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stage_8h_a86ecaade04cb75e6a583c73b22a21415}{Host\+Template}} $\ast$ \mbox{\hyperlink{stage_8h_aaf619943aae143b274acd117a9e500e7}{host\+\_\+template\+\_\+init}} (\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$parent, \mbox{\hyperlink{stage_8h_a86ecaade04cb75e6a583c73b22a21415}{Host\+Template}} t)
+\item 
+void \mbox{\hyperlink{stage_8h_a13fc504485584062a6c6b260d53d90f8}{host\+\_\+template\+\_\+stage}} (\mbox{\hyperlink{stage_8h_a86ecaade04cb75e6a583c73b22a21415}{Host\+Template}} $\ast$t)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{stage_8h_a888c4572e2c68eea91350fb96c1508b1}{host\+\_\+template\+\_\+handoff}} (\mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$dest, \mbox{\hyperlink{stage_8h_a86ecaade04cb75e6a583c73b22a21415}{Host\+Template}} $\ast$src)
+\end{DoxyCompactItemize}
+
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{stage_8h_a86ecaade04cb75e6a583c73b22a21415}\label{stage_8h_a86ecaade04cb75e6a583c73b22a21415}} 
+\index{stage.\+h@{stage.\+h}!Host\+Template@{Host\+Template}}
+\index{Host\+Template@{Host\+Template}!stage.\+h@{stage.\+h}}
+\subsubsection{\texorpdfstring{Host\+Template}{HostTemplate}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____host_template}{\+\_\+\+\_\+\+Host\+Template}} \mbox{\hyperlink{stage_8h_a86ecaade04cb75e6a583c73b22a21415}{Host\+Template}}}
+
+
+
+\subsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06}\label{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06}} 
+\index{stage.\+h@{stage.\+h}!template\+\_\+selects@{template\+\_\+selects}}
+\index{template\+\_\+selects@{template\+\_\+selects}!stage.\+h@{stage.\+h}}
+\subsubsection{\texorpdfstring{template\+\_\+selects}{template\_selects}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06}{template\+\_\+selects}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{C\+X\+X\+F\+L\+A\+GS@{C\+X\+X\+F\+L\+A\+GS}!stage.\+h@{stage.\+h}}\index{stage.\+h@{stage.\+h}!C\+X\+X\+F\+L\+A\+GS@{C\+X\+X\+F\+L\+A\+GS}}}\mbox{\Hypertarget{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06a585dd072ae3118ac5772930701129d0c}\label{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06a585dd072ae3118ac5772930701129d0c}} 
+C\+X\+X\+F\+L\+A\+GS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{T\+M\+P\+D\+IR@{T\+M\+P\+D\+IR}!stage.\+h@{stage.\+h}}\index{stage.\+h@{stage.\+h}!T\+M\+P\+D\+IR@{T\+M\+P\+D\+IR}}}\mbox{\Hypertarget{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06adf1543ab15a98526c80e385823a323bf}\label{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06adf1543ab15a98526c80e385823a323bf}} 
+T\+M\+P\+D\+IR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{P\+O\+R\+T\+D\+IR@{P\+O\+R\+T\+D\+IR}!stage.\+h@{stage.\+h}}\index{stage.\+h@{stage.\+h}!P\+O\+R\+T\+D\+IR@{P\+O\+R\+T\+D\+IR}}}\mbox{\Hypertarget{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06acb18d06e341553a35f5d4a366c19f2da}\label{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06acb18d06e341553a35f5d4a366c19f2da}} 
+P\+O\+R\+T\+D\+IR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{D\+I\+S\+T\+D\+IR@{D\+I\+S\+T\+D\+IR}!stage.\+h@{stage.\+h}}\index{stage.\+h@{stage.\+h}!D\+I\+S\+T\+D\+IR@{D\+I\+S\+T\+D\+IR}}}\mbox{\Hypertarget{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06ad8a20d8dcf4abda50bb5e56b05d5a1c9}\label{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06ad8a20d8dcf4abda50bb5e56b05d5a1c9}} 
+D\+I\+S\+T\+D\+IR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{P\+K\+G\+D\+IR@{P\+K\+G\+D\+IR}!stage.\+h@{stage.\+h}}\index{stage.\+h@{stage.\+h}!P\+K\+G\+D\+IR@{P\+K\+G\+D\+IR}}}\mbox{\Hypertarget{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06a841bf499d725562d9926368260645c4b}\label{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06a841bf499d725562d9926368260645c4b}} 
+P\+K\+G\+D\+IR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{L\+O\+G\+D\+IR@{L\+O\+G\+D\+IR}!stage.\+h@{stage.\+h}}\index{stage.\+h@{stage.\+h}!L\+O\+G\+D\+IR@{L\+O\+G\+D\+IR}}}\mbox{\Hypertarget{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06a952b81d9296d352d3954e119f8b0a4d5}\label{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06a952b81d9296d352d3954e119f8b0a4d5}} 
+L\+O\+G\+D\+IR&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{stage_8h_a888c4572e2c68eea91350fb96c1508b1}\label{stage_8h_a888c4572e2c68eea91350fb96c1508b1}} 
+\index{stage.\+h@{stage.\+h}!host\+\_\+template\+\_\+handoff@{host\+\_\+template\+\_\+handoff}}
+\index{host\+\_\+template\+\_\+handoff@{host\+\_\+template\+\_\+handoff}!stage.\+h@{stage.\+h}}
+\subsubsection{\texorpdfstring{host\+\_\+template\+\_\+handoff()}{host\_template\_handoff()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} host\+\_\+template\+\_\+handoff (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$}]{dest,  }\item[{\mbox{\hyperlink{stage_8h_a86ecaade04cb75e6a583c73b22a21415}{Host\+Template}} $\ast$}]{src }\end{DoxyParamCaption})}
+
+Mark The given Host\+Template as ready \textbackslash{} This allows the new Host to mount chroot and emerge new packages 
+\begin{DoxyParams}{Parameters}
+{\em dest} & The new parent (a Host) of the directory \\
+\hline
+{\em src} & The old parent (a Host\+Template) of the directory \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+OK if all goes well, I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR if error occured 
+\end{DoxyReturn}
+\mbox{\Hypertarget{stage_8h_aaf619943aae143b274acd117a9e500e7}\label{stage_8h_aaf619943aae143b274acd117a9e500e7}} 
+\index{stage.\+h@{stage.\+h}!host\+\_\+template\+\_\+init@{host\+\_\+template\+\_\+init}}
+\index{host\+\_\+template\+\_\+init@{host\+\_\+template\+\_\+init}!stage.\+h@{stage.\+h}}
+\subsubsection{\texorpdfstring{host\+\_\+template\+\_\+init()}{host\_template\_init()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{stage_8h_a86ecaade04cb75e6a583c73b22a21415}{Host\+Template}}$\ast$ host\+\_\+template\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$}]{parent,  }\item[{\mbox{\hyperlink{stage_8h_a86ecaade04cb75e6a583c73b22a21415}{Host\+Template}}}]{t }\end{DoxyParamCaption})}
+
+Initialize a dynamic Host\+Template given a static one. \textbackslash{} Initilizes unknown fields such as dest\+\_\+dir and parent 
+\begin{DoxyParams}{Parameters}
+{\em parent} & the parent server to bind to \\
+\hline
+{\em t} & the static template to copy \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer the dynamically allocated template 
+\end{DoxyReturn}
+\mbox{\Hypertarget{stage_8h_a13fc504485584062a6c6b260d53d90f8}\label{stage_8h_a13fc504485584062a6c6b260d53d90f8}} 
+\index{stage.\+h@{stage.\+h}!host\+\_\+template\+\_\+stage@{host\+\_\+template\+\_\+stage}}
+\index{host\+\_\+template\+\_\+stage@{host\+\_\+template\+\_\+stage}!stage.\+h@{stage.\+h}}
+\subsubsection{\texorpdfstring{host\+\_\+template\+\_\+stage()}{host\_template\_stage()}}
+{\footnotesize\ttfamily void host\+\_\+template\+\_\+stage (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stage_8h_a86ecaade04cb75e6a583c73b22a21415}{Host\+Template}} $\ast$}]{t }\end{DoxyParamCaption})}
+
+Initialize stage3 given a Host\+Template This downloads and extracts the a stage3 \textbackslash{} downloads are always from \href{http://distfiles.gentoo.org/}{\tt http\+://distfiles.\+gentoo.\+org/} 
+\begin{DoxyParams}{Parameters}
+{\em t} & the Host\+Template to initilize \\
+\hline
+\end{DoxyParams}

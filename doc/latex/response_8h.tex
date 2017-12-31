@@ -1,0 +1,268 @@
+\hypertarget{response_8h}{}\section{include/response.h File Reference}
+\label{response_8h}\index{include/response.\+h@{include/response.\+h}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$sys/socket.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}server.\+h\char`\"{}}\newline
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structresponse__t}{response\+\_\+t}}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{response_8h_a655c84af1b0034986ff56e12e84f983d}{N\+O\+NE}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{0, \char`\"{}\char`\"{}, 0\}
+\item 
+\#define \mbox{\hyperlink{response_8h_aba51915c87d64af47fb1cc59348961c9}{OK}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a43f8027764325bbcad2f773511156d0a}{H\+T\+T\+P\+\_\+\+OK}}, \char`\"{}OK\char`\"{}, 2\}
+\item 
+\#define \mbox{\hyperlink{response_8h_a78f1d1e4bb6450bfc6894a8f38c30370}{C\+R\+E\+A\+T\+ED}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a211e5143e6efe62c4f5eefc012a2dc39}{H\+T\+T\+P\+\_\+\+C\+R\+E\+A\+T\+ED}}, \char`\"{}Created\char`\"{}, 7\}
+\item 
+\#define \mbox{\hyperlink{response_8h_a87ed98446928d560ffd66539098a4849}{N\+O\+\_\+\+C\+O\+N\+T\+E\+NT}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a924170e0b9e6d6eec63321a20dd6f596}{H\+T\+T\+P\+\_\+\+N\+O\+\_\+\+C\+O\+N\+T\+E\+NT}}, \char`\"{}No Content\char`\"{}, 10\}
+\item 
+\#define \mbox{\hyperlink{response_8h_ad037b25feaa1b40af8a97d63526c82b0}{B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a173b2a55d636fe537b9069a4fb3388f2}{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST}}, \char`\"{}Bad Request\char`\"{}, 11\}
+\item 
+\#define \mbox{\hyperlink{response_8h_a326a9a923c1a8d5b4e0d3d62801195e8}{U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a74677f364201a3d068bc6b9db7359288}{H\+T\+T\+P\+\_\+\+U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED}}, \char`\"{}Unauthorized\char`\"{}, 12\}
+\item 
+\#define \mbox{\hyperlink{response_8h_a5064c29ab2d1e20c2304b3c67562774d}{F\+O\+R\+B\+I\+D\+D\+EN}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a7aec6e8ecb79ff84830a69e52ff01d17}{H\+T\+T\+P\+\_\+\+F\+O\+R\+B\+I\+D\+D\+EN}}, \char`\"{}Forbidden\char`\"{}, 9\}
+\item 
+\#define \mbox{\hyperlink{response_8h_a33bfc1f995233887a0414369c36936b8}{N\+O\+T\+\_\+\+F\+O\+U\+ND}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a7a2f2a109c030ee9d2d5afe761232451}{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+F\+O\+U\+ND}}, \char`\"{}Not found\char`\"{}, 9\}
+\item 
+\#define \mbox{\hyperlink{response_8h_a2d6fab92d183406b1baf59ca47c8b8e8}{M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5ab4cf8d97b3203f2926b30c517b45f837}{H\+T\+T\+P\+\_\+\+M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED}}, \char`\"{}Method Not Allowed\char`\"{}, 18\}
+\item 
+\#define \mbox{\hyperlink{response_8h_aca2b488c5f3c95dc5ae20d65552b948a}{R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5adcc34faaeb56b1d491853257833854a3}{H\+T\+T\+P\+\_\+\+R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT}}, \char`\"{}Requeset Timeout\char`\"{}, 16\}
+\item 
+\#define \mbox{\hyperlink{response_8h_a243b1b1f8ca7e7e98ac73a2d115256f4}{I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5ab6daedaa6f456ee305e0dbe92e56fb4e}{H\+T\+T\+P\+\_\+\+I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR}}, \char`\"{}Internal Error\char`\"{}, 14\}
+\item 
+\#define \mbox{\hyperlink{response_8h_aec2bcbab7ad208b42215cf4225e259e1}{N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5ad46f8921b20784b1d781ed4fcc13c39a}{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}}, \char`\"{}Method Not Implemented\char`\"{}, 22\}
+\item 
+\#define \mbox{\hyperlink{response_8h_a1f2268a7ea29fa0b2d64b59613aadee8}{B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a9c2445431af610981d73859df3c658f2}{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY}}, \char`\"{}Bad Gateway\char`\"{}, 11\}
+\item 
+\#define \mbox{\hyperlink{response_8h_a1c29dc97c4a889a2536b2ad9ed73b91e}{S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE}}~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a6251d4710923e5253b159943405a1a3a}{H\+T\+T\+P\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE}}, \char`\"{}Service Unavailable\char`\"{}, 19\}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5}{response\+\_\+nt}} \{ \newline
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a43f8027764325bbcad2f773511156d0a}{H\+T\+T\+P\+\_\+\+OK}} = 200, 
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a211e5143e6efe62c4f5eefc012a2dc39}{H\+T\+T\+P\+\_\+\+C\+R\+E\+A\+T\+ED}} = 201, 
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a924170e0b9e6d6eec63321a20dd6f596}{H\+T\+T\+P\+\_\+\+N\+O\+\_\+\+C\+O\+N\+T\+E\+NT}} = 204, 
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a173b2a55d636fe537b9069a4fb3388f2}{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST}} = 400, 
+\newline
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a74677f364201a3d068bc6b9db7359288}{H\+T\+T\+P\+\_\+\+U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED}} = 401, 
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a7aec6e8ecb79ff84830a69e52ff01d17}{H\+T\+T\+P\+\_\+\+F\+O\+R\+B\+I\+D\+D\+EN}} = 403, 
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a7a2f2a109c030ee9d2d5afe761232451}{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+F\+O\+U\+ND}} = 404, 
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5ab4cf8d97b3203f2926b30c517b45f837}{H\+T\+T\+P\+\_\+\+M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED}} = 405, 
+\newline
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5adcc34faaeb56b1d491853257833854a3}{H\+T\+T\+P\+\_\+\+R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT}} = 408, 
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5ab6daedaa6f456ee305e0dbe92e56fb4e}{H\+T\+T\+P\+\_\+\+I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR}} = 500, 
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5ad46f8921b20784b1d781ed4fcc13c39a}{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}} = 501, 
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a9c2445431af610981d73859df3c658f2}{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY}} = 502, 
+\newline
+\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a6251d4710923e5253b159943405a1a3a}{H\+T\+T\+P\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE}} = 503
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+ssize\+\_\+t \mbox{\hyperlink{response_8h_a4f1bdab384eb2af64328ca309e194651}{rsend}} (\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$conn, \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} code)
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{response_8h_a8898304d5ef9cfee177c3e91b2238cdc}{get\+\_\+res}} (\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5}{response\+\_\+nt}} x)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structresponse__t}{response\+\_\+t}} \mbox{\hyperlink{response_8h_a7d1eeb19252baca7947b42c4630a85c5}{res\+\_\+list}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{response_8h_a1f2268a7ea29fa0b2d64b59613aadee8}\label{response_8h_a1f2268a7ea29fa0b2d64b59613aadee8}} 
+\index{response.\+h@{response.\+h}!B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY@{B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY}}
+\index{B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY@{B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY}{BAD\_GATEWAY}}
+{\footnotesize\ttfamily \#define B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a9c2445431af610981d73859df3c658f2}{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY}}, \char`\"{}Bad Gateway\char`\"{}, 11\}}
+
+\mbox{\Hypertarget{response_8h_ad037b25feaa1b40af8a97d63526c82b0}\label{response_8h_ad037b25feaa1b40af8a97d63526c82b0}} 
+\index{response.\+h@{response.\+h}!B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST@{B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST}}
+\index{B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST@{B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST}{BAD\_REQUEST}}
+{\footnotesize\ttfamily \#define B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a173b2a55d636fe537b9069a4fb3388f2}{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST}}, \char`\"{}Bad Request\char`\"{}, 11\}}
+
+\mbox{\Hypertarget{response_8h_a78f1d1e4bb6450bfc6894a8f38c30370}\label{response_8h_a78f1d1e4bb6450bfc6894a8f38c30370}} 
+\index{response.\+h@{response.\+h}!C\+R\+E\+A\+T\+ED@{C\+R\+E\+A\+T\+ED}}
+\index{C\+R\+E\+A\+T\+ED@{C\+R\+E\+A\+T\+ED}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{C\+R\+E\+A\+T\+ED}{CREATED}}
+{\footnotesize\ttfamily \#define C\+R\+E\+A\+T\+ED~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a211e5143e6efe62c4f5eefc012a2dc39}{H\+T\+T\+P\+\_\+\+C\+R\+E\+A\+T\+ED}}, \char`\"{}Created\char`\"{}, 7\}}
+
+\mbox{\Hypertarget{response_8h_a5064c29ab2d1e20c2304b3c67562774d}\label{response_8h_a5064c29ab2d1e20c2304b3c67562774d}} 
+\index{response.\+h@{response.\+h}!F\+O\+R\+B\+I\+D\+D\+EN@{F\+O\+R\+B\+I\+D\+D\+EN}}
+\index{F\+O\+R\+B\+I\+D\+D\+EN@{F\+O\+R\+B\+I\+D\+D\+EN}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{F\+O\+R\+B\+I\+D\+D\+EN}{FORBIDDEN}}
+{\footnotesize\ttfamily \#define F\+O\+R\+B\+I\+D\+D\+EN~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a7aec6e8ecb79ff84830a69e52ff01d17}{H\+T\+T\+P\+\_\+\+F\+O\+R\+B\+I\+D\+D\+EN}}, \char`\"{}Forbidden\char`\"{}, 9\}}
+
+\mbox{\Hypertarget{response_8h_a243b1b1f8ca7e7e98ac73a2d115256f4}\label{response_8h_a243b1b1f8ca7e7e98ac73a2d115256f4}} 
+\index{response.\+h@{response.\+h}!I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR@{I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR}}
+\index{I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR@{I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR}{INTERNAL\_ERROR}}
+{\footnotesize\ttfamily \#define I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5ab6daedaa6f456ee305e0dbe92e56fb4e}{H\+T\+T\+P\+\_\+\+I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR}}, \char`\"{}Internal Error\char`\"{}, 14\}}
+
+\mbox{\Hypertarget{response_8h_a2d6fab92d183406b1baf59ca47c8b8e8}\label{response_8h_a2d6fab92d183406b1baf59ca47c8b8e8}} 
+\index{response.\+h@{response.\+h}!M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED@{M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED}}
+\index{M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED@{M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED}{METHOD\_NOT\_ALLOWED}}
+{\footnotesize\ttfamily \#define M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5ab4cf8d97b3203f2926b30c517b45f837}{H\+T\+T\+P\+\_\+\+M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED}}, \char`\"{}Method Not Allowed\char`\"{}, 18\}}
+
+\mbox{\Hypertarget{response_8h_a87ed98446928d560ffd66539098a4849}\label{response_8h_a87ed98446928d560ffd66539098a4849}} 
+\index{response.\+h@{response.\+h}!N\+O\+\_\+\+C\+O\+N\+T\+E\+NT@{N\+O\+\_\+\+C\+O\+N\+T\+E\+NT}}
+\index{N\+O\+\_\+\+C\+O\+N\+T\+E\+NT@{N\+O\+\_\+\+C\+O\+N\+T\+E\+NT}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{N\+O\+\_\+\+C\+O\+N\+T\+E\+NT}{NO\_CONTENT}}
+{\footnotesize\ttfamily \#define N\+O\+\_\+\+C\+O\+N\+T\+E\+NT~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a924170e0b9e6d6eec63321a20dd6f596}{H\+T\+T\+P\+\_\+\+N\+O\+\_\+\+C\+O\+N\+T\+E\+NT}}, \char`\"{}No Content\char`\"{}, 10\}}
+
+\mbox{\Hypertarget{response_8h_a655c84af1b0034986ff56e12e84f983d}\label{response_8h_a655c84af1b0034986ff56e12e84f983d}} 
+\index{response.\+h@{response.\+h}!N\+O\+NE@{N\+O\+NE}}
+\index{N\+O\+NE@{N\+O\+NE}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{N\+O\+NE}{NONE}}
+{\footnotesize\ttfamily \#define N\+O\+NE~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{0, \char`\"{}\char`\"{}, 0\}}
+
+\mbox{\Hypertarget{response_8h_a33bfc1f995233887a0414369c36936b8}\label{response_8h_a33bfc1f995233887a0414369c36936b8}} 
+\index{response.\+h@{response.\+h}!N\+O\+T\+\_\+\+F\+O\+U\+ND@{N\+O\+T\+\_\+\+F\+O\+U\+ND}}
+\index{N\+O\+T\+\_\+\+F\+O\+U\+ND@{N\+O\+T\+\_\+\+F\+O\+U\+ND}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{N\+O\+T\+\_\+\+F\+O\+U\+ND}{NOT\_FOUND}}
+{\footnotesize\ttfamily \#define N\+O\+T\+\_\+\+F\+O\+U\+ND~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a7a2f2a109c030ee9d2d5afe761232451}{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+F\+O\+U\+ND}}, \char`\"{}Not found\char`\"{}, 9\}}
+
+\mbox{\Hypertarget{response_8h_aec2bcbab7ad208b42215cf4225e259e1}\label{response_8h_aec2bcbab7ad208b42215cf4225e259e1}} 
+\index{response.\+h@{response.\+h}!N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED@{N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}}
+\index{N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED@{N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}{NOT\_IMPLEMENTED}}
+{\footnotesize\ttfamily \#define N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5ad46f8921b20784b1d781ed4fcc13c39a}{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}}, \char`\"{}Method Not Implemented\char`\"{}, 22\}}
+
+\mbox{\Hypertarget{response_8h_aba51915c87d64af47fb1cc59348961c9}\label{response_8h_aba51915c87d64af47fb1cc59348961c9}} 
+\index{response.\+h@{response.\+h}!OK@{OK}}
+\index{OK@{OK}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{OK}{OK}}
+{\footnotesize\ttfamily \#define OK~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a43f8027764325bbcad2f773511156d0a}{H\+T\+T\+P\+\_\+\+OK}}, \char`\"{}OK\char`\"{}, 2\}}
+
+\mbox{\Hypertarget{response_8h_aca2b488c5f3c95dc5ae20d65552b948a}\label{response_8h_aca2b488c5f3c95dc5ae20d65552b948a}} 
+\index{response.\+h@{response.\+h}!R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT@{R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT}}
+\index{R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT@{R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT}{REQUEST\_TIMEOUT}}
+{\footnotesize\ttfamily \#define R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5adcc34faaeb56b1d491853257833854a3}{H\+T\+T\+P\+\_\+\+R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT}}, \char`\"{}Requeset Timeout\char`\"{}, 16\}}
+
+\mbox{\Hypertarget{response_8h_a1c29dc97c4a889a2536b2ad9ed73b91e}\label{response_8h_a1c29dc97c4a889a2536b2ad9ed73b91e}} 
+\index{response.\+h@{response.\+h}!S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE@{S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE}}
+\index{S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE@{S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE}{SERVICE\_UNAVAILABLE}}
+{\footnotesize\ttfamily \#define S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a6251d4710923e5253b159943405a1a3a}{H\+T\+T\+P\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE}}, \char`\"{}Service Unavailable\char`\"{}, 19\}}
+
+\mbox{\Hypertarget{response_8h_a326a9a923c1a8d5b4e0d3d62801195e8}\label{response_8h_a326a9a923c1a8d5b4e0d3d62801195e8}} 
+\index{response.\+h@{response.\+h}!U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED@{U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED}}
+\index{U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED@{U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED}{UNAUTHORIZED}}
+{\footnotesize\ttfamily \#define U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED~(\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}) \{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5a74677f364201a3d068bc6b9db7359288}{H\+T\+T\+P\+\_\+\+U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED}}, \char`\"{}Unauthorized\char`\"{}, 12\}}
+
+
+
+\subsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5}\label{response_8h_a0b13748b574460b8784b7a521757b4b5}} 
+\index{response.\+h@{response.\+h}!response\+\_\+nt@{response\+\_\+nt}}
+\index{response\+\_\+nt@{response\+\_\+nt}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{response\+\_\+nt}{response\_nt}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5}{response\+\_\+nt}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+OK@{H\+T\+T\+P\+\_\+\+OK}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+OK@{H\+T\+T\+P\+\_\+\+OK}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5a43f8027764325bbcad2f773511156d0a}\label{response_8h_a0b13748b574460b8784b7a521757b4b5a43f8027764325bbcad2f773511156d0a}} 
+H\+T\+T\+P\+\_\+\+OK&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+C\+R\+E\+A\+T\+ED@{H\+T\+T\+P\+\_\+\+C\+R\+E\+A\+T\+ED}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+C\+R\+E\+A\+T\+ED@{H\+T\+T\+P\+\_\+\+C\+R\+E\+A\+T\+ED}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5a211e5143e6efe62c4f5eefc012a2dc39}\label{response_8h_a0b13748b574460b8784b7a521757b4b5a211e5143e6efe62c4f5eefc012a2dc39}} 
+H\+T\+T\+P\+\_\+\+C\+R\+E\+A\+T\+ED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+N\+O\+\_\+\+C\+O\+N\+T\+E\+NT@{H\+T\+T\+P\+\_\+\+N\+O\+\_\+\+C\+O\+N\+T\+E\+NT}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+N\+O\+\_\+\+C\+O\+N\+T\+E\+NT@{H\+T\+T\+P\+\_\+\+N\+O\+\_\+\+C\+O\+N\+T\+E\+NT}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5a924170e0b9e6d6eec63321a20dd6f596}\label{response_8h_a0b13748b574460b8784b7a521757b4b5a924170e0b9e6d6eec63321a20dd6f596}} 
+H\+T\+T\+P\+\_\+\+N\+O\+\_\+\+C\+O\+N\+T\+E\+NT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST@{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST@{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5a173b2a55d636fe537b9069a4fb3388f2}\label{response_8h_a0b13748b574460b8784b7a521757b4b5a173b2a55d636fe537b9069a4fb3388f2}} 
+H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+R\+E\+Q\+U\+E\+ST&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED@{H\+T\+T\+P\+\_\+\+U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED@{H\+T\+T\+P\+\_\+\+U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5a74677f364201a3d068bc6b9db7359288}\label{response_8h_a0b13748b574460b8784b7a521757b4b5a74677f364201a3d068bc6b9db7359288}} 
+H\+T\+T\+P\+\_\+\+U\+N\+A\+U\+T\+H\+O\+R\+I\+Z\+ED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+F\+O\+R\+B\+I\+D\+D\+EN@{H\+T\+T\+P\+\_\+\+F\+O\+R\+B\+I\+D\+D\+EN}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+F\+O\+R\+B\+I\+D\+D\+EN@{H\+T\+T\+P\+\_\+\+F\+O\+R\+B\+I\+D\+D\+EN}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5a7aec6e8ecb79ff84830a69e52ff01d17}\label{response_8h_a0b13748b574460b8784b7a521757b4b5a7aec6e8ecb79ff84830a69e52ff01d17}} 
+H\+T\+T\+P\+\_\+\+F\+O\+R\+B\+I\+D\+D\+EN&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+F\+O\+U\+ND@{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+F\+O\+U\+ND}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+F\+O\+U\+ND@{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+F\+O\+U\+ND}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5a7a2f2a109c030ee9d2d5afe761232451}\label{response_8h_a0b13748b574460b8784b7a521757b4b5a7a2f2a109c030ee9d2d5afe761232451}} 
+H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+F\+O\+U\+ND&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED@{H\+T\+T\+P\+\_\+\+M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED@{H\+T\+T\+P\+\_\+\+M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5ab4cf8d97b3203f2926b30c517b45f837}\label{response_8h_a0b13748b574460b8784b7a521757b4b5ab4cf8d97b3203f2926b30c517b45f837}} 
+H\+T\+T\+P\+\_\+\+M\+E\+T\+H\+O\+D\+\_\+\+N\+O\+T\+\_\+\+A\+L\+L\+O\+W\+ED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT@{H\+T\+T\+P\+\_\+\+R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT@{H\+T\+T\+P\+\_\+\+R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5adcc34faaeb56b1d491853257833854a3}\label{response_8h_a0b13748b574460b8784b7a521757b4b5adcc34faaeb56b1d491853257833854a3}} 
+H\+T\+T\+P\+\_\+\+R\+E\+Q\+U\+E\+S\+T\+\_\+\+T\+I\+M\+E\+O\+UT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR@{H\+T\+T\+P\+\_\+\+I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR@{H\+T\+T\+P\+\_\+\+I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5ab6daedaa6f456ee305e0dbe92e56fb4e}\label{response_8h_a0b13748b574460b8784b7a521757b4b5ab6daedaa6f456ee305e0dbe92e56fb4e}} 
+H\+T\+T\+P\+\_\+\+I\+N\+T\+E\+R\+N\+A\+L\+\_\+\+E\+R\+R\+OR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED@{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED@{H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5ad46f8921b20784b1d781ed4fcc13c39a}\label{response_8h_a0b13748b574460b8784b7a521757b4b5ad46f8921b20784b1d781ed4fcc13c39a}} 
+H\+T\+T\+P\+\_\+\+N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+ED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY@{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY@{H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5a9c2445431af610981d73859df3c658f2}\label{response_8h_a0b13748b574460b8784b7a521757b4b5a9c2445431af610981d73859df3c658f2}} 
+H\+T\+T\+P\+\_\+\+B\+A\+D\+\_\+\+G\+A\+T\+E\+W\+AY&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{H\+T\+T\+P\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE@{H\+T\+T\+P\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE}!response.\+h@{response.\+h}}\index{response.\+h@{response.\+h}!H\+T\+T\+P\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE@{H\+T\+T\+P\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE}}}\mbox{\Hypertarget{response_8h_a0b13748b574460b8784b7a521757b4b5a6251d4710923e5253b159943405a1a3a}\label{response_8h_a0b13748b574460b8784b7a521757b4b5a6251d4710923e5253b159943405a1a3a}} 
+H\+T\+T\+P\+\_\+\+S\+E\+R\+V\+I\+C\+E\+\_\+\+U\+N\+A\+V\+A\+I\+L\+A\+B\+LE&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{response_8h_a8898304d5ef9cfee177c3e91b2238cdc}\label{response_8h_a8898304d5ef9cfee177c3e91b2238cdc}} 
+\index{response.\+h@{response.\+h}!get\+\_\+res@{get\+\_\+res}}
+\index{get\+\_\+res@{get\+\_\+res}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{get\+\_\+res()}{get\_res()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} get\+\_\+res (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{response_8h_a0b13748b574460b8784b7a521757b4b5}{response\+\_\+nt}}}]{x }\end{DoxyParamCaption})}
+
+Get corresponding \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} given an H\+T\+TP response int 
+\begin{DoxyParams}{Parameters}
+{\em x} & the int (H\+T\+TP res) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the corresponding \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{response_8h_a4f1bdab384eb2af64328ca309e194651}\label{response_8h_a4f1bdab384eb2af64328ca309e194651}} 
+\index{response.\+h@{response.\+h}!rsend@{rsend}}
+\index{rsend@{rsend}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{rsend()}{rsend()}}
+{\footnotesize\ttfamily ssize\+\_\+t rsend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{server_8h_a69a3fe08611a85e34c7a5a3ed93da235}{Connection}} $\ast$}]{conn,  }\item[{\mbox{\hyperlink{structresponse__t}{response\+\_\+t}}}]{code }\end{DoxyParamCaption})}
+
+Send a H\+T\+TP response back to the client 
+\begin{DoxyParams}{Parameters}
+{\em conn} & the connection to respond to \\
+\hline
+{\em code} & the code to write \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the number of bytes that were written 
+\end{DoxyReturn}
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{response_8h_a7d1eeb19252baca7947b42c4630a85c5}\label{response_8h_a7d1eeb19252baca7947b42c4630a85c5}} 
+\index{response.\+h@{response.\+h}!res\+\_\+list@{res\+\_\+list}}
+\index{res\+\_\+list@{res\+\_\+list}!response.\+h@{response.\+h}}
+\subsubsection{\texorpdfstring{res\+\_\+list}{res\_list}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} res\+\_\+list\mbox{[}$\,$\mbox{]}}
+
