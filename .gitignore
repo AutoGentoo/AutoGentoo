@@ -68,3 +68,6 @@ en_US.utf8
 *.request
 Debug/*
 *~
+
+.idea/*
+cmake-build-debug/*

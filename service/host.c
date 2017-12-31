@@ -108,7 +108,7 @@ arch_t determine_arch (char* chost) {
     return _INVALIDBIT;
 }
 
-int host_write_make_conf (Host* host, char* path) {
+int host_write_make_conf (Host* host) {
     char cbuild[64];
     FILE* cbuild_stream = popen ("gcc -dumpmachine", "r");
     if(!cbuild_stream){
@@ -116,6 +116,8 @@ int host_write_make_conf (Host* host, char* path) {
         return 1;
     }
     
+    char path[256];
+    host_get_path(host, path);
     fgets(cbuild, 64, cbuild_stream);
     *strchr (cbuild, '\n') = '\0';
     pclose (cbuild_stream);

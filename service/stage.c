@@ -6,90 +6,27 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <archive.h>
-#include <archive_entry.h>
 #include <download.h>
+#include <command.h>
 
-static int prv_copy_data (struct archive *ar, struct archive *aw) {
-    la_ssize_t r;
-    const void *buff;
-    size_t size;
-    la_int64_t offset;
+static int stage_commands_init = 0;
 
-    for (;;) {
-        r = archive_read_data_block(ar, &buff, &size, &offset);
-        if (r == ARCHIVE_EOF)
-            return (ARCHIVE_OK);
-        if (r < ARCHIVE_OK)
-            return ((int)r);
-        r = archive_write_data_block(aw, buff, size, offset);
-        if (r < ARCHIVE_OK) {
-        fprintf(stderr, "%s\n", archive_error_string(aw));
-            return ((int)r);
-        }
-    }
+SmallMap* tar = NULL;
+
+void init_stage_commands (void) {
+    tar = small_map_new (sizeof(Command*), 5);
+    small_map_insert (tar, "extract", command_new("tar -xf %s", 1));
+    small_map_insert (tar, "extract to", command_new("tar -xf %s -C %s", 2));
+    small_map_insert (tar, "compress", command_new("tar -cf %s %s", 2));
 }
 
-response_t prv_extract_stage3 (HostTemplate* t) {
-    char fname[256];
-    sprintf (fname, "%s/distfiles/stage3-%s.tar.bz2", t->parent->location, t->id);
-    
-    if (access(fname, F_OK) == -1) {
-        lerror ("distfile 'stage3-%s.tar.bz2' does not exist (please download)", t->id);
-        return INTERNAL_ERROR;
+void free_stage_commands (void) {
+    int i;
+    for (i = 0; i != tar->n; i++) {
+        command_free ((Command*)(*(void***)vector_get(tar, i))[1]);
     }
-
-    struct archive* a;
-    struct archive* ext;
-    struct archive_entry* entry;
-    int flags;
-    int r;
-
-    /* Select which attributes we want to restore. */
-    flags = ARCHIVE_EXTRACT_TIME;
-    flags |= ARCHIVE_EXTRACT_PERM;
-    flags |= ARCHIVE_EXTRACT_ACL;
-    flags |= ARCHIVE_EXTRACT_FFLAGS;
     
-    a = archive_read_new();
-    archive_read_support_format_all(a);
-    archive_read_support_compression_all(a);
-    ext = archive_write_disk_new();
-    archive_write_disk_set_options(ext, flags);
-    archive_write_disk_set_standard_lookup(ext);
-    if ((r = archive_read_open_filename(a, fname, 10240)))
-        return INTERNAL_ERROR;
-    for (;;) {
-        r = archive_read_next_header(a, &entry);
-        if (r == ARCHIVE_EOF)
-            break;
-        if (r < ARCHIVE_OK)
-            fprintf(stderr, "%s\n", archive_error_string(a));
-        if (r < ARCHIVE_WARN)
-            return INTERNAL_ERROR;
-        r = archive_write_header(ext, entry);
-        if (r < ARCHIVE_OK)
-            fprintf(stderr, "%s\n", archive_error_string(ext));
-        else if (archive_entry_size(entry) > 0) {
-            r = prv_copy_data(a, ext);
-            if (r < ARCHIVE_OK)
-                fprintf(stderr, "%s\n", archive_error_string(ext));
-            if (r < ARCHIVE_WARN)
-                return INTERNAL_ERROR;
-        }
-        r = archive_write_finish_entry(ext);
-        if (r < ARCHIVE_OK)
-            fprintf(stderr, "%s\n", archive_error_string(ext));
-        if (r < ARCHIVE_WARN)
-            return INTERNAL_ERROR;
-    }
-    archive_read_close(a);
-    archive_read_free(a);
-    
-    archive_write_close(ext);
-    archive_write_free(ext);
-    
-    return OK;
+    small_map_free(tar, 0);
 }
 
 HostTemplate host_templates[] = {

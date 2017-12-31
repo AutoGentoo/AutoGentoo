@@ -1,0 +1,6 @@
+#ifndef __AUTOGENTOO_ARCHIVE_H__
+#define __AUTOGENTOO_ARCHIVE_H__
+
+
+
+#endif //__AUTOGENTOO_ARCHIVE_H__

@@ -25,8 +25,30 @@ struct __HostTemplate {
     Server* parent;
 };
 
+/**
+ * Initialize a dynamic HostTemplate given a static one. \
+ * Initilizes unknown fields such as dest_dir and parent
+ * @param parent the parent server to bind to
+ * @param t the static template to copy
+ * @return a pointer the dynamically allocated template
+ */
 HostTemplate* host_template_init (Server* parent, HostTemplate t);
+
+/**
+ * Initialize stage3 given a HostTemplate
+ * This downloads and extracts the a stage3 \
+ * downloads are always from http://distfiles.gentoo.org/
+ * @param t the HostTemplate to initilize
+ */
 void host_template_stage (HostTemplate* t);
+
+/**
+ * Mark The given HostTemplate as ready \
+ * This allows the new Host to mount chroot and emerge new packages
+ * @param dest The new parent (a Host) of the directory
+ * @param src The old parent (a HostTemplate) of the directory
+ * @return OK if all goes well, INTERNAL_ERROR if error occured
+ */
 response_t host_template_handoff (Host* dest, HostTemplate* src);
 
 #endif

@@ -47,7 +47,19 @@ extern response_t res_list[];
 #include <sys/socket.h>
 #include "server.h"
 
+/**
+ * Send a HTTP response back to the client
+ * @param conn the connection to respond to
+ * @param code the code to write
+ * @return the number of bytes that were written
+ */
 ssize_t rsend (Connection* conn, response_t code);
+
+/**
+ * Get corresponding response_t given an HTTP response int
+ * @param x the int (HTTP res)
+ * @return the corresponding response_t
+ */
 response_t get_res (response_nt x);
 
 #endif

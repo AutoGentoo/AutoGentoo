@@ -6,7 +6,7 @@
 #include <hacksaw/language.h>
 
 typedef struct __BinaryPackage BinaryPackage;
-
+/*
 BUILD_TIME: 1506728470
 CPV: app-accessibility/at-spi2-atk-2.22.0
 DEFINED_PHASES: compile configure install postinst postrm preinst prepare test
@@ -23,7 +23,7 @@ SLOT: 2
 USE: abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
 MTIME: 1511419260
 REPO: gentoo
-
+*/ 
 struct __BinaryPackage {
     char* cpv;
     

@@ -62,14 +62,15 @@ response_t GET (Connection* conn, char** args, int start) {
     char path[256];
     
     sprintf (path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->binhost.pkgdir, args[0]);
-    int fd, bytes_read, data_to_send;
+    int fd, data_to_send;
+    ssize_t bytes_read;
     if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
     {
         rsend (conn, OK);
         res = OK;
         write (conn->fd, "\n", 1);
         while ((bytes_read = read(fd, (void*)&data_to_send, sizeof(data_to_send))) > 0)
-            write(conn->fd, (void*)&data_to_send, bytes_read);
+            write(conn->fd, (void*)&data_to_send, (size_t)bytes_read);
     }
     else {
         rsend (conn, NOT_FOUND);
@@ -149,7 +150,8 @@ Host* prv_host_new (Server* server, int argc, StringVector* data) {
 response_t SRV_CREATE (Connection* conn, char** args, int start) {
     int argc = 0;
     if (strncmp (args[0], "HTTP", 4) != 0) {
-        sscanf (args[0], "%d", &argc);
+        char* end;
+        argc = (int)strtol(args[0], &end, 10);
     }
     
     char* request = conn->request + start;
@@ -178,11 +180,12 @@ response_t SRV_CREATE (Connection* conn, char** args, int start) {
 response_t SRV_EDIT (Connection* conn, char** args, int start) {
     int argc = 0;
     if (strncmp (args[0], "HTTP", 4) != 0) {
-        sscanf (args[0], "%d", &argc);
+        char* end;
+        argc = (int)strtol(args[0], &end, 10);
     }
     
     char id_to_edit[16];
-    int i_split = strchr (conn->request + start, '\n') - (conn->request + start);
+    unsigned long i_split = strchr (conn->request + start, '\n') - (conn->request + start);
     strncpy (id_to_edit, conn->request + start, i_split);
     
     char* request = conn->request + start + i_split + 1;
@@ -215,7 +218,7 @@ response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start) {
     
     // Remove the binding
     for (i = 0; i != conn->parent->host_bindings->n; i++) {
-        Host** tmp = (Host**)(((void***)vector_get((Vector*)conn->parent->host_bindings, i))[1]);
+        Host** tmp = (Host**)(((void***)vector_get(conn->parent->host_bindings, i))[1]);
         if (strcmp ((*tmp)->id, args[0]) == 0) {
             vector_remove (conn->parent->host_bindings, i);
             // dont break because multiple clients can point to the same host
@@ -224,7 +227,7 @@ response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start) {
     
     // Remove the definition
     for (i = 0; i != conn->parent->hosts->n; i++) {
-        if (strcmp ((*(Host**)vector_get((Vector*)conn->parent->host_bindings, i))->id, args[0]) == 0) {
+        if (strcmp ((*(Host**)vector_get(conn->parent->host_bindings, i))->id, args[0]) == 0) {
             vector_remove (conn->parent->host_bindings, i);
             break; // Two hosts cant have the same id (at least they are not support to...)
         }
@@ -356,7 +359,7 @@ response_t SRV_GETACTIVE (Connection* conn, char** args, int start) {
 response_t SRV_GETSPEC (Connection* conn, char** args, int start) {
     system ("lscpu > build.spec");
     FILE* lspcu_fp = fopen("build.spec", "r");
-    char symbol;
+    int symbol;
     if(lspcu_fp != NULL) {
         while((symbol = getc(lspcu_fp)) != EOF) {
             write (conn->fd, &symbol, sizeof (char));
