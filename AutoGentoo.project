@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="AutoGentoo" Version="10.0.0" InternalType="Console">
-  <VirtualDirectory Name="client">
-    <File Name="client/binpkg.c"/>
-    <File Name="client/Makefile.am"/>
-  </VirtualDirectory>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
     </Plugin>
   </Plugins>
+  <VirtualDirectory Name="client">
+    <File Name="client/binpkg.c"/>
+    <File Name="client/Makefile.am"/>
+  </VirtualDirectory>
   <VirtualDirectory Name="autotools">
     <File Name="configure.ac"/>
     <File Name="autogen.sh"/>
@@ -29,6 +29,7 @@
     <File Name="service/autogentoo.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="include/command.h"/>
     <File Name="include/binpkg.h"/>
     <File Name="include/download.h"/>
     <File Name="include/stage.h"/>
