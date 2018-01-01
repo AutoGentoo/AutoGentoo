@@ -17,20 +17,20 @@
  */
 
 HostTemplate host_templates[] = {
-        /*
-        {"alpha", "alpha", "-mieee -pipe -O2 -mcpu=ev4", "alpha-unknown-linux-gnu", {"/space/catalyst/portage", PORTDIR}, 1},
-        {"amd64", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", {"CPU_FLAGS_X86=\"mmx sse sse2\"", OTHER}, 1},
-        */
-        {"amd64-systemd", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", {"CPU_FLAGS_X86=\"mmx sse sse2\"", OTHER}, 1},
-        /*  
-        {"armv4tl", "arm"},
-        {"armv5tel", "arm"},
-        {"armv6j", "arm"},
-        {"armv6j_hardfp", "arm"},
-        {"armv7a", "arm"},
-        {"armv7a_hardfp", "arm", "-O2 -pipe -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard", "armv7a-hardfloat-linux-gnueabi"},
-        {"arm64", "arm", "-O2 -pipe", "aarch64-unknown-linux-gnu"},
-        {"hppa", "hppa", "-O2 -pipe -march=1.1", "hppa1.1-unknown-linux-gnu", "CXXFLAGS=\"-O2 -pipe\"", CXXFLAGS},
+    /*
+    {"alpha", "alpha", "-mieee -pipe -O2 -mcpu=ev4", "alpha-unknown-linux-gnu", {"/space/catalyst/portage", PORTDIR}, 1},
+    {"amd64", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", {"CPU_FLAGS_X86=\"mmx sse sse2\"", OTHER}, 1},
+    */
+    {"amd64-systemd", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", {"CPU_FLAGS_X86=\"mmx sse sse2\"", OTHER}, 1},
+    /*  
+    {"armv4tl", "arm"},
+    {"armv5tel", "arm"},
+    {"armv6j", "arm"},
+    {"armv6j_hardfp", "arm"},
+    {"armv7a", "arm"},
+    {"armv7a_hardfp", "arm", "-O2 -pipe -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard", "armv7a-hardfloat-linux-gnueabi"},
+    {"arm64", "arm", "-O2 -pipe", "aarch64-unknown-linux-gnu"},
+    {"hppa", "hppa", "-O2 -pipe -march=1.1", "hppa1.1-unknown-linux-gnu", "CXXFLAGS=\"-O2 -pipe\"", CXXFLAGS},
     */
 };
 
