@@ -13,6 +13,6 @@
 #define AUTOGENTOO_PORT 9490
 #endif
 
-int main(int argc, char** argv);
+int main (int argc, char** argv);
 
 #endif

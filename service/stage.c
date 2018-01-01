@@ -33,100 +33,100 @@ HostTemplate host_templates[] = {
         */
 };
 
-StringVector* host_template_get_all() {
-    StringVector* out = string_vector_new();
+StringVector* host_template_get_all () {
+    StringVector* out = string_vector_new ();
     int i;
-    for (i = 0; i != sizeof(host_templates) / sizeof(host_templates[0]); i++) {
-        string_vector_add(out, host_templates[i].id);
+    for (i = 0; i != sizeof (host_templates) / sizeof (host_templates[0]); i++) {
+        string_vector_add (out, host_templates[i].id);
     }
     
     return out;
 }
 
-HostTemplate* host_template_init(Server* parent, HostTemplate t) {
-    HostTemplate* out = malloc(sizeof(HostTemplate));
+HostTemplate* host_template_init (Server* parent, HostTemplate t) {
+    HostTemplate* out = malloc (sizeof (HostTemplate));
     out->parent = parent;
     
-    out->id = strdup(t.id);
-    out->arch = strdup(t.arch);
-    out->cflags = strdup(t.cflags);
-    out->chost = strdup(t.chost);
+    out->id = strdup (t.id);
+    out->arch = strdup (t.arch);
+    out->cflags = strdup (t.cflags);
+    out->chost = strdup (t.chost);
     
     int i;
     for (i = 0; i != t.extra_c; i++) {
-        out->extras[i].make_extra = strdup(t.extras[i].make_extra);
+        out->extras[i].make_extra = strdup (t.extras[i].make_extra);
         out->extras[i].select = t.extras[i].select;
     }
     
-    out->new_id = host_id_new();
-    asprintf(&out->dest_dir, "%s/stage-%s", parent->location, out->new_id);
+    out->new_id = host_id_new ();
+    asprintf (&out->dest_dir, "%s/stage-%s", parent->location, out->new_id);
     
-    small_map_insert(parent->stages, out->new_id, out);
+    small_map_insert (parent->stages, out->new_id, out);
     
     return out;
 }
 
-void host_template_stage(HostTemplate* t) {
+void host_template_stage (HostTemplate* t) {
     char distfile_dir[256];
     sprintf (distfile_dir, "%s/distfiles", t->parent->location);
     
-    if (!opendir(distfile_dir)) {
-        mkdir(t->dest_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    if (!opendir (distfile_dir)) {
+        mkdir (t->dest_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     }
     
     char distfile_meta_url[256];
     sprintf (distfile_meta_url, "http://distfiles.gentoo.org/%s/autobuilds/latest-stage3-%s.txt", t->arch, t->id);
     
-    if (download(distfile_meta_url, "temp_dest", NO_PROGRESS).code != 200) {
-        lerror("Could not download metadata for stage3!");
+    if (download (distfile_meta_url, "temp_dest", NO_PROGRESS).code != 200) {
+        lerror ("Could not download metadata for stage3!");
         return;
     }
     
-    FILE* fp_temp = fopen("temp_dest", "r");
+    FILE* fp_temp = fopen ("temp_dest", "r");
     
     char* line;
     size_t len;
     char* stage3_dest = NULL;
     ssize_t read = 0;
     char stage3_date[32];
-    while ((read = getline(&line, &len, fp_temp)) != -1) {
+    while ((read = getline (&line, &len, fp_temp)) != -1) {
         if (line[0] == '#')
             continue;
         // The first non-comment line will be our target stage3
         
-        line[strlen(line) - 1] = '\0'; // Remove the newline
-        char* s = strtok(line, " ");
+        line[strlen (line) - 1] = '\0'; // Remove the newline
+        char* s = strtok (line, " ");
         strcpy(stage3_date, s);
-        s = strtok(NULL, " ");
-        asprintf(&stage3_dest, "http://distfiles.gentoo.org/%s/autobuilds/%s", t->arch, s);
+        s = strtok (NULL, " ");
+        asprintf (&stage3_dest, "http://distfiles.gentoo.org/%s/autobuilds/%s", t->arch, s);
         break;
     }
-    fclose(fp_temp);
-    remove("temp_dest");
+    fclose (fp_temp);
+    remove ("temp_dest");
     
     char* fname;
-    asprintf(&fname, "%s/distfiles/stage3-%s-%s.tar.bz2", t->parent->location, t->id, stage3_date);
+    asprintf (&fname, "%s/distfiles/stage3-%s-%s.tar.bz2", t->parent->location, t->id, stage3_date);
     
-    if (access(fname, F_OK) == -1) {
-        linfo("Downloading stage3 from %s", stage3_dest);
-        download(stage3_dest, fname, SHOW_PROGRESS);
-        free(stage3_dest);
+    if (access (fname, F_OK) == -1) {
+        linfo ("Downloading stage3 from %s", stage3_dest);
+        download (stage3_dest, fname, SHOW_PROGRESS);
+        free (stage3_dest);
     }
     
     int ext_ret;
-    command("tar", "extract to", NULL, &ext_ret, fname, t->dest_dir);
+    command ("tar", "extract to", NULL, &ext_ret, fname, t->dest_dir);
     
     if (ext_ret != 0)
-        lerror("Failed to extract stage3 tar");
+        lerror ("Failed to extract stage3 tar");
 }
 
-Host* host_template_handoff(HostTemplate* src) {
-    Host* out = host_new(src->parent, src->id);
+Host* host_template_handoff (HostTemplate* src) {
+    Host* out = host_new (src->parent, src->id);
     char host_dir[256];
-    host_get_path(out, host_dir);
-    if (rename(src->dest_dir, host_dir) != 0) {
-        lerror("Failed to rename %s to %s", src->dest_dir, host_dir);
-        host_free(out);
+    host_get_path (out, host_dir);
+    if (rename (src->dest_dir, host_dir) != 0) {
+        lerror ("Failed to rename %s to %s", src->dest_dir, host_dir);
+        host_free (out);
         return NULL;
     }
     strcpy (out->hostname, "default");
@@ -136,24 +136,24 @@ Host* host_template_handoff(HostTemplate* src) {
         char* t_profile_l;
         char profile_dest[256];
         
-        asprintf(&t_profile_l, "%s/etc/portage/make.profile", src->dest_dir);
-        ssize_t profile_len = readlink(t_profile_l, profile_dest, sizeof(profile_dest) - 1);
+        asprintf (&t_profile_l, "%s/etc/portage/make.profile", src->dest_dir);
+        ssize_t profile_len = readlink (t_profile_l, profile_dest, sizeof (profile_dest) - 1);
         profile_dest[(int)profile_len] = 0; // Readlink does not null terminal
-        free(t_profile_l);
+        free (t_profile_l);
         
-        char* t_profile_split = strstr(profile_dest, "profiles/");
-        free(out->profile);
-        out->profile = strdup(t_profile_split + strlen("profiles/"));
+        char* t_profile_split = strstr (profile_dest, "profiles/");
+        free (out->profile);
+        out->profile = strdup (t_profile_split + strlen ("profiles/"));
     }
     
     // defaults
     {
-        string_overwrite(&out->cxxflags, "${CFLAGS}", 1);
-        string_overwrite(&out->portage_tmpdir, "/autogentoo/tmp", 1);
-        string_overwrite(&out->portdir, "/usr/portage", 1);
-        string_overwrite(&out->distdir, "/usr/portage/distfiles", 1);
-        string_overwrite(&out->pkgdir, "/autogentoo/pkg", 1);
-        string_overwrite(&out->port_logdir, "/autogentoo/log", 1);
+        string_overwrite (&out->cxxflags, "${CFLAGS}", 1);
+        string_overwrite (&out->portage_tmpdir, "/autogentoo/tmp", 1);
+        string_overwrite (&out->portdir, "/usr/portage", 1);
+        string_overwrite (&out->distdir, "/usr/portage/distfiles", 1);
+        string_overwrite (&out->pkgdir, "/autogentoo/pkg", 1);
+        string_overwrite (&out->port_logdir, "/autogentoo/log", 1);
     }
     
     // make.conf stuff
@@ -179,12 +179,12 @@ Host* host_template_handoff(HostTemplate* src) {
     int i;
     for (i = 0; i != src->extra_c; i++) {
         if (src->extras[i].select == OTHER) {
-            string_vector_add(out->extra, src->extras[i].make_extra);
+            string_vector_add (out->extra, src->extras[i].make_extra);
             continue;
         }
         
         int j;
-        for (j = 0; j != sizeof(_t) / sizeof(_t[0]); j++) {
+        for (j = 0; j != sizeof (_t) / sizeof (_t[0]); j++) {
             if (src->extras[i].select == _t[j].sel) {
                 strcpy (_t[j].ptr, src->extras[i].make_extra);
                 break;
@@ -192,23 +192,23 @@ Host* host_template_handoff(HostTemplate* src) {
         }
     }
     
-    src = small_map_delete(src->parent->stages, src->new_id);
-    host_template_free(src);
+    src = small_map_delete (src->parent->stages, src->new_id);
+    host_template_free (src);
     return out;
 }
 
-void host_template_free(HostTemplate* temp) {
-    free(temp->id);
-    free(temp->arch);
-    free(temp->cflags);
-    free(temp->chost);
+void host_template_free (HostTemplate* temp) {
+    free (temp->id);
+    free (temp->arch);
+    free (temp->cflags);
+    free (temp->chost);
     
     int i;
     for (i = 0; i != temp->extra_c; i++) {
-        free(temp->extras->make_extra);
+        free (temp->extras->make_extra);
     }
     
-    free(temp->dest_dir);
-    free(temp->new_id);
-    free(temp);
+    free (temp->dest_dir);
+    free (temp->new_id);
+    free (temp);
 }

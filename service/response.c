@@ -1,11 +1,11 @@
 #include <response.h>
 #include <unistd.h>
 
-ssize_t rsend(Connection* conn, response_t code) {
+ssize_t rsend (Connection* conn, response_t code) {
     char message[40];
     sprintf (message, "HTTP/1.0 %d %s\n", code.code, code.message);
     
-    return write(conn->fd, message, 14 + code.len);
+    return write (conn->fd, message, 14 + code.len);
 }
 
 response_t res_list[] = {
@@ -24,9 +24,9 @@ response_t res_list[] = {
         SERVICE_UNAVAILABLE
 };
 
-response_t get_res(response_nt x) {
+response_t get_res (response_nt x) {
     int i;
-    for (i = 0; i != sizeof(res_list) / sizeof(res_list[0]); i++) {
+    for (i = 0; i != sizeof (res_list) / sizeof (res_list[0]); i++) {
         if (res_list[i].code == x) {
             return res_list[i];
         }

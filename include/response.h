@@ -53,13 +53,13 @@ extern response_t res_list[];
  * @param code the code to write
  * @return the number of bytes that were written
  */
-ssize_t rsend(Connection* conn, response_t code);
+ssize_t rsend (Connection* conn, response_t code);
 
 /**
  * Get corresponding response_t given an HTTP response int
  * @param x the int (HTTP res)
  * @return the corresponding response_t
  */
-response_t get_res(response_nt x);
+response_t get_res (response_nt x);
 
 #endif
