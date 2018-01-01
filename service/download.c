@@ -1,5 +1,4 @@
 #include <download.h>
-#include <curl/curl.h>
 
 int download_progress (void* clientp, curl_off_t dltotal,
                        curl_off_t dlnow,

@@ -30,7 +30,7 @@ void write_server_fp (Server* server, FILE* fp) {
     }
     write_int (server->stages->n, fp);
     for (i = 0; i != server->stages->n; i++) {
-        void** __t = *(void***)vector_get(server->stages, i);
+        void** __t = *(void***)vector_get (server->stages, i);
         write_stage_fp (__t[1], fp);
     }
 }

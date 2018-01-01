@@ -11,21 +11,21 @@
 #include <writeconfig.h>
 
 RequestLink requests[] = {
-        {"GET",             GET},
-        {"INSTALL",         INSTALL},
-        {"CMD INSTALL",     INSTALL}, // Alias for INSTALL (this was the old usage)
-        {"SRV EDIT",        SRV_EDIT},
-        {"SRV ACTIVATE",    SRV_ACTIVATE},
-        {"SRV HOSTREMOVE",  SRV_HOSTREMOVE},
-        {"SRV MNTCHROOT",   SRV_MNTCHROOT},
-        {"SRV GETHOSTS",    SRV_GETHOSTS},
-        {"SRV GETHOST",     SRV_GETHOST},
-        {"SRV GETACTIVE",   SRV_GETACTIVE},
-        {"SRV GETSPEC",     SRV_GETSPEC},
+        {"GET",              GET},
+        {"INSTALL",          INSTALL},
+        {"CMD INSTALL",      INSTALL}, // Alias for INSTALL (this was the old usage)
+        {"SRV EDIT",         SRV_EDIT},
+        {"SRV ACTIVATE",     SRV_ACTIVATE},
+        {"SRV HOSTREMOVE",   SRV_HOSTREMOVE},
+        {"SRV MNTCHROOT",    SRV_MNTCHROOT},
+        {"SRV GETHOSTS",     SRV_GETHOSTS},
+        {"SRV GETHOST",      SRV_GETHOST},
+        {"SRV GETACTIVE",    SRV_GETACTIVE},
+        {"SRV GETSPEC",      SRV_GETSPEC},
         {"SRV GETTEMPLATES", SRV_GETTEMPPLATES},
-        {"SRV TEMPLATE",    SRV_TEMPLATE},
-        {"SRV SAVE",        SRV_SAVE},
-        {"EXIT",            EXIT}
+        {"SRV TEMPLATE",     SRV_TEMPLATE},
+        {"SRV SAVE",         SRV_SAVE},
+        {"EXIT",             EXIT}
 };
 
 SHFP parse_request (char* parse_line, StringVector* args) {
@@ -334,7 +334,7 @@ response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start, int argc
     
     char __n[16];
     sprintf(__n, "%d", conn->parent->stages->n);
-    write (conn->fd, &__n, strlen(__n));
+    write (conn->fd, &__n, strlen (__n));
     
     int i;
     char* b;
@@ -371,21 +371,18 @@ response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
             if (fname == NULL) {
                 return INTERNAL_ERROR;
             }
-        }
-        else if (strcmp (current_command, "EXTRACT") == 0) {
+        } else if (strcmp (current_command, "EXTRACT") == 0) {
             host_template_extract (t, fname);
-        }
-        else if (strcmp (current_command, "ALL") == 0) {
+        } else if (strcmp (current_command, "ALL") == 0) {
             host_template_stage (t);
-        }
-        else {
+        } else {
             fname = current_command;
         }
     }
     
     small_map_insert (t->parent->stages, t->new_id, t);
     
-    write (conn->fd, t->new_id, strlen(t->new_id));
+    write (conn->fd, t->new_id, strlen (t->new_id));
     write (conn->fd, "\n", 1);
     
     return OK;
