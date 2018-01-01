@@ -107,7 +107,25 @@ void host_template_stage(HostTemplate* t) {
 Host* host_template_handoff(HostTemplate* src) {
     Host* out = host_new (src->parent, src->id);
     
+    {
+        char* t_profile_l;
+        char profile_dest[256];
+        
+        asprintf (&t_profile_l, "%s/etc/portage/make.profile", src->dest_dir);
+        ssize_t profile_len = readlink(t_profile_l, profile_dest, sizeof(profile_dest) - 1);
+        profile_dest[(int)profile_len] = 0; // Readlink does not null terminal
+        free (t_profile_l);
+        
+        char* t_profile_split = strstr (profile_dest, "profiles/");
+        free (out->profile);
+        out->profile = strdup (t_profile_split + strlen("profiles/"));
+    }
     
+    strcpy (out->hostname, "default");
+    
+    {
+        strcpy (out->cflags, src->cflags);
+    }
     
     return out;
 }

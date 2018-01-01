@@ -38,24 +38,24 @@ void write_host_fp (Host* host, FILE* fp) {
     
     write_string (host->hostname, fp);
     write_string (host->profile, fp);
-    write_string (host->makeconf.cflags, fp);
-    write_string (host->makeconf.cxxflags, fp);
-    write_string (host->makeconf.use, fp);
-    write_string (host->makeconf.arch, fp);
-    write_string (host->makeconf.chost, fp);
+    write_string (host->cflags, fp);
+    write_string (host->cxxflags, fp);
+    write_string (host->use, fp);
+    write_string (host->arch, fp);
+    write_string (host->chost, fp);
     
-    write_int (host->makeconf.extra->n, fp);
+    write_int (host->extra->n, fp);
     
     int i;
-    for (i = 0; i != host->makeconf.extra->n; i++) {
-        write_string (string_vector_get (host->makeconf.extra, i), fp);
+    for (i = 0; i != host->extra->n; i++) {
+        write_string (string_vector_get (host->extra, i), fp);
     }
     
-    write_string (host->binhost.portage_tmpdir, fp);
-    write_string (host->binhost.portdir, fp);
-    write_string (host->binhost.distdir, fp);
-    write_string (host->binhost.pkgdir, fp);
-    write_string (host->binhost.port_logdir, fp);
+    write_string (host->portage_tmpdir, fp);
+    write_string (host->portdir, fp);
+    write_string (host->distdir, fp);
+    write_string (host->pkgdir, fp);
+    write_string (host->port_logdir, fp);
 }
 void write_host_binding_fp (HostBind* bind, FILE* fp) {
     write_string (bind->host->id, fp);
@@ -107,26 +107,26 @@ Host* read_host (FILE* fp) {
     
     out->hostname = read_string (fp);
     out->profile = read_string (fp);
-    out->makeconf.cflags = read_string (fp);
-    out->makeconf.cxxflags = read_string (fp);
-    out->makeconf.use = read_string (fp);
-    out->makeconf.arch = read_string (fp);
-    out->makeconf.chost = read_string (fp);
+    out->cflags = read_string (fp);
+    out->cxxflags = read_string (fp);
+    out->use = read_string (fp);
+    out->arch = read_string (fp);
+    out->chost = read_string (fp);
     
-    out->makeconf.extra = string_vector_new ();
+    out->extra = string_vector_new ();
     int n, i;
     n = read_int (fp);
     for (i = 0; i != n; i++) {
         char* temp = read_string (fp);
-        string_vector_add (out->makeconf.extra, temp);
+        string_vector_add (out->extra, temp);
         free (temp);
     }
     
-    out->binhost.portage_tmpdir = read_string (fp);
-    out->binhost.portdir = read_string (fp);
-    out->binhost.distdir = read_string (fp);
-    out->binhost.pkgdir = read_string (fp);
-    out->binhost.port_logdir = read_string (fp);
+    out->portage_tmpdir = read_string (fp);
+    out->portdir = read_string (fp);
+    out->distdir = read_string (fp);
+    out->pkgdir = read_string (fp);
+    out->port_logdir = read_string (fp);
     
     return out;
 }

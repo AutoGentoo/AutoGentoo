@@ -61,7 +61,7 @@ response_t GET (Connection* conn, char** args, int start) {
     
     char path[256];
     
-    sprintf (path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->binhost.pkgdir, args[0]);
+    sprintf (path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->pkgdir, args[0]);
     int fd, data_to_send;
     ssize_t bytes_read;
     if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
@@ -112,27 +112,27 @@ int prv_host_edit (Host* host, int argc, StringVector* data) {
     
     string_overwrite (&host->hostname, string_vector_get (data, HOSTNAME), 1);
     string_overwrite (&host->profile, string_vector_get (data, PROFILE), 1);
-    string_overwrite (&host->makeconf.cflags, string_vector_get (data, CFLAGS), 1);
-    string_overwrite (&host->makeconf.chost, string_vector_get (data, CHOST), 1);
-    string_overwrite (&host->makeconf.cxxflags, "${CFLAGS}", 1);
-    string_overwrite (&host->makeconf.use, string_vector_get (data, USE), 1);
+    string_overwrite (&host->cflags, string_vector_get (data, CFLAGS), 1);
+    string_overwrite (&host->chost, string_vector_get (data, CHOST), 1);
+    string_overwrite (&host->cxxflags, "${CFLAGS}", 1);
+    string_overwrite (&host->use, string_vector_get (data, USE), 1);
     
-    if (host->makeconf.extra != NULL) {
-        string_vector_free(host->makeconf.extra);
+    if (host->extra != NULL) {
+        string_vector_free(host->extra);
     }
     
-    host->makeconf.extra = string_vector_new ();
+    host->extra = string_vector_new ();
     
     int i;
     for(i = USE + 1; i != data->n; i++) {
-        string_vector_add (host->makeconf.extra, string_vector_get(data, i));
+        string_vector_add (host->extra, string_vector_get(data, i));
     }
     
-    string_overwrite (&host->binhost.portage_tmpdir, "/autogentoo/tmp", 1);
-    string_overwrite (&host->binhost.portdir, "/usr/portage", 1);
-    string_overwrite (&host->binhost.distdir, "/usr/portage/distfiles", 1);
-    string_overwrite (&host->binhost.pkgdir, "/autogentoo/pkg", 1);
-    string_overwrite (&host->binhost.port_logdir, "/autogentoo/log", 1);
+    string_overwrite (&host->portage_tmpdir, "/autogentoo/tmp", 1);
+    string_overwrite (&host->portdir, "/usr/portage", 1);
+    string_overwrite (&host->distdir, "/usr/portage/distfiles", 1);
+    string_overwrite (&host->pkgdir, "/autogentoo/pkg", 1);
+    string_overwrite (&host->port_logdir, "/autogentoo/log", 1);
     
     return 0;
 }
@@ -304,23 +304,23 @@ response_t SRV_GETHOST (Connection* conn, char** args, int start) {
         return NOT_FOUND;
     }
     
-    if (host->makeconf.extra != NULL) {
+    if (host->extra != NULL) {
         char t[8];
-        sprintf (t, "%d", host->makeconf.extra->n);
+        sprintf (t, "%d", host->extra->n);
         prv_fd_write_str (conn->fd, t);
     
     }
-    prv_fd_write_str (conn->fd, host->makeconf.cflags);
-    prv_fd_write_str (conn->fd, host->makeconf.cxxflags);
-    prv_fd_write_str (conn->fd, host->makeconf.chost);
-    prv_fd_write_str (conn->fd, host->makeconf.use);
+    prv_fd_write_str (conn->fd, host->cflags);
+    prv_fd_write_str (conn->fd, host->cxxflags);
+    prv_fd_write_str (conn->fd, host->chost);
+    prv_fd_write_str (conn->fd, host->use);
     prv_fd_write_str (conn->fd, host->hostname);
     prv_fd_write_str (conn->fd, host->profile);
     
-    if (host->makeconf.extra != NULL) {
+    if (host->extra != NULL) {
         int i;
-        for (i = 0; i != host->makeconf.extra->n; i++) {
-            char* current_str = string_vector_get(host->makeconf.extra, i);
+        for (i = 0; i != host->extra->n; i++) {
+            char* current_str = string_vector_get(host->extra, i);
             write (conn->fd, current_str, strlen(current_str));
             write (conn->fd, "\n", 1);
         }

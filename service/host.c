@@ -34,16 +34,16 @@ Host* host_new (Server* server, host_id id) {
     
     out->hostname = NULL;
     out->profile = NULL;
-    out->makeconf.cflags = NULL;
-    out->makeconf.cxxflags = NULL;
-    out->makeconf.use = NULL;
-    out->makeconf.chost = NULL;
-    out->makeconf.extra = NULL;
-    out->binhost.portage_tmpdir = NULL;
-    out->binhost.portdir = NULL;
-    out->binhost.distdir = NULL;
-    out->binhost.pkgdir = NULL;
-    out->binhost.port_logdir = NULL;
+    out->cflags = NULL;
+    out->cxxflags = NULL;
+    out->use = NULL;
+    out->chost = NULL;
+    out->extra = NULL;
+    out->portage_tmpdir = NULL;
+    out->portdir = NULL;
+    out->distdir = NULL;
+    out->pkgdir = NULL;
+    out->port_logdir = NULL;
     
     return out;
 }
@@ -62,16 +62,16 @@ void host_get_path (Host* host, char* dest) {
 void host_free (Host* host) {
     free(host->id);
     free(host->profile);
-    free(host->makeconf.cflags);
-    free(host->makeconf.cxxflags);
-    free(host->makeconf.use);
-    free(host->makeconf.chost);
-    string_vector_free (host->makeconf.extra);
-    free(host->binhost.portage_tmpdir);
-    free(host->binhost.portdir);
-    free(host->binhost.distdir);
-    free(host->binhost.pkgdir);
-    free(host->binhost.port_logdir);
+    free(host->cflags);
+    free(host->cxxflags);
+    free(host->use);
+    free(host->chost);
+    string_vector_free (host->extra);
+    free(host->portage_tmpdir);
+    free(host->portdir);
+    free(host->distdir);
+    free(host->pkgdir);
+    free(host->port_logdir);
     free(host);
 }
 
@@ -158,19 +158,19 @@ PORT_LOGDIR=\"${SYS_ROOT}%s\"\n\
 # Portage package configuration\n\
 USE=\"%s\"\n\
 EMERGE_DEFAULT_OPTS=\"--buildpkg --usepkg --autounmask-continue\"\n\
-\n",    host->makeconf.cflags, host->makeconf.cxxflags, host->makeconf.chost, cbuild,
+\n",    host->cflags, host->cxxflags, host->chost, cbuild,
         path,
-        host->binhost.portage_tmpdir,
-        host->binhost.portdir,
-        host->binhost.distdir,
-        host->binhost.pkgdir,
-        host->binhost.port_logdir,
-        host->makeconf.use
+        host->portage_tmpdir,
+        host->portdir,
+        host->distdir,
+        host->pkgdir,
+        host->port_logdir,
+        host->use
     );
     
     int i;
-    for (i = 0; i != host->makeconf.extra->n; i++) {
-        fputs (string_vector_get (host->makeconf.extra, i), fp_mc);
+    for (i = 0; i != host->extra->n; i++) {
+        fputs (string_vector_get (host->extra, i), fp_mc);
         fputc('\n', fp_mc);
     }
     
@@ -211,10 +211,10 @@ response_t host_init (Host* host) {
     linfo ("Initializing host in %s", host_path);
     
     char *new_dirs [] = {
-        host->binhost.portage_tmpdir,
-        host->binhost.pkgdir,
-        host->binhost.port_logdir,
-        host->binhost.portdir,
+        host->portage_tmpdir,
+        host->pkgdir,
+        host->port_logdir,
+        host->portdir,
         "etc/portage",
         "usr",
         "lib32",
@@ -241,9 +241,9 @@ response_t host_init (Host* host) {
         return INTERNAL_ERROR;
     }
     
-    arch_t current_arch = determine_arch (host->makeconf.chost);
+    arch_t current_arch = determine_arch (host->chost);
     if (current_arch == _INVALIDBIT) {
-        lerror ("invalid/unsupported chost: %s", host->makeconf.chost);
+        lerror ("invalid/unsupported chost: %s", host->chost);
         return INTERNAL_ERROR;
     }
     
