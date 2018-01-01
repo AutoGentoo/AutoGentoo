@@ -107,6 +107,10 @@ void server_start (Server* server) {
         server_respond (current_conn);
 #endif
     }
+    
+    write_server (server);
+    server_free (server);
+    linfo ("server exited succuessfully");
 }
 
 int server_init (char* port) {
@@ -313,4 +317,27 @@ void daemonize (char* _cwd) {
     
     /*resettign File Creation Mask */
     umask (027);
+}
+
+void server_free (Server* server) {
+    free(server->location);
+    
+    int i;
+    for (i = 0; i != server->hosts->n; i++) {
+        host_free (*(Host**)vector_get(server->hosts, i));
+    }
+    
+    for (i = 0; i != server->stages->n; i++) {
+        host_template_free ((*(HostTemplate***)vector_get (server->stages, i))[1]);
+    }
+    
+    for (i = 0; i != server->host_bindings->n; i++) {
+        free((*(HostBind**)vector_get (server->host_bindings, i))->ip);
+    }
+    
+    small_map_free (server->stages, 0);
+    vector_free (server->hosts);
+    vector_free (server->host_bindings);
+    
+    free (server);
 }

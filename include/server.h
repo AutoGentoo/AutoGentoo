@@ -164,4 +164,10 @@ void connection_free (Connection* conn);
  */
 void daemonize (char* _cwd);
 
+/**
+ * Free a server
+ * @param server server to free 
+ */
+void server_free (Server* server);
+
 #endif
