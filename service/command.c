@@ -1,9 +1,7 @@
 #include <command.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <hacksaw/tools.h>
 
 SmallMap* all_commands = NULL;
 SmallMap* tar = NULL;
@@ -11,10 +9,10 @@ SmallMap* tar = NULL;
 // Private functions
 SmallMap* init_cmd_tar(char* dest) {
     strcpy (dest, "tar");
-    tar = small_map_new (sizeof(Command*), 5);
-    small_map_insert (tar, "extract", command_new("tar -xf %s", 1));
-    small_map_insert (tar, "extract to", command_new("tar -xf %s -C %s", 2));
-    small_map_insert (tar, "compress", command_new("tar -cf %s %s", 2));
+    tar = small_map_new(sizeof(Command*), 5);
+    small_map_insert(tar, "extract", command_new("tar -xf %s", 1));
+    small_map_insert(tar, "extract to", command_new("tar -xf %s -C %s", 2));
+    small_map_insert(tar, "compress", command_new("tar -cf %s %s", 2));
     return tar;
 }
 
@@ -36,10 +34,10 @@ void init_commands(void) {
 void free_commands(void) {
     int i;
     for (i = 0; i != all_commands->n; i++) {
-        SmallMap* c = (*(SmallMap***) vector_get(all_commands, i))[1];
+        SmallMap* c = (*(SmallMap***)vector_get(all_commands, i))[1];
         int j;
         for (j = 0; j != c->n; j++) {
-            command_free((*(Command***) vector_get(c, j))[1]);
+            command_free((*(Command***)vector_get(c, j))[1]);
         }
         small_map_free(c, 0);
     }
@@ -67,7 +65,7 @@ void command_run(Command* cmd, char** output, int* ret, va_list args) {
         size_t cread, read_len = 0;
         char buffer[256];
         *output = malloc(output_allocation);
-    
+        
         while ((cread = fread(buffer, 1, sizeof(buffer), fp)) != 0) {
             if (cread + read_len >= output_allocation) {
                 output_allocation = cread + read_len + alloc_increm;

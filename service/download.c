@@ -1,41 +1,38 @@
 #include <download.h>
-#include <sys/ioctl.h>
-#include <stdio.h>
-#include <hacksaw/tools/debug.h>
 #include <curl/curl.h>
-#include <string.h>
 
 struct curlprog {
     double lastruntime;
-    CURL *curl;
+    CURL* curl;
     char* dest;
 };
 
-int download_progress (void *clientp, curl_off_t dltotal, 
-            curl_off_t dlnow, 
-            curl_off_t ultotal, 
-            curl_off_t ulnow) {
+int download_progress(void* clientp, curl_off_t dltotal,
+                      curl_off_t dlnow,
+                      curl_off_t ultotal,
+                      curl_off_t ulnow) {
     
-    printf ("%" CURL_FORMAT_CURL_OFF_T " / %" CURL_FORMAT_CURL_OFF_T " (%.2f%%)", dlnow, dltotal, (((double)dlnow/dltotal)*100));
-    putchar ('\r');
+    printf("%" CURL_FORMAT_CURL_OFF_T " / %" CURL_FORMAT_CURL_OFF_T " (%.2f%%)", dlnow, dltotal,
+           (((double)dlnow / dltotal) * 100));
+    putchar('\r');
     return 0;
 }
 
-response_t download (char* url, char* dest, down_progress p) {
-    CURL* curl = curl_easy_init ();
+response_t download(char* url, char* dest, down_progress p) {
+    CURL* curl = curl_easy_init();
     
-    linfo ("Downloading from %s...\n", url);
+    linfo("Downloading from %s...\n", url);
     
     struct curlprog prog;
     prog.dest = dest;
     if (!curl) {
-        lerror ("Could not initialize CURL request!");
+        lerror("Could not initialize CURL request!");
         return INTERNAL_ERROR;
     }
-    FILE* out = fopen (dest, "wb+");
+    FILE* out = fopen(dest, "wb+");
     
     if (p == SHOW_PROGRESS) {
-        printf ("Showing progress\n");
+        printf("Showing progress\n");
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, &prog);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, out);
@@ -44,16 +41,16 @@ response_t download (char* url, char* dest, down_progress p) {
     
     curl_easy_setopt (curl, CURLOPT_URL, url);
     curl_easy_setopt (curl, CURLOPT_WRITEDATA, out);
-    CURLcode res = curl_easy_perform (curl);
+    CURLcode res = curl_easy_perform(curl);
     
-    curl_easy_cleanup (curl);
+    curl_easy_cleanup(curl);
     
     if (res != CURLE_OK) {
-        lerror ("curl_easy_perform() failed: %s\n", curl_easy_strerror (res));
-        fclose (out);
+        lerror("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        fclose(out);
         return INTERNAL_ERROR;
     }
     
-    fclose (out);
+    fclose(out);
     return OK;
 }

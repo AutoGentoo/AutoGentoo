@@ -77,7 +77,7 @@ StringVector* host_template_get_all();
  * @param t the static template to copy
  * @return a pointer the dynamically allocated template
  */
-HostTemplate* host_template_init (Server* parent, HostTemplate t);
+HostTemplate* host_template_init(Server* parent, HostTemplate t);
 
 /**
  * Initialize stage3 given a HostTemplate
@@ -85,7 +85,7 @@ HostTemplate* host_template_init (Server* parent, HostTemplate t);
  * downloads are always from http://distfiles.gentoo.org/
  * @param t the HostTemplate to initilize
  */
-void host_template_stage (HostTemplate* t);
+void host_template_stage(HostTemplate* t);
 
 /**
  * Mark The given HostTemplate as ready
@@ -100,6 +100,6 @@ Host* host_template_handoff(HostTemplate* src);
  * Free a HostTemplate
  * @param temp the HostTemplate to free
  */
-void host_template_free (HostTemplate* temp);
+void host_template_free(HostTemplate* temp);
 
 #endif

@@ -10,4 +10,4 @@ file(GLOB HEADERS "include/*.h")
 
 add_executable(autogentoo-daemon ${SERVICE} ${HEADERS})
 #add_executable(autogentoo-client ${CLIENT} ${HEADERS})
-TARGET_LINK_LIBRARIES (autogentoo-daemon curl archive hacksaw-tools)
+TARGET_LINK_LIBRARIES(autogentoo-daemon curl archive hacksaw-tools)

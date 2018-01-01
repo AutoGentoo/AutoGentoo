@@ -10,7 +10,7 @@
  * @param args a list of arguments passed to the handler
  * @param the index to start reading the request at
  */
-typedef response_t (*SHFP)(Connection* conn, char** args, int start);
+typedef response_t (* SHFP)(Connection* conn, char** args, int start);
 
 /**
  * Links a string to a request handler
@@ -36,7 +36,7 @@ extern RequestLink requests[];
  * @param args the arguments parsed from the request
  * @return a pointer to function that should be called
  */
-SHFP parse_request (char* parse_line, char** args);
+SHFP parse_request(char* parse_line, char** args);
 
 /**
  * HTTP request to download file
@@ -45,7 +45,7 @@ SHFP parse_request (char* parse_line, char** args);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t GET (Connection* conn, char** args, int start);
+response_t GET(Connection* conn, char** args, int start);
 
 /**
  * Install a packages to the bounded host
@@ -54,7 +54,7 @@ response_t GET (Connection* conn, char** args, int start);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t INSTALL (Connection* conn, char** args, int start);
+response_t INSTALL(Connection* conn, char** args, int start);
 
 /* SRV Configure requests */
 
@@ -69,7 +69,7 @@ response_t INSTALL (Connection* conn, char** args, int start);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t SRV_EDIT (Connection* conn, char** args, int start);
+response_t SRV_EDIT(Connection* conn, char** args, int start);
 
 /**
  * Bind the connections ip address to the specified Host*
@@ -78,7 +78,7 @@ response_t SRV_EDIT (Connection* conn, char** args, int start);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t SRV_ACTIVATE (Connection* conn, char** args, int start);
+response_t SRV_ACTIVATE(Connection* conn, char** args, int start);
 
 /**
  * Delete a host (currently all users can do this)
@@ -89,7 +89,7 @@ response_t SRV_ACTIVATE (Connection* conn, char** args, int start);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start);
+response_t SRV_HOSTREMOVE(Connection* conn, char** args, int start);
 
 /* SRV Utility request */
 
@@ -100,7 +100,7 @@ response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t SRV_MNTCHROOT (Connection* conn, char** args, int start);
+response_t SRV_MNTCHROOT(Connection* conn, char** args, int start);
 
 /* SRV Metadata requests */
 
@@ -111,7 +111,7 @@ response_t SRV_MNTCHROOT (Connection* conn, char** args, int start);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t SRV_GETHOST (Connection* conn, char** args, int start);
+response_t SRV_GETHOST(Connection* conn, char** args, int start);
 
 /**
  * Returns an int (host count) followed by a list of the created hosts
@@ -122,7 +122,7 @@ response_t SRV_GETHOST (Connection* conn, char** args, int start);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t SRV_GETHOSTS (Connection* conn, char** args, int start);
+response_t SRV_GETHOSTS(Connection* conn, char** args, int start);
 
 /**
  * Returns the ID of the bounded host of the IP from the current request
@@ -131,7 +131,7 @@ response_t SRV_GETHOSTS (Connection* conn, char** args, int start);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t SRV_GETACTIVE (Connection* conn, char** args, int start);
+response_t SRV_GETACTIVE(Connection* conn, char** args, int start);
 
 /**
  * Returns information outputed from 'lscpu' of the build server
@@ -140,7 +140,7 @@ response_t SRV_GETACTIVE (Connection* conn, char** args, int start);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t SRV_GETSPEC (Connection* conn, char** args, int start);
+response_t SRV_GETSPEC(Connection* conn, char** args, int start);
 
 /**
  * Returns a list of all the availiable templates
@@ -149,7 +149,7 @@ response_t SRV_GETSPEC (Connection* conn, char** args, int start);
  * @param start Start index to read from request
  * @return HTTP standard codes
  */
-response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start);
+response_t SRV_GETTEMPPLATES(Connection* conn, char** args, int start);
 
 
 

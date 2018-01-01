@@ -115,7 +115,7 @@ Server* read_server(char* location) {
     
     n = read_int(fp);
     for (i = 0; i != n; i++) {
-        HostTemplate* temp = malloc (sizeof(HostTemplate));
+        HostTemplate* temp = malloc(sizeof(HostTemplate));
         read_stage(out, temp, fp);
         small_map_insert(out->stages, temp->new_id, temp);
     }

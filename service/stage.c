@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <stage.h>
-#include <host.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -37,7 +36,7 @@ HostTemplate host_templates[] = {
 StringVector* host_template_get_all() {
     StringVector* out = string_vector_new();
     int i;
-    for (i = 0; i != sizeof(host_templates) / sizeof(host_templates[0]); i++) { 
+    for (i = 0; i != sizeof(host_templates) / sizeof(host_templates[0]); i++) {
         string_vector_add(out, host_templates[i].id);
     }
     
@@ -139,7 +138,7 @@ Host* host_template_handoff(HostTemplate* src) {
         
         asprintf(&t_profile_l, "%s/etc/portage/make.profile", src->dest_dir);
         ssize_t profile_len = readlink(t_profile_l, profile_dest, sizeof(profile_dest) - 1);
-        profile_dest[(int) profile_len] = 0; // Readlink does not null terminal
+        profile_dest[(int)profile_len] = 0; // Readlink does not null terminal
         free(t_profile_l);
         
         char* t_profile_split = strstr(profile_dest, "profiles/");

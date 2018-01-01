@@ -15,6 +15,6 @@ typedef enum {
  * @param p Show/hide the progress bar
  * @return The HTTP response status
  */
-response_t download (char* url, char* dest, down_progress p);
+response_t download(char* url, char* dest, down_progress p);
 
 #endif

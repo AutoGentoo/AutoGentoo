@@ -3,9 +3,7 @@
 #include "server.h"
 #include "handle.h"
 #include "chroot.h"
-#include "host.h"
 #include <string.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -67,8 +65,8 @@ response_t GET(Connection* conn, char** args, int start) {
         rsend(conn, OK);
         res = OK;
         write(conn->fd, "\n", 1);
-        while ((bytes_read = read(fd, (void*) &data_to_send, sizeof(data_to_send))) > 0)
-            write(conn->fd, (void*) &data_to_send, (size_t) bytes_read);
+        while ((bytes_read = read(fd, (void*)&data_to_send, sizeof(data_to_send))) > 0)
+            write(conn->fd, (void*)&data_to_send, (size_t)bytes_read);
     } else {
         rsend(conn, NOT_FOUND);
         res = NOT_FOUND;
@@ -148,7 +146,7 @@ response_t SRV_CREATE(Connection* conn, char** args, int start) {
     int argc = 0;
     if (strncmp(args[0], "HTTP", 4) != 0) {
         char* end;
-        argc = (int) strtol(args[0], &end, 10);
+        argc = (int)strtol(args[0], &end, 10);
     }
     
     char* request = conn->request + start;
@@ -178,7 +176,7 @@ response_t SRV_EDIT(Connection* conn, char** args, int start) {
     int argc = 0;
     if (strncmp(args[0], "HTTP", 4) != 0) {
         char* end;
-        argc = (int) strtol(args[0], &end, 10);
+        argc = (int)strtol(args[0], &end, 10);
     }
     
     char id_to_edit[16];
@@ -215,7 +213,7 @@ response_t SRV_HOSTREMOVE(Connection* conn, char** args, int start) {
     
     // Remove the binding
     for (i = 0; i != conn->parent->host_bindings->n; i++) {
-        Host** tmp = (Host**) (((void***) vector_get(conn->parent->host_bindings, i))[1]);
+        Host** tmp = (Host**)(((void***)vector_get(conn->parent->host_bindings, i))[1]);
         if (strcmp((*tmp)->id, args[0]) == 0) {
             vector_remove(conn->parent->host_bindings, i);
             // dont break because multiple clients can point to the same host
@@ -224,7 +222,7 @@ response_t SRV_HOSTREMOVE(Connection* conn, char** args, int start) {
     
     // Remove the definition
     for (i = 0; i != conn->parent->hosts->n; i++) {
-        if (strcmp((*(Host**) vector_get(conn->parent->host_bindings, i))->id, args[0]) == 0) {
+        if (strcmp((*(Host**)vector_get(conn->parent->host_bindings, i))->id, args[0]) == 0) {
             vector_remove(conn->parent->host_bindings, i);
             break; // Two hosts cant have the same id (at least they are not support to...)
         }
@@ -291,7 +289,7 @@ response_t SRV_GETHOSTS(Connection* conn, char** args, int start) {
     
     int i;
     for (i = 0; i != conn->parent->hosts->n; i++) {
-        char* temp = (*(Host**) vector_get(conn->parent->hosts, i))->id;
+        char* temp = (*(Host**)vector_get(conn->parent->hosts, i))->id;
         write(conn->fd, temp, strlen(temp));
         write(conn->fd, "\n", 1);
     }

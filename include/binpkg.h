@@ -23,7 +23,7 @@ SLOT: 2
 USE: abi_x86_64 amd64 elibc_glibc kernel_linux userland_GNU
 MTIME: 1511419260
 REPO: gentoo
-*/ 
+*/
 struct __BinaryPackage {
     char* cpv;
     

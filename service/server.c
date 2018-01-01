@@ -28,7 +28,7 @@ Server* server_new(char* location, int port, server_t opts) {
 Host* server_get_active(Server* server, char* ip) {
     int i;
     for (i = 0; i != server->host_bindings->n; i++) {
-        HostBind* current_bind = (HostBind*) vector_get(server->host_bindings, i);
+        HostBind* current_bind = (HostBind*)vector_get(server->host_bindings, i);
         if (strcmp(ip, current_bind->ip) == 0) {
             return current_bind->host;
         }
@@ -40,7 +40,7 @@ Host* server_get_active(Server* server, char* ip) {
 HostBind* prv_server_get_active_location(Server* server, char* ip) {
     int i;
     for (i = 0; i != server->host_bindings->n; i++) {
-        HostBind* current_bind = (HostBind*) vector_get(server->host_bindings, i);
+        HostBind* current_bind = (HostBind*)vector_get(server->host_bindings, i);
         if (strcmp(ip, current_bind->ip) == 0) {
             return current_bind;
         }
@@ -56,7 +56,7 @@ Connection* connection_new(Server* server, int conn_fd) {
     
     struct sockaddr_in addr;
     socklen_t addr_size = sizeof(struct sockaddr_in);
-    int res = getpeername(out->fd, (struct sockaddr*) &addr, &addr_size);
+    int res = getpeername(out->fd, (struct sockaddr*)&addr, &addr_size);
     out->ip = strdup(inet_ntoa(addr.sin_addr));
     out->bounded_host = server_get_active(out->parent, out->ip);
     
@@ -81,7 +81,7 @@ void server_start(Server* server) {
     addrlen = sizeof(clientaddr);
     
     while (1) { // Main accept loop
-        int temp_fd = accept(listenfd, (struct sockaddr*) &clientaddr, &addrlen);
+        int temp_fd = accept(listenfd, (struct sockaddr*)&clientaddr, &addrlen);
         if (temp_fd < 3) {
             lwarning("accept() error");
             continue;
@@ -95,7 +95,7 @@ void server_start(Server* server) {
         pthread_t p_pid;
         
         Connection* current_conn = connection_new(server, temp_fd);
-        if (pthread_create(&p_pid, NULL, (void* (*)(void*)) server_respond, current_conn)) {
+        if (pthread_create(&p_pid, NULL, (void* (*)(void*))server_respond, current_conn)) {
             lerror("Error creating thread");
             fflush(stdout);
             exit(1);
@@ -121,7 +121,7 @@ int server_init(char* port) {
         listenfd = socket(p->ai_family, p->ai_socktype, 0);
         if (listenfd == -1)
             continue;
-        if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int)) < 0)
+        if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
             lerror("setsockopt(SO_REUSEADDR) failed");
         if (bind(listenfd, p->ai_addr, p->ai_addrlen) == 0)
             break;
@@ -200,8 +200,8 @@ void server_respond(Connection* conn) {
     char* args[4]; // Written to by parse_request
     
     char* request_line;
-    int split_i = (int) (strchr(conn->request, '\n') - conn->request);
-    request_line = malloc((size_t) split_i + 1);
+    int split_i = (int)(strchr(conn->request, '\n') - conn->request);
+    request_line = malloc((size_t)split_i + 1);
     strncpy (request_line, conn->request, split_i);
     request_line[split_i] = 0;
     
@@ -243,8 +243,8 @@ void server_bind(Connection* conn, Host* host) {
 Host* server_host_search(Server* server, host_id id) {
     int i;
     for (i = 0; i != server->hosts->n; i++) {
-        Host* current_host = *(Host**) vector_get(server->hosts, i);
-        if (strcmp((char*) id, current_host->id) == 0) {
+        Host* current_host = *(Host**)vector_get(server->hosts, i);
+        if (strcmp((char*)id, current_host->id) == 0) {
             return current_host;
         }
     }
@@ -267,7 +267,7 @@ void daemonize(char* _cwd) {
     }
     
     if (pid > 0) {
-        linfo("Forked to pid: %d", (int) pid);
+        linfo("Forked to pid: %d", (int)pid);
         linfo("Moving to background");
         fflush(stdout);
         exit(0); /*Killing the Parent Process*/
