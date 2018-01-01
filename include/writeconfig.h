@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "server.h"
 #include "host.h"
+#include "stage.h"
 
 /**
  * Write the server to file
@@ -33,6 +34,13 @@ void write_host_fp (Host* host, FILE* fp);
 void write_host_binding_fp (HostBind* bind, FILE* fp);
 
 /**
+ * Write an active HostTemplate/stage to file
+ * @param temp the template to write to file
+ * @param fp the file to write to
+ */
+void write_stage_fp (HostTemplate* temp, FILE* fp);
+
+/**
  * Read server from localtion
  * @param location the localtion of the file
  * @return a new server that was read from the file
@@ -53,6 +61,14 @@ Host* read_host (FILE* fp);
  * @param fp the file to read from
  */
 void read_host_binding (Server* server, HostBind* dest, FILE* fp);
+
+/**
+ * Read a HostTemplate from file
+ * @param server the parent server
+ * @param dest the HostTemplate in which content will be written
+ * @param fp the file to read from
+ */
+void read_stage (Server* server, HostTemplate* dest, FILE* fp);
 
 /**
  * Writes a string to file (also writes the NULL terminator)

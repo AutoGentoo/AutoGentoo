@@ -2,6 +2,7 @@
 #define __AUTOGENTOO_STAGE_H__
 
 #include <response.h>
+#include <hacksaw/tools.h>
 
 typedef struct __HostTemplate HostTemplate;
 
@@ -36,6 +37,8 @@ struct __HostTemplate {
     char* arch; //!< The portage arch of the system (eg. amd64)
     char* cflags; //!< CFLAGS put in make.conf
     char* chost; //!< CHOST of the system
+    
+    int extra_c; //!< The number of fields filled in extras (must be set to use extras)
     struct {
         char* make_extra; //!< Content to be put in make.conf
         
@@ -54,12 +57,18 @@ struct __HostTemplate {
          *  - my value
          */
         template_selects select;
-    } extras[16]; //!< The extra settings to put in make.conf
-    int extra_c; //!< The number of fields filled in extras (must be set to use extras)
+    } extras[32]; //!< The extra settings to put in make.conf
+    
     char* dest_dir; //!< The temporary destination before handoff (don't init)
     Server* parent; //!< The parent server (don't init)
     host_id new_id; //!< The new id that will be passed in the handoff (don't init)
 };
+
+/**
+ * Returns a list of all the avaiable templates
+ * @return a StringVector* of all the avaiable templates
+ */
+StringVector* host_template_get_all();
 
 /**
  * Initialize a dynamic HostTemplate given a static one. \

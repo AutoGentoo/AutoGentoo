@@ -19,33 +19,6 @@ typedef char* host_id;
 #include "server.h"
 
 /**
- * @brief Info regarding bit-size of the architecture
- * 
- * This is important because it will decide which directory to
- * link /lib and /usr/lib to
- * 
- * This is marked for removed after HostTemplate API is finished
- */
-typedef enum {
-    _32BIT,
-    _64BIT,
-    _INVALIDBIT //!< Could not be determined
-} arch_t;
-
-
-/**
- * @brief Status of the Host
- * 
- * This is marked for removed after HostTemplate API is finished
- */
-typedef enum {
-    NOT_INITED,
-    INIT,
-    STAGE1,
-    READY
-} host_t;
-
-/**
  * @brief Are the chroot directories mounted
  * 
  * This will decide whether or not the system
@@ -69,7 +42,6 @@ struct __Host {
     host_id id; //!< The ID of the Host
     char* profile; //!< Portage profile, see possible values with eselect profile list
     char* hostname; //!< Hostname of the host (shows up in the graphical client)
-    host_t status; //!< Are we ready to install packages?
     chroot_t chroot_status; //!< Is the chroot ready?
     
     char* cflags; //!< The gcc passed to C programs, try -march=native :)
@@ -122,13 +94,6 @@ void host_get_path(Host* host, char* dest);
 void host_free(Host* host);
 
 /**
- * Determine arch (32 or 64bit) from chost
- * @param chost the chost to read
- * @return the determined arch
- */
-arch_t determine_arch(char* chost);
-
-/**
  * Write the make.conf (also updates it)
  * @param host the host of which to write the make.conf for
  * @return 0 if successful, 1 if not successful
@@ -136,22 +101,6 @@ arch_t determine_arch(char* chost);
 int host_write_make_conf(Host* host);
 
 /* Request calls */
-/**
- * Initilize the host by creating its directory structure \
- * This has a scheduled deprecation due to HostTemplate implementations
- * @param host the host to init
- * @return OK if successful, INTERNAL_ERROR if not
- */
-response_t host_init(Host* host);
-
-/**
- * Emerges packages without chrooting (DANGEROUS)
- * 
- * This has a scheduled deprecation due to HostTemplate implementations
- * @param host 
- * @return OK if successful, INTERNAL_ERROR if not
- */
-response_t host_stage3(Host* host);
 
 /**
  * Safely install packages in the chroot

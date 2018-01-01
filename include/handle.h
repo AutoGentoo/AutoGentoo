@@ -58,17 +58,6 @@ response_t INSTALL (Connection* conn, char** args, int start);
 
 /* SRV Configure requests */
 
-/**
- * Create a new client
- * 
- * ARGUMENTS ARE SEPARATED BY NEW LINES!
- * @param conn the connection that holds the request
- * @param args [argc of ETC] [HOSTNAME] [PROFILE] [CHOST] [CFLAGS] [USE] [ETC]
- * @param start Start index to read from request
- * @return HTTP standard codes
- */
-response_t SRV_CREATE (Connection* conn, char** args, int start);
-
 //response_t SRV_DEVCREATE (Connection* conn, char** args, int start);
 
 /**
@@ -103,28 +92,6 @@ response_t SRV_ACTIVATE (Connection* conn, char** args, int start);
 response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start);
 
 /* SRV Utility request */
-
-/**
- * Initialize a host
- * 
- * This has a scheduled deprecation due to HostTemplate implementations
- * @param conn the connection that holds the request
- * @param args (none)
- * @param start Start index to read from request
- * @return HTTP standard codes
- */
-response_t SRV_INIT (Connection* conn, char** args, int start);
-
-/**
- * Initilize the STAGE1 of the bounded host
- * 
- * This has a scheduled deprecation due to HostTemplate implementations
- * @param conn the connection that holds the request
- * @param args (none)
- * @param start Start index to read from request
- * @return HTTP standard codes
- */
-response_t SRV_STAGE1 (Connection* conn, char** args, int start);
 
 /**
  * Mount all the directories required to chroot() to Host
@@ -174,6 +141,17 @@ response_t SRV_GETACTIVE (Connection* conn, char** args, int start);
  * @return HTTP standard codes
  */
 response_t SRV_GETSPEC (Connection* conn, char** args, int start);
+
+/**
+ * Returns a list of all the availiable templates
+ * @param conn the connection that holds the request
+ * @param args (none)
+ * @param start Start index to read from request
+ * @return HTTP standard codes
+ */
+response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start);
+
+
 
 /* SRV Kernel request (unimplmented) */
 
