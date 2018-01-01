@@ -83,8 +83,14 @@ void host_template_stage (HostTemplate* t);
  * 
  * This allows the new Host to mount chroot and emerge new packages
  * @param src The old parent (a HostTemplate) of the directory
- * @return a pointer to the newly inited Host
+ * @return a pointer to the newly inited Host, NULL if it fails
  */
 Host* host_template_handoff(HostTemplate* src);
+
+/**
+ * Free a HostTemplate
+ * @param temp the HostTemplate to free
+ */
+void host_template_free (HostTemplate* temp);
 
 #endif

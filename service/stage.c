@@ -52,7 +52,7 @@ HostTemplate* host_template_init(Server* parent, HostTemplate t) {
     }
     
     out->new_id = host_id_new();
-    sprintf (out->dest_dir, "%s/stage-%s", parent->location, out->new_id);
+    asprintf (&out->dest_dir, "%s/stage-%s", parent->location, out->new_id);
     
     return out;
 }
@@ -106,7 +106,16 @@ void host_template_stage(HostTemplate* t) {
 
 Host* host_template_handoff(HostTemplate* src) {
     Host* out = host_new (src->parent, src->id);
+    char host_dir[256];
+    host_get_path(out, host_dir);
+    if (rename (src->dest_dir, host_dir) != 0) {
+        lerror ("Failed to rename %s to %s", src->dest_dir, host_dir);
+        host_free (out);
+        return NULL;
+    }
+    strcpy (out->hostname, "default");
     
+    // Profile
     {
         char* t_profile_l;
         char profile_dest[256];
@@ -121,11 +130,68 @@ Host* host_template_handoff(HostTemplate* src) {
         out->profile = strdup (t_profile_split + strlen("profiles/"));
     }
     
-    strcpy (out->hostname, "default");
-    
+    // defaults
     {
-        strcpy (out->cflags, src->cflags);
+        string_overwrite (&out->cxxflags, "${CFLAGS}", 1);
+        string_overwrite (&out->portage_tmpdir, "/autogentoo/tmp", 1);
+        string_overwrite (&out->portdir, "/usr/portage", 1);
+        string_overwrite (&out->distdir, "/usr/portage/distfiles", 1);
+        string_overwrite (&out->pkgdir, "/autogentoo/pkg", 1);
+        string_overwrite (&out->port_logdir, "/autogentoo/log", 1);
     }
     
+    // make.conf stuff
+    {
+        strcpy (out->cflags, src->cflags);
+        strcpy (out->arch, src->arch);
+        strcpy (out->chost, src->chost);
+    }
+    
+    struct {
+        template_selects sel;
+        char* ptr;
+    } _t[] = {
+            {OTHER, NULL},
+            {CXXFLAGS, out->cxxflags},
+            {TMPDIR, out->portage_tmpdir},
+            {PORTDIR, out->portdir},
+            {DISTDIR, out->distdir},
+            {PKGDIR, out->pkgdir},
+            {LOGDIR, out->port_logdir}
+    };
+    
+    int i;
+    for (i = 0; i != src->extra_c; i++) {
+        if (src->extras[i].select == OTHER) {
+            string_vector_add(out->extra, src->extras[i].make_extra);
+            continue;
+        }
+        
+        int j;
+        for (j = 0; j != sizeof(_t) / sizeof(_t[0]); j++) {
+            if (src->extras[i].select == _t[j].sel) {
+                strcpy (_t[j].ptr, src->extras[i].make_extra);
+                break;
+            }
+        }
+    }
+    
+    host_template_free (src);
     return out;
+}
+
+void host_template_free (HostTemplate* temp) {
+    free(temp->id);
+    free(temp->arch);
+    free(temp->cflags);
+    free(temp->chost);
+    
+    int i;
+    for (i = 0; i != temp->extra_c; i++) {
+        free(temp->extras->make_extra);
+    }
+    
+    free(temp->dest_dir);
+    free(temp->new_id);
+    free(temp);
 }
