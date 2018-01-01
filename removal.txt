@@ -1,9 +1,0 @@
-arch_t
-host_t
-
-host_init
-host_stage3
-
-SRV_CREATE // Replaced with something similar
-SRV_INIT // Replace with host_template_init
-SRV_STAGE1
