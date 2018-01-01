@@ -199,11 +199,13 @@ void server_respond (Connection* conn) {
         lerror ("recv() error");
         conn->status = SERVER_ERROR;
         return;
-    } else if (total_read == 0) { // receive socket closed
+    }
+    else if (total_read == 0) { // receive socket closed
         lwarning ("Client disconnected upexpectedly.");
         conn->status = FAILED;
         return;
-    } else {
+    }
+    else {
         conn->status = CONNECTED;
     }
     
@@ -223,7 +225,8 @@ void server_respond (Connection* conn) {
     
     if (call == NULL) {
         res = BAD_REQUEST;
-    } else {
+    }
+    else {
         res = (*call) (conn, (char**)args->ptr, split_i + 1, args->n);
     }
     
@@ -243,7 +246,8 @@ void server_bind (Connection* conn, Host* host) {
     if (loc == NULL) {
         HostBind new_binding = {.ip = strdup (conn->ip), .host = host};
         vector_add (conn->parent->host_bindings, &new_binding);
-    } else {
+    }
+    else {
         loc->host = host;
     }
 }

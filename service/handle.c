@@ -71,7 +71,8 @@ response_t GET (Connection* conn, char** args, int start, int argc) {
         write (conn->fd, "\n", 1);
         while ((bytes_read = read (fd, (void*)&data_to_send, sizeof (data_to_send))) > 0)
             write (conn->fd, (void*)&data_to_send, (size_t)bytes_read);
-    } else {
+    }
+    else {
         rsend (conn, NOT_FOUND);
         res = NOT_FOUND;
     }
@@ -371,11 +372,14 @@ response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
             if (fname == NULL) {
                 return INTERNAL_ERROR;
             }
-        } else if (strcmp (current_command, "EXTRACT") == 0) {
+        }
+        else if (strcmp (current_command, "EXTRACT") == 0) {
             host_template_extract (t, fname);
-        } else if (strcmp (current_command, "ALL") == 0) {
+        }
+        else if (strcmp (current_command, "ALL") == 0) {
             host_template_stage (t);
-        } else {
+        }
+        else {
             fname = current_command;
         }
     }
