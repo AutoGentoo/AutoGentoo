@@ -11,6 +11,8 @@ int error = 0;
 int atomerror(char *s) {
     fprintf(stderr, "%s in line %d near '%s'\n", s, atomlineno, atomtext);
     error = 1;
+    
+    return error;
 }
 
 AtomSelector* atom_parse (char* buffer) {

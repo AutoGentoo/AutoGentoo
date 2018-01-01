@@ -49,6 +49,10 @@ void string_vector_split(StringVector* vec, char* string, char* delim) {
         return;
     }
     char* buff = strtok(string, delim);
+    
+    if (buff == NULL) // If there is no delim it would have segfaulted
+        return;
+    
     string_vector_add(vec, buff);
     for (;;) {
         buff = strtok(NULL, delim);
