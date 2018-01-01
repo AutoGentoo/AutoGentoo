@@ -197,7 +197,7 @@ void server_respond (Connection* conn) {
         conn->status = CONNECTED;
     }
     
-    char* args[4]; // Written to by parse_request
+    StringVector* args = string_vector_new (); // Written to by parse_request
     
     char* request_line;
     int split_i = (int)(strchr (conn->request, '\n') - conn->request);
@@ -214,7 +214,7 @@ void server_respond (Connection* conn) {
     if (call == NULL) {
         res = BAD_REQUEST;
     } else {
-        res = (*call) (conn, args, split_i + 1);
+        res = (*call) (conn, (char**)args->ptr, split_i + 1, args->n);
     }
     
     free (request_line);

@@ -12,8 +12,7 @@
 RequestLink requests[] = {
         {"GET",            GET},
         {"INSTALL",        INSTALL},
-        {"CMD INSTALL",    INSTALL},
-        //{"SRV DEVCREATE", SRV_DEVCREATE},
+        {"CMD INSTALL",    INSTALL}, // Alias for INSTALL (this was the old usage)
         {"SRV EDIT",       SRV_EDIT},
         {"SRV ACTIVATE",   SRV_ACTIVATE},
         {"SRV HOSTREMOVE", SRV_HOSTREMOVE},
@@ -21,17 +20,18 @@ RequestLink requests[] = {
         {"SRV GETHOSTS",   SRV_GETHOSTS},
         {"SRV GETHOST",    SRV_GETHOST},
         {"SRV GETACTIVE",  SRV_GETACTIVE},
-        {"SRV GETSPEC",    SRV_GETSPEC}
+        {"SRV GETSPEC",    SRV_GETSPEC},
+        {"SRV GETTEMPLATES", SRV_GETTEMPPLATES}
 };
 
-SHFP parse_request (char* parse_line, char** args) {
+SHFP parse_request (char* parse_line, StringVector* args) {
     int i;
     for (i = 0; i != sizeof (requests) / sizeof (RequestLink); i++) {
         size_t current_length = strlen (requests[i].request_ident);
         if (strncmp (parse_line, requests[i].request_ident, current_length) == 0) {
             char* temp = parse_line + current_length;
-            int j;
-            for (j = 0, args[j] = strtok (temp, " \t\n"); args[j] != NULL; j++, args[j] = strtok (NULL, " \t\n"));
+            
+            string_vector_split (args, temp, " \t\n");
             return requests[i].call;
         }
     }
@@ -39,7 +39,7 @@ SHFP parse_request (char* parse_line, char** args) {
     return NULL;
 }
 
-response_t GET (Connection* conn, char** args, int start) {
+response_t GET (Connection* conn, char** args, int start, int argc) {
     response_t res;
     if (strcmp (args[1], "HTTP/1.0") != 0 && strcmp (args[1], "HTTP/1.1") != 0) {
         rsend (conn, BAD_REQUEST);
@@ -76,7 +76,7 @@ response_t GET (Connection* conn, char** args, int start) {
     return res;
 }
 
-response_t INSTALL (Connection* conn, char** args, int start) {
+response_t INSTALL (Connection* conn, char** args, int start, int argc) {
     if (conn->bounded_host == NULL) {
         rsend (conn, FORBIDDEN);
         return FORBIDDEN;
@@ -172,11 +172,11 @@ response_t SRV_CREATE (Connection* conn, char** args, int start) {
     return OK;
 }
 
-response_t SRV_EDIT (Connection* conn, char** args, int start) {
-    int argc = 0;
+response_t SRV_EDIT (Connection* conn, char** args, int start, int argc) {
+    int e_argc = 0;
     if (strncmp (args[0], "HTTP", 4) != 0) {
         char* end;
-        argc = (int)strtol (args[0], &end, 10);
+        e_argc = (int)strtol (args[0], &end, 10);
     }
     
     char id_to_edit[16];
@@ -187,7 +187,7 @@ response_t SRV_EDIT (Connection* conn, char** args, int start) {
     StringVector* data = string_vector_new ();
     string_vector_split (data, request, "\n");
     
-    if (prv_host_edit (conn->bounded_host, argc, data)) {
+    if (prv_host_edit (conn->bounded_host, e_argc, data)) {
         return BAD_REQUEST;
     }
     
@@ -196,7 +196,7 @@ response_t SRV_EDIT (Connection* conn, char** args, int start) {
     return OK;
 }
 
-response_t SRV_ACTIVATE (Connection* conn, char** args, int start) {
+response_t SRV_ACTIVATE (Connection* conn, char** args, int start, int argc) {
     Host* found = server_host_search (conn->parent, args[0]);
     
     if (found == NULL) {
@@ -208,7 +208,7 @@ response_t SRV_ACTIVATE (Connection* conn, char** args, int start) {
     return OK;
 }
 
-response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start) {
+response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start, int argc) {
     int i;
     
     // Remove the binding
@@ -233,7 +233,7 @@ response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start) {
 
 /* SRV Utility request */
 
-response_t SRV_MNTCHROOT (Connection* conn, char** args, int start) {
+response_t SRV_MNTCHROOT (Connection* conn, char** args, int start, int argc) {
     if (conn->bounded_host == NULL) {
         return FORBIDDEN;
     }
@@ -250,7 +250,7 @@ void prv_fd_write_str (int fd, char* str) {
 }
 
 /* SRV Metadata requests */
-response_t SRV_GETHOST (Connection* conn, char** args, int start) {
+response_t SRV_GETHOST (Connection* conn, char** args, int start, int argc) {
     Host* host = server_host_search (conn->parent, args[0]);
     
     if (host == NULL) {
@@ -282,7 +282,7 @@ response_t SRV_GETHOST (Connection* conn, char** args, int start) {
     return OK;
 }
 
-response_t SRV_GETHOSTS (Connection* conn, char** args, int start) {
+response_t SRV_GETHOSTS (Connection* conn, char** args, int start, int argc) {
     char t[8];
     sprintf (t, "%d\n", conn->parent->hosts->n);
     write (conn->fd, t, strlen (t));
@@ -297,7 +297,7 @@ response_t SRV_GETHOSTS (Connection* conn, char** args, int start) {
     return OK;
 }
 
-response_t SRV_GETACTIVE (Connection* conn, char** args, int start) {
+response_t SRV_GETACTIVE (Connection* conn, char** args, int start, int argc) {
     if (conn->bounded_host == NULL) {
         char* out = "invalid\n";
         write (conn->fd, out, strlen (out));
@@ -310,7 +310,7 @@ response_t SRV_GETACTIVE (Connection* conn, char** args, int start) {
     return OK;
 }
 
-response_t SRV_GETSPEC (Connection* conn, char** args, int start) {
+response_t SRV_GETSPEC (Connection* conn, char** args, int start, int argc) {
     system ("lscpu > build.spec");
     FILE* lspcu_fp = fopen ("build.spec", "r");
     int symbol;
@@ -325,7 +325,7 @@ response_t SRV_GETSPEC (Connection* conn, char** args, int start) {
     return OK;
 }
 
-response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start) {
+response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start, int argc) {
     StringVector* templates = host_template_get_all ();
     
     write (conn->fd, &templates->n, sizeof (int));
@@ -339,5 +339,48 @@ response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start) {
         
     }
     write (conn->fd, "\n", 1);
+    return OK;
+}
+
+response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
+    /* We dont need to bind a template 
+     * because it doesn't need to 
+     * auto-detect destination directory for GET
+     */
+    
+    HostTemplate* t = host_template_new (conn->parent, args[0]);
+    if (t == NULL)
+        return NOT_FOUND;
+    
+    
+    StringVector* command_entries = string_vector_new ();
+    string_vector_split (command_entries, conn->request + start, " \t\n");
+    
+    char* fname = NULL;
+    int i;
+    for (i = 0; i != command_entries->n; i++) {
+        char* current_command = string_vector_get (command_entries, i);
+        if (strcmp (current_command, "DOWNLOAD") == 0) {
+            fname = host_template_download (t);
+            if (fname == NULL) {
+                return INTERNAL_ERROR;
+            }
+        }
+        else if (strcmp (current_command, "EXTRACT") == 0) {
+            host_template_extract (t, fname);
+        }
+        else if (strcmp (current_command, "ALL") == 0) {
+            host_template_stage (t);
+        }
+        else {
+            fname = current_command;
+        }
+    }
+    
+    small_map_insert (t->parent->stages, t->new_id, t);
+    
+    write (conn->fd, t->new_id, strlen(t->new_id));
+    write (conn->fd, "\n", 1);
+    
     return OK;
 }

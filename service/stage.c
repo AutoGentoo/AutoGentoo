@@ -43,6 +43,17 @@ StringVector* host_template_get_all () {
     return out;
 }
 
+HostTemplate* host_template_new (Server* parent, char* id) {
+    int i;
+    for (i = 0; i != sizeof (host_templates) / sizeof (host_templates[0]); i++) {
+        if (strcmp (host_templates[i].id, id) == 0) {
+            return host_template_init (parent, host_templates[i]);
+        }
+    }
+    
+    return NULL;
+}
+
 HostTemplate* host_template_init (Server* parent, HostTemplate t) {
     HostTemplate* out = malloc (sizeof (HostTemplate));
     out->parent = parent;
@@ -61,12 +72,10 @@ HostTemplate* host_template_init (Server* parent, HostTemplate t) {
     out->new_id = host_id_new ();
     asprintf (&out->dest_dir, "%s/stage-%s", parent->location, out->new_id);
     
-    small_map_insert (parent->stages, out->new_id, out);
-    
     return out;
 }
 
-void host_template_stage (HostTemplate* t) {
+char* host_template_download (HostTemplate* t) {
     char distfile_dir[256];
     sprintf (distfile_dir, "%s/distfiles", t->parent->location);
     
@@ -79,7 +88,7 @@ void host_template_stage (HostTemplate* t) {
     
     if (download (distfile_meta_url, "temp_dest", NO_PROGRESS).code != 200) {
         lerror ("Could not download metadata for stage3!");
-        return;
+        return NULL;
     }
     
     FILE* fp_temp = fopen ("temp_dest", "r");
@@ -110,14 +119,26 @@ void host_template_stage (HostTemplate* t) {
     if (access (fname, F_OK) == -1) {
         linfo ("Downloading stage3 from %s", stage3_dest);
         download (stage3_dest, fname, SHOW_PROGRESS);
-        free (stage3_dest);
     }
+    free (stage3_dest);
     
+    return fname;
+}
+
+void host_template_extract (HostTemplate* t, char* fname) {
     int ext_ret;
     command ("tar", "extract to", NULL, &ext_ret, fname, t->dest_dir);
     
     if (ext_ret != 0)
         lerror ("Failed to extract stage3 tar");
+}
+
+void host_template_stage (HostTemplate* t) {
+    char* fname = host_template_download (t);
+    if (!fname)
+        return;
+    
+    host_template_extract (t, fname);
 }
 
 Host* host_template_handoff (HostTemplate* src) {

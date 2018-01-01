@@ -1,12 +1,6 @@
 #include <download.h>
 #include <curl/curl.h>
 
-struct curlprog {
-    double lastruntime;
-    CURL* curl;
-    char* dest;
-};
-
 int download_progress (void* clientp, curl_off_t dltotal,
                        curl_off_t dlnow,
                        curl_off_t ultotal,

@@ -71,6 +71,28 @@ struct __HostTemplate {
 StringVector* host_template_get_all ();
 
 /**
+ * Get a new HostTemplate from an ID
+ * @param parent the parent server
+ * @param id the id of the target host template
+ * @return the newly created template
+ */
+HostTemplate* host_template_new (Server* parent, char* id);
+
+/**
+ * Download the stage3 of the HostTemplate
+ * @param t the target HostTemplate
+ * @return the path to the downloaded file
+ */
+char* host_template_download (HostTemplate* t);
+
+/**
+ * Extract the downloaded stage3 file to the dest_dir of the HostTemplate
+ * @param t the target HostTemplate to extract
+ * @param fname the filename (path) of the stage3
+ */
+void host_template_extract (HostTemplate* t, char* fname);
+
+/**
  * Initialize a dynamic HostTemplate given a static one. \
  * Initilizes unknown fields such as dest_dir and parent
  * @param parent the parent server to bind to

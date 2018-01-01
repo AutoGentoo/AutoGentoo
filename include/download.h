@@ -2,11 +2,18 @@
 #define __AUTOGENTOO_DOWNLOAD_H__
 
 #include <response.h>
+#include <curl/curl.h>
 
 typedef enum {
     NO_PROGRESS,
     SHOW_PROGRESS
 } down_progress;
+
+struct curlprog {
+    double lastruntime;
+    CURL* curl;
+    char* dest;
+};
 
 /**
  * Download a file from the internet
