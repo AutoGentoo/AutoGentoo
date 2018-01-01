@@ -30,7 +30,8 @@ void write_server_fp (Server* server, FILE* fp) {
     }
     write_int (server->stages->n, fp);
     for (i = 0; i != server->stages->n; i++) {
-        write_stage_fp (*((HostTemplate***)vector_get (server->stages, i))[1], fp);
+        void** __t = *(void***)vector_get(server->stages, i);
+        write_stage_fp (__t[1], fp);
     }
 }
 
@@ -169,6 +170,7 @@ void read_stage (Server* server, HostTemplate* dest, FILE* fp) {
     dest->id = read_string (fp);
     dest->arch = read_string (fp);
     dest->cflags = read_string (fp);
+    dest->chost = read_string (fp);
     
     dest->extra_c = read_int (fp);
     int i;

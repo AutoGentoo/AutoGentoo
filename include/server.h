@@ -60,6 +60,8 @@ struct __Server {
     Vector* hosts; //!< A list of hosts
     SmallMap* stages; //!< A list of active templates awaiting handoff to a host
     Vector* host_bindings; //!< A list of host bindings
+    
+    int keep_alive; //!< Set to 0 if you want the main loop to exit
 };
 
 /**

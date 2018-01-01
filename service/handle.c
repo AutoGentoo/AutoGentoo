@@ -8,20 +8,24 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stage.h>
+#include <writeconfig.h>
 
 RequestLink requests[] = {
-        {"GET",            GET},
-        {"INSTALL",        INSTALL},
-        {"CMD INSTALL",    INSTALL}, // Alias for INSTALL (this was the old usage)
-        {"SRV EDIT",       SRV_EDIT},
-        {"SRV ACTIVATE",   SRV_ACTIVATE},
-        {"SRV HOSTREMOVE", SRV_HOSTREMOVE},
-        {"SRV MNTCHROOT",  SRV_MNTCHROOT},
-        {"SRV GETHOSTS",   SRV_GETHOSTS},
-        {"SRV GETHOST",    SRV_GETHOST},
-        {"SRV GETACTIVE",  SRV_GETACTIVE},
-        {"SRV GETSPEC",    SRV_GETSPEC},
-        {"SRV GETTEMPLATES", SRV_GETTEMPPLATES}
+        {"GET",             GET},
+        {"INSTALL",         INSTALL},
+        {"CMD INSTALL",     INSTALL}, // Alias for INSTALL (this was the old usage)
+        {"SRV EDIT",        SRV_EDIT},
+        {"SRV ACTIVATE",    SRV_ACTIVATE},
+        {"SRV HOSTREMOVE",  SRV_HOSTREMOVE},
+        {"SRV MNTCHROOT",   SRV_MNTCHROOT},
+        {"SRV GETHOSTS",    SRV_GETHOSTS},
+        {"SRV GETHOST",     SRV_GETHOST},
+        {"SRV GETACTIVE",   SRV_GETACTIVE},
+        {"SRV GETSPEC",     SRV_GETSPEC},
+        {"SRV GETTEMPLATES", SRV_GETTEMPPLATES},
+        {"SRV TEMPLATE",    SRV_TEMPLATE},
+        {"SRV SAVE",        SRV_SAVE},
+        {"EXIT",            EXIT}
 };
 
 SHFP parse_request (char* parse_line, StringVector* args) {
@@ -328,7 +332,9 @@ response_t SRV_GETSPEC (Connection* conn, char** args, int start, int argc) {
 response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start, int argc) {
     StringVector* templates = host_template_get_all ();
     
-    write (conn->fd, &templates->n, sizeof (int));
+    char __n[16];
+    sprintf(__n, "%d", conn->parent->stages->n);
+    write (conn->fd, &__n, strlen(__n));
     
     int i;
     char* b;
@@ -382,5 +388,15 @@ response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
     write (conn->fd, t->new_id, strlen(t->new_id));
     write (conn->fd, "\n", 1);
     
+    return OK;
+}
+
+response_t SRV_SAVE (Connection* conn, char** args, int start, int argc) {
+    write_server (conn->parent);
+    return OK;
+}
+
+response_t EXIT (Connection* conn, char** args, int start, int argc) {
+    conn->parent->keep_alive = 0;
     return OK;
 }

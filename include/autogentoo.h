@@ -7,6 +7,8 @@
 /* Port to 9491 so we don't overlap with our main service */
 #define AUTOGENTOO_DEBUG
 
+#define AUTOGENTOO_NO_THREADS
+
 #ifdef AUTOGENTOO_DEBUG
 #define AUTOGENTOO_PORT 9491
 #else

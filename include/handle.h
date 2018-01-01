@@ -180,6 +180,27 @@ response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start, int argc
  */
 response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc);
 
+/**
+ * Saves the current server to the config
+ * You can use this whenever, its perfectly safe
+ * @param conn the connection that holds the request
+ * @param args (none)
+ * @param start Start index to read from request
+ * @param argc the argument count in args
+ * @return HTTP standard codes
+ */
+response_t SRV_SAVE (Connection* conn, char** args, int start, int argc);
+
+/**
+ * End the server's main loop
+ * @param conn the connection that holds the request
+ * @param args (none)
+ * @param start Start index to read from request
+ * @param argc the argument count in args
+ * @return HTTP standard codes
+ */
+response_t EXIT (Connection* conn, char** args, int start, int argc);
+
 /* SRV Kernel request (unimplmented) */
 
 #endif

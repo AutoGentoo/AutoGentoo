@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <stage.h>
 #include "writeconfig.h"
+#include <autogentoo.h>
 
 Server* server_new (char* location, int port, server_t opts) {
     Server* out = malloc (sizeof (Server));
@@ -79,8 +80,9 @@ void server_start (Server* server) {
     }
     
     addrlen = sizeof (clientaddr);
+    server->keep_alive = 1;
     
-    while (1) { // Main accept loop
+    while (server->keep_alive) { // Main accept loop
         int temp_fd = accept (listenfd, (struct sockaddr*)&clientaddr, &addrlen);
         if (temp_fd < 3) {
             lwarning ("accept() error");
@@ -91,15 +93,19 @@ void server_start (Server* server) {
             fflush (stdout);
             continue;
         }
-        
+        Connection* current_conn = connection_new (server, temp_fd);
+
+#ifndef AUTOGENTOO_NO_THREADS
         pthread_t p_pid;
         
-        Connection* current_conn = connection_new (server, temp_fd);
         if (pthread_create (&p_pid, NULL, (void* (*) (void*))server_respond, current_conn)) {
             lerror ("Error creating thread");
             fflush (stdout);
             exit (1);
         }
+#else
+        server_respond (current_conn);
+#endif
     }
 }
 
@@ -171,7 +177,11 @@ void connection_free (Connection* conn) {
 }
 
 void server_respond (Connection* conn) {
+#ifndef AUTOGENTOO_NO_THREADS
     conn->pid = pthread_self ();
+#else
+    conn->pid = 0;
+#endif
     
     /* Read the request */
     conn->request = malloc (2048);
@@ -226,8 +236,6 @@ void server_respond (Connection* conn) {
     write_server (conn->parent);
     
     connection_free (conn);
-    printf ("freed\n");
-    fflush (stdout);
 }
 
 void server_bind (Connection* conn, Host* host) {
