@@ -63,11 +63,22 @@ extern SmallMap* all_commands;
 
 /**
  * @brief Extract and Compress files 
+ * 
  * Valid commands
  *  - extract {file.tar} : Extract file.tar to the current directory
  *  - extract to {file.tar, path} : Extract file.tar to path
  *  - compress {file.tar, selector} : Compress files found through selector into file.tar
  */
 extern SmallMap* tar;
+
+/**
+ * @brief Download files from the internet
+ * 
+ * Valid commands
+ *  - download : Normal download (name will be the name of the file on the internet)
+ *  - download to {path_to_file} : Download to file
+ *  Both of the above have a 'quiet' vairant (append quiet to them to not print the logs)
+ */
+extern SmallMap* wget;
 
 #endif

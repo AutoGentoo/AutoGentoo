@@ -64,7 +64,7 @@ response_t chroot_mount (Host* host) {
         sprintf (dest_temp, "%s/%s", new_root, mnt.dest);
         fix_path (dest_temp);
         
-        if (string_find (mounted->ptr, dest_temp, mounted->n) == -1) {
+        if (string_find (mounted->ptr, dest_temp, (size_t)mounted->n) == -1) {
 #ifdef __linux__
             if (mount (mnt.src, dest_temp, mnt.type, mnt.opts, NULL) == -1) {
                 lerror ("Failed to mount %s", dest_temp);

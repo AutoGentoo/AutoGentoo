@@ -163,6 +163,16 @@ response_t SRV_GETSPEC (Connection* conn, char** args, int start, int argc);
 response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start, int argc);
 
 /**
+ * Creates a new template given a template id
+ * @param conn the connection that holds the request
+ * @param args the template id of the new template (look in stage.c)
+ * @param start Start index to read from request
+ * @param argc the argument count in args
+ * @return HTTP standard codes
+ */
+response_t SRV_TEMPLATE_NEW (Connection* conn, char** args, int start, int argc);
+
+/**
  * @brief Create/initilize a new template
  * 
  * Commands include the following
@@ -173,12 +183,32 @@ response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start, int argc
  *      the stage3 if EXTRACT is the only command used.
  *      This must be put BEFORE the EXTRACT command
  * @param conn the connection that holds the request
- * @param args the template id of the new template (look in stage.c)
+ * @param args the id of the staged template
  * @param start Start index to read from request
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
 response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc);
+
+/**
+ * Returns a list of the currently staged HostTemplates
+ * @param conn the connection that holds the request
+ * @param args (none)
+ * @param start Start index to read from request
+ * @param argc the argument count in args
+ * @return HTTP standard codes
+ */
+response_t SRV_GETSTAGED (Connection* conn, char** args, int start, int argc);
+
+/**
+ * Returns a info about the selected staged HostTemplate
+ * @param conn the connection that holds the request
+ * @param args host_id
+ * @param start Start index to read from request
+ * @param argc the argument count in args
+ * @return HTTP standard codes
+ */
+response_t SRV_GETSTAGE (Connection* conn, char** args, int start, int argc);
 
 /**
  * Saves the current server to the config

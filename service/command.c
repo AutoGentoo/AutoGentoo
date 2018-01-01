@@ -5,6 +5,7 @@
 
 SmallMap* all_commands = NULL;
 SmallMap* tar = NULL;
+SmallMap* wget = NULL;
 
 // Private functions
 SmallMap* init_cmd_tar (char* dest) {
@@ -16,8 +17,20 @@ SmallMap* init_cmd_tar (char* dest) {
     return tar;
 }
 
+SmallMap* init_cmd_wget (char* dest) {
+    strcpy (dest, "wget");
+    wget = small_map_new (sizeof (Command*), 5);
+    small_map_insert (wget, "download", command_new ("wget %s", 1));
+    small_map_insert (wget, "download to", command_new ("wget %s -O %s", 2));
+    small_map_insert (wget, "download quiet", command_new ("wget %s --quiet", 1));
+    small_map_insert (wget, "download to quiet", command_new ("wget %s -O %s --quiet", 2));
+    
+    return wget;
+}
+
 SmallMap* (* cmd_init_list[]) (char* dest) = {
-        init_cmd_tar
+        init_cmd_tar,
+        init_cmd_wget
 };
 
 void init_commands (void) {
@@ -87,9 +100,17 @@ void command_free (Command* cmd) {
 
 void command (char* top, char* bottom, char** output, int* ret, ...) {
     SmallMap* top_level = small_map_get (all_commands, top);
-    if (!top_level)
-        return lerror ("Command %s, could not be found", top);
-    Command* com = small_map_get (all_commands, bottom);
+    if (!top_level) {
+        *ret = -1;
+        return lerror ("Command '%s' could not be found", top);
+    }
+        
+    Command* com = small_map_get (top_level, bottom);
+    
+    if (!com) {
+        *ret = -1;
+        return lerror ("Command '%s' '%s' could not be found", top, bottom);
+    }
     
     va_list args;
     va_start (args, ret);

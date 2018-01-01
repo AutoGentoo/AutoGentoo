@@ -25,7 +25,7 @@ response_t download (char* url, char* dest, down_progress p) {
     FILE* out = fopen (dest, "wb+");
     
     if (p == SHOW_PROGRESS) {
-        printf ("Showing progress\n");
+        printf ("Download progress\n");
         curl_easy_setopt (curl, CURLOPT_XFERINFODATA, &prog);
         curl_easy_setopt (curl, CURLOPT_NOPROGRESS, 0L);
         curl_easy_setopt (curl, CURLOPT_WRITEDATA, out);

@@ -84,9 +84,13 @@ char* host_template_download (HostTemplate* t) {
     }
     
     char distfile_meta_url[256];
-    sprintf (distfile_meta_url, "http://distfiles.gentoo.org/%s/autobuilds/latest-stage3-%s.txt", t->arch, t->id);
+    sprintf (distfile_meta_url, "http://distfiles.gentoo.org/releases/%s/autobuilds/latest-stage3-%s.txt", t->arch, t->id);
     
-    if (download (distfile_meta_url, "temp_dest", NO_PROGRESS).code != 200) {
+    int dl_ret;
+    command ("wget", "download to", NULL, &dl_ret, distfile_meta_url, "temp_dest");
+    
+    
+    if (dl_ret != 0) {
         lerror ("Could not download metadata for stage3!");
         return NULL;
     }
@@ -104,21 +108,28 @@ char* host_template_download (HostTemplate* t) {
         // The first non-comment line will be our target stage3
         
         line[strlen (line) - 1] = '\0'; // Remove the newline
-        char* s = strtok (line, " ");
+        if (strlen(line) == 0)
+            continue;
+        
+        char* s = strtok (line, "/");
         strcpy(stage3_date, s);
         s = strtok (NULL, " ");
-        asprintf (&stage3_dest, "http://distfiles.gentoo.org/%s/autobuilds/%s", t->arch, s);
+        asprintf (&stage3_dest, "http://distfiles.gentoo.org/releases/%s/autobuilds/%s/%s", t->arch, stage3_date, s);
         break;
     }
+    if (stage3_dest == NULL)
+        return NULL;
     fclose (fp_temp);
     remove ("temp_dest");
     
     char* fname;
     asprintf (&fname, "%s/distfiles/stage3-%s-%s.tar.bz2", t->parent->location, t->id, stage3_date);
     
+    prv_mkdir ("distfiles");
+    
     if (access (fname, F_OK) == -1) {
         linfo ("Downloading stage3 from %s", stage3_dest);
-        download (stage3_dest, fname, SHOW_PROGRESS);
+        command ("wget", "download to", NULL, &dl_ret, stage3_dest, fname);
     }
     free (stage3_dest);
     

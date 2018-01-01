@@ -23,7 +23,11 @@ RequestLink requests[] = {
         {"SRV GETACTIVE",    SRV_GETACTIVE},
         {"SRV GETSPEC",      SRV_GETSPEC},
         {"SRV GETTEMPLATES", SRV_GETTEMPPLATES},
+        {"SRV TEMPLATE NEW", SRV_TEMPLATE_NEW},
+        {"SRV TEMPLATE_NEW", SRV_TEMPLATE_NEW}, // Alias for the previous one
         {"SRV TEMPLATE",     SRV_TEMPLATE},
+        {"SRV GETSTAGED",    SRV_GETSTAGED},
+        {"SRV GETSTAGE",     SRV_GETSTAGE},
         {"SRV SAVE",         SRV_SAVE},
         {"EXIT",             EXIT}
 };
@@ -33,9 +37,7 @@ SHFP parse_request (char* parse_line, StringVector* args) {
     for (i = 0; i != sizeof (requests) / sizeof (RequestLink); i++) {
         size_t current_length = strlen (requests[i].request_ident);
         if (strncmp (parse_line, requests[i].request_ident, current_length) == 0) {
-            char* temp = parse_line + current_length;
-            
-            string_vector_split (args, temp, " \t\n");
+            string_vector_split (args, parse_line + current_length, " \t\n");
             return requests[i].call;
         }
     }
@@ -349,16 +351,27 @@ response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start, int argc
     return OK;
 }
 
-response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
+response_t SRV_TEMPLATE_NEW (Connection* conn, char** args, int start, int argc) {
     /* We dont need to bind a template 
      * because it doesn't need to 
      * auto-detect destination directory for GET
      */
     
     HostTemplate* t = host_template_new (conn->parent, args[0]);
+    
+    small_map_insert (t->parent->stages, t->new_id, t);
+    
+    write (conn->fd, t->new_id, strlen (t->new_id));
+    write (conn->fd, "\n", 1);
+    return OK;
+}
+
+response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
+    HostTemplate* t = small_map_get (conn->parent->stages, args[0]);
+    printf ("%s\n", args[0]);
+    fflush(stdout);
     if (t == NULL)
         return NOT_FOUND;
-    
     
     StringVector* command_entries = string_vector_new ();
     string_vector_split (command_entries, conn->request + start, " \t\n");
@@ -374,6 +387,10 @@ response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
             }
         }
         else if (strcmp (current_command, "EXTRACT") == 0) {
+            if (fname == NULL) {
+                
+            }
+            
             host_template_extract (t, fname);
         }
         else if (strcmp (current_command, "ALL") == 0) {
@@ -384,11 +401,44 @@ response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
         }
     }
     
-    small_map_insert (t->parent->stages, t->new_id, t);
+    return OK;
+}
+
+response_t SRV_GETSTAGED (Connection* conn, char** args, int start, int argc) {
+    char __n[16];
+    sprintf(__n, "%d", conn->parent->stages->n);
+    write (conn->fd, &__n, strlen (__n));
     
-    write (conn->fd, t->new_id, strlen (t->new_id));
-    write (conn->fd, "\n", 1);
+    char* buf;
     
+    int i;
+    for (i = 0; i != conn->parent->stages->n; i++) {
+        write (conn->fd, "\n", 1);
+        HostTemplate* __t = (*(HostTemplate***)vector_get (conn->parent->stages, i))[1];
+        
+        asprintf (&buf, "%s\n%s\n%s\n%s\n%d\n",
+                  __t->new_id,
+                  __t->id,
+                  __t->cflags,
+                  __t->chost,
+                  __t->extra_c
+        );
+        
+        write (conn->fd, buf, strlen (buf));
+        free (buf);
+        
+        int j;
+        for (j = 0; j != __t->extra_c; j++) {
+            asprintf (&buf, "%s %d\n", __t->extras[i].make_extra, __t->extras[i].select);
+            write (conn->fd, buf, strlen (buf));
+            free (buf);
+        }
+    }
+    
+    return OK;
+}
+
+response_t SRV_GETSTAGE (Connection* conn, char** args, int start, int argc) {
     return OK;
 }
 

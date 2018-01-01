@@ -8,9 +8,9 @@
 
 host_id host_id_new () {
     int len = 15;
-    host_id out = malloc (len + 1);
+    host_id out = malloc ((size_t)(len + 1));
     
-    srandom (time (NULL));  // Correct seeding function for random()
+    srandom ((unsigned int)time (NULL));  // Correct seeding function for random()
     char c;
     int i;
     for (i = 0; i != len; i++) {
@@ -343,7 +343,7 @@ response_t host_install (Host* host, char* arg) {
     
     
     StringVector* args = string_vector_new ();
-    char* temp = strdup ((char*)cmd_full->ptr);
+    char* temp = strdup (cmd_full->ptr);
     
     string_vector_split (args, temp, " ");
     
