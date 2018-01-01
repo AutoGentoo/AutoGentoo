@@ -6,14 +6,14 @@
 \begin{DoxyCompactItemize}
 \item 
 struct \mbox{\hyperlink{struct_____host}{\+\_\+\+\_\+\+Host}}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Holds information about a build environment. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
 typedef struct \mbox{\hyperlink{struct_____host}{\+\_\+\+\_\+\+Host}} \mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}}
-\item 
+\begin{DoxyCompactList}\small\item\em Holds information about a build environment. \end{DoxyCompactList}\item 
 typedef char $\ast$ \mbox{\hyperlink{host_8h_ad9a5413d8b4376a70706368c97972c2b}{host\+\_\+id}}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em A simple typedef so that we don\textquotesingle{}t pass a random char$\ast$ instead of a host\+\_\+id by mistake. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Enumerations}
 \begin{DoxyCompactItemize}
 \item 
@@ -64,11 +64,19 @@ int \mbox{\hyperlink{host_8h_a737281fc33a7918ff410f66b78961e6f}{host\+\_\+write\
 \subsubsection{\texorpdfstring{Host}{Host}}
 {\footnotesize\ttfamily typedef struct \mbox{\hyperlink{struct_____host}{\+\_\+\+\_\+\+Host}} \mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}}}
 
-\mbox{\Hypertarget{host_8h_ad9a5413d8b4376a70706368c97972c2b}\label{host_8h_ad9a5413d8b4376a70706368c97972c2b}} 
+
+
+Holds information about a build environment. 
+
+Most of this struct will contain information that is used in /etc/portage/make.conf. \mbox{\Hypertarget{host_8h_ad9a5413d8b4376a70706368c97972c2b}\label{host_8h_ad9a5413d8b4376a70706368c97972c2b}} 
 \index{host.\+h@{host.\+h}!host\+\_\+id@{host\+\_\+id}}
 \index{host\+\_\+id@{host\+\_\+id}!host.\+h@{host.\+h}}
 \subsubsection{\texorpdfstring{host\+\_\+id}{host\_id}}
 {\footnotesize\ttfamily typedef char$\ast$ \mbox{\hyperlink{host_8h_ad9a5413d8b4376a70706368c97972c2b}{host\+\_\+id}}}
+
+
+
+A simple typedef so that we don\textquotesingle{}t pass a random char$\ast$ instead of a host\+\_\+id by mistake. 
 
 
 

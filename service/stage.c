@@ -107,7 +107,7 @@ void host_template_stage(HostTemplate* t) {
 Host* host_template_handoff(HostTemplate* src) {
     Host* out = host_new (src->parent, src->id);
     
-    out->
+    
     
     return out;
 }

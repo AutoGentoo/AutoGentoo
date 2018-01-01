@@ -1,7 +1,18 @@
 #ifndef __AUTOGENTOO_HOST_H__
 #define __AUTOGENTOO_HOST_H__
 
+/**
+ * @brief Holds information about a build environment
+ * 
+ * Most of this struct will contain information that is used in
+ * /etc/portage/make.conf.
+ */
 typedef struct __Host Host;
+
+/**
+ * @brief A simple typedef so that we don't pass
+ * a random char* instead of a host_id by mistake
+ */
 typedef char* host_id;
 
 #include "response.h"
@@ -47,6 +58,12 @@ typedef enum {
     CHR_MOUNTED
 } chroot_t;
 
+/**
+ * @brief Holds information about a build environment
+ * 
+ * Most of this struct will contain information that is used in
+ * /etc/portage/make.conf.
+ */
 struct __Host {
     Server* parent; //!< The parent server
     host_id id; //!< The ID of the Host
