@@ -81,6 +81,7 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_____host_template.html">__HostTemplate</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The template to creating a new Host.  <a href="struct_____host_template.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
@@ -91,12 +92,13 @@ Typedefs</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr class="memitem:a3ba89b32a5d51c086fa5dfa12e879f06"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06">template_selects</a> { <br />
-&#160;&#160;<a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06a585dd072ae3118ac5772930701129d0c">CXXFLAGS</a> = 0x01, 
+&#160;&#160;<a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06adbf1dee1b8cd7ea3c82661943c7b74f4">OTHER</a> = 0x00, 
+<a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06a585dd072ae3118ac5772930701129d0c">CXXFLAGS</a> = 0x01, 
 <a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06adf1543ab15a98526c80e385823a323bf">TMPDIR</a> = 0x02, 
 <a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06acb18d06e341553a35f5d4a366c19f2da">PORTDIR</a> = 0x04, 
-<a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06ad8a20d8dcf4abda50bb5e56b05d5a1c9">DISTDIR</a> = 0x08, 
 <br />
-&#160;&#160;<a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06a841bf499d725562d9926368260645c4b">PKGDIR</a> = 0x10, 
+&#160;&#160;<a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06ad8a20d8dcf4abda50bb5e56b05d5a1c9">DISTDIR</a> = 0x08, 
+<a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06a841bf499d725562d9926368260645c4b">PKGDIR</a> = 0x10, 
 <a class="el" href="stage_8h.html#a3ba89b32a5d51c086fa5dfa12e879f06a952b81d9296d352d3954e119f8b0a4d5">LOGDIR</a> = 0x20
 <br />
  }</td></tr>
@@ -108,8 +110,8 @@ Functions</h2></td></tr>
 <tr class="separator:aaf619943aae143b274acd117a9e500e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13fc504485584062a6c6b260d53d90f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stage_8h.html#a13fc504485584062a6c6b260d53d90f8">host_template_stage</a> (<a class="el" href="stage_8h.html#a86ecaade04cb75e6a583c73b22a21415">HostTemplate</a> *t)</td></tr>
 <tr class="separator:a13fc504485584062a6c6b260d53d90f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a888c4572e2c68eea91350fb96c1508b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structresponse__t.html">response_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stage_8h.html#a888c4572e2c68eea91350fb96c1508b1">host_template_handoff</a> (<a class="el" href="host_8h.html#a30ca67c0ed1f344be0c570271ecfc489">Host</a> *dest, <a class="el" href="stage_8h.html#a86ecaade04cb75e6a583c73b22a21415">HostTemplate</a> *src)</td></tr>
-<tr class="separator:a888c4572e2c68eea91350fb96c1508b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a166ce878eb96edd53089f3ec9b2c547e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="host_8h.html#a30ca67c0ed1f344be0c570271ecfc489">Host</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stage_8h.html#a166ce878eb96edd53089f3ec9b2c547e">host_template_handoff</a> (<a class="el" href="stage_8h.html#a86ecaade04cb75e6a583c73b22a21415">HostTemplate</a> *src)</td></tr>
+<tr class="separator:a166ce878eb96edd53089f3ec9b2c547e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="a86ecaade04cb75e6a583c73b22a21415"></a>
@@ -139,50 +141,48 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06a585dd072ae3118ac5772930701129d0c"></a>CXXFLAGS&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06adf1543ab15a98526c80e385823a323bf"></a>TMPDIR&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06acb18d06e341553a35f5d4a366c19f2da"></a>PORTDIR&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06ad8a20d8dcf4abda50bb5e56b05d5a1c9"></a>DISTDIR&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06a841bf499d725562d9926368260645c4b"></a>PKGDIR&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06a952b81d9296d352d3954e119f8b0a4d5"></a>LOGDIR&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06adbf1dee1b8cd7ea3c82661943c7b74f4"></a>OTHER&#160;</td><td class="fielddoc"><p>Anything else. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06a585dd072ae3118ac5772930701129d0c"></a>CXXFLAGS&#160;</td><td class="fielddoc"><p>The gcc flags to pass to CXX. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06adf1543ab15a98526c80e385823a323bf"></a>TMPDIR&#160;</td><td class="fielddoc"><p>The direcory to build ebuilds in (/autogentoo/tmp) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06acb18d06e341553a35f5d4a366c19f2da"></a>PORTDIR&#160;</td><td class="fielddoc"><p>The path to the portage repo (/usr/portage) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06ad8a20d8dcf4abda50bb5e56b05d5a1c9"></a>DISTDIR&#160;</td><td class="fielddoc"><p>The path to the distfiles (/usr/portage/distfiles) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06a841bf499d725562d9926368260645c4b"></a>PKGDIR&#160;</td><td class="fielddoc"><p>The path to the built binaries (/autogentoo/pkg) dont change! </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3ba89b32a5d51c086fa5dfa12e879f06a952b81d9296d352d3954e119f8b0a4d5"></a>LOGDIR&#160;</td><td class="fielddoc"><p>The path to the logs for ebuild builds (/autogentoo/log) </p>
+</td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a888c4572e2c68eea91350fb96c1508b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a888c4572e2c68eea91350fb96c1508b1">&#9670;&nbsp;</a></span>host_template_handoff()</h2>
+<a id="a166ce878eb96edd53089f3ec9b2c547e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a166ce878eb96edd53089f3ec9b2c547e">&#9670;&nbsp;</a></span>host_template_handoff()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structresponse__t.html">response_t</a> host_template_handoff </td>
+          <td class="memname"><a class="el" href="host_8h.html#a30ca67c0ed1f344be0c570271ecfc489">Host</a>* host_template_handoff </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="host_8h.html#a30ca67c0ed1f344be0c570271ecfc489">Host</a> *&#160;</td>
-          <td class="paramname"><em>dest</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype"><a class="el" href="stage_8h.html#a86ecaade04cb75e6a583c73b22a21415">HostTemplate</a> *&#160;</td>
-          <td class="paramname"><em>src</em>&#160;</td>
-        </tr>
-        <tr>
+          <td class="paramname"><em>src</em></td><td>)</td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Mark The given HostTemplate as ready \ This allows the new Host to mount chroot and emerge new packages </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Mark The given HostTemplate as ready</p>
+<p>This allows the new Host to mount chroot and emerge new packages </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">dest</td><td>The new parent (a Host) of the directory </td></tr>
     <tr><td class="paramname">src</td><td>The old parent (a HostTemplate) of the directory </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>OK if all goes well, INTERNAL_ERROR if error occured </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to the newly inited Host </dd></dl>
 
 </div>
 </div>

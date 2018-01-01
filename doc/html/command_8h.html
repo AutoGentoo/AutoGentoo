@@ -94,15 +94,22 @@ Typedefs</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a1bedd9a9a01e740f37f2be0085c0350a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="command_8h.html#ade38f8bb88790360aa19962fcd401aca">Command</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#a1bedd9a9a01e740f37f2be0085c0350a">command_new</a> (char *fmt, int argc)</td></tr>
 <tr class="separator:a1bedd9a9a01e740f37f2be0085c0350a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac92e392e148eac53fe61b676172df0c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#ac92e392e148eac53fe61b676172df0c8">command_run</a> (<a class="el" href="command_8h.html#ade38f8bb88790360aa19962fcd401aca">Command</a> *cmd, char **output, int *ret,...)</td></tr>
-<tr class="separator:ac92e392e148eac53fe61b676172df0c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad23617ca79e1c533c8c57c4d5919075f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#ad23617ca79e1c533c8c57c4d5919075f">command_run</a> (<a class="el" href="command_8h.html#ade38f8bb88790360aa19962fcd401aca">Command</a> *cmd, char **output, int *ret, va_list args)</td></tr>
+<tr class="separator:ad23617ca79e1c533c8c57c4d5919075f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad706fc66113165386d2b394caa3b6093"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#ad706fc66113165386d2b394caa3b6093">command_free</a> (<a class="el" href="command_8h.html#ade38f8bb88790360aa19962fcd401aca">Command</a> *cmd)</td></tr>
 <tr class="separator:ad706fc66113165386d2b394caa3b6093"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09b1d7bed8c4f5faa3ccee7fbbd8138e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#a09b1d7bed8c4f5faa3ccee7fbbd8138e">command</a> (char *top, char *bottom, char **output, int *ret)</td></tr>
-<tr class="separator:a09b1d7bed8c4f5faa3ccee7fbbd8138e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a51135e60fef4d4e0830cd4f014370c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#a4a51135e60fef4d4e0830cd4f014370c">command</a> (char *top, char *bottom, char **output, int *ret,...)</td></tr>
+<tr class="separator:a4a51135e60fef4d4e0830cd4f014370c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4132f384f50af788684be21d3b095dd4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#a4132f384f50af788684be21d3b095dd4">init_commands</a> (void) __attribute__((constructor))</td></tr>
+<tr class="separator:a4132f384f50af788684be21d3b095dd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3e5f750bd8a099bfbee2646f38b5e42"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#ad3e5f750bd8a099bfbee2646f38b5e42">free_commands</a> (void) __attribute__((destructor))</td></tr>
+<tr class="separator:ad3e5f750bd8a099bfbee2646f38b5e42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a899773d4152d110a0458aa2c37f17ed8"><td class="memItemLeft" align="right" valign="top">SmallMap *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#a899773d4152d110a0458aa2c37f17ed8">all_commands</a></td></tr>
+<tr class="memdesc:a899773d4152d110a0458aa2c37f17ed8"><td class="mdescLeft">&#160;</td><td class="mdescRight">All of the registered commands.  <a href="#a899773d4152d110a0458aa2c37f17ed8">More...</a><br /></td></tr>
+<tr class="separator:a899773d4152d110a0458aa2c37f17ed8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67767d4755385e273ec24dc0f7c1b9ad"><td class="memItemLeft" align="right" valign="top">SmallMap *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="command_8h.html#a67767d4755385e273ec24dc0f7c1b9ad">tar</a></td></tr>
 <tr class="memdesc:a67767d4755385e273ec24dc0f7c1b9ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract and Compress files Valid commands.  <a href="#a67767d4755385e273ec24dc0f7c1b9ad">More...</a><br /></td></tr>
 <tr class="separator:a67767d4755385e273ec24dc0f7c1b9ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -125,8 +132,8 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a09b1d7bed8c4f5faa3ccee7fbbd8138e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09b1d7bed8c4f5faa3ccee7fbbd8138e">&#9670;&nbsp;</a></span>command()</h2>
+<a id="a4a51135e60fef4d4e0830cd4f014370c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a51135e60fef4d4e0830cd4f014370c">&#9670;&nbsp;</a></span>command()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -153,7 +160,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>ret</em>&#160;</td>
+          <td class="paramname"><em>ret</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -168,6 +181,7 @@ Variables</h2></td></tr>
     <tr><td class="paramname">bottom</td><td>the sub-level class of command to call (eg. extract) </td></tr>
     <tr><td class="paramname">output</td><td>a pointer to where the output will be written </td></tr>
     <tr><td class="paramname">ret</td><td>a pointer to where the return value will be stored </td></tr>
+    <tr><td class="paramname">...</td><td>the arguments to pass to the command </td></tr>
   </table>
   </dd>
 </dl>
@@ -234,8 +248,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ac92e392e148eac53fe61b676172df0c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac92e392e148eac53fe61b676172df0c8">&#9670;&nbsp;</a></span>command_run()</h2>
+<a id="ad23617ca79e1c533c8c57c4d5919075f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad23617ca79e1c533c8c57c4d5919075f">&#9670;&nbsp;</a></span>command_run()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -261,8 +275,8 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em>&#160;</td>
+          <td class="paramtype">va_list&#160;</td>
+          <td class="paramname"><em>args</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -276,14 +290,67 @@ Variables</h2></td></tr>
     <tr><td class="paramname">cmd</td><td>the command to run </td></tr>
     <tr><td class="paramname">output</td><td>A pointer to the string to which the output is written </td></tr>
     <tr><td class="paramname">ret</td><td>a pointer to which the return value of the command is written </td></tr>
-    <tr><td class="paramname">...</td><td>the arguments to pass to the command </td></tr>
+    <tr><td class="paramname">args</td><td>the arguments to pass to the command </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
+<a id="ad3e5f750bd8a099bfbee2646f38b5e42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3e5f750bd8a099bfbee2646f38b5e42">&#9670;&nbsp;</a></span>free_commands()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void free_commands </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4132f384f50af788684be21d3b095dd4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4132f384f50af788684be21d3b095dd4">&#9670;&nbsp;</a></span>init_commands()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void init_commands </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="a899773d4152d110a0458aa2c37f17ed8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a899773d4152d110a0458aa2c37f17ed8">&#9670;&nbsp;</a></span>all_commands</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SmallMap* all_commands</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>All of the registered commands. </p>
+<p>All commands are held in small maps </p>
+
+</div>
+</div>
 <a id="a67767d4755385e273ec24dc0f7c1b9ad"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a67767d4755385e273ec24dc0f7c1b9ad">&#9670;&nbsp;</a></span>tar</h2>
 

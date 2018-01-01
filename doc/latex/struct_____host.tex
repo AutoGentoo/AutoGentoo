@@ -8,40 +8,51 @@
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$ \mbox{\hyperlink{struct_____host_ac050615c8d9d8da7d2cfaffaafd9473d}{parent}}
-\item 
+\begin{DoxyCompactList}\small\item\em The parent server. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{host_8h_ad9a5413d8b4376a70706368c97972c2b}{host\+\_\+id}} \mbox{\hyperlink{struct_____host_a2101a62a3859aa1106a2722c659f93c6}{id}}
-\item 
+\begin{DoxyCompactList}\small\item\em The ID of the Host. \end{DoxyCompactList}\item 
 char $\ast$ \mbox{\hyperlink{struct_____host_abfbef38d66410fc8705ea35967e65115}{profile}}
-\item 
+\begin{DoxyCompactList}\small\item\em Portage profile, see possible values with eselect profile list. \end{DoxyCompactList}\item 
 char $\ast$ \mbox{\hyperlink{struct_____host_a3fdd5a6a4e8dc35d72067996674c9ac5}{hostname}}
-\item 
+\begin{DoxyCompactList}\small\item\em Hostname of the host (shows up in the graphical client) \end{DoxyCompactList}\item 
 \mbox{\hyperlink{host_8h_a1392734739c1e1eba62ebfab3bf7dc92}{host\+\_\+t}} \mbox{\hyperlink{struct_____host_a0a366a15966b166891ba8451009df63d}{status}}
-\item 
+\begin{DoxyCompactList}\small\item\em Are we ready to install packages? \end{DoxyCompactList}\item 
 \mbox{\hyperlink{host_8h_a54b3a4fa9f2eb80339d743f0152bc293}{chroot\+\_\+t}} \mbox{\hyperlink{struct_____host_a6f57f709b8074f8d231036b94806aff7}{chroot\+\_\+status}}
-\item 
+\begin{DoxyCompactList}\small\item\em Is the chroot ready? \end{DoxyCompactList}\item 
 \begin{tabbing}
 xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
 struct \{\\
 \>char $\ast$ \mbox{\hyperlink{struct_____host_a94121a0033331d7cdf5425e6d97a74ca}{cflags}}\\
+\>\>{\em The gcc passed to C programs, try -\/march=native :) }\\
 \>char $\ast$ \mbox{\hyperlink{struct_____host_ae241a5f7a25f297926c85a06c4b11c1d}{cxxflags}}\\
+\>\>{\em The gcc passed only to CXX programs. }\\
 \>char $\ast$ \mbox{\hyperlink{struct_____host_a781364a501280f6632f702fc1dceb8e4}{arch}}\\
+\>\>{\em The portage-\/arch (eg. amd64) }\\
 \>char $\ast$ \mbox{\hyperlink{struct_____host_a73ffa5f9a5dbc9e987f5d804ebc320fa}{chost}}\\
+\>\>{\em The system chost (should not be changed after it is set) }\\
 \>char $\ast$ \mbox{\hyperlink{struct_____host_a29d2f3a317a102944ed07955038d827c}{use}}\\
+\>\>{\em use flags }\\
 \>StringVector $\ast$ \mbox{\hyperlink{struct_____host_a7b6efbb413eb628ad363c5557da00796}{extra}}\\
+\>\>{\em A list of extra entries to go into make.conf. }\\
 \} \mbox{\hyperlink{struct_____host_a5dbb399641e9722e0250871091751972}{makeconf}}\\
 
-\end{tabbing}\item 
+\end{tabbing}\begin{DoxyCompactList}\small\item\em These will go in make.\+conf. \end{DoxyCompactList}\item 
 \begin{tabbing}
 xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
 struct \{\\
 \>char $\ast$ \mbox{\hyperlink{struct_____host_a40e40d3bc778b8f73c312edd7c4c36a8}{portage\_tmpdir}}\\
+\>\>{\em build dir }\\
 \>char $\ast$ \mbox{\hyperlink{struct_____host_ac4e7738b691197122d5f18069425933a}{portdir}}\\
+\>\>{\em ebuild portage tree }\\
 \>char $\ast$ \mbox{\hyperlink{struct_____host_ad108845535e7ae4801e939319b208e52}{distdir}}\\
+\>\>{\em distfiles }\\
 \>char $\ast$ \mbox{\hyperlink{struct_____host_af2be365c35b8cd256780212154c5e639}{pkgdir}}\\
+\>\>{\em path to binaries }\\
 \>char $\ast$ \mbox{\hyperlink{struct_____host_a8d9d6cea205f5bdb44284aafb41b9266}{port\_logdir}}\\
+\>\>{\em logs }\\
 \} \mbox{\hyperlink{struct_____host_adde139e84a9a3722fee6faab0978568f}{binhost}}\\
 
-\end{tabbing}\end{DoxyCompactItemize}
+\end{tabbing}\begin{DoxyCompactList}\small\item\em Information about the binhost (all values are relative to the Host\textquotesingle{}s root) \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Field Documentation}
@@ -51,11 +62,19 @@ struct \{\\
 \subsubsection{\texorpdfstring{arch}{arch}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::arch}
 
+
+
+The portage-\/arch (eg. amd64) 
+
 \mbox{\Hypertarget{struct_____host_adde139e84a9a3722fee6faab0978568f}\label{struct_____host_adde139e84a9a3722fee6faab0978568f}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!binhost@{binhost}}
 \index{binhost@{binhost}!\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}}
 \subsubsection{\texorpdfstring{binhost}{binhost}}
 {\footnotesize\ttfamily struct \{ ... \}   \+\_\+\+\_\+\+Host\+::binhost}
+
+
+
+Information about the binhost (all values are relative to the Host\textquotesingle{}s root) 
 
 \mbox{\Hypertarget{struct_____host_a94121a0033331d7cdf5425e6d97a74ca}\label{struct_____host_a94121a0033331d7cdf5425e6d97a74ca}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!cflags@{cflags}}
@@ -63,11 +82,19 @@ struct \{\\
 \subsubsection{\texorpdfstring{cflags}{cflags}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::cflags}
 
+
+
+The gcc passed to C programs, try -\/march=native \+:) 
+
 \mbox{\Hypertarget{struct_____host_a73ffa5f9a5dbc9e987f5d804ebc320fa}\label{struct_____host_a73ffa5f9a5dbc9e987f5d804ebc320fa}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!chost@{chost}}
 \index{chost@{chost}!\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}}
 \subsubsection{\texorpdfstring{chost}{chost}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::chost}
+
+
+
+The system chost (should not be changed after it is set) 
 
 \mbox{\Hypertarget{struct_____host_a6f57f709b8074f8d231036b94806aff7}\label{struct_____host_a6f57f709b8074f8d231036b94806aff7}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!chroot\+\_\+status@{chroot\+\_\+status}}
@@ -75,11 +102,19 @@ struct \{\\
 \subsubsection{\texorpdfstring{chroot\+\_\+status}{chroot\_status}}
 {\footnotesize\ttfamily \mbox{\hyperlink{host_8h_a54b3a4fa9f2eb80339d743f0152bc293}{chroot\+\_\+t}} \+\_\+\+\_\+\+Host\+::chroot\+\_\+status}
 
+
+
+Is the chroot ready? 
+
 \mbox{\Hypertarget{struct_____host_ae241a5f7a25f297926c85a06c4b11c1d}\label{struct_____host_ae241a5f7a25f297926c85a06c4b11c1d}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!cxxflags@{cxxflags}}
 \index{cxxflags@{cxxflags}!\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}}
 \subsubsection{\texorpdfstring{cxxflags}{cxxflags}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::cxxflags}
+
+
+
+The gcc passed only to C\+XX programs. 
 
 \mbox{\Hypertarget{struct_____host_ad108845535e7ae4801e939319b208e52}\label{struct_____host_ad108845535e7ae4801e939319b208e52}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!distdir@{distdir}}
@@ -87,11 +122,19 @@ struct \{\\
 \subsubsection{\texorpdfstring{distdir}{distdir}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::distdir}
 
+
+
+distfiles 
+
 \mbox{\Hypertarget{struct_____host_a7b6efbb413eb628ad363c5557da00796}\label{struct_____host_a7b6efbb413eb628ad363c5557da00796}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!extra@{extra}}
 \index{extra@{extra}!\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}}
 \subsubsection{\texorpdfstring{extra}{extra}}
 {\footnotesize\ttfamily String\+Vector$\ast$ \+\_\+\+\_\+\+Host\+::extra}
+
+
+
+A list of extra entries to go into make.\+conf. 
 
 \mbox{\Hypertarget{struct_____host_a3fdd5a6a4e8dc35d72067996674c9ac5}\label{struct_____host_a3fdd5a6a4e8dc35d72067996674c9ac5}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!hostname@{hostname}}
@@ -99,11 +142,19 @@ struct \{\\
 \subsubsection{\texorpdfstring{hostname}{hostname}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::hostname}
 
+
+
+Hostname of the host (shows up in the graphical client) 
+
 \mbox{\Hypertarget{struct_____host_a2101a62a3859aa1106a2722c659f93c6}\label{struct_____host_a2101a62a3859aa1106a2722c659f93c6}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!id@{id}}
 \index{id@{id}!\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}}
 \subsubsection{\texorpdfstring{id}{id}}
 {\footnotesize\ttfamily \mbox{\hyperlink{host_8h_ad9a5413d8b4376a70706368c97972c2b}{host\+\_\+id}} \+\_\+\+\_\+\+Host\+::id}
+
+
+
+The ID of the Host. 
 
 \mbox{\Hypertarget{struct_____host_a5dbb399641e9722e0250871091751972}\label{struct_____host_a5dbb399641e9722e0250871091751972}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!makeconf@{makeconf}}
@@ -111,11 +162,19 @@ struct \{\\
 \subsubsection{\texorpdfstring{makeconf}{makeconf}}
 {\footnotesize\ttfamily struct \{ ... \}   \+\_\+\+\_\+\+Host\+::makeconf}
 
+
+
+These will go in make.\+conf. 
+
 \mbox{\Hypertarget{struct_____host_ac050615c8d9d8da7d2cfaffaafd9473d}\label{struct_____host_ac050615c8d9d8da7d2cfaffaafd9473d}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!parent@{parent}}
 \index{parent@{parent}!\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}}
 \subsubsection{\texorpdfstring{parent}{parent}}
 {\footnotesize\ttfamily \mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}}$\ast$ \+\_\+\+\_\+\+Host\+::parent}
+
+
+
+The parent server. 
 
 \mbox{\Hypertarget{struct_____host_af2be365c35b8cd256780212154c5e639}\label{struct_____host_af2be365c35b8cd256780212154c5e639}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!pkgdir@{pkgdir}}
@@ -123,11 +182,19 @@ struct \{\\
 \subsubsection{\texorpdfstring{pkgdir}{pkgdir}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::pkgdir}
 
+
+
+path to binaries 
+
 \mbox{\Hypertarget{struct_____host_a8d9d6cea205f5bdb44284aafb41b9266}\label{struct_____host_a8d9d6cea205f5bdb44284aafb41b9266}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!port\+\_\+logdir@{port\+\_\+logdir}}
 \index{port\+\_\+logdir@{port\+\_\+logdir}!\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}}
 \subsubsection{\texorpdfstring{port\+\_\+logdir}{port\_logdir}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::port\+\_\+logdir}
+
+
+
+logs 
 
 \mbox{\Hypertarget{struct_____host_a40e40d3bc778b8f73c312edd7c4c36a8}\label{struct_____host_a40e40d3bc778b8f73c312edd7c4c36a8}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!portage\+\_\+tmpdir@{portage\+\_\+tmpdir}}
@@ -135,11 +202,19 @@ struct \{\\
 \subsubsection{\texorpdfstring{portage\+\_\+tmpdir}{portage\_tmpdir}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::portage\+\_\+tmpdir}
 
+
+
+build dir 
+
 \mbox{\Hypertarget{struct_____host_ac4e7738b691197122d5f18069425933a}\label{struct_____host_ac4e7738b691197122d5f18069425933a}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!portdir@{portdir}}
 \index{portdir@{portdir}!\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}}
 \subsubsection{\texorpdfstring{portdir}{portdir}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::portdir}
+
+
+
+ebuild portage tree 
 
 \mbox{\Hypertarget{struct_____host_abfbef38d66410fc8705ea35967e65115}\label{struct_____host_abfbef38d66410fc8705ea35967e65115}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!profile@{profile}}
@@ -147,17 +222,29 @@ struct \{\\
 \subsubsection{\texorpdfstring{profile}{profile}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::profile}
 
+
+
+Portage profile, see possible values with eselect profile list. 
+
 \mbox{\Hypertarget{struct_____host_a0a366a15966b166891ba8451009df63d}\label{struct_____host_a0a366a15966b166891ba8451009df63d}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!status@{status}}
 \index{status@{status}!\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}}
 \subsubsection{\texorpdfstring{status}{status}}
 {\footnotesize\ttfamily \mbox{\hyperlink{host_8h_a1392734739c1e1eba62ebfab3bf7dc92}{host\+\_\+t}} \+\_\+\+\_\+\+Host\+::status}
 
+
+
+Are we ready to install packages? 
+
 \mbox{\Hypertarget{struct_____host_a29d2f3a317a102944ed07955038d827c}\label{struct_____host_a29d2f3a317a102944ed07955038d827c}} 
 \index{\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}!use@{use}}
 \index{use@{use}!\+\_\+\+\_\+\+Host@{\+\_\+\+\_\+\+Host}}
 \subsubsection{\texorpdfstring{use}{use}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+::use}
+
+
+
+use flags 
 
 
 

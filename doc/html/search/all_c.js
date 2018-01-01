@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['new_5fid',['new_id',['../struct_____host_template.html#ae7564721dc0d66845c5238ae141035c8',1,'__HostTemplate']]],
   ['no_5fcontent',['NO_CONTENT',['../response_8h.html#a87ed98446928d560ffd66539098a4849',1,'response.h']]],
   ['no_5fdebug',['NO_DEBUG',['../server_8h.html#ac716a2b0d74f0b48cf81937cb7b3f725a8a940829337d73440d4227fe2d2fa950',1,'server.h']]],
   ['no_5fprogress',['NO_PROGRESS',['../download_8h.html#a786aee38a475e8b2e78c31540bb39dd2a0bfc7f81db63c23b1463d2bda746d174',1,'download.h']]],

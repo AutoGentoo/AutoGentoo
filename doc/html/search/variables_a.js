@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['opts',['opts',['../struct_____chroot_mount.html#a301ce607b0f62e7c5cc1caed898e6b93',1,'__ChrootMount::opts()'],['../struct_____server.html#a7bedad78c4a7e7dc2045067cb99dc237',1,'__Server::opts()']]]
+  ['new_5fid',['new_id',['../struct_____host_template.html#ae7564721dc0d66845c5238ae141035c8',1,'__HostTemplate']]]
 ];

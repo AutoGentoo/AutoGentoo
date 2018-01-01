@@ -5,60 +5,96 @@
 #include <stdarg.h>
 #include <hacksaw/tools.h>
 
-Command* command_new (char* fmt, int argc) {
-    Command* out = malloc (sizeof (Command));
-    out->format = strdup (fmt);
-    out->argc = argc;
-    
-    out->output = NULL;
-    out->ret = -1;
+SmallMap* all_commands = NULL;
+SmallMap* tar = NULL;
+
+// Private functions
+SmallMap* init_cmd_tar(char* dest) {
+    strcpy (dest, "tar");
+    tar = small_map_new (sizeof(Command*), 5);
+    small_map_insert (tar, "extract", command_new("tar -xf %s", 1));
+    small_map_insert (tar, "extract to", command_new("tar -xf %s -C %s", 2));
+    small_map_insert (tar, "compress", command_new("tar -cf %s %s", 2));
+    return tar;
 }
-void command_run (Command* cmd, char** output, int* ret, ...) {
-    va_list args;
-    va_start (args, ret);
+
+SmallMap* (* cmd_init_list[])(char* dest) = {
+        init_cmd_tar
+};
+
+void init_commands(void) {
+    all_commands = small_map_new(sizeof(SmallMap*), 5);
     
+    int i;
+    for (i = 0; i != sizeof(cmd_init_list) / sizeof(cmd_init_list[0]); i++) {
+        char c_cmd[32];
+        SmallMap* t = cmd_init_list[i](c_cmd);
+        small_map_insert(all_commands, c_cmd, t);
+    }
+}
+
+void free_commands(void) {
+    int i;
+    for (i = 0; i != all_commands->n; i++) {
+        SmallMap* c = (*(SmallMap***) vector_get(all_commands, i))[1];
+        int j;
+        for (j = 0; j != c->n; j++) {
+            command_free((*(Command***) vector_get(c, j))[1]);
+        }
+        small_map_free(c, 0);
+    }
+    small_map_free(all_commands, 0);
+}
+
+Command* command_new(char* fmt, int argc) {
+    Command* out = malloc(sizeof(Command));
+    out->format = strdup(fmt);
+    out->argc = argc;
+}
+
+void command_run(Command* cmd, char** output, int* ret, va_list args) {
     char* dest;
     vasprintf(&dest, cmd->format, args);
-    linfo ("running %s", dest);
+    linfo("running %s", dest);
     
-    FILE* fp = popen (dest, "r");
-    if (!fp) {
-        lerror("Failed to run command!");
-        return;
-    }
+    FILE* fp = popen(dest, "r");
+    if (!fp)
+        return lerror("Failed to run command!");
     
-    size_t alloc_increm = 128;
-    size_t output_allocation = 256;
-    size_t cread, read_len = 0;
-    char buffer[256];
-    cmd->output = malloc (output_allocation);
+    if (output) {
+        size_t alloc_increm = 128;
+        size_t output_allocation = 256;
+        size_t cread, read_len = 0;
+        char buffer[256];
+        *output = malloc(output_allocation);
     
-    while ((cread = fread(buffer, 1, sizeof(buffer), fp)) != 0) {
-        if (cread + read_len >= output_allocation) {
-            output_allocation = cread + read_len + alloc_increm;
-            cmd->output = realloc(cmd->output, output_allocation);
+        while ((cread = fread(buffer, 1, sizeof(buffer), fp)) != 0) {
+            if (cread + read_len >= output_allocation) {
+                output_allocation = cread + read_len + alloc_increm;
+                *output = realloc(*output, output_allocation);
+            }
+            memcpy (*output + read_len, buffer, cread);
+            read_len += cread;
         }
-        memcpy (cmd->output + read_len, buffer, cread);
-        read_len += cread;
     }
     
-    cmd->ret = pclose(fp);
+    if (ret)
+        *ret = pclose(fp);
 }
 
-void command_reset (Command* cmd) {
-    if (cmd->output != NULL) {
-        free (cmd->output);
-    }
-    cmd->output = NULL;
-    cmd->ret = -1;
-}
-
-void command_free (Command* cmd) {
-    command_reset(cmd);
+void command_free(Command* cmd) {
     free(cmd->format);
-    free (cmd);
+    free(cmd);
 }
 
-void command(char *top, char *bottom, char **output, int *ret, ...) {
+void command(char* top, char* bottom, char** output, int* ret, ...) {
+    SmallMap* top_level = small_map_get(all_commands, top);
+    if (!top_level)
+        return lerror("Command %s, could not be found", top);
+    Command* com = small_map_get(all_commands, bottom);
     
+    va_list args;
+    va_start (args, ret);
+    command_run(com, output, ret, args);
 }
+

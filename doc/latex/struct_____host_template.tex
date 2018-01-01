@@ -2,28 +2,48 @@
 \label{struct_____host_template}\index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}}
 
 
+The template to creating a new Host.  
+
+
+
+
 {\ttfamily \#include $<$stage.\+h$>$}
 
 \subsection*{Data Fields}
 \begin{DoxyCompactItemize}
 \item 
 char $\ast$ \mbox{\hyperlink{struct_____host_template_a6c8b983339976e4622f62d82c0b4fbf1}{id}}
-\item 
+\begin{DoxyCompactList}\small\item\em The Host\+Template ID. \end{DoxyCompactList}\item 
 char $\ast$ \mbox{\hyperlink{struct_____host_template_a6052713001eb237749beb250899b09ba}{arch}}
-\item 
+\begin{DoxyCompactList}\small\item\em The portage arch of the system (eg. amd64) \end{DoxyCompactList}\item 
 char $\ast$ \mbox{\hyperlink{struct_____host_template_a1e87b79a1795d0e02a913327e0d46878}{cflags}}
-\item 
+\begin{DoxyCompactList}\small\item\em C\+F\+L\+A\+GS put in make.\+conf. \end{DoxyCompactList}\item 
 char $\ast$ \mbox{\hyperlink{struct_____host_template_a5ed1986b1774d3836e5f5f5d769de82f}{chost}}
-\item 
-char $\ast$ \mbox{\hyperlink{struct_____host_template_a80bac92c13aa822d5cff439c0d66a60f}{make\+\_\+extras}}
-\item 
-\mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06}{template\+\_\+selects}} \mbox{\hyperlink{struct_____host_template_ad1f4c7a1e25592181f63018195b4ff54}{select}}
-\item 
-char $\ast$ \mbox{\hyperlink{struct_____host_template_afca1e49a19d36cff4e745d615b33ab7a}{dest\+\_\+dir}}
-\item 
-\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$ \mbox{\hyperlink{struct_____host_template_aa8239544f5fd3a31a47940c7c0de5c5c}{parent}}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em C\+H\+O\+ST of the system. \end{DoxyCompactList}\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>char $\ast$ \mbox{\hyperlink{struct_____host_template_a7225136c3e9e14ca6a469fedb2cfd22a}{make\_extra}}\\
+\>\>{\em Content to be put in make.conf. }\\
+\>\mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06}{template\_selects}} \mbox{\hyperlink{struct_____host_template_ad1f4c7a1e25592181f63018195b4ff54}{select}}\\
+\>\>{\em Select what type of data this is. }\\
+\} \mbox{\hyperlink{struct_____host_template_aff5d3ff3e82e08c0535756ab18e6b545}{extras}} \mbox{[}16\mbox{]}\\
 
+\end{tabbing}\begin{DoxyCompactList}\small\item\em The extra settings to put in make.\+conf. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{struct_____host_template_a36e3e69b0dfda8fe28376c6bc89ec0c0}{extra\+\_\+c}}
+\begin{DoxyCompactList}\small\item\em The number of fields filled in extras (must be set to use extras) \end{DoxyCompactList}\item 
+char $\ast$ \mbox{\hyperlink{struct_____host_template_afca1e49a19d36cff4e745d615b33ab7a}{dest\+\_\+dir}}
+\begin{DoxyCompactList}\small\item\em The temporary destination before handoff (don\textquotesingle{}t init) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}} $\ast$ \mbox{\hyperlink{struct_____host_template_aa8239544f5fd3a31a47940c7c0de5c5c}{parent}}
+\begin{DoxyCompactList}\small\item\em The parent server (don\textquotesingle{}t init) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{host_8h_ad9a5413d8b4376a70706368c97972c2b}{host\+\_\+id}} \mbox{\hyperlink{struct_____host_template_ae7564721dc0d66845c5238ae141035c8}{new\+\_\+id}}
+\begin{DoxyCompactList}\small\item\em The new id that will be passed in the handoff (don\textquotesingle{}t init) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The template to creating a new Host. 
+
+There is a global list in stage.\+c that will have all of the availiable/supported templates. For now I commented out all but the amd64-\/systemd one just for testing but I will I have more avaiable after Auto\+Gentoo is released Feel free to uncomment other ones (or add other ones) 
 
 \subsection{Field Documentation}
 \mbox{\Hypertarget{struct_____host_template_a6052713001eb237749beb250899b09ba}\label{struct_____host_template_a6052713001eb237749beb250899b09ba}} 
@@ -32,11 +52,19 @@ char $\ast$ \mbox{\hyperlink{struct_____host_template_afca1e49a19d36cff4e745d615
 \subsubsection{\texorpdfstring{arch}{arch}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+Template\+::arch}
 
+
+
+The portage arch of the system (eg. amd64) 
+
 \mbox{\Hypertarget{struct_____host_template_a1e87b79a1795d0e02a913327e0d46878}\label{struct_____host_template_a1e87b79a1795d0e02a913327e0d46878}} 
 \index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!cflags@{cflags}}
 \index{cflags@{cflags}!\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}}
 \subsubsection{\texorpdfstring{cflags}{cflags}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+Template\+::cflags}
+
+
+
+C\+F\+L\+A\+GS put in make.\+conf. 
 
 \mbox{\Hypertarget{struct_____host_template_a5ed1986b1774d3836e5f5f5d769de82f}\label{struct_____host_template_a5ed1986b1774d3836e5f5f5d769de82f}} 
 \index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!chost@{chost}}
@@ -44,11 +72,39 @@ char $\ast$ \mbox{\hyperlink{struct_____host_template_afca1e49a19d36cff4e745d615
 \subsubsection{\texorpdfstring{chost}{chost}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+Template\+::chost}
 
+
+
+C\+H\+O\+ST of the system. 
+
 \mbox{\Hypertarget{struct_____host_template_afca1e49a19d36cff4e745d615b33ab7a}\label{struct_____host_template_afca1e49a19d36cff4e745d615b33ab7a}} 
 \index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!dest\+\_\+dir@{dest\+\_\+dir}}
 \index{dest\+\_\+dir@{dest\+\_\+dir}!\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}}
 \subsubsection{\texorpdfstring{dest\+\_\+dir}{dest\_dir}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+Template\+::dest\+\_\+dir}
+
+
+
+The temporary destination before handoff (don\textquotesingle{}t init) 
+
+\mbox{\Hypertarget{struct_____host_template_a36e3e69b0dfda8fe28376c6bc89ec0c0}\label{struct_____host_template_a36e3e69b0dfda8fe28376c6bc89ec0c0}} 
+\index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!extra\+\_\+c@{extra\+\_\+c}}
+\index{extra\+\_\+c@{extra\+\_\+c}!\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}}
+\subsubsection{\texorpdfstring{extra\+\_\+c}{extra\_c}}
+{\footnotesize\ttfamily int \+\_\+\+\_\+\+Host\+Template\+::extra\+\_\+c}
+
+
+
+The number of fields filled in extras (must be set to use extras) 
+
+\mbox{\Hypertarget{struct_____host_template_aff5d3ff3e82e08c0535756ab18e6b545}\label{struct_____host_template_aff5d3ff3e82e08c0535756ab18e6b545}} 
+\index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!extras@{extras}}
+\index{extras@{extras}!\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}}
+\subsubsection{\texorpdfstring{extras}{extras}}
+{\footnotesize\ttfamily struct \{ ... \}   \+\_\+\+\_\+\+Host\+Template\+::extras\mbox{[}16\mbox{]}}
+
+
+
+The extra settings to put in make.\+conf. 
 
 \mbox{\Hypertarget{struct_____host_template_a6c8b983339976e4622f62d82c0b4fbf1}\label{struct_____host_template_a6c8b983339976e4622f62d82c0b4fbf1}} 
 \index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!id@{id}}
@@ -56,17 +112,42 @@ char $\ast$ \mbox{\hyperlink{struct_____host_template_afca1e49a19d36cff4e745d615
 \subsubsection{\texorpdfstring{id}{id}}
 {\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+Template\+::id}
 
-\mbox{\Hypertarget{struct_____host_template_a80bac92c13aa822d5cff439c0d66a60f}\label{struct_____host_template_a80bac92c13aa822d5cff439c0d66a60f}} 
-\index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!make\+\_\+extras@{make\+\_\+extras}}
-\index{make\+\_\+extras@{make\+\_\+extras}!\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}}
-\subsubsection{\texorpdfstring{make\+\_\+extras}{make\_extras}}
-{\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+Template\+::make\+\_\+extras}
+
+
+The Host\+Template ID. 
+
+this will decide which stage3 to download
+\begin{DoxyItemize}
+\item eg. amd64-\/systemd 
+\end{DoxyItemize}\mbox{\Hypertarget{struct_____host_template_a7225136c3e9e14ca6a469fedb2cfd22a}\label{struct_____host_template_a7225136c3e9e14ca6a469fedb2cfd22a}} 
+\index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!make\+\_\+extra@{make\+\_\+extra}}
+\index{make\+\_\+extra@{make\+\_\+extra}!\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}}
+\subsubsection{\texorpdfstring{make\+\_\+extra}{make\_extra}}
+{\footnotesize\ttfamily char$\ast$ \+\_\+\+\_\+\+Host\+Template\+::make\+\_\+extra}
+
+
+
+Content to be put in make.\+conf. 
+
+\mbox{\Hypertarget{struct_____host_template_ae7564721dc0d66845c5238ae141035c8}\label{struct_____host_template_ae7564721dc0d66845c5238ae141035c8}} 
+\index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!new\+\_\+id@{new\+\_\+id}}
+\index{new\+\_\+id@{new\+\_\+id}!\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}}
+\subsubsection{\texorpdfstring{new\+\_\+id}{new\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{host_8h_ad9a5413d8b4376a70706368c97972c2b}{host\+\_\+id}} \+\_\+\+\_\+\+Host\+Template\+::new\+\_\+id}
+
+
+
+The new id that will be passed in the handoff (don\textquotesingle{}t init) 
 
 \mbox{\Hypertarget{struct_____host_template_aa8239544f5fd3a31a47940c7c0de5c5c}\label{struct_____host_template_aa8239544f5fd3a31a47940c7c0de5c5c}} 
 \index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!parent@{parent}}
 \index{parent@{parent}!\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}}
 \subsubsection{\texorpdfstring{parent}{parent}}
 {\footnotesize\ttfamily \mbox{\hyperlink{server_8h_a705d964b8a67edeeb3943273a397e4c2}{Server}}$\ast$ \+\_\+\+\_\+\+Host\+Template\+::parent}
+
+
+
+The parent server (don\textquotesingle{}t init) 
 
 \mbox{\Hypertarget{struct_____host_template_ad1f4c7a1e25592181f63018195b4ff54}\label{struct_____host_template_ad1f4c7a1e25592181f63018195b4ff54}} 
 \index{\+\_\+\+\_\+\+Host\+Template@{\+\_\+\+\_\+\+Host\+Template}!select@{select}}
@@ -75,6 +156,18 @@ char $\ast$ \mbox{\hyperlink{struct_____host_template_afca1e49a19d36cff4e745d615
 {\footnotesize\ttfamily \mbox{\hyperlink{stage_8h_a3ba89b32a5d51c086fa5dfa12e879f06}{template\+\_\+selects}} \+\_\+\+\_\+\+Host\+Template\+::select}
 
 
+
+Select what type of data this is. 
+
+If this is used (set to anything other than 0), It will copy the contents to the correct location when it is handed over to a Host$\ast$
+
+Usage\+:
+
+(if O\+T\+H\+ER)\+:
+\begin{DoxyItemize}
+\item V\+A\+R\+\_\+\+N\+A\+ME="my value" (if !\+O\+T\+H\+ER)\+:
+\item my value 
+\end{DoxyItemize}
 
 The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 

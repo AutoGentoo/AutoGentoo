@@ -7,12 +7,26 @@ typedef char* host_id;
 #include "response.h"
 #include "server.h"
 
+/**
+ * @brief Info regarding bit-size of the architecture
+ * 
+ * This is important because it will decide which directory to
+ * link /lib and /usr/lib to
+ * 
+ * This is marked for removed after HostTemplate API is finished
+ */
 typedef enum {
     _32BIT,
     _64BIT,
-    _INVALIDBIT
+    _INVALIDBIT //!< Could not be determined
 } arch_t;
 
+
+/**
+ * @brief Status of the Host
+ * 
+ * This is marked for removed after HostTemplate API is finished
+ */
 typedef enum {
     NOT_INITED,
     INIT,
@@ -20,36 +34,43 @@ typedef enum {
     READY
 } host_t;
 
+/**
+ * @brief Are the chroot directories mounted
+ * 
+ * This will decide whether or not the system
+ * is able to perform a chroot()
+ * 
+ * This is reset/updated after every restart (not persistant)
+ */
 typedef enum {
     CHR_NOT_MOUNTED,
     CHR_MOUNTED
 } chroot_t;
 
 struct __Host {
-    Server* parent;
-    host_id id;
-    char* profile;
-    char* hostname;
-    host_t status;
-    chroot_t chroot_status;
-    
-    // Architecture configuration
-    struct {
-        char* cflags;
-        char* cxxflags;
-        char* arch;
-        char* chost;
-        char* use;
-        StringVector* extra;
-    } makeconf;
+    Server* parent; //!< The parent server
+    host_id id; //!< The ID of the Host
+    char* profile; //!< Portage profile, see possible values with eselect profile list
+    char* hostname; //!< Hostname of the host (shows up in the graphical client)
+    host_t status; //!< Are we ready to install packages?
+    chroot_t chroot_status; //!< Is the chroot ready?
     
     struct {
-        char* portage_tmpdir; // build dir
-        char* portdir; // ebuild portage tree
-        char* distdir; // distfiles
-        char* pkgdir; // path to binaries
-        char* port_logdir; // logs
-    } binhost;
+        char* cflags; //!< The gcc passed to C programs, try -march=native :)
+        char* cxxflags; //!< The gcc passed only to CXX programs
+        char* arch; //!<  The portage-arch (eg. amd64)
+        char* chost; //!< The system chost (should not be changed after it is set)
+        char* use; //!< use flags
+        StringVector* extra; //!< A list of extra entries to go into make.conf
+    } makeconf; //!< These will go in make.conf
+    
+    struct {
+        char* portage_tmpdir; //!< build dir
+        char* portdir; //!< ebuild portage tree
+        char* distdir; //!< distfiles
+        char* pkgdir; //!< path to binaries
+        char* port_logdir; //!< logs
+    } binhost; //!< Information about the binhost (all values are relative to the Host's root)
     
     //Kernel* kernel;
 };
@@ -111,7 +132,8 @@ int host_write_make_conf (Host* host);
 response_t host_init (Host* host);
 
 /**
- * Emerges packages without chrooting (DANGEROUS) \
+ * Emerges packages without chrooting (DANGEROUS)
+ * 
  * This has a scheduled deprecation due to HostTemplate implementations
  * @param host 
  * @return OK if successful, INTERNAL_ERROR if not

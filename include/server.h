@@ -97,7 +97,7 @@ struct __Connection {
  * @param opts here you are able to enable the DAEMON or DEBUG features
  * @return a pointer to the newly created server
  */
-Server* server_new (char* location, int port, server_t opts);
+Server* server_new(char* location, int port, server_t opts);
 
 /**
  * Creates a new Connection given a file desciptor from accept()
@@ -105,7 +105,7 @@ Server* server_new (char* location, int port, server_t opts);
  * @param conn_fd the fd taken from accept()
  * @return a pointer to the newly created Connection
  */
-Connection* connection_new (Server* server, int conn_fd);
+Connection* connection_new(Server* server, int conn_fd);
 
 /**
  * Get the host that is bounded to the given IP address
@@ -113,20 +113,20 @@ Connection* connection_new (Server* server, int conn_fd);
  * @param ip the ip to search for
  * @return a pointer to the bounded host, NULL if was not found
  */
-Host* server_get_active (Server* server, char* ip);
+Host* server_get_active(Server* server, char* ip);
 
 /**
  * Start the server and allow connections
  * @param server the server to start
  */
-void server_start (Server* server);
+void server_start(Server* server);
 
 /**
  * Bind an IP address to a host
  * @param conn the connection that holds our IP
  * @param host the host to bind to
  */
-void server_bind (Connection* conn, Host* host);
+void server_bind(Connection* conn, Host* host);
 
 /**
  * Search for a host given an ID
@@ -134,26 +134,26 @@ void server_bind (Connection* conn, Host* host);
  * @param id the ID to search for
  * @return a pointer to the Host that was found, NULL if not found
  */
-Host* server_host_search (Server* server, host_id id);
+Host* server_host_search(Server* server, host_id id);
 
 /**
  * Meta-function called by server_start (DO NOT CALL THIS)
  * @param port the port to bind on
  * @return the fd to read from
  */
-int server_init (char* port);
+int server_init(char* port);
 
 /**
  * Handle the conn's request
  * @param conn the connection to read request from
  */
-void server_respond (Connection* conn);
+void server_respond(Connection* conn);
 
 /**
  * Free the completed connection
  * @param conn the connection to free
  */
-void connection_free (Connection* conn);
+void connection_free(Connection* conn);
 
 /**
  * Fork this process to a daemon and disconnect from the terminal

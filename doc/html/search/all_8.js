@@ -14,7 +14,7 @@ var searchData=
   ['host_5fset_5fstatus',['host_set_status',['../host_8h.html#a5fd1827934b90f5f4706addeacd37977',1,'host.h']]],
   ['host_5fstage3',['host_stage3',['../host_8h.html#af1be84bfd7668db616dac2b7969f877c',1,'host.h']]],
   ['host_5ft',['host_t',['../host_8h.html#a1392734739c1e1eba62ebfab3bf7dc92',1,'host.h']]],
-  ['host_5ftemplate_5fhandoff',['host_template_handoff',['../stage_8h.html#a888c4572e2c68eea91350fb96c1508b1',1,'stage.h']]],
+  ['host_5ftemplate_5fhandoff',['host_template_handoff',['../stage_8h.html#a166ce878eb96edd53089f3ec9b2c547e',1,'stage.h']]],
   ['host_5ftemplate_5finit',['host_template_init',['../stage_8h.html#aaf619943aae143b274acd117a9e500e7',1,'stage.h']]],
   ['host_5ftemplate_5fstage',['host_template_stage',['../stage_8h.html#a13fc504485584062a6c6b260d53d90f8',1,'stage.h']]],
   ['host_5fwrite_5fmake_5fconf',['host_write_make_conf',['../host_8h.html#a737281fc33a7918ff410f66b78961e6f',1,'host.h']]],

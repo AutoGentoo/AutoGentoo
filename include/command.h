@@ -29,9 +29,9 @@ Command* command_new (char* fmt, int argc);
  * @param cmd the command to run
  * @param output A pointer to the string to which the output is written
  * @param ret a pointer to which the return value of the command is written
- * @param ... the arguments to pass to the command
+ * @param args the arguments to pass to the command
  */
-void command_run (Command* cmd, char** output, int* ret, ...);
+void command_run (Command* cmd, char** output, int* ret, va_list args);
 
 /**
  * Free a command
@@ -45,13 +45,20 @@ void command_free (Command* cmd);
  * @param bottom the sub-level class of command to call (eg. extract)
  * @param output a pointer to where the output will be written
  * @param ret a pointer to where the return value will be stored
+ * @param ... the arguments to pass to the command
  */
-void command (char* top, char* bottom, char** output, int* ret);
+void command (char* top, char* bottom, char** output, int* ret, ...);
 
-/*
- * Registered commands
+void init_commands (void) __attribute__ ((constructor));
+void free_commands (void) __attribute__ ((destructor));
+
+/**
+ * @brief All of the registered commands
+ * 
  * All commands are held in small maps
  */
+extern SmallMap* all_commands;
+
 
 /**
  * @brief Extract and Compress files 
@@ -60,6 +67,6 @@ void command (char* top, char* bottom, char** output, int* ret);
  *  - extract to {file.tar, path} : Extract file.tar to path
  *  - compress {file.tar, selector} : Compress files found through selector into file.tar
  */
-SmallMap* tar;
+extern SmallMap* tar;
 
 #endif

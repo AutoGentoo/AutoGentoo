@@ -21,17 +21,17 @@ enum \mbox{\hyperlink{host_8h_aeb0b53bd82ace87cc22658ea14695b8f}{arch\+\_\+t}} \
 \mbox{\hyperlink{host_8h_aeb0b53bd82ace87cc22658ea14695b8fadf0116bdc8534d5444b4003be3235746}{\+\_\+64\+B\+IT}}, 
 \mbox{\hyperlink{host_8h_aeb0b53bd82ace87cc22658ea14695b8fa46a0e6612193c93a45593e3a3db49c44}{\+\_\+\+I\+N\+V\+A\+L\+I\+D\+B\+IT}}
  \}
-\item 
+\begin{DoxyCompactList}\small\item\em Info regarding bit-\/size of the architecture. \end{DoxyCompactList}\item 
 enum \mbox{\hyperlink{host_8h_a1392734739c1e1eba62ebfab3bf7dc92}{host\+\_\+t}} \{ \mbox{\hyperlink{host_8h_a1392734739c1e1eba62ebfab3bf7dc92a4a3fecc9aede1a324c701f738a79176c}{N\+O\+T\+\_\+\+I\+N\+I\+T\+ED}}, 
 \mbox{\hyperlink{host_8h_a1392734739c1e1eba62ebfab3bf7dc92a0cb1b2c6a7db1f1084886c98909a3f36}{I\+N\+IT}}, 
 \mbox{\hyperlink{host_8h_a1392734739c1e1eba62ebfab3bf7dc92a1484cd8614dca496f8583c5ec62785bd}{S\+T\+A\+G\+E1}}, 
 \mbox{\hyperlink{host_8h_a1392734739c1e1eba62ebfab3bf7dc92a6564f2f3e15be06b670547bbcaaf0798}{R\+E\+A\+DY}}
  \}
-\item 
+\begin{DoxyCompactList}\small\item\em Status of the Host. \end{DoxyCompactList}\item 
 enum \mbox{\hyperlink{host_8h_a54b3a4fa9f2eb80339d743f0152bc293}{chroot\+\_\+t}} \{ \mbox{\hyperlink{host_8h_a54b3a4fa9f2eb80339d743f0152bc293a9ca12b93b597156c5d3ac74aa69ab20e}{C\+H\+R\+\_\+\+N\+O\+T\+\_\+\+M\+O\+U\+N\+T\+ED}}, 
 \mbox{\hyperlink{host_8h_a54b3a4fa9f2eb80339d743f0152bc293a824381029109f186330f6d6af8919df3}{C\+H\+R\+\_\+\+M\+O\+U\+N\+T\+ED}}
  \}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Are the chroot directories mounted. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -79,7 +79,13 @@ int \mbox{\hyperlink{host_8h_a737281fc33a7918ff410f66b78961e6f}{host\+\_\+write\
 \subsubsection{\texorpdfstring{arch\+\_\+t}{arch\_t}}
 {\footnotesize\ttfamily enum \mbox{\hyperlink{host_8h_aeb0b53bd82ace87cc22658ea14695b8f}{arch\+\_\+t}}}
 
-\begin{DoxyEnumFields}{Enumerator}
+
+
+Info regarding bit-\/size of the architecture. 
+
+This is important because it will decide which directory to link /lib and /usr/lib to
+
+This is marked for removed after Host\+Template A\+PI is finished \begin{DoxyEnumFields}{Enumerator}
 \raisebox{\heightof{T}}[0pt][0pt]{\index{\+\_\+32\+B\+IT@{\+\_\+32\+B\+IT}!host.\+h@{host.\+h}}\index{host.\+h@{host.\+h}!\+\_\+32\+B\+IT@{\+\_\+32\+B\+IT}}}\mbox{\Hypertarget{host_8h_aeb0b53bd82ace87cc22658ea14695b8fa452e4498dd723d406caffa447f4136e6}\label{host_8h_aeb0b53bd82ace87cc22658ea14695b8fa452e4498dd723d406caffa447f4136e6}} 
 \+\_\+32\+B\+IT&\\
 \hline
@@ -89,7 +95,7 @@ int \mbox{\hyperlink{host_8h_a737281fc33a7918ff410f66b78961e6f}{host\+\_\+write\
 \hline
 
 \raisebox{\heightof{T}}[0pt][0pt]{\index{\+\_\+\+I\+N\+V\+A\+L\+I\+D\+B\+IT@{\+\_\+\+I\+N\+V\+A\+L\+I\+D\+B\+IT}!host.\+h@{host.\+h}}\index{host.\+h@{host.\+h}!\+\_\+\+I\+N\+V\+A\+L\+I\+D\+B\+IT@{\+\_\+\+I\+N\+V\+A\+L\+I\+D\+B\+IT}}}\mbox{\Hypertarget{host_8h_aeb0b53bd82ace87cc22658ea14695b8fa46a0e6612193c93a45593e3a3db49c44}\label{host_8h_aeb0b53bd82ace87cc22658ea14695b8fa46a0e6612193c93a45593e3a3db49c44}} 
-\+\_\+\+I\+N\+V\+A\+L\+I\+D\+B\+IT&\\
+\+\_\+\+I\+N\+V\+A\+L\+I\+D\+B\+IT&Could not be determined. \\
 \hline
 
 \end{DoxyEnumFields}
@@ -99,7 +105,13 @@ int \mbox{\hyperlink{host_8h_a737281fc33a7918ff410f66b78961e6f}{host\+\_\+write\
 \subsubsection{\texorpdfstring{chroot\+\_\+t}{chroot\_t}}
 {\footnotesize\ttfamily enum \mbox{\hyperlink{host_8h_a54b3a4fa9f2eb80339d743f0152bc293}{chroot\+\_\+t}}}
 
-\begin{DoxyEnumFields}{Enumerator}
+
+
+Are the chroot directories mounted. 
+
+This will decide whether or not the system is able to perform a chroot()
+
+This is reset/updated after every restart (not persistant) \begin{DoxyEnumFields}{Enumerator}
 \raisebox{\heightof{T}}[0pt][0pt]{\index{C\+H\+R\+\_\+\+N\+O\+T\+\_\+\+M\+O\+U\+N\+T\+ED@{C\+H\+R\+\_\+\+N\+O\+T\+\_\+\+M\+O\+U\+N\+T\+ED}!host.\+h@{host.\+h}}\index{host.\+h@{host.\+h}!C\+H\+R\+\_\+\+N\+O\+T\+\_\+\+M\+O\+U\+N\+T\+ED@{C\+H\+R\+\_\+\+N\+O\+T\+\_\+\+M\+O\+U\+N\+T\+ED}}}\mbox{\Hypertarget{host_8h_a54b3a4fa9f2eb80339d743f0152bc293a9ca12b93b597156c5d3ac74aa69ab20e}\label{host_8h_a54b3a4fa9f2eb80339d743f0152bc293a9ca12b93b597156c5d3ac74aa69ab20e}} 
 C\+H\+R\+\_\+\+N\+O\+T\+\_\+\+M\+O\+U\+N\+T\+ED&\\
 \hline
@@ -115,7 +127,11 @@ C\+H\+R\+\_\+\+M\+O\+U\+N\+T\+ED&\\
 \subsubsection{\texorpdfstring{host\+\_\+t}{host\_t}}
 {\footnotesize\ttfamily enum \mbox{\hyperlink{host_8h_a1392734739c1e1eba62ebfab3bf7dc92}{host\+\_\+t}}}
 
-\begin{DoxyEnumFields}{Enumerator}
+
+
+Status of the Host. 
+
+This is marked for removed after Host\+Template A\+PI is finished \begin{DoxyEnumFields}{Enumerator}
 \raisebox{\heightof{T}}[0pt][0pt]{\index{N\+O\+T\+\_\+\+I\+N\+I\+T\+ED@{N\+O\+T\+\_\+\+I\+N\+I\+T\+ED}!host.\+h@{host.\+h}}\index{host.\+h@{host.\+h}!N\+O\+T\+\_\+\+I\+N\+I\+T\+ED@{N\+O\+T\+\_\+\+I\+N\+I\+T\+ED}}}\mbox{\Hypertarget{host_8h_a1392734739c1e1eba62ebfab3bf7dc92a4a3fecc9aede1a324c701f738a79176c}\label{host_8h_a1392734739c1e1eba62ebfab3bf7dc92a4a3fecc9aede1a324c701f738a79176c}} 
 N\+O\+T\+\_\+\+I\+N\+I\+T\+ED&\\
 \hline
@@ -246,7 +262,9 @@ Updates the current status of the host by reading its directory
 \subsubsection{\texorpdfstring{host\+\_\+stage3()}{host\_stage3()}}
 {\footnotesize\ttfamily \mbox{\hyperlink{structresponse__t}{response\+\_\+t}} host\+\_\+stage3 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{host_8h_a30ca67c0ed1f344be0c570271ecfc489}{Host}} $\ast$}]{host }\end{DoxyParamCaption})}
 
-Emerges packages without chrooting (D\+A\+N\+G\+E\+R\+O\+US) \textbackslash{} This has a scheduled deprecation due to Host\+Template implementations 
+Emerges packages without chrooting (D\+A\+N\+G\+E\+R\+O\+US)
+
+This has a scheduled deprecation due to Host\+Template implementations 
 \begin{DoxyParams}{Parameters}
 {\em host} & \\
 \hline
