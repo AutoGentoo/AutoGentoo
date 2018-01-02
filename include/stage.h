@@ -90,7 +90,7 @@ char* host_template_download (HostTemplate* t);
  * @param t the target HostTemplate to extract
  * @param fname the filename (path) of the stage3
  */
-void host_template_extract (HostTemplate* t, char* fname);
+response_t host_template_extract (HostTemplate* t, char* fname);
 
 /**
  * Initialize a dynamic HostTemplate given a static one. \
@@ -107,7 +107,7 @@ HostTemplate* host_template_init (Server* parent, HostTemplate t);
  * downloads are always from http://distfiles.gentoo.org/
  * @param t the HostTemplate to initilize
  */
-void host_template_stage (HostTemplate* t);
+response_t host_template_stage (HostTemplate* t);
 
 /**
  * Mark The given HostTemplate as ready

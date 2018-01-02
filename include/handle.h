@@ -211,6 +211,16 @@ response_t SRV_GETSTAGED (Connection* conn, char** args, int start, int argc);
 response_t SRV_GETSTAGE (Connection* conn, char** args, int start, int argc);
 
 /**
+ * Handoff a HostTemplate to Host
+ * @param conn the connection that holds the request
+ * @param args host_id
+ * @param start Start index to read from request
+ * @param argc the argument count in args
+ * @return HTTP standard codes
+ */
+response_t SRV_HANDOFF (Connection* conn, char** args, int start, int argc);
+
+/**
  * Saves the current server to the config
  * You can use this whenever, its perfectly safe
  * @param conn the connection that holds the request

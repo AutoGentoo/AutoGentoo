@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <stage.h>
 #include <writeconfig.h>
+#include <response.h>
 
 RequestLink requests[] = {
         {"GET",              GET},
@@ -28,6 +29,7 @@ RequestLink requests[] = {
         {"SRV TEMPLATE",     SRV_TEMPLATE},
         {"SRV GETSTAGED",    SRV_GETSTAGED},
         {"SRV GETSTAGE",     SRV_GETSTAGE},
+        {"SRV HANDOFF",      SRV_HANDOFF},
         {"SRV SAVE",         SRV_SAVE},
         {"EXIT",             EXIT}
 };
@@ -368,8 +370,6 @@ response_t SRV_TEMPLATE_NEW (Connection* conn, char** args, int start, int argc)
 
 response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
     HostTemplate* t = small_map_get (conn->parent->stages, args[0]);
-    printf ("%s\n", args[0]);
-    fflush(stdout);
     if (t == NULL)
         return NOT_FOUND;
     
@@ -378,6 +378,7 @@ response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
     
     char* fname = NULL;
     int i;
+    response_t ret = OK;
     for (i = 0; i != command_entries->n; i++) {
         char* current_command = string_vector_get (command_entries, i);
         if (strcmp (current_command, "DOWNLOAD") == 0) {
@@ -388,57 +389,80 @@ response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
         }
         else if (strcmp (current_command, "EXTRACT") == 0) {
             if (fname == NULL) {
-                
+                fname = host_template_download (t);
             }
             
-            host_template_extract (t, fname);
+            ret = host_template_extract (t, fname);
+            if (ret.code != 200) {
+                return ret;
+            }
         }
         else if (strcmp (current_command, "ALL") == 0) {
-            host_template_stage (t);
+            ret = host_template_stage (t);
         }
         else {
             fname = current_command;
         }
     }
     
-    return OK;
+    return ret;
 }
 
 response_t SRV_GETSTAGED (Connection* conn, char** args, int start, int argc) {
     char __n[16];
     sprintf(__n, "%d", conn->parent->stages->n);
     write (conn->fd, &__n, strlen (__n));
+    write (conn->fd, "\n", 1);
     
     char* buf;
     
     int i;
     for (i = 0; i != conn->parent->stages->n; i++) {
-        write (conn->fd, "\n", 1);
         HostTemplate* __t = (*(HostTemplate***)vector_get (conn->parent->stages, i))[1];
         
-        asprintf (&buf, "%s\n%s\n%s\n%s\n%d\n",
-                  __t->new_id,
-                  __t->id,
-                  __t->cflags,
-                  __t->chost,
-                  __t->extra_c
-        );
-        
-        write (conn->fd, buf, strlen (buf));
-        free (buf);
-        
-        int j;
-        for (j = 0; j != __t->extra_c; j++) {
-            asprintf (&buf, "%s %d\n", __t->extras[i].make_extra, __t->extras[i].select);
-            write (conn->fd, buf, strlen (buf));
-            free (buf);
-        }
+        write (conn->fd, __t->new_id, strlen (__t->new_id));
+        write (conn->fd, "\n", 1);
     }
     
     return OK;
 }
 
 response_t SRV_GETSTAGE (Connection* conn, char** args, int start, int argc) {
+    char* buf;
+    HostTemplate* __t = small_map_get (conn->parent->stages, args[0]);
+    
+    asprintf (&buf, "%s\n%s\n%s\n%s\n%d\n",
+              __t->new_id,
+              __t->id,
+              __t->cflags,
+              __t->chost,
+              __t->extra_c
+    );
+    
+    write (conn->fd, buf, strlen (buf));
+    free (buf);
+    
+    int j;
+    for (j = 0; j != __t->extra_c; j++) {
+        asprintf (&buf, "%s %d\n", __t->extras[j].make_extra, __t->extras[j].select);
+        write (conn->fd, buf, strlen (buf));
+        free (buf);
+    }
+    
+    return OK;
+}
+
+response_t SRV_HANDOFF (Connection* conn, char** args, int start, int argc) {
+    HostTemplate* __t = small_map_get (conn->parent->stages, args[0]);
+    if (!__t)
+        return NOT_FOUND;
+    
+    Host* new_host = host_template_handoff (__t);
+    if (!new_host)
+        return INTERNAL_ERROR;
+    
+    vector_add (conn->parent->hosts, &new_host);
+    
     return OK;
 }
 

@@ -18,9 +18,9 @@
 HostTemplate host_templates[] = {
         /*
         {"alpha", "alpha", "-mieee -pipe -O2 -mcpu=ev4", "alpha-unknown-linux-gnu", 1, {"/space/catalyst/portage", PORTDIR}},
+         */
         {"amd64", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", 1, {"CPU_FLAGS_X86=\"mmx sse sse2\"", OTHER}},
-        */
-        "amd64-systemd", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", 1, "CPU_FLAGS_X86=\"mmx sse sse2\"", OTHER,
+        {"amd64-systemd", "amd64", "-O2 -pipe", "x86_64-pc-linux-gnu", 1, {"CPU_FLAGS_X86=\"mmx sse sse2\"", OTHER}},
         /*  
         {"armv4tl", "arm"},
         {"armv5tel", "arm"},
@@ -62,6 +62,7 @@ HostTemplate* host_template_init (Server* parent, HostTemplate t) {
     out->arch = strdup (t.arch);
     out->cflags = strdup (t.cflags);
     out->chost = strdup (t.chost);
+    out->extra_c = t.extra_c;
     
     int i;
     for (i = 0; i != t.extra_c; i++) {
@@ -87,7 +88,7 @@ char* host_template_download (HostTemplate* t) {
     sprintf (distfile_meta_url, "http://distfiles.gentoo.org/releases/%s/autobuilds/latest-stage3-%s.txt", t->arch, t->id);
     
     int dl_ret;
-    command ("wget", "download to", NULL, &dl_ret, distfile_meta_url, "temp_dest");
+    command ("wget", "download to quiet", NULL, &dl_ret, distfile_meta_url, "temp_dest");
     
     
     if (dl_ret != 0) {
@@ -136,46 +137,53 @@ char* host_template_download (HostTemplate* t) {
     return fname;
 }
 
-void host_template_extract (HostTemplate* t, char* fname) {
+response_t host_template_extract (HostTemplate* t, char* fname) {
     int ext_ret;
+    prv_mkdir (t->dest_dir);
     command ("tar", "extract to", NULL, &ext_ret, fname, t->dest_dir);
     
-    if (ext_ret != 0)
+    if (ext_ret != 0) {
         lerror ("Failed to extract stage3 tar");
+        return INTERNAL_ERROR;
+    }
+        
+    return OK;
 }
 
-void host_template_stage (HostTemplate* t) {
+response_t host_template_stage (HostTemplate* t) {
     char* fname = host_template_download (t);
     if (!fname)
-        return;
+        return INTERNAL_ERROR;
     
-    host_template_extract (t, fname);
+    return host_template_extract (t, fname);
 }
 
 Host* host_template_handoff (HostTemplate* src) {
-    Host* out = host_new (src->parent, src->id);
+    Host* out = host_new (src->parent, strdup(src->new_id));
     char host_dir[256];
     host_get_path (out, host_dir);
+    out->extra = string_vector_new ();
     if (rename (src->dest_dir, host_dir) != 0) {
         lerror ("Failed to rename %s to %s", src->dest_dir, host_dir);
-        host_free (out);
+        free (out->id);
+        free (out);
         return NULL;
     }
-    strcpy (out->hostname, "default");
+    
+    out->hostname, strdup("default");
     
     // Profile
     {
         char* t_profile_l;
         char profile_dest[256];
         
-        asprintf (&t_profile_l, "%s/etc/portage/make.profile", src->dest_dir);
+        asprintf (&t_profile_l, "%s/etc/portage/make.profile", out->id);
         ssize_t profile_len = readlink (t_profile_l, profile_dest, sizeof (profile_dest) - 1);
         profile_dest[(int)profile_len] = 0; // Readlink does not null terminal
-        free (t_profile_l);
         
         char* t_profile_split = strstr (profile_dest, "profiles/");
-        free (out->profile);
         out->profile = strdup (t_profile_split + strlen ("profiles/"));
+        free (t_profile_l);
     }
     
     // defaults
@@ -190,22 +198,22 @@ Host* host_template_handoff (HostTemplate* src) {
     
     // make.conf stuff
     {
-        strcpy (out->cflags, src->cflags);
-        strcpy (out->arch, src->arch);
-        strcpy (out->chost, src->chost);
+        out->cflags = strdup(src->cflags);
+        out->arch = strdup(src->arch);
+        out->chost = strdup (src->chost);
     }
     
     struct {
         template_selects sel;
-        char* ptr;
+        char** ptr;
     } _t[] = {
             {OTHER, NULL},
-            {CXXFLAGS, out->cxxflags},
-            {TMPDIR,   out->portage_tmpdir},
-            {PORTDIR,  out->portdir},
-            {DISTDIR,  out->distdir},
-            {PKGDIR,   out->pkgdir},
-            {LOGDIR,   out->port_logdir}
+            {CXXFLAGS, &out->cxxflags},
+            {TMPDIR,   &out->portage_tmpdir},
+            {PORTDIR,  &out->portdir},
+            {DISTDIR,  &out->distdir},
+            {PKGDIR,   &out->pkgdir},
+            {LOGDIR,   &out->port_logdir}
     };
     
     int i;
@@ -218,7 +226,7 @@ Host* host_template_handoff (HostTemplate* src) {
         int j;
         for (j = 0; j != sizeof (_t) / sizeof (_t[0]); j++) {
             if (src->extras[i].select == _t[j].sel) {
-                strcpy (_t[j].ptr, src->extras[i].make_extra);
+                *_t[j].ptr = strdup (src->extras[i].make_extra);
                 break;
             }
         }
