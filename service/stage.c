@@ -170,7 +170,8 @@ Host* host_template_handoff (HostTemplate* src) {
         return NULL;
     }
     
-    out->hostname, strdup("default");
+    out->hostname = strdup("default");
+    out->use = strdup (""); // Give it an empty just in case
     
     // Profile
     {
