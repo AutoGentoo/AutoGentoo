@@ -9,7 +9,8 @@ libautogentoo_la_SOURCES =  handle.c \
                             chroot.c \
                             writeconfig.c \
                             stage.c \
-                            download.c
+                            download.c \
+                            command.c
 libautogentoo_la_CFLAGS = ${AM_CFLAGS}
 libautogentoo_la_LDFLAGS = -version-info 0
 
