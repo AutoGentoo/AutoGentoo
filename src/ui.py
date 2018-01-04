@@ -60,7 +60,6 @@ class ui:
         ci_sr = SocketRequest (Address(self.server.ip, self.server.port))
         res = "\n".join(ci_sr.send (b"SRV GETSPEC HTTP/1.0\n").decode ("utf-8").split ("\n")[:-2]) # Account for \n at end and HTTP/1.0 200 OK
         self.builder.get_object ("_server_spec_scroll").set_vexpand(True)
-        ci_sr.close ()
         cpuinfo.set_text (res)
         self.portage = portage.portage (self.server.ip, "/usr/portage")
         self.portageMeta = PortageMeta (self.portage, self)
@@ -126,7 +125,7 @@ class ui:
         response = dialog.run()
         if response == Gtk.ResponseType.YES:
             remove_socket = SocketRequest (Address(self.server.ip, self.server.port))
-            remove_socket.send (("SRV SCREMOVE HTTP/1.0\n%s\n" % _id).encode ("utf-8"))
+            remove_socket.send (("SRV HOSTREMOVE %s\n" % _id).encode ("utf-8"))
         dialog.destroy()
         self.regen()
     
@@ -182,7 +181,7 @@ class ui:
     def activate (self, treeview, path, column):
         __iter = treeview.get_model().get_iter (path)
         activate_socket = SocketRequest (Address(self.server.ip, self.server.port))
-        activate_socket.send (("SRV ACTIVATE HTTP/1.0\n%s\n" % treeview.get_model().get_value (__iter, 0)).encode ("utf-8"))
+        activate_socket.send (("SRV ACTIVATE %s\n" % treeview.get_model().get_value (__iter, 0)).encode ("utf-8"))
         self.server.get_active()
         self.portage.generate_from_server ()
         self.portageMeta.rerender ()
@@ -192,20 +191,20 @@ class ui:
         if server_regen:
             self.server.regen ()
         self.clients_tree.treestore.clear()
-        for i in range (len(self.server.clients)):
-            client = self.server.clients[i]
+        for i in range (len(self.server.hosts)):
+            client = self.server.hosts[i]
             self.clients_tree.treestore.append (None, [client._id, self.server.ip, client.hostname, "...%s" % client.profile[-20:], client.CHOST, "•" if i == self.server.active else ""])
         self.gen_active ()
     
     def client_change (self, widget):
         if (self.server.active < 0):
             return
-        active_client = self.server.clients[self.server.active]
+        active_client = self.server.hosts[self.server.active]
         client_objs = {
             active_client._id: self.builder.get_object ("id"),
-            active_client.CHOST: self.builder.get_object ("chost"),
-            active_client.profile: self.builder.get_object ("profile"),
             active_client.hostname: self.builder.get_object ("hostname"),
+            active_client.profile: self.builder.get_object ("profile"),
+            active_client.CHOST: self.builder.get_object ("chost"),
             active_client.CFLAGS: self.builder.get_object ("cflags"),
             active_client.USE: self.builder.get_object ("use") # Do extras manually
         }
@@ -231,12 +230,14 @@ class ui:
         use = self.builder.get_object ("use").get_text()
         start_iter = self.builder.get_object ("extra").get_start_iter()
         end_iter = self.builder.get_object ("extra").get_end_iter()
-        extras = self.builder.get_object ("extra").get_text(start_iter, end_iter, True).split ("\n")
+        extras = self.builder.get_object ("extra").get_text(start_iter, end_iter, True).strip().split ("\n")
+        if extras == ['']:
+            extras = []
         
         edit_socket = SocketRequest (Address(self.server.ip, self.server.port))
         res = edit_socket.send (("SRV EDIT %s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" % (
-            len(extras), 
-            self.server.clients[self.server.active]._id, 
+            len(extras),
+            self.server.hosts[self.server.active]._id,
             hostname,
             profile,
             chost,
@@ -257,7 +258,7 @@ class ui:
             self.builder.get_object ("use").set_text ("")
             self.builder.get_object ("extra").set_text ("")
             return
-        active_client = self.server.clients[self.server.active]
+        active_client = self.server.hosts[self.server.active]
         self.builder.get_object ("_client_hostname").set_label (active_client.hostname)
         self.builder.get_object ("id").set_text (active_client._id)
         self.builder.get_object ("chost").set_text (active_client.CHOST)
