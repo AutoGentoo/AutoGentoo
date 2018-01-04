@@ -28,6 +28,10 @@ import portage, sys
 def css_rgba (r, b, g, a):
     return Gdk.RGBA(r/255,g/255,b/255,a)
 
+def version_sort (k):
+    print (k)
+    print()
+
 class PortageMeta (Gtk.Box):
     __gtype_name__ = 'portageMeta'
     
@@ -157,8 +161,7 @@ class PackageMeta (Gtk.Box):
         }
         self.store = Gtk.ListStore (*([str] * (len(portage.current_keywords) + 1)))
         self.sorted_model = Gtk.TreeModelSort(model=self.store)
-        self.sorted_model.set_sort_column_id(0, Gtk.SortType.DESCENDING)
-
+        
         self.view = Gtk.TreeView.new_with_model(self.sorted_model)
         self.view.get_style_context ().add_class ("package-view")
         self.view.set_grid_lines (Gtk.TreeViewGridLines.BOTH)
@@ -226,6 +229,8 @@ class PackageMeta (Gtk.Box):
             self.desc_top.pack_start (homepkg_label, False, False, 0)
             homepkg_label.set_uri(x)
             homepkg_label.set_label(x)
+        temp = package.versions
+        temp.sort (key=version_sort)
         for ebuild in package.versions:
             buf = ["%s <span font='Open Sans 10px' foreground='#888'>: %s</span>" % (ebuild.id, ebuild.slot)]
             for arch in portage.current_keywords:

@@ -237,7 +237,11 @@ class ui:
         edit_socket = SocketRequest (Address(self.server.ip, self.server.port))
         res = edit_socket.send (("SRV EDIT %s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" % (
             len(extras),
+<<<<<<< HEAD
             self.server.hosts[self.server.active]._id,
+=======
+            self.server.clients[self.server.active]._id, 
+>>>>>>> c934bd82c63aab531c37a0cbee97ca5094876026
             hostname,
             profile,
             chost,
