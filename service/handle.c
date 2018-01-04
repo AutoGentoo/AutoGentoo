@@ -23,7 +23,7 @@ RequestLink requests[] = {
         {"SRV GETHOST",      SRV_GETHOST},
         {"SRV GETACTIVE",    SRV_GETACTIVE},
         {"SRV GETSPEC",      SRV_GETSPEC},
-        {"SRV GETTEMPLATES", SRV_GETTEMPPLATES},
+        {"SRV GETTEMPLATES", SRV_GETTEMPLATES},
         {"SRV TEMPLATE NEW", SRV_TEMPLATE_NEW},
         {"SRV TEMPLATE_NEW", SRV_TEMPLATE_NEW}, // Alias for the previous one
         {"SRV TEMPLATE",     SRV_TEMPLATE},
@@ -49,25 +49,19 @@ SHFP parse_request (char* parse_line, StringVector* args) {
 
 response_t GET (Connection* conn, char** args, int start, int argc) {
     response_t res;
-    if (strcmp (args[1], "HTTP/1.0") != 0 && strcmp (args[1], "HTTP/1.1") != 0) {
-        rsend (conn, BAD_REQUEST);
-        res = BAD_REQUEST;
-        res.len = 0;
-        return res;
-    }
     
-    if (conn->bounded_host == NULL) {
-        rsend (conn, FORBIDDEN);
-        res = FORBIDDEN;
-        res.len = 0;
-        return res;
-    }
+    if (conn->bounded_host == NULL)
+        return FORBIDDEN;
     
-    char path[256];
+    if (strcmp (args[1], "HTTP/1.0") != 0 && strcmp (args[1], "HTTP/1.1") != 0)
+        return BAD_REQUEST;
     
-    sprintf (path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->pkgdir, args[0]);
+    char* path;
+    asprintf (&path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->pkgdir, args[0]);
+    
     int fd, data_to_send;
     ssize_t bytes_read;
+    
     if ((fd = open (path, O_RDONLY)) != -1) // FILE FOUND
     {
         rsend (conn, OK);
@@ -75,12 +69,14 @@ response_t GET (Connection* conn, char** args, int start, int argc) {
         write (conn->fd, "\n", 1);
         while ((bytes_read = read (fd, (void*)&data_to_send, sizeof (data_to_send))) > 0)
             write (conn->fd, (void*)&data_to_send, (size_t)bytes_read);
+        close (fd);
     }
     else {
         rsend (conn, NOT_FOUND);
         res = NOT_FOUND;
     }
     
+    free (path);
     res.len = 0;
     return res;
 }
@@ -334,11 +330,11 @@ response_t SRV_GETSPEC (Connection* conn, char** args, int start, int argc) {
     return OK;
 }
 
-response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start, int argc) {
+response_t SRV_GETTEMPLATES (Connection* conn, char** args, int start, int argc) {
     StringVector* templates = host_template_get_all ();
     
     char __n[16];
-    sprintf(__n, "%d", conn->parent->stages->n);
+    sprintf(__n, "%d", templates->n);
     write (conn->fd, &__n, strlen (__n));
     
     int i;

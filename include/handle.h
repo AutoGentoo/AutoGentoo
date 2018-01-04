@@ -160,7 +160,7 @@ response_t SRV_GETSPEC (Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_GETTEMPPLATES (Connection* conn, char** args, int start, int argc);
+response_t SRV_GETTEMPLATES (Connection* conn, char** args, int start, int argc);
 
 /**
  * Creates a new template given a template id
@@ -242,5 +242,7 @@ response_t SRV_SAVE (Connection* conn, char** args, int start, int argc);
 response_t EXIT (Connection* conn, char** args, int start, int argc);
 
 /* SRV Kernel request (unimplmented) */
+
+
 
 #endif

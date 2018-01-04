@@ -41,6 +41,8 @@ Host* host_new (Server* server, host_id id) {
     out->pkgdir = NULL;
     out->port_logdir = NULL;
     
+    out->kernel = NULL;
+    
     return out;
 }
 

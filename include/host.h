@@ -17,6 +17,7 @@ typedef char* host_id;
 
 #include "response.h"
 #include "server.h"
+#include "kernel.h"
 
 /**
  * @brief Are the chroot directories mounted
@@ -57,7 +58,7 @@ struct __Host {
     char* pkgdir; //!< path to binaries
     char* port_logdir; //!< logs
     
-    //Kernel* kernel;
+    Vector* kernel;
 };
 
 /**

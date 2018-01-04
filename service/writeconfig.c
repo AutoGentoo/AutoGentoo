@@ -19,23 +19,24 @@ void write_server_fp (Server* server, FILE* fp) {
     write_int (server->opts, fp);
     write_int (server->port, fp);
     
-    write_int (server->hosts->n, fp);
     int i;
     for (i = 0; i != server->hosts->n; i++) {
         write_host_fp (*(Host**)vector_get (server->hosts, i), fp);
     }
-    write_int (server->host_bindings->n, fp);
+    
     for (i = 0; i != server->host_bindings->n; i++) {
         write_host_binding_fp ((HostBind*)vector_get (server->host_bindings, i), fp);
     }
-    write_int (server->stages->n, fp);
+    
     for (i = 0; i != server->stages->n; i++) {
         void** __t = *(void***)vector_get (server->stages, i);
         write_stage_fp (__t[1], fp);
     }
+    write_int (AUTOGENTOO_FILE_END, fp);
 }
 
 void write_host_fp (Host* host, FILE* fp) {
+    write_int (AUTOGENTOO_HOST, fp);
     write_string (host->id, fp);
     write_int (CHR_NOT_MOUNTED, fp); // What if system restarted (might as well assume unmounted)
     
@@ -59,14 +60,28 @@ void write_host_fp (Host* host, FILE* fp) {
     write_string (host->distdir, fp);
     write_string (host->pkgdir, fp);
     write_string (host->port_logdir, fp);
+    
+    if (host->kernel) {
+        for (i = 0; i != host->kernel->n; i++) {
+            write_int (AUTOGENTOO_HOST_KERNEL, fp);
+            
+            Kernel* current_kernel = vector_get (host->kernel, i);
+            write_string (current_kernel->kernel_target, fp);
+            write_string (current_kernel->version, fp);
+        }
+    }
+    
+    write_int (AUTOGENTOO_HOST_END, fp);
 }
 
 void write_host_binding_fp (HostBind* bind, FILE* fp) {
+    write_int (AUTOGENTOO_HOST_BINDING, fp);
     write_string (bind->host->id, fp);
     write_string (bind->ip, fp);
 }
 
 void write_stage_fp (HostTemplate* temp, FILE* fp) {
+    write_int (AUTOGENTOO_STAGE, fp);
     write_string (temp->id, fp);
     write_string (temp->arch, fp);
     write_string (temp->cflags, fp);
@@ -99,26 +114,35 @@ Server* read_server (char* location) {
     Server* out = server_new (new_location, port, opts);
     free (new_location);
     
-    int n, i;
-    n = read_int (fp);
-    for (i = 0; i != n; i++) {
-        Host* temp = read_host (fp);
-        temp->parent = out;
-        vector_add (out->hosts, &temp);
-    }
+    Host* host_temp;
+    HostBind bind_temp;
+    HostTemplate* stage_temp;
     
-    n = read_int (fp);
-    for (i = 0; i != n; i++) {
-        HostBind temp;
-        read_host_binding (out, &temp, fp);
-        vector_add (out->host_bindings, &temp);
-    }
-    
-    n = read_int (fp);
-    for (i = 0; i != n; i++) {
-        HostTemplate* temp = malloc (sizeof (HostTemplate));
-        read_stage (out, temp, fp);
-        small_map_insert (out->stages, temp->new_id, temp);
+    int current = 0;
+    while (current != AUTOGENTOO_FILE_END) {
+        current = read_int (fp);
+        
+        switch (current) {
+            case AUTOGENTOO_HOST:
+                host_temp = read_host (fp);
+                host_temp->parent = out;
+                vector_add (out->hosts, &host_temp);
+                break;
+            case AUTOGENTOO_HOST_BINDING:
+                read_host_binding (out, &bind_temp, fp);
+                vector_add (out->host_bindings, &bind_temp);
+                break;
+            case AUTOGENTOO_STAGE:
+                stage_temp = malloc (sizeof (HostTemplate));
+                read_stage (out, stage_temp, fp);
+                small_map_insert (out->stages, stage_temp->new_id, stage_temp);
+                break;
+            case AUTOGENTOO_FILE_END:
+                break;
+            default:
+                lerror ("Could not understand autogentoo data type: 0x%x", current);
+                break;
+        }
     }
     
     fclose (fp);
@@ -154,6 +178,26 @@ Host* read_host (FILE* fp) {
     out->distdir = read_string (fp);
     out->pkgdir = read_string (fp);
     out->port_logdir = read_string (fp);
+    out->kernel = vector_new (sizeof(Kernel*), 5);
+    
+    int current = 0;
+    while (current != AUTOGENTOO_HOST_END) {
+        Kernel* new_kernel;
+        current = read_int (fp);
+        switch (current) {
+            case AUTOGENTOO_HOST_KERNEL:
+                new_kernel = malloc (sizeof (Kernel));
+                new_kernel->kernel_target = read_string (fp);
+                new_kernel->version = read_string (fp);
+                vector_add (out->kernel, new_kernel);
+                break;
+            case AUTOGENTOO_HOST_END:
+                break;
+            default:
+                lerror ("Could not understand autogentoo data type: 0x%x", current);
+                break;
+        }
+    }
     
     return out;
 }
