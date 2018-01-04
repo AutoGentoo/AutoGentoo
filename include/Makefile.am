@@ -8,4 +8,5 @@ maininclude_HEADERS =   autogentoo.h \
                         chroot.h \
                         stage.h \
                         download.h \
-                        binpkg.h
+                        binpkg.h \
+                        command.h
