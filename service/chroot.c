@@ -10,7 +10,6 @@ void prv_get_mounted (StringVector* dest) {
 }
 
 #elif __linux__
-                                                                                                                        
 #include <mntent.h>
 void prv_get_mounted (StringVector* dest) {
     struct mntent* fs;
