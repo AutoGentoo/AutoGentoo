@@ -69,5 +69,5 @@ en_US.utf8
 Debug/*
 *~
 
-#.idea/*
+.idea/*
 cmake-build-debug/*
