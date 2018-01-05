@@ -25,8 +25,23 @@ struct __Kernel {
      * (ie: 2.6.32)
      */
     char* version;
+
+    /**
+     * The URI of the kernel git repo
+     * NULL if you dont want to use git
+     */
+    char* uri;
+
+    /**
+     * @brief Root of the kernel sources
+     *
+     * Default will be /usr/src/linux-{version}{kernel-target}
+     */
+    char* kroot;
 };
 
-
+Kernel* kernel_new (Host* parent, char* target, char* version);
+void kernel_set_uri (Kernel* k, char* uri);
+void kernel_sync (Kernel* k);
 
 #endif //__AUTOGENTOO_KERNEL_H__

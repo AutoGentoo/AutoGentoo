@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -5,10 +6,12 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <limits.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 host_id host_id_new () {
     int len = 15;
-    host_id out = malloc ((size_t)(len + 1));
+    host_id out = malloc (len + 1);
     
     srandom ((unsigned int)time (NULL));  // Correct seeding function for random()
     char c;
