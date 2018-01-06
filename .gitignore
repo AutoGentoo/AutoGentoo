@@ -49,3 +49,5 @@ libtool
 src/hacksaw
 .anjuta*
 ylwrap
+*.tab.c
+*.tab.h
