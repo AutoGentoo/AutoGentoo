@@ -21,7 +21,7 @@ AC_CHECK_LIB([curl], [curl_easy_init], [], [
     AC_MSG_ERROR(["libcurl could not be found"])
 ])
 
-AC_CHECK_LIB([hacksaw-tools], [vector_new], [], [
+AC_CHECK_LIB([hacksaw], [vector_new], [], [
     AC_MSG_ERROR(["libhacksaw could not be found"])
 ])
 
