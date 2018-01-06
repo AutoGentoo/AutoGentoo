@@ -8,6 +8,10 @@ file(GLOB SERVICE "service/*.c")
 file(GLOB CLIENT "client/*.c")
 file(GLOB HEADERS "include/*.h")
 
-add_executable(autogentoo-daemon ${SERVICE} ${HEADERS})
+file(GLOB ARCH_SOURCES "arch/*.c")
+file(GLOB ARCH_HEADERS "arch/*.h")
+
+add_executable (autogentoo-build ${ARCH_SOURCES} ${ARCH_HEADERS})
+add_executable (autogentoo-daemon ${SERVICE} ${HEADERS})
 #add_executable(autogentoo-client ${CLIENT} ${HEADERS})
 TARGET_LINK_LIBRARIES(autogentoo-daemon curl archive hacksaw)
