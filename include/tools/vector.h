@@ -23,14 +23,14 @@ enum __vector_opts {
 
 struct __Vector {
     void* ptr; // Location where elements are stored
-    int n; // Number of filled places
-    int s; // Max number of elements (increments by HACKSAW_VECTOR_INCREMENT)
+    size_t n; // Number of filled places
+    size_t s; // Max number of elements (increments by HACKSAW_VECTOR_INCREMENT)
     size_t size; // size of each element
 
-    int increment; // Default is HACKSAW_VECTOR_INCREMENT
+    size_t increment; // Default is HACKSAW_VECTOR_INCREMENT
 
-    int ordered;
-    int keep;
+    unsigned short ordered;
+    unsigned short keep;
 };
 
 Vector* vector_new (size_t el_size, vector_opts opts);
