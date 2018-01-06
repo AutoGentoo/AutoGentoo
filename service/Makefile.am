@@ -2,7 +2,8 @@ AM_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/ -Wno-unused-result
 ACLOCAL_AMFLAGS='-I m4'
 
 lib_LTLIBRARIES = libautogentoo.la
-libautogentoo_la_SOURCES =  handle.c \
+libautogentoo_la_SOURCES =  archive.c
+                            handle.c \
                             response.c \
                             server.c \
                             host.c \
@@ -10,7 +11,8 @@ libautogentoo_la_SOURCES =  handle.c \
                             writeconfig.c \
                             stage.c \
                             download.c \
-                            command.c
+                            command.c \
+                            kernel.c \
 libautogentoo_la_CFLAGS = ${AM_CFLAGS}
 libautogentoo_la_LDFLAGS = -version-info 0
 

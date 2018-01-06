@@ -9,4 +9,5 @@ maininclude_HEADERS =   autogentoo.h \
                         stage.h \
                         download.h \
                         binpkg.h \
-                        command.h
+                        command.h \
+                        kernel.h
