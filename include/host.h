@@ -111,10 +111,4 @@ int host_write_make_conf (Host* host);
  */
 response_t host_install (Host* host, char* arg);
 
-/**
- * Safetely make a directory
- * @param dir target directory to make
- */
-void prv_mkdir (const char* dir);
-
 #endif
