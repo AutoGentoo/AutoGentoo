@@ -38,17 +38,18 @@ set (arch_SOURCES
         arch/db.c
         arch/package.c
         arch/repo.c
-        arch/util.c)
+        arch/util.c arch/write.c arch/deps.c)
 
 set (arch_HEADERS
         arch/aabs.h
         arch/db.h
         arch/package.h
         arch/repo.h
-        arch/util.h)
+        arch/util.h arch/write.h arch/deps.h)
 
 find_library(ARCHIVE archive)
 
+set (LOCALSTATEDIR /var)
 add_definitions (-DDBPATH="${LOCALSTATEDIR}/lib/pacman")
 
 add_executable (autogentoo-build ${arch_SOURCES} ${arch_HEADERS})

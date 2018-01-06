@@ -11,7 +11,7 @@ typedef struct __aabs_repo_t aabs_repo_t;
 
 struct __aabs_repo_t {
     char* name;
-    aabs_string_vector_t* mirrors;
+    aabs_svec_t* mirrors;
 };
 
 

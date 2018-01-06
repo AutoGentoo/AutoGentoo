@@ -8,14 +8,18 @@
 #include <sys/types.h>
 #include <hacksaw/tools.h>
 
+
 typedef Vector aabs_vector_t;
-typedef StringVector aabs_string_vector_t;
+typedef StringVector aabs_svec_t;
 typedef SmallMap aabs_small_map_t;
 typedef Map aabs_map_t;
 typedef LinkedNode aabs_node_t;
 
 typedef struct __aabs_file_t aabs_file_t;
 typedef struct __aabs_filelist_t aabs_filelist_t;
+
+typedef int64_t aabs_int64_t;
+typedef aabs_int64_t aabs_time_t;
 
 typedef enum {
     AABS_ERR_MEMORY = 1,

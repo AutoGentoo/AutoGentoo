@@ -7,14 +7,22 @@
 
 #include "aabs.h"
 
-typedef struct __aabs_package_t aabs_package_t;
+typedef struct __aabs_pkg_t aabs_pkg_t;
 
 typedef enum {
-    AABS_REASON_WORLD = 0, //!< Pull in by world (defined in DBPATH/world)
-    AABS_REASON_DEPEND = 1
-} aabs_pkg_reason_t;
+    AABS_PKG_REASON_WORLD = 0, //!< Pull in by world (defined in DBPATH/world)
+    AABS_PKG_REASON_DEPEND = 1
+} aabs_pkgreason_t;
 
-struct __aabs_package_t {
+typedef enum {
+    AABS_PKG_VALIDATION_UNKNOWN = 0,
+    AABS_PKG_VALIDATION_NONE = (1 << 0),
+    AABS_PKG_VALIDATION_MD5SUM = (1 << 1),
+    AABS_PKG_VALIDATION_SHA256SUM = (1 << 2),
+    AABS_PKG_VALIDATION_SIGNATURE = (1 << 3)
+} aabs_pkgvalidation_t;
+
+struct __aabs_pkg_t {
     unsigned long name_hash;
     char* filename;
     char* base;
@@ -31,17 +39,28 @@ struct __aabs_package_t {
     /* The binary archive */
     struct archive* mtree;
     
-    aabs_node_t* licenses;
-    aabs_node_t* replaces;
-    aabs_node_t* groups;
-    aabs_node_t* backup;
-    aabs_node_t* depends;
-    aabs_node_t* optdepends;
-    aabs_node_t* conflicts;
-    aabs_node_t* provides;
-    
     aabs_filelist_t files;
+    
+    aabs_svec_t* licenses;
+    aabs_svec_t* replaces;
+    aabs_svec_t* groups;
+    aabs_svec_t* backup;
+    aabs_svec_t* depends;
+    aabs_svec_t* optdepends;
+    aabs_svec_t* conflicts;
+    aabs_svec_t* provides;
+    
+    aabs_time_t builddate;
+    aabs_time_t installdate;
+    
+    off_t size;
+    off_t isize;
+    off_t download_size;
+    
+    aabs_pkgreason_t reason;
+    aabs_pkgvalidation_t validation;
 };
 
+aabs_pkg_t* aabs_pkg_new_from_desc (FILE* fp);
 
 #endif //AUTOGENTOO_ABS_PACKAGE_H

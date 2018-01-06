@@ -21,6 +21,8 @@ void _aabs_alloc_fail(size_t size);
 
 #define ASSERT(cond, action) do { if(!(cond)) { action; } } while(0)
 
-void* aabs_read_archive (aabs_filelist_t* dest, struct archive* ar, char* file_path, int close);
+void* aabs_read_archive (aabs_filelist_t* dest, struct archive** ar, char* file_path, int close);
+aabs_time_t _aabs_parsedate (const char* line);
+off_t _aabs_str_to_off_t(const char *line);
 
 #endif //AUTOGENTOO_UTIL_H

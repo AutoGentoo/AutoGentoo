@@ -10,15 +10,29 @@
 #include <archive.h>
 
 typedef struct __aabs_db_t aabs_db_t;
+typedef struct _aabs_db_read_handler_t aabs_db_read_handler_t;
 
 typedef enum {
     DB_BASE = (1 << 0),
-    DB_DESC = (1 << 1),
-    DB_FILES = (1 << 2),
-    DB_INSTALL = (1 << 3),
-    DB_
+    DB_DESC = (1 << 1) | DB_BASE,
+    DB_FILES = (1 << 2) | DB_BASE,
+    DB_INSTALL = (1 << 3) | DB_BASE,
+    DB_ALL =  DB_BASE | DB_FILES | DB_INSTALL
 } aabs_db_read_t;
 
+typedef enum {
+    AABS_DB_HANDLE_TYPE_STRING,
+    AABS_DB_HANDLE_TYPE_SVEC,
+    AABS_DB_HANDLE_TYPE_DEP
+} aabs_db_read_handle_type_t;
+
+struct _aabs_db_read_handler_t {
+    char* desc_header;
+    size_t offset;
+    aabs_db_read_handle_type_t type;
+    aabs_int64_t (*single_handler)(const char* line);
+    aabs_int64_t (*list_handler)(aabs_svec_t* vec);
+};
 
 /*
  * Two types of db
@@ -36,11 +50,21 @@ struct __aabs_db_t {
     struct archive* obj;
     aabs_map_t* packages;
     unsigned short type; // 0 for sync; 1 for local
+    
+    aabs_filelist_t files;
 };
 
 aabs_db_t* aabs_db_new (char* name, char* mirror);
 void aabs_db_read (aabs_db_t* db);
 char* aabs_db_path (aabs_db_t* db);
-char* aabs_db_local_pkg_path (aabs_db_t* db, aabs_package_t* pkg);
+char* aabs_db_archive_path (aabs_db_t* db);
+char* aabs_local_db_pkgpath(aabs_db_t* db,
+                            aabs_pkg_t* info,
+                            const char* filename);
+
+void aabs_local_write_db (aabs_db_t* db,
+                          aabs_pkg_t* pkg,
+                          aabs_db_read_t opts);
+aabs_pkgvalidation_t aabs_validation_get (aabs_svec_t* vec);
 
 #endif //AUTOGENTOO_DB_H
