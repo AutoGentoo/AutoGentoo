@@ -8,4 +8,5 @@ tools_HEADERS = debug.h \
                 map.h \
                 conf.h \
                 small_map.h \
-                linked_vector.h
+                linked_vector.h \
+                util.h

@@ -51,7 +51,9 @@ set (hacksaw_SRC
         src/string_vector.c
         src/use_flag.c
         src/vector.c
-        src/linked_vector.c)
+        src/linked_vector.c
+        src/util.c
+        )
 
 set (hacksaw_HEADERS
         include/hacksaw.h
@@ -74,7 +76,9 @@ set (hacksaw_HEADERS
         include/tools/string.h
         include/tools/string_vector.h
         include/tools/vector.h
-        include/tools/linked_vector.h)
+        include/tools/linked_vector.h
+        include/tools/utils.h
+        )
 
 set (language_SOURCES
         language/share.h
