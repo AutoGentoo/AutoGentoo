@@ -51,3 +51,4 @@ src/hacksaw
 ylwrap
 *.tab.c
 *.tab.h
+language/liblanguage.a

@@ -11,9 +11,9 @@ ATOMFILES =  atom.c \
                 atom_bison.y \
                 atom_flex.l
 
-lib_LTLIBRARIES=libhacksaw-languages.la
-libhacksaw_languages_la_LDFLAGS=-shared
-libhacksaw_languages_la_SOURCES = $(ATOMFILES) $(DEPENDFILES) share.c
+noinst_LIBRARIES=liblanguage.a
+liblanguage_a_CFLAGS  = ${AM_CFLAGS} -fPIC
+liblanguage_a_SOURCES = $(ATOMFILES) $(DEPENDFILES) share.c
 
 depend_flex.c: depend_flex.l
 	$(LEX) -o depend_flex.c depend_flex.l
