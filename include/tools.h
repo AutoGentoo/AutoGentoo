@@ -7,3 +7,4 @@
 #include "tools/string.h"
 #include "tools/string_vector.h"
 #include "tools/vector.h"
+#include "tools/linked_vector.h"

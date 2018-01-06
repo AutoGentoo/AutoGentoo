@@ -7,4 +7,5 @@ tools_HEADERS = debug.h \
                 vector.h \
                 map.h \
                 conf.h \
-                small_map.h
+                small_map.h \
+                linked_vector.h

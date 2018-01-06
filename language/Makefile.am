@@ -1,16 +1,6 @@
 AM_CFLAGS = ${HACKSAW_CFLAGS} -I$(top_srcdir)/include/ $(CFLAGS)
 ACLOCAL_AMFLAGS='-I m4'
 
-AM_YFLAGS = -d
-
-DEPENDFILES =   depend.c \
-                depend_bison.y \
-                depend_flex.l
-
-ATOMFILES =  atom.c \
-                atom_bison.y \
-                atom_flex.l
-
 noinst_LIBRARIES=liblanguage.a
 liblanguage_a_CFLAGS  = ${AM_CFLAGS} -fPIC
 liblanguage_a_SOURCES = \
@@ -18,7 +8,10 @@ liblanguage_a_SOURCES = \
                atom.tab.c \
                depend.c \
                depend.tab.c \
-               share.c
+               share.c \
+               atom.flex.c \
+               depend.flex.c
+
 
 atom.tab.h:
 	$(MAKE) atom.tab.c
