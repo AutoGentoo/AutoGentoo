@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.10)
-project(Hacksaw C)
+cmake_minimum_required (VERSION 3.10)
+project (Hacksaw C)
 
 find_package (BISON REQUIRED)
 find_package(FLEX REQUIRED)
@@ -19,16 +19,19 @@ bison_target (LANG_DEPEND
 add_flex_bison_dependency (FLEX_ATOM LANG_ATOM)
 add_flex_bison_dependency (FLEX_DEPEND LANG_DEPEND)
 
-set (LANG_BIN ${BISON_LANG_ATOM_OUTPUTS}
+set (language_BIN
+        ${BISON_LANG_ATOM_OUTPUTS}
         ${BISON_LANG_DEPEND_OUTPUTS}
-        ${FLEX_DEPEND_OUTPUTS}
-        ${ATOM_DEPEND_OUTPUTS})
+        ${FLEX_FLEX_DEPEND_OUTPUTS}
+        ${FLEX_FLEX_ATOM_OUTPUTS}
+        )
 
 set (CMAKE_C_STANDARD 99)
 
 include_directories (include)
 include_directories (language)
 include_directories (.)
+include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 set (hacksaw_SRC
         src/conf.c
@@ -48,7 +51,7 @@ set (hacksaw_SRC
         src/string_vector.c
         src/use_flag.c
         src/vector.c
-        )
+        src/linked_vector.c)
 
 set (hacksaw_HEADERS
         include/hacksaw.h
@@ -71,7 +74,7 @@ set (hacksaw_HEADERS
         include/tools/string.h
         include/tools/string_vector.h
         include/tools/vector.h
-        )
+        include/tools/linked_vector.h)
 
 set (language_SOURCES
         language/share.h
@@ -89,10 +92,14 @@ set (language_PARSER
         language/depend_flex.l
         )
 
-add_library(hacksaw SHARED
+add_library (hacksaw SHARED
         ${hacksaw_HEADERS}
         ${hacksaw_SRC}
-        ${LANG_BIN}
+        ${language_BIN}
         ${language_PARSER}
         ${language_SOURCES}
         )
+
+add_executable (hacksaw-test EXCLUDE_FROM_ALL src/main.c)
+add_test (hacksaw-test hacksaw-test)
+target_link_libraries (hacksaw-test hacksaw pcre2-8)
