@@ -52,6 +52,6 @@ void* map_insert (Map* map, char* key, void* data);
 
 Map* map_new (size_t new_size, int threshold);
 void map_realloc (Map* map, size_t size);
-size_t get_hash (char* key); // Returns offset from hash_table[0]
+unsigned long get_hash (char* key); // Returns offset from hash_table[0]
 
 #endif // HACKSAW_MAP_H

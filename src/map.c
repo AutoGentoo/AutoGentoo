@@ -87,16 +87,15 @@ void* map_insert (Map* map, char* key, void* data) {
     return &map->hash_table[offset];
 };
 
-static const size_t init_fnv = 2166136261U;
-static const size_t fnv_mult = 16777619;
-
-size_t get_hash(char* key) {
-    size_t hash = init_fnv;
-    size_t i, len;
-    len = strlen (key);
-    for(i = 0; i != len; i++) {
-        hash = hash ^ (key[i]);
-        hash = hash * fnv_mult;
+unsigned long get_hash (char* key) {
+    unsigned long hash = 0;
+    int c;
+    
+    if(!key) {
+        return hash;
+    }
+    while((c = *key++)) {
+        hash = c + hash * 65599;
     }
     
     return hash;
