@@ -30,8 +30,48 @@ include_directories (include)
 include_directories (language)
 include_directories (.)
 
-file (GLOB HACKSAW_SRC "src/*.c")
-file (GLOB HACKSAW_HEADERS "include/**/*.h")
+set (hacksaw_SRC
+        src/conf.c
+        src/debug.c
+        src/dependency.c
+        src/directory.c
+        src/hash.c
+        src/log.c
+        src/manifest.c
+        src/map.c
+        src/package.c
+        src/package_config.c
+        src/regular_expression.c
+        src/repository.c
+        src/small_map.c
+        src/string.c
+        src/string_vector.c
+        src/use_flag.c
+        src/vector.c
+        )
+
+set (hacksaw_HEADERS
+        include/hacksaw.h
+        include/tools.h
+        include/portage/dependency.h
+        include/portage/directory.h
+        include/portage/hash.h
+        include/portage/manifest.h
+        include/portage/package.h
+        include/portage/package_config.h
+        include/portage/portage.h
+        include/portage/repository.h
+        include/portage/use_flags.h
+        include/tools/conf.h
+        include/tools/debug.h
+        include/tools/log.h
+        include/tools/map.h
+        include/tools/regular_expression.h
+        include/tools/small_map.h
+        include/tools/string.h
+        include/tools/string_vector.h
+        include/tools/vector.h
+        )
 
 set (language_SOURCES
         language/share.h
@@ -50,12 +90,9 @@ set (language_PARSER
         )
 
 add_library(hacksaw SHARED
-        include/hacksaw.h
-        include/tools.h
-        ${HACKSAW_SRC}
-        ${LANG_BINS}
-        ${language_SOURCES}
-        ${HACKSAW_HEADERS}
+        ${hacksaw_HEADERS}
+        ${hacksaw_SRC}
         ${LANG_BIN}
         ${language_PARSER}
+        ${language_SOURCES}
         )
