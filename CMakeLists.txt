@@ -4,14 +4,57 @@ include_directories(include)
 
 SET(CMAKE_C_COMPILER gcc)
 
-file(GLOB SERVICE "service/*.c")
-file(GLOB CLIENT "client/*.c")
-file(GLOB HEADERS "include/*.h")
+set (service_SOURCES
+        service/autogentoo.c
+        service/chroot.c
+        service/command.c
+        service/download.c
+        service/handle.c
+        service/host.c
+        service/kernel.c
+        service/response.c
+        service/server.c
+        service/stage.c
+        service/writeconfig.c
+        )
 
-file(GLOB ARCH_SOURCES "arch/*.c")
-file(GLOB ARCH_HEADERS "arch/*.h")
+set (include_HEADERS
+        include/autogentoo.h
+        include/binpkg.h
+        include/chroot.h
+        include/command.h
+        include/download.h
+        include/handle.h
+        include/host.h
+        include/kernel.h
+        include/response.h
+        include/server.h
+        include/stage.h
+        include/writeconfig.h
+        )
 
-add_executable (autogentoo-build ${ARCH_SOURCES} ${ARCH_HEADERS})
-add_executable (autogentoo-daemon ${SERVICE} ${HEADERS})
+set (arch_SOURCES
+        arch/main.c
+        arch/db.c
+        arch/package.c
+        arch/repo.c
+        arch/util.c)
+
+set (arch_HEADERS
+        arch/aabs.h
+        arch/db.h
+        arch/package.h
+        arch/repo.h
+        arch/util.h)
+
+find_library(ARCHIVE archive)
+
+add_definitions (-DDBPATH="${LOCALSTATEDIR}/lib/pacman")
+
+add_executable (autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
+add_executable (autogentoo-daemon
+        ${service_SOURCES}
+        ${include_HEADERS})
 #add_executable(autogentoo-client ${CLIENT} ${HEADERS})
-TARGET_LINK_LIBRARIES(autogentoo-daemon curl archive hacksaw)
+TARGET_LINK_LIBRARIES(autogentoo-daemon curl ${ARCHIVE} hacksaw)
+TARGET_LINK_LIBRARIES(autogentoo-build curl ${ARCHIVE} hacksaw)
