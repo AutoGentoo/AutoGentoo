@@ -1,7 +1,7 @@
 %option prefix="depend"
 
 %{
-#include "depend_bison.h"
+#include "depend.tab.h"
 #include <stdio.h>
 #include <depend.h>
 

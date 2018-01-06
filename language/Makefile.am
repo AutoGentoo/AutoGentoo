@@ -13,25 +13,42 @@ ATOMFILES =  atom.c \
 
 noinst_LIBRARIES=liblanguage.a
 liblanguage_a_CFLAGS  = ${AM_CFLAGS} -fPIC
-liblanguage_a_SOURCES = $(ATOMFILES) $(DEPENDFILES) share.c
+liblanguage_a_SOURCES = \
+               atom.c \
+               atom.tab.c \
+               depend.c \
+               depend.tab.c \
+               share.c
 
-depend_flex.c: depend_flex.l
-	$(LEX) -o depend_flex.c depend_flex.l
+atom.tab.h:
+	$(MAKE) atom.tab.c
 
-atom_flex.c: atom_flex.l
-	$(LEX) -o atom_flex.c atom_flex.l
+depend.tab.h:
+	$(MAKE) depend.tab.c
 
-BUILT_SOURCES = depend_bison.h atom_bison.h
+atom.tab.c: atom_bison.y
+	$(YACC) -d $^ -o $@ --defines=atom.tab.h
 
-DEPEND_CLEAN=depend_bison.h depend_bison.c depend_flex.c
-ATOM_CLEAN=atom_bison.h atom_bison.c atom_flex.c
+depend.tab.c: depend_bison.y
+	$(YACC) -d $^ -o $@ --defines=depend.tab.h
+
+atom.flex.c: atom_flex.l atom.tab.h
+	$(LEX) -o $@ $<
+
+depend.flex.c: depend_flex.l depend.tab.h
+	$(LEX) -o $@ $<
+
+BUILT_SOURCES = depend.tab.h atom.tab.h
+
+DEPEND_CLEAN=depend.tab.h depend.tab.c depend.flex.c
+ATOM_CLEAN=atom.tab.h atom.tab.c atom.flex.c
 CLEANFILES = *~ $(DEPEND_CLEAN) $(ATOM_CLEAN)
 
 check_PROGRAMS = test-depend test-atom
 test_depend_SOURCES = depend-main.c
-test_depend_LDADD = libhacksaw-languages.la ../src/libhacksaw.la
+test_depend_LDADD = languages.a ../src/libhacksaw.la
 test_depend_CFLAGS  = ${AM_CFLAGS} -Wno-unused-result -g
 
 test_atom_SOURCES = atom-main.c
-test_atom_LDADD = libhacksaw-languages.la ../src/libhacksaw.la
+test_atom_LDADD = languages.a ../src/libhacksaw.la
 test_atom_CFLAGS  = ${AM_CFLAGS} -Wno-unused-result -g

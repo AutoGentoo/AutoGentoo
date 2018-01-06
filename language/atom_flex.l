@@ -1,7 +1,7 @@
 %option prefix="atom"
 
 %{
-#include "atom_bison.h"
+#include "atom.tab.h"
 #include <stdio.h>
 #include <atom.h>
 #include <share.h>
