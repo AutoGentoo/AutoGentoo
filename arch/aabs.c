@@ -1,5 +1,5 @@
 /*
- * deps.h
+ * aabs.c
  * 
  * Copyright 2018 Andrei Tumbar <atuser@Kronos>
  * 
@@ -21,28 +21,10 @@
  * 
  */
 
-#ifndef AUTOGENTOO_DEPENDENCY_H
-#define AUTOGENTOO_DEPENDENCY_H
+void aabs_create (char* config) {
+    
+}
 
-typedef struct _aabs_depend_t aabs_depend_t;
+aabs_pkg_t* aabs_package_search (char* str);
+aabs_pkg_t* aabs_library_search (char* lib);
 
-typedef enum {
-    AABS_DEP_MOD_ANY = 1,
-    AABS_DEP_MOD_EQ,
-    AABS_DEP_MOD_GE,
-    AABS_DEP_MOD_LE,
-    AABS_DEP_MOD_GT,
-    AABS_DEP_MOD_LT
-} aabs_depmod_t;
-
-struct _aabs_depend_t {
-    char* name;
-    char* version;
-    char* desc;
-    unsigned long name_hash;
-    aabs_depmod_t mod;
-};
-
-aabs_depend_t* aabs_dep_from_str (char* dep_str);
-
-#endif //AUTOGENTOO_DEPENDENCY_H

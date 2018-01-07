@@ -1,6 +1,25 @@
-//
-// Created by atuser on 1/6/18.
-//
+/*
+ * util.h
+ * 
+ * Copyright 2018 Andrei Tumbar <atuser@Kronos>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ * 
+ * 
+ */
 
 #ifndef AUTOGENTOO_UTIL_H
 #define AUTOGENTOO_UTIL_H
@@ -30,6 +49,7 @@ off_t _aabs_str_to_off_t(const char *line);
 size_t aabs_str_strip_newline (char* str, size_t len);
 char* aabs_fgets (char* dest, int size, FILE* stream);
 aabs_file_stat_t aabs_file_exists (char* path);
+int aabs_strnrcmp (char* str1, char* str2, size_t n);
 int aabs_has_numbers (char* str);
 int aabs_has_letters (char* str);
 
