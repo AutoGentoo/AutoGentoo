@@ -36,6 +36,16 @@ struct _aabs_db_read_handler_t {
     aabs_int64_t (*single_handler_large)(const char* line);
 };
 
+struct aabs_db_backup {
+    char* filename;
+    char* md5sum;
+};
+
+typedef enum {
+    AABS_DB_TYPE_SYNC,
+    AABS_DB_TYPE_LOCAL
+} aabs_db_type;
+
 /*
  * Two types of db
  * sync and local
@@ -51,12 +61,13 @@ struct __aabs_db_t {
     char* mirror;
     struct archive* obj;
     aabs_map_t* packages;
-    unsigned short type; // 0 for sync; 1 for local
+    aabs_db_type type;
     
     aabs_filelist_t files;
 };
 
 aabs_db_t* aabs_db_new (char* name, char* mirror);
+void aabs_local_db_write (aabs_db_t* db);
 void aabs_db_read (aabs_db_t* db);
 char* aabs_db_path (aabs_db_t* db);
 char* aabs_db_archive_path (aabs_db_t* db);
@@ -70,11 +81,15 @@ void aabs_local_write_db (aabs_db_t* db,
 aabs_pkgvalidation_t aabs_validation_get (aabs_svec_t* vec);
 int aabs_db_handler_get (char* name);
 
-#define READ_NEXT() ({ \
+#define READ_NEXT(x) ({ \
     size_t ret_val;\
     if(aabs_fgets(line, sizeof(line), fp) == NULL) break; \
     ret_val = aabs_str_strip_newline(line, 0); \
-ret_val;}) \
+ret_val;})
 
+#define READ_NEXT_NO_BREAK() ({ \
+    size_t ret_val;\
+    ret_val = aabs_str_strip_newline(line, 0); \
+ret_val;})
 
 #endif //AUTOGENTOO_DB_H

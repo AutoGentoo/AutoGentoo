@@ -2,6 +2,8 @@
 // Created by atuser on 1/6/18.
 //
 
+#define _GNU_SOURCE
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <archive.h>
@@ -11,6 +13,7 @@
 #include "aabs.h"
 #include "deps.h"
 #include <stddef.h>
+#include <linux/limits.h>
 
 aabs_db_read_handler_t db_pkg_read_offsets[] = {
         {"%NAME%", offsetof (aabs_pkg_t, name)},
@@ -38,8 +41,8 @@ aabs_db_read_handler_t db_pkg_read_offsets[] = {
 aabs_db_t* aabs_db_new (char* name, char* mirror) {
     aabs_db_t* out;
     MALLOC (out, sizeof(aabs_db_t), exit (1));
-    out->packages = map_new (sizeof (aabs_pkg_t*), 64);
-    out->type = 1;
+    out->packages = map_new (sizeof (aabs_pkg_t*), 128);
+    out->type = AABS_DB_TYPE_LOCAL;
     
     ASSERT(name != NULL, lerror ("db name cannot be NULL");
             FREE (out);
@@ -50,9 +53,28 @@ aabs_db_t* aabs_db_new (char* name, char* mirror) {
     
     if (mirror) {
         out->mirror = strdup(mirror);
+        out->type = AABS_DB_TYPE_SYNC;
     }
     
     out->name = name;
+}
+
+void aabs_local_db_write (aabs_db_t* db) {
+    if (db->type != AABS_DB_TYPE_LOCAL) {
+        lerror ("can't write a 'sync' db");
+        return;
+    }
+    
+    char* db_ar = aabs_db_archive_path (db);
+    char* db_path = aabs_db_path (db);
+    
+    char* archive_cmd;
+    asprintf (&archive_cmd, "cd %s && tar -cf %s *", db_path, db_ar);
+    
+    system (archive_cmd);
+    free (db_ar);
+    free (db_path);
+    free (archive_cmd);
 }
 
 void aabs_db_read (aabs_db_t* db) {
@@ -65,7 +87,7 @@ void aabs_db_read (aabs_db_t* db) {
     archive_read_support_filter_all(db->obj);
     archive_read_support_format_all(db->obj);
     
-    r = archive_read_open_filename(db->obj, db_path, 10240); // Note 1
+    r = archive_read_open_filename(db->obj, db_path, 10240);
     
     if (r != ARCHIVE_OK) {
         aabs_errno = AABS_ERR_DB_READ;
@@ -86,93 +108,120 @@ void aabs_db_read (aabs_db_t* db) {
         
         /* Once we enter a new directory we are parsing for a different package */
         if (*file_name == '\0') {
-            printf ("new_pkg\n");
             curr_pkg = malloc (sizeof (aabs_pkg_t));
             memset (curr_pkg, 0, sizeof (aabs_pkg_t));
             continue;
         }
-        
-        if (strcmp (file_name, "desc") != 0) {
-            continue;
-        }
-        size_t current_size = (size_t)archive_entry_size (entry);
-        char* buffer = malloc (current_size + 4);
-        ssize_t size = archive_read_data(db->obj, buffer, current_size);
-        
-        FILE* fp = fmemopen (buffer, (size_t)size, "r");
-        char line[1024];
-        
-        while (1) {
-            if (READ_NEXT () == 0)
-                continue;
+        if (strcmp (file_name, "desc") == 0) {
+            size_t current_size = (size_t)archive_entry_size (entry);
+            char* buffer = malloc (current_size + 4);
+            ssize_t size = archive_read_data(db->obj, buffer, current_size);
             
-            int handler_index = aabs_db_handler_get(line);
-            if (handler_index == -1) {
-                fprintf (stderr, "could not recognize header %s for package %s\n", line, full_path);
-                continue;
+            FILE* fp = fmemopen (buffer, (size_t)size, "r");
+            char line[1024];
+            
+            while (1) {
+                if (READ_NEXT () == 0)
+                    continue;
+                
+                int handler_index = aabs_db_handler_get(line);
+                if (handler_index == -1) {
+                    fprintf (stderr, "could not recognize header %s for package %s\n", line, full_path);
+                    continue;
+                }
+                
+                size_t offset = db_pkg_read_offsets[handler_index].offset;
+                if (db_pkg_read_offsets[handler_index].type == AABS_DB_HANDLE_TYPE_STRING) {
+                    READ_NEXT();
+                    if (db_pkg_read_offsets[handler_index].single_handler != NULL) {
+                        int temp = (*db_pkg_read_offsets[handler_index].single_handler)(line);
+                        memcpy (&((char*)curr_pkg)[offset], &temp, sizeof (int));
+                    }
+                    else if (db_pkg_read_offsets[handler_index].single_handler_large != NULL) {
+                        aabs_int64_t temp = (*db_pkg_read_offsets[handler_index].single_handler_large)(line);
+                        memcpy (&((char*)curr_pkg)[offset], &temp, sizeof (aabs_int64_t));
+                    }
+                    else {
+                        char* temp = strdup (line);
+                        memcpy (&((char*)curr_pkg)[offset], &temp, sizeof (char*));
+                    }
+                }
+                else if (db_pkg_read_offsets[handler_index].type == AABS_DB_HANDLE_TYPE_SVEC) {
+                    aabs_svec_t* svec_dest = string_vector_new ();
+                    
+                    do {
+                        READ_NEXT();
+                        if (*line == '\0')
+                            break;
+                        string_vector_add (svec_dest, line);
+                    } while (1);
+                    
+                    if (db_pkg_read_offsets[handler_index].list_handler != NULL) {
+                        int temp = (*db_pkg_read_offsets[handler_index].list_handler)(svec_dest);
+                        memcpy (&((char*)curr_pkg)[offset], &temp, sizeof (int));
+                    }
+                    else {
+                        memcpy (&((char*)curr_pkg)[offset], &svec_dest, sizeof (void*));
+                    }
+                }
+                else if (db_pkg_read_offsets[handler_index].type == AABS_DB_HANDLE_TYPE_DEP) {
+                    /* I want it ordered in anticipation of multiple constraints on one dependency problem */
+                    aabs_vec_t* vec_dest = vector_new (sizeof (aabs_depend_t*), REMOVE | ORDERED);
+        
+                    do {
+                        READ_NEXT();
+                        if (*line == '\0')
+                            break;
+                        aabs_depend_t* k = aabs_dep_from_str(line);
+                        vector_add (vec_dest, &k);
+                    } while (1);
+        
+                    memcpy (&((char*)curr_pkg)[offset], &vec_dest, sizeof (void*));
+                }
             }
             
-            size_t offset = db_pkg_read_offsets[handler_index].offset;
-            if (db_pkg_read_offsets[handler_index].type == AABS_DB_HANDLE_TYPE_STRING) {
-                READ_NEXT();
-                if (db_pkg_read_offsets[handler_index].single_handler != NULL) {
-                    int temp = (*db_pkg_read_offsets[handler_index].single_handler)(line);
-                    memcpy (&((char*)curr_pkg)[offset], &temp, sizeof (int));
-                }
-                else if (db_pkg_read_offsets[handler_index].single_handler_large != NULL) {
-                    aabs_int64_t temp = (*db_pkg_read_offsets[handler_index].single_handler_large)(line);
-                    memcpy (&((char*)curr_pkg)[offset], &temp, sizeof (aabs_int64_t));
-                }
-                else {
-                    char* temp = strdup (line);
-                    memcpy (&((char*)curr_pkg)[offset], &temp, sizeof (char*));
-                }
-            }
-            else if (db_pkg_read_offsets[handler_index].type == AABS_DB_HANDLE_TYPE_SVEC) {
-                aabs_svec_t* svec_dest = string_vector_new ();
-                
-                do {
-                    READ_NEXT();
-                    if (*line == '\0')
-                        break;
-                    string_vector_add (svec_dest, line);
-                } while (1);
-                
-                if (db_pkg_read_offsets[handler_index].list_handler != NULL) {
-                    int temp = (*db_pkg_read_offsets[handler_index].list_handler)(svec_dest);
-                    memcpy (&((char*)curr_pkg)[offset], &temp, sizeof (int));
-                }
-                else {
-                    memcpy (&((char*)curr_pkg)[offset], &svec_dest, sizeof (void*));
-                }
-            }
-            else if (db_pkg_read_offsets[handler_index].type == AABS_DB_HANDLE_TYPE_DEP) {
-                /* I want it ordered in anticipation of multiple constraints on one dependency problem */
-                aabs_vec_t* vec_dest = vector_new (sizeof (aabs_depend_t*), REMOVE | ORDERED);
-    
-                do {
-                    READ_NEXT();
-                    if (*line == '\0')
-                        break;
-                    aabs_depend_t* k = aabs_dep_from_str(line);
-                    vector_add (vec_dest, &k);
-                } while (1);
-    
-                memcpy (&((char*)curr_pkg)[offset], &vec_dest, sizeof (void*));
-            }
+            fclose (fp);
+            free (buffer);
+            
+            map_insert (db->packages, curr_pkg->name, &curr_pkg);
         }
-        
-        fclose (fp);
-        free (buffer);
+        else if (strcmp (file_name, "files") == 0) {
+            size_t current_size = (size_t)archive_entry_size (entry);
+            char* buffer = malloc (current_size + 4);
+            ssize_t size = archive_read_data(db->obj, buffer, current_size);
+            
+            FILE* fp = fmemopen (buffer, (size_t)size, "r");
+            char line[PATH_MAX];
+            
+            /* %FILES% */
+            READ_NEXT_NO_BREAK();
+            
+            curr_pkg->files = string_vector_new ();
+            curr_pkg->backup = string_vector_new ();
+            
+            while (1) {
+                if (READ_NEXT () == 0)
+                    break;
+                string_vector_add (curr_pkg->files, line);
+            };
+            
+            /* Just in case we reach end of file */
+            READ_NEXT_NO_BREAK();
+            
+            if (strcmp (line, "%BACKUP%") == 0) {
+                while (1) {
+                    if (READ_NEXT () == 0)
+                        break;
+                    string_vector_add (curr_pkg->backup, line);
+                };
+            }
+            
+            fclose (fp);
+            free (buffer);
+        }
     }
     
     free (db_path);
-    
-    error: do {
-        lerror ("Failed to read db");
-    } while (0);
-    
-
 }
 
 char* aabs_db_archive_path (aabs_db_t* db) {

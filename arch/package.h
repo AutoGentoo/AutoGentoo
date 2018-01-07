@@ -39,12 +39,13 @@ struct __aabs_pkg_t {
     /* The binary archive */
     struct archive* mtree;
     
-    aabs_filelist_t files;
+    /* This is simply a list provided by the db */
+    aabs_svec_t* files;
+    aabs_vec_t* backup;
     
     aabs_svec_t* licenses;
     aabs_svec_t* replaces;
     aabs_svec_t* groups;
-    aabs_svec_t* backup;
     aabs_vec_t*  depends;
     aabs_vec_t*  optdepends;
     aabs_vec_t*  conflicts;

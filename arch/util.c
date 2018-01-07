@@ -134,3 +134,7 @@ char* aabs_fgets (char* dest, int size, FILE* stream) {
     }
     return ret;
 }
+
+aabs_file_stat_t aabs_file_exists (char* path) {
+    return access(path, F_OK) == -1 ? AABS_FILE_NOEXIST : AABS_FILE_FOUND;
+}
