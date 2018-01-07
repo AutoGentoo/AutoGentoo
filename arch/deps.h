@@ -17,9 +17,9 @@ typedef enum {
 } aabs_depmod_t;
 
 struct _aabs_depend_t {
-    char *name;
-    char *version;
-    char *desc;
+    char* name;
+    char* version;
+    char* desc;
     unsigned long name_hash;
     aabs_depmod_t mod;
 };

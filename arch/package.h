@@ -7,7 +7,8 @@
 
 #include "aabs.h"
 
-typedef struct __aabs_pkg_t aabs_pkg_t;
+typedef struct _aabs_pkg_t aabs_pkg_t;
+typedef struct _aabs_pkgver_t aabs_pkgver_t;
 
 typedef enum {
     AABS_PKG_REASON_WORLD = 0, //!< Pull in by world (defined in DBPATH/world)
@@ -22,7 +23,7 @@ typedef enum {
     AABS_PKG_VALIDATION_SIGNATURE = (1 << 3)
 } aabs_pkgvalidation_t;
 
-struct __aabs_pkg_t {
+struct _aabs_pkg_t {
     unsigned long name_hash;
     char* filename;
     char* base;
@@ -62,6 +63,9 @@ struct __aabs_pkg_t {
     aabs_pkgvalidation_t validation;
 };
 
-void aabs_pkg_init_from_desc (FILE* fp);
+static void parseEVR(char *evr, const char **ep, const char **vp,
+        const char **rp);
+static int rpmvercmp(const char *a, const char *b);
+int aabs_pkg_vercmp(const char *a, const char *b);
 
 #endif //AUTOGENTOO_ABS_PACKAGE_H

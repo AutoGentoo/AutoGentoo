@@ -138,3 +138,32 @@ char* aabs_fgets (char* dest, int size, FILE* stream) {
 aabs_file_stat_t aabs_file_exists (char* path) {
     return access(path, F_OK) == -1 ? AABS_FILE_NOEXIST : AABS_FILE_FOUND;
 }
+
+int aabs_strnrcmp (char* str1, char* str2, size_t n) {
+    size_t s1_len = strlen (str1);
+    size_t s2_len = strlen (str2);
+    
+    int i;
+    for (i = 1; i <= n; i++) {
+        if (str1[s1_len - i] > str2[s2_len - i])
+            return -1;
+        else if (str1[s1_len - i] < str2[s2_len - i])
+            return 1;
+    }
+    
+    return 0;
+}
+
+int aabs_has_numbers (char* str) {
+    char* s = str;
+    while ((*s) != '\0')
+        if (isdigit (*s++)) return 1;
+    return 0;
+}
+
+int aabs_has_letters (char* str) {
+    char* s = str;
+    while ((*s) != '\0')
+        if (!isdigit (*s++)) return 1;
+    return 0;
+}

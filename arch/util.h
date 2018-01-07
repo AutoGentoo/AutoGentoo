@@ -30,5 +30,7 @@ off_t _aabs_str_to_off_t(const char *line);
 size_t aabs_str_strip_newline (char* str, size_t len);
 char* aabs_fgets (char* dest, int size, FILE* stream);
 aabs_file_stat_t aabs_file_exists (char* path);
+int aabs_has_numbers (char* str);
+int aabs_has_letters (char* str);
 
 #endif //AUTOGENTOO_UTIL_H
