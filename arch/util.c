@@ -102,3 +102,35 @@ off_t _aabs_str_to_off_t(const char *line) {
     
     return (off_t)result;
 }
+
+size_t aabs_str_strip_newline (char* str, size_t len) {
+    if (*str == '\0')
+        return 0;
+    
+    if (len == 0)
+        len = strlen(str);
+    
+    while (len > 0 && str[len - 1] == '\n') {
+        len--;
+    }
+    
+    str[len] = '\0';
+    return len;
+}
+
+char* aabs_fgets (char* dest, int size, FILE* stream) {
+    char *ret;
+    int errno_save = errno, ferror_save = ferror(stream);
+    while((ret = fgets(dest, size, stream)) == NULL && !feof(stream)) {
+        if(errno == EINTR) {
+            /* clear any errors we set and try again */
+            errno = errno_save;
+            if(!ferror_save) {
+                clearerr(stream);
+            }
+        } else {
+            break;
+        }
+    }
+    return ret;
+}

@@ -24,5 +24,7 @@ void _aabs_alloc_fail(size_t size);
 void* aabs_read_archive (aabs_filelist_t* dest, struct archive** ar, char* file_path, int close);
 aabs_time_t _aabs_parsedate (const char* line);
 off_t _aabs_str_to_off_t(const char *line);
+size_t aabs_str_strip_newline (char* str, size_t len);
+char* aabs_fgets (char* dest, int size, FILE* stream);
 
 #endif //AUTOGENTOO_UTIL_H

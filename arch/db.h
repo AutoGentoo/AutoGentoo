@@ -7,6 +7,7 @@
 
 #include "aabs.h"
 #include "package.h"
+#include "util.h"
 #include <archive.h>
 
 typedef struct __aabs_db_t aabs_db_t;
@@ -30,8 +31,9 @@ struct _aabs_db_read_handler_t {
     char* desc_header;
     size_t offset;
     aabs_db_read_handle_type_t type;
-    aabs_int64_t (*single_handler)(const char* line);
-    aabs_int64_t (*list_handler)(aabs_svec_t* vec);
+    int (*single_handler)(const char* line);
+    int (*list_handler) (aabs_svec_t* vec);
+    aabs_int64_t (*single_handler_large)(const char* line);
 };
 
 /*
@@ -66,5 +68,13 @@ void aabs_local_write_db (aabs_db_t* db,
                           aabs_pkg_t* pkg,
                           aabs_db_read_t opts);
 aabs_pkgvalidation_t aabs_validation_get (aabs_svec_t* vec);
+int aabs_db_handler_get (char* name);
+
+#define READ_NEXT() ({ \
+    size_t ret_val;\
+    if(aabs_fgets(line, sizeof(line), fp) == NULL) break; \
+    ret_val = aabs_str_strip_newline(line, 0); \
+ret_val;}) \
+
 
 #endif //AUTOGENTOO_DB_H
