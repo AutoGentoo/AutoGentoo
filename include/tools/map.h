@@ -50,6 +50,17 @@ void* map_get (Map* map, char* key);
  */
 void* map_insert (Map* map, char* key, void* data);
 
+/**
+ * @brief Instead of generating the hash take one
+ * This is slightly faster that map_get and should be used
+ * if you kept the hash
+ * @param map Map in question
+ * @param key Target key (you still need this)
+ * @param hash Hash to use
+ * @return a pointer to the data
+ */
+void* map_get_from_hash (Map* map, char* key, unsigned long hash);
+
 Map* map_new (size_t new_size, int threshold);
 void map_realloc (Map* map, size_t size);
 unsigned long get_hash (char* key); // Returns offset from hash_table[0]

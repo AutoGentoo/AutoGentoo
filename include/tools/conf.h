@@ -20,7 +20,7 @@ struct __Conf {
 struct __ConfVariable {
     Conf* parent;
     ConfSection* parent_section;
-    char identifier[64];
+    char* identifier;
     char* value;
 };
 

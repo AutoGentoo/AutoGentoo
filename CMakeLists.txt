@@ -77,7 +77,7 @@ set (hacksaw_HEADERS
         include/tools/string_vector.h
         include/tools/vector.h
         include/tools/linked_vector.h
-        include/tools/utils.h
+        include/tools/util.h
         )
 
 set (language_SOURCES

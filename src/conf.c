@@ -87,7 +87,7 @@ ConfSection* conf_section_new (char* name) {
 }
 
 void conf_variable_new (Conf* conf, ConfSection* section, ConfVariable* var, StringVector* data) {
-    strcpy (var->identifier, string_vector_get(data, 0));
+    var->identifier = strdup(string_vector_get(data, 0));
     char* value_buf = string_vector_get(data, 1);
     size_t len = strlen(value_buf);
     var->value = malloc (sizeof(char) * (len + (len % 16)));
