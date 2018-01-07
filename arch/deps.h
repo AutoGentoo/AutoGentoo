@@ -16,7 +16,7 @@ typedef enum {
     AABS_DEP_MOD_LT
 } aabs_depmod_t;
 
-typedef struct _aabs_depend_t {
+struct _aabs_depend_t {
     char *name;
     char *version;
     char *desc;

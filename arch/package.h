@@ -45,10 +45,10 @@ struct __aabs_pkg_t {
     aabs_svec_t* replaces;
     aabs_svec_t* groups;
     aabs_svec_t* backup;
-    aabs_svec_t* depends;
-    aabs_svec_t* optdepends;
-    aabs_svec_t* conflicts;
-    aabs_svec_t* provides;
+    aabs_vec_t*  depends;
+    aabs_vec_t*  optdepends;
+    aabs_vec_t*  conflicts;
+    aabs_vec_t*  provides;
     
     aabs_time_t builddate;
     aabs_time_t installdate;
@@ -61,6 +61,6 @@ struct __aabs_pkg_t {
     aabs_pkgvalidation_t validation;
 };
 
-aabs_pkg_t* aabs_pkg_new_from_desc (FILE* fp);
+void aabs_pkg_init_from_desc (FILE* fp);
 
 #endif //AUTOGENTOO_ABS_PACKAGE_H

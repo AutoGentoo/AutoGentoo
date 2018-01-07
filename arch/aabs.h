@@ -9,9 +9,9 @@
 #include <hacksaw/tools.h>
 
 
-typedef Vector aabs_vector_t;
+typedef Vector aabs_vec_t;
 typedef StringVector aabs_svec_t;
-typedef SmallMap aabs_small_map_t;
+typedef SmallMap aabs_smap_t;
 typedef Map aabs_map_t;
 typedef LinkedNode aabs_node_t;
 
