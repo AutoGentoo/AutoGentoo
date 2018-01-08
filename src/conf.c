@@ -11,7 +11,7 @@
 Conf* conf_new (char* path) {
     Conf* conf = malloc (sizeof(Conf));
 
-    strcpy(conf->path, path);
+    conf->path = strdup(path);
     conf->sections = vector_new(sizeof(ConfSection*), REMOVE | UNORDERED);
     conf->default_variables = vector_new(sizeof(ConfVariable), REMOVE | UNORDERED);
 
@@ -82,7 +82,7 @@ void conf_section_read (Conf* conf, ConfSection* section, Vector* variables, lon
 ConfSection* conf_section_new (char* name) {
     ConfSection* out = malloc (sizeof (ConfSection));
     out->variables = vector_new(sizeof(ConfVariable), REMOVE | UNORDERED);
-    strcpy(out->name, name);
+    out->name, strdup(name);
     return out;
 }
 

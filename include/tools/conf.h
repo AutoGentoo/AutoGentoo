@@ -12,7 +12,7 @@ typedef struct __ConfSection ConfSection;
 typedef struct __ConfVariable ConfVariable;
 
 struct __Conf {
-    char path[256];
+    char* path;
     Vector* sections;
     Vector* default_variables;
 };
@@ -26,7 +26,7 @@ struct __ConfVariable {
 
 struct __ConfSection {
     Conf* parent;
-    char name[64];
+    char* name;
     Vector* variables;
 };
 
