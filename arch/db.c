@@ -35,6 +35,7 @@
 #include <linux/limits.h>
 
 aabs_db_read_handler_t db_pkg_read_offsets[] = {
+        /* Global read handlers (local and sync) */
         {"%NAME%", offsetof (aabs_pkg_t, name)},
         {"%VERSION%", offsetof (aabs_pkg_t, version)},
         {"%BASE%", offsetof (aabs_pkg_t, base)},
@@ -54,10 +55,28 @@ aabs_db_read_handler_t db_pkg_read_offsets[] = {
         {"%OPTDEPENDS%", offsetof (aabs_pkg_t, optdepends), AABS_DB_HANDLE_TYPE_DEP},
         {"%CONFLICTS%", offsetof (aabs_pkg_t, conflicts), AABS_DB_HANDLE_TYPE_DEP},
         {"%PROVIDES%", offsetof (aabs_pkg_t, provides), AABS_DB_HANDLE_TYPE_DEP},
+        
+        /* Sync only read handlers */
+        {"%FILENAME%", offsetof (aabs_pkg_t, filename)},
+        {"%DESC%", offsetof (aabs_pkg_t, desc)},
+        {"%CSIZE%", offsetof (aabs_pkg_t, size), AABS_DB_HANDLE_TYPE_STRING, NULL, NULL, _aabs_str_to_off_t},
+        {"%ISIZE%", offsetof (aabs_pkg_t, isize), AABS_DB_HANDLE_TYPE_STRING, NULL, NULL, _aabs_str_to_off_t},
+        {"%ISIZE%", offsetof (aabs_pkg_t, isize), AABS_DB_HANDLE_TYPE_STRING, NULL, NULL, _aabs_str_to_off_t},
+        {"%MD5SUM%", offsetof (aabs_pkg_t, md5sum)},
+        {"%SHA256SUM%", offsetof (aabs_pkg_t, sha256sum)},
+        {"%PGPSIG%", offsetof (aabs_pkg_t, base64_sig)},
+        
+        /* According to libalpm these are unused  */
+        {"%MAKEDEPENDS%", offsetof (aabs_pkg_t, makedepends), AABS_DB_HANDLE_TYPE_SKIP_MULTI},
+        {"%CHECKDEPENDS%", offsetof (aabs_pkg_t, checkdepends), AABS_DB_HANDLE_TYPE_SKIP_MULTI},
+        
+        {"%DELTAS%", 0, AABS_DB_HANDLE_TYPE_SKIP_MULTI},
+        {"%FILES%", offsetof (aabs_pkg_t, files), AABS_DB_HANDLE_TYPE_SVEC},
+        
         {NULL, 0, AABS_DB_HANDLE_TYPE_STRING, NULL, NULL}
 };
 
-aabs_db_t* aabs_db_new (char* name, char* mirror) {
+aabs_db_t* aabs_db_new(char* name, aabs_db_type_t type) {
     aabs_db_t* out;
     MALLOC (out, sizeof(aabs_db_t), exit (1));
     out->packages = map_new (sizeof (aabs_pkg_t*), 128);
@@ -70,10 +89,9 @@ aabs_db_t* aabs_db_new (char* name, char* mirror) {
            
     );
     
-    if (mirror) {
-        out->mirror = strdup(mirror);
+    out->type = type;
+    if (type == AABS_DB_TYPE_SYNC)
         out->type = AABS_DB_TYPE_SYNC;
-    }
     
     out->name = name;
 }
@@ -194,8 +212,18 @@ void aabs_db_read (aabs_db_t* db) {
                         aabs_depend_t* k = aabs_dep_from_str(line);
                         vector_add (vec_dest, &k);
                     } while (1);
-        
+                    
                     memcpy (&((char*)curr_pkg)[offset], &vec_dest, sizeof (void*));
+                }
+                else if (db_pkg_read_offsets[handler_index].type == AABS_DB_HANDLE_TYPE_SKIP_SINGLE) {
+                    READ_NEXT();
+                }
+                else if (db_pkg_read_offsets[handler_index].type == AABS_DB_HANDLE_TYPE_SKIP_MULTI) {
+                    do {
+                        READ_NEXT();
+                        if (*line == '\0')
+                            break;
+                    } while (1);
                 }
             }
             
@@ -247,7 +275,7 @@ char* aabs_db_archive_path (aabs_db_t* db) {
     char* out = NULL;
     MALLOC (out, strlen(db->name) + strlen(DBPATH) + 32, exit (1));
     sprintf (out, DBPATH "%s/%s.db",
-             db->type ? "": "/sync",
+             db->type == AABS_DB_TYPE_LOCAL ? "": "/sync",
              db->name);
     
     return out;
@@ -256,7 +284,7 @@ char* aabs_db_archive_path (aabs_db_t* db) {
 char* aabs_db_path (aabs_db_t* db) {
     char* out = NULL;
     MALLOC (out, strlen(DBPATH) + 32, exit (1));
-    sprintf (out, DBPATH "%s/", db->type ? "/local": "/sync");
+    sprintf (out, DBPATH "%s/", db->type == AABS_DB_TYPE_LOCAL ? "/local": "/sync");
     
     return out;
 }

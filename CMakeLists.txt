@@ -35,27 +35,35 @@ set (include_HEADERS
 
 set (arch_SOURCES
         arch/main.c
+        arch/aabs.c
         arch/db.c
         arch/package.c
         arch/repo.c
-        arch/util.c arch/write.c arch/deps.c)
+        arch/util.c
+        arch/write.c
+        arch/deps.c
+        arch/ini.c)
 
 set (arch_HEADERS
         arch/aabs.h
         arch/db.h
         arch/package.h
         arch/repo.h
-        arch/util.h arch/write.h arch/deps.h)
+        arch/util.h
+        arch/write.h
+        arch/deps.h
+        arch/ini.h
+        )
 
 find_library(ARCHIVE archive)
 
 set (LOCALSTATEDIR /var)
-add_definitions (-DDBPATH="${LOCALSTATEDIR}/lib/pacman")
+add_definitions (-DDBPATH="test")
 
 add_executable (autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
 add_executable (autogentoo-daemon
         ${service_SOURCES}
         ${include_HEADERS})
-#add_executable(autogentoo-client ${CLIENT} ${HEADERS})
+
 TARGET_LINK_LIBRARIES(autogentoo-daemon curl ${ARCHIVE} hacksaw)
 TARGET_LINK_LIBRARIES(autogentoo-build curl ${ARCHIVE} hacksaw)

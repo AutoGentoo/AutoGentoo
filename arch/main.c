@@ -31,7 +31,7 @@
 static aabs_db_t* local_db;
 
 int main (int argc, char** argv) {
-    local_db = aabs_db_new("local", NULL);
+    local_db = aabs_db_new("core", AABS_DB_TYPE_SYNC);
     char* db_path = aabs_db_archive_path(local_db);
     if (aabs_file_exists (db_path) == AABS_FILE_NOEXIST) {
         aabs_local_db_write(local_db);

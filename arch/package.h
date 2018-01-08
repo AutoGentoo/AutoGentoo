@@ -70,6 +70,10 @@ struct __aabs_pkg_t {
     aabs_vec_t*  conflicts;
     aabs_vec_t*  provides;
     
+    /* Currently unused */
+    aabs_vec_t* makedepends;
+    aabs_vec_t* checkdepends;
+    
     aabs_time_t builddate;
     aabs_time_t installdate;
     

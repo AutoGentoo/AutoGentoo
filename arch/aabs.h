@@ -21,14 +21,11 @@
  * 
  */
 
-
-
 #ifndef AUTOGENTOO_ABS_AABS_H
 #define AUTOGENTOO_ABS_AABS_H
 
 #include <sys/types.h>
 #include <hacksaw/tools.h>
-
 
 typedef Vector aabs_vec_t;
 typedef StringVector aabs_svec_t;
@@ -42,6 +39,7 @@ typedef struct __aabs_main aabs_main;
 
 typedef int64_t aabs_int64_t;
 typedef aabs_int64_t aabs_time_t;
+
 
 typedef enum {
     AABS_ERR_MEMORY = 1,
@@ -82,6 +80,9 @@ struct __aabs_filelist_t {
     aabs_file_t* files;
 };
 
+#include "db.h"
+#include "package.h"
+
 struct __aabs_main {
     char* rootdir;
     char* dbpath;
@@ -89,7 +90,7 @@ struct __aabs_main {
     char* logfile;
     char* gpgdir;
     char* hookdir;
-    char* logfile;
+
     
     char* xfercommand;
     aabs_svec_t* holdpkg;

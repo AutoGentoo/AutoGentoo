@@ -21,10 +21,14 @@
  * 
  */
 
+#include <hacksaw/tools.h>
+#include "aabs.h"
+
 typedef Conf aabs_ini_t;
 typedef ConfSection aabs_inisec_t;
 typedef ConfVariable aabs_inivar_t;
 
 aabs_ini_t* aabs_ini_parse (char* path);
 aabs_svec_t* aabs_ini_getsections (aabs_ini_t* ini);
-aabs_svec_t* aabs_ini_getvariable (aabs_ini_t* ini, char* )
+char* aabs_ini_getvariable(aabs_ini_t* ini, char* section, char* varname);
+char* aabs_ini_getsecvariable(aabs_inisec_t* sec, char* varname);

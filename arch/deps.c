@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "deps.h"
+#include "db.h"
 
 /**
  * @brief Generate depend struct from string
@@ -89,5 +90,18 @@ aabs_depend_t* aabs_dep_from_str (char* dep_str) {
         out->version = strdup (version);
     
     return out;
+}
+
+int aabs_dep_check_new (aabs_db_t* local, aabs_db_t* sync, char* pkg_name) {
+    aabs_pkg_t* pkg_local = map_get (local->packages, pkg_name);
+    aabs_pkg_t* pkg_sync = map_get (local->packages, pkg_name);
+    
+    ASSERT (pkg_local && pkg_sync, return 0);
+    
+    if (aabs_pkg_vercmp(pkg_local->version, pkg_sync->version) > 0) {
+        return 1;
+    }
+    
+    return 0;
 }
 

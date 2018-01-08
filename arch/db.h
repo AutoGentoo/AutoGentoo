@@ -24,13 +24,14 @@
 #ifndef AUTOGENTOO_DB_H
 #define AUTOGENTOO_DB_H
 
+typedef struct __aabs_db_t aabs_db_t;
+typedef struct __aabs_db_read_handler_t aabs_db_read_handler_t;
+
 #include "aabs.h"
 #include "package.h"
 #include "util.h"
 #include <archive.h>
 
-typedef struct __aabs_db_t aabs_db_t;
-typedef struct __aabs_db_read_handler_t aabs_db_read_handler_t;
 
 typedef enum {
     DB_BASE = (1 << 0),
@@ -43,7 +44,11 @@ typedef enum {
 typedef enum {
     AABS_DB_HANDLE_TYPE_STRING,
     AABS_DB_HANDLE_TYPE_SVEC,
-    AABS_DB_HANDLE_TYPE_DEP
+    AABS_DB_HANDLE_TYPE_DEP,
+    
+    /* These deal with unsupported features */
+    AABS_DB_HANDLE_TYPE_SKIP_SINGLE,
+    AABS_DB_HANDLE_TYPE_SKIP_MULTI
 } aabs_db_read_handle_type_t;
 
 struct __aabs_db_read_handler_t {
@@ -63,7 +68,7 @@ struct aabs_db_backup {
 typedef enum {
     AABS_DB_TYPE_SYNC,
     AABS_DB_TYPE_LOCAL
-} aabs_db_type;
+} aabs_db_type_t;
 
 /*
  * Two types of db
@@ -80,12 +85,12 @@ struct __aabs_db_t {
     char* mirror;
     struct archive* obj;
     aabs_map_t* packages;
-    aabs_db_type type;
+    aabs_db_type_t type;
     
     aabs_filelist_t files;
 };
 
-aabs_db_t* aabs_db_new (char* name, char* mirror);
+aabs_db_t* aabs_db_new(char* name, aabs_db_type_t type);
 void aabs_local_db_write (aabs_db_t* db);
 void aabs_db_read (aabs_db_t* db);
 char* aabs_db_path (aabs_db_t* db);
