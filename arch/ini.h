@@ -1,5 +1,5 @@
 /*
- * deps.h
+ * ini.h
  * 
  * Copyright 2018 Andrei Tumbar <atuser@Kronos>
  * 
@@ -21,28 +21,10 @@
  * 
  */
 
-#ifndef AUTOGENTOO_DEPENDENCY_H
-#define AUTOGENTOO_DEPENDENCY_H
+typedef Conf aabs_ini_t;
+typedef ConfSection aabs_inisec_t;
+typedef ConfVariable aabs_inivar_t;
 
-typedef struct __aabs_depend_t aabs_depend_t;
-
-typedef enum {
-    AABS_DEP_MOD_ANY = 1,
-    AABS_DEP_MOD_EQ,
-    AABS_DEP_MOD_GE,
-    AABS_DEP_MOD_LE,
-    AABS_DEP_MOD_GT,
-    AABS_DEP_MOD_LT
-} aabs_depmod_t;
-
-struct __aabs_depend_t {
-    char* name;
-    char* version;
-    char* desc;
-    unsigned long name_hash;
-    aabs_depmod_t mod;
-};
-
-aabs_depend_t* aabs_dep_from_str (char* dep_str);
-
-#endif //AUTOGENTOO_DEPENDENCY_H
+aabs_ini_t* aabs_ini_parse (char* path);
+aabs_svec_t* aabs_ini_getsections (aabs_ini_t* ini);
+aabs_svec_t* aabs_ini_getvariable (aabs_ini_t* ini, char* )

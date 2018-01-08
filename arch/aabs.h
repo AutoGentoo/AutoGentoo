@@ -38,6 +38,7 @@ typedef LinkedNode aabs_node_t;
 
 typedef struct __aabs_file_t aabs_file_t;
 typedef struct __aabs_filelist_t aabs_filelist_t;
+typedef struct __aabs_main aabs_main;
 
 typedef int64_t aabs_int64_t;
 typedef aabs_int64_t aabs_time_t;
@@ -80,6 +81,25 @@ struct __aabs_filelist_t {
     size_t count;
     aabs_file_t* files;
 };
+
+struct __aabs_main {
+    char* rootdir;
+    char* dbpath;
+    char* cachedir;
+    char* logfile;
+    char* gpgdir;
+    char* hookdir;
+    char* logfile;
+    
+    char* xfercommand;
+    aabs_svec_t* holdpkg;
+    char* architecture;
+    
+    aabs_db_t* local;
+    aabs_vec_t* repositories;
+};
+
+extern aabs_main* aabs;
 
 void aabs_create (char* config);
 aabs_pkg_t* aabs_package_search (char* str);

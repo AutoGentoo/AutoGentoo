@@ -22,7 +22,8 @@
  */
 
 void aabs_create (char* config) {
-    
+    aabs = calloc (sizeof (aabs_main), 1);
+    aabs->
 }
 
 aabs_pkg_t* aabs_package_search (char* str);

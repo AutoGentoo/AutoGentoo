@@ -30,7 +30,7 @@
 #include <archive.h>
 
 typedef struct __aabs_db_t aabs_db_t;
-typedef struct _aabs_db_read_handler_t aabs_db_read_handler_t;
+typedef struct __aabs_db_read_handler_t aabs_db_read_handler_t;
 
 typedef enum {
     DB_BASE = (1 << 0),
@@ -46,7 +46,7 @@ typedef enum {
     AABS_DB_HANDLE_TYPE_DEP
 } aabs_db_read_handle_type_t;
 
-struct _aabs_db_read_handler_t {
+struct __aabs_db_read_handler_t {
     char* desc_header;
     size_t offset;
     aabs_db_read_handle_type_t type;
