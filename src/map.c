@@ -68,7 +68,7 @@ void* map_get (Map* map, char* key) {
     return map->hash_table[offset].data;
 };
 
-void* map_insert (Map* map, char* key, void* data) {
+unsigned long map_insert(Map* map, char* key, void* data) {
     if (map->filled + map->threshold >= map->size) {
         map_realloc(map, map->size + map->threshold);
     }
@@ -77,14 +77,15 @@ void* map_insert (Map* map, char* key, void* data) {
     to_copy.key = strdup(key);
     to_copy.data = data;
     
-    size_t offset = get_hash (key) % map->size;
+    unsigned long hash = get_hash (key);
+    size_t offset = hash % map->size;
     while (map->hash_table[offset].key != 0) { // If collided go to next
         offset += sizeof(void*);
         offset %= map->size; // Make sure it doesn't go map of bounds
     }
     memcpy (&map->hash_table[offset], &to_copy, sizeof(void*));
     map->filled++;
-    return &map->hash_table[offset];
+    return hash;
 };
 
 unsigned long get_hash (char* key) {

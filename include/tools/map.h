@@ -46,9 +46,9 @@ void* map_get (Map* map, char* key);
  * @param map Map in question
  * @param key Key to search for when retrieving
  * @param data Pointer to data that will be copied
- * @return returns a pointer to the location on hash_table
+ * @return returns the hash generated from the key
  */
-void* map_insert (Map* map, char* key, void* data);
+unsigned long map_insert(Map* map, char* key, void* data);
 
 /**
  * @brief Instead of generating the hash take one
