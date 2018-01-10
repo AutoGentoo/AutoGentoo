@@ -230,7 +230,7 @@ void aabs_db_read (aabs_db_t* db) {
             fclose (fp);
             free (buffer);
             
-            map_insert (db->packages, curr_pkg->name, &curr_pkg);
+            curr_pkg->name_hash = map_insert (db->packages, curr_pkg->name, &curr_pkg);
         }
         else if (strcmp (file_name, "files") == 0) {
             size_t current_size = (size_t)archive_entry_size (entry);
