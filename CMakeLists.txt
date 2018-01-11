@@ -42,7 +42,9 @@ set (arch_SOURCES
         arch/util.c
         arch/write.c
         arch/deps.c
-        arch/ini.c)
+        arch/ini.c
+        arch/makepkg.c
+        )
 
 set (arch_HEADERS
         arch/aabs.h
@@ -53,6 +55,7 @@ set (arch_HEADERS
         arch/write.h
         arch/deps.h
         arch/ini.h
+        arch/makepkg.h
         )
 
 find_library(ARCHIVE archive)

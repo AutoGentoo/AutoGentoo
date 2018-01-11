@@ -90,7 +90,6 @@ struct __aabs_main {
     char* logfile;
     char* gpgdir;
     char* hookdir;
-
     
     char* xfercommand;
     aabs_svec_t* holdpkg;
