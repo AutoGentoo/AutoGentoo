@@ -1,0 +1,1 @@
+cdef extern struct
