@@ -16,6 +16,7 @@ set (service_SOURCES
         service/server.c
         service/stage.c
         service/writeconfig.c
+        service/endian_convert.c
         )
 
 set (include_HEADERS
@@ -31,6 +32,7 @@ set (include_HEADERS
         include/server.h
         include/stage.h
         include/writeconfig.h
+        include/endian_convert.h
         )
 
 set (arch_SOURCES
