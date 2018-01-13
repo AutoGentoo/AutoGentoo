@@ -30,9 +30,13 @@ struct __Endian {
 };
 
 uint64_t htonll(uint64_t host);
+uint64_t ntohll(uint64_t network);
 Endian* endian_new (void* src);
 void endian_add_handler (Endian* target, size_t offset, endian_convert_t type);
 
-void endian_write (Endian* target, void* dest);
+void endian_to_network (Endian* target, void* dest);
+void endian_to_host (Endian* target, void* dest);
+
+void endian_free (Endian* target);
 
 #endif //AUTOGENTOO_ENDIAN_CONVERT_H
