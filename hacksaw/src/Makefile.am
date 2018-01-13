@@ -1,11 +1,10 @@
-AM_CFLAGS = ${HACKSAW_CFLAGS} -I$(top_srcdir)/include/ -I$(top_srcdir)/ ${CFLAGS} -Wno-unused-result
+AM_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/ -I$(top_srcdir)/ ${CFLAGS} -Wno-unused-result -I$(top_srcdir)/hacksaw/include/ -I$(top_srcdir)/hacksaw/ 
 ACLOCAL_AMFLAGS='-I m4'
 
-lib_LTLIBRARIES=libhacksaw.la
-libhacksaw_la_CFLAGS  =     ${AM_CFLAGS}
-libhacksaw_la_LDFLAGS =     -shared
-libhacksaw_la_LIBADD  =     ../language/liblanguage.a
-libhacksaw_la_SOURCES =     dependency.c \
+noinst_LIBRARIES = libhacksaw.a
+libhacksaw_a_CFLAGS  =      ${AM_CFLAGS}
+libhacksaw_a_LIBADD  =      ../language/liblanguage.a
+libhacksaw_a_SOURCES =      dependency.c \
                             directory.c \
                             hash.c \
                             manifest.c \

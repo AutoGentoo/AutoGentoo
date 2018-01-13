@@ -1,4 +1,4 @@
-SUBDIRS = include service client
+SUBDIRS = hacksaw include service
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 

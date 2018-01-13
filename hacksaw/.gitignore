@@ -52,4 +52,5 @@ ylwrap
 *.tab.c
 *.tab.h
 language/liblanguage.a
+src/libhacksaw.a
 *.flex.c

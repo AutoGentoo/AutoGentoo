@@ -1,4 +1,4 @@
-AM_CFLAGS = ${HACKSAW_CFLAGS} -I$(top_srcdir)/include/ $(CFLAGS)
+AM_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/ $(CFLAGS)  -I$(top_srcdir)/hacksaw/include/ -I$(top_srcdir)/hacksaw/
 ACLOCAL_AMFLAGS='-I m4'
 
 noinst_LIBRARIES=liblanguage.a
