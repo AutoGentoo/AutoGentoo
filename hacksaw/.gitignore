@@ -1,0 +1,55 @@
++CMakeCache.txt
+ +CMakeFiles
+ +CMakeScripts
+ +Testing
+ +Makefile
+ +cmake_install.cmake
+ +install_manifest.txt
+ +compile_commands.json
+ +CTestTestfile.cmake
+cmake-build-debug/*
+.idea/*
+*.lo
+*.la
+.libs
+*.o
+*.pyc
+*.gch
+*.so
+*.geany
+src/.deps/*
+INSTALL
+Makefile
+Makefile.in
+README
+aclocal.m4
+ar-lib
+autom4te.cache/
+compile
+config.guess
+config.h
+config.h.in
+config.log
+config.status
+config.sub
+configure
+depcomp
+install-sh
+*/Makefile
+*/Makefile.in
+ltmain.sh
+m4/
+missing
+*/.deps/*
+stamp-h1
+config.h.in~
+*~
+libtool
+*.log
+src/hacksaw
+.anjuta*
+ylwrap
+*.tab.c
+*.tab.h
+language/liblanguage.a
+*.flex.c

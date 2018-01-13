@@ -1,0 +1,11 @@
+# USE compiler
+depend_bison.h
+depend_bison.c
+depend_flex.c
+test-depend
+
+# USE compiler
+atom_bison.h
+atom_bison.c
+atom_flex.c
+test-atom
