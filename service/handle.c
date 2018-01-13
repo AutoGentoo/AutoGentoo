@@ -33,7 +33,10 @@ RequestLink requests[] = {
         {"SRV GETSTAGE",     SRV_GETSTAGE},
         {"SRV HANDOFF",      SRV_HANDOFF},
         {"SRV SAVE",         SRV_SAVE},
-        {"EXIT",             EXIT}
+        {"EXIT",             EXIT},
+        
+        /* Binary requests */
+        {"BIN SERVER",       BIN_SERVER}
 };
 
 SHFP parse_request (char* parse_line, StringVector* args) {
@@ -472,4 +475,21 @@ response_t SRV_SAVE (Connection* conn, char** args, int start, int argc) {
 response_t EXIT (Connection* conn, char** args, int start, int argc) {
     conn->parent->keep_alive = 0;
     return OK;
+}
+
+response_t BIN_SERVER (Connection* conn, char** args, int start, int argc) {
+    size_t size = write_server (conn->parent);
+    void* buffer = malloc (size);
+    ((char*)buffer)[0] = 0;
+    FILE* fp = fmemopen(buffer, size, "wb");
+    size = write_server_fp (conn->parent, fp);
+    rewind(fp);
+    write (conn->fd, buffer, size);
+    fclose (fp);
+    free (buffer);
+    
+    response_t res = OK;
+    res.len = 0;
+    
+    return res;
 }

@@ -241,6 +241,8 @@ response_t SRV_SAVE (Connection* conn, char** args, int start, int argc);
  */
 response_t EXIT (Connection* conn, char** args, int start, int argc);
 
+response_t BIN_SERVER (Connection* conn, char** args, int start, int argc);
+
 /* SRV Kernel request (unimplmented) */
 
 

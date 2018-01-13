@@ -2,100 +2,115 @@
 #include <stdlib.h>
 #include <string.h>
 #include <autogentoo.h>
+#include <netinet/in.h>
 
-void write_server (Server* server) {
+size_t write_server (Server* server) {
     char* config_file_name = ".autogentoo.config";
     char* config_file = malloc (strlen (server->location) + strlen (config_file_name) + 2);
     sprintf (config_file, "%s/%s", server->location, config_file_name);
     
     FILE* to_write = fopen (config_file, "wb+");
-    write_server_fp (server, to_write);
+    size_t size = write_server_fp (server, to_write);
     
     fclose (to_write);
+    
+    return size;
 }
 
-void write_server_fp (Server* server, FILE* fp) {
-    write_string (server->location, fp);
-    write_int (server->opts, fp);
-    write_int (server->port, fp);
+size_t write_server_fp (Server* server, FILE* fp) {
+    size_t size = 0;
+    size += write_string (server->location, fp);
+    size += write_int (server->opts, fp);
+    size += write_int (server->port, fp);
     
     int i;
     for (i = 0; i != server->hosts->n; i++) {
-        write_host_fp (*(Host**)vector_get (server->hosts, i), fp);
+        size += write_host_fp (*(Host**)vector_get (server->hosts, i), fp);
     }
     
     for (i = 0; i != server->host_bindings->n; i++) {
-        write_host_binding_fp ((HostBind*)vector_get (server->host_bindings, i), fp);
+        size += write_host_binding_fp ((HostBind*)vector_get (server->host_bindings, i), fp);
     }
     
     for (i = 0; i != server->stages->n; i++) {
         void** __t = *(void***)vector_get (server->stages, i);
-        write_stage_fp (__t[1], fp);
+        size += write_stage_fp (__t[1], fp);
     }
-    write_int (AUTOGENTOO_FILE_END, fp);
+    size += write_int (AUTOGENTOO_FILE_END, fp);
+    
+    return size;
 }
 
-void write_host_fp (Host* host, FILE* fp) {
-    write_int (AUTOGENTOO_HOST, fp);
-    write_string (host->id, fp);
-    write_int (CHR_NOT_MOUNTED, fp); // What if system restarted (might as well assume unmounted)
+size_t write_host_fp (Host* host, FILE* fp) {
+    size_t size = 0;
+    size += write_int (AUTOGENTOO_HOST, fp);
+    size += write_string (host->id, fp);
+    size += write_int (CHR_NOT_MOUNTED, fp); // What if system restarted (might as well assume unmounted)
     
-    write_string (host->hostname, fp);
-    write_string (host->profile, fp);
-    write_string (host->cflags, fp);
-    write_string (host->cxxflags, fp);
-    write_string (host->use, fp);
-    write_string (host->arch, fp);
-    write_string (host->chost, fp);
+    size += write_string (host->hostname, fp);
+    size += write_string (host->profile, fp);
+    size += write_string (host->cflags, fp);
+    size += write_string (host->cxxflags, fp);
+    size += write_string (host->use, fp);
+    size += write_string (host->arch, fp);
+    size += write_string (host->chost, fp);
     
-    write_int (host->extra->n, fp);
+    size += write_int (host->extra->n, fp);
     
     int i;
     for (i = 0; i != host->extra->n; i++) {
-        write_string (string_vector_get (host->extra, i), fp);
+        size += write_string (string_vector_get (host->extra, i), fp);
     }
     
-    write_string (host->portage_tmpdir, fp);
-    write_string (host->portdir, fp);
-    write_string (host->distdir, fp);
-    write_string (host->pkgdir, fp);
-    write_string (host->port_logdir, fp);
+    size += write_string (host->portage_tmpdir, fp);
+    size += write_string (host->portdir, fp);
+    size += write_string (host->distdir, fp);
+    size += write_string (host->pkgdir, fp);
+    size += write_string (host->port_logdir, fp);
     
     if (host->kernel) {
         for (i = 0; i != host->kernel->n; i++) {
-            write_int (AUTOGENTOO_HOST_KERNEL, fp);
+            size += write_int (AUTOGENTOO_HOST_KERNEL, fp);
             
             Kernel* current_kernel = vector_get (host->kernel, i);
-            write_string (current_kernel->kernel_target, fp);
-            write_string (current_kernel->version, fp);
+            size += write_string (current_kernel->kernel_target, fp);
+            size += write_string (current_kernel->version, fp);
         }
     }
     
-    write_int (AUTOGENTOO_HOST_END, fp);
-}
-
-void write_host_binding_fp (HostBind* bind, FILE* fp) {
-    write_int (AUTOGENTOO_HOST_BINDING, fp);
-    write_string (bind->host->id, fp);
-    write_string (bind->ip, fp);
-}
-
-void write_stage_fp (HostTemplate* temp, FILE* fp) {
-    write_int (AUTOGENTOO_STAGE, fp);
-    write_string (temp->id, fp);
-    write_string (temp->arch, fp);
-    write_string (temp->cflags, fp);
-    write_string (temp->chost, fp);
+    size += write_int (AUTOGENTOO_HOST_END, fp);
     
-    write_int (temp->extra_c, fp);
+    return size;
+}
+
+size_t write_host_binding_fp (HostBind* bind, FILE* fp) {
+    size_t size = 0;
+    size += write_int (AUTOGENTOO_HOST_BINDING, fp);
+    size += write_string (bind->host->id, fp);
+    size += write_string (bind->ip, fp);
+    
+    return size;
+}
+
+size_t write_stage_fp (HostTemplate* temp, FILE* fp) {
+    size_t size = 0;
+    size += write_int (AUTOGENTOO_STAGE, fp);
+    size += write_string (temp->id, fp);
+    size += write_string (temp->arch, fp);
+    size += write_string (temp->cflags, fp);
+    size += write_string (temp->chost, fp);
+    
+    size += write_int (temp->extra_c, fp);
     int i;
     for (i = 0; i != temp->extra_c; i++) {
-        write_string (temp->extras[i].make_extra, fp);
-        write_int (temp->extras[i].select, fp);
+        size += write_string (temp->extras[i].make_extra, fp);
+        size += write_int (temp->extras[i].select, fp);
     }
     
-    write_string (temp->dest_dir, fp);
-    write_string (temp->new_id, fp);
+    size += write_string (temp->dest_dir, fp);
+    size += write_string (temp->new_id, fp);
+    
+    return size;
 }
 
 Server* read_server (char* location) {
@@ -227,9 +242,11 @@ void read_stage (Server* server, HostTemplate* dest, FILE* fp) {
     dest->new_id = read_string (fp);
 }
 
-void write_string (char* src, FILE* fp) {
+size_t write_string (char* src, FILE* fp) {
     fputs (src, fp);
     fputc (0, fp);
+    
+    return strlen (src) + 1;
 }
 
 char* read_string (FILE* fp) {
@@ -242,12 +259,15 @@ char* read_string (FILE* fp) {
     return out;
 }
 
-void write_int (int src, FILE* fp) {
-    fwrite (&src, sizeof (int), 1, fp);
+size_t write_int (int src, FILE* fp) {
+    int big_endian_src = htonl ((uint32_t)src);
+    
+    return fwrite (&big_endian_src, sizeof (int), 1, fp);
 }
 
 int read_int (FILE* fp) {
     int out;
     fread (&out, sizeof (int), 1, fp);
+    out = ntohl ((uint32_t)out);
     return out;
 }

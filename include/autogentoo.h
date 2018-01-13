@@ -3,6 +3,7 @@
 
 #include "server.h"
 #include "writeconfig.h"
+#include "endian_convert.h"
 
 /* Port to 9491 so we don't overlap with our main service */
 #define AUTOGENTOO_DEBUG

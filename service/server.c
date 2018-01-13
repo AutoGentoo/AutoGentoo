@@ -218,7 +218,7 @@ void server_respond (Connection* conn) {
     char* request_line;
     int split_i = (int)(strchr (conn->request, '\n') - conn->request);
     request_line = malloc ((size_t)split_i + 1);
-    strncpy (request_line, conn->request, split_i);
+    strncpy (request_line, conn->request, (size_t)split_i);
     request_line[split_i] = 0;
     
     SHFP call = parse_request (request_line, args);
@@ -231,7 +231,7 @@ void server_respond (Connection* conn) {
         res = BAD_REQUEST;
     }
     else {
-        res = (*call) (conn, (char**)args->ptr, split_i + 1, args->n);
+        res = (*call) (conn, (char**)args->ptr, split_i + 1, (int)args->n);
     }
     
     free (request_line);
@@ -323,17 +323,14 @@ void server_free (Server* server) {
     free(server->location);
     
     int i;
-    for (i = 0; i != server->hosts->n; i++) {
+    for (i = 0; i != server->hosts->n; i++)
         host_free (*(Host**)vector_get(server->hosts, i));
-    }
     
-    for (i = 0; i != server->stages->n; i++) {
+    for (i = 0; i != server->stages->n; i++)
         host_template_free ((*(HostTemplate***)vector_get (server->stages, i))[1]);
-    }
     
-    for (i = 0; i != server->host_bindings->n; i++) {
+    for (i = 0; i != server->host_bindings->n; i++)
         free((*(HostBind**)vector_get (server->host_bindings, i))->ip);
-    }
     
     small_map_free (server->stages, 0);
     vector_free (server->hosts);
