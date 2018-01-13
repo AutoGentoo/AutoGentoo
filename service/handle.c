@@ -266,7 +266,7 @@ response_t SRV_GETHOST (Connection* conn, char** args, int start, int argc) {
     
     if (host->extra != NULL) {
         char t[8];
-        sprintf (t, "%d", host->extra->n);
+        sprintf (t, "%d", (int)host->extra->n);
         prv_fd_write_str (conn->fd, t);
         
     }
@@ -291,7 +291,7 @@ response_t SRV_GETHOST (Connection* conn, char** args, int start, int argc) {
 
 response_t SRV_GETHOSTS (Connection* conn, char** args, int start, int argc) {
     char t[8];
-    sprintf (t, "%d\n", conn->parent->hosts->n);
+    sprintf (t, "%d\n", (int)conn->parent->hosts->n);
     write (conn->fd, t, strlen (t));
     
     int i;
@@ -336,7 +336,7 @@ response_t SRV_GETTEMPLATES (Connection* conn, char** args, int start, int argc)
     StringVector* templates = host_template_get_all ();
     
     char __n[16];
-    sprintf(__n, "%d", templates->n);
+    sprintf(__n, "%d", (int)templates->n);
     write (conn->fd, &__n, strlen (__n));
     
     int i;
@@ -408,7 +408,7 @@ response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
 
 response_t SRV_GETSTAGED (Connection* conn, char** args, int start, int argc) {
     char __n[16];
-    sprintf(__n, "%d", conn->parent->stages->n);
+    sprintf(__n, "%d", (int)conn->parent->stages->n);
     write (conn->fd, &__n, strlen (__n));
     write (conn->fd, "\n", 1);
     

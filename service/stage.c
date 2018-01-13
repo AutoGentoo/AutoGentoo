@@ -104,7 +104,7 @@ char* host_template_download (HostTemplate* t) {
     ssize_t read = 0;
     char stage3_date[32];
     while ((read = getline (&line, &len, fp_temp)) != -1) {
-        if (line[0] == '#')
+        if (!line || line[0] == '#')
             continue;
         // The first non-comment line will be our target stage3
         
@@ -112,10 +112,13 @@ char* host_template_download (HostTemplate* t) {
         if (strlen(line) == 0)
             continue;
         
+        char* dup_line = strdup (line);
         char* s = strtok (line, "/");
         strcpy(stage3_date, s);
         s = strtok (NULL, " ");
         asprintf (&stage3_dest, "http://distfiles.gentoo.org/releases/%s/autobuilds/%s/%s", t->arch, stage3_date, s);
+        free (dup_line);
+        
         break;
     }
     if (stage3_dest == NULL)
