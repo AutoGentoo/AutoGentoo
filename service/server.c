@@ -271,7 +271,6 @@ Host* server_host_search (Server* server, host_id id) {
 
 void daemonize (char* _cwd) {
     pid_t pid, sid;
-    int fd;
     
     /* already a daemon */
     if (getppid () == 1)

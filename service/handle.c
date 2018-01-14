@@ -89,10 +89,10 @@ response_t GET (Connection* conn, char** args, int start, int argc) {
     return res;
 }
 
-int prv_pipe_to_client (int* conn_fd, int* backup_conn) {
+int prv_pipe_to_client (int conn_fd, int* backup_conn) {
     int out = dup (1);
-    *backup_conn = *conn_fd;
-    dup2 (*conn_fd, 1);
+    *backup_conn = conn_fd;
+    dup2 (conn_fd, 1);
     
     return out;
 }
@@ -113,7 +113,7 @@ response_t INSTALL (Connection* conn, char** args, int start, int argc) {
     }
     
     int backup_conn, backup_stdout;
-    backup_stdout = prv_pipe_to_client (&conn->fd, &backup_conn);
+    backup_stdout = prv_pipe_to_client (conn->fd, &backup_conn);
     
     response_t res = host_install (conn->bounded_host, conn->request + start);
     fflush (stdout);
