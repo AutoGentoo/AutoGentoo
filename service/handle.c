@@ -61,7 +61,7 @@ response_t GET (Connection* conn, char** args, int start, int argc) {
     if (conn->bounded_host == NULL)
         return FORBIDDEN;
     
-    if (strcmp (args[1], "HTTP/1.0") != 0 && strcmp (args[1], "HTTP/1.1") != 0)
+    if (!(strncmp (args[1], "HTTP/1.0", 8) == 0 || strncmp (args[1], "HTTP/1.1", 8) == 0))
         return BAD_REQUEST;
     
     char* path;
