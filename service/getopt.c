@@ -74,7 +74,7 @@ void print_help (Opt* opts) {
     Opt* current = &opts[0];
     while (current->handler != NULL) {
         printf ("  ");
-        size_t psize = 0;
+        int psize = 0;
         if (current->opt & OPT_SHORT) {
             printf ("-%c ", current->_short);
             psize += 3;
@@ -89,7 +89,7 @@ void print_help (Opt* opts) {
             psize += 7;
         }
         
-        printf ("%0*s%s\n", 30 - psize, " ", current->help);
+        printf ("%*s%s\n", 30 - psize, " ", current->help);
         
         current++;
     }
