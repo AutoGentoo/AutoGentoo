@@ -326,14 +326,6 @@ response_t host_install (Host* host, char* arg) {
     
     char* temp;
     asprintf (&temp, "emerge --autounmask-continue --buildpkg %s", arg);
-    StringVector* args = string_vector_new ();
-    string_vector_split (args, temp, " ");
-    
-    free (temp);
-    
-    char** real_args = malloc (sizeof (char*) * (args->n + 1));
-    memcpy (real_args, args->ptr, args->n);
-    real_args[args->n] = NULL;
     
     pid_t install_pid = fork ();
     if (install_pid == 0) {
@@ -351,14 +343,12 @@ response_t host_install (Host* host, char* arg) {
         linfo ("Starting emerge...");
         fflush (stdout);
         
-        execv ("/usr/bin/emerge", real_args);
-        exit (-1);
+        exit (system (temp));
     }
     
     int install_ret;
     waitpid (install_pid, &install_ret, 0); // Wait until finished
-    
-    string_vector_free (args);
+    free (temp);
     
     return install_ret == 0 ? OK : INTERNAL_ERROR;
     
