@@ -10,6 +10,11 @@ size_t write_server (Server* server) {
     sprintf (config_file, "%s/%s", server->location, config_file_name);
     
     FILE* to_write = fopen (config_file, "wb+");
+    if (to_write == NULL) {
+        lerror ("Failed to open '%s' for writing!", config_file);
+        exit (1);
+    }
+    
     size_t size = write_server_fp (server, to_write);
     
     fclose (to_write);
@@ -19,9 +24,6 @@ size_t write_server (Server* server) {
 
 size_t write_server_fp (Server* server, FILE* fp) {
     size_t size = 0;
-    size += write_string (server->location, fp);
-    size += write_int (server->opts, fp);
-    size += write_int (server->port, fp);
     
     int i;
     for (i = 0; i != server->hosts->n; i++) {

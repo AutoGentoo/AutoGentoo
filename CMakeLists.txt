@@ -22,7 +22,7 @@ set (service_SOURCES
         service/stage.c
         service/writeconfig.c
         service/endian_convert.c
-        )
+        service/getopt.c)
 
 set (include_HEADERS
         include/autogentoo.h
@@ -38,7 +38,7 @@ set (include_HEADERS
         include/stage.h
         include/writeconfig.h
         include/endian_convert.h
-        )
+        include/getopt.h)
 
 set (arch_SOURCES
         arch/main.c
@@ -181,5 +181,5 @@ add_executable (autogentoo-daemon
         ${service_SOURCES}
         ${include_HEADERS})
 
-TARGET_LINK_LIBRARIES(autogentoo-daemon curl ${ARCHIVE} pcre2-8 hacksaw)
+TARGET_LINK_LIBRARIES(autogentoo-daemon curl ${ARCHIVE} pcre2-8 hacksaw pthread)
 TARGET_LINK_LIBRARIES(autogentoo-build curl ${ARCHIVE} pcre2-8 hacksaw)
