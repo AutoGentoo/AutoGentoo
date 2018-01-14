@@ -318,29 +318,22 @@ response_t host_stage1_install (Host* host, char* arg) {
 }*/
 
 response_t host_install (Host* host, char* arg) {
-    String* cmd_full = string_new (128);
     
     char* new_line;
     if ((new_line = strchr (arg, '\n')) != NULL) {
         *new_line = 0;
     }
     
-    string_append (cmd_full, "emerge --autounmask-continue --buildpkg ");
-    string_append (cmd_full, arg);
-    
-    
+    char* temp;
+    asprintf (&temp, "emerge --autounmask-continue --buildpkg %s", arg);
     StringVector* args = string_vector_new ();
-    char* temp = strdup (cmd_full->ptr);
-    
     string_vector_split (args, temp, " ");
     
-    if (string_vector_get (args, args->n - 1) != NULL) {
-        if (args->n + 1 == args->s) {
-            vector_allocate (args);
-        }
-        ((char**)args->ptr)[args->n] = NULL;
-        args->n++;
-    }
+    free (temp);
+    
+    char** real_args = malloc (sizeof (char*) * (args->n + 1));
+    memcpy (real_args, args->ptr, args->n);
+    real_args[args->n] = NULL;
     
     pid_t install_pid = fork ();
     if (install_pid == 0) {
@@ -355,7 +348,6 @@ response_t host_install (Host* host, char* arg) {
             exit (-1);
         }
         
-        linfo (cmd_full->ptr);
         linfo ("Starting emerge...");
         fflush (stdout);
         
@@ -367,7 +359,6 @@ response_t host_install (Host* host, char* arg) {
     waitpid (install_pid, &install_ret, 0); // Wait until finished
     
     string_vector_free (args);
-    string_free (cmd_full);
     
     return install_ret == 0 ? OK : INTERNAL_ERROR;
     
