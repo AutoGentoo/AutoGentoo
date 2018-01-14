@@ -33,10 +33,13 @@ RequestLink requests[] = {
         {"SRV GETSTAGE",     SRV_GETSTAGE},
         {"SRV HANDOFF",      SRV_HANDOFF},
         {"SRV SAVE",         SRV_SAVE},
-        {"EXIT",             EXIT},
+        {"SRV HOSTWRITE",    HOSTWRITE},
         
         /* Binary requests */
-        {"BIN SERVER",       BIN_SERVER}
+        {"BIN SERVER",       BIN_SERVER},
+        
+        /* General */
+        {"EXIT",             EXIT}
 };
 
 SHFP parse_request (char* parse_line, StringVector* args) {
@@ -490,4 +493,13 @@ response_t BIN_SERVER (Connection* conn, char** args, int start, int argc) {
     res.len = 0;
     
     return res;
+}
+
+response_t HOSTWRITE (Connection* conn, char** args, int start, int argc) {
+    if (conn->bounded_host == NULL)
+        return FORBIDDEN;
+    
+    host_write_make_conf(conn->bounded_host);
+    
+    return OK;
 }
