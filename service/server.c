@@ -234,6 +234,7 @@ void server_respond (Connection* conn) {
         res = (*call) (conn, (char**)args->ptr, split_i + 1, (int)args->n);
     }
     
+    string_vector_free (args);
     free (request_line);
     
     if (res.len != 0) {

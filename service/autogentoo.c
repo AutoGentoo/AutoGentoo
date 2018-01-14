@@ -13,13 +13,12 @@ Opt opt_handlers[] = {
         {0, NULL, NULL, NULL, 0}
 };
 
-static char* location = ".";
+static char* location = NULL;
 static int port = AUTOGENTOO_PORT;
 static server_t server_opts;
 
 void set_location (Opt* op, char* loc) {
-    location = malloc (strlen (loc));
-    strcpy(location, loc);
+    location = strdup (loc);
 }
 
 void print_help_wrapper (Opt* op, char* arg) {
@@ -41,10 +40,11 @@ void set_daemon (Opt* op, char* c) {
 
 int main (int argc, char** argv) {
     opt_handle (opt_handlers, argc, argv + 1);
+    if (location == NULL)
+        location = strdup(".");
     
-    Server* main_server = read_server (location);
-    main_server->opts = server_opts;
-    main_server->port = port;
+    Server* main_server = read_server (location, port, server_opts);
     
+    free (location);
     server_start (main_server);
 }

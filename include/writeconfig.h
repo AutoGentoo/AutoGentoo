@@ -58,7 +58,7 @@ size_t write_stage_fp (HostTemplate* temp, FILE* fp);
  * @param location the localtion of the file
  * @return a new server that was read from the file
  */
-Server* read_server (char* location);
+Server* read_server (char* location, int port, server_t opts);
 
 /**
  * Read host from file

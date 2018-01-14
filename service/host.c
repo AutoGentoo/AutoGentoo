@@ -73,6 +73,7 @@ void host_free (Host* host) {
     free (host->distdir);
     free (host->pkgdir);
     free (host->port_logdir);
+    
     free (host);
 }
 
