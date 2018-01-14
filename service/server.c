@@ -303,19 +303,6 @@ void daemonize (char* _cwd) {
         exit (1);
     }
     
-    
-    fd = open ("/dev/null", O_RDWR, 0);
-    
-    if (fd != -1) {
-        dup2 (fd, STDIN_FILENO);
-        dup2 (fd, STDOUT_FILENO);
-        dup2 (fd, STDERR_FILENO);
-        
-        if (fd > 2) {
-            close (fd);
-        }
-    }
-    
     /*resettign File Creation Mask */
     umask (027);
 }
