@@ -10,4 +10,5 @@ maininclude_HEADERS =   autogentoo.h \
                         download.h \
                         binpkg.h \
                         command.h \
-                        kernel.h
+                        kernel.h \
+                        getopt.h
