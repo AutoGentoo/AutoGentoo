@@ -3,6 +3,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <tools/log.h>
 
 Opt opt_handlers[] = {
         {'r', "root", "Set the root directory of the server", set_location, OPT_SHORT | OPT_LONG | OPT_ARG},
@@ -10,15 +15,18 @@ Opt opt_handlers[] = {
         {0, "port", "Set the port to bind the server to", set_port, OPT_LONG | OPT_ARG},
         {0, "debug", "Turn on the debug feature (nothing right now)", set_debug, OPT_LONG},
         {0, "daemon", "Run in background and detach from the terminal", set_daemon, OPT_LONG},
+        {0, "log", "Pipe output to logfile", pipe_to_log, OPT_LONG | OPT_ARG},
         {0, NULL, NULL, NULL, 0}
 };
 
 static char* location = NULL;
 static int port = AUTOGENTOO_PORT;
 static server_t server_opts;
+static int logfile_fd = -1;
 
 void set_location (Opt* op, char* loc) {
     location = strdup (loc);
+    chdir (location);
 }
 
 void print_help_wrapper (Opt* op, char* arg) {
@@ -38,7 +46,13 @@ void set_daemon (Opt* op, char* c) {
     server_opts |= DAEMON;
 }
 
+void pipe_to_log (Opt* op, char* logfile) {
+    FILE* f = fopen (logfile, "w+");
+    lset (f);
+}
+
 int main (int argc, char** argv) {
+    
     opt_handle (opt_handlers, argc, argv + 1);
     if (location == NULL)
         location = strdup(".");
@@ -47,4 +61,9 @@ int main (int argc, char** argv) {
     
     free (location);
     server_start (main_server);
+    
+    if (logfile_fd != -1)
+        close (logfile_fd);
+    
+    return 0;
 }

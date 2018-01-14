@@ -89,6 +89,20 @@ response_t GET (Connection* conn, char** args, int start, int argc) {
     return res;
 }
 
+int prv_pipe_to_client (int* conn_fd, int* backup_conn) {
+    int out = dup (1);
+    *backup_conn = *conn_fd;
+    dup2 (*conn_fd, 1);
+    
+    return out;
+}
+
+void prv_pipe_back (int* conn_fd, int backup, int backup_conn) {
+    close (1);
+    dup2 (backup, 1);
+    *conn_fd = backup_conn;
+}
+
 response_t INSTALL (Connection* conn, char** args, int start, int argc) {
     if (conn->bounded_host == NULL) {
         return FORBIDDEN;
@@ -98,7 +112,13 @@ response_t INSTALL (Connection* conn, char** args, int start, int argc) {
         return BAD_REQUEST;
     }
     
+    int backup_conn, backup_stdout;
+    backup_stdout = prv_pipe_to_client (&conn->fd, &backup_conn);
+    
     response_t res = host_install (conn->bounded_host, conn->request + start);
+    fflush (stdout);
+    
+    prv_pipe_back(&conn->fd, backup_stdout, backup_conn);
     
     return res;
 }

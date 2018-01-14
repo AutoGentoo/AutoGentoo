@@ -1,7 +1,7 @@
 #ifndef __AUTOGENTOO_COMMAND_H__
 #define __AUTOGENTOO_COMMAND_H__
 
-#include <hacksaw/tools.h>
+#include <tools.h>
 
 /**
  * @brief Holds information regarding a commandline call

@@ -6,29 +6,43 @@
 #include <tools/log.h>
 #include <stdarg.h>
 
+static FILE* target = NULL;
+
+void init_log () {
+    target = stdout;
+}
+
+void close_log () {
+    fclose (target);
+}
+
+void lset (FILE* _target) {
+    target = _target;
+}
+
 void lerror (char* format, ...) {
-    fprintf (stderr, ANSI_BOLD ANSI_RED " * " ANSI_COLOR);
+    fprintf (target, ANSI_BOLD ANSI_RED " * " ANSI_COLOR);
     va_list args;
     va_start (args, format);
-    vfprintf (stderr, format, args);
+    vfprintf (target, format, args);
     va_end (args);
-    fprintf (stderr, ANSI_RESET "\n");
+    fprintf (target, ANSI_RESET "\n");
 }
 
 void lwarning (char* format, ...) {
-    printf (ANSI_BOLD ANSI_YELLOW " * " ANSI_COLOR);
+    fprintf (target, ANSI_BOLD ANSI_YELLOW " * " ANSI_COLOR);
     va_list args;
     va_start (args, format);
-    vprintf (format, args);
+    vfprintf (target, format, args);
     va_end (args);
-    printf (ANSI_RESET "\n");
+    fprintf (target, ANSI_RESET "\n");
 }
 
 void linfo (char* format, ...) {
-    printf (ANSI_BOLD ANSI_GREEN " * " ANSI_COLOR);
+    fprintf (target, ANSI_BOLD ANSI_GREEN " * " ANSI_COLOR);
     va_list args;
     va_start (args, format);
-    vprintf (format, args);
+    vfprintf (target, format, args);
     va_end (args);
-    printf (ANSI_RESET "\n");
+    fprintf (target, ANSI_RESET "\n");
 }

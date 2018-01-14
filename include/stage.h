@@ -2,7 +2,7 @@
 #define __AUTOGENTOO_STAGE_H__
 
 #include <response.h>
-#include <hacksaw/tools.h>
+#include <tools.h>
 
 typedef struct __HostTemplate HostTemplate;
 

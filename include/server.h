@@ -23,7 +23,7 @@ typedef struct __HostBind HostBind;
  */
 typedef struct __Connection Connection;
 
-#include <hacksaw/tools.h>
+#include <tools.h>
 #include "host.h"
 #include <sys/types.h>
 #include <pthread.h>
