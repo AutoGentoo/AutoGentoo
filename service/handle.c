@@ -542,5 +542,27 @@ response_t HOSTWRITE (Connection* conn, char** args, int start, int argc) {
     free (profile_dest);
     free (profile_src);
     
+    char* new_dirs[] = {
+            conn->bounded_host->pkgdir,
+            conn->bounded_host->port_logdir,
+            conn->bounded_host->portage_tmpdir,
+            "usr/portage/",
+            NULL
+    };
+    
+    
+    char* curr;
+    for (curr = new_dirs[0]; curr != NULL; curr++) {
+        char* autogentoo_tmp;
+        asprintf (&autogentoo_tmp, "%s/%s/%s", conn->parent->location, conn->bounded_host->id, curr);
+        prv_mkdir (autogentoo_tmp);
+        free (autogentoo_tmp);
+    }
+    
+    char* autogentoo_tmp;
+    asprintf (&autogentoo_tmp, "%s/%s/etc/resolv.conf", conn->parent->location, conn->bounded_host->id);
+    file_copy ("/etc/resolv.conf", autogentoo_tmp);
+    free (autogentoo_tmp);
+    
     return OK;
 }

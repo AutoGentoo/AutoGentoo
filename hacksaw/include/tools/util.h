@@ -4,5 +4,6 @@
 #include <stdio.h>
 
 void prv_mkdir (const char* dir);
+void file_copy (char* src, char* dest);
 
 #endif
