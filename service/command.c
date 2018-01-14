@@ -64,6 +64,8 @@ Command* command_new (char* fmt, int argc) {
     Command* out = malloc (sizeof (Command));
     out->format = strdup (fmt);
     out->argc = argc;
+    
+    return out;
 }
 
 void command_run (Command* cmd, char** output, int* ret, va_list args) {
@@ -118,5 +120,6 @@ void command (char* top, char* bottom, char** output, int* ret, ...) {
     va_list args;
     va_start (args, ret);
     command_run (com, output, ret, args);
+    va_end (args);
 }
 

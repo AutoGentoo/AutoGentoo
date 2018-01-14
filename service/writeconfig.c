@@ -123,6 +123,7 @@ Server* read_server (char* location, int port, server_t opts) {
     
     FILE* fp = fopen (config_file, "rb");
     if (fp == NULL) {
+        free (config_file);
         return server_new (location, AUTOGENTOO_PORT, 0);
     }
     

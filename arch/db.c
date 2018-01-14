@@ -94,6 +94,8 @@ aabs_db_t* aabs_db_new(char* name, aabs_db_type_t type) {
         out->type = AABS_DB_TYPE_SYNC;
     
     out->name = name;
+    
+    return out;
 }
 
 void aabs_local_db_write (aabs_db_t* db) {

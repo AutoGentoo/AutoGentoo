@@ -65,10 +65,10 @@ response_t GET (Connection* conn, char** args, int start, int argc) {
     asprintf (&path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->pkgdir, args[0]);
     
     int fd, data_to_send;
-    ssize_t bytes_read;
     
     if ((fd = open (path, O_RDONLY)) != -1) // FILE FOUND
     {
+        ssize_t bytes_read;
         rsend (conn, OK);
         res = OK;
         write (conn->fd, "\n", 1);
@@ -343,8 +343,8 @@ response_t SRV_GETTEMPLATES (Connection* conn, char** args, int start, int argc)
     write (conn->fd, &__n, strlen (__n));
     
     int i;
-    char* b;
     for (i = 0; i != templates->n; i++) {
+        char* b;
         write (conn->fd, "\n", 1);
         b = string_vector_get (templates, i);
         write (conn->fd, b, strlen (b));
@@ -414,8 +414,6 @@ response_t SRV_GETSTAGED (Connection* conn, char** args, int start, int argc) {
     sprintf(__n, "%d", (int)conn->parent->stages->n);
     write (conn->fd, &__n, strlen (__n));
     write (conn->fd, "\n", 1);
-    
-    char* buf;
     
     int i;
     for (i = 0; i != conn->parent->stages->n; i++) {

@@ -14,9 +14,10 @@ host_id host_id_new () {
     host_id out = malloc (len + 1);
     
     srandom ((unsigned int)time (NULL));  // Correct seeding function for random()
-    char c;
+    
     int i;
     for (i = 0; i != len; i++) {
+        char c;
         c = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[random () % 62];
         out[i] = c;
     }
