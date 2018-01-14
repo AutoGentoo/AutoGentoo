@@ -501,5 +501,22 @@ response_t HOSTWRITE (Connection* conn, char** args, int start, int argc) {
     
     host_write_make_conf(conn->bounded_host);
     
+    char* profile_dest;
+    char* profile_src;
+    struct stat __sym_buff;
+    
+    asprintf (&profile_src, "/usr/portage/profiles/%s/", conn->bounded_host->profile);
+    asprintf (&profile_dest, "%s/%s/etc/portage/make.profile", conn->parent->location, conn->bounded_host->id);
+    
+    if (lstat (profile_dest, &__sym_buff) == 0) {
+        unlink (profile_dest);
+    }
+    
+    linfo ("Setting profile to %s", profile_src);
+    if (symlink (profile_src, profile_dest) != 0) {
+        lwarning("Failed to symlink %s!", profile_dest);
+        return INTERNAL_ERROR;
+    }
+    
     return OK;
 }
