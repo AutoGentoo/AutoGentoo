@@ -91,7 +91,6 @@ response_t GET (Connection* conn, char** args, int start, int argc) {
 
 response_t INSTALL (Connection* conn, char** args, int start, int argc) {
     if (conn->bounded_host == NULL) {
-        rsend (conn, FORBIDDEN);
         return FORBIDDEN;
     }
     
@@ -514,9 +513,14 @@ response_t HOSTWRITE (Connection* conn, char** args, int start, int argc) {
     
     linfo ("Setting profile to %s", profile_src);
     if (symlink (profile_src, profile_dest) != 0) {
+        free (profile_dest);
+        free (profile_src);
         lwarning("Failed to symlink %s!", profile_dest);
         return INTERNAL_ERROR;
     }
+    
+    free (profile_dest);
+    free (profile_src);
     
     return OK;
 }
