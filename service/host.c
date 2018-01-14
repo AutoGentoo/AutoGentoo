@@ -351,7 +351,7 @@ response_t host_install (Host* host, char* arg) {
         linfo ("Starting emerge...");
         fflush (stdout);
         
-        execv ("/usr/bin/emerge", args->ptr);
+        execv ("/usr/bin/emerge", real_args);
         exit (-1);
     }
     
