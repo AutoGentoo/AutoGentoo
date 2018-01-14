@@ -450,7 +450,13 @@ response_t SRV_GETSTAGED (Connection* conn, char** args, int start, int argc) {
 
 response_t SRV_GETSTAGE (Connection* conn, char** args, int start, int argc) {
     char* buf;
+    if (args[0] == NULL)
+        return NOT_FOUND;
+    
     HostTemplate* __t = small_map_get (conn->parent->stages, args[0]);
+    
+    if (__t == NULL)
+        return NOT_FOUND;
     
     asprintf (&buf, "%s\n%s\n%s\n%s\n%d\n",
               __t->new_id,
@@ -494,6 +500,9 @@ response_t SRV_SAVE (Connection* conn, char** args, int start, int argc) {
 
 response_t EXIT (Connection* conn, char** args, int start, int argc) {
     conn->parent->keep_alive = 0;
+    rsend (conn, OK);
+    server_kill (conn->parent);
+    exit (0);
     return OK;
 }
 

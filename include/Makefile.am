@@ -11,4 +11,5 @@ maininclude_HEADERS =   autogentoo.h \
                         binpkg.h \
                         command.h \
                         kernel.h \
-                        getopt.h
+                        getopt.h \
+                        thread.h

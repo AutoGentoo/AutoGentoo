@@ -20,7 +20,7 @@ Opt opt_handlers[] = {
 };
 
 static char* location = NULL;
-static int port = AUTOGENTOO_PORT;
+static char port[5] = AUTOGENTOO_PORT;
 static server_t server_opts;
 static int logfile_fd = -1;
 
@@ -35,7 +35,7 @@ void print_help_wrapper (Opt* op, char* arg) {
 }
 
 void set_port (Opt* op, char* c) {
-    port = atoi(c);
+    strcpy(port, c);
 }
 
 void set_debug (Opt* op, char* c) {
@@ -56,6 +56,7 @@ int main (int argc, char** argv) {
     opt_handle (opt_handlers, argc, argv + 1);
     if (location == NULL)
         location = strdup(".");
+    
     
     Server* main_server = read_server (location, port, server_opts);
     

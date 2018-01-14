@@ -12,8 +12,9 @@
 #include <stage.h>
 #include "writeconfig.h"
 #include <autogentoo.h>
+#include <thread.h>
 
-Server* server_new (char* location, int port, server_t opts) {
+Server* server_new(char* location, char* port, server_t opts) {
     Server* out = malloc (sizeof (Server));
     out->hosts = vector_new (sizeof (Host*), REMOVE | UNORDERED);
     out->stages = small_map_new (sizeof (HostTemplate*), 5);
@@ -21,7 +22,7 @@ Server* server_new (char* location, int port, server_t opts) {
     out->location = strdup (location);
     chdir (out->location);
     out->opts = opts;
-    out->port = port;
+    out->port = strdup(port);
     
     return out;
 }
@@ -68,12 +69,9 @@ void server_start (Server* server) {
     struct sockaddr_in clientaddr;
     socklen_t addrlen;
     
-    char port[5];
-    sprintf (port, "%d", server->port);
+    int listenfd = server_init (server->port);
     
-    int listenfd = server_init (port);
-    
-    linfo ("Server started on port %d", server->port);
+    linfo ("Server started on port %s", server->port);
     
     if (server->opts & DAEMON) {
         daemonize (server->location);
@@ -81,6 +79,7 @@ void server_start (Server* server) {
     
     addrlen = sizeof (clientaddr);
     server->keep_alive = 1;
+    server->thandler = thread_handler_new(32);
     
     while (server->keep_alive) { // Main accept loop
         int temp_fd = accept (listenfd, (struct sockaddr*)&clientaddr, &addrlen);
@@ -107,8 +106,12 @@ void server_start (Server* server) {
         server_respond (current_conn);
 #endif
     }
-    
+}
+
+void server_kill (Server* server) {
     write_server (server);
+    thread_handler_join_all(server->thandler);
+    thread_handler_free (server->thandler);
     server_free (server);
     linfo ("server exited succuessfully");
 }
@@ -183,6 +186,7 @@ void connection_free (Connection* conn) {
 void server_respond (Connection* conn) {
 #ifndef AUTOGENTOO_NO_THREADS
     conn->pid = pthread_self ();
+    thread_register(conn->parent->thandler, conn->pid);
 #else
     conn->pid = 0;
 #endif
@@ -243,7 +247,12 @@ void server_respond (Connection* conn) {
     linfo ("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
     write_server (conn->parent);
     
+    Server* parent_ptr = conn->parent;
+    pthread_t pid = conn->pid;
     connection_free (conn);
+#ifndef AUTOGENTOO_NO_THREADS
+    thread_join(parent_ptr->thandler, pid);
+#endif
 }
 
 void server_bind (Connection* conn, Host* host) {

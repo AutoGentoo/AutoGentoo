@@ -25,6 +25,7 @@ typedef struct __Connection Connection;
 
 #include <tools.h>
 #include "host.h"
+#include "thread.h"
 #include <sys/types.h>
 #include <pthread.h>
 
@@ -55,13 +56,14 @@ typedef enum {
  */
 struct __Server {
     char* location; //!< The working directory of the server
-    int port;  //!< The port to bind to
+    char* port;  //!< The port to bind to
     server_t opts; //!< The options that the server was initilized with
     Vector* hosts; //!< A list of hosts
     SmallMap* stages; //!< A list of active templates awaiting handoff to a host
     Vector* host_bindings; //!< A list of host bindings
     
     volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
+    ThreadHandler* thandler;
 };
 
 /**
@@ -100,7 +102,7 @@ struct __Connection {
  * @param opts here you are able to enable the DAEMON or DEBUG features
  * @return a pointer to the newly created server
  */
-Server* server_new (char* location, int port, server_t opts);
+Server* server_new(char* location, char* port, server_t opts);
 
 /**
  * Creates a new Connection given a file desciptor from accept()
@@ -169,5 +171,7 @@ void daemonize (char* _cwd);
  * @param server server to free 
  */
 void server_free (Server* server);
+
+void server_kill (Server* server);
 
 #endif

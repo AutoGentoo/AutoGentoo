@@ -22,7 +22,7 @@ set (service_SOURCES
         service/stage.c
         service/writeconfig.c
         service/endian_convert.c
-        service/getopt.c)
+        service/getopt.c service/thread.c)
 
 set (include_HEADERS
         include/autogentoo.h
@@ -38,7 +38,7 @@ set (include_HEADERS
         include/stage.h
         include/writeconfig.h
         include/endian_convert.h
-        include/getopt.h)
+        include/getopt.h include/thread.h)
 
 set (arch_SOURCES
         arch/main.c

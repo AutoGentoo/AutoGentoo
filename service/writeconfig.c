@@ -116,7 +116,7 @@ size_t write_stage_fp (HostTemplate* temp, FILE* fp) {
     return size;
 }
 
-Server* read_server (char* location, int port, server_t opts) {
+Server* read_server(char* location, char* port, server_t opts) {
     char* config_file_name = ".autogentoo.config";
     char* config_file = malloc (strlen (location) + strlen (config_file_name) + 2);
     sprintf (config_file, "%s/%s", location, config_file_name);
@@ -124,7 +124,7 @@ Server* read_server (char* location, int port, server_t opts) {
     FILE* fp = fopen (config_file, "rb");
     if (fp == NULL) {
         free (config_file);
-        return server_new (location, AUTOGENTOO_PORT, 0);
+        return server_new (location, port, opts);
     }
     
     free (config_file);
