@@ -27,6 +27,7 @@ void lerror (char* format, ...) {
     vfprintf (target, format, args);
     va_end (args);
     fprintf (target, ANSI_RESET "\n");
+    fflush (target);
 }
 
 void lwarning (char* format, ...) {
@@ -36,6 +37,7 @@ void lwarning (char* format, ...) {
     vfprintf (target, format, args);
     va_end (args);
     fprintf (target, ANSI_RESET "\n");
+    fflush (target);
 }
 
 void linfo (char* format, ...) {
@@ -45,4 +47,5 @@ void linfo (char* format, ...) {
     vfprintf (target, format, args);
     va_end (args);
     fprintf (target, ANSI_RESET "\n");
+    fflush (target);
 }
