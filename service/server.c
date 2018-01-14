@@ -57,7 +57,7 @@ Connection* connection_new (Server* server, int conn_fd) {
     
     struct sockaddr_in addr;
     socklen_t addr_size = sizeof (struct sockaddr_in);
-    int res = getpeername (out->fd, (struct sockaddr*)&addr, &addr_size);
+    getpeername (out->fd, (struct sockaddr*)&addr, &addr_size);
     out->ip = strdup (inet_ntoa (addr.sin_addr));
     out->bounded_host = server_get_active (out->parent, out->ip);
     

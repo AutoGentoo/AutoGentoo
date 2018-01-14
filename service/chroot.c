@@ -55,8 +55,8 @@ response_t chroot_mount (Host* host) {
     host_get_path (host, (char*)new_root);
     
     int i;
-    char* dest_temp;
     for (i = 0; i != sizeof (to_mount) / sizeof (to_mount[0]); i++) {
+        char* dest_temp;
         ChrootMount mnt = to_mount[i];
         
         dest_temp = malloc (strlen (new_root) + strlen (mnt.dest) + 2);
