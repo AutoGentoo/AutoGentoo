@@ -1,17 +1,14 @@
 #define _GNU_SOURCE
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <host.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <limits.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 
 host_id host_id_new () {
     int len = 15;
-    host_id out = malloc (len + 1);
+    host_id out = malloc ((size_t)len + 1);
     
     srandom ((unsigned int)time (NULL));  // Correct seeding function for random()
     
@@ -327,6 +324,17 @@ response_t host_install (Host* host, char* arg) {
     char* temp;
     asprintf (&temp, "emerge --autounmask-continue --buildpkg %s", arg);
     
+    char* k;
+    int spaces = 0;
+    for (k = temp; *k != 0; k++)
+        if (*k == ' ')
+            spaces++;
+    
+    char** args = malloc (sizeof (char*) * (spaces + 1));
+    char** pos;
+    for (k = strtok (temp, " "), pos = args; k != NULL; pos++, k = strtok (NULL, " "))
+        *pos = k;
+    
     pid_t install_pid = fork ();
     if (install_pid == 0) {
         char root[256];
@@ -342,13 +350,15 @@ response_t host_install (Host* host, char* arg) {
         
         linfo ("Starting emerge...");
         fflush (stdout);
-        
-        exit (system (temp));
+    
+        execv ("/usr/bin/emerge", args);
+        exit (-1);
     }
     
     int install_ret;
     waitpid (install_pid, &install_ret, 0); // Wait until finished
     free (temp);
+    free (args);
     
     return install_ret == 0 ? OK : INTERNAL_ERROR;
     
