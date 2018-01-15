@@ -330,10 +330,11 @@ response_t host_install (Host* host, char* arg) {
         if (*k == ' ')
             spaces++;
     
-    char** args = malloc (sizeof (char*) * (spaces + 1));
+    char** args = malloc (sizeof (char*) * (spaces + 2));
     char** pos;
     for (k = strtok (temp, " "), pos = args; k != NULL; pos++, k = strtok (NULL, " "))
         *pos = k;
+    *pos = NULL;
     
     pid_t install_pid = fork ();
     if (install_pid == 0) {
