@@ -60,17 +60,26 @@ void host_get_path (Host* host, char* dest) {
 
 void host_free (Host* host) {
     free (host->id);
+    free (host->hostname);
     free (host->profile);
     free (host->cflags);
     free (host->cxxflags);
     free (host->use);
     free (host->chost);
+    free (host->arch);
     string_vector_free (host->extra);
     free (host->portage_tmpdir);
     free (host->portdir);
     free (host->distdir);
     free (host->pkgdir);
     free (host->port_logdir);
+    
+    if (host->kernel != NULL) {
+        int i;
+        for (i = 0; i != host->kernel->n; i++)
+            kernel_free(*(Kernel**)vector_get(host->kernel, i));
+        vector_free (host->kernel);
+    }
     
     free (host);
 }

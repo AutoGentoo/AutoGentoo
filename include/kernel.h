@@ -43,5 +43,6 @@ struct __Kernel {
 Kernel* kernel_new (Host* parent, char* target, char* version);
 void kernel_set_uri (Kernel* k, char* uri);
 void kernel_sync (Kernel* k);
+void kernel_free (Kernel* k);
 
 #endif //__AUTOGENTOO_KERNEL_H__

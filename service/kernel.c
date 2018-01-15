@@ -45,3 +45,11 @@ void kernel_sync (Kernel* k) {
     
     free (sync_command);
 }
+
+void kernel_free (Kernel* k) {
+    free (k->version);
+    free (k->uri);
+    free (k->kroot);
+    free (k->kernel_target);
+    free (k);
+}

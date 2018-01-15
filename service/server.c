@@ -331,6 +331,7 @@ void server_free (Server* server) {
     small_map_free (server->stages, 0);
     vector_free (server->hosts);
     vector_free (server->host_bindings);
+    free (server->port);
     
     free (server);
 }
