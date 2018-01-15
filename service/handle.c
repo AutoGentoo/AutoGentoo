@@ -12,6 +12,7 @@
 #include <stage.h>
 #include <writeconfig.h>
 #include <response.h>
+#include <signal.h>
 
 RequestLink requests[] = {
         {"GET",              GET},
@@ -500,9 +501,6 @@ response_t SRV_SAVE (Connection* conn, char** args, int start, int argc) {
 
 response_t EXIT (Connection* conn, char** args, int start, int argc) {
     conn->parent->keep_alive = 0;
-    rsend (conn, OK);
-    server_kill (conn->parent);
-    exit (0);
     return OK;
 }
 

@@ -12,16 +12,16 @@
 #include <stage.h>
 #include "writeconfig.h"
 #include <autogentoo.h>
-#include <thread.h>
 #include <signal.h>
 
-
-static pthread_t join_me = 0;
 static Server* srv = NULL;
-static pid_t ppid;
 
 void handle_thread_kill (int signum) {
-    thread_join(srv->thandler, join_me);
+    thread_join(srv->thandler, srv->thandler->to_join);
+    if (srv->keep_alive == 0) {
+        server_kill (srv);
+        exit (0);
+    }
 }
 
 Server* server_new(char* location, char* port, server_t opts) {
@@ -87,7 +87,7 @@ void server_start (Server* server) {
         daemonize (server->location);
     }
     
-    ppid = getpid ();
+    server->pid = getpid ();
     srv = server;
     signal (SIGUSR1, handle_thread_kill);
     
@@ -261,10 +261,11 @@ void server_respond (Connection* conn) {
     linfo ("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
     write_server (conn->parent);
     
-    join_me = conn->pid;
+    conn->parent->thandler->to_join = conn->pid;
+    pid_t p = conn->parent->pid;
     connection_free (conn);
 #ifndef AUTOGENTOO_NO_THREADS
-    kill (ppid, SIGUSR1);
+    kill (p, SIGUSR1);
 #endif
 }
 

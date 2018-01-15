@@ -5,6 +5,7 @@
 #include <thread.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <tools.h>
 
 ThreadHandler* thread_handler_new (size_t conn_max) {
     ThreadHandler* out = malloc (sizeof (ThreadHandler));
@@ -15,14 +16,14 @@ ThreadHandler* thread_handler_new (size_t conn_max) {
 }
 
 void thread_join (ThreadHandler* handler, pthread_t thread) {
+    pthread_join(thread, NULL);
+    
     int i;
     for (i = 0; i != handler->conn_max; i++) {
         pthread_t k = handler->threads[i];
         if (k == thread)
             memset (&handler->threads[i], 0, sizeof (pthread_t));
     }
-    
-    pthread_join(thread, NULL);
 }
 
 void thread_register (ThreadHandler* handler, pthread_t thread) {

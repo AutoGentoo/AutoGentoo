@@ -12,6 +12,7 @@
 typedef struct _ThreadHandler ThreadHandler;
 
 struct _ThreadHandler {
+    pthread_t to_join;
     size_t conn_max;
     pthread_t* threads;
 };
