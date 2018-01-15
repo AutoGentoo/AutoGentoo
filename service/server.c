@@ -326,7 +326,7 @@ void server_free (Server* server) {
         host_template_free ((*(HostTemplate***)vector_get (server->stages, i))[1]);
     
     for (i = 0; i != server->host_bindings->n; i++)
-        free((*(HostBind**)vector_get (server->host_bindings, i))->ip);
+        free((*(HostBind*)vector_get (server->host_bindings, i)).ip);
     
     small_map_free (server->stages, 0);
     vector_free (server->hosts);
