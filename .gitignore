@@ -71,3 +71,6 @@ Debug/*
 
 .idea/*
 cmake-build-debug/*
+!include/*
+include/*Makefile.in
+include/*Makefile
