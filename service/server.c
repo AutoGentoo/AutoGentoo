@@ -204,7 +204,7 @@ void server_respond (Connection* conn) {
 #else
     conn->pid = 0;
 #endif
-    
+    pid_t p = conn->parent->pid;
     /* Read the request */
     conn->request = malloc (2048);
     ssize_t total_read = 0, current_bytes = 0;
@@ -220,11 +220,15 @@ void server_respond (Connection* conn) {
     if (total_read < 0) { // receive error
         lerror ("recv() error");
         conn->status = SERVER_ERROR;
+        connection_free(conn);
+        kill (p, SIGUSR1);
         return;
     }
     else if (total_read == 0) { // receive socket closed
         lwarning ("Client disconnected upexpectedly.");
         conn->status = FAILED;
+        connection_free(conn);
+        kill (p, SIGUSR1);
         return;
     }
     else {
@@ -262,7 +266,6 @@ void server_respond (Connection* conn) {
     write_server (conn->parent);
     
     conn->parent->thandler->to_join = conn->pid;
-    pid_t p = conn->parent->pid;
     connection_free (conn);
 #ifndef AUTOGENTOO_NO_THREADS
     kill (p, SIGUSR1);

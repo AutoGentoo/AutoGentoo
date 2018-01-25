@@ -5,7 +5,6 @@
 #include <thread.h>
 #include <stdlib.h>
 #include <memory.h>
-#include <tools.h>
 
 ThreadHandler* thread_handler_new (size_t conn_max) {
     ThreadHandler* out = malloc (sizeof (ThreadHandler));

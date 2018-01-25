@@ -11,7 +11,6 @@
 #include <unistd.h>
 #include <stage.h>
 #include <writeconfig.h>
-#include <response.h>
 #include <signal.h>
 
 RequestLink requests[] = {
@@ -397,18 +396,24 @@ response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
     if (t == NULL)
         return NOT_FOUND;
     
+    int backup_conn, backup_stdout;
+    backup_stdout = prv_pipe_to_client (conn->fd, &backup_conn);
+    
+    
+    response_t res = OK;
+    
     StringVector* command_entries = string_vector_new ();
     string_vector_split (command_entries, conn->request + start, " \t\n");
     
     char* fname = NULL;
     int i;
-    response_t ret = OK;
     for (i = 0; i != command_entries->n; i++) {
         char* current_command = string_vector_get (command_entries, i);
         if (strcmp (current_command, "DOWNLOAD") == 0) {
             fname = host_template_download (t);
             if (fname == NULL) {
-                return INTERNAL_ERROR;
+                res  = INTERNAL_ERROR;
+                goto __return;
             }
         }
         else if (strcmp (current_command, "EXTRACT") == 0) {
@@ -416,20 +421,25 @@ response_t SRV_TEMPLATE (Connection* conn, char** args, int start, int argc) {
                 fname = host_template_download (t);
             }
             
-            ret = host_template_extract (t, fname);
-            if (ret.code != 200) {
-                return ret;
+            res = host_template_extract (t, fname);
+            if (res.code != 200) {
+                goto __return;
             }
         }
         else if (strcmp (current_command, "ALL") == 0) {
-            ret = host_template_stage (t);
+            res = host_template_stage (t);
         }
         else {
             fname = current_command;
         }
     }
     
-    return ret;
+    goto __return;
+    
+__return:
+    fflush (stdout);
+    prv_pipe_back(&conn->fd, backup_stdout, backup_conn);
+    return res;
 }
 
 response_t SRV_GETSTAGED (Connection* conn, char** args, int start, int argc) {
@@ -562,7 +572,7 @@ response_t HOSTWRITE (Connection* conn, char** args, int start, int argc) {
     for (curr = new_dirs[0]; curr != NULL; curr++) {
         char* autogentoo_tmp;
         asprintf (&autogentoo_tmp, "%s/%s/%s", conn->parent->location, conn->bounded_host->id, curr);
-        prv_mkdir (autogentoo_tmp);
+        mkdir (autogentoo_tmp, 0700);
         free (autogentoo_tmp);
     }
     
