@@ -3,7 +3,7 @@
 //
 
 #define _GNU_SOURCE
-#include <kernel.h>
+#include <autogentoo/kernel.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

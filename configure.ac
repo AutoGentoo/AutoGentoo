@@ -54,12 +54,13 @@ AC_CONFIG_FILES([
     hacksaw/Makefile
     hacksaw/src/Makefile
     hacksaw/language/Makefile
-    hacksaw/include/Makefile
-    hacksaw/include/portage/Makefile
-    hacksaw/include/tools/Makefile
+    include/autogentoo/hacksaw/Makefile
+    include/autogentoo/hacksaw/portage/Makefile
+    include/autogentoo/hacksaw/tools/Makefile
     Makefile
-    service/Makefile
+    src/Makefile
     include/Makefile
+    include/autogentoo/Makefile
 ])
 
 

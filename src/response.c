@@ -1,4 +1,4 @@
-#include <response.h>
+#include <autogentoo/response.h>
 #include <unistd.h>
 
 ssize_t rsend (Connection* conn, response_t code) {

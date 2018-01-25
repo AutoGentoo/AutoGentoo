@@ -2,7 +2,7 @@
 // Created by atuser on 1/14/18.
 //
 
-#include <thread.h>
+#include <autogentoo/thread.h>
 #include <stdlib.h>
 #include <memory.h>
 

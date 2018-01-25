@@ -2,9 +2,9 @@
 // Created by atuser on 10/22/17.
 //
 
-#include <tools/string.h>
 #include <stdlib.h>
 #include <string.h>
+#include <autogentoo/hacksaw/tools.h>
 
 String* string_new (size_t start) {
     String* out = malloc (sizeof(String));

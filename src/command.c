@@ -1,7 +1,7 @@
 #define _GNU_SOURCE
 
 #include <stdio.h>
-#include <command.h>
+#include <autogentoo/command.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>

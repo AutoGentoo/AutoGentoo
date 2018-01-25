@@ -1,7 +1,6 @@
-#include "writeconfig.h"
 #include <stdlib.h>
 #include <string.h>
-#include <autogentoo.h>
+#include <autogentoo/autogentoo.h>
 #include <netinet/in.h>
 
 size_t write_server (Server* server) {

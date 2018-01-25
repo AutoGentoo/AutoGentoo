@@ -1,4 +1,4 @@
-#include <chroot.h>
+#include <autogentoo/chroot.h>
 #include <sys/mount.h>
 #include <string.h>
 #include <stdlib.h>

@@ -1,13 +1,8 @@
-#include <autogentoo.h>
-#include <getopt.h>
+#include <autogentoo/autogentoo.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <tools/log.h>
+#include <autogentoo/hacksaw/tools/log.h>
 
 Opt opt_handlers[] = {
         {'r', "root", "Set the root directory of the server", set_location, OPT_SHORT | OPT_LONG | OPT_ARG},

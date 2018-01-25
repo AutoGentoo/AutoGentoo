@@ -1,8 +1,7 @@
-#include <portage/use_flags.h>
-#include <tools/map.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <autogentoo/hacksaw/portage/use_flags.h>
 
 IUSE read_iuse (Ebuild* ebuild) {
     char* temp_use = conf_get(ebuild->metadata, "", "IUSE");

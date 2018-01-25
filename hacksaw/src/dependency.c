@@ -1,7 +1,6 @@
-#include <portage/package.h>
-#include <tools/vector.h>
-#include <portage/dependency.h>
-#include <language/share.h>
+#include <autogentoo/hacksaw/portage/package.h>
+#include <autogentoo/hacksaw/portage/dependency.h>
+#include <share.h>
 #include <string.h>
 #include <stdlib.h>
 

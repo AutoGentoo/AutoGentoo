@@ -2,16 +2,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "server.h"
-#include "handle.h"
-#include "chroot.h"
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stage.h>
-#include <writeconfig.h>
 #include <signal.h>
+#include <autogentoo/autogentoo.h>
 
 RequestLink requests[] = {
         {"GET",              GET},

@@ -1,10 +1,7 @@
-#include <portage/package.h>
-#include <portage/manifest.h>
 #include <stdlib.h>
-#include <tools/string.h>
-#include <portage/directory.h>
 #include <string.h>
-#include <tools/vector.h>
+#include <autogentoo/hacksaw/portage/repository.h>
+#include <autogentoo/hacksaw/portage/directory.h>
 
 void category_read (Repository* repo, char* name) {
     char cat_dir[256];

@@ -1,17 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <server.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <handle.h>
 #include <errno.h>
-#include <stage.h>
-#include "writeconfig.h"
-#include <autogentoo.h>
+#include <autogentoo/autogentoo.h>
 #include <signal.h>
 
 static Server* srv = NULL;

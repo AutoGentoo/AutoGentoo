@@ -3,6 +3,8 @@
 //
 
 
+#include <autogentoo/hacksaw/tools/vector.h>
+
 #if !defined(HACKSAW_COMPILER_DEPEND_H) && !defined(HACKSAW_LANGUAGE_H)
 #define HACKSAW_COMPILER_DEPEND_H
 
@@ -13,8 +15,6 @@ typedef struct __use Use;
 typedef struct __atom_opts AtomOpts;
 typedef struct __require_use RequireUse;
 typedef struct __atom_slot AtomSlot;
-
-#include <tools/vector.h>
 
 typedef enum {
     ALL,

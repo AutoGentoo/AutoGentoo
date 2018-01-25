@@ -6,9 +6,9 @@
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 #include <string.h>
-#include <tools/regular_expression.h>
-#include <tools/string_vector.h>
 #include <regex.h>
+
+#include <autogentoo/hacksaw/tools/string_vector.h>
 
 Vector* regex_full (const char* value, char* pattern) {
     pcre2_code *re;

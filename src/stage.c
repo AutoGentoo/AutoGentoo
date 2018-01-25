@@ -1,14 +1,13 @@
 #define _GNU_SOURCE
 
 #include <stdio.h>
-#include <stage.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <download.h>
-#include <command.h>
 #include <unistd.h>
+#include <autogentoo/stage.h>
+#include <autogentoo/command.h>
 
 /*
  * Arguments (Everything after chost is optional)

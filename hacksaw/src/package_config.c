@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <portage/package_config.h>
-#include <portage/directory.h>
+#include <autogentoo/hacksaw/portage/package_config.h>
+#include <autogentoo/hacksaw/portage/directory.h>
 
 PackageMeta* package_meta_new () {
     PackageMeta* out = malloc (sizeof (PackageMeta));

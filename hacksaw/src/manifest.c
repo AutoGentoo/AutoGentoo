@@ -1,8 +1,6 @@
-#include <portage/manifest.h>
 #include <string.h>
 #include <stdlib.h>
-#include <tools/string_vector.h>
-#include <portage/package.h>
+#include <autogentoo/hacksaw/portage/package.h>
 
 void manifest_parse (Package* pkg) {
     char manifest_file[256];

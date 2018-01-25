@@ -3,10 +3,9 @@
 //
 
 #include <stdio.h>
-#include <tools/small_map.h>
-#include <tools/vector.h>
 #include <string.h>
 #include <stdlib.h>
+#include <autogentoo/hacksaw/tools.h>
 
 SmallMap* small_map_new (int start_size, int increment) {
     SmallMap* out = (SmallMap*)vector_new (sizeof (void*), REMOVE | UNORDERED);

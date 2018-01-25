@@ -1,9 +1,8 @@
 #include <stdio.h>
-#include <tools/util.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <dirent.h>
-#include <tools.h>
+#include <autogentoo/hacksaw/tools/log.h>
 
 void prv_mkdir (const char* dir) {
     DIR* _dir = opendir(dir);
@@ -35,8 +34,10 @@ void file_copy (char* src, char* dest) {
         return lerror ("could not open file '%s'", src);
     
     FILE* fp_dest = fopen(dest, "w+");
-    if (fp_dest == NULL)
+    if (fp_dest == NULL) {
+        fclose (fp_src);
         return lerror ("could not open file '%s' for writing", dest);
+    }
     
     int c = fgetc(fp_src);
     while (c != EOF)

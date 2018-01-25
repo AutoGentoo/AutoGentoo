@@ -8,37 +8,38 @@ execute_process (
         COMMAND bash -c "mkdir -p hacksaw"
 )
 
-
-set (service_SOURCES
-        service/autogentoo.c
-        service/chroot.c
-        service/command.c
-        service/download.c
-        service/handle.c
-        service/host.c
-        service/kernel.c
-        service/response.c
-        service/server.c
-        service/stage.c
-        service/writeconfig.c
-        service/endian_convert.c
-        service/getopt.c service/thread.c)
+set (src_SOURCES
+        src/autogentoo.c
+        src/chroot.c
+        src/command.c
+        src/download.c
+        src/handle.c
+        src/host.c
+        src/kernel.c
+        src/response.c
+        src/server.c
+        src/stage.c
+        src/writeconfig.c
+        src/endian_convert.c
+        src/getopt.c
+        src/thread.c)
 
 set (include_HEADERS
-        include/autogentoo.h
-        include/binpkg.h
-        include/chroot.h
-        include/command.h
-        include/download.h
-        include/handle.h
-        include/host.h
-        include/kernel.h
-        include/response.h
-        include/server.h
-        include/stage.h
-        include/writeconfig.h
-        include/endian_convert.h
-        include/getopt.h include/thread.h)
+        include/autogentoo/autogentoo.h
+        include/autogentoo/binpkg.h
+        include/autogentoo/chroot.h
+        include/autogentoo/command.h
+        include/autogentoo/download.h
+        include/autogentoo/handle.h
+        include/autogentoo/host.h
+        include/autogentoo/kernel.h
+        include/autogentoo/response.h
+        include/autogentoo/server.h
+        include/autogentoo/stage.h
+        include/autogentoo/writeconfig.h
+        include/autogentoo/endian_convert.h
+        include/autogentoo/getopt.h
+        include/autogentoo/thread.h)
 
 set (arch_SOURCES
         arch/main.c
@@ -90,10 +91,7 @@ set (language_BIN
         ${FLEX_FLEX_ATOM_OUTPUTS}
         )
 
-
-include_directories (hacksaw/include)
 include_directories (hacksaw/language)
-include_directories (hacksaw/)
 include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 set (hacksaw_SRC
@@ -119,28 +117,29 @@ set (hacksaw_SRC
         )
 
 set (hacksaw_HEADERS
-        hacksaw/include/hacksaw.h
-        hacksaw/include/tools.h
-        hacksaw/include/portage/dependency.h
-        hacksaw/include/portage/directory.h
-        hacksaw/include/portage/hash.h
-        hacksaw/include/portage/manifest.h
-        hacksaw/include/portage/package.h
-        hacksaw/include/portage/package_config.h
-        hacksaw/include/portage/portage.h
-        hacksaw/include/portage/repository.h
-        hacksaw/include/portage/use_flags.h
-        hacksaw/include/tools/conf.h
-        hacksaw/include/tools/debug.h
-        hacksaw/include/tools/log.h
-        hacksaw/include/tools/map.h
-        hacksaw/include/tools/regular_expression.h
-        hacksaw/include/tools/small_map.h
-        hacksaw/include/tools/string.h
-        hacksaw/include/tools/string_vector.h
-        hacksaw/include/tools/vector.h
-        hacksaw/include/tools/linked_vector.h
-        hacksaw/include/tools/util.h
+        include/autogentoo/hacksaw/hacksaw.h
+        include/autogentoo/hacksaw/language.h
+        include/autogentoo/hacksaw/tools.h
+        include/autogentoo/hacksaw/portage/dependency.h
+        include/autogentoo/hacksaw/portage/directory.h
+        include/autogentoo/hacksaw/portage/hash.h
+        include/autogentoo/hacksaw/portage/manifest.h
+        include/autogentoo/hacksaw/portage/package.h
+        include/autogentoo/hacksaw/portage/package_config.h
+        include/autogentoo/hacksaw/portage/portage.h
+        include/autogentoo/hacksaw/portage/repository.h
+        include/autogentoo/hacksaw/portage/use_flags.h
+        include/autogentoo/hacksaw/tools/conf.h
+        include/autogentoo/hacksaw/tools/debug.h
+        include/autogentoo/hacksaw/tools/log.h
+        include/autogentoo/hacksaw/tools/map.h
+        include/autogentoo/hacksaw/tools/regular_expression.h
+        include/autogentoo/hacksaw/tools/small_map.h
+        include/autogentoo/hacksaw/tools/string.h
+        include/autogentoo/hacksaw/tools/string_vector.h
+        include/autogentoo/hacksaw/tools/vector.h
+        include/autogentoo/hacksaw/tools/linked_vector.h
+        include/autogentoo/hacksaw/tools/util.h
         )
 
 set (language_SOURCES
@@ -167,7 +166,7 @@ add_library (hacksaw SHARED
         ${language_SOURCES}
         )
 
-add_executable (hacksaw-test EXCLUDE_FROM_ALL hacksaw/src/main.c)
+add_executable (hacksaw-test hacksaw/src/main.c)
 add_test (hacksaw-test hacksaw-test)
 target_link_libraries (hacksaw-test hacksaw pcre2-8)
 
@@ -178,7 +177,7 @@ add_definitions (-DDBPATH="test")
 
 add_executable (autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
 add_executable (autogentoo-daemon
-        ${service_SOURCES}
+        ${src_SOURCES}
         ${include_HEADERS})
 
 TARGET_LINK_LIBRARIES(autogentoo-daemon curl ${ARCHIVE} pcre2-8 hacksaw pthread)

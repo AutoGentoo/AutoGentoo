@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <dirent.h>
-#include <portage/directory.h>
+#include <autogentoo/hacksaw/portage/directory.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>

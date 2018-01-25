@@ -1,1 +1,1 @@
-SUBDIRS = include language src
+SUBDIRS = language src

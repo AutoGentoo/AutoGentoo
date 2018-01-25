@@ -3,7 +3,7 @@
 //
 
 #include <stdio.h>
-#include <tools/log.h>
+#include <autogentoo/hacksaw/tools/log.h>
 #include <stdarg.h>
 
 static FILE* target = NULL;

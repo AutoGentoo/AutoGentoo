@@ -1,7 +1,7 @@
 #define _GNU_SOURCE
 #include <stdlib.h>
 #include <unistd.h>
-#include <host.h>
+#include <autogentoo/host.h>
 #include <string.h>
 #include <limits.h>
 #include <sys/wait.h>

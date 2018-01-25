@@ -3,9 +3,7 @@
 //
 
 #include <stddef.h>
-#include <tools/vector.h>
-#include <tools/string_vector.h>
-#include <tools/debug.h>
+#include <autogentoo/hacksaw/tools.h>
 
 void print_bin (void* ptr, int n, size_t size) {
     int i;

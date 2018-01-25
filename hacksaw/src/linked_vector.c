@@ -2,8 +2,8 @@
 // Created by atuser on 1/6/18.
 //
 
-#include <tools/linked_vector.h>
 #include <stdlib.h>
+#include <autogentoo/hacksaw/tools.h>
 
 LinkedNode* _linked_node_new () {
     LinkedNode* out = malloc(sizeof(LinkedNode));

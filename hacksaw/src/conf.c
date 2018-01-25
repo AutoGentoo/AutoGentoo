@@ -2,11 +2,9 @@
 // Created by atuser on 10/21/17.
 //
 
-#include <tools/conf.h>
+#include <autogentoo/hacksaw/tools.h>
 #include <string.h>
-#include <tools/regular_expression.h>
 #include <stdlib.h>
-#include <tools/log.h>
 
 Conf* conf_new (char* path) {
     Conf* conf = malloc (sizeof(Conf));

@@ -4,7 +4,7 @@
 
 #include <getopt.h>
 #include <string.h>
-#include <tools.h>
+#include <autogentoo/autogentoo.h>
 #include <stdlib.h>
 
 void opt_handle (Opt* opts, int argc, char** argv) {

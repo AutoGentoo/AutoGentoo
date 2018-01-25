@@ -2,12 +2,9 @@
 // Created by atuser on 10/21/17.
 //
 
-#include <portage/repository.h>
 #include <string.h>
 #include <stdlib.h>
-#include <tools/string.h>
-#include <tools/log.h>
-#include <portage/directory.h>
+#include <autogentoo/hacksaw/portage/repository.h>
 
 char* sync_types[] = {
         "cvs",

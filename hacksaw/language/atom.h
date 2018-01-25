@@ -6,8 +6,7 @@
 #if !defined(HACKSAW_COMPILER_ATOM_H) && !defined(HACKSAW_LANGUAGE_H)
 #define HACKSAW_COMPILER_ATOM_H
 
-#include <tools/vector.h>
-#include <portage/package.h>
+#include <autogentoo/hacksaw/portage/package.h>
 
 typedef struct __package AtomSelector;
 
