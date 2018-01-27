@@ -41,18 +41,15 @@ void read_package_use (Portage* portage, PackageConf* dest) {
     
     char* line;
     size_t len = 0;
-    ssize_t read;
     
     int i;
-    FILE* fp;
     for (i = 0; i != pdir->fp_list->n; i++) {
-        fp = *(FILE**)vector_get(pdir->fp_list, i);
+        FILE* fp = *(FILE**)vector_get(pdir->fp_list, i);
         
         len = 0;
-        read = 0;
         line = NULL;
         
-        while ((read = getline(&line, &len, fp)) != -1) {
+        while (getline(&line, &len, fp) != -1) {
             line[strlen(line) - 1] = 0; // Remove the newline
             
         }

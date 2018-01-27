@@ -19,6 +19,7 @@
 #include "thread.h"
 #include "stage.h"
 #include "writeconfig.h"
+#include "render.h"
 
 
 /* Port to 9491 so we don't overlap with our main service */
@@ -32,6 +33,7 @@
 #define AUTOGENTOO_PORT "9490"
 #endif
 
+void set_is_server (Opt* op, char* c);
 void set_location (Opt* op, char* loc);
 void print_help_wrapper (Opt* op, char* arg);
 void set_port (Opt* op, char* c);

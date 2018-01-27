@@ -33,9 +33,9 @@ StringVector* get_files (char* path) {
     StringVector* out = string_vector_new();
     
     DIR *dr;
-    struct dirent *de;
     dr = opendir(path);
     if (dr) {
+        struct dirent *de;
         while ((de = readdir(dr)) != NULL) {
             string_vector_add(out, de->d_name);
         }

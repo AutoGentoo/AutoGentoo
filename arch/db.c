@@ -296,7 +296,7 @@ char* aabs_local_db_pkgpath(aabs_db_t* db,
                             const char* filename) {
     size_t len;
     char *pkgpath;
-    const char *dbpath;
+    char *dbpath;
     
     dbpath = aabs_db_path(db);
     len = strlen(dbpath) + strlen(info->name) + strlen(info->version) + 3;
@@ -304,6 +304,7 @@ char* aabs_local_db_pkgpath(aabs_db_t* db,
     MALLOC(pkgpath, len, exit (1));
     sprintf(pkgpath, "%s%s-%s/%s", dbpath, info->name, info->version,
             filename ? filename : "");
+    free (dbpath);
     return pkgpath;
 }
 

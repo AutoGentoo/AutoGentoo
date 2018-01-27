@@ -24,6 +24,12 @@ set (src_SOURCES
         src/getopt.c
         src/thread.c)
 
+set (client_SOURCES
+        src/render.c src/command_line.c)
+
+set (client_HEADERS
+        include/autogentoo/render.h)
+
 set (include_HEADERS
         include/autogentoo/autogentoo.h
         include/autogentoo/binpkg.h
@@ -176,9 +182,18 @@ set (LOCALSTATEDIR /var)
 add_definitions (-DDBPATH="test")
 
 add_executable (autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
-add_executable (autogentoo-daemon
+add_executable (autogentoo
         ${src_SOURCES}
-        ${include_HEADERS})
+        ${include_HEADERS}
+        ${client_SOURCES}
+        ${client_HEADERS})
 
-TARGET_LINK_LIBRARIES(autogentoo-daemon curl ${ARCHIVE} pcre2-8 hacksaw pthread)
+TARGET_LINK_LIBRARIES(autogentoo curl
+        ${ARCHIVE}
+        pcre2-8
+        hacksaw
+        pthread
+        curses
+        )
+
 TARGET_LINK_LIBRARIES(autogentoo-build curl ${ARCHIVE} pcre2-8 hacksaw)
