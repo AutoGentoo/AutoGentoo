@@ -11,7 +11,7 @@ Opt opt_handlers[] = {
         {0, "debug", "Turn on the debug feature (nothing right now)", set_debug, OPT_LONG},
         {0, "daemon", "Run in background and detach from the terminal", set_daemon, OPT_LONG},
         {0, "log", "Pipe output to logfile", pipe_to_log, OPT_LONG | OPT_ARG},
-        {0, NULL, NULL, NULL, 0}
+        {0, NULL, NULL, NULL, (opt_opts_t)0}
 };
 
 static char* location = NULL;

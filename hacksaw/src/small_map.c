@@ -62,3 +62,14 @@ void small_map_free (SmallMap* smap, int free_data) {
     
     vector_free (smap);
 }
+
+char* small_map_get_key (SmallMap* smap, void* data) {
+    int i;
+    void** current_key = NULL;
+    for (i = 0; i != smap->n; i++) {
+        current_key = *(void***)vector_get(smap, i);
+        if (data == current_key[1])
+            return current_key[0];
+    }
+    return NULL;
+}

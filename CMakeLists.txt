@@ -28,7 +28,7 @@ set (client_SOURCES
         src/render.c src/command_line.c)
 
 set (client_HEADERS
-        include/autogentoo/render.h)
+        include/autogentoo/render.h include/autogentoo/command_line.h)
 
 set (include_HEADERS
         include/autogentoo/autogentoo.h
@@ -164,7 +164,7 @@ set (language_PARSER
         hacksaw/language/depend_flex.l
         )
 
-add_library (hacksaw SHARED
+add_library (hacksaw STATIC
         ${hacksaw_HEADERS}
         ${hacksaw_SRC}
         ${language_BIN}

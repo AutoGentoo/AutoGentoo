@@ -22,5 +22,6 @@ void small_map_insert (SmallMap* smap, char* key, void* data);
 void* small_map_get (SmallMap* smap, char* key);
 void* small_map_delete (SmallMap* smap, char* key);
 void small_map_free (SmallMap* smap, int free_data);
+char* small_map_get_key (SmallMap* smap, void* data);
 
 #endif
