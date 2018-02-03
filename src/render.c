@@ -45,7 +45,7 @@ void render (WindowManager* _parent) {
     }
     
     init_windows (parent);
-    current_window = winget ("cmd");
+    current_window = winget ("cmdline");
     
     set_binding(parent, KEY_LEFT, arrows);
     set_binding(parent, KEY_RIGHT, arrows);
@@ -88,17 +88,18 @@ void stop_running (int c) {
 void type_char (int c) {
     int y, x;
     getyx (current_window, y, x);
+    wresize (current_window, y, x + 1);
+    wrefresh(current_window);
     winsch(current_window, c);
     wmove(current_window, y, x + 1);
 }
 
 void delete_char (int c) {
     int y, x;
-    int y_s, x_s;
-    winstartget (y_s, x_s);
     getyx (current_window, y, x);
-    if (x_s < x)
-        mvwdelch(current_window, y, x - 1);
+    mvwdelch(current_window, y, x - 1);
+    wresize (current_window, y, x - 1);
+    wrefresh(current_window);
 }
 
 void init_windows (WindowManager* parent) {
@@ -108,8 +109,9 @@ void init_windows (WindowManager* parent) {
     small_map_insert(parent->subwindows, "server", subwin(parent->main, half_down + 6, half_over, 0, 0));
     small_map_insert(parent->subwindows, "host", subwin(parent->main, half_down, half_over, 0, half_over));
     small_map_insert(parent->subwindows, "cmd", subwin(parent->main, half_down - 6, 0, half_down + 6, 0));
+    small_map_insert(parent->subwindows, "cmdline", subwin(parent->main, 1, 2, LINES - 2, 15));
     
-    keypad(winget("cmd"),1);
+    keypad(winget("cmdline"),1);
     draw_borders(winget ("cmd"), (WindowBorder) {
             ACS_LTEE,
             ACS_RTEE,
