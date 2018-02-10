@@ -4,11 +4,11 @@ include_directories(include)
 
 SET(CMAKE_C_COMPILER gcc)
 
-execute_process (
+execute_process(
         COMMAND bash -c "mkdir -p hacksaw"
 )
 
-set (src_SOURCES
+set(src_SOURCES
         src/autogentoo.c
         src/chroot.c
         src/command.c
@@ -24,13 +24,13 @@ set (src_SOURCES
         src/getopt.c
         src/thread.c)
 
-set (client_SOURCES
+set(client_SOURCES
         src/render.c src/command_line.c)
 
-set (client_HEADERS
+set(client_HEADERS
         include/autogentoo/render.h include/autogentoo/command_line.h)
 
-set (include_HEADERS
+set(include_HEADERS
         include/autogentoo/autogentoo.h
         include/autogentoo/binpkg.h
         include/autogentoo/chroot.h
@@ -47,7 +47,7 @@ set (include_HEADERS
         include/autogentoo/getopt.h
         include/autogentoo/thread.h)
 
-set (arch_SOURCES
+set(arch_SOURCES
         arch/main.c
         arch/aabs.c
         arch/db.c
@@ -60,7 +60,7 @@ set (arch_SOURCES
         arch/makepkg.c
         )
 
-set (arch_HEADERS
+set(arch_HEADERS
         arch/aabs.h
         arch/db.h
         arch/package.h
@@ -72,35 +72,35 @@ set (arch_HEADERS
         arch/makepkg.h
         )
 
-find_package (BISON REQUIRED)
+find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
-flex_target (FLEX_ATOM ${CMAKE_SOURCE_DIR}/hacksaw/language/atom_flex.l
+flex_target(FLEX_ATOM ${CMAKE_SOURCE_DIR}/hacksaw/language/atom_flex.l
         ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/atom.flex.c)
-flex_target (FLEX_DEPEND ${CMAKE_SOURCE_DIR}/hacksaw/language/depend_flex.l
+flex_target(FLEX_DEPEND ${CMAKE_SOURCE_DIR}/hacksaw/language/depend_flex.l
         ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/depend.flex.c)
 
-bison_target (LANG_ATOM
+bison_target(LANG_ATOM
         ${CMAKE_SOURCE_DIR}/hacksaw/language/atom_bison.y
         ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/atom.tab.c)
-bison_target (LANG_DEPEND
+bison_target(LANG_DEPEND
         ${CMAKE_SOURCE_DIR}/hacksaw/language/depend_bison.y
         ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/depend.tab.c)
 
-add_flex_bison_dependency (FLEX_ATOM LANG_ATOM)
-add_flex_bison_dependency (FLEX_DEPEND LANG_DEPEND)
+add_flex_bison_dependency(FLEX_ATOM LANG_ATOM)
+add_flex_bison_dependency(FLEX_DEPEND LANG_DEPEND)
 
-set (language_BIN
+set(language_BIN
         ${BISON_LANG_ATOM_OUTPUTS}
         ${BISON_LANG_DEPEND_OUTPUTS}
         ${FLEX_FLEX_DEPEND_OUTPUTS}
         ${FLEX_FLEX_ATOM_OUTPUTS}
         )
 
-include_directories (hacksaw/language)
-include_directories (${CMAKE_CURRENT_BINARY_DIR})
+include_directories(hacksaw/language)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-set (hacksaw_SRC
+set(hacksaw_SRC
         hacksaw/src/conf.c
         hacksaw/src/debug.c
         hacksaw/src/dependency.c
@@ -122,7 +122,7 @@ set (hacksaw_SRC
         hacksaw/src/util.c
         )
 
-set (hacksaw_HEADERS
+set(hacksaw_HEADERS
         include/autogentoo/hacksaw/hacksaw.h
         include/autogentoo/hacksaw/language.h
         include/autogentoo/hacksaw/tools.h
@@ -148,7 +148,7 @@ set (hacksaw_HEADERS
         include/autogentoo/hacksaw/tools/util.h
         )
 
-set (language_SOURCES
+set(language_SOURCES
         hacksaw/language/share.h
         hacksaw/language/share.c
         hacksaw/language/atom.c
@@ -157,14 +157,14 @@ set (language_SOURCES
         hacksaw/language/depend.h
         )
 
-set (language_PARSER
+set(language_PARSER
         hacksaw/language/atom_bison.y
         hacksaw/language/atom_flex.l
         hacksaw/language/depend_bison.y
         hacksaw/language/depend_flex.l
         )
 
-add_library (hacksaw STATIC
+add_library(hacksaw STATIC
         ${hacksaw_HEADERS}
         ${hacksaw_SRC}
         ${language_BIN}
@@ -172,17 +172,17 @@ add_library (hacksaw STATIC
         ${language_SOURCES}
         )
 
-add_executable (hacksaw-test hacksaw/src/main.c)
-add_test (hacksaw-test hacksaw-test)
-target_link_libraries (hacksaw-test hacksaw pcre2-8)
+add_executable(hacksaw-test hacksaw/src/main.c)
+add_test(hacksaw-test hacksaw-test)
+target_link_libraries(hacksaw-test hacksaw pcre2-8)
 
 find_library(ARCHIVE archive)
 
-set (LOCALSTATEDIR /var)
-add_definitions (-DDBPATH="test")
+set(LOCALSTATEDIR /var)
+add_definitions(-DDBPATH="test")
 
-add_executable (autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
-add_executable (autogentoo
+add_executable(autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
+add_executable(autogentoo
         ${src_SOURCES}
         ${include_HEADERS}
         ${client_SOURCES}

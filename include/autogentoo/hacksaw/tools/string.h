@@ -14,20 +14,28 @@ typedef struct __String String;
 #endif //HACKSAW_STRING_INCREMENT
 
 struct __String {
-    char* ptr;
-    size_t n;
-    size_t size;
-    int increment;
+	char* ptr;
+	size_t n;
+	size_t size;
+	int increment;
 };
 
-String* string_new (size_t start);
+String* string_new(size_t start);
+
 void string_append(String* dest, char* str);
+
 void string_append_c(String* dest, int c);
-void string_allocate (String* string);
-int string_find (char** array, char* element, size_t n);
-void string_free (String* string);
-void fix_path (char* ptr);
-void string_overwrite (char** dest, char* src, int dup);
-char* string_join (char** src, char* delim, int n);
+
+void string_allocate(String* string);
+
+int string_find(char** array, char* element, size_t n);
+
+void string_free(String* string);
+
+void fix_path(char* ptr);
+
+void string_overwrite(char** dest, char* src, int dup);
+
+char* string_join(char** src, char* delim, int n);
 
 #endif //HACKSAW_STRING_H

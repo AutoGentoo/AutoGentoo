@@ -5,14 +5,14 @@
 #include <curl/curl.h>
 
 typedef enum {
-    NO_PROGRESS,
-    SHOW_PROGRESS
+	NO_PROGRESS,
+	SHOW_PROGRESS
 } down_progress;
 
 struct curlprog {
-    double lastruntime;
-    CURL* curl;
-    char* dest;
+	double lastruntime;
+	CURL* curl;
+	char* dest;
 };
 
 /**
@@ -22,6 +22,6 @@ struct curlprog {
  * @param p Show/hide the progress bar
  * @return The HTTP response status
  */
-response_t download (char* url, char* dest, down_progress p);
+response_t download(char* url, char* dest, down_progress p);
 
 #endif

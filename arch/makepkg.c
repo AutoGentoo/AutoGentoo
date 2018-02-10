@@ -22,13 +22,14 @@
  */
 
 
-#include <stdio.h>
 #include "makepkg.h"
 
-aabs_makepkg_t* aabs_makepkg_create (char* PKGBUILD) {
+aabs_makepkg_t* aabs_makepkg_create(char* PKGBUILD) {
 
 }
 
-int aabs_makepkg_prepare (aabs_makepkg_t* target);
-int aabs_makepkg_build (aabs_makepkg_t* target);
-aabs_pkg_t* aabs_makepkg_handoff (aabs_makepkg_t* target);
+int aabs_makepkg_prepare(aabs_makepkg_t* target);
+
+int aabs_makepkg_build(aabs_makepkg_t* target);
+
+aabs_pkg_t* aabs_makepkg_handoff(aabs_makepkg_t* target);

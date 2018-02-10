@@ -8,44 +8,44 @@
 
 static FILE* target = NULL;
 
-void init_log () {
-    target = stdout;
+void init_log() {
+	target = stdout;
 }
 
-void close_log () {
-    fclose (target);
+void close_log() {
+	fclose(target);
 }
 
-void lset (FILE* _target) {
-    target = _target;
+void lset(FILE* _target) {
+	target = _target;
 }
 
-void lerror (char* format, ...) {
-    fprintf (target, ANSI_BOLD ANSI_RED " * " ANSI_COLOR);
-    va_list args;
-    va_start (args, format);
-    vfprintf (target, format, args);
-    va_end (args);
-    fprintf (target, ANSI_RESET "\n");
-    fflush (target);
+void lerror(char* format, ...) {
+	fprintf(target, ANSI_BOLD ANSI_RED " * " ANSI_COLOR);
+	va_list args;
+	va_start (args, format);
+	vfprintf(target, format, args);
+	va_end (args);
+	fprintf(target, ANSI_RESET "\n");
+	fflush(target);
 }
 
-void lwarning (char* format, ...) {
-    fprintf (target, ANSI_BOLD ANSI_YELLOW " * " ANSI_COLOR);
-    va_list args;
-    va_start (args, format);
-    vfprintf (target, format, args);
-    va_end (args);
-    fprintf (target, ANSI_RESET "\n");
-    fflush (target);
+void lwarning(char* format, ...) {
+	fprintf(target, ANSI_BOLD ANSI_YELLOW " * " ANSI_COLOR);
+	va_list args;
+	va_start (args, format);
+	vfprintf(target, format, args);
+	va_end (args);
+	fprintf(target, ANSI_RESET "\n");
+	fflush(target);
 }
 
-void linfo (char* format, ...) {
-    fprintf (target, ANSI_BOLD ANSI_GREEN " * " ANSI_COLOR);
-    va_list args;
-    va_start (args, format);
-    vfprintf (target, format, args);
-    va_end (args);
-    fprintf (target, ANSI_RESET "\n");
-    fflush (target);
+void linfo(char* format, ...) {
+	fprintf(target, ANSI_BOLD ANSI_GREEN " * " ANSI_COLOR);
+	va_list args;
+	va_start (args, format);
+	vfprintf(target, format, args);
+	va_end (args);
+	fprintf(target, ANSI_RESET "\n");
+	fflush(target);
 }

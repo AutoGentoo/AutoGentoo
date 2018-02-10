@@ -25,18 +25,18 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "aabs.h"
-#include "package.h"
 #include "ini.h"
 
 aabs_main* aabs = NULL;
 
-void aabs_create (char* config) {
-    aabs = calloc (sizeof (aabs_main), 1);
-    
-    aabs_ini_t* ini_temp = aabs_ini_parse(config);
-    
+void aabs_create(char* config) {
+	aabs = calloc(sizeof(aabs_main), 1);
+	
+	aabs_ini_t* ini_temp = aabs_ini_parse(config);
+	
 }
 
-aabs_pkg_t* aabs_package_search (char* str);
-aabs_pkg_t* aabs_library_search (char* lib);
+aabs_pkg_t* aabs_package_search(char* str);
+
+aabs_pkg_t* aabs_library_search(char* lib);
 

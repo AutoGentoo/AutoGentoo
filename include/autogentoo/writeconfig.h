@@ -7,51 +7,51 @@
 #include "stage.h"
 
 typedef enum {
-    AUTOGENTOO_FILE_END = 0xffffffff,
-    AUTOGENTOO_HOST = 0xfffffff0,
-    AUTOGENTOO_HOST_BINDING = 0xffffff00,
-    AUTOGENTOO_STAGE = 0xfffff000,
-    
-    // Because Host* is extensible this is required
-    AUTOGENTOO_HOST_END = 0xaaaaaaaa,
-    
-    // Host entries for autogentoo extensions
-    AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb
+	AUTOGENTOO_FILE_END = 0xffffffff,
+	AUTOGENTOO_HOST = 0xfffffff0,
+	AUTOGENTOO_HOST_BINDING = 0xffffff00,
+	AUTOGENTOO_STAGE = 0xfffff000,
+	
+	// Because Host* is extensible this is required
+			AUTOGENTOO_HOST_END = 0xaaaaaaaa,
+	
+	// Host entries for autogentoo extensions
+			AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb
 } AutoGentoo_WriteConfig;
 
 /**
  * Write the server to file
  * @param server the server to write
  */
-size_t write_server (Server* server);
+size_t write_server(Server* server);
 
 /**
  * Write server to file given an open fp
  * @param server the server to write
  * @param fp the fp open to write to
  */
-size_t write_server_fp (Server* server, FILE* fp);
+size_t write_server_fp(Server* server, FILE* fp);
 
 /**
  * Write a host to file
  * @param host the host to write to file
  * @param fp the file to write to
  */
-size_t write_host_fp (Host* host, FILE* fp);
+size_t write_host_fp(Host* host, FILE* fp);
 
 /**
  * Write a binding to file
  * @param bind the binding to write to file
  * @param fp the file to write to
  */
-size_t write_host_binding_fp (HostBind* bind, FILE* fp);
+size_t write_host_binding_fp(HostBind* bind, FILE* fp);
 
 /**
  * Write an active HostTemplate/stage to file
  * @param temp the template to write to file
  * @param fp the file to write to
  */
-size_t write_stage_fp (HostTemplate* temp, FILE* fp);
+size_t write_stage_fp(HostTemplate* temp, FILE* fp);
 
 /**
  * Read server from localtion
@@ -65,7 +65,7 @@ Server* read_server(char* location, char* port, server_t opts);
  * @param fp the open file to read from
  * @return the new host created after reading the file
  */
-Host* read_host (FILE* fp);
+Host* read_host(FILE* fp);
 
 /**
  * Read host binding from file
@@ -73,7 +73,7 @@ Host* read_host (FILE* fp);
  * @param dest the binding destination
  * @param fp the file to read from
  */
-void read_host_binding (Server* server, HostBind* dest, FILE* fp);
+void read_host_binding(Server* server, HostBind* dest, FILE* fp);
 
 /**
  * Read a HostTemplate from file
@@ -81,14 +81,14 @@ void read_host_binding (Server* server, HostBind* dest, FILE* fp);
  * @param dest the HostTemplate in which content will be written
  * @param fp the file to read from
  */
-void read_stage (Server* server, HostTemplate* dest, FILE* fp);
+void read_stage(Server* server, HostTemplate* dest, FILE* fp);
 
 /**
  * Writes a string to file (also writes the NULL terminator)
  * @param src the string to write
  * @param fp the file to write to
  */
-size_t write_string (char* src, FILE* fp);
+size_t write_string(char* src, FILE* fp);
 
 /**
  * Reads a string from file \
@@ -96,20 +96,20 @@ size_t write_string (char* src, FILE* fp);
  * @param fp the file to read from
  * @return a dynamically allocated string that has been read from file
  */
-char* read_string (FILE* fp);
+char* read_string(FILE* fp);
 
 /**
  * Write an integer to file
  * @param src the integer to write
  * @param fp the file to write to
  */
-size_t write_int (int src, FILE* fp);
+size_t write_int(int src, FILE* fp);
 
 /**
  * Read an integer from file
  * @param fp the file to read from
  * @return the integer that has been read
  */
-int read_int (FILE* fp);
+int read_int(FILE* fp);
 
 #endif

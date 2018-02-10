@@ -17,12 +17,16 @@ typedef enum __bash_t bash_t;
 #define ANSI_BOLD    "\x1b[1m"
 #define ANSI_COLOR   "\x1b[39m"
 
-void init_log () __attribute__((constructor));
-void close_log () __attribute__((destructor));
-void lset (FILE* target);
+void init_log() __attribute__((constructor));
 
-void lerror (char* format, ...);
+void close_log() __attribute__((destructor));
+
+void lset(FILE* target);
+
+void lerror(char* format, ...);
+
 void lwarning(char* format, ...);
+
 void linfo(char* format, ...);
 
 #endif //HACKSAW_LOG_H
