@@ -24,10 +24,10 @@ MTIME: 1511419260
 REPO: gentoo
 */
 struct __BinaryPackage {
-    char* cpv;
-    
-    long build_time;
-    StringVector* defined_phases;
+	char* cpv;
+	
+	long build_time;
+	StringVector* defined_phases;
 };
 
 #endif

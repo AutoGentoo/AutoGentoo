@@ -12,9 +12,9 @@
 typedef struct __Portage Portage;
 
 struct __Portage {
-    char* root_dir;
-    RepoConfig* repos;
-    
+	char* root_dir;
+	RepoConfig* repos;
+
 };
 
 #endif

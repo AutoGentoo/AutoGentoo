@@ -33,13 +33,20 @@
 #define AUTOGENTOO_PORT "9490"
 #endif
 
-void set_is_server (Opt* op, char* c);
-void set_location (Opt* op, char* loc);
-void print_help_wrapper (Opt* op, char* arg);
-void set_port (Opt* op, char* c);
-void set_debug (Opt* op, char* c);
-void set_daemon (Opt* op, char* c);
-void pipe_to_log (Opt* op, char* logfile);
-int main (int argc, char** argv);
+void set_is_server(Opt* op, char* c);
+
+void set_location(Opt* op, char* loc);
+
+void print_help_wrapper(Opt* op, char* arg);
+
+void set_port(Opt* op, char* c);
+
+void set_debug(Opt* op, char* c);
+
+void set_daemon(Opt* op, char* c);
+
+void pipe_to_log(Opt* op, char* logfile);
+
+int main(int argc, char** argv);
 
 #endif

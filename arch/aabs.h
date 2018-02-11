@@ -42,67 +42,69 @@ typedef aabs_int64_t aabs_time_t;
 
 
 typedef enum {
-    AABS_ERR_MEMORY = 1,
-    AABS_ERR_NOT_A_FILE,
-    AABS_ERR_NOT_A_DIRECTORY,
-    AABS_ERR_DISK_SPACE,
-    
-    /* Function calls */
-    AABS_ERR_NULL_PTR,
-    
-    /* Database */
-    AABS_ERR_DB_CREATE,
-    AABS_ERR_DB_READ,
-    AABS_ERR_DB_NOT_FOUND,
-    
-    /* Internet */
-    AABS_ERR_NET_NOT_FOUND,
-    AABS_ERR_NET_SERVER_INVALID,
-    
-    /* Package */
-    AABS_ERR_PKG_NOT_FOUND,
-    AABS_ERR_PKG_INVALID,
-    AABS_ERR_PKG_INVALID_CHECKSUM,
-    AABS_ERR_PKG_INVALID_SIG
+	AABS_ERR_MEMORY = 1,
+	AABS_ERR_NOT_A_FILE,
+	AABS_ERR_NOT_A_DIRECTORY,
+	AABS_ERR_DISK_SPACE,
+	
+	/* Function calls */
+			AABS_ERR_NULL_PTR,
+	
+	/* Database */
+			AABS_ERR_DB_CREATE,
+	AABS_ERR_DB_READ,
+	AABS_ERR_DB_NOT_FOUND,
+	
+	/* Internet */
+			AABS_ERR_NET_NOT_FOUND,
+	AABS_ERR_NET_SERVER_INVALID,
+	
+	/* Package */
+			AABS_ERR_PKG_NOT_FOUND,
+	AABS_ERR_PKG_INVALID,
+	AABS_ERR_PKG_INVALID_CHECKSUM,
+	AABS_ERR_PKG_INVALID_SIG
 } aabs_error_t;
 
 /* The error status of the last failure */
 static aabs_error_t aabs_errno;
 
 struct __aabs_file_t {
-    char* name;
-    off_t size;
-    mode_t mode;
+	char* name;
+	off_t size;
+	mode_t mode;
 };
 
 struct __aabs_filelist_t {
-    size_t count;
-    aabs_file_t* files;
+	size_t count;
+	aabs_file_t* files;
 };
 
 #include "db.h"
 #include "package.h"
 
 struct __aabs_main {
-    char* rootdir;
-    char* dbpath;
-    char* cachedir;
-    char* logfile;
-    char* gpgdir;
-    char* hookdir;
-    
-    char* xfercommand;
-    aabs_svec_t* holdpkg;
-    char* architecture;
-    
-    aabs_db_t* local;
-    aabs_vec_t* repositories;
+	char* rootdir;
+	char* dbpath;
+	char* cachedir;
+	char* logfile;
+	char* gpgdir;
+	char* hookdir;
+	
+	char* xfercommand;
+	aabs_svec_t* holdpkg;
+	char* architecture;
+	
+	aabs_db_t* local;
+	aabs_vec_t* repositories;
 };
 
 extern aabs_main* aabs;
 
-void aabs_create (char* config);
-aabs_pkg_t* aabs_package_search (char* str);
-aabs_pkg_t* aabs_library_search (char* lib);
+void aabs_create(char* config);
+
+aabs_pkg_t* aabs_package_search(char* str);
+
+aabs_pkg_t* aabs_library_search(char* lib);
 
 #endif //AUTOGENTOO_ABS_AABS_H

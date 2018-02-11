@@ -38,19 +38,28 @@
 #define ASSERT(cond, action) do { if(!(cond)) { action; } } while(0)
 
 typedef enum {
-    AABS_FILE_NOEXIST,
-    AABS_FILE_FOUND
+	AABS_FILE_NOEXIST,
+	AABS_FILE_FOUND
 } aabs_file_stat_t;
 
 void _aabs_alloc_fail(size_t size);
-void* aabs_read_archive (aabs_filelist_t* dest, struct archive** ar, char* file_path, int close);
-aabs_time_t _aabs_parsedate (const char* line);
-off_t _aabs_str_to_off_t(const char *line);
-size_t aabs_str_strip_newline (char* str, size_t len);
-char* aabs_fgets (char* dest, int size, FILE* stream);
-aabs_file_stat_t aabs_file_exists (char* path);
-int aabs_strnrcmp (char* str1, char* str2, size_t n);
-int aabs_has_numbers (char* str);
-int aabs_has_letters (char* str);
+
+void* aabs_read_archive(aabs_filelist_t* dest, struct archive** ar, char* file_path, int close);
+
+aabs_time_t _aabs_parsedate(const char* line);
+
+off_t _aabs_str_to_off_t(const char* line);
+
+size_t aabs_str_strip_newline(char* str, size_t len);
+
+char* aabs_fgets(char* dest, int size, FILE* stream);
+
+aabs_file_stat_t aabs_file_exists(char* path);
+
+int aabs_strnrcmp(char* str1, char* str2, size_t n);
+
+int aabs_has_numbers(char* str);
+
+int aabs_has_letters(char* str);
 
 #endif //AUTOGENTOO_UTIL_H

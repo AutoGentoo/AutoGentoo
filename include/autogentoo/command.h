@@ -12,8 +12,8 @@ typedef struct __Command Command;
  * @brief Holds information regarding a commandline call
  */
 struct __Command {
-    char* format; //!< Format for the command in printf form
-    int argc; //!< The number of arguments to look for when passing the command
+	char* format; //!< Format for the command in printf form
+	int argc; //!< The number of arguments to look for when passing the command
 };
 
 /**
@@ -22,7 +22,7 @@ struct __Command {
  * @param argc argument count to pass to fmt
  * @return a pointer to the new command
  */
-Command* command_new (char* fmt, int argc);
+Command* command_new(char* fmt, int argc);
 
 /**
  * Run a command given its arguments
@@ -31,13 +31,13 @@ Command* command_new (char* fmt, int argc);
  * @param ret a pointer to which the return value of the command is written
  * @param args the arguments to pass to the command
  */
-void command_run (Command* cmd, char** output, int* ret, va_list args);
+void command_run(Command* cmd, char** output, int* ret, va_list args);
 
 /**
  * Free a command
  * @param cmd the command to free
  */
-void command_free (Command* cmd);
+void command_free(Command* cmd);
 
 /**
  * Call a registered command
@@ -47,11 +47,11 @@ void command_free (Command* cmd);
  * @param ret a pointer to where the return value will be stored
  * @param ... the arguments to pass to the command
  */
-void command (char* top, char* bottom, char** output, int* ret, ...);
+void command(char* top, char* bottom, char** output, int* ret, ...);
 
-void init_commands (void) __attribute__ ((constructor));
+void init_commands(void) __attribute__ ((constructor));
 
-void free_commands (void) __attribute__ ((destructor));
+void free_commands(void) __attribute__ ((destructor));
 
 /**
  * @brief All of the registered commands

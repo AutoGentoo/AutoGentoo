@@ -19,25 +19,25 @@ typedef struct __EbuildVersion EbuildVersion;
  * The manifest
  */
 struct __Package {
-    Repository* repo;
-    Manifest* manifest;
-    Vector* ebuilds; // Vector<EbuildVersion>, just create version not the entire ebuild
-    
-    char* category;
-    char* name;
+	Repository* repo;
+	Manifest* manifest;
+	Vector* ebuilds; // Vector<EbuildVersion>, just create version not the entire ebuild
+	
+	char* category;
+	char* name;
 };
 
 
 struct __EbuildVersion {
-    Vector* version;
-    char* suffix;
-    unsigned char revision; // 0 to disable
+	Vector* version;
+	char* suffix;
+	unsigned char revision; // 0 to disable
 };
 
 struct __Ebuild {
-    Package* parent;
-    Conf* metadata;
-    EbuildVersion* version; // Pointer to parent->ebuilds
+	Package* parent;
+	Conf* metadata;
+	EbuildVersion* version; // Pointer to parent->ebuilds
 };
 
 void category_read (Repository* repo, char* name);

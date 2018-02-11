@@ -4,25 +4,25 @@
 #include <stdio.h>
 
 typedef enum {
-    HTTP_OK = 200,
-    HTTP_CREATED = 201,
-    HTTP_NO_CONTENT = 204,
-    HTTP_BAD_REQUEST = 400,
-    HTTP_UNAUTHORIZED = 401,
-    HTTP_FORBIDDEN = 403,
-    HTTP_NOT_FOUND = 404,
-    HTTP_METHOD_NOT_ALLOWED = 405,
-    HTTP_REQUEST_TIMEOUT = 408,
-    HTTP_INTERNAL_ERROR = 500,
-    HTTP_NOT_IMPLEMENTED = 501,
-    HTTP_BAD_GATEWAY = 502,
-    HTTP_SERVICE_UNAVAILABLE = 503
+	HTTP_OK = 200,
+	HTTP_CREATED = 201,
+	HTTP_NO_CONTENT = 204,
+	HTTP_BAD_REQUEST = 400,
+	HTTP_UNAUTHORIZED = 401,
+	HTTP_FORBIDDEN = 403,
+	HTTP_NOT_FOUND = 404,
+	HTTP_METHOD_NOT_ALLOWED = 405,
+	HTTP_REQUEST_TIMEOUT = 408,
+	HTTP_INTERNAL_ERROR = 500,
+	HTTP_NOT_IMPLEMENTED = 501,
+	HTTP_BAD_GATEWAY = 502,
+	HTTP_SERVICE_UNAVAILABLE = 503
 } response_nt;
 
 typedef struct {
-    response_nt code;
-    char* message;
-    size_t len;
+	response_nt code;
+	char* message;
+	size_t len;
 } response_t;
 
 
@@ -53,13 +53,13 @@ extern response_t res_list[];
  * @param code the code to write
  * @return the number of bytes that were written
  */
-ssize_t rsend (Connection* conn, response_t code);
+ssize_t rsend(Connection* conn, response_t code);
 
 /**
  * Get corresponding response_t given an HTTP response int
  * @param x the int (HTTP res)
  * @return the corresponding response_t
  */
-response_t get_res (response_nt x);
+response_t get_res(response_nt x);
 
 #endif
