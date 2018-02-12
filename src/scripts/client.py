@@ -1,10 +1,11 @@
-"""
-The client interface to the server daemon
-
-"""
+from socketrequest import SocketRequest, Address
 
 
 class CommandManager:
+	"""
+	The client interface to the server daemon
+
+	"""
 	commands = {}
 	help_size = 0
 	help_text = ""
@@ -59,17 +60,37 @@ class Command:
 		self.fptr = func
 
 	def print_help(self):
-		print("\t%s%s%s%s" % (self.selector, ', '.join(self.argv), ' ' * (self.manager.help_size - len(self.selector)), self.help))
+		print("\t%s%s%s%s" % (
+			self.selector, ', '.join(self.argv), ' ' * (self.manager.help_size - len(self.selector)), self.help))
 
 	def run(self, args):
 		self.fptr(*args)
 
-class SocketRequest:
-	pass
+
+class ServerCache:
+	def __init__(self, parent):
+		self.hosts = []
+		self.bind = None
+		self.stages = []
+		self.templates = []
+		self.parent = parent
+
+	def update(self):
+		res = self.parent.request("SRV GETHOSTS")
+		host_ids = str(res).split('\n')[1:-1]
+		
 
 class ServerInterface:
-	pass
+	def __init__(self, server: Address):
+		self.server = server
 
-def main (argv):
+	def list(self):
+		pass
+	
+	def request(self, request: str):
+		return SocketRequest(self.server).send(request)
+
+
+def main(argv):
 	cmd_man = CommandManager("autogentoo", 20, "AutoGentoo CLI")
-	cmd_man.new_command(Command (cmd_man, "list", ))
+	cmd_man.new_command(Command(cmd_man, "list", ))
