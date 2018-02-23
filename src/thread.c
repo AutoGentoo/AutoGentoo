@@ -5,6 +5,7 @@
 #include <autogentoo/thread.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <autogentoo/hacksaw/tools.h>
 
 ThreadHandler* thread_handler_new(size_t conn_max) {
 	ThreadHandler* out = malloc(sizeof(ThreadHandler));
@@ -29,9 +30,13 @@ void thread_register(ThreadHandler* handler, pthread_t thread) {
 	int i;
 	for (i = 0; i != handler->conn_max; i++) {
 		pthread_t k = handler->threads[i];
-		if (k == 0)
+		if (k == 0) {
 			handler->threads[i] = thread;
+			return;
+		}
 	}
+	
+	lerror ("No more threads availiable.");
 }
 
 void thread_handler_join_all(ThreadHandler* handler) {
