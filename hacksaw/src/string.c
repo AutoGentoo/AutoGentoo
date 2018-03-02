@@ -44,16 +44,14 @@ void string_free(String* string) {
 
 int string_find(char** array, char* element, size_t n) {
 	int i;
-	for (i = 0; i != n; i++) {
-		if (strcmp(element, array[i]) == 0) {
+	for (i = 0; i != n; i++)
+		if (strcmp(element, array[i]) == 0)
 			return i;
-		}
-	}
 	return -1;
 }
 
 void fix_path(char* ptr) {
-	int n = strlen(ptr);
+	size_t n = strlen(ptr);
 	int i;
 	for (i = 1; i != n; i++) {
 		if (ptr[i] == '/' && ptr[i - 1] == '/') {

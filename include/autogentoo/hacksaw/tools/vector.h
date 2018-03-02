@@ -6,6 +6,7 @@
 #define HACKSAW_VECTOR_H
 
 #include <stdio.h>
+#include <stdbool.h>
 
 typedef enum __vector_opts vector_opts;
 typedef struct __Vector Vector;
@@ -29,13 +30,13 @@ struct __Vector {
 
 	size_t increment; // Default is HACKSAW_VECTOR_INCREMENT
 
-	unsigned short ordered;
-	unsigned short keep;
+	bool ordered;
+	bool keep;
 };
 
 Vector* vector_new(size_t el_size, vector_opts opts);
 
-int vector_add(Vector* vec, void* el);
+size_t vector_add(Vector* vec, void* el);
 
 void vector_remove(Vector* vec, int index);
 
@@ -45,7 +46,7 @@ void vector_extend(Vector* dest, Vector* ex);
 
 void vector_allocate(Vector* vec);
 
-void vector_allocate_to_size(Vector* vec, int s);
+void vector_allocate_to_size(Vector* vec, size_t s);
 
 void* vector_get(Vector* vec, int i);
 

@@ -57,7 +57,7 @@ size_t write_host_fp(Host* host, FILE* fp) {
 	size += write_string(host->arch, fp);
 	size += write_string(host->chost, fp);
 	
-	size += write_int(host->extra->n, fp);
+	size += write_int((int)host->extra->n, fp);
 	
 	int i;
 	for (i = 0; i != host->extra->n; i++) {
@@ -169,7 +169,7 @@ Host* read_host(FILE* fp) {
 	Host* out = malloc(sizeof(Host));
 	
 	out->id = read_string(fp);
-	out->chroot_status = read_int(fp);
+	out->chroot_status = (chroot_t)read_int(fp);
 	
 	out->hostname = read_string(fp);
 	out->profile = read_string(fp);
@@ -193,7 +193,7 @@ Host* read_host(FILE* fp) {
 	out->distdir = read_string(fp);
 	out->pkgdir = read_string(fp);
 	out->port_logdir = read_string(fp);
-	out->kernel = vector_new(sizeof(Kernel*), 5);
+	out->kernel = vector_new(sizeof(Kernel*), UNORDERED | REMOVE);
 	
 	int current = 0;
 	while (current != AUTOGENTOO_HOST_END) {
@@ -235,7 +235,7 @@ void read_stage(Server* server, HostTemplate* dest, FILE* fp) {
 	int i;
 	for (i = 0; i != dest->extra_c; i++) {
 		dest->extras[i].make_extra = read_string(fp);
-		dest->extras[i].select = read_int(fp);
+		dest->extras[i].select = (template_selects)read_int(fp);
 	}
 	
 	dest->dest_dir = read_string(fp);

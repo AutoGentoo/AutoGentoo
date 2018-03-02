@@ -21,7 +21,7 @@ Vector* vector_new(size_t el_size, vector_opts opts) {
 	return out_ptr;
 }
 
-int vector_add(Vector* vec, void* el) {
+size_t vector_add(Vector* vec, void* el) {
 	if (vec->s == (vec->n + 1)) {
 		vector_allocate(vec);
 	}
@@ -78,7 +78,7 @@ void vector_allocate(Vector* vec) { // A private function
 	vec->ptr = realloc(vec->ptr, vec->size * vec->s);
 }
 
-void vector_allocate_to_size(Vector* vec, int s) {
+void vector_allocate_to_size(Vector* vec, size_t s) {
 	vec->s += s;
 	vec->ptr = realloc(vec->ptr, vec->size * vec->s);
 }
