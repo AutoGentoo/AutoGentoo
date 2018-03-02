@@ -1,9 +1,29 @@
-cdef struct Address:
-	char port[4]
-	char* ip
+from libc.stdlib cimport atoi
+import socket
+from op_string import CString
+from vector import PyVec
+
+cdef class Host
+cdef class Stage
+
+cdef class Address:
+	cdef char port[4]
+	cdef char* ip
 
 cdef class Server:
-	pass
+	cdef Address adr
+	cdef char* target;
+	
+	cdef PyVec hosts;
+	cdef staged;
+	
+	def __cinit__ (self, Address adr):
+		self.hosts = PyVec (sizeof(Host*))
+		self.stages = {}
+		self.adr = adr
+	
+	cdef void cython_read_server (self, CString buffer):
+		pass
 
 cdef class Host:
 	cdef Server parent # The parent server
@@ -23,6 +43,23 @@ cdef class Host:
 	cdef char* distdir # distfiles
 	cdef char* pkgdir # path to binaries
 	cdef char* port_logdir # logs
-	
 
-cdef char* socket_request (Address adr, char* request):
+cdef class Stage:
+	cdef char* id;
+
+cdef socket_request (Address adr, char* request, void (*func)):
+	cdef int portno = atoi (adr.port);
+	sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+	
+	sock.connect ((adr.ip.decode("UTF-8"), portno))
+	sock.sendall(request)
+	
+	cdef CString buff = CString (sock.recv(16, 0))
+	if func != NULL:
+		func (buff.get_c())
+	while len(buff) >= 16:
+		buff + sock.recv(16, 0) # + op edits the first arg
+		if func != NULL:
+			func (buff.get_c())
+	
+	return buff.get_py()
