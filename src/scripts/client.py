@@ -1,4 +1,6 @@
-from socketrequest import SocketRequest, Address
+#!/usr/bin/python
+
+from vector import PyVec
 
 
 class CommandManager:
@@ -51,11 +53,11 @@ class Command:
 	manager = None
 	fptr = None
 
-	def __init__(self, manager, selector, func, argv=None, help=""):
+	def __init__(self, manager, selector, func, argv=None, _help=""):
 		self.selector = selector
 		self.argc = len(argv)
 		self.argv = argv
-		self.help = help
+		self.help = _help
 		self.manager = manager
 		self.fptr = func
 
@@ -81,16 +83,23 @@ class ServerCache:
 		
 
 class ServerInterface:
-	def __init__(self, server: Address):
+	def __init__(self, server):
 		self.server = server
 
 	def list(self):
 		pass
 	
 	def request(self, request: str):
-		return SocketRequest(self.server).send(request)
+		pass  # return SocketRequest(self.server).send(request)
 
 
 def main(argv):
-	cmd_man = CommandManager("autogentoo", 20, "AutoGentoo CLI")
-	cmd_man.new_command(Command(cmd_man, "list", ))
+	k = PyVec()
+	k.append ("hello world")
+	print(k[0])
+	return 0
+	#  cmd_man = CommandManager("autogentoo", 20, "AutoGentoo CLI")
+	#  cmd_man.new_command(Command(cmd_man, "list", ))
+
+
+exit(main([]))

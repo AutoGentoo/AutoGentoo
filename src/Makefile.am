@@ -8,9 +8,9 @@ libautogentoo_la_SOURCES =  \
 	kernel.c endian_convert.c getopt.c thread.c
 
 libautogentoo_la_CFLAGS = ${AM_CFLAGS}
-libautogentoo_la_LDFLAGS = -version-info 0
+libautogentoo_la_LDFLAGS = ../hacksaw/src/libhacksaw.a -version-info 0
 
 bin_PROGRAMS = autogentoo
 autogentoo_SOURCES = autogentoo.c
 autogentoo_CFLAGS = ${AM_CFLAGS}
-autogentoo_LDADD = libautogentoo.la ../hacksaw/src/libhacksaw.a
+autogentoo_LDADD = libautogentoo.la
