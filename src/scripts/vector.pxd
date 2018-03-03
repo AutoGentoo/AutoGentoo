@@ -39,3 +39,5 @@ cdef class PyVec:
 	cpdef void insert (self, item, int index)
 	cpdef void remove (self, int index)
 	cdef void* get (self, int index)
+	cpdef int size (self)
+	cdef void free_strings (self)

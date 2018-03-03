@@ -13,10 +13,10 @@ typedef enum {
 	AUTOGENTOO_STAGE = 0xfffff000,
 	
 	// Because Host* is extensible this is required
-			AUTOGENTOO_HOST_END = 0xaaaaaaaa,
+	AUTOGENTOO_HOST_END = 0xaaaaaaaa,
 	
 	// Host entries for autogentoo extensions
-			AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb
+	AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb
 } AutoGentoo_WriteConfig;
 
 /**

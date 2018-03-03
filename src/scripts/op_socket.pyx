@@ -2,7 +2,6 @@ from op_socket cimport Address
 from op_string cimport CString
 from socket import AF_INET, SOCK_STREAM, socket
 
-from posix.unistd cimport close
 from libc.stdio cimport sprintf
 from libc.string cimport strdup
 from libc.stdlib cimport atoi, free
@@ -36,7 +35,7 @@ cdef class Socket:
 		return self.socket.recv(size)
 	
 	cpdef int close (self):
-		return close (self.fd)
+		return self.socket.close ()
 	
 	cpdef CString request (self, request, _print=False):
 		cdef char* c_req;

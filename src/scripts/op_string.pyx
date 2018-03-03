@@ -1,3 +1,5 @@
+from libc.string cimport strlen, strstr
+
 cdef class CString:
 	def __cinit__ (self, _in=None, size=32):
 		if _in is None:

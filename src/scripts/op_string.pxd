@@ -1,5 +1,3 @@
-from libc.string cimport strlen, strstr
-
 cdef extern from "<autogentoo/hacksaw/tools/string.h>":
 	cdef struct __String:
 		char* ptr;

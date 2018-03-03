@@ -1,3 +1,5 @@
+from libc.stdlib cimport free
+
 cdef class PyVec:
 	def __init__(self, size_t el_size=sizeof (void*), ordered=False):
 		self.parent = vector_new (el_size, <vector_opts>(REMOVE | ORDERED if ordered else UNORDERED))
@@ -19,6 +21,13 @@ cdef class PyVec:
 	
 	cdef void* get (self, int index):
 		return (<void**>vector_get (self.parent, index))[0]
+	
+	cpdef int size (self):
+		return self.parent.n
+	
+	cdef void free_strings (self):
+		for i in range (self.parent.n):
+			free ((<char**>self.get (i))[0])
 	
 	def __getitem__ (self, index):
 		return <object>self.get(<int>index)
