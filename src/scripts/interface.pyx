@@ -32,7 +32,7 @@ cdef class Binary:
 	cdef CString buffer
 	cdef size_t pos
 	
-	def __cinit__ (self, char* buffer):
+	def __cinit__ (self, CString buffer):
 		self.buffer = buffer
 		self.pos = 0
 	
@@ -51,7 +51,7 @@ cdef class Binary:
 			to_find = [to_find]
 		
 		cdef char c = (self.buffer.parent.ptr + self.pos)[0]
-		while c not in (*to_find, AUTOGENTOO_FILE_END):
+		while c not in to_find or c is not AUTOGENTOO_FILE_END:
 			self.pos += 1
 			c = (self.buffer.parent.ptr + self.pos)[0]
 
@@ -72,7 +72,7 @@ cdef class Server:
 		self.adr = adr
 		self.sock = Socket (self.adr)
 	
-	cdef void read_server (self):
+	cpdef void read_server (self):
 		cdef Binary server_bin = Binary (self.sock.request())
 	
 		cdef Host hbuff
@@ -88,7 +88,7 @@ cdef class Server:
 				sbuff.parse (server_bin)
 				self.staged.__setitem__(sbuff.id.decode ("UTF-8"), sbuff)
 			else:
-				Binary.skip_until((AUTOGENTOO_HOST, AUTOGENTOO_STAGE))
+				server_bin.skip_until((AUTOGENTOO_HOST, AUTOGENTOO_STAGE))
 			current = server_bin.read_int()
 	
 	def __dealloc__ (self):
@@ -134,7 +134,7 @@ cdef class Host:
 		self.distdir = NULL
 		self.pkgdir = NULL
 		self.port_logdir = NULL
-		self.chroot_status = -1
+		self.chroot_status = <chroot_t>-1
 	
 	cdef void parse (self, Binary _bin):
 		self.id = _bin.read_string()
@@ -226,9 +226,7 @@ cdef class Stage:
 		
 		cdef extra_c = _bin.read_int();
 		for i in range (extra_c):
-			cdef t_s = _bin.read_string()
-			cdef t_i = _bin.read_int()
-			self.extra.append (StageExtra (t_s, t_i))
+			self.extra.append (StageExtra (_bin.read_string(), _bin.read_int()))
 		
 		self.dest_dir = _bin.read_string()
 		self.new_id = _bin.read_string()
