@@ -12,29 +12,25 @@ StringVector* string_vector_new() {
 }
 
 void string_vector_add(StringVector* vec, char* string) {
-	char* new_ptr = strdup(string);
-	
-	if (vec->s == (vec->n + 1)) {
+	if (vec->s >= (vec->n + 1))
 		vector_allocate(vec);
-	}
 	
-	((char**) vec->ptr)[vec->n] = new_ptr;
+	((char**) vec->ptr)[vec->n] = strdup(string);
 	vec->n++;
 }
 
 void string_vector_insert(StringVector* vec, char* string, int index) {
-	char* new_ptr = strdup(string);
-	
-	if (vec->s == (vec->n + 1)) {
+	if (vec->s >= (vec->n + 1))
 		vector_allocate(vec);
-	}
 	
-	int i;
-	for (i = vec->n; i >= index; i--) {
-		((char**) vec->ptr)[i] = ((char**) vec->ptr)[i - 1];
-	}
+	if (vec->ordered)
+		for (int i = (int)vec->n; i >= index; i--)
+			((char**) vec->ptr)[i] = ((char**) vec->ptr)[i - 1];
+	else
+		((char**) vec->ptr)[vec->n] = ((char**) vec->ptr)[index];
 	
-	((char**) vec->ptr)[index] = new_ptr;
+	
+	((char**) vec->ptr)[index] = strdup(string);
 	vec->n++;
 }
 
@@ -44,9 +40,8 @@ void string_vector_remove(StringVector* vec, int index) {
 }
 
 void string_vector_split(StringVector* vec, char* string, char* delim) {
-	if (string == NULL) {
+	if (string == NULL)
 		return;
-	}
 	char* buff = strtok(string, delim);
 	
 	while (buff != NULL) {
