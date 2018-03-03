@@ -5,7 +5,7 @@ from socket import AF_INET, SOCK_STREAM, socket
 from posix.unistd cimport close
 from libc.errno cimport errno
 from libc.stdio cimport printf, sprintf
-from libc.string cimport memset, strlen, strdup
+from libc.string cimport strlen, strdup
 from libc.stdlib cimport atoi, malloc, free
 from libc.stdint cimport uint16_t
 
