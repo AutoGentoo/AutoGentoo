@@ -102,7 +102,7 @@ def main(argv):
 	#  cmd_man = CommandManager("autogentoo", 20, "AutoGentoo CLI")
 	#  cmd_man.new_command(Command(cmd_man, "list", ))
 	s = Socket(Address("0.0.0.0", 9490))
-	print(s.request("GET /Packages HTTP/1.0\r\n\r\n", True))
+	print(s.request("GET /Packages HTTP/1.0\r\n\r\n"))
 	
 	return 0
 

@@ -21,6 +21,7 @@ void string_set_from(String* dest, char* source, size_t start) {
 	
 	memcpy(&dest->ptr[start], source, append_size);
 	dest->n = start + append_size;
+	dest->ptr[dest->n - 1] = 0;
 }
 
 void string_append(String* dest, char* str) {

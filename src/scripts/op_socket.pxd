@@ -21,7 +21,7 @@ cdef class Socket:
 	cdef sockaddr_in address
 	cdef int fd
 	
-	cdef size_t c_send (self, char* data, do_connect=*)
-	cdef ssize_t c_recv (self, char* dest, size_t size)
+	cpdef send (self, object data, do_connect=*)
+	cpdef recv (self, int size, do_connect=*)
 	cpdef CString request (self, request, _print=*)
 	cpdef int close (self)

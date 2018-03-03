@@ -7,6 +7,7 @@ from libc.errno cimport errno
 from libc.stdio cimport printf, sprintf
 from libc.string cimport strlen, strdup
 from libc.stdlib cimport atoi, malloc, free
+import sys
 from libc.stdint cimport uint16_t
 
 cdef extern from "<arpa/inet.h>":
@@ -26,28 +27,14 @@ cdef class Socket:
 		if self.fd < 0:
 			raise IOError ("Failed to create socket")
 	
-	cdef size_t c_send (self, char* data, do_connect=True):
+	cpdef send (self, object data, do_connect=True):
 		if do_connect:
 			if self.socket.connect ((self.adr.ip.decode ("UTF-8"), <object>atoi(self.adr.port))):
 				raise ConnectionError("Failed to connect")
-		cdef ssize_t out = send (self.fd, data, strlen(data), 0)
-		if out == -1:
-			raise IOError ("Failed to send errno: '%d'" % <int>errno)
-		
-		return out
+		return self.socket.send (data)
 	
-	cdef ssize_t c_recv (self, char* dest, size_t size):
-		return recv (self.fd, dest, size, 0)
-	
-	def send (self, object data, do_connect=True):
-		return <object>self.c_send (str(data).encode ("UTF-8"), do_connect)
-	
-	def recv (self, object size, do_connect=True):
-		cdef char* data = <char*>malloc (size % 32 + size)
-		cdef size_t read_bytes = self.c_recv(data, size)
-		cdef object out = str(data.decode("UTF-8"))
-		
-		return <object> (out, <object>read_bytes)
+	cpdef recv (self, int size, do_connect=True):
+		return self.socket.recv(size)
 	
 	cpdef int close (self):
 		return close (self.fd)
@@ -59,18 +46,16 @@ cdef class Socket:
 			c_req = strdup (request.encode ("UTF-8"))
 		else:
 			c_req = strdup(<char*>request)
-		self.c_send (c_req, True)
-		cdef CString out_data = CString (size=32)
+		self.send (c_req, True)
+		cdef CString out_data = CString (size=128)
 		
-		cdef char* buffer = <char*>malloc (20)
-		buffer[0] = 0
-		while self.c_recv(buffer, 16) > 0:
+		buffer = self.recv(128)
+		while len(buffer) > 0:
 			if _print:
-				printf ("%s", buffer)
+				sys.stdout.write ("%s", buffer)
 			out_data.append (buffer)
-			buffer[0] = 0
+			buffer = self.recv(128)
 		
-		free (buffer)
 		free (c_req)
 		
 		return out_data
