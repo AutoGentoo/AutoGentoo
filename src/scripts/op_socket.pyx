@@ -3,10 +3,9 @@ from op_string cimport CString
 from socket import AF_INET, SOCK_STREAM, socket
 
 from posix.unistd cimport close
-from libc.errno cimport errno
-from libc.stdio cimport printf, sprintf
-from libc.string cimport strlen, strdup
-from libc.stdlib cimport atoi, malloc, free
+from libc.stdio cimport sprintf
+from libc.string cimport strdup
+from libc.stdlib cimport atoi, free
 import sys
 from libc.stdint cimport uint16_t
 
@@ -15,7 +14,7 @@ cdef extern from "<arpa/inet.h>":
 	int inet_pton(int af, const char *src, void *dst);
 
 cdef extern from "<sys/socket.h>":
-	ssize_t send(int sockfd, const void *buf, size_t _len, int flags);
+	ssize_t send(int sockfd, const vogit id *buf, size_t _len, int flags);
 	ssize_t recv(int sockfd, void *buf, size_t _len, int flags);
 	int connect(int sockfd, const sockaddr_in *addr, size_t addrlen);
 
