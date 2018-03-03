@@ -14,7 +14,7 @@ cdef extern from "<arpa/inet.h>":
 	int inet_pton(int af, const char *src, void *dst);
 
 cdef extern from "<sys/socket.h>":
-	ssize_t send(int sockfd, const vogit id *buf, size_t _len, int flags);
+	ssize_t send(int sockfd, const void *buf, size_t _len, int flags);
 	ssize_t recv(int sockfd, void *buf, size_t _len, int flags);
 	int connect(int sockfd, const sockaddr_in *addr, size_t addrlen);
 
