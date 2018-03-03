@@ -1,7 +1,7 @@
 cdef class CString:
-	def __cinit__ (self, _in=None):
+	def __cinit__ (self, _in=None, size=32):
 		if _in is None:
-			self.parent = string_new (32)
+			self.parent = string_new (size)
 		else:
 			l = strlen(_in)
 			self.parent = string_new (l % 32 + l)

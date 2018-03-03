@@ -24,7 +24,7 @@ void string_set_from(String* dest, char* source, size_t start) {
 }
 
 void string_append(String* dest, char* str) {
-	string_set_from(dest, str, dest->n);
+	string_set_from(dest, str, dest->n - 1);
 }
 
 void string_append_c(String* dest, int c) {

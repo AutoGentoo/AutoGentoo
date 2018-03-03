@@ -24,6 +24,7 @@ cdef class Server:
 	
 	cdef void read_server (self):
 		cdef Socket t_sock = Socket (self.adr)
+		
 
 cdef class Host:
 	cdef Server parent # The parent server

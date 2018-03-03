@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 from vector import PyVec
+from op_socket import Socket, Address
+import sys
 
 
 class CommandManager:
@@ -97,9 +99,12 @@ def main(argv):
 	k = PyVec()
 	k.append("hello world")
 	print(k[0])
-	return 0
 	#  cmd_man = CommandManager("autogentoo", 20, "AutoGentoo CLI")
 	#  cmd_man.new_command(Command(cmd_man, "list", ))
+	s = Socket(Address("0.0.0.0", 9490))
+	print (s.request("GET /Packages HTTP/1.0\r\n\r\n", True))
+	
+	return 0
 
 
-exit(main([]))
+exit(main(sys.argv))
