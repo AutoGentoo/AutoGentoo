@@ -1,29 +1,29 @@
 from libc.stdlib cimport atoi
+from libc.stdio cimport printf
+
 import socket
-import op_string
-import vector
+
+from op_string cimport CString
+from vector cimport PyVec
+from op_socket cimport Address, Socket
 
 cdef class Host
 cdef class Stage
-
-cdef class Address:
-	cdef char port[4]
-	cdef char* ip
 
 cdef class Server:
 	cdef Address adr
 	cdef char* target;
 	
-	hosts = None
-	cdef staged;
+	cdef PyVec hosts
+	cdef dict staged;
 	
 	def __cinit__ (self, Address adr):
-		self.hosts = vector.PyVec (sizeof(void*))
+		self.hosts = PyVec ()
 		self.stages = {}
 		self.adr = adr
 	
-	cdef void cython_read_server (self, buffer):
-		pass
+	cdef void read_server (self):
+		cdef Socket t_sock = Socket (self.adr)
 
 cdef class Host:
 	cdef Server parent # The parent server
@@ -49,18 +49,20 @@ cdef class Stage:
 
 cdef socket_request (Address adr, char* request, _print=False):
 	cdef int portno = atoi (adr.port);
-	sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+	sock = socket (socket.AF_INET, socket.SOCK_STREAM)
 	
 	sock.connect ((adr.ip.decode("UTF-8"), portno))
 	sock.sendall(request)
 	
-	buff = op_string.CString (sock.recv(16, 0))
+	pb = sock.recv(16, 0)
+	cdef CString buff = CString (<char*>pb)
+	cdef char* k
 	if _print:
-		print (buff.get_py())
+		printf ("%s", buff.get_c())
 	while len(buff) >= 16:
-		k = sock.recv(16, 0)
+		pb = sock.recv(16, 0)
 		if _print:
-			print (k.decode ("UTF-8"))
-		buff + k
+			printf ("%s", <char*>pb)
+		buff + <char*>pb
 	
 	return buff.get_py()

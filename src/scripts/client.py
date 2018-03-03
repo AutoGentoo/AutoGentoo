@@ -95,7 +95,7 @@ class ServerInterface:
 
 def main(argv):
 	k = PyVec()
-	k.append ("hello world")
+	k.append("hello world")
 	print(k[0])
 	return 0
 	#  cmd_man = CommandManager("autogentoo", 20, "AutoGentoo CLI")
