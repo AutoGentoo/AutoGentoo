@@ -24,8 +24,7 @@ void string_vector_insert(StringVector* vec, char* string, int index) {
 		vector_allocate(vec);
 	
 	if (vec->ordered)
-		for (int i = (int)vec->n; i >= index; i--)
-			((char**) vec->ptr)[i] = ((char**) vec->ptr)[i - 1];
+		memcpy (((char**) vec->ptr)[index + 1], ((char**) vec->ptr)[index], sizeof (char*) * (vec->n - index));
 	else
 		((char**) vec->ptr)[vec->n] = ((char**) vec->ptr)[index];
 	

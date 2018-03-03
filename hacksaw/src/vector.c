@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <memory.h>
 
-void vector_allocate(Vector* vec);
-
 Vector* vector_new(size_t el_size, vector_opts opts) {
 	Vector* out_ptr = malloc(sizeof(Vector));
 	out_ptr->s = HACKSAW_VECTOR_INCREMENT;
