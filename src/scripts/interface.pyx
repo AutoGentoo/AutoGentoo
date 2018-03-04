@@ -77,6 +77,7 @@ cdef class Host(PyOb):
 		cdef DynamicBuffer request = DynamicBuffer ()
 		cdef char* n = "SRV EDIT\n"
 		request.append (n, strlen(n))
+		request.append (self.id, 16)
 		
 		cdef int c_f1 = <int>f1
 		cdef int c_f2 = <int>f2

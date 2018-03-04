@@ -202,7 +202,8 @@ response_t SRV_CREATE(Connection* conn, char** args, int start) {
 
 response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
 	char host_id[16];
-	memcpy (host_id, conn->request + start, 16);
+	memcpy (host_id, conn->request + start, 15);
+	host_id[15] = 0;
 	start += 16;
 	Host* target;
 	if (!(target = server_host_search(conn->parent, host_id)))
