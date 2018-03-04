@@ -204,7 +204,7 @@ response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
 	char host_id[16];
 	memcpy (host_id, conn->request + start, 15);
 	host_id[15] = 0;
-	start += 16;
+	start += 15;
 	Host* target;
 	if (!(target = server_host_search(conn->parent, host_id)))
 		return NOT_FOUND;
@@ -217,6 +217,7 @@ response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
 	if (field_one == 5) {
 		int field_two;
 		memcpy (&field_two, conn->request + start, sizeof (int));
+		field_two = ntohl((uint32_t)field_two);
 		start += sizeof (int);
 		
 		if (field_two >= target->extra->n)
@@ -229,19 +230,19 @@ response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
 	}
 	else {
 		switch (field_one) {
-			case 1:
+			case 0:
 				free (target->hostname);
 				target->hostname = strdup (conn->request + start);
 				break;
-			case 2:
+			case 1:
 				free (target->profile);
 				target->profile = strdup (conn->request + start);
 				break;
-			case 3:
+			case 2:
 				free (target->cflags);
 				target->hostname = strdup (conn->request + start);
 				break;
-			case 4:
+			case 3:
 				free (target->cflags);
 				target->cflags = strdup (conn->request + start);
 				break;

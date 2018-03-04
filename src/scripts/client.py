@@ -148,7 +148,7 @@ def edit_host(host: Host):
 	else:
 		k = ["hostname: ", "profile: ", "cflags: ", "use: "][f1 - 1]
 	
-	host.set_field(f1 - 1, f2 - 1, rlinput(k, values[last - 1]))
+	host.set_field(f1, f2 - 1, rlinput(k, values[last - 1]))
 
 
 def main():

@@ -1,9 +1,7 @@
 from socket import AF_INET, SOCK_STREAM, socket
-from op_string cimport CString
 from d_malloc cimport DynamicBuffer
 from op_socket cimport Address
 
-from posix.unistd cimport write
 from libc.stdio cimport sprintf, printf, stdout, fflush
 from libc.string cimport strdup
 from libc.stdlib cimport atoi, free, malloc
@@ -46,13 +44,7 @@ cdef class Socket:
 	cpdef close (self):
 		return self.socket.close ()
 	
-	@staticmethod
-	cdef print_raw (char* ptr, size_t n):
-		for i in range (n):
-			printf ("%02X ", ptr[i])
-		fflush (stdout)
-	
-	cpdef DynamicBuffer request_raw (self, request, _print=False):
+	cpdef DynamicBuffer request (self, request, _print=False, _print_raw=False):
 		cdef char* c_req;
 		
 		if isinstance(request, unicode):
@@ -66,8 +58,10 @@ cdef class Socket:
 		cdef void* buffer = malloc (128)
 		cdef size_t size = self.recv_into(buffer, 128)
 		while size > 0:
+			if _print_raw:
+				print_raw (<char*>buffer, size)
 			if _print:
-				Socket.print_raw (<char*>buffer, size)
+				printf ("%s", <char*>buffer)
 			out_data_raw.append (buffer, size)
 			size = self.recv_into(buffer, 128)
 		
@@ -76,31 +70,6 @@ cdef class Socket:
 		self.close ()
 		
 		return out_data_raw
-	
-	cpdef CString request (self, request, _print=False):
-		cdef char* c_req;
-		
-		if isinstance(request, unicode):
-			c_req = strdup ((<unicode>request).encode ("UTF-8"))
-		else:
-			c_req = strdup(<char*>request)
-		self.send (c_req, True)
-		
-		cdef CString out_data = CString (size=128)
-		
-		cdef void* buffer = malloc (128)
-		cdef size_t size = self.recv_into(buffer, 128)
-		while size > 0:
-			if _print:
-				write (1, buffer, size)
-			out_data.append (<char*>buffer)
-			size = self.recv_into(buffer, 128)
-		
-		free (buffer)
-		free (c_req)
-		self.close ()
-		
-		return out_data
 	
 	def __dealloc__ (self):
 		pass
@@ -115,3 +84,8 @@ cdef class Address:
 	
 	def __dealloc__ (self):
 		free (self.ip)
+
+cpdef print_raw (char* ptr, size_t n):
+	for i in range (n):
+		printf ("%02X ", ptr[i])
+	fflush (stdout)

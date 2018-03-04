@@ -1,5 +1,6 @@
 from op_socket cimport Address
 from d_malloc cimport Binary
+from op_socket cimport Socket
 
 cdef extern from "<autogentoo/writeconfig.h>":
 	cdef enum:
@@ -33,7 +34,7 @@ cdef class Server:
 	cdef readonly hosts
 	cdef readonly stages
 	cdef char** templates
-	cdef sock
+	cdef Socket sock
 	
 	cpdef void read_server (self)
 

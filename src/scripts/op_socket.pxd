@@ -1,4 +1,3 @@
-from op_string cimport CString
 from d_malloc cimport DynamicBuffer
 
 cdef extern from "<netinet/ip.h>":
@@ -25,10 +24,8 @@ cdef class Socket:
 	cpdef recv (self, int size)
 	cdef size_t recv_into (self, void* buffer, size_t size)
 	
-	@staticmethod
-	cdef print_raw (char* ptr, size_t n)
-	
-	cpdef DynamicBuffer request_raw (self, request, _print=*)
-	cpdef CString request (self, request, _print=*)
+	cpdef DynamicBuffer request (self, request, _print=*, _print_raw=*)
 	
 	cpdef close (self)
+
+cpdef print_raw (char* ptr, size_t n)

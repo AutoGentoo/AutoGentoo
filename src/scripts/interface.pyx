@@ -1,9 +1,12 @@
-from op_socket cimport Address, Socket
+from op_socket cimport Address, Socket, print_raw
 from libc.stdlib cimport free, malloc
 from libc.stdio cimport *
 from libc.string cimport *
 from d_malloc cimport DynamicBuffer
 from log import Log
+
+cdef extern from "<arpa/inet.h>":
+	int htonl (int)
 
 cdef class Server:
 	def __init__ (self, Address adr):
@@ -16,7 +19,7 @@ cdef class Server:
 	cpdef void read_server (self):
 		self.hosts = []
 		
-		cdef Binary server_bin = Binary (self.sock.request_raw("BIN SERVER\n"))
+		cdef Binary server_bin = Binary (self.sock.request("BIN SERVER\n"))
 		
 		Log.info ("Processing hosts...", flush=True)
 		cdef int current = server_bin.read_int()
@@ -35,7 +38,7 @@ cdef class Server:
 			current = server_bin.read_int()
 		Log.info ("ok", color_only=True, newline=True)
 		Log.info ("Processing templates...", flush=True)
-		cdef DynamicBuffer template_t = self.sock.request_raw("SRV GETTEMPLATES")
+		cdef DynamicBuffer template_t = self.sock.request("SRV GETTEMPLATES")
 		cdef char* len_buff = strtok (template_t.ptr, "\n")
 		cdef int l;
 		sscanf (len_buff, "%d", &l)
@@ -77,20 +80,20 @@ cdef class Host(PyOb):
 		cdef DynamicBuffer request = DynamicBuffer ()
 		cdef char* n = "SRV EDIT\n"
 		request.append (n, strlen(n))
-		request.append (self.id, 16)
+		request.append (self.id, 15)
 		
-		cdef int c_f1 = <int>f1
+		cdef int c_f1 = htonl (<int>f1)
 		cdef int c_f2 = <int>f2
 		
 		request.append (&c_f1, sizeof (int))
 		if c_f2 >= 0:
+			c_f2 = htonl(c_f2)
 			request.append(&c_f2, sizeof (int))
 		
 		cdef field_set = (<unicode>value).encode('utf8')
-		
 		request.append (<char*>field_set, strlen(field_set))
-		
-		self.parent.sock.request_raw (request.ptr, _print=True)
+		print_raw(request.ptr, request.n)
+		self.parent.sock.request (request.ptr, _print=True)
 	
 	cdef void parse (self, Binary _bin):
 		self.id = _bin.read_string()
