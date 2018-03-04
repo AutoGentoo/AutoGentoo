@@ -53,11 +53,6 @@ void pipe_to_log(Opt* op, char* logfile) {
 }
 
 int main(int argc, char** argv) {
-	String* test = string_new (32);
-	string_append (test, "strone");
-	string_append (test, "stringtwo");
-	printf ("%s\n", test->ptr);
-
 	opt_handle(opt_handlers, argc, argv + 1);
 	if (location == NULL)
 		location = strdup(".");
