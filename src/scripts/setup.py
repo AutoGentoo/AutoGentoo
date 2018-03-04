@@ -3,6 +3,7 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 
 ex = [
+	"log",
 	"op_string",
 	"op_socket",
 	"d_malloc",

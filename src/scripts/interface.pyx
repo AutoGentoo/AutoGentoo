@@ -3,6 +3,7 @@ from libc.stdlib cimport free, malloc
 from libc.stdio cimport *
 from libc.string cimport *
 from d_malloc cimport DynamicBuffer
+from log import Log
 
 cdef class Server:
 	def __init__ (self, Address adr):
@@ -15,6 +16,7 @@ cdef class Server:
 	cpdef void read_server (self):
 		cdef Binary server_bin = Binary (self.sock.request_raw("BIN SERVER\n"))
 		
+		Log.info ("Processing hosts...", flush=True)
 		cdef int current = server_bin.read_int()
 		while current != AUTOGENTOO_FILE_END and server_bin.inside():
 			if current == AUTOGENTOO_HOST:
@@ -29,7 +31,8 @@ cdef class Server:
 				if not server_bin.skip_until((AUTOGENTOO_HOST, AUTOGENTOO_STAGE)):
 					break
 			current = server_bin.read_int()
-		
+		Log.info ("ok", color_only=True, newline=True)
+		Log.info ("Processing templates...", flush=True)
 		cdef DynamicBuffer template_t = self.sock.request_raw("SRV GETTEMPLATES")
 		cdef char* len_buff = strtok (template_t.ptr, "\n")
 		cdef int l;
@@ -42,6 +45,7 @@ cdef class Server:
 		for i in range (l):
 			self.templates[i] = strdup (strtok (NULL, "\n"))
 		self.templates[l] = NULL
+		Log.info ("ok", color_only=True, newline=True, flush=True)
 	
 	def __dealloc__ (self):
 		if self.templates != NULL:
@@ -197,3 +201,4 @@ cdef class PyOb:
 	
 	def get (self, ident):
 		return self.__getattribute__(ident).decode ("UTF-8")
+

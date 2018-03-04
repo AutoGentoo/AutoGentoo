@@ -10,7 +10,7 @@ void print_bin(void* ptr, int n, size_t size) {
 	for (i = 0; i != (size * n); i++) {
 		int j;
 		for (j = 0; j < 8; j++) {
-			printf("%d", !!((((char*) ptr)[i] << j) & 0x80));
+			printf("%d", ((((char*) ptr)[i] << j) & 0x80) != 0);
 		}
 		
 		if (!((i + 1) % size)) {
@@ -21,14 +21,14 @@ void print_bin(void* ptr, int n, size_t size) {
 }
 
 void print_vec(Vector* vec) {
-	print_bin(vec->ptr, vec->n, vec->size);
+	print_bin(vec->ptr, (int)vec->n, vec->size);
 	fflush(stdout);
 }
 
 void print_string_vec(StringVector* vec) {
 	int i;
 	for (i = 0; i != vec->n; i++) {
-		printf("%p (%s) ", string_vector_get(vec, i), string_vector_get(vec, i));
+		printf("%p (%s) ", (void*)string_vector_get(vec, i), string_vector_get(vec, i));
 	}
 	printf("\n");
 }

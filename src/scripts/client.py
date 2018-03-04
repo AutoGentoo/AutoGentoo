@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
-from op_socket import Socket, Address
+from op_socket import Address
 from interface import Server
 import sys
+
+ANSI_BOLD = "\x1b[1m"
+ANSI_GREEN = "\x1b[32m"
+ANSI_RESET = "\x1b[0m"
 
 
 class CommandManager:
@@ -27,21 +31,24 @@ class CommandManager:
 		self.commands[cmd.selector] = cmd
 
 	def help(self):
-		print("%s\nCommands:\n" % (self.name + ("\n" + self.help_text) if len(self.help_text) > 0 else ""))
+		print("%sCommands:" % (self.name + ("\n" + self.help_text + "\n" + "\n") if len(self.help_text) > 0 else ""))
 		for key in self.commands:
 			self.commands[key].print_help()
 
 	def commandline(self):
 		while self.keep_going:
-			k = input("autogentoo > ").split(" ")
+			sys.stdout.write("%s%sautogentoo> %s" % (ANSI_GREEN, ANSI_BOLD, ANSI_RESET))
+			k = input().split(" ")
+			if not k[0]:
+				continue
 			try:
 				self.commands[k[0]]
 			except KeyError:
 				print("command '%s' not found" % k[0])
 				continue
 			target_cmd = self.commands[k[0]]
-			if len(k[0]) - 1 != target_cmd.argc:
-				print("'%s' requires %s arguments" % (k[0], target_cmd.argc))
+			if len(k[1:]) != target_cmd.argc:
+				print("'%s' requires %s arguments got '%s" % (k[0], target_cmd.argc, len(k[1:])))
 				continue
 
 			target_cmd.run(k[1:])
@@ -57,56 +64,41 @@ class Command:
 
 	def __init__(self, manager, selector, func, argv=None, _help=""):
 		self.selector = selector
-		self.argc = len(argv)
+		if argv is None:
+			self.argc = 0
+		else:
+			self.argc = len(argv)
 		self.argv = argv
 		self.help = _help
 		self.manager = manager
 		self.fptr = func
 
 	def print_help(self):
-		print("\t%s%s%s%s" % (
-			self.selector, ', '.join(self.argv), ' ' * (self.manager.help_size - len(self.selector)), self.help))
+		if self.argv is None:
+			self.argv = []
+		print("    %s%s%s%s" % (
+			self.selector, " " + ', '.join(self.argv), ' ' * (self.manager.help_size - len(self.selector)), self.help))
 
 	def run(self, args):
 		self.fptr(*args)
 
 
-class ServerCache:
-	def __init__(self, parent):
-		self.hosts = []
-		self.bind = None
-		self.stages = []
-		self.templates = []
-		self.parent = parent
-
-	def update(self):
-		res = self.parent.request("SRV GETHOSTS")
-		host_ids = str(res).split('\n')[1:-1]
-		
-
-class ServerInterface:
-	def __init__(self, server):
-		self.server = server
-
-	def list(self):
-		pass
+def main():
+	server = Server (Address("kronos", 9490))
 	
-	def request(self, request: str):
-		pass  # return SocketRequest(self.server).send(request)
-
-
-def main(argv):
+	cmdline = CommandManager("AutoGentoo CLI", help_text="The autogentoo user interface")
+	commands = [
+		Command(cmdline, "refresh", lambda: server.read_server(), _help="refresh the server data"),
+		Command(cmdline, "help", lambda: cmdline.help(), _help="Print the help page and exit"),
+		Command(cmdline, "exit", exit, _help="exit"),
+		Command(cmdline, "q", exit, _help="exit")
+	]
 	
+	for cmd in commands:
+		cmdline.new_command(cmd)
+	cmdline.commandline()
 	
 	return 0
 
 
-def test ():
-	s = Server(Address("kronos", 9490))
-	s.read_server()
-	
-	print(s.hosts[0].get("id"))
-	print(s.hosts[0].get_extra())
-
-test ()
-#exit(main(sys.argv))
+exit(main())
