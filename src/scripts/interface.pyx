@@ -14,6 +14,8 @@ cdef class Server:
 		self.sock = Socket (self.adr)
 	
 	cpdef void read_server (self):
+		self.hosts = []
+		
 		cdef Binary server_bin = Binary (self.sock.request_raw("BIN SERVER\n"))
 		
 		Log.info ("Processing hosts...", flush=True)
