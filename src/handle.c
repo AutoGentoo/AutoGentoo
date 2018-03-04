@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <autogentoo/autogentoo.h>
+#include <netinet/in.h>
 
 RequestLink requests[] = {
 		{"GET",              GET},
@@ -28,7 +29,8 @@ RequestLink requests[] = {
 		{"SRV GETSTAGE",     SRV_GETSTAGE},
 		{"SRV HANDOFF",      SRV_HANDOFF},
 		{"SRV SAVE",         SRV_SAVE},
-		{"SRV HOSTWRITE",    HOSTWRITE},
+		{"SRV HOSTWRITE",    SRV_HOSTWRITE},
+		//{"SRV HOSTUPLOAD",   SRV_HOSTUPLOAD},
 		
 		/* Binary requests */
 		{"BIN SERVER",       BIN_SERVER},
@@ -199,25 +201,53 @@ response_t SRV_CREATE(Connection* conn, char** args, int start) {
 }
 
 response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
-	int e_argc = 0;
-	if (strncmp(args[0], "HTTP", 4) != 0) {
-		char* end;
-		e_argc = (int) strtol(args[0], &end, 10);
+	char host_id[16];
+	memcpy (host_id, conn->request + start, 16);
+	start += 16;
+	Host* target;
+	if (!(target = server_host_search(conn->parent, host_id)))
+		return NOT_FOUND;
+	
+	int field_one;
+	memcpy (&field_one, conn->request + start, sizeof (int));
+	start += sizeof(int);
+	field_one = ntohl ((uint32_t)field_one);
+	
+	if (field_one == 5) {
+		int field_two;
+		memcpy (&field_two, conn->request + start, sizeof (int));
+		start += sizeof (int);
+		
+		if (field_two >= target->extra->n)
+			return BAD_REQUEST;
+		
+		void** t_ptr = (void**)vector_get (target->extra, field_two);
+		free (*t_ptr);
+		
+		*t_ptr = strdup (conn->request + start);
 	}
-	
-	char id_to_edit[16];
-	unsigned long i_split = strchr(conn->request + start, '\n') - (conn->request + start);
-	strncpy(id_to_edit, conn->request + start, i_split);
-	
-	char* request = conn->request + start + i_split + 1;
-	StringVector* data = string_vector_new();
-	string_vector_split(data, request, "\n");
-	
-	if (prv_host_edit(conn->bounded_host, e_argc, data)) {
-		return BAD_REQUEST;
+	else {
+		switch (field_one) {
+			case 1:
+				free (target->hostname);
+				target->hostname = strdup (conn->request + start);
+				break;
+			case 2:
+				free (target->profile);
+				target->profile = strdup (conn->request + start);
+				break;
+			case 3:
+				free (target->cflags);
+				target->hostname = strdup (conn->request + start);
+				break;
+			case 4:
+				free (target->cflags);
+				target->cflags = strdup (conn->request + start);
+				break;
+			default:
+				return BAD_REQUEST;
+		}
 	}
-	
-	string_vector_free(data);
 	
 	return OK;
 }
@@ -522,7 +552,7 @@ response_t BIN_SERVER(Connection* conn, char** args, int start, int argc) {
 	return res;
 }
 
-response_t HOSTWRITE(Connection* conn, char** args, int start, int argc) {
+response_t SRV_HOSTWRITE(Connection* conn, char** args, int start, int argc) {
 	if (conn->bounded_host == NULL)
 		return FORBIDDEN;
 	
@@ -574,3 +604,48 @@ response_t HOSTWRITE(Connection* conn, char** args, int start, int argc) {
 	
 	return OK;
 }
+
+/*
+response_t SRV_HOSTUPLOAD(Connection* conn, char** args, int start, int argc) {
+	struct {
+		char host_id[16];
+		char* hostname;
+		char* profile;
+		char* cflags;
+		char* use;
+	} _in_template = {{}, NULL, NULL, NULL, NULL};
+	
+	strncpy (_in_template.host_id, conn->request + start, 15);
+	start += 15;
+	
+	size_t ptr_size = sizeof (void*);
+	
+	Host* target = server_host_search (conn->parent, _in_template.host_id);
+	if (!target)
+		return NOT_FOUND;
+	
+	int lengths[4];
+	memcpy(lengths, conn->request + start, sizeof (int) * 4);
+	start += sizeof (int) * 4;
+	
+	for (int i = 0; i != 4; i++, start++) {
+		char** current_string = ((char**)&_in_template + 16 + sizeof (void*) * i);
+		*current_string = strndup (conn->request + start, (size_t)lengths[i]);
+		start += lengths[i];
+	}
+	
+	size_t offsets[4] = {
+		offsetof (Host, hostname),
+		offsetof (Host, profile),
+		offsetof (Host, cflags),
+		offsetof (Host, use)
+	};
+	
+	for (int i = 0; i != 4; i++) {
+		if ((char*)(target + offsets[i]))
+			free (target + offsets[i]);
+		memcpy(target + offsets[i], &_in_template + 16 + sizeof (void*) * i, ptr_size);
+	}
+	
+	return OK;
+}*/

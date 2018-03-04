@@ -2,6 +2,7 @@
 
 from op_socket import Address
 from interface import Server, Host
+import readline
 import sys
 
 ANSI_BOLD = "\x1b[1m"
@@ -37,8 +38,7 @@ class CommandManager:
 	
 	def commandline(self):
 		while self.keep_going:
-			sys.stdout.write("%s%sautogentoo> %s" % (ANSI_GREEN, ANSI_BOLD, ANSI_RESET))
-			k = input().split(" ")
+			k = input("%s%sautogentoo> %s" % (ANSI_GREEN, ANSI_BOLD, ANSI_RESET)).split(" ")
 			if not k[0]:
 				continue
 			try:
@@ -48,7 +48,7 @@ class CommandManager:
 				continue
 			target_cmd = self.commands[k[0]]
 			if len(k[1:]) != target_cmd.argc:
-				print("'%s' requires %s arguments got '%s" % (k[0], target_cmd.argc, len(k[1:])))
+				print("'%s' requires %s arguments got %s" % (k[0], target_cmd.argc, len(k[1:])))
 				continue
 			target_cmd.run(k[1:])
 
@@ -91,7 +91,7 @@ def limit_width(__str, indent, size=60):
 	return out[:-1 * (indent + 1)]
 
 
-def find_host(server: Server, host_id: str)->[Host, None]:
+def find_host(server: Server, host_id: str) -> [Host, None]:
 	for host in server.hosts:
 		if host_id == host.get("id"):
 			return host
@@ -107,7 +107,7 @@ def print_hosts(server: Server):
 			limit_width(host.get("use"), 4, 63)))
 
 
-def print_host (host: Host):
+def print_host(host: Host):
 	print("%s\n%s\nprofile=%s\nchost=%s\narch=%s\nCFLAGS=%s\nUSE=%s\n" % (
 		host.get("id"),
 		host.get("hostname"),
@@ -116,7 +116,39 @@ def print_host (host: Host):
 		host.get("arch"),
 		limit_width(host.get("cflags"), 7),
 		limit_width(host.get("use"), 4, 63))
-	)
+		)
+
+
+def rlinput(prompt, prefill=''):
+	readline.set_startup_hook(lambda: readline.insert_text(prefill))
+	try:
+		return input(prompt)
+	finally:
+		readline.set_startup_hook()
+
+
+def edit_host(host: Host):
+	values = []
+	extra = host.get_extra()
+	for i, x in enumerate (["hostname", "profile", "cflags", "use"]):
+		values.append(host.get(x))
+		print("[%d] %s = %s" % (i + 1, x, host.get(x)))
+	print("[5] extra = %s" % extra)
+	
+	k = ""
+	f1 = int(input ("Field to edit > "))
+	f2 = -1
+	last = f1
+	if f1 == 5:
+		for i, x in enumerate(extra):
+			print("[%s] %s" % (i + 1, x))
+		f2 = int(input("Field to edit > "))
+		values = extra
+		last = f2
+	else:
+		k = ["hostname: ", "profile: ", "cflags: ", "use: "][f1 - 1]
+	
+	host.set_field(f1 - 1, f2 - 1, rlinput(k, values[last - 1]))
 
 
 def main():
@@ -128,7 +160,11 @@ def main():
 		Command(cmdline, "refresh", lambda: server.read_server(), _help="refresh the server data"),
 		Command(cmdline, "help", lambda: cmdline.help(), _help="Print the help page"),
 		Command(cmdline, "list", lambda: print_hosts(server), _help="List all the available hosts"),
-		Command(cmdline, "host", lambda x: print_host(find_host(server, x)), ["host_id"], _help="print all information about specified host"),
+		Command(cmdline, "host", lambda x: print_host(find_host(server, x)), ["host_id"],
+				_help="print all information about specified host"),
+		Command(cmdline, "edit", lambda x: edit_host(find_host(server, x)), ["host_id"],
+				_help="edit fields in the host given its id"),
+		# Command(cmdline, "new", lambda: ),
 		Command(cmdline, "exit", exit, _help="exit"),
 		Command(cmdline, "q", exit, _help="exit")
 	]

@@ -73,6 +73,24 @@ cdef class Host(PyOb):
 		self.port_logdir = NULL
 		self.chroot_status = <chroot_t>-1
 	
+	def set_field (self, f1, f2, value):
+		cdef DynamicBuffer request = DynamicBuffer ()
+		cdef char* n = "SRV EDIT\n"
+		request.append (n, strlen(n))
+		
+		cdef int c_f1 = <int>f1
+		cdef int c_f2 = <int>f2
+		
+		request.append (&c_f1, sizeof (int))
+		if c_f2 >= 0:
+			request.append(&c_f2, sizeof (int))
+		
+		cdef field_set = (<unicode>value).encode('utf8')
+		
+		request.append (<char*>field_set, strlen(field_set))
+		
+		self.parent.sock.request_raw (request.ptr, _print=True)
+	
 	cdef void parse (self, Binary _bin):
 		self.id = _bin.read_string()
 		self.chroot_status = <chroot_t>_bin.read_int()
@@ -203,4 +221,3 @@ cdef class PyOb:
 	
 	def get (self, ident):
 		return self.__getattribute__(ident).decode ("UTF-8")
-

@@ -243,7 +243,9 @@ response_t EXIT(Connection* conn, char** args, int start, int argc);
 
 response_t BIN_SERVER(Connection* conn, char** args, int start, int argc);
 
-response_t HOSTWRITE(Connection* conn, char** args, int start, int argc);
+response_t SRV_HOSTWRITE(Connection* conn, char** args, int start, int argc);
+
+//response_t SRV_HOSTUPLOAD(Connection* conn, char** args, int start, int argc);
 
 /* SRV Kernel request (unimplmented) */
 
