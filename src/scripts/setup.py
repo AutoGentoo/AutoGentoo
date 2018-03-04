@@ -3,15 +3,10 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 
 ex = [
-	"vector",
 	"op_string",
 	"op_socket",
 	"d_malloc",
 	"interface"
-]
-
-cxx_ex = [
-	["interface"]
 ]
 
 extensions = []

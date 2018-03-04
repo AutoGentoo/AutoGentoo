@@ -1,18 +1,14 @@
-from vector cimport PyVec
 from op_socket cimport Address, Socket
 from libc.stdlib cimport free, malloc
-from libc.stdio cimport printf, sscanf
+from libc.stdio cimport *
 from libc.string cimport *
 from d_malloc cimport DynamicBuffer
-
-import gc
-gc.disable ()
 
 cdef class Server:
 	def __init__ (self, Address adr):
 		self.hosts = []
-		self.stages = PyVec(free_data=True)
-		self.templates = []
+		self.stages = {}
+		self.templates = NULL
 		self.adr = adr
 		self.sock = Socket (self.adr)
 	
@@ -35,19 +31,27 @@ cdef class Server:
 			current = server_bin.read_int()
 		
 		cdef DynamicBuffer template_t = self.sock.request_raw("SRV GETTEMPLATES")
-		buffer = template_t.ptr.decode ("UTF-8")
-		buffer = buffer.split ("\n")
-		print (buffer)
+		cdef char* len_buff = strtok (template_t.ptr, "\n")
+		cdef int l;
+		sscanf (len_buff, "%d", &l)
 		
-		for i in range (int (buffer[0])):
-			print (buffer[i + 1])
-			self.templates.append (buffer[i + 1])
+		if self.templates != NULL:
+			free_array (<void**>self.templates)
+		self.templates = <char**>malloc (sizeof(char*) * l)
+		
+		for i in range (l):
+			self.templates[i] = strdup (strtok (NULL, "\n"))
+		self.templates[l] = NULL
+	
+	def __dealloc__ (self):
+		if self.templates != NULL:
+			free_array(<void**>self.templates)
 
-cdef class Host(object):
+cdef class Host(PyOb):
 	def __init__ (self, parent):
 		self.parent = parent
-		self.extra = PyVec (free_data=True)
-		self.kernel = PyVec ()
+		self.extra = NULL
+		#self.kernel = PyVec ()
 		self.id = NULL
 		self.profile = NULL
 		self.hostname = NULL
@@ -76,8 +80,10 @@ cdef class Host(object):
 		self.chost = _bin.read_string()
 		
 		n = _bin.read_int()
+		self.extra = <char**>malloc (sizeof(char*) * (n + 1))
 		for i in range (n):
-			self.extra.append (_bin.read_string())
+			self.extra[i] = _bin.read_string()
+		self.extra[n] = NULL
 		
 		self.portage_tmpdir = _bin.read_string()
 		self.portdir = _bin.read_string()
@@ -94,6 +100,12 @@ cdef class Host(object):
 				break
 			current = _bin.read_int()
 	
+	def get_extra (self):
+		out = []
+		for i in range (arr_len(<void**>self.extra)):
+			out.append (self.extra[i].decode ("UTF-8"))
+		return out
+	
 	def __dealloc__ (self):
 		free(self.id)
 		free(self.hostname)
@@ -109,8 +121,8 @@ cdef class Host(object):
 		free(self.pkgdir)
 		free(self.port_logdir)
 		
-		del self.extra
-		del self.kernel
+		free_array (<void**>self.extra)
+		#del self.kernel
 
 cdef StageExtra* stage_extra (char* m_e, template_selects sel):
 	cdef StageExtra* out = <StageExtra*>malloc (sizeof (StageExtra))
@@ -118,16 +130,39 @@ cdef StageExtra* stage_extra (char* m_e, template_selects sel):
 	out.select = sel
 	return out
 
-cdef class Stage:
+cdef free_array (void** array):
+	cdef int i = 0
+	cdef void* c = array[i];
+	while c != NULL:
+		free (c)
+		i += 1
+		c = array[i]
+	free (array)
+
+cdef int arr_len (void** array):
+	cdef int i = 0
+	cdef void* c = array[i];
+	while c != NULL:
+		i += 1
+		c = array[i]
+	return i
+
+cdef class Stage(PyOb):
 	def __init__ (self, parent):
 		self.parent = parent
 		self.id = NULL
 		self.arch = NULL
 		self.cflags = NULL
 		self.chost = NULL
-		self.extra = PyVec (free_data=True)
+		self.extra = NULL
 		self.dest_dir = NULL
 		self.new_id = NULL
+	
+	def get_extra (self):
+		out = []
+		for i in range (arr_len(<void**>self.extra)):
+			out.append ((self.extra[i].make_extra.decode ("UTF-8"), self.extra[i].select))
+		return out
 	
 	cdef parse (self, Binary _bin):
 		self.id = _bin.read_string()
@@ -136,8 +171,10 @@ cdef class Stage:
 		self.chost = _bin.read_string()
 		
 		cdef extra_c = _bin.read_int();
+		self.extra = <StageExtra**>malloc (sizeof (StageExtra*) * (extra_c + 1))
 		for i in range (extra_c):
-			self.extra.append (<object>stage_extra (_bin.read_string(), <template_selects>_bin.read_int()))
+			self.extra[i] = stage_extra (_bin.read_string(), <template_selects>_bin.read_int())
+		self.extra[extra_c] = NULL
 		
 		self.dest_dir = _bin.read_string()
 		self.new_id = _bin.read_string()
@@ -150,7 +187,13 @@ cdef class Stage:
 		free (self.dest_dir)
 		free (self.new_id)
 		
-		for i in range (self.extra.size):
-			free ((<StageExtra*>(<void*>self.extra.get (i))).make_extra)
-		
-		del self.extra
+		for i in range (arr_len (<void**>self.extra)):
+			free (self.extra[i].make_extra)
+		free_array (<void**>self.extra)
+
+cdef class PyOb:
+	def __init__ (self):
+		pass
+	
+	def get (self, ident):
+		return self.__getattribute__(ident).decode ("UTF-8")

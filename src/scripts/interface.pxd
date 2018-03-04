@@ -1,5 +1,4 @@
 from op_socket cimport Address
-from vector cimport PyVec
 from d_malloc cimport Binary
 
 cdef extern from "<autogentoo/writeconfig.h>":
@@ -23,7 +22,9 @@ cdef extern from "<autogentoo/writeconfig.h>":
 		DISTDIR = 0x08,
 		PKGDIR = 0x10,
 		LOGDIR = 0x20
-	
+
+cdef class PyOb:
+	pass
 
 cdef class Server:
 	cdef Address adr
@@ -31,12 +32,12 @@ cdef class Server:
 	
 	cdef readonly hosts
 	cdef readonly stages
-	cdef readonly templates
+	cdef char** templates
 	cdef sock
 	
 	cpdef void read_server (self)
 
-cdef class Host:
+cdef class Host(PyOb):
 	cdef readonly Server parent # The parent server
 	cdef readonly char* id # The ID of the Host
 	cdef readonly char* profile # Portage profile, see possible values with eselect profile list
@@ -47,7 +48,7 @@ cdef class Host:
 	cdef readonly char* arch #  The portage-arch (eg. amd64)
 	cdef readonly char* chost # The system chost (should not be changed after it is set)
 	cdef readonly char* use # use flags
-	cdef readonly PyVec extra # A list of extra entries to go into make.conf
+	cdef char** extra # A list of extra entries to go into make.conf
 	
 	cdef readonly char* portage_tmpdir # build dir
 	cdef readonly char* portdir # ebuild portage tree
@@ -55,7 +56,7 @@ cdef class Host:
 	cdef readonly char* pkgdir # path to binaries
 	cdef readonly char* port_logdir # logs
 	cdef readonly chroot_t chroot_status
-	cdef readonly PyVec kernel
+	#cdef readonly [:] kernel
 	
 	cdef void parse (self, Binary _bin)
 
@@ -64,14 +65,16 @@ cdef struct StageExtra:
 	template_selects select
 
 cdef StageExtra* stage_extra (char* m_e, template_selects sel)
+cdef free_array (void** array)
+cdef int arr_len (void** array)
 
-cdef class Stage:
+cdef class Stage(PyOb):
 	cdef readonly char* id
 	cdef readonly char* arch
 	cdef readonly char* cflags
 	cdef readonly char* chost
 	
-	cdef readonly PyVec extras
+	cdef StageExtra** extra
 	
 	cdef readonly char* dest_dir
 	cdef readonly char* parent

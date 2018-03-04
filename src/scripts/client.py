@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-from vector import PyVec
 from op_socket import Socket, Address
 from interface import Server
 import sys
@@ -97,13 +96,7 @@ class ServerInterface:
 
 
 def main(argv):
-	k = PyVec()
-	k.append("hello world")
-	print(k[0])
-	#  cmd_man = CommandManager("autogentoo", 20, "AutoGentoo CLI")
-	#  cmd_man.new_command(Command(cmd_man, "list", ))
-	s = Socket(Address("0.0.0.0", 9490))
-	print(s.request("GET /Packages HTTP/1.0\r\n\r\n"))
+	
 	
 	return 0
 
@@ -111,11 +104,9 @@ def main(argv):
 def test ():
 	s = Server(Address("kronos", 9490))
 	s.read_server()
-	#print(s.hosts[0].cflags)
 	
-	print(s.hosts[0].extra[0])
-	print(s.stages[0])
-	print(s.stages[1])
+	print(s.hosts[0].get("id"))
+	print(s.hosts[0].get_extra())
 
 test ()
 #exit(main(sys.argv))
