@@ -20,24 +20,24 @@ cdef extern from "<autogentoo/hacksaw/tools/vector.h>":
 		
 	ctypedef __vector_opts vector_opts
 	ctypedef __Vector Vector
-	
-	Vector* vector_new(size_t el_size, vector_opts opts);
+	Vector* vector_new(size_t el_size, vector_opts opts)
+	void vector_extend(Vector* dest, Vector* ex);
+	void vector_free(Vector* vec);
 	size_t vector_add(Vector* vec, void* el);
 	void vector_remove(Vector* vec, int index);
 	void vector_insert(Vector* vec, void* el, int index);
-	void vector_extend(Vector* dest, Vector* ex);
-	void vector_allocate(Vector* vec);
-	void vector_allocate_to_size(Vector* vec, size_t s);
-	void* vector_get(Vector* vec, int i);
+	char* vector_get(Vector* vec, int i);
 	void vector_free(Vector* vec);
 
 cdef class PyVec:
-	cdef Vector* parent
-	cdef size_t el_size
+	cdef void** ptr
+	cdef size_t size # number of items in vec
+	cdef size_t vec_size # number of slots
 	
-	cpdef append (self, item)
-	cpdef void insert (self, item, int index)
-	cpdef void remove (self, int index)
+	cdef bool ordered
+	cdef bool free_data
+	
+	cdef void append (self, void* item)
+	cdef void allocate (self)
+	cdef remove (self, int index)
 	cdef void* get (self, int index)
-	cpdef int size (self)
-	cdef void free_strings (self)

@@ -1,4 +1,5 @@
 from op_string cimport CString
+from d_malloc cimport DynamicBuffer
 
 cdef extern from "<netinet/ip.h>":
 	ctypedef unsigned short int sa_family_t
@@ -13,7 +14,6 @@ cdef extern from "<netinet/ip.h>":
 cdef class Address:
 	cdef char port[4]
 	cdef char* ip
-	
 
 cdef class Socket:
 	cdef socket
@@ -22,6 +22,13 @@ cdef class Socket:
 	cdef int fd
 	
 	cpdef send (self, object data, do_connect=*)
-	cpdef recv (self, int size, do_connect=*)
+	cpdef recv (self, int size)
+	cdef size_t recv_into (self, void* buffer, size_t size)
+	
+	@staticmethod
+	cdef print_raw (char* ptr, size_t n)
+	
+	cpdef DynamicBuffer request_raw (self, request, _print=*)
 	cpdef CString request (self, request, _print=*)
-	cpdef int close (self)
+	
+	cpdef close (self)

@@ -9,12 +9,13 @@ cdef class CString:
 			self.parent = string_new (l % 32 + l)
 			string_append(self.parent, _in)
 	
-	cpdef append (self, char* toappend):
+	cpdef append (self, toappend):
+		if isinstance(toappend, CString):
+			string_append (self.parent, toappend.parent.ptr)
+			return self
+		
+		
 		string_append(self.parent, toappend)
-		return self
-	
-	def append (self, CString toappend):
-		string_append (self.parent, toappend.parent.ptr)
 		return self
 	
 	def __add__ (self, toappend):
@@ -27,7 +28,7 @@ cdef class CString:
 		return self
 	
 	def __str__ (self):
-		return self.parent.ptr.decode ("UTF-8")
+		return str(self.parent.ptr)
 	
 	cpdef find (self, char* _token):
 		return CString (strstr (self.parent.ptr, _token))

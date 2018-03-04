@@ -19,7 +19,7 @@ cdef extern from "<autogentoo/hacksaw/tools/string.h>":
 cdef class CString:
 	cdef String* parent
 	
-	cpdef append (self, char* toappend)
+	cpdef append (self, toappend)
 	cpdef find (self, char* _token)
 	cdef char* get_c (self)
 	cpdef get_py (self)

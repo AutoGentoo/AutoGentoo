@@ -1,3 +1,5 @@
 *.so
 build/*
 *.c
+cmake-build-debug/*
+.idea/*

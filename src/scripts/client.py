@@ -2,6 +2,7 @@
 
 from vector import PyVec
 from op_socket import Socket, Address
+from interface import Server
 import sys
 
 
@@ -107,4 +108,14 @@ def main(argv):
 	return 0
 
 
-exit(main(sys.argv))
+def test ():
+	s = Server(Address("kronos", 9490))
+	s.read_server()
+	#print(s.hosts[0].cflags)
+	
+	print(s.hosts[0].extra[0])
+	print(s.stages[0])
+	print(s.stages[1])
+
+test ()
+#exit(main(sys.argv))

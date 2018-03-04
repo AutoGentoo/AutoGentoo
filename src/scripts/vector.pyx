@@ -1,36 +1,43 @@
 from libc.stdlib cimport free
+from cpython.bytes cimport PyBytes_FromString
+from libc.stdio cimport *
+from libc.stdlib cimport *
+from libc.string cimport *
 
 cdef class PyVec:
-	def __init__(self, size_t el_size=sizeof (void*), ordered=False):
-		self.parent = vector_new (el_size, <vector_opts>(REMOVE | ORDERED if ordered else UNORDERED))
-		self.el_size = el_size
+	increment = 5
+	def __cinit__ (self, ordered=False, free_data=False):
+		self.ptr = <void**>malloc (sizeof(void*) * self.increment)
+		self.size = 0
+		self.vec_size = self.increment
+		self.free_data = free_data
 	
-	cpdef append (self, item):
-		cdef void* t = <void*> item;
-		vector_add (self.parent, &t)
+	cdef void allocate (self):
+		self.vec_size += self.increment
+		self.ptr = <void**>realloc (self.ptr, sizeof(void*) * self.vec_size)
 	
-	def __add__ (self, PyVec another):
-		vector_extend(<Vector*>self.parent, another.parent)
+	cdef void append (self, void* item):
+		if self.size + 1 >= self.vec_size:
+			self.allocate()
+		
+		self.ptr[self.size] = item
+		self.size += 1
 	
-	cpdef void remove (self, int index):
-		vector_remove(self.parent, index)
-	
-	cpdef void insert (self, item, int index):
-		cdef void* k = <void*>item;
-		vector_insert (self.parent, &k, index)
+	cdef remove (self, int index):
+		if self.ordered:
+			memcpy (&self.ptr[index], &self.ptr[index +1], sizeof(void*) * (self.size - index))
+		else:
+			self.ptr[index] = self.ptr[self.size - 1]
+		self.size -= 1
 	
 	cdef void* get (self, int index):
-		return (<void**>vector_get (self.parent, index))[0]
-	
-	cpdef int size (self):
-		return self.parent.n
-	
-	cdef void free_strings (self):
-		for i in range (self.parent.n):
-			free ((<char**>self.get (i))[0])
+		return self.ptr[index]
 	
 	def __getitem__ (self, index):
-		return <object>self.get(<int>index)
+		return <object><char*>self.ptr[index]
 	
 	def __dealloc__ (self):
-		vector_free (self.parent)
+		if self.free_data:
+			for i in range (self.size):
+				free (self.get (i))
+		free (self.ptr)
