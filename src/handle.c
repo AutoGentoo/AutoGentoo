@@ -71,9 +71,9 @@ response_t GET(Connection* conn, char** args, int start, int argc) {
 		ssize_t bytes_read;
 		rsend(conn, OK);
 		res = OK;
-		write(conn->fd, "\n", 1);
+		conn_write(conn->fd, "\n", 1);
 		while ((bytes_read = read(fd, (void*) &data_to_send, sizeof(data_to_send))) > 0)
-			write(conn->fd, (void*) &data_to_send, (size_t) bytes_read);
+			conn_write(conn->fd, (void*) &data_to_send, (size_t) bytes_read);
 		close(fd);
 	} else {
 		rsend(conn, NOT_FOUND);
@@ -192,8 +192,8 @@ response_t SRV_CREATE(Connection* conn, char** args, int start) {
 	vector_add(conn->parent->hosts, &new_host);
 	server_bind(conn, new_host);
 	
-	write(conn->fd, new_host->id, strlen(new_host->id));
-	write(conn->fd, "\n", 1);
+	conn_write(conn->fd, new_host->id, strlen(new_host->id));
+	conn_write(conn->fd, "\n", 1);
 	
 	string_vector_free(data);
 	
@@ -202,9 +202,8 @@ response_t SRV_CREATE(Connection* conn, char** args, int start) {
 
 response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
 	char host_id[16];
-	memcpy (host_id, conn->request + start, 15);
-	host_id[15] = 0;
-	start += 15;
+	memcpy (host_id, conn->request + start, 16);
+	start += 16;
 	Host* target;
 	if (!(target = server_host_search(conn->parent, host_id)))
 		return NOT_FOUND;
@@ -212,7 +211,6 @@ response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
 	int field_one;
 	memcpy (&field_one, conn->request + start, sizeof (int));
 	start += sizeof(int);
-	field_one = ntohl ((uint32_t)field_one);
 	
 	if (field_one == 5) {
 		int field_two;
@@ -303,8 +301,8 @@ void prv_fd_write_str(int fd, char* str) {
 	if (str == NULL) {
 		return;
 	}
-	write(fd, str, strlen(str));
-	write(fd, "\n", 1);
+	conn_write(fd, str, strlen(str));
+	conn_write(fd, "\n", 1);
 }
 
 /* SRV Metadata requests */
@@ -332,8 +330,8 @@ response_t SRV_GETHOST(Connection* conn, char** args, int start, int argc) {
 		int i;
 		for (i = 0; i != host->extra->n; i++) {
 			char* current_str = string_vector_get(host->extra, i);
-			write(conn->fd, current_str, strlen(current_str));
-			write(conn->fd, "\n", 1);
+			conn_write(conn->fd, current_str, strlen(current_str));
+			conn_write(conn->fd, "\n", 1);
 		}
 	}
 	
@@ -343,13 +341,13 @@ response_t SRV_GETHOST(Connection* conn, char** args, int start, int argc) {
 response_t SRV_GETHOSTS(Connection* conn, char** args, int start, int argc) {
 	char t[8];
 	sprintf(t, "%d\n", (int) conn->parent->hosts->n);
-	write(conn->fd, t, strlen(t));
+	conn_write(conn->fd, t, strlen(t));
 	
 	int i;
 	for (i = 0; i != conn->parent->hosts->n; i++) {
 		char* temp = (*(Host**) vector_get(conn->parent->hosts, i))->id;
-		write(conn->fd, temp, strlen(temp));
-		write(conn->fd, "\n", 1);
+		conn_write(conn->fd, temp, strlen(temp));
+		conn_write(conn->fd, "\n", 1);
 	}
 	
 	return OK;
@@ -358,12 +356,12 @@ response_t SRV_GETHOSTS(Connection* conn, char** args, int start, int argc) {
 response_t SRV_GETACTIVE(Connection* conn, char** args, int start, int argc) {
 	if (conn->bounded_host == NULL) {
 		char* out = "invalid\n";
-		write(conn->fd, out, strlen(out));
+		conn_write(conn->fd, out, strlen(out));
 		return OK;
 	}
 	
-	write(conn->fd, conn->bounded_host->id, strlen(conn->bounded_host->id));
-	write(conn->fd, "\n", 1);
+	conn_write(conn->fd, conn->bounded_host->id, strlen(conn->bounded_host->id));
+	conn_write(conn->fd, "\n", 1);
 	
 	return OK;
 }
@@ -374,7 +372,7 @@ response_t SRV_GETSPEC(Connection* conn, char** args, int start, int argc) {
 	int symbol;
 	if (lspcu_fp != NULL) {
 		while ((symbol = getc (lspcu_fp)) != EOF) {
-			write(conn->fd, &symbol, sizeof(char));
+			conn_write(conn->fd, &symbol, sizeof(char));
 		}
 		fclose(lspcu_fp);
 	}
@@ -384,21 +382,21 @@ response_t SRV_GETSPEC(Connection* conn, char** args, int start, int argc) {
 }
 
 response_t SRV_GETTEMPLATES(Connection* conn, char** args, int start, int argc) {
-	StringVector* templates = host_template_get_all();
+	int temp_n;
+	for (temp_n = 0; host_templates[temp_n].id != NULL; temp_n++);
 	
 	char __n[16];
-	sprintf(__n, "%d", (int) templates->n);
-	write(conn->fd, &__n, strlen(__n));
+	sprintf(__n, "%d", temp_n);
+	conn_write(conn->fd, &__n, strlen(__n));
 	
 	int i;
-	for (i = 0; i != templates->n; i++) {
+	for (i = 0; i != temp_n; i++) {
 		char* b;
-		write(conn->fd, "\n", 1);
-		b = string_vector_get(templates, i);
-		write(conn->fd, b, strlen(b));
-		
+		conn_write(conn->fd, "\n", 1);
+		b = host_templates[i].id;
+		conn_write(conn->fd, b, strlen(b));
 	}
-	write(conn->fd, "\n", 1);
+	conn_write(conn->fd, "\n", 1);
 	return OK;
 }
 
@@ -412,8 +410,8 @@ response_t SRV_TEMPLATE_NEW(Connection* conn, char** args, int start, int argc) 
 	
 	small_map_insert(t->parent->stages, t->new_id, t);
 	
-	write(conn->fd, t->new_id, strlen(t->new_id));
-	write(conn->fd, "\n", 1);
+	conn_write(conn->fd, t->new_id, strlen(t->new_id));
+	conn_write(conn->fd, "\n", 1);
 	return OK;
 }
 
@@ -468,15 +466,15 @@ response_t SRV_TEMPLATE(Connection* conn, char** args, int start, int argc) {
 response_t SRV_GETSTAGED(Connection* conn, char** args, int start, int argc) {
 	char __n[16];
 	sprintf(__n, "%d", (int) conn->parent->stages->n);
-	write(conn->fd, &__n, strlen(__n));
-	write(conn->fd, "\n", 1);
+	conn_write(conn->fd, &__n, strlen(__n));
+	conn_write(conn->fd, "\n", 1);
 	
 	int i;
 	for (i = 0; i != conn->parent->stages->n; i++) {
 		HostTemplate* __t = (*(HostTemplate***) vector_get(conn->parent->stages, i))[1];
 		
-		write(conn->fd, __t->new_id, strlen(__t->new_id));
-		write(conn->fd, "\n", 1);
+		conn_write(conn->fd, __t->new_id, strlen(__t->new_id));
+		conn_write(conn->fd, "\n", 1);
 	}
 	
 	return OK;
@@ -500,13 +498,13 @@ response_t SRV_GETSTAGE(Connection* conn, char** args, int start, int argc) {
 			 __t->extra_c
 	);
 	
-	write(conn->fd, buf, strlen(buf));
+	conn_write(conn->fd, buf, strlen(buf));
 	free(buf);
 	
 	int j;
 	for (j = 0; j != __t->extra_c; j++) {
 		asprintf(&buf, "%s %d\n", __t->extras[j].make_extra, __t->extras[j].select);
-		write(conn->fd, buf, strlen(buf));
+		conn_write(conn->fd, buf, strlen(buf));
 		free(buf);
 	}
 	
@@ -544,7 +542,7 @@ response_t BIN_SERVER(Connection* conn, char** args, int start, int argc) {
 	FILE* fp = fmemopen(buffer, size, "wb");
 	size = write_server_fp(conn->parent, fp);
 	rewind(fp);
-	write(conn->fd, buffer, size);
+	conn_write(conn->fd, buffer, size);
 	fclose(fp);
 	free(buffer);
 	

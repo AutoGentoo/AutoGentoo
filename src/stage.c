@@ -30,8 +30,10 @@ HostTemplate host_templates[] = {
 		{"arm64", "arm", "-O2 -pipe", "aarch64-unknown-linux-gnu"},
 		{"hppa", "hppa", "-O2 -pipe -march=1.1", "hppa1.1-unknown-linux-gnu", "CXXFLAGS=\"-O2 -pipe\"", CXXFLAGS},
 		*/
+		{NULL}
 };
 
+/*
 StringVector* host_template_get_all() {
 	StringVector* out = string_vector_new();
 	int i;
@@ -40,7 +42,7 @@ StringVector* host_template_get_all() {
 	}
 	
 	return out;
-}
+}*/
 
 HostTemplate* host_template_new(Server* parent, char* id) {
 	int i;

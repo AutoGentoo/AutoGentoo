@@ -63,11 +63,13 @@ struct __HostTemplate {
 	host_id new_id; //!< The new id that will be passed in the handoff (don't init)
 };
 
+extern HostTemplate host_templates[];
+
 /**
  * Returns a list of all the avaiable templates
  * @return a StringVector* of all the avaiable templates
  */
-StringVector* host_template_get_all();
+//StringVector* host_template_get_all();
 
 /**
  * Get a new HostTemplate from an ID

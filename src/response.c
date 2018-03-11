@@ -1,5 +1,8 @@
 #include <autogentoo/response.h>
 #include <unistd.h>
+#include <asm/errno.h>
+#include <errno.h>
+#include <fcntl.h>
 
 ssize_t rsend(Connection* conn, response_t code) {
 	char message[40];
@@ -32,4 +35,13 @@ response_t get_res(response_nt x) {
 		}
 	}
 	return OK;
+}
+
+ssize_t conn_write (int fd, void* data, size_t len) {
+	if (fcntl(fd, F_GETFD) == -1 || errno == EBADF) {
+		close (fd);
+		return 0;
+	}
+	
+	return write (fd, data, len);
 }

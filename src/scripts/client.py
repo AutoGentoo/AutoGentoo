@@ -3,7 +3,6 @@
 from op_socket import Address
 from interface import Server, Host
 import readline
-import sys
 
 ANSI_BOLD = "\x1b[1m"
 ANSI_GREEN = "\x1b[32m"
@@ -100,11 +99,7 @@ def find_host(server: Server, host_id: str) -> [Host, None]:
 
 def print_hosts(server: Server):
 	for host in server.hosts:
-		print("%s\n%s\nCFLAGS=%s\nUSE=%s\n" % (
-			host.get("id"),
-			host.get("hostname"),
-			limit_width(host.get("cflags"), 7),
-			limit_width(host.get("use"), 4, 63)))
+		print("%s: %s" % (host.get("id"), host.get("hostname")))
 
 
 def print_host(host: Host):
@@ -130,13 +125,13 @@ def rlinput(prompt, prefill=''):
 def edit_host(host: Host):
 	values = []
 	extra = host.get_extra()
-	for i, x in enumerate (["hostname", "profile", "cflags", "use"]):
+	for i, x in enumerate(["hostname", "profile", "cflags", "use"]):
 		values.append(host.get(x))
 		print("[%d] %s = %s" % (i + 1, x, host.get(x)))
 	print("[5] extra = %s" % extra)
 	
 	k = ""
-	f1 = int(input ("Field to edit > "))
+	f1 = int(input("Field to edit > "))
 	f2 = -1
 	last = f1
 	if f1 == 5:
@@ -148,11 +143,21 @@ def edit_host(host: Host):
 	else:
 		k = ["hostname: ", "profile: ", "cflags: ", "use: "][f1 - 1]
 	
-	host.set_field(f1, f2 - 1, rlinput(k, values[last - 1]))
+	host.set_field(f1 - 1, f2 - 1, rlinput(k, values[last - 1]))
+
+
+def new_host(server: Server):
+	server.new_host([
+		input("hostname> "),
+		rlinput("profile> ", "default/linux/amd64/17.0/desktop/gnome/systemd"),
+		rlinput("chost> ", "x86_64-pc-linux-gnu"),
+		input("cflags> "),
+		rlinput("use> ", "mmx sse sse2 systemd")
+	])
 
 
 def main():
-	server = Server(Address("kronos", 9490))
+	server = Server(Address("localhost", 9490))
 	server.read_server()
 	
 	cmdline = CommandManager("AutoGentoo CLI", help_text="The autogentoo user interface")
@@ -165,6 +170,7 @@ def main():
 		Command(cmdline, "edit", lambda x: edit_host(find_host(server, x)), ["host_id"],
 				_help="edit fields in the host given its id"),
 		# Command(cmdline, "new", lambda: ),
+		Command(cmdline, "new", lambda: new_host(server), _help="create a new package environment"),
 		Command(cmdline, "exit", exit, _help="exit"),
 		Command(cmdline, "q", exit, _help="exit")
 	]

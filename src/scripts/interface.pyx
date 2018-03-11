@@ -16,6 +16,10 @@ cdef class Server:
 		self.adr = adr
 		self.sock = Socket (self.adr)
 	
+	cpdef void new_host (self, list fields):
+		req = "SRV NEW 0\n" + "\n".join (fields)
+		self.sock.request(req.encode('utf8'), _print=True)
+	
 	cpdef void read_server (self):
 		self.hosts = []
 		
@@ -80,7 +84,7 @@ cdef class Host(PyOb):
 		cdef DynamicBuffer request = DynamicBuffer ()
 		cdef char* n = "SRV EDIT\n"
 		request.append (n, strlen(n))
-		request.append (self.id, 15)
+		request.append (self.id, 16)
 		
 		cdef int c_f1 = htonl (<int>f1)
 		cdef int c_f2 = <int>f2

@@ -180,8 +180,7 @@ int server_init(char* port) {
 }
 
 void connection_free(Connection* conn) {
-	if (conn->status != CLOSED) {
-		shutdown(conn->fd, SHUT_RDWR);
+	if (conn->status != CLOSED) {;
 		if (fcntl(conn->fd, F_GETFD) != -1 || errno != EBADF) {
 			close(conn->fd);
 		}
@@ -244,7 +243,7 @@ void server_respond(Connection* conn) {
 	response_t res;
 	
 	if (call == NULL) {
-		res = BAD_REQUEST;
+		res = NOT_IMPLEMENTED;
 	} else {
 		res = (*call)(conn, (char**) args->ptr, split_i + 1, (int) args->n);
 	}
