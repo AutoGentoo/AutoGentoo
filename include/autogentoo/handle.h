@@ -163,17 +163,28 @@ response_t SRV_GETSPEC(Connection* conn, char** args, int start, int argc);
 response_t SRV_GETTEMPLATES(Connection* conn, char** args, int start, int argc);
 
 /**
- * Creates a new template given a template id
+ * Create a new template given binary data
+ * Should only be called from client.py
+ * @param conn the connection that holds the request
+ * @param args binary data
+ * @param start Start index to read from request
+ * @param argc the argument count in args
+ * @return HTTP standard codes
+ */
+response_t SRV_TEMPLATE_CREATE(Connection* conn, char** args, int start, int argc);
+
+/**
+ * Creates a new stage from an existing template given a template id
  * @param conn the connection that holds the request
  * @param args the template id of the new template (look in stage.c)
  * @param start Start index to read from request
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_TEMPLATE_NEW(Connection* conn, char** args, int start, int argc);
+response_t SRV_STAGE_NEW(Connection* conn, char** args, int start, int argc);
 
 /**
- * @brief Create/initilize a new template
+ * @brief Create/initilize a new stage
  * 
  * Commands include the following
  *  - DOWNLOAD: download the stage3
@@ -188,7 +199,7 @@ response_t SRV_TEMPLATE_NEW(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_TEMPLATE(Connection* conn, char** args, int start, int argc);
+response_t SRV_STAGE(Connection* conn, char** args, int start, int argc);
 
 /**
  * Returns a list of the currently staged HostTemplates
@@ -241,8 +252,25 @@ response_t SRV_SAVE(Connection* conn, char** args, int start, int argc);
  */
 response_t EXIT(Connection* conn, char** args, int start, int argc);
 
+/**
+ * Write the Server struct back to the client
+ * @param conn the connection that holds the request
+ * @param args (none)
+ * @param start Start index to read from request
+ * @param argc the argument count in args
+ * @return HTTP standard codes
+ */
 response_t BIN_SERVER(Connection* conn, char** args, int start, int argc);
 
+/**
+ * Links host_environ directory and write configs
+ * useful for regening a corrupt build environ
+ * @param conn the connection that holds the request
+ * @param args (none)
+ * @param start Start index to read from request
+ * @param argc the argument count in args
+ * @return HTTP standard codes
+ */
 response_t SRV_HOSTWRITE(Connection* conn, char** args, int start, int argc);
 
 //response_t SRV_HOSTUPLOAD(Connection* conn, char** args, int start, int argc);

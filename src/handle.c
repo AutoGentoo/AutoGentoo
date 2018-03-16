@@ -22,9 +22,9 @@ RequestLink requests[] = {
 		{"SRV GETACTIVE",    SRV_GETACTIVE},
 		{"SRV GETSPEC",      SRV_GETSPEC},
 		{"SRV GETTEMPLATES", SRV_GETTEMPLATES},
-		{"SRV TEMPLATE NEW", SRV_TEMPLATE_NEW},
-		{"SRV TEMPLATE_NEW", SRV_TEMPLATE_NEW}, // Alias for the previous one
-		{"SRV TEMPLATE",     SRV_TEMPLATE},
+		{"SRV STAGE_NEW",    SRV_STAGE_NEW},
+		{"SRV TEMPLATE_CREATE", SRV_TEMPLATE_CREATE}, // Alias for the previous one
+		{"SRV STAGE",        SRV_STAGE},
 		{"SRV GETSTAGED",    SRV_GETSTAGED},
 		{"SRV GETSTAGE",     SRV_GETSTAGE},
 		{"SRV HANDOFF",      SRV_HANDOFF},
@@ -382,31 +382,41 @@ response_t SRV_GETSPEC(Connection* conn, char** args, int start, int argc) {
 }
 
 response_t SRV_GETTEMPLATES(Connection* conn, char** args, int start, int argc) {
-	int temp_n;
-	for (temp_n = 0; host_templates[temp_n].id != NULL; temp_n++);
-	
 	char __n[16];
-	sprintf(__n, "%d", temp_n);
+	sprintf(__n, "%d", (int)conn->parent->templates->n);
 	conn_write(conn->fd, &__n, strlen(__n));
 	
 	int i;
-	for (i = 0; i != temp_n; i++) {
-		char* b;
+	for (i = 0; i != conn->parent->templates->n; i++) {
 		conn_write(conn->fd, "\n", 1);
-		b = host_templates[i].id;
+		
+		char* b = (*(HostTemplate**)vector_get(conn->parent->templates, i))->id;
 		conn_write(conn->fd, b, strlen(b));
 	}
 	conn_write(conn->fd, "\n", 1);
 	return OK;
 }
 
-response_t SRV_TEMPLATE_NEW(Connection* conn, char** args, int start, int argc) {
+response_t SRV_TEMPLATE_CREATE(Connection* conn, char** args, int start, int argc) {
+	struct {
+		char* id;
+		char* arch;
+		char* cflags;
+		char* chost;
+	} in_data;
+	
+	
+	
+	return OK;
+}
+
+response_t SRV_STAGE_NEW(Connection* conn, char** args, int start, int argc) {
 	/* We dont need to bind a template
 	 * because it doesn't need to
 	 * auto-detect destination directory for GET
 	 */
 	
-	HostTemplate* t = host_template_new(conn->parent, args[0]);
+	HostTemplate* t = stage_new(conn->parent, args[0]);
 	
 	small_map_insert(t->parent->stages, t->new_id, t);
 	
@@ -415,7 +425,7 @@ response_t SRV_TEMPLATE_NEW(Connection* conn, char** args, int start, int argc) 
 	return OK;
 }
 
-response_t SRV_TEMPLATE(Connection* conn, char** args, int start, int argc) {
+response_t SRV_STAGE(Connection* conn, char** args, int start, int argc) {
 	HostTemplate* t = small_map_get(conn->parent->stages, args[0]);
 	if (t == NULL)
 		return NOT_FOUND;

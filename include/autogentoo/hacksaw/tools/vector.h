@@ -48,7 +48,7 @@ void vector_allocate(Vector* vec);
 
 void vector_allocate_to_size(Vector* vec, size_t s);
 
-void* vector_get(Vector* vec, int i);
+void** vector_get (Vector* vec, int i);
 
 void vector_free(Vector* vec);
 

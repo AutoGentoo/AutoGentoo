@@ -29,7 +29,7 @@ void set_binding(WindowManager* parent, int key, KeyFunc handler) {
 	
 	// Find if its already bound
 	for (i = 0; i != parent->keybindings->n; i++) {
-		KeyBinding* k = vector_get(parent->keybindings, i);
+		KeyBinding* k = (KeyBinding*)vector_get(parent->keybindings, i);
 		if (k->key == key) {
 			k->handler = handler;
 			return;
@@ -50,7 +50,7 @@ void remove_binding(WindowManager* parent, int key) {
 KeyFunc get_binding(WindowManager* parent, int key) {
 	int i;
 	for (i = 0; i != parent->keybindings->n; i++) {
-		KeyBinding* k = vector_get(parent->keybindings, i);
+		KeyBinding* k = (KeyBinding*)vector_get(parent->keybindings, i);
 		if (k->key == key)
 			return k->handler;
 	}

@@ -49,8 +49,8 @@ void parse_depend_expression(DependExpression* expr, DependencyVec out_deps) {
 			expr->select->opts.status;
 			break;
 		case EXPR_EXPR:
-			parse_depend_expression(vector_get(expr->dependexpressions, 0), out_deps);
-			parse_depend_expression(vector_get(expr->dependexpressions, 1), out_deps);
+			parse_depend_expression((DependExpression*)vector_get(expr->dependexpressions, 0), out_deps);
+			parse_depend_expression((DependExpression*)vector_get(expr->dependexpressions, 1), out_deps);
 			break;
 	}
 }

@@ -98,7 +98,7 @@ void conf_variable_new(Conf* conf, ConfSection* section, ConfVariable* var, Stri
 void conf_free(Conf* conf) {
 	int i;
 	for (i = 0; i != conf->default_variables->n; i++) {
-		conf_variable_free(vector_get(conf->default_variables, i));
+		conf_variable_free((ConfVariable*)vector_get(conf->default_variables, i));
 	}
 	vector_free(conf->default_variables);
 	for (i = 0; i != conf->sections->n; i++) {
@@ -112,7 +112,7 @@ void conf_free(Conf* conf) {
 void conf_section_free(ConfSection* section) {
 	int i;
 	for (i = 0; i != section->variables->n; i++) {
-		conf_variable_free(vector_get(section->variables, i));
+		conf_variable_free((ConfVariable*)vector_get(section->variables, i));
 	}
 	vector_free(section->variables);
 }

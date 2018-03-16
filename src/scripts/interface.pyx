@@ -12,7 +12,7 @@ cdef class Server:
 	def __init__ (self, Address adr):
 		self.hosts = []
 		self.stages = {}
-		self.templates = NULL
+		self.templates = []
 		self.adr = adr
 		self.sock = Socket (self.adr)
 	
@@ -22,43 +22,55 @@ cdef class Server:
 	
 	cpdef void read_server (self):
 		self.hosts = []
+		self.templates = []
 		
 		cdef Binary server_bin = Binary (self.sock.request("BIN SERVER\n"))
 		
-		Log.info ("Processing hosts...", flush=True)
+		p_a = False
+		p_h = False
+		p_s = False
+		p_t = False
+		
 		cdef int current = server_bin.read_int()
 		while current != AUTOGENTOO_FILE_END and server_bin.inside():
 			if current == AUTOGENTOO_HOST:
+				if not p_h:
+					if p_a:
+						Log.info ("ok", color_only=True, newline=True)
+					Log.info ("Processing hosts...", flush=True)
+					p_a = True
+					p_h = True
 				hbuff = Host (self)
 				hbuff.parse(server_bin)
 				self.hosts.append (hbuff)
 			elif current == AUTOGENTOO_STAGE:
+				if not p_s:
+					if p_a:
+						Log.info ("ok", color_only=True, newline=True)
+					Log.info ("Processing stages...", flush=True)
+					p_s = True
+					p_a = True
 				sbuff = Stage (self)
 				sbuff.parse (server_bin)
 				self.stages.__setitem__(sbuff.id.decode ("UTF-8"), sbuff)
+			elif current == AUTOGENTOO_TEMPLATE:
+				if not p_t:
+					if p_a:
+						Log.info ("ok", color_only=True, newline=True)
+					Log.info ("Processing templates...", flush=True)
+					p_t = True
+					p_a = True
+				__sbuff = Stage (self)
+				__sbuff.parse (server_bin, True)
+				self.templates.append (__sbuff)
 			else:
-				if not server_bin.skip_until((AUTOGENTOO_HOST, AUTOGENTOO_STAGE)):
+				if not server_bin.skip_until((AUTOGENTOO_HOST, AUTOGENTOO_STAGE, AUTOGENTOO_TEMPLATE)):
 					break
 			current = server_bin.read_int()
-		Log.info ("ok", color_only=True, newline=True)
-		Log.info ("Processing templates...", flush=True)
-		cdef DynamicBuffer template_t = self.sock.request("SRV GETTEMPLATES")
-		cdef char* len_buff = strtok (template_t.ptr, "\n")
-		cdef int l;
-		sscanf (len_buff, "%d", &l)
-		
-		if self.templates != NULL:
-			free_array (<void**>self.templates)
-		self.templates = <char**>malloc (sizeof(char*) * l)
-		
-		for i in range (l):
-			self.templates[i] = strdup (strtok (NULL, "\n"))
-		self.templates[l] = NULL
-		Log.info ("ok", color_only=True, newline=True, flush=True)
+			
+		if p_a:
+			Log.info ("ok", color_only=True, newline=True)
 	
-	def __dealloc__ (self):
-		if self.templates != NULL:
-			free_array(<void**>self.templates)
 
 cdef class Host(PyOb):
 	def __init__ (self, parent):
@@ -185,6 +197,7 @@ cdef class Stage(PyOb):
 		self.id = NULL
 		self.arch = NULL
 		self.cflags = NULL
+		self.extra_c = -1
 		self.chost = NULL
 		self.extra = NULL
 		self.dest_dir = NULL
@@ -196,20 +209,36 @@ cdef class Stage(PyOb):
 			out.append ((self.extra[i].make_extra.decode ("UTF-8"), self.extra[i].select))
 		return out
 	
-	cdef parse (self, Binary _bin):
+	cdef parse (self, Binary _bin, template=False):
 		self.id = _bin.read_string()
 		self.arch = _bin.read_string()
 		self.cflags = _bin.read_string()
 		self.chost = _bin.read_string()
 		
-		cdef extra_c = _bin.read_int();
-		self.extra = <StageExtra**>malloc (sizeof (StageExtra*) * (extra_c + 1))
-		for i in range (extra_c):
+		self.extra_c = _bin.read_int()
+		self.extra = <StageExtra**>malloc (sizeof (StageExtra*) * (self.extra_c + 1))
+		for i in range (self.extra_c):
 			self.extra[i] = stage_extra (_bin.read_string(), <template_selects>_bin.read_int())
-		self.extra[extra_c] = NULL
+		self.extra[self.extra_c] = NULL
 		
-		self.dest_dir = _bin.read_string()
-		self.new_id = _bin.read_string()
+		if not template:
+			self.dest_dir = _bin.read_string()
+			self.new_id = _bin.read_string()
+	
+	cdef char* send_dup (self, char* cflags=NULL):
+		cdef DynamicBuffer out = DynamicBuffer
+		out.append (self.id, strlen (id))
+		out.append (self.arch, strlen(self.arch))
+		
+		if cflags is None:
+			cflags = self.cflags
+		out.append (cflags, strlen(cflags))
+		out.append (self.chost, strlen(self.chost))
+		out.append (&self.extra_c, sizeof (int))
+		
+		for i in range (self.extra_c):
+			out.append (self.extra[i].make_extra, strlen(self.extra[i].make_extra))
+			out.append (&self.extra[i].select, sizeof(int))
 	
 	def __dealloc__ (self):
 		free (self.id)

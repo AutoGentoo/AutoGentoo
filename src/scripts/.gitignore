@@ -3,3 +3,4 @@ build/*
 *.c
 cmake-build-debug/*
 .idea/*
+venv/*

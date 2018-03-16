@@ -9,7 +9,8 @@ cdef extern from "<autogentoo/writeconfig.h>":
 		AUTOGENTOO_HOST_BINDING = 0xffffff00,
 		AUTOGENTOO_STAGE = 0xfffff000,
 		AUTOGENTOO_HOST_END = 0xaaaaaaaa,
-		AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb
+		AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb,
+		AUTOGENTOO_TEMPLATE = 0xcccccccc
 	
 	ctypedef enum chroot_t:
 		CHR_NOT_MOUNTED,
@@ -33,7 +34,7 @@ cdef class Server:
 	
 	cdef readonly hosts
 	cdef readonly stages
-	cdef char** templates
+	cdef readonly templates
 	cdef Socket sock
 	
 	cpdef void new_host (self, list fields)
@@ -71,15 +72,17 @@ cdef free_array (void** array)
 cdef int arr_len (void** array)
 
 cdef class Stage(PyOb):
+	cdef readonly Server parent
 	cdef readonly char* id
 	cdef readonly char* arch
 	cdef readonly char* cflags
 	cdef readonly char* chost
+	cdef readonly int extra_c;
 	
 	cdef StageExtra** extra
 	
 	cdef readonly char* dest_dir
-	cdef readonly char* parent
 	cdef readonly char* new_id
 	
-	cdef parse (self, Binary _bin)
+	cdef parse (self, Binary _bin, template=*)
+	cdef char* send_dup (self, char* cflags=*)

@@ -63,7 +63,13 @@ struct __HostTemplate {
 	host_id new_id; //!< The new id that will be passed in the handoff (don't init)
 };
 
-extern HostTemplate host_templates[];
+extern Vector* host_templates;
+
+/**
+ * Fill the Tempate vector with the predefined templates
+ * @param srv
+ */
+void host_template_list_init (Server* srv);
 
 /**
  * Returns a list of all the avaiable templates
@@ -72,12 +78,12 @@ extern HostTemplate host_templates[];
 //StringVector* host_template_get_all();
 
 /**
- * Get a new HostTemplate from an ID
+ * Get a new Stage from an Template ID
  * @param parent the parent server
  * @param id the id of the target host template
  * @return the newly created template
  */
-HostTemplate* host_template_new(Server* parent, char* id);
+HostTemplate* stage_new(Server* parent, char* id);
 
 /**
  * Download the stage3 of the HostTemplate
@@ -100,7 +106,7 @@ response_t host_template_extract(HostTemplate* t, char* fname);
  * @param t the static template to copy
  * @return a pointer the dynamically allocated template
  */
-HostTemplate* host_template_init(Server* parent, HostTemplate t);
+HostTemplate* host_template_init(Server* parent, HostTemplate* t);
 
 /**
  * Initialize stage3 given a HostTemplate

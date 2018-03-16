@@ -14,7 +14,7 @@
  * [id] [portage-arch] [cflags] [chost] [extras]
  */
 
-HostTemplate host_templates[] = {
+HostTemplate host_templates_init[] = {
 		/*
 		{"alpha", "alpha", "-mieee -pipe -O2 -mcpu=ev4", "alpha-unknown-linux-gnu", 1, {"/space/catalyst/portage", PORTDIR}},
 		 */
@@ -30,8 +30,32 @@ HostTemplate host_templates[] = {
 		{"arm64", "arm", "-O2 -pipe", "aarch64-unknown-linux-gnu"},
 		{"hppa", "hppa", "-O2 -pipe -march=1.1", "hppa1.1-unknown-linux-gnu", "CXXFLAGS=\"-O2 -pipe\"", CXXFLAGS},
 		*/
-		{NULL}
 };
+
+HostTemplate* prv_host_template_alloc (HostTemplate* t) {
+	HostTemplate* out = malloc(sizeof(HostTemplate));
+	
+	out->id = strdup(t->id);
+	out->arch = strdup(t->arch);
+	out->cflags = strdup(t->cflags);
+	out->chost = strdup(t->chost);
+	out->extra_c = t->extra_c;
+	
+	int i;
+	for (i = 0; i != t->extra_c; i++) {
+		out->extras[i].make_extra = strdup(t->extras[i].make_extra);
+		out->extras[i].select = t->extras[i].select;
+	}
+	
+	return out;
+}
+
+void host_template_list_init (Server* srv) {
+	for (int i = 0; i != sizeof (host_templates_init) / sizeof (HostTemplate); i++) {
+		HostTemplate* temp = prv_host_template_alloc(&host_templates_init[i]);
+		vector_add (srv->templates, &temp);
+	}
+}
 
 /*
 StringVector* host_template_get_all() {
@@ -44,32 +68,21 @@ StringVector* host_template_get_all() {
 	return out;
 }*/
 
-HostTemplate* host_template_new(Server* parent, char* id) {
+HostTemplate* stage_new(Server* parent, char* id) {
 	int i;
-	for (i = 0; i != sizeof(host_templates) / sizeof(host_templates[0]); i++) {
-		if (strcmp(host_templates[i].id, id) == 0) {
-			return host_template_init(parent, host_templates[i]);
+	for (i = 0; i != parent->templates->n; i++) {
+		HostTemplate* curr = *((HostTemplate**)vector_get(parent->templates, i));
+		if (strcmp(curr->id, id) == 0) {
+			return host_template_init(parent, curr);
 		}
 	}
 	
 	return NULL;
 }
 
-HostTemplate* host_template_init(Server* parent, HostTemplate t) {
-	HostTemplate* out = malloc(sizeof(HostTemplate));
+HostTemplate* host_template_init(Server* parent, HostTemplate* t) {
+	HostTemplate* out = prv_host_template_alloc(t);
 	out->parent = parent;
-	
-	out->id = strdup(t.id);
-	out->arch = strdup(t.arch);
-	out->cflags = strdup(t.cflags);
-	out->chost = strdup(t.chost);
-	out->extra_c = t.extra_c;
-	
-	int i;
-	for (i = 0; i != t.extra_c; i++) {
-		out->extras[i].make_extra = strdup(t.extras[i].make_extra);
-		out->extras[i].select = t.extras[i].select;
-	}
 	
 	out->new_id = host_id_new();
 	asprintf(&out->dest_dir, "%s/stage-%s", parent->location, out->new_id);

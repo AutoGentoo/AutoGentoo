@@ -40,14 +40,14 @@ void print_config_variable(ConfVariable* var) {
 void print_config(Conf* config) {
 	int i;
 	for (i = 0; i != config->default_variables->n; i++) {
-		print_config_variable(vector_get(config->default_variables, i));
+		print_config_variable((ConfVariable*)vector_get(config->default_variables, i));
 	}
 	for (i = 0; i != config->sections->n; i++) {
 		ConfSection* current_section = *(ConfSection**) vector_get(config->sections, i);
 		printf("[%s]\n", current_section->name);
 		int j;
 		for (j = 0; j != current_section->variables->n; j++) {
-			print_config_variable(vector_get(current_section->variables, j));
+			print_config_variable((ConfVariable*)vector_get(current_section->variables, j));
 		}
 	}
 }

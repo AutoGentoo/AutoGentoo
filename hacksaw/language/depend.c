@@ -28,7 +28,7 @@ DependExpression* new_dependexpression(void* ptr, expr_t type) {
 void add_dependexpression(Vector* list, Vector* exp) {
 	int i;
 	for (i = 0; i != exp->n; i++) {
-		DependExpression* current_expr = vector_get(exp, i);
+		DependExpression* current_expr = (DependExpression*)vector_get(exp, i);
 		if (current_expr->type == EXPR_EXPR) {
 			add_dependexpression(list, current_expr->dependexpressions);
 		} else {
@@ -143,7 +143,7 @@ void free_dependexpression(DependExpression* expr) {
 	} else if (expr->type == EXPR_EXPR) {
 		int i;
 		for (i = 0; i != expr->dependexpressions->n; i++) {
-			free_dependexpression(vector_get(expr->dependexpressions, i));
+			free_dependexpression((DependExpression*)vector_get(expr->dependexpressions, i));
 		}
 		vector_free(expr->dependexpressions);
 	} else {

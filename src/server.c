@@ -22,6 +22,8 @@ void handle_thread_kill(int signum) {
 
 Server* server_new(char* location, char* port, server_t opts) {
 	Server* out = malloc(sizeof(Server));
+	
+	out->templates = vector_new (sizeof(HostTemplate*), REMOVE | UNORDERED);
 	out->hosts = vector_new(sizeof(Host*), REMOVE | UNORDERED);
 	out->stages = small_map_new(sizeof(HostTemplate*), 5);
 	out->host_bindings = vector_new(sizeof(HostBind), REMOVE | UNORDERED);

@@ -38,6 +38,11 @@ size_t write_server_fp(Server* server, FILE* fp) {
 		void** __t = *(void***) vector_get(server->stages, i);
 		size += write_stage_fp(__t[1], fp);
 	}
+	for (i = 0; i != server->templates->n; i++) {
+		void* __t = *vector_get(server->templates, i);
+		size += write_template_fp(__t, fp);
+	}
+	
 	size += write_int(AUTOGENTOO_FILE_END, fp);
 	
 	return size;
@@ -74,7 +79,7 @@ size_t write_host_fp(Host* host, FILE* fp) {
 		for (i = 0; i != host->kernel->n; i++) {
 			size += write_int(AUTOGENTOO_HOST_KERNEL, fp);
 			
-			Kernel* current_kernel = vector_get(host->kernel, i);
+			Kernel* current_kernel = (Kernel*)vector_get(host->kernel, i);
 			size += write_string(current_kernel->kernel_target, fp);
 			size += write_string(current_kernel->version, fp);
 		}
@@ -115,6 +120,24 @@ size_t write_stage_fp(HostTemplate* temp, FILE* fp) {
 	return size;
 }
 
+size_t write_template_fp (HostTemplate* temp, FILE* fp) {
+	size_t size = 0;
+	size += write_int(AUTOGENTOO_TEMPLATE, fp);
+	size += write_string(temp->id, fp);
+	size += write_string(temp->arch, fp);
+	size += write_string(temp->cflags, fp);
+	size += write_string(temp->chost, fp);
+	
+	size += write_int(temp->extra_c, fp);
+	int i;
+	for (i = 0; i != temp->extra_c; i++) {
+		size += write_string(temp->extras[i].make_extra, fp);
+		size += write_int(temp->extras[i].select, fp);
+	}
+	
+	return size;
+}
+
 Server* read_server(char* location, char* port, server_t opts) {
 	char* config_file_name = ".autogentoo.config";
 	char* config_file = malloc(strlen(location) + strlen(config_file_name) + 2);
@@ -123,7 +146,9 @@ Server* read_server(char* location, char* port, server_t opts) {
 	FILE* fp = fopen(config_file, "rb");
 	if (fp == NULL) {
 		free(config_file);
-		return server_new(location, port, opts);
+		Server* out = server_new(location, port, opts);
+		host_template_list_init(out);
+		return out;
 	}
 	
 	free(config_file);
@@ -152,6 +177,10 @@ Server* read_server(char* location, char* port, server_t opts) {
 				read_stage(out, stage_temp, fp);
 				small_map_insert(out->stages, stage_temp->new_id, stage_temp);
 				break;
+			case AUTOGENTOO_TEMPLATE:
+				stage_temp = malloc(sizeof(HostTemplate));
+				read_template (out, stage_temp, fp);
+				vector_add(out->templates, &stage_temp);
 			case AUTOGENTOO_FILE_END:
 				break;
 			default:
@@ -240,6 +269,24 @@ void read_stage(Server* server, HostTemplate* dest, FILE* fp) {
 	
 	dest->dest_dir = read_string(fp);
 	dest->new_id = read_string(fp);
+}
+
+void read_template(Server* server, HostTemplate* dest, FILE* fp) {
+	dest->parent = server;
+	dest->id = read_string(fp);
+	dest->arch = read_string(fp);
+	dest->cflags = read_string(fp);
+	dest->chost = read_string(fp);
+	
+	dest->extra_c = read_int(fp);
+	int i;
+	for (i = 0; i != dest->extra_c; i++) {
+		dest->extras[i].make_extra = read_string(fp);
+		dest->extras[i].select = (template_selects)read_int(fp);
+	}
+	
+	dest->dest_dir = NULL;
+	dest->new_id = NULL;
 }
 
 size_t write_string(char* src, FILE* fp) {

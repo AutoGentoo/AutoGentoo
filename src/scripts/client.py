@@ -74,8 +74,9 @@ class Command:
 	def print_help(self):
 		if self.argv is None:
 			self.argv = []
-		print("    %s%s%s%s" % (
-			self.selector, " " + ', '.join(self.argv), ' ' * (self.manager.help_size - len(self.selector)), self.help))
+		ar_list = ', '.join(self.argv)
+		print("    %s%s%s %s" % (
+			self.selector, " " + ar_list, ' ' * (self.manager.help_size - (len(self.selector) + len(ar_list))), self.help))
 	
 	def run(self, args):
 		self.fptr(*args)
@@ -165,10 +166,18 @@ def main():
 		Command(cmdline, "refresh", lambda: server.read_server(), _help="refresh the server data"),
 		Command(cmdline, "help", lambda: cmdline.help(), _help="Print the help page"),
 		Command(cmdline, "list", lambda: print_hosts(server), _help="List all the available hosts"),
-		Command(cmdline, "host", lambda x: print_host(find_host(server, x)), ["host_id"],
-				_help="print all information about specified host"),
-		Command(cmdline, "edit", lambda x: edit_host(find_host(server, x)), ["host_id"],
-				_help="edit fields in the host given its id"),
+		Command(
+			cmdline,
+			"host",
+			lambda x: print_host(find_host(server, x)),
+			["host_id"],
+			_help="print all information about specified host"),
+		Command(
+			cmdline,
+			"edit",
+			lambda x: edit_host(find_host(server, x)),
+			["host_id"],
+			_help="edit fields in the host given its id"),
 		# Command(cmdline, "new", lambda: ),
 		Command(cmdline, "new", lambda: new_host(server), _help="create a new package environment"),
 		Command(cmdline, "exit", exit, _help="exit"),
