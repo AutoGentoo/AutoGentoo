@@ -148,6 +148,12 @@ def edit_host(host: Host):
 
 
 def new_host(server: Server):
+	print ("Choose a template for new environ, or new")
+	for x in server.templates:
+		print("%s (%s)" % (x.get("id"), x.get("arch")))
+	
+	templ = input("template> ")
+	
 	server.new_host([
 		input("hostname> "),
 		rlinput("profile> ", "default/linux/amd64/17.0/desktop/gnome/systemd"),

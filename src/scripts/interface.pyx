@@ -20,6 +20,25 @@ cdef class Server:
 		req = "SRV NEW 0\n" + "\n".join (fields)
 		self.sock.request(req.encode('utf8'), _print=True)
 	
+	def new_template (self, name, arch, chost, make_conf_entry=(), distfile=None, subfolder=None):
+		if distfile is None:
+			import urllib.request
+			distfile_meta = data = urllib.request.urlopen("http://distfiles.gentoo.org/releases/%s/autobuilds/latest-stage3.txt")
+			distfile = "http://distfiles.gentoo.org/releases/%s/autobuilds/" % arch
+			for line in distfile_meta:
+				if line[0] == "#":
+					continue
+				vers, rest = line.split ("/", 1)
+				if subfolder is not None:
+					subfolder += "/"
+				else:
+					subfolder = ""
+				buffer_check = "%s/%sstage3-%s-%s%s.tar" % (vers, subfolder, arch, subfolder.replace ("/", "-"), vers)
+				if line.startswith (buffer_check):
+					distfile += line.split (" ")[0]
+		print (distfile)
+	
+	
 	cpdef void read_server (self):
 		self.hosts = []
 		self.templates = []
