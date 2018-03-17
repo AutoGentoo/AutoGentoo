@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <autogentoo/autogentoo.h>
 #include <netinet/in.h>
+#include <autogentoo/stage.h>
 
 RequestLink requests[] = {
 		{"GET",              GET},
@@ -104,7 +105,7 @@ response_t INSTALL(Connection* conn, char** args, int start, int argc) {
 		return FORBIDDEN;
 	}
 	
-	if ((conn->request + start)[0] == 0) {
+	if (((char*)conn->request + start)[0] == 0) {
 		return BAD_REQUEST;
 	}
 	
@@ -221,7 +222,7 @@ response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
 		if (field_two >= target->extra->n)
 			return BAD_REQUEST;
 		
-		void** t_ptr = (void**)vector_get (target->extra, field_two);
+		void** t_ptr = vector_get (target->extra, field_two);
 		free (*t_ptr);
 		
 		*t_ptr = strdup (conn->request + start);
@@ -397,15 +398,32 @@ response_t SRV_GETTEMPLATES(Connection* conn, char** args, int start, int argc) 
 	return OK;
 }
 
+void prv_conn_read_str (char** dest, char* request, int* offset) {
+	*dest = request + *offset;
+	*offset += strlen(*dest) + 1;
+}
+
+void prv_conn_read_int (int* dest, char* request, int* offset) {
+	memcpy (dest, request + *offset, sizeof (int));
+	*offset += sizeof (int);
+	*dest = ntohl((uint32_t)*dest);
+}
+
 response_t SRV_TEMPLATE_CREATE(Connection* conn, char** args, int start, int argc) {
-	struct {
-		char* id;
-		char* arch;
-		char* cflags;
-		char* chost;
-	} in_data;
+	HostTemplate in_data;
 	
+	prv_conn_read_str(&in_data.id, conn->request, &start);
+	prv_conn_read_str(&in_data.arch, conn->request, &start);
+	prv_conn_read_str(&in_data.cflags, conn->request, &start);
+	prv_conn_read_str(&in_data.chost, conn->request, &start);
 	
+	prv_conn_read_int(&in_data.extra_c, conn->request, &start);
+	for (int i = 0; i != in_data.extra_c; i++) {
+		prv_conn_read_str (&in_data.extras[i].make_extra, conn->request, &start);
+		prv_conn_read_int ((int*)&in_data.extras[i].select, conn->request, &start);
+	}
+	
+	host_template_add(conn->parent, &in_data);
 	
 	return OK;
 }

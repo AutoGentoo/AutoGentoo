@@ -203,14 +203,17 @@ void server_respond(Connection* conn) {
 #endif
 	pid_t p = conn->parent->pid;
 	/* Read the request */
-	conn->request = malloc(2048);
+	size_t chunk_len = 128;
+	
+	conn->request = malloc(chunk_len);
 	ssize_t total_read = 0, current_bytes = 0;
-	size_t buffer_size = 2048;
-	total_read += current_bytes = read(conn->fd, conn->request, 2048);
-	while (current_bytes == 2048) {
-		buffer_size += 2048;
+	size_t buffer_size = chunk_len;
+	current_bytes = read(conn->fd, conn->request , chunk_len);
+	total_read += current_bytes;
+	while (current_bytes == chunk_len) {
+		buffer_size += chunk_len;
 		conn->request = realloc(conn->request, buffer_size);
-		current_bytes = read(conn->fd, conn->request + total_read, 2048);
+		current_bytes = recv(conn->fd, conn->request + total_read, chunk_len, 0);
 		total_read += current_bytes;
 	}
 	
@@ -229,11 +232,10 @@ void server_respond(Connection* conn) {
 	} else {
 		conn->status = CONNECTED;
 	}
-	
 	StringVector* args = string_vector_new(); // Written to by parse_request
 	
 	char* request_line;
-	int split_i = (int) (strchr(conn->request, '\n') - conn->request);
+	int split_i = (int) (strchr((char*)conn->request, '\n') - (char*)conn->request);
 	request_line = malloc((size_t) split_i + 1);
 	strncpy(request_line, conn->request, (size_t) split_i);
 	request_line[split_i] = 0;

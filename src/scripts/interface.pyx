@@ -20,21 +20,73 @@ cdef class Server:
 		req = "SRV NEW 0\n" + "\n".join (fields)
 		self.sock.request(req.encode('utf8'), _print=True)
 	
-	def new_template (self, name, arch, chost, make_conf_entry=()):
-		import http.client
-		c = http.client.HTTPConnection("distfiles.gentoo.org")
-		c.request("HEAD", "/releases/%s/autobuilds/latest-stage3-%s.txt" % (arch, name))
-		if c.getresponse().status != 200:
-			Log.error ("template id '%s' or arch '%s' is invalid")
-			Log.error ("make sure url http://distfiles.gentoo.org/releases/{arch}/autobuilds/latest-stage3-{id}.txt exists")
-			return None
+	def new_template (self, name, arch, chost, cflags, make_conf_entry=()):
+		send = [
+			name,
+			arch,
+			cflags,
+			chost,
+			len(make_conf_entry)
+		]
+		
+		cdef DynamicBuffer out_data = DynamicBuffer ()
+		cdef char* req = b"SRV TEMPLATE_CREATE HTTP/1.0\n"
+		out_data.append (req, strlen (req))
+		
+		cdef char* temp_str
+		cdef int temp_int
+		
+		for item in send:
+			if isinstance(item, int):
+				temp_int = htonl(<int>item)
+				out_data.append (&temp_int, sizeof (int))
+			else:
+				k = item.encode ("utf-8")
+				temp_str = k
+				out_data.append (temp_str, len(item) + 1)
+		
+		port_overwrites = [
+			("CXXFLAGS", CXXFLAGS),
+			("PORTDIR", PORTDIR),
+			("PORTAGE_TMPDIR", TMPDIR),
+			("DISTDIR", DISTDIR),
+			("PKGDIR", PKGDIR),
+			("PORT_LOGDIR", LOGDIR),
+		]
+		
+		for item in make_conf_entry:
+			temp_int = OTHER
+			overwrite = True
+			for x in port_overwrites:
+				if item.startswith(x[0]):
+					temp_int = x[1]
+					if input("overwrite %s (Y/n): " % x[0])[0].lower() == "n":
+						overwrite = False
+					break
+			
+			if not overwrite:
+				continue
+			if temp_int != OTHER:
+				item = item[item.find("=") + 2: -1]
+			
+			k = item.encode ("utf-8")
+			temp_str = k
+			out_data.append(temp_str, strlen(temp_str) + 1)
+			
+			temp_int = htonl(temp_int)
+			out_data.append(&temp_int, sizeof (int))
+		
+		
+		if strncmp (<char*>self.sock.request(out_data).ptr, "HTTP/1.0 200 OK", 15) == 0:
+			return name
+		return None
 	
 	
 	cpdef void read_server (self):
 		self.hosts = []
 		self.templates = []
 		
-		cdef Binary server_bin = Binary (self.sock.request("BIN SERVER\n"))
+		cdef Binary server_bin = Binary (self.sock.request(DynamicBuffer(b"BIN SERVER\n")))
 		
 		p_a = False
 		p_h = False
@@ -119,7 +171,7 @@ cdef class Host(PyOb):
 		cdef field_set = (<unicode>value).encode('utf8')
 		request.append (<char*>field_set, strlen(field_set))
 		print_raw(request.ptr, request.n)
-		self.parent.sock.request (request.ptr, _print=True)
+		self.parent.sock.request (request, _print=True)
 	
 	cdef void parse (self, Binary _bin):
 		self.id = _bin.read_string()

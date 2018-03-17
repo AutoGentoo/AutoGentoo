@@ -16,6 +16,8 @@ cdef extern from "<sys/socket.h>":
 	ssize_t send(int sockfd, const void *buf, size_t _len, int flags);
 	ssize_t recv(int sockfd, void *buf, size_t _len, int flags);
 	int connect(int sockfd, const sockaddr_in *addr, size_t addrlen);
+	ssize_t write(int fd, const void *buf, size_t count);
+	size_t strlen(char*);
 
 cdef class Socket:
 	def __init__ (self, Address adr):
@@ -23,7 +25,7 @@ cdef class Socket:
 		self.socket = None
 		self.fd = -1
 	
-	cpdef send (self, object data, do_connect=True):
+	cdef send (self, DynamicBuffer data, do_connect):
 		if do_connect:
 			self.socket = socket (AF_INET, SOCK_STREAM, 0)
 			self.fd = self.socket.fileno()
@@ -31,7 +33,8 @@ cdef class Socket:
 				raise IOError ("Failed to create socket")
 			if self.socket.connect ((self.adr.ip.decode ("UTF-8"), <object>atoi(self.adr.port))):
 				raise ConnectionError("Failed to connect")
-		return self.socket.send (data)
+		
+		return write (self.fd, data.ptr, data.n)
 	
 	cpdef recv (self, int size):
 		cdef char* buffer = <char*>malloc (size)
@@ -44,14 +47,10 @@ cdef class Socket:
 	cpdef close (self):
 		return self.socket.close ()
 	
-	cpdef DynamicBuffer request (self, request, _print=False, _print_raw=False):
+	cpdef DynamicBuffer request (self, DynamicBuffer request, _print=False, _print_raw=False):
 		cdef char* c_req;
 		
-		if isinstance(request, unicode):
-			c_req = strdup ((<unicode>request).encode ("UTF-8"))
-		else:
-			c_req = strdup(<char*>request)
-		self.send (c_req, True)
+		self.send (request, True)
 		
 		cdef DynamicBuffer out_data_raw = DynamicBuffer (size=128)
 		
@@ -67,7 +66,6 @@ cdef class Socket:
 			size = self.recv_into(buffer, 128)
 		
 		free (buffer)
-		free (c_req)
 		self.close ()
 		
 		return out_data_raw
@@ -86,9 +84,9 @@ cdef class Address:
 	def __dealloc__ (self):
 		free (self.ip)
 
-cdef print_raw (char* ptr, size_t n, int last_i = 0):
+cdef print_raw (void* ptr, size_t n, int last_i = 0):
 	for i in range (n):
-		printf ("%02x ", ptr[i] & 0xff)
+		printf ("%02x ", (<char*>ptr)[i] & 0xff)
 		if last_i % 25 == 0:
 			printf ("\n")
 		last_i += 1

@@ -1,7 +1,7 @@
 cdef class DynamicBuffer:
-	cdef public char* ptr
+	cdef void* ptr
 	cdef size_t size
-	cdef size_t n
+	cdef public size_t n
 	cdef short align
 	
 	cdef realloc (self, size_t size_to_add)

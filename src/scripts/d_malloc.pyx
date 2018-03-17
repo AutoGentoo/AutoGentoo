@@ -7,19 +7,26 @@ cdef extern from "<arpa/inet.h>":
 	int htonl (int)
 
 cdef class DynamicBuffer:
-	def __init__ (self, size_t size=32, short align=32):
-		self.ptr = <char*>malloc (size)
+	def __init__ (self, char* start=NULL, size_t size=32, short align=32):
+		self.ptr = malloc (size)
 		self.size = size
 		self.n = 0
 		self.align = align
+		
+		if start:
+			self.append (start, strlen(start))
 	
 	cdef realloc (self, size_t size_to_add):
 		self.size += size_to_add
-		self.ptr = <char*>realloc (self.ptr, self.size)
+		self.ptr = realloc (self.ptr, self.size)
 	
 	cdef void append (self, void* ptr, size_t size):
+		if size == 0 or ptr == NULL:
+			return
+		
 		if self.n + size >= self.size:
-			self.realloc(size + size % self.align)
+			final_unaligned = self.size + size
+			self.realloc(size + (final_unaligned % self.align))
 		
 		memcpy (self.ptr + self.n, ptr, size)
 		self.n += size

@@ -20,12 +20,12 @@ cdef class Socket:
 	cdef sockaddr_in address
 	cdef int fd
 	
-	cpdef send (self, object data, do_connect=*)
+	cdef send (self, DynamicBuffer data, do_connect)
 	cpdef recv (self, int size)
 	cdef size_t recv_into (self, void* buffer, size_t size)
 	
-	cpdef DynamicBuffer request (self, request, _print=*, _print_raw=*)
+	cpdef DynamicBuffer request (self, DynamicBuffer request, _print=*, _print_raw=*)
 	
 	cpdef close (self)
 
-cdef print_raw (char* ptr, size_t n, int last_i=*)
+cdef print_raw (void* ptr, size_t n, int last_i=*)

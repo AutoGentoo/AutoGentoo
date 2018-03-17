@@ -4,10 +4,12 @@ from op_socket import Address
 from interface import Server, Host
 import readline
 from log import Log
+import os
 
 ANSI_BOLD = "\x1b[1m"
 ANSI_GREEN = "\x1b[32m"
 ANSI_RESET = "\x1b[0m"
+native_cflags = os.popen("gcc -### -E - -march=native 2>&1 | sed -r '/cc1/!d;s/(\")|(^.* - )//g'").read()[:-1]
 
 
 class CommandManager:
@@ -143,9 +145,12 @@ def edit_host(host: Host):
 		values = extra
 		last = f2
 	else:
-		k = ["hostname: ", "profile: ", "cflags: ", "use: "][f1 - 1]
+		k = ["hostname: ", "profile: ", "cflags (-march=native is auto replaced): ", "use: "][f1 - 1]
 	
-	host.set_field(f1 - 1, f2 - 1, rlinput(k, values[last - 1]))
+	new_val = rlinput(k, values[last - 1])
+	if k == "cflags: ":
+		new_val.replace("-march=native", native_cflags)
+	host.set_field(f1 - 1, f2 - 1, new_val)
 
 
 def new_host(server: Server):
@@ -154,35 +159,45 @@ def new_host(server: Server):
 		print("%s (%s)" % (x.get("id"), x.get("arch")))
 	
 	template = None
-	while template is None:
-		templ = input("template > ")
-		if templ == "new":
-			arch = input("arch (amd64/x86/arm) > ")
+	templ = input("template > ")
+	if templ == "new":
+		while 1:
+			arch = input("portage arch (amd64/x86/arm) > ")
+			spec_arch = arch
+			if arch in ("arm", "x86"):
+				spec_arch = input("actual arch (i686, armv7a) > ")
 			feature = input("option feature (systemd/ulibc/hardened) > ")
 			if len(feature) > 0:
 				feature = '-' + feature
-			chost = rlinput("chost > x86_64-pc-linux-gnu")
-			
-			make_extra = []
-			me_buff = input("append to make.conf > ")
-			while len(me_buff) > 0:
-				make_extra.append(me_buff)
-				me_buff = input("append to make.conf > ")
-			
-			templ = server.new_template(arch + feature, arch, chost, make_extra)
-			while templ is None:
-				arch = input("arch (amd64/x86/arm) > ")
-				feature = input("option feature (systemd/ulibc/hardened) > ")
-				if len(feature) > 0:
-					feature = '-' + feature
-				templ = server.new_template(arch + feature, arch, chost, make_extra)
+			import http.client
+			c = http.client.HTTPConnection("distfiles.gentoo.org")
+			c.request("HEAD", "/releases/%s/autobuilds/latest-stage3-%s.txt" % (arch, spec_arch + feature))
+			if c.getresponse().status != 200:
+				Log.error("template id '%s' or arch '%s' is invalid\n", spec_arch + feature, arch)
+				Log.error(
+					"http://distfiles.gentoo.org/releases/%s/autobuilds/latest-stage3-%s.txt does not exist\n",
+					arch, spec_arch + feature)
+				continue
+			break
 		
-		for t in server.templates:
-			if t.get("id") == templ:
-				template = t
-				break
-		if template is None:
-			Log.error("template '%s' could not be found\n" % templ)
+		chost = rlinput("chost > ", "x86_64-pc-linux-gnu")
+		cflags = rlinput("cflags (-march=native is auto converted) > ", "-march=native -O2 -pipe")
+		cflags = cflags.replace("-march=native", native_cflags)
+		
+		make_extra = []
+		me_buff = input("append to make.conf > ")
+		while len(me_buff) > 0:
+			make_extra.append(me_buff)
+			me_buff = input("append to make.conf > ")
+		
+		templ = server.new_template(spec_arch + feature, arch, chost, cflags, make_extra)
+	
+	for t in server.templates:
+		if t.get("id") == templ:
+			template = t
+			break
+	if template is None:
+		Log.error("template '%s' could not be found\n" % templ)
 	
 	server.new_host([
 		input("hostname > "),
@@ -219,9 +234,6 @@ def main():
 		Command(cmdline, "exit", exit, _help="exit"),
 		Command(cmdline, "q", exit, _help="exit")
 	]
-	
-	for s in server.templates:
-		print(s.id)
 	
 	for cmd in commands:
 		cmdline.new_command(cmd)

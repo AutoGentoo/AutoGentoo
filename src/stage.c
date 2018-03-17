@@ -51,10 +51,13 @@ HostTemplate* prv_host_template_alloc (HostTemplate* t) {
 }
 
 void host_template_list_init (Server* srv) {
-	for (int i = 0; i != sizeof (host_templates_init) / sizeof (HostTemplate); i++) {
-		HostTemplate* temp = prv_host_template_alloc(&host_templates_init[i]);
-		vector_add (srv->templates, &temp);
-	}
+	for (int i = 0; i != sizeof (host_templates_init) / sizeof (HostTemplate); i++)
+		host_template_add (srv, &host_templates_init[i]);
+}
+
+void host_template_add (Server* srv, HostTemplate* ht) {
+	HostTemplate* temp = prv_host_template_alloc(ht);
+	vector_add (srv->templates, &temp);
 }
 
 /*

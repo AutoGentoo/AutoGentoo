@@ -67,9 +67,16 @@ extern Vector* host_templates;
 
 /**
  * Fill the Tempate vector with the predefined templates
- * @param srv
+ * @param srv parent server
  */
 void host_template_list_init (Server* srv);
+
+/**
+ * Duplicate the HostTemplate and add it to the parent
+ * @param srv parent server
+ * @param ht host template to dup
+ */
+void host_template_add (Server* srv, HostTemplate* ht);
 
 /**
  * Returns a list of all the avaiable templates
