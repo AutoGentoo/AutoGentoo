@@ -398,29 +398,47 @@ response_t SRV_GETTEMPLATES(Connection* conn, char** args, int start, int argc) 
 	return OK;
 }
 
-void prv_conn_read_str (char** dest, char* request, int* offset) {
+char prv_conn_read_str (char** dest, char* request, int* offset, size_t size) {
+	if (*offset >= size)
+		return 1;
+	
 	*dest = request + *offset;
 	*offset += strlen(*dest) + 1;
+	return 0;
 }
 
-void prv_conn_read_int (int* dest, char* request, int* offset) {
+char prv_conn_read_int (int* dest, char* request, int* offset, size_t size) {
+	if (*offset >= size)
+		return 1;
+	
 	memcpy (dest, request + *offset, sizeof (int));
 	*offset += sizeof (int);
 	*dest = ntohl((uint32_t)*dest);
+	return 0;
 }
 
 response_t SRV_TEMPLATE_CREATE(Connection* conn, char** args, int start, int argc) {
 	HostTemplate in_data;
 	
-	prv_conn_read_str(&in_data.id, conn->request, &start);
-	prv_conn_read_str(&in_data.arch, conn->request, &start);
-	prv_conn_read_str(&in_data.cflags, conn->request, &start);
-	prv_conn_read_str(&in_data.chost, conn->request, &start);
+	char** cpy_ar[] = {
+		&in_data.id,
+		&in_data.arch,
+		&in_data.cflags,
+		&in_data.chost,
+		NULL
+	};
 	
-	prv_conn_read_int(&in_data.extra_c, conn->request, &start);
+	for (int k = 0; cpy_ar[k] != NULL; k++) {
+		if (prv_conn_read_str(cpy_ar[k], conn->request, &start, conn->size))
+			return BAD_REQUEST;
+	}
+	
+	if (prv_conn_read_int(&in_data.extra_c, conn->request, &start, conn->size))
+		return BAD_REQUEST;
 	for (int i = 0; i != in_data.extra_c; i++) {
-		prv_conn_read_str (&in_data.extras[i].make_extra, conn->request, &start);
-		prv_conn_read_int ((int*)&in_data.extras[i].select, conn->request, &start);
+		if (prv_conn_read_str (&in_data.extras[i].make_extra, conn->request, &start, conn->size)
+			|| prv_conn_read_int ((int*)&in_data.extras[i].select, conn->request, &start, conn->size))
+			return BAD_REQUEST;
 	}
 	
 	host_template_add(conn->parent, &in_data);

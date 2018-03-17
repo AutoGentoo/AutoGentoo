@@ -232,6 +232,8 @@ void server_respond(Connection* conn) {
 	} else {
 		conn->status = CONNECTED;
 	}
+	
+	conn->size = (size_t)total_read;
 	StringVector* args = string_vector_new(); // Written to by parse_request
 	
 	char* request_line;

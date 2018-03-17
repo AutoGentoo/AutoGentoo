@@ -91,6 +91,7 @@ struct __Connection {
 	Server* parent; //!< The parent server of the connection
 	Host* bounded_host; //!< The Host bounded to the connections IP address (NULL if unbounded)
 	void* request; //!< The entire request
+	size_t size;
 	char* ip; //!< The IP of the connected client
 	int fd; //!< The file descriptor that points to the open connections
 	pthread_t pid; //!< The pid of the pthread that the handle is runnning in
