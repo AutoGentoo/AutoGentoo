@@ -546,15 +546,9 @@ response_t EXIT(Connection* conn, char** args, int start, int argc) {
 }
 
 response_t BIN_SERVER(Connection* conn, char** args, int start, int argc) {
-	size_t size = write_server(conn->parent);
-	void* buffer = malloc(size);
-	((char*) buffer)[0] = 0;
-	FILE* fp = fmemopen(buffer, size, "wb");
-	size = write_server_fp(conn->parent, fp);
-	rewind(fp);
-	conn_write(conn->fd, buffer, size);
-	fclose(fp);
-	free(buffer);
+	FILE* fp = fdopen (conn->fd, "wb");
+	write_server_fp(conn->parent, fp);
+	fflush (fp);
 	
 	response_t res = OK;
 	res.len = 0;

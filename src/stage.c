@@ -99,7 +99,9 @@ char* host_template_download(HostTemplate* t) {
 	}
 	
 	char distfile_meta_url[256];
-	sprintf(distfile_meta_url, "http://distfiles.gentoo.org/releases/%s/autobuilds/latest-stage3-%s.txt", t->arch,
+	sprintf(distfile_meta_url,
+			"http://distfiles.gentoo.org/releases/%s/autobuilds/latest-stage3-%s.txt",
+			t->arch,
 			t->id);
 	
 	int dl_ret;
