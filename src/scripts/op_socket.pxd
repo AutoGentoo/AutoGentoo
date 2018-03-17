@@ -28,4 +28,4 @@ cdef class Socket:
 	
 	cpdef close (self)
 
-cpdef print_raw (char* ptr, size_t n)
+cdef print_raw (char* ptr, size_t n, int last_i=*)

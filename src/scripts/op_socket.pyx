@@ -56,10 +56,11 @@ cdef class Socket:
 		cdef DynamicBuffer out_data_raw = DynamicBuffer (size=128)
 		
 		cdef void* buffer = malloc (128)
+		cdef int k = 1
 		cdef size_t size = self.recv_into(buffer, 128)
 		while size > 0:
 			if _print_raw:
-				print_raw (<char*>buffer, size)
+				k = print_raw (<char*>buffer, size, k)
 			if _print:
 				printf ("%s", <char*>buffer)
 			out_data_raw.append (buffer, size)
@@ -85,7 +86,11 @@ cdef class Address:
 	def __dealloc__ (self):
 		free (self.ip)
 
-cpdef print_raw (char* ptr, size_t n):
+cdef print_raw (char* ptr, size_t n, int last_i = 0):
 	for i in range (n):
-		printf ("%02X ", ptr[i])
+		printf ("%02x ", ptr[i] & 0xff)
+		if last_i % 25 == 0:
+			printf ("\n")
+		last_i += 1
 	fflush (stdout)
+	return last_i

@@ -20,23 +20,14 @@ cdef class Server:
 		req = "SRV NEW 0\n" + "\n".join (fields)
 		self.sock.request(req.encode('utf8'), _print=True)
 	
-	def new_template (self, name, arch, chost, make_conf_entry=(), distfile=None, subfolder=None):
-		if distfile is None:
-			import urllib.request
-			distfile_meta = data = urllib.request.urlopen("http://distfiles.gentoo.org/releases/%s/autobuilds/latest-stage3.txt")
-			distfile = "http://distfiles.gentoo.org/releases/%s/autobuilds/" % arch
-			for line in distfile_meta:
-				if line[0] == "#":
-					continue
-				vers, rest = line.split ("/", 1)
-				if subfolder is not None:
-					subfolder += "/"
-				else:
-					subfolder = ""
-				buffer_check = "%s/%sstage3-%s-%s%s.tar" % (vers, subfolder, arch, subfolder.replace ("/", "-"), vers)
-				if line.startswith (buffer_check):
-					distfile += line.split (" ")[0]
-		print (distfile)
+	def new_template (self, name, arch, chost, make_conf_entry=()):
+		import http.client
+		c = http.client.HTTPConnection("distfiles.gentoo.org")
+		c.request("HEAD", "/releases/%s/autobuilds/latest-stage3-%s.txt" % (arch, name))
+		if c.getresponse().status != 200:
+			Log.error ("template id '%s' or arch '%s' is invalid")
+			Log.error ("make sure url http://distfiles.gentoo.org/releases/{arch}/autobuilds/latest-stage3-{id}.txt exists")
+			return None
 	
 	
 	cpdef void read_server (self):
@@ -236,8 +227,14 @@ cdef class Stage(PyOb):
 		
 		self.extra_c = _bin.read_int()
 		self.extra = <StageExtra**>malloc (sizeof (StageExtra*) * (self.extra_c + 1))
+		
+		cdef char* k
+		cdef int _k
+		
 		for i in range (self.extra_c):
-			self.extra[i] = stage_extra (_bin.read_string(), <template_selects>_bin.read_int())
+			k = _bin.read_string()
+			_k = _bin.read_int()
+			self.extra[i] = stage_extra (k, <template_selects>_k)
 		self.extra[self.extra_c] = NULL
 		
 		if not template:

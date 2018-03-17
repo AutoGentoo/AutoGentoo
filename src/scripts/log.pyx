@@ -19,7 +19,7 @@ cdef class Log:
 	
 	@staticmethod
 	def common (kwargs):
-		printf (ANSI_RESET)
+		fputs (ANSI_RESET, stdout)
 		
 		for key in Log.kw_handlers:
 			try:
@@ -42,18 +42,19 @@ cdef class Log:
 			else:
 				printf ("%s%s * %s", ANSI_BOLD, ANSI_GREEN, ANSI_COLOR)
 		
-		printf ((text % va_args).encode ("UTF-8"))
+		fputs((text % va_args).encode ("UTF-8"), stdout)
 		Log.common(kwargs)
 		
 	
 	@staticmethod
 	def error (text, *va_args, **kwargs):
 		printf (b"%s%s * %s", ANSI_BOLD, ANSI_RED, ANSI_COLOR)
-		sys.stdout.write (text % va_args)
+		fflush (stdout)
+		fputs((text % va_args).encode ("UTF-8"), stdout)
 		Log.common(kwargs)
 	
 	@staticmethod
 	def warn (text, *va_args, **kwargs):
 		printf ("%s%s * %s", ANSI_BOLD, ANSI_YELLOW, ANSI_COLOR)
-		sys.stdout.write (text % va_args)
+		fputs((text % va_args).encode ("UTF-8"), stdout)
 		Log.common(kwargs)
