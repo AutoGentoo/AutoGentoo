@@ -31,6 +31,19 @@ cdef class DynamicBuffer:
 		memcpy (self.ptr + self.n, ptr, size)
 		self.n += size
 	
+	cdef void set (self, void* ptr, int start, size_t size):
+		if size == 0 or ptr == NULL:
+			return
+		
+		if start + size >= self.size:
+			final_unaligned = start + size
+			self.realloc(size + (final_unaligned % self.align))
+		
+		memcpy (self.ptr + start, ptr, size)
+		
+		if start + size >= self.n:
+			self.n = start + size
+	
 	def __dealloc__ (self):
 		free (self.ptr)
 
@@ -64,6 +77,7 @@ cdef class Binary:
 			memcpy (&c, self.buffer.ptr + self.pos, sizeof (int))
 			
 			self.pos += 1
+		self.pos -= 1
 		
 		return self.pos + 1 < self.buffer.n
 	

@@ -37,7 +37,6 @@ cdef class Server:
 	cdef readonly templates
 	cdef Socket sock
 	
-	cpdef void new_host (self, list fields)
 	cpdef void read_server (self)
 
 cdef class Host(PyOb):

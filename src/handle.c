@@ -120,9 +120,11 @@ char prv_conn_read_int (int* dest, char* request, int* offset, size_t size) {
 }
 
 response_t INSTALL(Connection* conn, char** args, int start, int argc) {
-	if (conn->bounded_host == NULL) {
+	if (conn->bounded_host == NULL)
 		return FORBIDDEN;
-	}
+	
+	if (conn->bounded_host->chroot_status == CHR_NOT_MOUNTED)
+		return CHROOT_NOT_MOUNTED;
 	
 	if (((char*)conn->request + start)[0] == 0) {
 		return BAD_REQUEST;
@@ -132,7 +134,6 @@ response_t INSTALL(Connection* conn, char** args, int start, int argc) {
 	backup_stdout = prv_pipe_to_client(conn->fd, &backup_conn);
 	
 	response_t res = host_install(conn->bounded_host, conn->request + start);
-	fflush(stdout);
 	
 	prv_pipe_back(&conn->fd, backup_stdout, backup_conn);
 	
@@ -274,9 +275,8 @@ response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
 response_t SRV_ACTIVATE(Connection* conn, char** args, int start, int argc) {
 	Host* found = server_host_search(conn->parent, args[0]);
 	
-	if (found == NULL) {
+	if (found == NULL)
 		return NOT_FOUND;
-	}
 	
 	server_bind(conn, found);
 	

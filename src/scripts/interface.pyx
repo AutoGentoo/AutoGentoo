@@ -1,4 +1,4 @@
-from op_socket cimport Address, Socket, print_raw
+from op_socket cimport Address, Socket
 from libc.stdlib cimport free, malloc
 from libc.stdio cimport *
 from libc.string cimport *
@@ -16,9 +16,38 @@ cdef class Server:
 		self.adr = adr
 		self.sock = Socket (self.adr)
 	
-	cpdef void new_host (self, list fields):
-		req = "SRV NEW 0\n" + "\n".join (fields)
-		self.sock.request(req.encode('utf8'), _print=True)
+	def activate (self, str host_id):
+		cdef DynamicBuffer bres = self.sock.request(DynamicBuffer(("SRV ACTIVATE " + host_id).encode ("utf-8")))
+		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
+		
+		if check_tr (b"HTTP/1.0 200 OK\n") == 0:
+			return True
+		return False
+	
+	def install (self, str _str):
+		temp = _str.encode("utf-8")
+		cdef char* c_str = temp
+		
+		cdef DynamicBuffer req = DynamicBuffer ()
+		req.append (b"INSTALL\n", 8)
+		req.append (c_str, strlen (c_str))
+		
+		cdef DynamicBuffer bres = self.sock.request(req, _print=True, _print_raw=False, _store=False)
+		
+		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
+		
+		if check_tr (b"HTTP/1.0 200 OK\n") == 0:
+			return True
+		elif check_tr (b"HTTP/1.0 403 Forbidden\n") == 0:
+			Log.error("You must select a build host first\n")
+		elif check_tr (b"HTTP/1.0 504 Chroot Not Mounted\n") == 0:
+			if strncmp (<char*>self.sock.request(DynamicBuffer(b"SRV MNTCHROOT\n")).ptr, "HTTP/1.0 2", 10) == 0:
+				return self.install (_str)
+			Log.error("Failed to mount chroot\n")
+			Log.error("Check the server logs\n")
+			return False
+		
+		return False
 	
 	def new_template (self, name, arch, chost, cflags, make_conf_entry=()):
 		send = [

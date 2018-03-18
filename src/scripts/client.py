@@ -49,6 +49,9 @@ class CommandManager:
 				print("command '%s' not found" % k[0])
 				continue
 			target_cmd = self.commands[k[0]]
+			if target_cmd.as_string:
+				target_cmd.run([' '.join(k[1:])])
+				continue
 			if len(k[1:]) != target_cmd.argc:
 				print("'%s' requires %s arguments got %s" % (k[0], target_cmd.argc, len(k[1:])))
 				continue
@@ -62,8 +65,9 @@ class Command:
 	help = ""
 	manager = None
 	fptr = None
+	as_string = False
 	
-	def __init__(self, manager, selector, func, argv=None, _help=""):
+	def __init__(self, manager, selector, func, argv=None, _help="", string=False):
 		self.selector = selector
 		if argv is None:
 			self.argc = 0
@@ -73,6 +77,7 @@ class Command:
 		self.help = _help
 		self.manager = manager
 		self.fptr = func
+		self.as_string = string
 	
 	def print_help(self):
 		if self.argv is None:
@@ -198,13 +203,28 @@ def new_host(server: Server):
 			break
 	if template is None:
 		Log.error("template '%s' could not be found\n" % templ)
-	
+	"""
 	server.new_host([
 		input("hostname > "),
 		rlinput("profile > ", "default/linux/amd64/17.0/desktop/gnome/systemd"),
 		rlinput("cflags > ", template.get('cflags')),
 		rlinput("use > ", "mmx sse sse2 systemd")
-	])
+	])"""
+
+
+def install(server: Server, arg: str):
+	Log.info("emerge %s\n" % arg)
+	if server.install(arg):
+		Log.info("Successfully ran\n")
+	else:
+		Log.error("Failed to run command\n")
+
+
+def activate_host(server: Server, host_id: str):
+	if server.activate(host_id):
+		Log.info("Selected host with id %s\n", host_id)
+	else:
+		Log.error("Host '%s' could not be found\n", host_id)
 
 
 def main():
@@ -231,14 +251,23 @@ def main():
 		# Command(cmdline, "new", lambda: ),
 		Command(cmdline, "new", lambda: new_host(server), _help="create a new package environment"),
 		Command(cmdline, "exit", exit, _help="exit"),
-		Command(cmdline, "q", exit, _help="exit")
+		Command(cmdline, "q", exit, _help="exit"),
+		Command(cmdline, "emerge", lambda x: install(server, x), string=True, _help="Run emerge in the build environment"),
+		Command(cmdline, "select", lambda x: activate_host(server, x), ["host_id"], "Select a host to bind to this client"),
+		Command(cmdline, "clear", lambda: os.system("clear"), _help="clear the screen")
 	]
 	
 	for cmd in commands:
 		cmdline.new_command(cmd)
-	cmdline.commandline()
 	
-	return 0
+	while True:
+		try:
+			cmdline.commandline()
+		except KeyboardInterrupt:
+			print("^C")
+		except EOFError:
+			print("^D")
+			break
 
 
-exit(main())
+main()

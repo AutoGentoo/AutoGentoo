@@ -16,7 +16,8 @@ typedef enum {
 	HTTP_INTERNAL_ERROR = 500,
 	HTTP_NOT_IMPLEMENTED = 501,
 	HTTP_BAD_GATEWAY = 502,
-	HTTP_SERVICE_UNAVAILABLE = 503
+	HTTP_SERVICE_UNAVAILABLE = 503,
+	HTTP_CHROOT_NOT_MOUNTED = 504
 } response_nt;
 
 typedef struct {
@@ -40,6 +41,7 @@ typedef struct {
 #define NOT_IMPLEMENTED (response_t) {HTTP_NOT_IMPLEMENTED, "Method Not Implemented", 22}
 #define BAD_GATEWAY (response_t) {HTTP_BAD_GATEWAY, "Bad Gateway", 11}
 #define SERVICE_UNAVAILABLE (response_t) {HTTP_SERVICE_UNAVAILABLE, "Service Unavailable", 19}
+#define CHROOT_NOT_MOUNTED (response_t) {HTTP_CHROOT_NOT_MOUNTED, "Chroot Not Mounted", 18}
 
 extern response_t res_list[];
 

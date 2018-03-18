@@ -47,7 +47,7 @@ cdef class Socket:
 	cpdef close (self):
 		return self.socket.close ()
 	
-	cpdef DynamicBuffer request (self, DynamicBuffer request, _print=False, _print_raw=False):
+	cpdef DynamicBuffer request (self, DynamicBuffer request, _print=False, _print_raw=False, _store=True):
 		cdef char* c_req;
 		
 		self.send (request, True)
@@ -62,7 +62,10 @@ cdef class Socket:
 				k = print_raw (<char*>buffer, size, k)
 			if _print:
 				printf ("%s", <char*>buffer)
-			out_data_raw.append (buffer, size)
+			if _store:
+				out_data_raw.append (buffer, size)
+			else:
+				out_data_raw.set (buffer, 0, size)
 			size = self.recv_into(buffer, 128)
 		
 		free (buffer)
@@ -84,10 +87,10 @@ cdef class Address:
 	def __dealloc__ (self):
 		free (self.ip)
 
-cdef print_raw (void* ptr, size_t n, int last_i = 0):
+cdef print_raw (void* ptr, size_t n, int last_i = 1, align=True):
 	for i in range (n):
 		printf ("%02x ", (<char*>ptr)[i] & 0xff)
-		if last_i % 25 == 0:
+		if last_i % 25 == 0 and align:
 			printf ("\n")
 		last_i += 1
 	fflush (stdout)
