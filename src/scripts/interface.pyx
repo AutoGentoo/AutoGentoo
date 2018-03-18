@@ -78,6 +78,7 @@ cdef class Server:
 		
 		
 		if strncmp (<char*>self.sock.request(out_data).ptr, "HTTP/1.0 200 OK", 15) == 0:
+			self.read_server()
 			return name
 		return None
 	
@@ -164,14 +165,14 @@ cdef class Host(PyOb):
 		cdef int c_f2 = <int>f2
 		
 		request.append (&c_f1, sizeof (int))
-		if c_f2 >= 0:
+		if c_f2 >= 0 and f1 == 5:
 			c_f2 = htonl(c_f2)
 			request.append(&c_f2, sizeof (int))
 		
 		cdef field_set = (<unicode>value).encode('utf8')
-		request.append (<char*>field_set, strlen(field_set))
-		print_raw(request.ptr, request.n)
-		self.parent.sock.request (request, _print=True)
+		request.append (<char*>field_set, strlen(field_set) + 1)
+		self.parent.sock.request (request)
+		self.parent.read_server()
 	
 	cdef void parse (self, Binary _bin):
 		self.id = _bin.read_string()

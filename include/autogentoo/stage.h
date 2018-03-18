@@ -87,10 +87,10 @@ void host_template_add (Server* srv, HostTemplate* ht);
 /**
  * Get a new Stage from an Template ID
  * @param parent the parent server
- * @param id the id of the target host template
+ * @param index the id of the target host template
  * @return the newly created template
  */
-HostTemplate* stage_new(Server* parent, char* id);
+HostTemplate* stage_new (Server* parent, int index);
 
 /**
  * Download the stage3 of the HostTemplate

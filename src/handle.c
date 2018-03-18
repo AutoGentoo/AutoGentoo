@@ -100,6 +100,25 @@ void prv_pipe_back(int* conn_fd, int backup, int backup_conn) {
 	*conn_fd = backup_conn;
 }
 
+char prv_conn_read_str (char** dest, char* request, int* offset, size_t size) {
+	if (*offset >= size)
+		return 1;
+	
+	*dest = request + *offset;
+	*offset += strlen(*dest) + 1;
+	return 0;
+}
+
+char prv_conn_read_int (int* dest, char* request, int* offset, size_t size) {
+	if (*offset >= size)
+		return 1;
+	
+	memcpy (dest, request + *offset, sizeof (int));
+	*offset += sizeof (int);
+	*dest = ntohl((uint32_t)*dest);
+	return 0;
+}
+
 response_t INSTALL(Connection* conn, char** args, int start, int argc) {
 	if (conn->bounded_host == NULL) {
 		return FORBIDDEN;
@@ -202,22 +221,23 @@ response_t SRV_CREATE(Connection* conn, char** args, int start) {
 }
 
 response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
-	char host_id[16];
-	memcpy (host_id, conn->request + start, 16);
-	start += 16;
+	char* host_id;
+	
+	if (prv_conn_read_str (&host_id, conn->request, &start, conn->size))
+		return BAD_REQUEST;
+	
 	Host* target;
 	if (!(target = server_host_search(conn->parent, host_id)))
 		return NOT_FOUND;
 	
 	int field_one;
-	memcpy (&field_one, conn->request + start, sizeof (int));
-	start += sizeof(int);
-	
+	if (prv_conn_read_int(&field_one, conn->request, &start, conn->size))
+		return BAD_REQUEST;
+
 	if (field_one == 5) {
 		int field_two;
-		memcpy (&field_two, conn->request + start, sizeof (int));
-		field_two = ntohl((uint32_t)field_two);
-		start += sizeof (int);
+		if (prv_conn_read_int(&field_two, conn->request, &start, conn->size))
+			return BAD_REQUEST;
 		
 		if (field_two >= target->extra->n)
 			return BAD_REQUEST;
@@ -228,26 +248,24 @@ response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
 		*t_ptr = strdup (conn->request + start);
 	}
 	else {
-		switch (field_one) {
-			case 0:
-				free (target->hostname);
-				target->hostname = strdup (conn->request + start);
-				break;
-			case 1:
-				free (target->profile);
-				target->profile = strdup (conn->request + start);
-				break;
-			case 2:
-				free (target->cflags);
-				target->hostname = strdup (conn->request + start);
-				break;
-			case 3:
-				free (target->cflags);
-				target->cflags = strdup (conn->request + start);
-				break;
-			default:
-				return BAD_REQUEST;
+		if (field_one == 0) {
+				free(target->hostname);
+			target->hostname = strdup(conn->request + start);
 		}
+		else if (field_one == 1) {
+			free(target->profile);
+			target->profile = strdup(conn->request + start);
+		}
+		else if (field_one == 2) {
+			free(target->cflags);
+			target->hostname = strdup(conn->request + start);
+		}
+		else if (field_one == 3) {
+			free(target->use);
+			target->use = strdup(conn->request + start);
+		}
+		else
+			return BAD_REQUEST;
 	}
 	
 	return OK;
@@ -398,25 +416,6 @@ response_t SRV_GETTEMPLATES(Connection* conn, char** args, int start, int argc) 
 	return OK;
 }
 
-char prv_conn_read_str (char** dest, char* request, int* offset, size_t size) {
-	if (*offset >= size)
-		return 1;
-	
-	*dest = request + *offset;
-	*offset += strlen(*dest) + 1;
-	return 0;
-}
-
-char prv_conn_read_int (int* dest, char* request, int* offset, size_t size) {
-	if (*offset >= size)
-		return 1;
-	
-	memcpy (dest, request + *offset, sizeof (int));
-	*offset += sizeof (int);
-	*dest = ntohl((uint32_t)*dest);
-	return 0;
-}
-
 response_t SRV_TEMPLATE_CREATE(Connection* conn, char** args, int start, int argc) {
 	HostTemplate in_data;
 	
@@ -447,12 +446,11 @@ response_t SRV_TEMPLATE_CREATE(Connection* conn, char** args, int start, int arg
 }
 
 response_t SRV_STAGE_NEW(Connection* conn, char** args, int start, int argc) {
-	/* We dont need to bind a template
-	 * because it doesn't need to
-	 * auto-detect destination directory for GET
+	/* We need to bind template using
+	 * its index instead of ID
 	 */
 	
-	HostTemplate* t = stage_new(conn->parent, args[0]);
+	HostTemplate* t = stage_new(conn->parent, (int)strtol (args[0], NULL, 10));
 	
 	small_map_insert(t->parent->stages, t->new_id, t);
 	

@@ -202,8 +202,7 @@ def new_host(server: Server):
 	server.new_host([
 		input("hostname > "),
 		rlinput("profile > ", "default/linux/amd64/17.0/desktop/gnome/systemd"),
-		rlinput("chost > ", "x86_64-pc-linux-gnu"),
-		input("cflags > "),
+		rlinput("cflags > ", template.get('cflags')),
 		rlinput("use > ", "mmx sse sse2 systemd")
 	])
 

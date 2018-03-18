@@ -71,16 +71,11 @@ StringVector* host_template_get_all() {
 	return out;
 }*/
 
-HostTemplate* stage_new(Server* parent, char* id) {
-	int i;
-	for (i = 0; i != parent->templates->n; i++) {
-		HostTemplate* curr = *((HostTemplate**)vector_get(parent->templates, i));
-		if (strcmp(curr->id, id) == 0) {
-			return host_template_init(parent, curr);
-		}
-	}
+HostTemplate* stage_new (Server* parent, int index) {
+	if (index >= parent->templates->n)
+		return NULL;
 	
-	return NULL;
+	return host_template_init(parent, *vector_get(parent->templates, index));
 }
 
 HostTemplate* host_template_init(Server* parent, HostTemplate* t) {
