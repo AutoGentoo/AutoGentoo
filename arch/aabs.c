@@ -36,7 +36,6 @@ void aabs_create(char* config) {
 	
 }
 
-aabs_pkg_t* aabs_package_search(char* str);
 
 aabs_pkg_t* aabs_library_search(char* lib);
 
