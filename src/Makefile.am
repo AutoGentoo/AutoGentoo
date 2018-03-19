@@ -1,3 +1,4 @@
+SUBDIRS = scripts
 AM_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/ -Wno-unused-result
 ACLOCAL_AMFLAGS='-I m4'
 
@@ -12,5 +13,5 @@ libautogentoo_la_LDFLAGS = ../hacksaw/src/libhacksaw.a -version-info 0
 
 bin_PROGRAMS = autogentoo
 autogentoo_SOURCES = autogentoo.c
-autogentoo_CFLAGS = ${AM_CFLAGS}
+autogentoo_CFLAGS = ${AM_CFLAGS} -D AUTOGENTOO_CLIENT=\"$(libdir)/autogentoo/client.py\"
 autogentoo_LDADD = libautogentoo.la

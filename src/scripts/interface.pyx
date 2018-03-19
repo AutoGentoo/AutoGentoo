@@ -36,6 +36,7 @@ cdef class Server:
 		
 		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
 		
+		
 		if check_tr (b"HTTP/1.0 200 OK\n") == 0:
 			return True
 		elif check_tr (b"HTTP/1.0 403 Forbidden\n") == 0:

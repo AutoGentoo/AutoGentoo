@@ -1,4 +1,4 @@
-AC_INIT([autogentoo], [1.0], [])
+AC_INIT([autogentoo], [1.1], [])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_PROG_CC
 AC_CONFIG_HEADERS([config.h])
@@ -10,6 +10,13 @@ AC_PROG_LEX
 LT_INIT
 
 AC_SUBST([LIBTOOL_DEPS])
+PYTHON_EXTENSION_SUFFIX=$(python-config --extension-suffix)
+PYTHON_LIBS=$(python-config --libs)
+PYTHON_INCLUDES=$(python-config --includes)
+
+AC_SUBST([PYTHON_EXTENSION_SUFFIX])
+AC_SUBST([PYTHON_INCLUDES])
+AC_SUBST([PYTHON_LIBS])
 
 AC_CHECK_HEADERS([archive.h archive_entry.h], [], [
     AC_MSG_ERROR(["Missing libarchive headers"])
@@ -59,6 +66,7 @@ AC_CONFIG_FILES([
     include/autogentoo/hacksaw/tools/Makefile
     Makefile
     src/Makefile
+    src/scripts/Makefile
     include/Makefile
     include/autogentoo/Makefile
 ])
