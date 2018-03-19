@@ -7,7 +7,7 @@ CYTHON_LIBS = -lautogentoo
 
 mainlibdir = $(libdir)/autogentoo
 
-build_dir: build
+build_dir:
 	mkdir -p build
 
 BUILT_SOURCES = build_dir
