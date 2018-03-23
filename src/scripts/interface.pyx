@@ -48,7 +48,7 @@ cdef class Server:
 			Log.error("Check the server logs\n")
 			return False
 		
-		return False
+		return True
 	
 	def new_template (self, name, arch, chost, cflags, make_conf_entry=()):
 		send = [

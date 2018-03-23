@@ -192,6 +192,8 @@ Host* prv_host_new(Server* server, int argc, StringVector* data) {
 }
 
 response_t SRV_CREATE(Connection* conn, char** args, int start) {
+	return METHOD_NOT_ALLOWED;
+	
 	int argc = 0;
 	if (strncmp(args[0], "HTTP", 4) != 0) {
 		char* end;

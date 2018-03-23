@@ -5,6 +5,8 @@ from interface import Server, Host
 import readline
 from log import Log
 import os
+import sys
+import subprocess
 
 ANSI_BOLD = "\x1b[1m"
 ANSI_GREEN = "\x1b[32m"
@@ -214,9 +216,7 @@ def new_host(server: Server):
 
 def install(server: Server, arg: str):
 	Log.info("emerge %s\n" % arg)
-	if server.install(arg):
-		Log.info("Successfully ran\n")
-	else:
+	if not server.install(arg):
 		Log.error("Failed to run command\n")
 
 
@@ -225,6 +225,12 @@ def activate_host(server: Server, host_id: str):
 		Log.info("Selected host with id %s\n", host_id)
 	else:
 		Log.error("Host '%s' could not be found\n", host_id)
+
+
+def emerge(cmd):
+	command = ["sudo", "emerge", *cmd.split(' ')]
+	subprocess.call(command)
+	sys.stdout.flush()
 
 
 def main():
@@ -253,6 +259,7 @@ def main():
 		Command(cmdline, "exit", exit, _help="exit"),
 		Command(cmdline, "q", exit, _help="exit"),
 		Command(cmdline, "emerge", lambda x: install(server, x), string=True, _help="Run emerge in the build environment"),
+		Command(cmdline, "lemerge", lambda x: emerge(x), string=True, _help="Run emerge in local environment"),
 		Command(cmdline, "select", lambda x: activate_host(server, x), ["host_id"], "Select a host to bind to this client"),
 		Command(cmdline, "clear", lambda: os.system("clear"), _help="clear the screen")
 	]
