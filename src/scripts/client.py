@@ -233,8 +233,11 @@ def emerge(cmd):
 	sys.stdout.flush()
 
 
-def main():
-	server = Server(Address("localhost", 9490))
+def main(argv):
+	ip = "localhost"
+	if len(argv) > 1:
+		ip = argv[1]
+	server = Server(Address(ip, 9490))
 	server.read_server()
 	
 	cmdline = CommandManager("AutoGentoo CLI", help_text="The autogentoo user interface")
@@ -277,4 +280,4 @@ def main():
 			break
 
 
-main()
+main(sys.argv)

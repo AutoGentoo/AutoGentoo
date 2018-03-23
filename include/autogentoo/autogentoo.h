@@ -47,6 +47,8 @@ void set_daemon(Opt* op, char* c);
 
 void pipe_to_log(Opt* op, char* logfile);
 
+void set_target(Opt* op, char* target);
+
 int main(int argc, char** argv);
 
 #endif
