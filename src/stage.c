@@ -179,13 +179,15 @@ response_t host_template_stage(HostTemplate* t) {
 
 Host* host_template_handoff(HostTemplate* src) {
 	Host* out = host_new(src->parent, strdup(src->new_id));
-	char host_dir[256];
-	host_get_path(out, host_dir);
+	char old_stage[32];
+	sprintf (old_stage, "stage-%s", src->new_id);
+	
 	out->extra = string_vector_new();
-	if (rename(src->dest_dir, host_dir) != 0) {
-		lerror("Failed to rename %s to %s", src->dest_dir, host_dir);
+	if (rename(old_stage, out->id) != 0) {
+		lerror("Failed to rename %s to %s", old_stage, out->id);
 		free(out->id);
 		free(out);
+		string_vector_free(out->extra);
 		return NULL;
 	}
 	
@@ -202,7 +204,8 @@ Host* host_template_handoff(HostTemplate* src) {
 		profile_dest[(int) profile_len] = 0; // Readlink does not null terminal
 		
 		char* t_profile_split = strstr(profile_dest, "profiles/");
-		out->profile = strdup(t_profile_split + strlen("profiles/"));
+		if (t_profile_split)
+			out->profile = strdup(t_profile_split + strlen("profiles/"));
 		free(t_profile_l);
 	}
 	

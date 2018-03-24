@@ -38,6 +38,7 @@ cdef class Server:
 	cdef Socket sock
 	
 	cpdef void read_server (self)
+	cdef Host find_host (self, char* name)
 
 cdef class Host(PyOb):
 	cdef readonly Server parent # The parent server

@@ -29,7 +29,32 @@ cdef class Server:
 		stage_req.append (b"\n", 1)
 		stage_req.append (b"ALL\n", 4)
 		
-		self.sock.request(stage_req, _print=True, _print_raw=False, _store=False)
+		cdef DynamicBuffer bres = self.sock.request(stage_req, _print=True, _print_raw=False, _store=False)
+		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
+		if check_tr(b"HTTP/1.0 200 OK\n") != 0:
+			Log.error ("Download or extract failed\n")
+			return None
+		
+		cdef DynamicBuffer handoff_req = DynamicBuffer(b"SRV HANDOFF ")
+		stage_req.append (new_id_name, strlen (new_id_name))
+		stage_req.append (b"\n", 1)
+		bref = self.sock.request(handoff_req)
+		if check_tr(b"HTTP/1.0 200 OK\n") != 0:
+			Log.error ("Host handoff failed\n")
+			return None
+		
+		self.read_server()
+		cdef Host target = self.find_host (new_id_name)
+		# 0 hostname
+		# 1 profile
+		# 2 cflags
+		# 3 use
+		
+		target.set_field(0, -1, hostname)
+		target.set_field(1, -1, profile)
+		target.set_field(2, -1, cflags)
+		target.set_field(3, -1, use)
+		
 		return new_id_name.decode ("utf-8")
 	
 	
@@ -129,6 +154,11 @@ cdef class Server:
 			return name
 		return None
 	
+	cdef Host find_host (self, char* name):
+		for x in self.hosts:
+			if strcmp (name, x.id):
+				return x
+		return None
 	
 	cpdef void read_server (self):
 		self.hosts = []
@@ -210,12 +240,10 @@ cdef class Host(PyOb):
 		request.append (self.id, 16)
 		
 		cdef int c_f1 = htonl (<int>f1)
-		cdef int c_f2 = <int>f2
+		cdef int c_f2 = htonl(<int>f2)
 		
 		request.append (&c_f1, sizeof (int))
-		if c_f2 >= 0 and f1 == 5:
-			c_f2 = htonl(c_f2)
-			request.append(&c_f2, sizeof (int))
+		request.append (&c_f2, sizeof (int))
 		
 		cdef field_set = (<unicode>value).encode('utf8')
 		request.append (<char*>field_set, strlen(field_set) + 1)

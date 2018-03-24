@@ -48,7 +48,7 @@ Host* host_new(Server* server, host_id id) {
 	return out;
 }
 
-void host_get_path(Host* host, char* dest) {
+void host_get_path (Host* host, char** dest) {
 	char buf[PATH_MAX];
 	char* dest_temp = realpath(host->parent->location, buf);
 	if (dest_temp == NULL) {
@@ -56,7 +56,7 @@ void host_get_path(Host* host, char* dest) {
 		return;
 	}
 	
-	sprintf(dest, "%s/%s", dest_temp, host->id);
+	asprintf(dest, "%s/%s", dest_temp, host->id);
 }
 
 void host_free(Host* host) {
@@ -128,14 +128,15 @@ int host_write_make_conf(Host* host) {
 		return 1;
 	}
 	
-	char path[256];
-	host_get_path(host, path);
+	char* path;
+	host_get_path(host, &path);
 	fgets(cbuild, 64, cbuild_stream);
 	*strchr(cbuild, '\n') = '\0';
 	pclose(cbuild_stream);
 	
 	char make_conf_file[256];
 	sprintf(make_conf_file, "%s/etc/portage/make.conf", path);
+	free (path);
 	FILE* fp_mc;
 	
 	fp_mc = fopen(make_conf_file, "w+");
@@ -348,8 +349,8 @@ response_t host_install(Host* host, char* arg) {
 	
 	pid_t install_pid = fork();
 	if (install_pid == 0) {
-		char root[256];
-		host_get_path(host, root);
+		char* root;
+		host_get_path(host, &root);
 		if (chdir(root) == -1) {
 			lerror("chdir() failed");
 			exit(-1);
@@ -358,6 +359,7 @@ response_t host_install(Host* host, char* arg) {
 			lerror("chroot() failed");
 			exit(-1);
 		}
+		free (root);
 		
 		linfo("Starting emerge...");
 		fflush(stdout);

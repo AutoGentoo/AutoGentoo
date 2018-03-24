@@ -236,19 +236,23 @@ response_t SRV_EDIT(Connection* conn, char** args, int start, int argc) {
 	int field_one;
 	if (prv_conn_read_int(&field_one, conn->request, &start, conn->size))
 		return BAD_REQUEST;
-
-	if (field_one == 5) {
-		int field_two;
-		if (prv_conn_read_int(&field_two, conn->request, &start, conn->size))
-			return BAD_REQUEST;
-		
+	
+	int field_two;
+	if (prv_conn_read_int(&field_two, conn->request, &start, conn->size))
+		return BAD_REQUEST;
+	
+	if (field_one == 4) {
 		if (field_two >= target->extra->n)
-			return BAD_REQUEST;
-		
-		void** t_ptr = vector_get (target->extra, field_two);
-		free (*t_ptr);
-		
-		*t_ptr = strdup (conn->request + start);
+			string_vector_add (target->extra, conn->request + start);
+		else {
+			void** t_ptr = vector_get (target->extra, field_two);
+			free (*t_ptr);
+			
+			if (strlen (conn->request + start) == 0)
+				vector_remove (target->extra, field_two);
+			else
+				*t_ptr = strdup (conn->request + start);
+		}
 	}
 	else {
 		if (field_one == 0) {
@@ -564,6 +568,10 @@ response_t SRV_GETSTAGE(Connection* conn, char** args, int start, int argc) {
 }
 
 response_t SRV_HANDOFF(Connection* conn, char** args, int start, int argc) {
+	if (argc == 0)
+		return BAD_REQUEST;
+	
+	
 	HostTemplate* __t = small_map_get(conn->parent->stages, args[0]);
 	if (!__t)
 		return NOT_FOUND;
@@ -573,6 +581,7 @@ response_t SRV_HANDOFF(Connection* conn, char** args, int start, int argc) {
 		return INTERNAL_ERROR;
 	
 	vector_add(conn->parent->hosts, &new_host);
+	write_server (conn->parent);
 	
 	return OK;
 }

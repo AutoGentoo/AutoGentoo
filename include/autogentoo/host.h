@@ -86,7 +86,7 @@ void host_set_status(Host* host);
  * @param host the host to read path from
  * @param dest the destination of the Host's path
  */
-void host_get_path(Host* host, char* dest);
+void host_get_path (Host* host, char** dest);
 
 /**
  * Free a host

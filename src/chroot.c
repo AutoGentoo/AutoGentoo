@@ -53,8 +53,8 @@ response_t chroot_mount(Host* host) {
 		return INTERNAL_ERROR;
 	}
 	
-	char new_root[256];
-	host_get_path(host, (char*) new_root);
+	char* new_root;
+	host_get_path(host, &new_root);
 	
 	int i;
 	for (i = 0; i != sizeof(to_mount) / sizeof(to_mount[0]); i++) {
@@ -82,6 +82,7 @@ response_t chroot_mount(Host* host) {
 		free(dest_temp);
 	}
 	
+	free(new_root);
 	string_vector_free(mounted);
 	host->chroot_status = CHR_MOUNTED;
 	return OK;

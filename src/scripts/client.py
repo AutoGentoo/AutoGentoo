@@ -141,6 +141,10 @@ def rlinput(prompt, prefill=''):
 
 
 def edit_host(host: Host):
+	if host is None:
+		Log.error("Host does not exist\n")
+		return
+	
 	values = []
 	extra = host.get_extra()
 	for i, x in enumerate(["hostname", "profile", "cflags", "use"]):
@@ -158,11 +162,15 @@ def edit_host(host: Host):
 		f2 = int(input("Field to edit > "))
 		values = extra
 		last = f2
+		k = "extra : "
 	else:
 		k = ["hostname: ", "profile: ", "cflags (-march=native is auto replaced): ", "use: "][f1 - 1]
 	
-	new_val = rlinput(k, values[last - 1])
-	if k == "cflags: ":
+	if last - 1 >= len(values):
+		new_val = input("new: ")
+	else:
+		new_val = rlinput(k, values[last - 1])
+	if f1 == 3:
 		new_val.replace("-march=native", native_cflags)
 	host.set_field(f1 - 1, f2 - 1, new_val)
 
@@ -218,7 +226,9 @@ def new_host(server: Server):
 		template,
 		input("hostname > "),
 		rlinput("profile > ", "default/linux/amd64/17.0/desktop/gnome/systemd"),
-		rlinput("cflags > ", template.get('cflags')),
+		rlinput(
+			"cflags (-march=native is auto converted) > ",
+			template.get('cflags').replace("-march=native", native_cflags)),
 		rlinput("use > ", "mmx sse sse2 systemd")
 	)
 
