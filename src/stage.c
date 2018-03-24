@@ -72,7 +72,7 @@ StringVector* host_template_get_all() {
 }*/
 
 HostTemplate* stage_new (Server* parent, int index) {
-	if (index >= parent->templates->n)
+	if (!parent->templates || index >= parent->templates->n)
 		return NULL;
 	
 	return host_template_init(parent, *vector_get(parent->templates, index));
@@ -117,7 +117,7 @@ char* host_template_download(HostTemplate* t) {
 	size_t len;
 	char* stage3_dest = NULL;
 	ssize_t read = 0;
-	char stage3_date[32];
+	char* stage3_date = NULL;
 	while ((read = getline(&line, &len, fp_temp)) != -1) {
 		if (!line || line[0] == '#')
 			continue;
@@ -129,10 +129,11 @@ char* host_template_download(HostTemplate* t) {
 		
 		char* dup_line = strdup(line);
 		char* s = strtok(line, "/");
-		strcpy(stage3_date, s);
+		stage3_date = strdup(s);
 		s = strtok(NULL, " ");
 		asprintf(&stage3_dest, "http://distfiles.gentoo.org/releases/%s/autobuilds/%s/%s", t->arch, stage3_date, s);
 		free(dup_line);
+		free(stage3_date);
 		
 		break;
 	}

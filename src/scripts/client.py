@@ -108,9 +108,16 @@ def find_host(server: Server, host_id: str) -> [Host, None]:
 	return None
 
 
-def print_hosts(server: Server):
-	for host in server.hosts:
-		print("%s: %s" % (host.get("id"), host.get("hostname")))
+def print_hosts(server: Server, _type=0):
+	if _type == 0:
+		for host in server.hosts:
+			print("%s: %s" % (host.get("id"), host.get("hostname")))
+	elif _type == 1:
+		for temp in server.templates:
+			print("%s: %s" % (temp.get("id"), temp.get("arch")))
+	elif _type == 2:
+		for temp in server.stages:
+			print("%s: %s" % (temp.get("new_id"), temp.get("arch")))
 
 
 def print_host(host: Host):
@@ -205,13 +212,15 @@ def new_host(server: Server):
 			break
 	if template is None:
 		Log.error("template '%s' could not be found\n" % templ)
-	"""
-	server.new_host([
+		return
+	
+	server.new_host(
+		template,
 		input("hostname > "),
 		rlinput("profile > ", "default/linux/amd64/17.0/desktop/gnome/systemd"),
 		rlinput("cflags > ", template.get('cflags')),
 		rlinput("use > ", "mmx sse sse2 systemd")
-	])"""
+	)
 
 
 def install(server: Server, arg: str):
@@ -244,7 +253,9 @@ def main(argv):
 	commands = [
 		Command(cmdline, "refresh", lambda: server.read_server(), _help="refresh the server data"),
 		Command(cmdline, "help", lambda: cmdline.help(), _help="Print the help page"),
-		Command(cmdline, "list", lambda: print_hosts(server), _help="List all the available hosts"),
+		Command(cmdline, "list", lambda: print_hosts(server, 0), _help="List all the available hosts"),
+		Command(cmdline, "list_templates", lambda: print_hosts(server, 1), _help="List all the available templates"),
+		Command(cmdline, "list_stages", lambda: print_hosts(server, 2), _help="List all the available stages"),
 		Command(
 			cmdline,
 			"host",

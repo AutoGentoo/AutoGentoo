@@ -11,10 +11,27 @@ cdef extern from "<arpa/inet.h>":
 cdef class Server:
 	def __init__ (self, Address adr):
 		self.hosts = []
-		self.stages = {}
+		self.stages = []
 		self.templates = []
 		self.adr = adr
 		self.sock = Socket (self.adr)
+	
+	def new_host (self, Stage template, str hostname, str profile, str cflags, str use):
+		cdef DynamicBuffer n_stage_req = DynamicBuffer (b"SRV STAGE_NEW ")
+		n_stage_req.append (<char*>template.id, strlen (template.id))
+		n_stage_req.append (b"\n", 1)
+		
+		cdef DynamicBuffer res = self.sock.request(n_stage_req)
+		cdef char* new_id_name = strtok (<char*>res.ptr, "\n")
+		
+		cdef DynamicBuffer stage_req = DynamicBuffer (b"SRV STAGE ")
+		stage_req.append (new_id_name, strlen (new_id_name))
+		stage_req.append (b"\n", 1)
+		stage_req.append (b"ALL\n", 4)
+		
+		self.sock.request(stage_req, _print=True, _print_raw=False, _store=False)
+		return new_id_name.decode ("utf-8")
+	
 	
 	def activate (self, str host_id):
 		cdef DynamicBuffer bres = self.sock.request(DynamicBuffer(("SRV ACTIVATE " + host_id).encode ("utf-8")))
@@ -116,6 +133,7 @@ cdef class Server:
 	cpdef void read_server (self):
 		self.hosts = []
 		self.templates = []
+		self.stages = []
 		
 		cdef Binary server_bin = Binary (self.sock.request(DynamicBuffer(b"BIN SERVER\n")))
 		
@@ -145,7 +163,7 @@ cdef class Server:
 					p_a = True
 				sbuff = Stage (self)
 				sbuff.parse (server_bin)
-				self.stages.__setitem__(sbuff.id.decode ("UTF-8"), sbuff)
+				self.stages.append(sbuff)
 			elif current == AUTOGENTOO_TEMPLATE:
 				if not p_t:
 					if p_a:

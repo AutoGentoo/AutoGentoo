@@ -16,17 +16,16 @@ cdef class DynamicBuffer:
 		if start:
 			self.append (start, strlen(start))
 	
-	cdef realloc (self, size_t size_to_add):
-		self.size += size_to_add
+	cdef realloc (self):
+		self.size *= 2
 		self.ptr = realloc (self.ptr, self.size)
 	
 	cdef void append (self, void* ptr, size_t size):
 		if size == 0 or ptr == NULL:
 			return
 		
-		if self.n + size >= self.size:
-			final_unaligned = self.size + size
-			self.realloc(size + (final_unaligned % self.align))
+		while self.n + size >= self.size:
+			self.realloc()
 		
 		memcpy (self.ptr + self.n, ptr, size)
 		self.n += size
@@ -35,14 +34,12 @@ cdef class DynamicBuffer:
 		if size == 0 or ptr == NULL:
 			return
 		
-		if start + size >= self.size:
-			final_unaligned = start + size
-			self.realloc(size + (final_unaligned % self.align))
+		while start + size >= self.size:
+			self.realloc()
 		
 		memcpy (self.ptr + start, ptr, size)
 		
-		if start + size >= self.n:
-			self.n = start + size
+		self.n = start + size
 	
 	def __dealloc__ (self):
 		free (self.ptr)

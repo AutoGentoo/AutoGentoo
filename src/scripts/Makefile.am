@@ -45,7 +45,7 @@ clean-local:
 	rm -rf op_socket$(PYTHON_EXTENSION_SUFFIX) build/op_socket.o op_socket.c
 	rm -rf op_string$(PYTHON_EXTENSION_SUFFIX) build/op_string.o op_string.c
 	rm -rf log$(PYTHON_EXTENSION_SUFFIX) build/log.o log.c
-	rm build
+	rm -rf build
 
 mainlib_DATA = client.py \
                  d_malloc$(PYTHON_EXTENSION_SUFFIX) \

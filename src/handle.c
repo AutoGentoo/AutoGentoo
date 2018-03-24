@@ -452,6 +452,9 @@ response_t SRV_STAGE_NEW(Connection* conn, char** args, int start, int argc) {
 	 * its index instead of ID
 	 */
 	
+	if (argc == 0)
+		return BAD_REQUEST;
+	
 	HostTemplate* t = stage_new(conn->parent, (int)strtol (args[0], NULL, 10));
 	
 	small_map_insert(t->parent->stages, t->new_id, t);
@@ -462,6 +465,9 @@ response_t SRV_STAGE_NEW(Connection* conn, char** args, int start, int argc) {
 }
 
 response_t SRV_STAGE(Connection* conn, char** args, int start, int argc) {
+	if (argc == 0)
+		return BAD_REQUEST;
+	
 	HostTemplate* t = small_map_get(conn->parent->stages, args[0]);
 	if (t == NULL)
 		return NOT_FOUND;

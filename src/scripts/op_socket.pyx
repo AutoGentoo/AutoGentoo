@@ -19,6 +19,8 @@ cdef extern from "<sys/socket.h>":
 	ssize_t write(int fd, const void *buf, size_t count);
 	size_t strlen(char*);
 
+from posix.unistd cimport STDOUT_FILENO
+
 cdef class Socket:
 	def __init__ (self, Address adr):
 		self.adr = adr
@@ -54,14 +56,13 @@ cdef class Socket:
 		
 		cdef DynamicBuffer out_data_raw = DynamicBuffer (size=128)
 		
-		cdef void* buffer = malloc (128)
-		cdef int k = 1
+		cdef void* buffer = malloc (132)
 		cdef size_t size = self.recv_into(buffer, 128)
 		while size > 0:
 			if _print_raw:
 				k = print_raw (<char*>buffer, size, k)
 			if _print:
-				printf ("%s", <char*>buffer)
+				write (STDOUT_FILENO, buffer, size)
 			if _store:
 				out_data_raw.append (buffer, size)
 			else:
