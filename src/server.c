@@ -192,10 +192,22 @@ void connection_free(Connection* conn) {
 	free(conn);
 }
 
+void handle_segv (int signum) {
+	Connection* failed_thread = thread_get_conn(srv->thandler, pthread_self());
+	rsend (failed_thread, AUTOGENTOO_SEGV);
+	
+	failed_thread->parent->thandler->to_join = failed_thread->pid;
+	connection_free(failed_thread);
+#ifndef AUTOGENTOO_NO_THREADS
+	pthread_kill(failed_thread->parent->pthread, SIGUSR1);
+#endif
+}
+
 void server_respond(Connection* conn) {
 #ifndef AUTOGENTOO_NO_THREADS
 	conn->pid = pthread_self();
-	thread_register(conn->parent->thandler, conn->pid);
+	thread_register(conn->parent->thandler, conn->pid, conn);
+	signal (SIGSEGV, handle_segv);
 #else
 	conn->pid = 0;
 #endif
@@ -261,9 +273,13 @@ void server_respond(Connection* conn) {
 	write_server(conn->parent);
 	
 	conn->parent->thandler->to_join = conn->pid;
+	pthread_t parent = conn->parent->pthread;
 	connection_free(conn);
+	
+	
+	
 #ifndef AUTOGENTOO_NO_THREADS
-	pthread_kill(conn->parent->pthread, SIGUSR1);
+	pthread_kill(parent, SIGUSR1);
 #endif
 }
 
@@ -272,18 +288,17 @@ void server_bind(Connection* conn, Host* host) {
 	if (loc == NULL) {
 		HostBind new_binding = {.ip = strdup(conn->ip), .host = host};
 		vector_add(conn->parent->host_bindings, &new_binding);
-	} else {
-		loc->host = host;
 	}
+	else
+		loc->host = host;
 }
 
 Host* server_host_search(Server* server, host_id id) {
 	int i;
 	for (i = 0; i != server->hosts->n; i++) {
 		Host* current_host = *(Host**) vector_get(server->hosts, i);
-		if (strcmp((char*) id, current_host->id) == 0) {
+		if (strcmp((char*) id, current_host->id) == 0)
 			return current_host;
-		}
 	}
 	
 	return NULL;
@@ -318,9 +333,8 @@ void daemonize(char* _cwd) {
 	}
 	
 	/* Change the current working directory. */
-	if ((chdir(_cwd)) < 0) {
+	if ((chdir(_cwd)) < 0)
 		exit(1);
-	}
 	
 	/*resettign File Creation Mask */
 	umask(027);
