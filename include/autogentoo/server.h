@@ -66,6 +66,7 @@ struct __Server {
 	volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
 	ThreadHandler* thandler;
 	pid_t pid;
+	pthread_t pthread;
 };
 
 /**
