@@ -1,30 +1,7 @@
 #ifndef __AUTOGENTOO_SERVER_H__
 #define __AUTOGENTOO_SERVER_H__
 
-/**
- * @brief The main struct that hold hosts/bindings and other information
- *  - This is pretty much required throughout the entire program so keep it!
- */
-typedef struct __Server Server;
-
-/**
- * @brief Bind an IP to a host
- *  - This is used when a request is made. 
- *  - The IP of the request is matched to a Host using this struct
- */
-typedef struct __HostBind HostBind;
-
-/**
- * @brief Holds information about a connection
- *  - A new connection will initilized after the return of accept().
- *  - The request is immediately after the connection is made
- *  - The bounded_host will be set as well (NULL if the IP is not bounded)
- *  - Since every connection runs in its own thread the pthread_t is kept here as well
- */
-typedef struct __Connection Connection;
-
 #include <autogentoo/hacksaw/hacksaw.h>
-#include "host.h"
 #include "thread.h"
 #include <sys/types.h>
 #include <pthread.h>
@@ -76,7 +53,7 @@ struct __Server {
  */
 struct __HostBind {
 	char* ip; //!< The IP to bind the host to
-	Host* host; //!< The target of the host binding
+	struct __Host* host; //!< The target of the host binding
 };
 
 /**
@@ -88,8 +65,8 @@ struct __HostBind {
  * Since every connection runs in its own thread the pthread_t is kept here as well
  */
 struct __Connection {
-	Server* parent; //!< The parent server of the connection
-	Host* bounded_host; //!< The Host bounded to the connections IP address (NULL if unbounded)
+	struct __Server* parent; //!< The parent server of the connection
+	struct __Host* bounded_host; //!< The Host bounded to the connections IP address (NULL if unbounded)
 	void* request; //!< The entire request
 	size_t size;
 	char* ip; //!< The IP of the connected client
@@ -97,6 +74,30 @@ struct __Connection {
 	pthread_t pid; //!< The pid of the pthread that the handle is runnning in
 	con_t status; //!< The status of the current Connection
 };
+
+/**
+ * @brief The main struct that hold hosts/bindings and other information
+ *  - This is pretty much required throughout the entire program so keep it!
+ */
+typedef struct __Server Server;
+
+/**
+ * @brief Bind an IP to a host
+ *  - This is used when a request is made.
+ *  - The IP of the request is matched to a Host using this struct
+ */
+typedef struct __HostBind HostBind;
+
+/**
+ * @brief Holds information about a connection
+ *  - A new connection will initilized after the return of accept().
+ *  - The request is immediately after the connection is made
+ *  - The bounded_host will be set as well (NULL if the IP is not bounded)
+ *  - Since every connection runs in its own thread the pthread_t is kept here as well
+ */
+typedef struct __Connection Connection;
+
+#include "host.h"
 
 /**
  * Creates a new server ready to start

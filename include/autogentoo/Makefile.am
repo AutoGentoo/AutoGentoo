@@ -4,6 +4,7 @@ maininclude_HEADERS =   autogentoo.h \
                         handle.h \
                         host.h \
                         response.h \
+                        request.h \
                         server.h \
                         writeconfig.h \
                         chroot.h \

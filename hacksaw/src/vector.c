@@ -23,7 +23,7 @@ size_t vector_add(Vector* vec, void* el) {
 	if (vec->s == (vec->n + 1)) {
 		vector_allocate(vec);
 	}
-	void* out = vector_get(vec, vec->n);
+	void* out = vector_get(vec, (int)vec->n);
 	memcpy(out, el, vec->size);
 	
 	vec->n++;
@@ -40,10 +40,10 @@ void vector_remove(Vector* vec, int index) {
 				   vector_get(vec, index + 1),
 				   vec->size * (vec->n - index)
 			); // Moves everything back by vec->size
-			memcpy(vector_get(vec, vec->n), zero, vec->size);
+			memcpy(vector_get(vec, (int)vec->n), zero, vec->size);
 		} else {
 			memmove(vector_get(vec, index),
-					vector_get(vec, vec->n - 1),
+					vector_get(vec, (int)vec->n - 1),
 					vec->size
 			); // Moves the last element into the open place
 		}

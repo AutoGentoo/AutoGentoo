@@ -215,6 +215,7 @@ cdef class Server:
 
 cdef class Host(PyOb):
 	def __init__ (self, parent):
+		super ().__init__()
 		self.parent = parent
 		self.extra = NULL
 		#self.kernel = PyVec ()
@@ -332,6 +333,7 @@ cdef int arr_len (void** array):
 
 cdef class Stage(PyOb):
 	def __init__ (self, parent):
+		super ().__init__()
 		self.parent = parent
 		self.id = NULL
 		self.arch = NULL

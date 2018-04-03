@@ -22,7 +22,7 @@ set(src_SOURCES
         src/writeconfig.c
         src/endian_convert.c
         src/getopt.c
-        src/thread.c)
+        src/thread.c src/request.c)
 
 set(client_SOURCES
         src/render.c src/command_line.c)
@@ -40,6 +40,7 @@ set(include_HEADERS
         include/autogentoo/host.h
         include/autogentoo/kernel.h
         include/autogentoo/response.h
+        include/autogentoo/request.h
         include/autogentoo/server.h
         include/autogentoo/stage.h
         include/autogentoo/writeconfig.h

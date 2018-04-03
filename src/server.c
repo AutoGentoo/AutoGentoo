@@ -242,7 +242,7 @@ void server_respond(Connection* conn) {
 	strncpy(request_line, conn->request, (size_t) split_i);
 	request_line[split_i] = 0;
 	
-	SHFP call = parse_request(request_line, args);
+	Request* request = request_handle(conn);
 	
 	linfo("handle %s on pthread_t 0x%llx (%s)", conn->ip, conn->pid, request_line);
 	

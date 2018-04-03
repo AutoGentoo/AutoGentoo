@@ -4,24 +4,20 @@
 #include "server.h"
 #include "response.h"
 
-/**
- * A function pointer for to handle requests
- * @param conn the connection of the request
- * @param args a list of arguments passed to the handler
- * @param the index to start reading the request at
- */
-typedef response_t (* SHFP)(Connection* conn, char** args, int start, int argc);
+
 
 /**
  * Links a string to a request handler
  */
 typedef struct __RequestLink RequestLink;
 
+#include "request.h"
+
 /**
  * Links a string to a request handler
  */
 struct __RequestLink {
-	char* request_ident; //!< The string that matches the request
+	request_t request_ident; //!< The string that matches the request
 	SHFP call; //!< A pointer to the function handler
 };
 
@@ -36,7 +32,7 @@ extern RequestLink requests[];
  * @param args the arguments parsed from the request
  * @return a pointer to function that should be called
  */
-SHFP parse_request(char* parse_line, StringVector* args);
+//SHFP parse_request(char* parse_line, StringVector* args);
 
 /**
  * HTTP request to download file

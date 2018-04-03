@@ -35,7 +35,7 @@ cdef class Server:
 	cdef readonly hosts
 	cdef readonly stages
 	cdef readonly templates
-	cdef Socket sock
+	cdef public Socket sock
 	
 	cpdef void read_server (self)
 	cdef Host find_host (self, char* name)
