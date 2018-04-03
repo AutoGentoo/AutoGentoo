@@ -39,9 +39,8 @@ Host* server_get_active(Server* server, char* ip) {
 	int i;
 	for (i = 0; i != server->host_bindings->n; i++) {
 		HostBind* current_bind = (HostBind*) vector_get(server->host_bindings, i);
-		if (strcmp(ip, current_bind->ip) == 0) {
+		if (strcmp(ip, current_bind->ip) == 0)
 			return current_bind->host;
-		}
 	}
 	
 	return NULL;
@@ -51,9 +50,8 @@ HostBind* prv_server_get_active_location(Server* server, char* ip) {
 	int i;
 	for (i = 0; i != server->host_bindings->n; i++) {
 		HostBind* current_bind = (HostBind*) vector_get(server->host_bindings, i);
-		if (strcmp(ip, current_bind->ip) == 0) {
+		if (strcmp(ip, current_bind->ip) == 0)
 			return current_bind;
-		}
 	}
 	
 	return NULL;
@@ -76,6 +74,7 @@ Connection* connection_new(Server* server, int conn_fd) {
 void server_start(Server* server) {
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
+	server->pthread = pthread_self();
 	
 	int listenfd = server_init(server->port);
 	
@@ -183,9 +182,8 @@ int server_init(char* port) {
 
 void connection_free(Connection* conn) {
 	if (conn->status != CLOSED) {;
-		if (fcntl(conn->fd, F_GETFD) != -1 || errno != EBADF) {
+		if (fcntl(conn->fd, F_GETFD) != -1 || errno != EBADF)
 			close(conn->fd);
-		}
 		conn->status = CLOSED;
 	}
 	
@@ -194,26 +192,41 @@ void connection_free(Connection* conn) {
 	free(conn);
 }
 
+void handle_segv (int signum) {
+	Connection* failed_thread = thread_get_conn(srv->thandler, pthread_self());
+	rsend (failed_thread, AUTOGENTOO_SEGV);
+	
+	failed_thread->parent->thandler->to_join = failed_thread->pid;
+	connection_free(failed_thread);
+#ifndef AUTOGENTOO_NO_THREADS
+	pthread_kill(failed_thread->parent->pthread, SIGUSR1);
+#endif
+}
+
 void server_respond(Connection* conn) {
 #ifndef AUTOGENTOO_NO_THREADS
 	conn->pid = pthread_self();
-	thread_register(conn->parent->thandler, conn->pid);
+	thread_register(conn->parent->thandler, conn->pid, conn);
+	signal (SIGSEGV, handle_segv);
 #else
 	conn->pid = 0;
 #endif
-	pid_t p = conn->parent->pid;
 	/* Read the request */
 	size_t chunk_len = 128;
 	
 	conn->request = malloc(chunk_len);
 	ssize_t total_read = 0, current_bytes = 0;
+	
 	size_t buffer_size = chunk_len;
 	current_bytes = read(conn->fd, conn->request , chunk_len);
 	total_read += current_bytes;
 	while (current_bytes == chunk_len) {
-		buffer_size += chunk_len;
-		conn->request = realloc(conn->request, buffer_size);
-		current_bytes = recv(conn->fd, conn->request + total_read, chunk_len, 0);
+		if (total_read + chunk_len >= buffer_size) {
+			buffer_size *= 2;
+			conn->request = realloc(conn->request, buffer_size);
+		}
+		
+		current_bytes = read(conn->fd, conn->request + total_read, chunk_len);
 		total_read += current_bytes;
 	}
 	
@@ -221,52 +234,53 @@ void server_respond(Connection* conn) {
 		lerror("recv() error");
 		conn->status = SERVER_ERROR;
 		connection_free(conn);
-		kill(p, SIGUSR1);
+		pthread_kill(conn->parent->pthread, SIGUSR1);
 		return;
-	} else if (total_read == 0) { // receive socket closed
+	}
+	else if (total_read == 0) { // receive socket closed
 		lwarning("Client disconnected upexpectedly.");
 		conn->status = FAILED;
 		connection_free(conn);
-		kill(p, SIGUSR1);
+		pthread_kill(conn->parent->pthread, SIGUSR1);
 		return;
-	} else {
-		conn->status = CONNECTED;
 	}
+	
+	conn->status = CONNECTED;
 	
 	conn->size = (size_t)total_read;
 	StringVector* args = string_vector_new(); // Written to by parse_request
 	
-	char* request_line;
-	int split_i = (int) (strchr((char*)conn->request, '\n') - (char*)conn->request);
-	request_line = malloc((size_t) split_i + 1);
-	strncpy(request_line, conn->request, (size_t) split_i);
-	request_line[split_i] = 0;
-	
 	Request* request = request_handle(conn);
+	char* split = strchr (conn->request, '\n');
+	*split = 0;
+	void* call = NULL;
+	//SHFP call = parse_request(conn->request, args);
 	
-	linfo("handle %s on pthread_t 0x%llx (%s)", conn->ip, conn->pid, request_line);
+	linfo("handle %s on pthread_t 0x%llx (%s)", conn->ip, conn->pid, conn->request);
 	
 	response_t res;
 	
-	if (call == NULL) {
+	if (call == NULL)
 		res = NOT_IMPLEMENTED;
-	} else {
-		res = (*call)(conn, (char**) args->ptr, split_i + 1, (int) args->n);
-	}
+	//else
+		//res = (*call)(conn, (char**) args->ptr, (int)(++split - (char*)conn->request), (int) args->n);
 	
 	string_vector_free(args);
-	free(request_line);
 	
-	if (res.len != 0) {
+	if (res.len != 0)
 		rsend(conn, res);
-	}
+	
 	linfo("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
 	write_server(conn->parent);
 	
 	conn->parent->thandler->to_join = conn->pid;
+	pthread_t parent = conn->parent->pthread;
 	connection_free(conn);
+	
+	
+	
 #ifndef AUTOGENTOO_NO_THREADS
-	kill(p, SIGUSR1);
+	pthread_kill(parent, SIGUSR1);
 #endif
 }
 
@@ -275,18 +289,17 @@ void server_bind(Connection* conn, Host* host) {
 	if (loc == NULL) {
 		HostBind new_binding = {.ip = strdup(conn->ip), .host = host};
 		vector_add(conn->parent->host_bindings, &new_binding);
-	} else {
-		loc->host = host;
 	}
+	else
+		loc->host = host;
 }
 
 Host* server_host_search(Server* server, host_id id) {
 	int i;
 	for (i = 0; i != server->hosts->n; i++) {
 		Host* current_host = *(Host**) vector_get(server->hosts, i);
-		if (strcmp((char*) id, current_host->id) == 0) {
+		if (strcmp((char*) id, current_host->id) == 0)
 			return current_host;
-		}
 	}
 	
 	return NULL;
@@ -321,9 +334,8 @@ void daemonize(char* _cwd) {
 	}
 	
 	/* Change the current working directory. */
-	if ((chdir(_cwd)) < 0) {
+	if ((chdir(_cwd)) < 0)
 		exit(1);
-	}
 	
 	/*resettign File Creation Mask */
 	umask(027);
