@@ -74,16 +74,18 @@ int http_request_parse (Request* req, HTTPRequest* dest) {
 	if (!splt_1)
 		return 1;
 	
-	char* splt_2 = strpbrk(++splt_1, "\t\n\r ");
+	char* splt_2 = strpbrk(splt_1 + 1, "\t\n\r ");
 	if (!splt_2)
 		return 1;
 	
-	*splt_1 = 0;
-	*splt_2 = 0;
+	char* splt_3 = strpbrk(splt_2 + 1, "\t\n\r ");
+	if (!splt_3)
+		return 1;
 	
-	dest->function = (char*)req->conn->request;
-	dest->arg = splt_1;
-	dest->version = ++splt_2;
+	
+	dest->function = strndup((char*)req->conn->request, splt_1 - (char*)req->conn->request);
+	dest->arg = strndup(splt_1 + 1, splt_2 - (splt_1 + 1));
+	dest->version = strndup (splt_2 + 1, splt_3 - (splt_2 + 1));
 	
 	return 0;
 }
