@@ -73,3 +73,7 @@ char* small_map_get_key(SmallMap* smap, void* data) {
 	}
 	return NULL;
 }
+
+void* small_map_get_index(SmallMap* smap, int index) {
+	return (*(void***) vector_get(smap, index))[1];
+}

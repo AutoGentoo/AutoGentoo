@@ -8,8 +8,6 @@
 #include <unistd.h>
 #include <autogentoo/autogentoo.h>
 #include <netinet/in.h>
-#include <autogentoo/stage.h>
-#include <autogentoo/request_structure.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -410,86 +408,71 @@ response_t SRV_STAGE_NEW (Request* request) {
 
 response_t SRV_STAGE (Request* request) {
 	int check_types[] = {
+			STRCT_HOSTSELECT,
 			STRCT_STAGESELECT
 	};
 	
 	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
 		return BAD_REQUEST;
 	
-	HostTemplate* t = small_map_get(conn->parent->stages, args[0]);
+	HostTemplate* t = small_map_get(request->conn->parent->stages, request->structures[0].hs.host_id);
 	if (t == NULL)
 		return NOT_FOUND;
 	
 	int backup_conn, backup_stdout;
-	backup_stdout = prv_pipe_to_client(conn->fd, &backup_conn);
+	backup_stdout = prv_pipe_to_client(request->conn->fd, &backup_conn);
 	
 	
 	response_t res = OK;
 	
-	StringVector* command_entries = string_vector_new();
-	string_vector_split(command_entries, conn->request + start, " \t\n");
-	
 	char* fname = NULL;
-	int i;
-	for (i = 0; i != command_entries->n; i++) {
-		char* current_command = string_vector_get(command_entries, i);
-		if (strcmp(current_command, "DOWNLOAD") == 0) {
+	if (request->structures[0].sc.command & STAGE_DOWNLOAD) {
+		fname = host_template_download(t);
+		if (fname == NULL)
+			res = INTERNAL_ERROR;
+	}
+	if (request->structures[0].sc.command & STAGE_EXTRACT) {
+		if (fname == NULL)
 			fname = host_template_download(t);
-			if (fname == NULL) {
-				res = INTERNAL_ERROR;
-				goto __return;
-			}
-		} else if (strcmp(current_command, "EXTRACT") == 0) {
-			if (fname == NULL) {
-				fname = host_template_download(t);
-			}
-			
-			res = host_template_extract(t, fname);
-			if (res.code != 200) {
-				goto __return;
-			}
-		} else if (strcmp(current_command, "ALL") == 0) {
-			res = host_template_stage(t);
-		} else {
-			fname = current_command;
-		}
+		res = host_template_extract(t, fname);
 	}
 	
-	goto __return;
-	
-	__return:
 	fflush(stdout);
-	prv_pipe_back(&conn->fd, backup_stdout, backup_conn);
+	prv_pipe_back(&request->conn->fd, backup_stdout, backup_conn);
 	return res;
 }
 
 response_t SRV_GETSTAGED (Request* request) {
 	char __n[16];
-	sprintf(__n, "%d", (int) conn->parent->stages->n);
-	conn_write(conn->fd, &__n, strlen(__n));
-	conn_write(conn->fd, "\n", 1);
+	sprintf(__n, "%d", (int) request->conn->parent->stages->n);
+	conn_write(request->conn->fd, &__n, strlen(__n));
+	conn_write(request->conn->fd, "\n", 1);
 	
 	int i;
-	for (i = 0; i != conn->parent->stages->n; i++) {
-		HostTemplate* __t = (*(HostTemplate***) vector_get(conn->parent->stages, i))[1];
+	for (i = 0; i != request->conn->parent->stages->n; i++) {
+		HostTemplate* __t = (*(HostTemplate***) vector_get(request->conn->parent->stages, i))[1];
 		
-		conn_write(conn->fd, __t->new_id, strlen(__t->new_id));
-		conn_write(conn->fd, "\n", 1);
+		conn_write(request->conn->fd, __t->new_id, strlen(__t->new_id));
+		conn_write(request->conn->fd, "\n", 1);
 	}
 	
 	return OK;
 }
 
 response_t SRV_GETSTAGE (Request* request) {
-	char* buf;
-	if (args[0] == NULL)
-		return NOT_FOUND;
+	int check_types[] = {
+			STRCT_STAGESELECT
+	};
 	
-	HostTemplate* __t = small_map_get(conn->parent->stages, args[0]);
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
+		return BAD_REQUEST;
+	
+	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, request->structures[0].ss.index);
 	
 	if (__t == NULL)
 		return NOT_FOUND;
 	
+	char* buf;
 	asprintf(&buf, "%s\n%s\n%s\n%s\n%d\n",
 			 __t->new_id,
 			 __t->id,
@@ -498,13 +481,13 @@ response_t SRV_GETSTAGE (Request* request) {
 			 __t->extra_c
 	);
 	
-	conn_write(conn->fd, buf, strlen(buf));
+	conn_write(request->conn->fd, buf, strlen(buf));
 	free(buf);
 	
 	int j;
 	for (j = 0; j != __t->extra_c; j++) {
 		asprintf(&buf, "%s %d\n", __t->extras[j].make_extra, __t->extras[j].select);
-		conn_write(conn->fd, buf, strlen(buf));
+		conn_write(request->conn->fd, buf, strlen(buf));
 		free(buf);
 	}
 	
@@ -512,11 +495,15 @@ response_t SRV_GETSTAGE (Request* request) {
 }
 
 response_t SRV_HANDOFF (Request* request) {
-	if (argc == 0)
+	int check_types[] = {
+			STRCT_STAGESELECT
+	};
+	
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
 		return BAD_REQUEST;
 	
 	
-	HostTemplate* __t = small_map_get(conn->parent->stages, args[0]);
+	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, request->structures[0].ss.index);
 	if (!__t)
 		return NOT_FOUND;
 	
@@ -524,25 +511,25 @@ response_t SRV_HANDOFF (Request* request) {
 	if (!new_host)
 		return INTERNAL_ERROR;
 	
-	vector_add(conn->parent->hosts, &new_host);
-	write_server(conn->parent);
+	vector_add(request->conn->parent->hosts, &new_host);
+	write_server(request->conn->parent);
 	
 	return OK;
 }
 
 response_t SRV_SAVE (Request* request) {
-	write_server(conn->parent);
+	write_server(request->conn->parent);
 	return OK;
 }
 
 response_t EXIT (Request* request) {
-	conn->parent->keep_alive = 0;
+	request->conn->parent->keep_alive = 0;
 	return OK;
 }
 
 response_t BIN_SERVER (Request* request) {
-	FILE* fp = fdopen(conn->fd, "wb");
-	write_server_fp(conn->parent, fp);
+	FILE* fp = fdopen(request->conn->fd, "wb");
+	write_server_fp(request->conn->parent, fp);
 	fflush(fp);
 	
 	response_t res = OK;
@@ -552,17 +539,17 @@ response_t BIN_SERVER (Request* request) {
 }
 
 response_t SRV_HOSTWRITE (Request* request) {
-	if (conn->bounded_host == NULL)
+	if (request->conn->bounded_host == NULL)
 		return FORBIDDEN;
 	
-	host_write_make_conf(conn->bounded_host);
+	host_write_make_conf(request->conn->bounded_host);
 	
 	char* profile_dest;
 	char* profile_src;
 	struct stat __sym_buff;
 	
-	asprintf(&profile_src, "/usr/portage/profiles/%s/", conn->bounded_host->profile);
-	asprintf(&profile_dest, "%s/%s/etc/portage/make.profile", conn->parent->location, conn->bounded_host->id);
+	asprintf(&profile_src, "/usr/portage/profiles/%s/", request->conn->bounded_host->profile);
+	asprintf(&profile_dest, "%s/%s/etc/portage/make.profile", request->conn->parent->location, request->conn->bounded_host->id);
 	
 	if (lstat(profile_dest, &__sym_buff) == 0) {
 		unlink(profile_dest);
@@ -580,9 +567,9 @@ response_t SRV_HOSTWRITE (Request* request) {
 	free(profile_src);
 	
 	char* new_dirs[] = {
-			conn->bounded_host->pkgdir,
-			conn->bounded_host->port_logdir,
-			conn->bounded_host->portage_tmpdir,
+			request->conn->bounded_host->pkgdir,
+			request->conn->bounded_host->port_logdir,
+			request->conn->bounded_host->portage_tmpdir,
 			"usr/portage/",
 			NULL
 	};
@@ -591,13 +578,13 @@ response_t SRV_HOSTWRITE (Request* request) {
 	char* curr;
 	for (curr = new_dirs[0]; curr != NULL; curr++) {
 		char* autogentoo_tmp;
-		asprintf(&autogentoo_tmp, "%s/%s/%s", conn->parent->location, conn->bounded_host->id, curr);
+		asprintf(&autogentoo_tmp, "%s/%s/%s", request->conn->parent->location, request->conn->bounded_host->id, curr);
 		mkdir(autogentoo_tmp, 0700);
 		free(autogentoo_tmp);
 	}
 	
 	char* autogentoo_tmp;
-	asprintf(&autogentoo_tmp, "%s/%s/etc/resolv.conf", conn->parent->location, conn->bounded_host->id);
+	asprintf(&autogentoo_tmp, "%s/%s/etc/resolv.conf", request->conn->parent->location, request->conn->bounded_host->id);
 	file_copy("/etc/resolv.conf", autogentoo_tmp);
 	free(autogentoo_tmp);
 	

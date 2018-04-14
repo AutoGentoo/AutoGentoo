@@ -29,4 +29,6 @@ void small_map_free(SmallMap* smap, int free_data);
 
 char* small_map_get_key(SmallMap* smap, void* data);
 
+void* small_map_get_index(SmallMap* smap, int index);
+
 #endif

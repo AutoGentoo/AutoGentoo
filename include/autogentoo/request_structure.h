@@ -5,8 +5,6 @@
 #ifndef AUTOGENTOO_REQUEST_STRUCTURE_H
 #define AUTOGENTOO_REQUEST_STRUCTURE_H
 
-#include <autogentoo/request.h>
-
 typedef union __RequestData RequestData;
 
 typedef enum {
@@ -16,6 +14,7 @@ typedef enum {
 	STRCT_HOSTINSTALL,
 	STRCT_TEMPLATECREATE,
 	STRCT_STAGESELECT,
+	STRCT_STAGECOMMAND,
 } request_structure_t;
 
 struct __HostEdit {
@@ -50,11 +49,23 @@ struct __HostInstall {
 	char* argument;
 } __attribute__((packed));
 
+typedef enum {
+	STAGE_NONE = 0,
+	STAGE_DOWNLOAD = 0x1,
+	STAGE_EXTRACT = 0x2,
+	STAGE_ALL = STAGE_DOWNLOAD | STAGE_EXTRACT
+} stage_command_t;
+
+struct __StageCommand {
+	 stage_command_t command;
+} __attribute__((packed));
+
 static char* request_structure_linkage[] = {
 		"iis",
 		"s",
 		"s",
 		"ssssa(si)",
+		"i",
 		"i"
 };
 
@@ -64,6 +75,7 @@ union __RequestData {
 	struct __HostInstall hi;
 	struct __TemplateCreate tc;
 	struct __StageSelect ss;
+	struct __StageCommand sc;
 };
 
 int parse_request_structure (RequestData* out, char* template, void* data, void* end);
