@@ -5,6 +5,8 @@
 #include <autogentoo/request.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unitypes.h>
+#include <netinet/in.h>
 
 Request* request_handle (Connection* conn) {
 	Request* out = malloc (sizeof (Request));
@@ -26,9 +28,12 @@ Request* request_handle (Connection* conn) {
 		return out;
 	
 	memcpy (&out->request_type, current_request, sizeof (request_t));
+	out->request_type = (request_t)ntohl((uint32_t) out->request_type);
 	current_request += sizeof (request_t);
 	
 	memcpy (&out->struct_c, current_request, sizeof (request_t));
+	out->struct_c = ntohl((uint32_t) out->struct_c);
+	
 	current_request += sizeof (int);
 	
 	out->structures = malloc (sizeof (RequestData) * out->struct_c);
@@ -36,20 +41,25 @@ Request* request_handle (Connection* conn) {
 	
 	request_structure_t current;
 	memcpy(&current, current_request, sizeof (request_structure_t));
+	current = (request_structure_t)ntohl((uint32_t) current);
+	
 	current_request += sizeof(request_t);
 	int len = 0;
 	int i = 0;
 	
 	void* end = out->conn->request + out->conn->size;
 	
-	for (; i < out->struct_c && current != STRCT_END; current_request += sizeof(request_t), i++) {
-		out->types[i] = current;
-		len = parse_request_structure (&out->structures[i], current, current_request, end);
+	for (; i < out->struct_c && current != STRCT_END; i++) {
+		len = parse_request_structure (&out->structures[i], request_structure_linkage[out->types[i]], current_request, end);
 		if (len == -1) {
 			request_free (out);
 			return NULL;
 		}
 		current_request += len;
+		memcpy(&current, current_request, sizeof (request_structure_t));
+		current = (request_structure_t)ntohl((uint32_t) current);
+		out->types[i] = current;
+		current_request += sizeof (request_structure_t);
 	}
 	
 	return out;
@@ -84,7 +94,7 @@ response_t request_call (Request* req) {
 
 void request_free (Request* req) {
 	for (int i = 0; i != req->struct_c; i++)
-		free_request_structure(&req->structures[i], req->types[i]);
+		free_request_structure(&req->structures[i], request_structure_linkage[req->types[i]], NULL);
 	
 	free (req->structures);
 	free (req->types);

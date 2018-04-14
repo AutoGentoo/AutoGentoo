@@ -9,7 +9,7 @@
 #include <autogentoo/autogentoo.h>
 #include <netinet/in.h>
 #include <autogentoo/stage.h>
-#include <autogentoo/server.h>
+#include <autogentoo/request_structure.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -81,6 +81,17 @@ response_t GET (Connection* conn, HTTPRequest req) {
 	return res;
 }
 
+int prv_check_data_structs (Request* req, const int* to_check, int count) {
+	if (count != req->struct_c)
+		return 1;
+	
+	for (int i = 0; i < count; i++)
+		if (req->types[i] != to_check[i])
+			return 1;
+	
+	return 0;
+}
+
 int prv_pipe_to_client (int conn_fd, int* backup_conn) {
 	int out = dup(1);
 	*backup_conn = conn_fd;
@@ -115,75 +126,25 @@ char prv_conn_read_int (int* dest, char* request, int* offset, size_t size) {
 }
 
 response_t INSTALL (Request* request) {
+	int check_types[] = {
+			STRCT_HOSTINSTALL
+	};
+	
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
+		return BAD_REQUEST;
+	
 	if (request->conn->bounded_host == NULL)
 		return FORBIDDEN;
 	
 	if (request->conn->bounded_host->chroot_status == CHR_NOT_MOUNTED)
 		return CHROOT_NOT_MOUNTED;
 	
-	if (((char*) conn->request + start)[0] == 0) {
-		return BAD_REQUEST;
-	}
-	
 	int backup_conn, backup_stdout;
-	backup_stdout = prv_pipe_to_client(conn->fd, &backup_conn);
-	
-	response_t res = host_install(conn->bounded_host, conn->request + start);
-	
-	prv_pipe_back(&conn->fd, backup_stdout, backup_conn);
+	backup_stdout = prv_pipe_to_client(request->conn->fd, &backup_conn);
+	response_t res = host_install(request->conn->bounded_host, request->structures[0].hi.argument);
+	prv_pipe_back(&request->conn->fd, backup_stdout, backup_conn);
 	
 	return res;
-}
-
-/* SRV Configure requests */
-int prv_host_edit (Host* host, int argc, StringVector* data) {
-	enum {
-		HOSTNAME,
-		PROFILE,
-		CHOST,
-		CFLAGS,
-		USE
-	};
-	
-	if (data->n < USE + 1 + argc) {
-		return 1;
-	}
-	
-	string_overwrite(&host->hostname, string_vector_get(data, HOSTNAME), 1);
-	string_overwrite(&host->profile, string_vector_get(data, PROFILE), 1);
-	string_overwrite(&host->cflags, string_vector_get(data, CFLAGS), 1);
-	string_overwrite(&host->chost, string_vector_get(data, CHOST), 1);
-	string_overwrite(&host->cxxflags, "${CFLAGS}", 1);
-	string_overwrite(&host->use, string_vector_get(data, USE), 1);
-	
-	if (host->extra != NULL) {
-		string_vector_free(host->extra);
-	}
-	
-	host->extra = string_vector_new();
-	
-	int i;
-	for (i = USE + 1; i != data->n; i++) {
-		string_vector_add(host->extra, string_vector_get(data, i));
-	}
-	
-	string_overwrite(&host->portage_tmpdir, "/autogentoo/tmp", 1);
-	string_overwrite(&host->portdir, "/usr/portage", 1);
-	string_overwrite(&host->distdir, "/usr/portage/distfiles", 1);
-	string_overwrite(&host->pkgdir, "/autogentoo/pkg", 1);
-	string_overwrite(&host->port_logdir, "/autogentoo/log", 1);
-	
-	return 0;
-}
-
-Host* prv_host_new (Server* server, int argc, StringVector* data) {
-	Host* host = host_new(server, host_id_new());
-	if (prv_host_edit(host, argc, data) == 1) {
-		free(host->id);
-		free(host);
-		return NULL;
-	}
-	return host;
 }
 
 response_t SRV_CREATE (Connection* conn, char** args, int start) {
@@ -191,48 +152,46 @@ response_t SRV_CREATE (Connection* conn, char** args, int start) {
 }
 
 response_t SRV_EDIT (Request* request) {
-	char* host_id;
+	int check_types[] = {
+			STRCT_HOSTSELECT,
+			STRCT_HOSTEDIT
+	};
 	
-	if (prv_conn_read_str(&host_id, conn->request, &start, conn->size))
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
 		return BAD_REQUEST;
 	
 	Host* target;
-	if (!(target = server_host_search(conn->parent, host_id)))
+	if (!(target = server_host_search(request->conn->parent, request->structures[0].hs.host_id)))
 		return NOT_FOUND;
 	
-	int field_one;
-	if (prv_conn_read_int(&field_one, conn->request, &start, conn->size))
-		return BAD_REQUEST;
-	
-	int field_two;
-	if (prv_conn_read_int(&field_two, conn->request, &start, conn->size))
-		return BAD_REQUEST;
+	int field_one = request->structures[1].he.selection_one;
+	int field_two = request->structures[1].he.selection_two;
 	
 	if (field_one == 4) {
 		if (field_two >= target->extra->n)
-			string_vector_add(target->extra, conn->request + start);
+			string_vector_add(target->extra, request->structures[1].he.edit);
 		else {
 			void** t_ptr = vector_get(target->extra, field_two);
 			free(*t_ptr);
 			
-			if (strlen(conn->request + start) == 0)
+			if (strlen(request->structures[1].he.edit) == 0)
 				vector_remove(target->extra, field_two);
 			else
-				*t_ptr = strdup(conn->request + start);
+				*t_ptr = strdup(request->structures[1].he.edit);
 		}
 	} else {
 		if (field_one == 0) {
 			free(target->hostname);
-			target->hostname = strdup(conn->request + start);
+			target->hostname = strdup(request->structures[1].he.edit);
 		} else if (field_one == 1) {
 			free(target->profile);
-			target->profile = strdup(conn->request + start);
+			target->profile = strdup(request->structures[1].he.edit);
 		} else if (field_one == 2) {
 			free(target->cflags);
-			target->hostname = strdup(conn->request + start);
+			target->hostname = strdup(request->structures[1].he.edit);
 		} else if (field_one == 3) {
 			free(target->use);
-			target->use = strdup(conn->request + start);
+			target->use = strdup(request->structures[1].he.edit);
 		} else
 			return BAD_REQUEST;
 	}
@@ -241,32 +200,46 @@ response_t SRV_EDIT (Request* request) {
 }
 
 response_t SRV_ACTIVATE (Request* request) {
-	Host* found = server_host_search(conn->parent, args[0]);
+	int check_types[] = {
+			STRCT_HOSTSELECT
+	};
+	
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
+		return BAD_REQUEST;
+	
+	Host* found = server_host_search(request->conn->parent, request->structures[0].hs.host_id);
 	
 	if (found == NULL)
 		return NOT_FOUND;
 	
-	server_bind(conn, found);
+	server_bind(request->conn, found);
 	
 	return OK;
 }
 
 response_t SRV_HOSTREMOVE (Request* request) {
+	int check_types[] = {
+			STRCT_HOSTSELECT
+	};
+	
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
+		return BAD_REQUEST;
+	
 	int i;
 	
 	// Remove the binding
-	for (i = 0; i != conn->parent->host_bindings->n; i++) {
-		Host** tmp = (Host**) (((void***) vector_get(conn->parent->host_bindings, i))[1]);
-		if (strcmp((*tmp)->id, args[0]) == 0) {
-			vector_remove(conn->parent->host_bindings, i);
+	for (i = 0; i != request->conn->parent->host_bindings->n; i++) {
+		Host** tmp = (Host**) (((void***) vector_get(request->conn->parent->host_bindings, i))[1]);
+		if (strcmp((*tmp)->id, request->structures[0].hs.host_id) == 0) {
+			vector_remove(request->conn->parent->host_bindings, i);
 			// dont break because multiple clients can point to the same host
 		}
 	}
 	
 	// Remove the definition
-	for (i = 0; i != conn->parent->hosts->n; i++) {
-		if (strcmp((*(Host**) vector_get(conn->parent->host_bindings, i))->id, args[0]) == 0) {
-			vector_remove(conn->parent->host_bindings, i);
+	for (i = 0; i != request->conn->parent->hosts->n; i++) {
+		if (strcmp((*(Host**) vector_get(request->conn->parent->host_bindings, i))->id, request->structures[0].hs.host_id) == 0) {
+			vector_remove(request->conn->parent->host_bindings, i);
 			break; // Two hosts cant have the same id (at least they are not support to...)
 		}
 	}
@@ -293,61 +266,65 @@ void prv_fd_write_str (int fd, char* str) {
 
 /* SRV Metadata requests */
 response_t SRV_GETHOST (Request* request) {
-	Host* host = server_host_search(conn->parent, args[0]);
+	int check_types[] = {
+			STRCT_HOSTSELECT
+	};
 	
-	if (host == NULL) {
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
+		return BAD_REQUEST;
+	
+	Host* host = server_host_search(request->conn->parent, request->structures[0].hs.host_id);
+	
+	if (host == NULL)
 		return NOT_FOUND;
-	}
 	
 	if (host->extra != NULL) {
 		char t[8];
 		sprintf(t, "%d", (int) host->extra->n);
-		prv_fd_write_str(conn->fd, t);
+		prv_fd_write_str(request->conn->fd, t);
 		
 	}
-	prv_fd_write_str(conn->fd, host->cflags);
-	prv_fd_write_str(conn->fd, host->cxxflags);
-	prv_fd_write_str(conn->fd, host->chost);
-	prv_fd_write_str(conn->fd, host->use);
-	prv_fd_write_str(conn->fd, host->hostname);
-	prv_fd_write_str(conn->fd, host->profile);
+	prv_fd_write_str(request->conn->fd, host->cflags);
+	prv_fd_write_str(request->conn->fd, host->cxxflags);
+	prv_fd_write_str(request->conn->fd, host->chost);
+	prv_fd_write_str(request->conn->fd, host->use);
+	prv_fd_write_str(request->conn->fd, host->hostname);
+	prv_fd_write_str(request->conn->fd, host->profile);
 	
-	if (host->extra != NULL) {
-		int i;
-		for (i = 0; i != host->extra->n; i++) {
+	if (host->extra != NULL)
+		for (int i = 0; i != host->extra->n; i++) {
 			char* current_str = string_vector_get(host->extra, i);
-			conn_write(conn->fd, current_str, strlen(current_str));
-			conn_write(conn->fd, "\n", 1);
+			conn_write(request->conn->fd, current_str, strlen(current_str));
+			conn_write(request->conn->fd, "\n", 1);
 		}
-	}
 	
 	return OK;
 }
 
 response_t SRV_GETHOSTS (Request* request) {
 	char t[8];
-	sprintf(t, "%d\n", (int) conn->parent->hosts->n);
-	conn_write(conn->fd, t, strlen(t));
+	sprintf(t, "%d\n", (int) request->conn->parent->hosts->n);
+	conn_write(request->conn->fd, t, strlen(t));
 	
 	int i;
-	for (i = 0; i != conn->parent->hosts->n; i++) {
-		char* temp = (*(Host**) vector_get(conn->parent->hosts, i))->id;
-		conn_write(conn->fd, temp, strlen(temp));
-		conn_write(conn->fd, "\n", 1);
+	for (i = 0; i != request->conn->parent->hosts->n; i++) {
+		char* temp = (*(Host**) vector_get(request->conn->parent->hosts, i))->id;
+		conn_write(request->conn->fd, temp, strlen(temp));
+		conn_write(request->conn->fd, "\n", 1);
 	}
 	
 	return OK;
 }
 
 response_t SRV_GETACTIVE (Request* request) {
-	if (conn->bounded_host == NULL) {
+	if (request->conn->bounded_host == NULL) {
 		char* out = "invalid\n";
-		conn_write(conn->fd, out, strlen(out));
-		return OK;
+		conn_write(request->conn->fd, out, strlen(out));
+		return NOT_FOUND;
 	}
 	
-	conn_write(conn->fd, conn->bounded_host->id, strlen(conn->bounded_host->id));
-	conn_write(conn->fd, "\n", 1);
+	conn_write(request->conn->fd, request->conn->bounded_host->id, strlen(request->conn->bounded_host->id));
+	conn_write(request->conn->fd, "\n", 1);
 	
 	return OK;
 }
@@ -358,7 +335,7 @@ response_t SRV_GETSPEC (Request* request) {
 	int symbol;
 	if (lspcu_fp != NULL) {
 		while ((symbol = getc (lspcu_fp)) != EOF) {
-			conn_write(conn->fd, &symbol, sizeof(char));
+			conn_write(request->conn->fd, &symbol, sizeof(char));
 		}
 		fclose(lspcu_fp);
 	}
@@ -369,45 +346,41 @@ response_t SRV_GETSPEC (Request* request) {
 
 response_t SRV_GETTEMPLATES (Request* request) {
 	char __n[16];
-	sprintf(__n, "%d", (int) conn->parent->templates->n);
-	conn_write(conn->fd, &__n, strlen(__n));
+	sprintf(__n, "%d", (int) request->conn->parent->templates->n);
+	conn_write(request->conn->fd, &__n, strlen(__n));
 	
 	int i;
-	for (i = 0; i != conn->parent->templates->n; i++) {
-		conn_write(conn->fd, "\n", 1);
+	for (i = 0; i != request->conn->parent->templates->n; i++) {
+		conn_write(request->conn->fd, "\n", 1);
 		
-		char* b = (*(HostTemplate**) vector_get(conn->parent->templates, i))->id;
-		conn_write(conn->fd, b, strlen(b));
+		char* b = (*(HostTemplate**) vector_get(request->conn->parent->templates, i))->id;
+		conn_write(request->conn->fd, b, strlen(b));
 	}
-	conn_write(conn->fd, "\n", 1);
+	conn_write(request->conn->fd, "\n", 1);
 	return OK;
 }
 
 response_t SRV_TEMPLATE_CREATE (Request* request) {
-	HostTemplate in_data;
-	
-	char** cpy_ar[] = {
-			&in_data.id,
-			&in_data.arch,
-			&in_data.cflags,
-			&in_data.chost,
-			NULL
+	int check_types[] = {
+			STRCT_TEMPLATECREATE
 	};
 	
-	for (int k = 0; cpy_ar[k] != NULL; k++) {
-		if (prv_conn_read_str(cpy_ar[k], conn->request, &start, conn->size))
-			return BAD_REQUEST;
-	}
-	
-	if (prv_conn_read_int(&in_data.extra_c, conn->request, &start, conn->size))
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
 		return BAD_REQUEST;
-	for (int i = 0; i != in_data.extra_c; i++) {
-		if (prv_conn_read_str(&in_data.extras[i].make_extra, conn->request, &start, conn->size)
-			|| prv_conn_read_int((int*) &in_data.extras[i].select, conn->request, &start, conn->size))
-			return BAD_REQUEST;
+	
+	HostTemplate in_data;
+	in_data.arch = request->structures[0].tc.arch;
+	in_data.cflags = request->structures[0].tc.cflags;
+	in_data.chost = request->structures[0].tc.chost;
+	in_data.extra_c = request->structures[0].tc.make_extra_c;
+	
+	for (int i = 0; i < in_data.extra_c; i++) {
+		in_data.extras[i].select = (template_selects)request->structures[0].tc.extras[i].select;
+		in_data.extras[i].make_extra = request->structures[0].tc.extras[i].make_extra;
 	}
 	
-	host_template_add(conn->parent, &in_data);
+	
+	host_template_add(request->conn->parent, &in_data);
 	
 	return OK;
 }
@@ -415,22 +388,32 @@ response_t SRV_TEMPLATE_CREATE (Request* request) {
 response_t SRV_STAGE_NEW (Request* request) {
 	/* We need to bind template using
 	 * its index instead of ID
+	 * ID in this case is a name not
+	 * random generated str
 	 */
 	
-	if (argc == 0)
+	int check_types[] = {
+			STRCT_STAGESELECT
+	};
+	
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
 		return BAD_REQUEST;
 	
-	HostTemplate* t = stage_new(conn->parent, (int) strtol(args[0], NULL, 10));
+	HostTemplate* t = stage_new(request->conn->parent, request->structures[0].ss.index);
 	
 	small_map_insert(t->parent->stages, t->new_id, t);
 	
-	conn_write(conn->fd, t->new_id, strlen(t->new_id));
-	conn_write(conn->fd, "\n", 1);
+	conn_write(request->conn->fd, t->new_id, strlen(t->new_id));
+	conn_write(request->conn->fd, "\n", 1);
 	return OK;
 }
 
 response_t SRV_STAGE (Request* request) {
-	if (argc == 0)
+	int check_types[] = {
+			STRCT_STAGESELECT
+	};
+	
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
 		return BAD_REQUEST;
 	
 	HostTemplate* t = small_map_get(conn->parent->stages, args[0]);
