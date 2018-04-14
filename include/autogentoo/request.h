@@ -6,6 +6,7 @@
 #define AUTOGENTOO_REQUEST_H
 
 #include "response.h"
+#include "request_structure.h"
 
 typedef struct __Request Request;
 typedef struct __HTTPRequest HTTPRequest;
@@ -19,7 +20,7 @@ typedef struct __HTTPRequest HTTPRequest;
 typedef response_t (* HTTP_FH)(Connection* conn, HTTPRequest req);
 typedef response_t (* AUTOGENTOO_FH) (Request* request);
 
-typedef union __RequestData RequestData;
+typedef union __FunctionHandler FunctionHandler;
 
 typedef enum {
 	PROT_AUTOGENTOO = 0, // guarentees first byte is 0 (cant be HTTP)
@@ -54,45 +55,53 @@ typedef enum {
 	REQ_EXIT
 } request_t;
 
-typedef enum {
-	STRCT_END,
-	STRCT_HOST,
-} request_structure_t;
-
-struct __HostEdit {
-	request_structure_t type;
-	char host_id[16];
-	size_t selection_one;
-	size_t selection_two; //!< -1 for none, >= 0 for vector access at offset_1
-};
-
 struct __HTTPRequest {
-	char* type;
+	char* function;
 	char* arg;
 	char* version;
 	char** headers;
-	char* request;
+	char* body;
 	
 	size_t request_size;
 };
 
-union __RequestData{
-	struct __HostEdit he;
-	
+union __FunctionHandler {
+	AUTOGENTOO_FH ag_fh;
+	HTTP_FH http_fh;
 };
+
+
 
 struct __Request {
 	protocol_t protocol;
 	request_t request_type;
-	void* resolved_call;
+	FunctionHandler resolved_call;
 	Connection* conn;
 	
-	RequestData structures;
+	int struct_c;
+	RequestData* structures;
+	request_structure_t* types;
+};
+
+/**
+ * Links a string to a request handler
+ */
+typedef struct __RequestLink RequestLink;
+
+#include "request.h"
+
+/**
+ * Links a string to a request handler
+ */
+struct __RequestLink {
+	request_t request_ident; //!< The string that matches the request
+	FunctionHandler call; //!< A pointer to the function handler
 };
 
 Request* request_handle (Connection* conn);
 int http_request_parse (Request* req, HTTPRequest* dest);
 response_t request_call (Request* req);
+void request_free (Request* req);
 
 
 #endif //AUTOGENTOO_REQUEST_H

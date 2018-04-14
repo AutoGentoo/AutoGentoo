@@ -3,23 +3,7 @@
 
 #include "server.h"
 #include "response.h"
-
-
-
-/**
- * Links a string to a request handler
- */
-typedef struct __RequestLink RequestLink;
-
 #include "request.h"
-
-/**
- * Links a string to a request handler
- */
-struct __RequestLink {
-	request_t request_ident; //!< The string that matches the request
-	SHFP call; //!< A pointer to the function handler
-};
 
 /**
  * Holds all of the valid requests
@@ -42,7 +26,7 @@ extern RequestLink requests[];
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t GET(Connection* conn, char** args, int start, int argc);
+response_t GET(Connection* conn, HTTPRequest req);
 
 /**
  * Install a packages to the bounded host
@@ -52,7 +36,7 @@ response_t GET(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t INSTALL(Connection* conn, char** args, int start, int argc);
+response_t INSTALL(Request* request);
 
 /* SRV Configure requests */
 
@@ -68,7 +52,7 @@ response_t INSTALL(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_EDIT(Connection* conn, char** args, int start, int argc);
+response_t SRV_EDIT(Request* request);
 
 /**
  * Bind the connections ip address to the specified Host*
@@ -78,7 +62,7 @@ response_t SRV_EDIT(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_ACTIVATE(Connection* conn, char** args, int start, int argc);
+response_t SRV_ACTIVATE(Request* request);
 
 /**
  * Delete a host (currently all users can do this)
@@ -90,7 +74,7 @@ response_t SRV_ACTIVATE(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_HOSTREMOVE(Connection* conn, char** args, int start, int argc);
+response_t SRV_HOSTREMOVE(Request* request);
 
 /* SRV Utility request */
 
@@ -102,7 +86,7 @@ response_t SRV_HOSTREMOVE(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_MNTCHROOT(Connection* conn, char** args, int start, int argc);
+response_t SRV_MNTCHROOT(Request* request);
 
 /* SRV Metadata requests */
 
@@ -114,7 +98,7 @@ response_t SRV_MNTCHROOT(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_GETHOST(Connection* conn, char** args, int start, int argc);
+response_t SRV_GETHOST(Request* request);
 
 /**
  * Returns an int (host count) followed by a list of the created hosts
@@ -126,7 +110,7 @@ response_t SRV_GETHOST(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_GETHOSTS(Connection* conn, char** args, int start, int argc);
+response_t SRV_GETHOSTS(Request* request);
 
 /**
  * Returns the ID of the bounded host of the IP from the current request
@@ -136,7 +120,7 @@ response_t SRV_GETHOSTS(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_GETACTIVE(Connection* conn, char** args, int start, int argc);
+response_t SRV_GETACTIVE(Request* request);
 
 /**
  * Returns information outputed from 'lscpu' of the build server
@@ -146,7 +130,7 @@ response_t SRV_GETACTIVE(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_GETSPEC(Connection* conn, char** args, int start, int argc);
+response_t SRV_GETSPEC(Request* request);
 
 /**
  * Returns a list of all the availiable templates
@@ -156,7 +140,7 @@ response_t SRV_GETSPEC(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_GETTEMPLATES(Connection* conn, char** args, int start, int argc);
+response_t SRV_GETTEMPLATES(Request* request);
 
 /**
  * Create a new template given binary data
@@ -167,7 +151,7 @@ response_t SRV_GETTEMPLATES(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_TEMPLATE_CREATE(Connection* conn, char** args, int start, int argc);
+response_t SRV_TEMPLATE_CREATE(Request* request);
 
 /**
  * Creates a new stage from an existing template given a template id
@@ -177,7 +161,7 @@ response_t SRV_TEMPLATE_CREATE(Connection* conn, char** args, int start, int arg
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_STAGE_NEW(Connection* conn, char** args, int start, int argc);
+response_t SRV_STAGE_NEW(Request* request);
 
 /**
  * @brief Create/initilize a new stage
@@ -195,7 +179,7 @@ response_t SRV_STAGE_NEW(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_STAGE(Connection* conn, char** args, int start, int argc);
+response_t SRV_STAGE(Request* request);
 
 /**
  * Returns a list of the currently staged HostTemplates
@@ -205,7 +189,7 @@ response_t SRV_STAGE(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_GETSTAGED(Connection* conn, char** args, int start, int argc);
+response_t SRV_GETSTAGED(Request* request);
 
 /**
  * Returns a info about the selected staged HostTemplate
@@ -215,7 +199,7 @@ response_t SRV_GETSTAGED(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_GETSTAGE(Connection* conn, char** args, int start, int argc);
+response_t SRV_GETSTAGE(Request* request);
 
 /**
  * Handoff a HostTemplate to Host
@@ -225,7 +209,7 @@ response_t SRV_GETSTAGE(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_HANDOFF(Connection* conn, char** args, int start, int argc);
+response_t SRV_HANDOFF(Request* request);
 
 /**
  * Saves the current server to the config
@@ -236,7 +220,7 @@ response_t SRV_HANDOFF(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_SAVE(Connection* conn, char** args, int start, int argc);
+response_t SRV_SAVE(Request* request);
 
 /**
  * End the server's main loop
@@ -246,7 +230,7 @@ response_t SRV_SAVE(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t EXIT(Connection* conn, char** args, int start, int argc);
+response_t EXIT(Request* request);
 
 /**
  * Write the Server struct back to the client
@@ -256,7 +240,7 @@ response_t EXIT(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t BIN_SERVER(Connection* conn, char** args, int start, int argc);
+response_t BIN_SERVER(Request* request);
 
 /**
  * Links host_environ directory and write configs
@@ -267,9 +251,9 @@ response_t BIN_SERVER(Connection* conn, char** args, int start, int argc);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t SRV_HOSTWRITE(Connection* conn, char** args, int start, int argc);
+response_t SRV_HOSTWRITE(Request* request);
 
-//response_t SRV_HOSTUPLOAD(Connection* conn, char** args, int start, int argc);
+//response_t SRV_HOSTUPLOAD(Request* request);
 
 /* SRV Kernel request (unimplmented) */
 

@@ -12,53 +12,53 @@
 #include <autogentoo/server.h>
 
 RequestLink requests[] = {
-		{REQ_GET,             GET},
-		{REQ_INSTALL,         INSTALL},
-		{REQ_EDIT,            SRV_EDIT},
-		{REQ_ACTIVATE,        SRV_ACTIVATE},
-		{REQ_HOSTREMOVE,      SRV_HOSTREMOVE},
-		{REQ_MNTCHROOT,       SRV_MNTCHROOT},
-		{REQ_GETHOSTS,        SRV_GETHOSTS},
-		{REQ_GETHOST,         SRV_GETHOST},
-		{REQ_GETACTIVE,       SRV_GETACTIVE},
-		{REQ_GETSPEC,         SRV_GETSPEC},
-		{REQ_GETTEMPLATES,    SRV_GETTEMPLATES},
-		{REQ_STAGE_NEW,       SRV_STAGE_NEW},
-		{REQ_TEMPLATE_CREATE, SRV_TEMPLATE_CREATE}, // Alias for the previous one
-		{REQ_STAGE,           SRV_STAGE},
-		{REQ_GETSTAGED,       SRV_GETSTAGED},
-		{REQ_GETSTAGE,        SRV_GETSTAGE},
-		{REQ_HANDOFF,         SRV_HANDOFF},
-		{REQ_SAVE,            SRV_SAVE},
-		{REQ_HOSTWRITE,       SRV_HOSTWRITE},
+		{REQ_GET,             {.http_fh=GET}},
+		{REQ_INSTALL,         {.ag_fh=INSTALL}},
+		{REQ_EDIT,            {.ag_fh=SRV_EDIT}},
+		{REQ_ACTIVATE,        {.ag_fh=SRV_ACTIVATE}},
+		{REQ_HOSTREMOVE,      {.ag_fh=SRV_HOSTREMOVE}},
+		{REQ_MNTCHROOT,       {.ag_fh=SRV_MNTCHROOT}},
+		{REQ_GETHOSTS,        {.ag_fh=SRV_GETHOSTS}},
+		{REQ_GETHOST,         {.ag_fh=SRV_GETHOST}},
+		{REQ_GETACTIVE,       {.ag_fh=SRV_GETACTIVE}},
+		{REQ_GETSPEC,         {.ag_fh=SRV_GETSPEC}},
+		{REQ_GETTEMPLATES,    {.ag_fh=SRV_GETTEMPLATES}},
+		{REQ_STAGE_NEW,       {.ag_fh=SRV_STAGE_NEW}},
+		{REQ_TEMPLATE_CREATE, {.ag_fh=SRV_TEMPLATE_CREATE}}, // Alias for the previous one
+		{REQ_STAGE,           {.ag_fh=SRV_STAGE}},
+		{REQ_GETSTAGED,       {.ag_fh=SRV_GETSTAGED}},
+		{REQ_GETSTAGE,        {.ag_fh=SRV_GETSTAGE}},
+		{REQ_HANDOFF,         {.ag_fh=SRV_HANDOFF}},
+		{REQ_SAVE,            {.ag_fh=SRV_SAVE}},
+		{REQ_HOSTWRITE,       {.ag_fh=SRV_HOSTWRITE}},
 		
 		/* Binary requests */
-		{REQ_BINSERVER,       BIN_SERVER},
+		{REQ_BINSERVER,       {.ag_fh=BIN_SERVER}},
 		
 		/* General */
-		{REQ_EXIT,            EXIT}
+		{REQ_EXIT,            {.ag_fh=EXIT}}
 };
 
-SHFP resolve_call (request_t type) {
+FunctionHandler resolve_call (request_t type) {
 	int i;
 	for (i = 0; i < sizeof (requests) / sizeof (RequestLink); i++)
 		if (requests[i].request_ident == type)
 			return requests[i].call;
-	
-	return NULL;
+	FunctionHandler k = {NULL};
+	return k;
 }
 
-response_t GET (Connection* conn, char** args, int start, int argc) {
+response_t GET (Connection* conn, HTTPRequest req) {
 	response_t res;
 	
 	if (conn->bounded_host == NULL)
 		return FORBIDDEN;
 	
-	if (!(strncmp(args[1], "HTTP/1.0", 8) == 0 || strncmp(args[1], "HTTP/1.1", 8) == 0))
+	if (!(strncmp(req.version, "HTTP/1.0", 8) == 0 || strncmp(req.version, "HTTP/1.1", 8) == 0))
 		return BAD_REQUEST;
 	
 	char* path;
-	asprintf(&path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->pkgdir, args[0]);
+	asprintf(&path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->pkgdir, req.arg);
 	
 	int fd, data_to_send;
 	
@@ -114,11 +114,11 @@ char prv_conn_read_int (int* dest, char* request, int* offset, size_t size) {
 	return 0;
 }
 
-response_t INSTALL (Connection* conn, char** args, int start, int argc) {
-	if (conn->bounded_host == NULL)
+response_t INSTALL (Request* request) {
+	if (request->conn->bounded_host == NULL)
 		return FORBIDDEN;
 	
-	if (conn->bounded_host->chroot_status == CHR_NOT_MOUNTED)
+	if (request->conn->bounded_host->chroot_status == CHR_NOT_MOUNTED)
 		return CHROOT_NOT_MOUNTED;
 	
 	if (((char*) conn->request + start)[0] == 0) {
@@ -190,7 +190,7 @@ response_t SRV_CREATE (Connection* conn, char** args, int start) {
 	return METHOD_NOT_ALLOWED;
 }
 
-response_t SRV_EDIT (Connection* conn, char** args, int start, int argc) {
+response_t SRV_EDIT (Request* request) {
 	char* host_id;
 	
 	if (prv_conn_read_str(&host_id, conn->request, &start, conn->size))
@@ -240,7 +240,7 @@ response_t SRV_EDIT (Connection* conn, char** args, int start, int argc) {
 	return OK;
 }
 
-response_t SRV_ACTIVATE (Connection* conn, char** args, int start, int argc) {
+response_t SRV_ACTIVATE (Request* request) {
 	Host* found = server_host_search(conn->parent, args[0]);
 	
 	if (found == NULL)
@@ -251,7 +251,7 @@ response_t SRV_ACTIVATE (Connection* conn, char** args, int start, int argc) {
 	return OK;
 }
 
-response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start, int argc) {
+response_t SRV_HOSTREMOVE (Request* request) {
 	int i;
 	
 	// Remove the binding
@@ -276,12 +276,11 @@ response_t SRV_HOSTREMOVE (Connection* conn, char** args, int start, int argc) {
 
 /* SRV Utility request */
 
-response_t SRV_MNTCHROOT (Connection* conn, char** args, int start, int argc) {
-	if (conn->bounded_host == NULL) {
+response_t SRV_MNTCHROOT (Request* request) {
+	if (request->conn->bounded_host == NULL)
 		return FORBIDDEN;
-	}
 	
-	return chroot_mount(conn->bounded_host);
+	return chroot_mount(request->conn->bounded_host);
 }
 
 void prv_fd_write_str (int fd, char* str) {
@@ -293,7 +292,7 @@ void prv_fd_write_str (int fd, char* str) {
 }
 
 /* SRV Metadata requests */
-response_t SRV_GETHOST (Connection* conn, char** args, int start, int argc) {
+response_t SRV_GETHOST (Request* request) {
 	Host* host = server_host_search(conn->parent, args[0]);
 	
 	if (host == NULL) {
@@ -325,7 +324,7 @@ response_t SRV_GETHOST (Connection* conn, char** args, int start, int argc) {
 	return OK;
 }
 
-response_t SRV_GETHOSTS (Connection* conn, char** args, int start, int argc) {
+response_t SRV_GETHOSTS (Request* request) {
 	char t[8];
 	sprintf(t, "%d\n", (int) conn->parent->hosts->n);
 	conn_write(conn->fd, t, strlen(t));
@@ -340,7 +339,7 @@ response_t SRV_GETHOSTS (Connection* conn, char** args, int start, int argc) {
 	return OK;
 }
 
-response_t SRV_GETACTIVE (Connection* conn, char** args, int start, int argc) {
+response_t SRV_GETACTIVE (Request* request) {
 	if (conn->bounded_host == NULL) {
 		char* out = "invalid\n";
 		conn_write(conn->fd, out, strlen(out));
@@ -353,7 +352,7 @@ response_t SRV_GETACTIVE (Connection* conn, char** args, int start, int argc) {
 	return OK;
 }
 
-response_t SRV_GETSPEC (Connection* conn, char** args, int start, int argc) {
+response_t SRV_GETSPEC (Request* request) {
 	system("lscpu > build.spec");
 	FILE* lspcu_fp = fopen("build.spec", "r");
 	int symbol;
@@ -368,7 +367,7 @@ response_t SRV_GETSPEC (Connection* conn, char** args, int start, int argc) {
 	return OK;
 }
 
-response_t SRV_GETTEMPLATES (Connection* conn, char** args, int start, int argc) {
+response_t SRV_GETTEMPLATES (Request* request) {
 	char __n[16];
 	sprintf(__n, "%d", (int) conn->parent->templates->n);
 	conn_write(conn->fd, &__n, strlen(__n));
@@ -384,7 +383,7 @@ response_t SRV_GETTEMPLATES (Connection* conn, char** args, int start, int argc)
 	return OK;
 }
 
-response_t SRV_TEMPLATE_CREATE (Connection* conn, char** args, int start, int argc) {
+response_t SRV_TEMPLATE_CREATE (Request* request) {
 	HostTemplate in_data;
 	
 	char** cpy_ar[] = {
@@ -413,7 +412,7 @@ response_t SRV_TEMPLATE_CREATE (Connection* conn, char** args, int start, int ar
 	return OK;
 }
 
-response_t SRV_STAGE_NEW (Connection* conn, char** args, int start, int argc) {
+response_t SRV_STAGE_NEW (Request* request) {
 	/* We need to bind template using
 	 * its index instead of ID
 	 */
@@ -430,7 +429,7 @@ response_t SRV_STAGE_NEW (Connection* conn, char** args, int start, int argc) {
 	return OK;
 }
 
-response_t SRV_STAGE (Connection* conn, char** args, int start, int argc) {
+response_t SRV_STAGE (Request* request) {
 	if (argc == 0)
 		return BAD_REQUEST;
 	
@@ -481,7 +480,7 @@ response_t SRV_STAGE (Connection* conn, char** args, int start, int argc) {
 	return res;
 }
 
-response_t SRV_GETSTAGED (Connection* conn, char** args, int start, int argc) {
+response_t SRV_GETSTAGED (Request* request) {
 	char __n[16];
 	sprintf(__n, "%d", (int) conn->parent->stages->n);
 	conn_write(conn->fd, &__n, strlen(__n));
@@ -498,7 +497,7 @@ response_t SRV_GETSTAGED (Connection* conn, char** args, int start, int argc) {
 	return OK;
 }
 
-response_t SRV_GETSTAGE (Connection* conn, char** args, int start, int argc) {
+response_t SRV_GETSTAGE (Request* request) {
 	char* buf;
 	if (args[0] == NULL)
 		return NOT_FOUND;
@@ -529,7 +528,7 @@ response_t SRV_GETSTAGE (Connection* conn, char** args, int start, int argc) {
 	return OK;
 }
 
-response_t SRV_HANDOFF (Connection* conn, char** args, int start, int argc) {
+response_t SRV_HANDOFF (Request* request) {
 	if (argc == 0)
 		return BAD_REQUEST;
 	
@@ -548,17 +547,17 @@ response_t SRV_HANDOFF (Connection* conn, char** args, int start, int argc) {
 	return OK;
 }
 
-response_t SRV_SAVE (Connection* conn, char** args, int start, int argc) {
+response_t SRV_SAVE (Request* request) {
 	write_server(conn->parent);
 	return OK;
 }
 
-response_t EXIT (Connection* conn, char** args, int start, int argc) {
+response_t EXIT (Request* request) {
 	conn->parent->keep_alive = 0;
 	return OK;
 }
 
-response_t BIN_SERVER (Connection* conn, char** args, int start, int argc) {
+response_t BIN_SERVER (Request* request) {
 	FILE* fp = fdopen(conn->fd, "wb");
 	write_server_fp(conn->parent, fp);
 	fflush(fp);
@@ -569,7 +568,7 @@ response_t BIN_SERVER (Connection* conn, char** args, int start, int argc) {
 	return res;
 }
 
-response_t SRV_HOSTWRITE (Connection* conn, char** args, int start, int argc) {
+response_t SRV_HOSTWRITE (Request* request) {
 	if (conn->bounded_host == NULL)
 		return FORBIDDEN;
 	
@@ -623,7 +622,7 @@ response_t SRV_HOSTWRITE (Connection* conn, char** args, int start, int argc) {
 }
 
 /*
-response_t SRV_HOSTUPLOAD(Connection* conn, char** args, int start, int argc) {
+response_t SRV_HOSTUPLOAD(Request* request) {
 	struct {
 		char host_id[16];
 		char* hostname;

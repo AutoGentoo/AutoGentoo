@@ -2,9 +2,30 @@
 #define __AUTOGENTOO_SERVER_H__
 
 #include <autogentoo/hacksaw/hacksaw.h>
-#include "thread.h"
 #include <sys/types.h>
 #include <pthread.h>
+
+/**
+ * @brief The main struct that hold hosts/bindings and other information
+ *  - This is pretty much required throughout the entire program so keep it!
+ */
+typedef struct __Server Server;
+
+/**
+ * @brief Bind an IP to a host
+ *  - This is used when a request is made.
+ *  - The IP of the request is matched to a Host using this struct
+ */
+typedef struct __HostBind HostBind;
+
+/**
+ * @brief Holds information about a connection
+ *  - A new connection will initilized after the return of accept().
+ *  - The request is immediately after the connection is made
+ *  - The bounded_host will be set as well (NULL if the IP is not bounded)
+ *  - Since every connection runs in its own thread the pthread_t is kept here as well
+ */
+typedef struct __Connection Connection;
 
 /**
  * Server options for enabling/disabling server features
@@ -25,6 +46,8 @@ typedef enum {
 	FAILED, //!< Client disconnected closing the connection
 	CLOSED //!< Closed successfully with connection_free()
 } con_t;
+
+#include "thread.h"
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -75,28 +98,6 @@ struct __Connection {
 	pthread_t pid; //!< The pid of the pthread that the handle is runnning in
 	con_t status; //!< The status of the current Connection
 };
-
-/**
- * @brief The main struct that hold hosts/bindings and other information
- *  - This is pretty much required throughout the entire program so keep it!
- */
-typedef struct __Server Server;
-
-/**
- * @brief Bind an IP to a host
- *  - This is used when a request is made.
- *  - The IP of the request is matched to a Host using this struct
- */
-typedef struct __HostBind HostBind;
-
-/**
- * @brief Holds information about a connection
- *  - A new connection will initilized after the return of accept().
- *  - The request is immediately after the connection is made
- *  - The bounded_host will be set as well (NULL if the IP is not bounded)
- *  - Since every connection runs in its own thread the pthread_t is kept here as well
- */
-typedef struct __Connection Connection;
 
 #include "host.h"
 
