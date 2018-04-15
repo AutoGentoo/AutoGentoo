@@ -73,7 +73,7 @@ cdef class Server:
 		temp = _str.encode("utf-8")
 		cdef char* c_str = temp
 		
-		cdef Request req = DynamicBuffer (REQ_INSTALL, PROT_AUTOGENTOO)
+		cdef Request req = Request (REQ_INSTALL, PROT_AUTOGENTOO)
 		req.add_hostinstall(c_str)
 		
 		cdef DynamicBuffer bres = self.sock.request(req.data, _print=True, _print_raw=False, _store=False)
@@ -150,7 +150,7 @@ cdef class Server:
 		self.templates = []
 		self.stages = []
 		
-		cdef Binary server_bin = Binary (self.sock.request(DynamicBuffer(b"BIN SERVER\n")))
+		cdef Binary server_bin = Binary (self.sock.request(Request(REQ_BINSERVER, PROT_AUTOGENTOO).data ))
 		
 		p_a = False
 		p_h = False

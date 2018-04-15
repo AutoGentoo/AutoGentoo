@@ -5,14 +5,14 @@ cdef class Request:
 	def __init__ (self, request_t rtype, protocol_t prot):
 		self.data = DynamicBuffer ()
 		self.protocol = prot
-		self.request_type = rtype
+		self.type = rtype
 		
 		cdef int k = 0
 		
 		if self.protocol == PROT_AUTOGENTOO:
 			
 			self.data.append (&k, 1)
-			self.add_int(self.request_type)
+			self.add_int(self.type)
 			self.add_int(k) # Start the count at zero
 			
 			self.count_ptr = <int*>self.data.ptr + self.data.n - sizeof (int)
