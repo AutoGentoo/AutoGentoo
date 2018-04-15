@@ -20,6 +20,11 @@ cdef class DynamicBuffer:
 		self.size *= 2
 		self.ptr = realloc (self.ptr, self.size)
 	
+	cdef void append_string (self, char* ptr):
+		self.append (ptr, strlen(ptr))
+		cdef char k = 0
+		self.append (&k, 1)
+	
 	cdef void append (self, void* ptr, size_t size):
 		if size == 0 or ptr == NULL:
 			return

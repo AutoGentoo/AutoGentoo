@@ -34,33 +34,26 @@ Request* request_handle (Connection* conn) {
 	
 	memcpy (&out->struct_c, current_request, sizeof (request_t));
 	out->struct_c = ntohl((uint32_t) out->struct_c);
-	
 	current_request += sizeof (int);
 	
 	out->structures = malloc (sizeof (RequestData) * out->struct_c);
 	out->types = malloc (sizeof (request_structure_t) * out->struct_c);
 	
-	request_structure_t current;
-	memcpy(&current, current_request, sizeof (request_structure_t));
-	current = (request_structure_t)ntohl((uint32_t) current);
-	
-	current_request += sizeof(request_t);
-	int len = 0;
-	int i = 0;
-	
 	void* end = out->conn->request + out->conn->size;
+	request_structure_t current;
 	
-	for (; i < out->struct_c && current != STRCT_END; i++) {
-		len = parse_request_structure (&out->structures[i], request_structure_linkage[out->types[i]], current_request, end);
+	for (int i = 0; i < out->struct_c; i++) {
+		memcpy(&current, current_request, sizeof (request_structure_t));
+		current = (request_structure_t)ntohl((uint32_t) current);
+		out->types[i] = current;
+		current_request += sizeof (request_structure_t);
+		
+		int len = parse_request_structure (&out->structures[i], request_structure_linkage[out->types[i]], current_request, end);
 		if (len == -1) {
 			request_free (out);
 			return NULL;
 		}
 		current_request += len;
-		memcpy(&current, current_request, sizeof (request_structure_t));
-		current = (request_structure_t)ntohl((uint32_t) current);
-		out->types[i] = current;
-		current_request += sizeof (request_structure_t);
 	}
 	
 	return out;

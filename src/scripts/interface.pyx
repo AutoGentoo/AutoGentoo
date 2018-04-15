@@ -2,8 +2,8 @@ from op_socket cimport Address, Socket
 from libc.stdlib cimport free, malloc
 from libc.stdio cimport *
 from libc.string cimport *
-from d_malloc cimport DynamicBuffer
 from log import Log
+from request cimport *
 
 cdef extern from "<arpa/inet.h>":
 	int htonl (int)
@@ -94,28 +94,11 @@ cdef class Server:
 	
 	def new_template (self, name, arch, chost, cflags, make_conf_entry=()):
 		send = [
-			name,
-			arch,
-			cflags,
-			chost,
-			len(make_conf_entry)
+			name.encode('utf-8'),
+			arch.encode('utf-8'),
+			cflags.encode('utf-8'),
+			chost.encode('utf-8')
 		]
-		
-		cdef DynamicBuffer out_data = DynamicBuffer ()
-		cdef char* req = b"SRV TEMPLATE_CREATE HTTP/1.0\n"
-		out_data.append (req, strlen (req))
-		
-		cdef char* temp_str
-		cdef int temp_int
-		
-		for item in send:
-			if isinstance(item, int):
-				temp_int = htonl(<int>item)
-				out_data.append (&temp_int, sizeof (int))
-			else:
-				k = item.encode ("utf-8")
-				temp_str = k
-				out_data.append (temp_str, len(item) + 1)
 		
 		port_overwrites = [
 			("CXXFLAGS", CXXFLAGS),
@@ -125,6 +108,8 @@ cdef class Server:
 			("PKGDIR", PKGDIR),
 			("PORT_LOGDIR", LOGDIR),
 		]
+		
+		me_out = []
 		
 		for item in make_conf_entry:
 			temp_int = OTHER
@@ -141,15 +126,13 @@ cdef class Server:
 			if temp_int != OTHER:
 				item = item[item.find("=") + 2: -1]
 			
-			k = item.encode ("utf-8")
-			temp_str = k
-			out_data.append(temp_str, strlen(temp_str) + 1)
-			
-			temp_int = htonl(temp_int)
-			out_data.append(&temp_int, sizeof (int))
+			temp_str  = item.encode ("utf-8")
+			me_out.append (MakeExtra(temp_str, temp_int))
 		
+		cdef Request req = Request (REQ_TEMPLATE_CREATE, PROT_AUTOGENTOO)
+		req.add_templatecreate(send[0], arch[1], cflags[2], chost[3], me_out)
 		
-		if strncmp (<char*>self.sock.request(out_data).ptr, "HTTP/1.0 200 OK", 15) == 0:
+		if strncmp (<char*>self.sock.request(req.data).ptr, "HTTP/1.0 200 OK", 15) == 0:
 			self.read_server()
 			return name
 		return None
@@ -235,20 +218,12 @@ cdef class Host(PyOb):
 		self.chroot_status = <chroot_t>-1
 	
 	def set_field (self, f1, f2, value):
-		cdef DynamicBuffer request = DynamicBuffer ()
-		cdef char* n = "SRV EDIT\n"
-		request.append (n, strlen(n))
-		request.append (self.id, 16)
+		cdef Request request = Request (REQ_EDIT, PROT_AUTOGENTOO)
 		
-		cdef int c_f1 = htonl (<int>f1)
-		cdef int c_f2 = htonl(<int>f2)
+		request.add_hostselect(self.id)
+		request.add_hostedit(f1, f2, (<unicode>value).encode('utf8'))
 		
-		request.append (&c_f1, sizeof (int))
-		request.append (&c_f2, sizeof (int))
-		
-		cdef field_set = (<unicode>value).encode('utf8')
-		request.append (<char*>field_set, strlen(field_set) + 1)
-		self.parent.sock.request (request)
+		self.parent.sock.request (request.data)
 		self.parent.read_server()
 	
 	cdef void parse (self, Binary _bin):
@@ -373,7 +348,7 @@ cdef class Stage(PyOb):
 			self.new_id = _bin.read_string()
 	
 	cdef char* send_dup (self, char* cflags=NULL):
-		cdef DynamicBuffer out = DynamicBuffer
+		cdef DynamicBuffer out = DynamicBuffer ()
 		out.append (self.id, strlen (id))
 		out.append (self.arch, strlen(self.arch))
 		

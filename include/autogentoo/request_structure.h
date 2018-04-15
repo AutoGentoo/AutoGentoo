@@ -8,8 +8,7 @@
 typedef union __RequestData RequestData;
 
 typedef enum {
-	STRCT_END,
-	STRCT_HOSTEDIT,
+	STRCT_HOSTEDIT = 1,
 	STRCT_HOSTSELECT,
 	STRCT_HOSTINSTALL,
 	STRCT_TEMPLATECREATE,
