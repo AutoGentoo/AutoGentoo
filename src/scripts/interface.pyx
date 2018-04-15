@@ -59,7 +59,10 @@ cdef class Server:
 	
 	
 	def activate (self, str host_id):
-		cdef DynamicBuffer bres = self.sock.request(DynamicBuffer(("SRV ACTIVATE " + host_id).encode ("utf-8")))
+		cdef Request req = Request(REQ_ACTIVATE, PROT_AUTOGENTOO)
+		req.add_hostselect(host_id.encode("utf-8"))
+		cdef DynamicBuffer bres = self.sock.request(req.data)
+		
 		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
 		
 		if check_tr (b"HTTP/1.0 200 OK\n") == 0:
@@ -70,11 +73,10 @@ cdef class Server:
 		temp = _str.encode("utf-8")
 		cdef char* c_str = temp
 		
-		cdef DynamicBuffer req = DynamicBuffer ()
-		req.append (b"INSTALL\n", 8)
-		req.append (c_str, strlen (c_str))
+		cdef Request req = DynamicBuffer (REQ_INSTALL, PROT_AUTOGENTOO)
+		req.add_hostinstall(c_str)
 		
-		cdef DynamicBuffer bres = self.sock.request(req, _print=True, _print_raw=False, _store=False)
+		cdef DynamicBuffer bres = self.sock.request(req.data, _print=True, _print_raw=False, _store=False)
 		
 		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
 		
