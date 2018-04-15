@@ -80,6 +80,9 @@ int main(int argc, char** argv) {
 	
 	printf ("%d\n", http_request_parse (&r, &o));
 	printf ("request: '%s'\npath: '%s'\nversion: '%s'\n", o.function, o.arg, o.version);
+	
+	Server* main_server = read_server(".", port, server_opts);
+	server_start(main_server);
 #else
 	opt_handle(opt_handlers, argc, argv + 1);
 	if (!location)

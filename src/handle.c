@@ -124,12 +124,7 @@ char prv_conn_read_int (int* dest, char* request, int* offset, size_t size) {
 }
 
 response_t INSTALL (Request* request) {
-	int check_types[] = {
-			STRCT_HOSTINSTALL
-	};
-	
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
-		return BAD_REQUEST;
+	CHECK_STRUCTURES({STRCT_HOSTINSTALL});
 	
 	if (request->conn->bounded_host == NULL)
 		return FORBIDDEN;
@@ -150,13 +145,7 @@ response_t SRV_CREATE (Connection* conn, char** args, int start) {
 }
 
 response_t SRV_EDIT (Request* request) {
-	int check_types[] = {
-			STRCT_HOSTSELECT,
-			STRCT_HOSTEDIT
-	};
-	
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
-		return BAD_REQUEST;
+	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_HOSTEDIT});
 	
 	Host* target;
 	if (!(target = server_host_search(request->conn->parent, request->structures[0].hs.host_id)))
@@ -198,12 +187,7 @@ response_t SRV_EDIT (Request* request) {
 }
 
 response_t SRV_ACTIVATE (Request* request) {
-	int check_types[] = {
-			STRCT_HOSTSELECT
-	};
-	
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
-		return BAD_REQUEST;
+	CHECK_STRUCTURES({STRCT_HOSTSELECT})
 	
 	Host* found = server_host_search(request->conn->parent, request->structures[0].hs.host_id);
 	
@@ -216,15 +200,9 @@ response_t SRV_ACTIVATE (Request* request) {
 }
 
 response_t SRV_HOSTREMOVE (Request* request) {
-	int check_types[] = {
-			STRCT_HOSTSELECT
-	};
-	
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
-		return BAD_REQUEST;
+	CHECK_STRUCTURES({STRCT_HOSTSELECT});
 	
 	int i;
-	
 	// Remove the binding
 	for (i = 0; i != request->conn->parent->host_bindings->n; i++) {
 		Host** tmp = (Host**) (((void***) vector_get(request->conn->parent->host_bindings, i))[1]);
@@ -264,12 +242,7 @@ void prv_fd_write_str (int fd, char* str) {
 
 /* SRV Metadata requests */
 response_t SRV_GETHOST (Request* request) {
-	int check_types[] = {
-			STRCT_HOSTSELECT
-	};
-	
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
-		return BAD_REQUEST;
+	CHECK_STRUCTURES ({STRCT_HOSTSELECT});
 	
 	Host* host = server_host_search(request->conn->parent, request->structures[0].hs.host_id);
 	
@@ -359,12 +332,7 @@ response_t SRV_GETTEMPLATES (Request* request) {
 }
 
 response_t SRV_TEMPLATE_CREATE (Request* request) {
-	int check_types[] = {
-			STRCT_TEMPLATECREATE
-	};
-	
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
-		return BAD_REQUEST;
+	CHECK_STRUCTURES({STRCT_TEMPLATECREATE})
 	
 	HostTemplate in_data;
 	in_data.arch = request->structures[0].tc.arch;
@@ -390,12 +358,7 @@ response_t SRV_STAGE_NEW (Request* request) {
 	 * random generated str
 	 */
 	
-	int check_types[] = {
-			STRCT_STAGESELECT
-	};
-	
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
-		return BAD_REQUEST;
+	CHECK_STRUCTURES({STRCT_STAGESELECT})
 	
 	HostTemplate* t = stage_new(request->conn->parent, request->structures[0].ss.index);
 	
@@ -407,13 +370,7 @@ response_t SRV_STAGE_NEW (Request* request) {
 }
 
 response_t SRV_STAGE (Request* request) {
-	int check_types[] = {
-			STRCT_HOSTSELECT,
-			STRCT_STAGESELECT
-	};
-	
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
-		return BAD_REQUEST;
+	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_STAGESELECT})
 	
 	HostTemplate* t = small_map_get(request->conn->parent->stages, request->structures[0].hs.host_id);
 	if (t == NULL)
@@ -460,12 +417,7 @@ response_t SRV_GETSTAGED (Request* request) {
 }
 
 response_t SRV_GETSTAGE (Request* request) {
-	int check_types[] = {
-			STRCT_STAGESELECT
-	};
-	
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
-		return BAD_REQUEST;
+	CHECK_STRUCTURES({STRCT_STAGESELECT})
 	
 	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, request->structures[0].ss.index);
 	
@@ -495,12 +447,7 @@ response_t SRV_GETSTAGE (Request* request) {
 }
 
 response_t SRV_HANDOFF (Request* request) {
-	int check_types[] = {
-			STRCT_STAGESELECT
-	};
-	
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1)
-		return BAD_REQUEST;
+	CHECK_STRUCTURES({STRCT_STAGESELECT})
 	
 	
 	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, request->structures[0].ss.index);

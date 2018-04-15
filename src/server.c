@@ -246,26 +246,27 @@ void server_respond(Connection* conn) {
 	}
 	
 	conn->status = CONNECTED;
-	
 	conn->size = (size_t)total_read;
-	StringVector* args = string_vector_new(); // Written to by parse_request
 	
+	response_t res;
 	Request* request = request_handle(conn);
-	char* split = strchr (conn->request, '\n');
-	*split = 0;
-	void* call = NULL;
-	//SHFP call = parse_request(conn->request, args);
+	request->resolved_call = resolve_call(request->request_type);
 	
 	linfo("handle %s on pthread_t 0x%llx (%s)", conn->ip, conn->pid, conn->request);
 	
-	response_t res;
-	
-	if (call == NULL)
+	if (request->resolved_call.ag_fh == NULL)
 		res = NOT_IMPLEMENTED;
-	//else
-		//res = (*call)(conn, (char**) args->ptr, (int)(++split - (char*)conn->request), (int) args->n);
-	
-	string_vector_free(args);
+	else {
+		if (request->protocol == PROT_AUTOGENTOO)
+			res = (*request->resolved_call.ag_fh) (request);
+		else {
+			HTTPRequest http_req;
+			if (http_request_parse (request, &http_req) != 0)
+				res = BAD_REQUEST;
+			else
+				res = (*request->resolved_call.http_fh)(conn, http_req);
+		}
+	}
 	
 	if (res.len != 0)
 		rsend(conn, res);
@@ -276,8 +277,7 @@ void server_respond(Connection* conn) {
 	conn->parent->thandler->to_join = conn->pid;
 	pthread_t parent = conn->parent->pthread;
 	connection_free(conn);
-	
-	
+	request_free (request);
 	
 #ifndef AUTOGENTOO_NO_THREADS
 	pthread_kill(parent, SIGUSR1);

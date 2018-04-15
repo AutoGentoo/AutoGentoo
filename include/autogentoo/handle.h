@@ -5,6 +5,12 @@
 #include "response.h"
 #include "request.h"
 
+#define CHECK_STRUCTURES(...) ({ \
+	int check_types[] = __VA_ARGS__; \
+	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1) \
+		return BAD_REQUEST; \
+});
+
 /**
  * Holds all of the valid requests
  */
@@ -12,11 +18,10 @@ extern RequestLink requests[];
 
 /**
  * Parse the request and write the arguemnts to args
- * @param parse_line the input request to read from
- * @param args the arguments parsed from the request
+ * @param type resolved type from request_handle
  * @return a pointer to function that should be called
  */
-//SHFP parse_request(char* parse_line, StringVector* args);
+FunctionHandler resolve_call (request_t type);
 
 /**
  * HTTP request to download file

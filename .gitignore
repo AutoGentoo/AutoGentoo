@@ -41,3 +41,4 @@ include/*Makefile.in
 include/*Makefile
 venv/*
 **/.autogentoo.config
+src/test/*
