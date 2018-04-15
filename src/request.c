@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unitypes.h>
 #include <netinet/in.h>
+#include <autogentoo/handle.h>
 
 Request* request_handle (Connection* conn) {
 	Request* out = malloc (sizeof (Request));
@@ -91,7 +92,17 @@ int http_request_parse (Request* req, HTTPRequest* dest) {
 }
 
 response_t request_call (Request* req) {
-
+	req->resolved_call = resolve_call(req->request_type);
+	
+	if (req->resolved_call.ag_fh == NULL)
+		return NOT_IMPLEMENTED;
+	if (req->protocol == PROT_AUTOGENTOO)
+		return (*req->resolved_call.ag_fh) (req);
+	
+	HTTPRequest http_req;
+	if (http_request_parse (req, &http_req) != 0)
+		return BAD_REQUEST;
+	return (*req->resolved_call.http_fh)(req->conn, http_req);
 }
 
 void request_free (Request* req) {

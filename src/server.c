@@ -250,27 +250,11 @@ void server_respond(Connection* conn) {
 	
 	response_t res;
 	Request* request = request_handle(conn);
-	request->resolved_call = resolve_call(request->request_type);
 	
 	linfo("handle %s on pthread_t 0x%llx (%s)", conn->ip, conn->pid, conn->request);
-	
-	if (request->resolved_call.ag_fh == NULL)
-		res = NOT_IMPLEMENTED;
-	else {
-		if (request->protocol == PROT_AUTOGENTOO)
-			res = (*request->resolved_call.ag_fh) (request);
-		else {
-			HTTPRequest http_req;
-			if (http_request_parse (request, &http_req) != 0)
-				res = BAD_REQUEST;
-			else
-				res = (*request->resolved_call.http_fh)(conn, http_req);
-		}
-	}
-	
+	res = request_call (request);
 	if (res.len != 0)
 		rsend(conn, res);
-	
 	linfo("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
 	write_server(conn->parent);
 	
