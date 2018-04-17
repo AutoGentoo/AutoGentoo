@@ -17,6 +17,8 @@ void string_vector_remove(StringVector* vec, int index);
 
 void string_vector_insert(StringVector* vec, char* string, int index);
 
+void string_vector_set(StringVector* vec, char* string, int index);
+
 char* string_vector_get(StringVector* vec, int index);
 
 void string_vector_split(StringVector* vec, char* string, char* delim);

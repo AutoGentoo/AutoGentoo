@@ -33,6 +33,13 @@ void string_vector_insert(StringVector* vec, char* string, int index) {
 	vec->n++;
 }
 
+void string_vector_set(StringVector* vec, char* string, int index) {
+	while (vec->s >= index)
+		vector_allocate(vec);
+	
+	*(char**)vector_get (vec, index) = string;
+}
+
 void string_vector_remove(StringVector* vec, int index) {
 	free(string_vector_get(vec, index));
 	vector_remove(vec, index);

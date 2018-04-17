@@ -9,12 +9,9 @@
  */
 typedef struct __Host Host;
 
-/**
- * @brief A simple typedef so that we don't pass
- * a random char* instead of a host_id by mistake
- */
-typedef char* host_id;
-
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "response.h"
 #include "server.h"
 #include "kernel.h"
@@ -40,7 +37,7 @@ typedef enum {
  */
 struct __Host {
 	Server* parent; //!< The parent server
-	host_id id; //!< The ID of the Host
+	char* id; //!< The ID of the Host
 	char* profile; //!< Portage profile, see possible values with eselect profile list
 	char* hostname; //!< Hostname of the host (shows up in the graphical client)
 	chroot_t chroot_status; //!< Is the chroot ready?
@@ -61,11 +58,58 @@ struct __Host {
 	Vector* kernel;
 };
 
+typedef enum {
+	VOIDTYPE_STRING,
+	VOIDTYPE_INT,
+	VOIDTYPE_STRINGVECTOR
+} voidtype_t;
+
+typedef enum {
+	HOSTOFF_ID,
+	HOSTOFF_PROFILE,
+	HOSTOFF_HOSTNAME,
+	HOSTOFF_CHROOT_STATUS,
+	HOSTOFF_CFLAGS,
+	HOSTOFF_CXXFLAGS,
+	HOSTOFF_ARCH,
+	HOSTOFF_CHOST,
+	HOSTOFF_USE,
+	HOSTOFF_EXTRA,
+	HOSTOFF_PORTAGE_TMPDIR,
+	HOSTOFF_PORTDIR,
+	HOSTOFF_DISTDIR,
+	HOSTOFF_PKGDIR,
+	HOSTOFF_PORT_LOGDIR
+} hostoffsets_t;
+
+typedef struct {
+	voidtype_t type;
+	size_t offset;
+} host_offset_t;
+
+static host_offset_t host_valid_offset[] = {
+		{VOIDTYPE_STRING, offsetof(struct __Host, id)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, profile)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, hostname)},
+		{VOIDTYPE_INT, offsetof(struct __Host, chroot_status)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, cflags)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, cxxflags)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, arch)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, chost)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, use)},
+		{VOIDTYPE_STRINGVECTOR, offsetof(struct __Host, extra)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, portage_tmpdir)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, portdir)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, distdir)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, pkgdir)},
+		{VOIDTYPE_STRING, offsetof(struct __Host, port_logdir)},
+};
+
 /**
  * Returns a randomly generated HOST_ID
  * @return a new host id
  */
-host_id host_id_new();
+char* host_id_new();
 
 /**
  * Creates a new host given an ID
@@ -73,7 +117,7 @@ host_id host_id_new();
  * @param id the ID of the Host
  * @return a pointer to the Host
  */
-Host* host_new(Server* server, host_id id);
+Host* host_new(Server* server, char* id);
 
 /**
  * Updates the current status of the host by reading its directory

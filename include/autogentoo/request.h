@@ -47,6 +47,7 @@ typedef enum {
 	REQ_HANDOFF,
 	REQ_SAVE,
 	REQ_HOSTWRITE,
+	REQ_HOSTUPLOAD,
 	
 	/* Binary requests */
 	REQ_BINSERVER,

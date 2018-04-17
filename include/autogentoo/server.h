@@ -145,7 +145,7 @@ void server_bind(Connection* conn, Host* host);
  * @param id the ID to search for
  * @return a pointer to the Host that was found, NULL if not found
  */
-Host* server_host_search(Server* server, host_id id);
+Host* server_host_search(Server* server, char* id);
 
 /**
  * Meta-function called by server_start (DO NOT CALL THIS)

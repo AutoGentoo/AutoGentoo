@@ -5,16 +5,9 @@
 #ifndef AUTOGENTOO_REQUEST_STRUCTURE_H
 #define AUTOGENTOO_REQUEST_STRUCTURE_H
 
-typedef union __RequestData RequestData;
+#include <stdio.h>
 
-typedef enum {
-	STRCT_HOSTEDIT = 1,
-	STRCT_HOSTSELECT,
-	STRCT_HOSTINSTALL,
-	STRCT_TEMPLATECREATE,
-	STRCT_STAGESELECT,
-	STRCT_STAGECOMMAND,
-} request_structure_t;
+typedef union __RequestData RequestData;
 
 struct __HostEdit {
 	int selection_one;
@@ -48,6 +41,12 @@ struct __HostInstall {
 	char* argument;
 } __attribute__((packed));
 
+struct __HostOffset {
+	size_t offset_index;
+	size_t n;
+	void* data;
+} __attribute__((packed));
+
 typedef enum {
 	STAGE_NONE = 0,
 	STAGE_DOWNLOAD = 0x1,
@@ -59,13 +58,24 @@ struct __StageCommand {
 	 stage_command_t command;
 } __attribute__((packed));
 
+typedef enum {
+	STRCT_HOSTEDIT = 1,
+	STRCT_HOSTSELECT,
+	STRCT_HOSTINSTALL,
+	STRCT_TEMPLATECREATE,
+	STRCT_TEMPLATESELECT,
+	STRCT_STAGECOMMAND,
+	STRCT_HOSTOFFSET, /* Custom offset on Host struct */
+} request_structure_t;
+
 static char* request_structure_linkage[] = {
 		"iis",
 		"s",
 		"s",
 		"ssssa(si)",
 		"i",
-		"i"
+		"i",
+		"iv",
 };
 
 union __RequestData {
@@ -75,6 +85,7 @@ union __RequestData {
 	struct __TemplateCreate tc;
 	struct __StageSelect ss;
 	struct __StageCommand sc;
+	struct __HostOffset ho;
 };
 
 int parse_request_structure (RequestData* out, char* template, void* data, void* end);

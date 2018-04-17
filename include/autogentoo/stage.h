@@ -60,7 +60,7 @@ struct __HostTemplate {
 	
 	char* dest_dir; //!< The temporary destination before handoff (don't init)
 	Server* parent; //!< The parent server (don't init)
-	host_id new_id; //!< The new id that will be passed in the handoff (don't init)
+	char* new_id; //!< The new id that will be passed in the handoff (don't init)
 };
 
 extern Vector* host_templates;

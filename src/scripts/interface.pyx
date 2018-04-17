@@ -16,29 +16,26 @@ cdef class Server:
 		self.adr = adr
 		self.sock = Socket (self.adr)
 	
-	def new_host (self, Stage template, str hostname, str profile, str cflags, str use):
-		cdef DynamicBuffer n_stage_req = DynamicBuffer (b"SRV STAGE_NEW ")
-		n_stage_req.append (<char*>template.id, strlen (template.id))
-		n_stage_req.append (b"\n", 1)
+	def new_host (self, int template, str hostname, str profile, str cflags, str use, list[str] extra):
+		cdef Request n_stage_req = Request (REQ_STAGE_NEW, PROT_AUTOGENTOO)
+		n_stage_req.add_templateselect(template)
 		
-		cdef DynamicBuffer res = self.sock.request(n_stage_req)
+		cdef DynamicBuffer res = self.sock.request(n_stage_req.data)
 		cdef char* new_id_name = strtok (<char*>res.ptr, "\n")
 		
-		cdef DynamicBuffer stage_req = DynamicBuffer (b"SRV STAGE ")
-		stage_req.append (new_id_name, strlen (new_id_name))
-		stage_req.append (b"\n", 1)
-		stage_req.append (b"ALL\n", 4)
+		cdef Request stage_req = Request (REQ_STAGE, PROT_AUTOGENTOO)
+		stage_req.add_stagecommand(STAGE_ALL)
 		
-		cdef DynamicBuffer bres = self.sock.request(stage_req, _print=True, _print_raw=False, _store=False)
+		cdef DynamicBuffer bres = self.sock.request(stage_req.data, _print=True, _print_raw=False, _store=False)
 		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
 		if check_tr(b"HTTP/1.0 200 OK\n") != 0:
 			Log.error ("Download or extract failed\n")
 			return None
 		
-		cdef DynamicBuffer handoff_req = DynamicBuffer(b"SRV HANDOFF ")
-		stage_req.append (new_id_name, strlen (new_id_name))
-		stage_req.append (b"\n", 1)
-		bref = self.sock.request(handoff_req)
+		cdef Request handoff_req = Request(REQ_HANDOFF, PROT_AUTOGENTOO)
+		handoff_req.add_templateselect(template)
+		
+		bres = self.sock.request(handoff_req.data)
 		if check_tr(b"HTTP/1.0 200 OK\n") != 0:
 			Log.error ("Host handoff failed\n")
 			return None
@@ -50,10 +47,8 @@ cdef class Server:
 		# 2 cflags
 		# 3 use
 		
-		target.set_field(0, -1, hostname)
-		target.set_field(1, -1, profile)
-		target.set_field(2, -1, cflags)
-		target.set_field(3, -1, use)
+		cdef Request edit_req = Request(REQ_EDIT, PROT_AUTOGENTOO)
+		edit_req
 		
 		return new_id_name.decode ("utf-8")
 	
@@ -86,7 +81,7 @@ cdef class Server:
 		elif check_tr (b"HTTP/1.0 403 Forbidden\n") == 0:
 			Log.error("You must select a build host first\n")
 		elif check_tr (b"HTTP/1.0 504 Chroot Not Mounted\n") == 0:
-			if strncmp (<char*>self.sock.request(DynamicBuffer(b"SRV MNTCHROOT\n")).ptr, "HTTP/1.0 2", 10) == 0:
+			if strncmp (<char*>self.sock.request(Request(REQ_MNTCHROOT, PROT_AUTOGENTOO).data).ptr, "HTTP/1.0 2", 10) == 0:
 				return self.install (_str)
 			Log.error("Failed to mount chroot\n")
 			Log.error("Check the server logs\n")

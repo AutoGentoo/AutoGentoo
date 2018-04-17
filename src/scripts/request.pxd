@@ -25,6 +25,7 @@ cdef extern from "<autogentoo/request.h>":
 		REQ_HANDOFF,
 		REQ_SAVE,
 		REQ_HOSTWRITE,
+		REQ_HOSTUPLOAD,
 		
 		# Binary requests
 		REQ_BINSERVER,
@@ -68,13 +69,19 @@ cdef extern from "<autogentoo/request.h>":
 	cdef packed struct __StageCommand:
 		stage_command_t command;
 	
+	cdef packed struct __HostOffset:
+		size_t offset;
+		size_t size;
+		void* ptr;
+	
 	ctypedef enum request_structure_t:
 		STRCT_HOSTEDIT = 1,
 		STRCT_HOSTSELECT,
 		STRCT_HOSTINSTALL,
 		STRCT_TEMPLATECREATE,
-		STRCT_STAGESELECT,
-		STRCT_STAGECOMMAND
+		STRCT_TEMPLATESELECT,
+		STRCT_STAGECOMMAND,
+		STRCT_HOSTOFFSET, # /* Custom offset on Host struct */
 	
 cdef union RequestData:
 	__HostEdit he
@@ -83,6 +90,43 @@ cdef union RequestData:
 	__TemplateCreate tc;
 	__StageSelect ss;
 	__StageCommand sc;
+	__HostOffset ho;
+
+cdef extern from "<autogentoo/host.h>":
+	ctypedef enum hostoffsets_t:
+		HOSTOFF_ID,
+		HOSTOFF_PROFILE,
+		HOSTOFF_HOSTNAME,
+		HOSTOFF_CHROOT_STATUS,
+		HOSTOFF_CFLAGS,
+		HOSTOFF_CXXFLAGS,
+		HOSTOFF_ARCH,
+		HOSTOFF_CHOST,
+		HOSTOFF_USE,
+		HOSTOFF_EXTRA,
+		HOSTOFF_PORTAGE_TMPDIR,
+		HOSTOFF_PORTDIR,
+		HOSTOFF_DISTDIR,
+		HOSTOFF_PKGDIR,
+		HOSTOFF_PORT_LOGDIR
+
+host_offset_binding = {
+	"ID": HOSTOFF_ID,
+	"PROFILE": HOSTOFF_PROFILE,
+	"HOSTNAME": HOSTOFF_HOSTNAME,
+	"CHROOT_STATUS": HOSTOFF_CHROOT_STATUS,
+	"CFLAGS": HOSTOFF_CFLAGS,
+	"CXXFLAGS": HOSTOFF_CXXFLAGS,
+	"ARCH": HOSTOFF_ARCH,
+	"CHOST": HOSTOFF_CHOST,
+	"USE": HOSTOFF_USE,
+	"EXTRA": HOSTOFF_EXTRA,
+	"PORTAGE_TMPDIR": HOSTOFF_PORTAGE_TMPDIR,
+	"PORTDIR": HOSTOFF_PORTDIR,
+	"DISTDIR": HOSTOFF_DISTDIR,
+	"PKGDIR": HOSTOFF_PKGDIR,
+	"PORT_LOGDIR": HOSTOFF_PORT_LOGDIR
+}
 
 from collections import namedtuple
 MakeExtra = namedtuple('MakeExtra', 'make_extra select')
@@ -97,7 +141,7 @@ cdef class Request:
 	cdef add_hostselect (self, char* host_id)
 	cdef add_hostinstall (self, char* param)
 	cdef add_templatecreate (self, char* host_id, char* arch, char* cflags, char* chost, extras=*)
-	cdef add_stageselect (self, int index)
+	cdef add_templateselect (self, int index)
 	cdef add_stagecommand (self, stage_command_t command)
 	cdef increment (self)
 	cdef add_int (self, int to_add)

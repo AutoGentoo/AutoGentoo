@@ -62,8 +62,8 @@ cdef class Request:
 		
 		self.increment()
 	
-	cdef add_stageselect (self, int index):
-		cdef request_structure_t __type = STRCT_STAGESELECT
+	cdef add_templateselect (self, int index):
+		cdef request_structure_t __type = STRCT_TEMPLATESELECT
 		self.add_int(__type)
 		self.add_int(index)
 		

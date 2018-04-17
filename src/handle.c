@@ -29,6 +29,7 @@ RequestLink requests[] = {
 		{REQ_HANDOFF,         {.ag_fh=SRV_HANDOFF}},
 		{REQ_SAVE,            {.ag_fh=SRV_SAVE}},
 		{REQ_HOSTWRITE,       {.ag_fh=SRV_HOSTWRITE}},
+		{REQ_HOSTUPLOAD,       {.ag_fh=SRV_HOSTUPLOAD}},
 		
 		/* Binary requests */
 		{REQ_BINSERVER,       {.ag_fh=BIN_SERVER}},
@@ -358,7 +359,7 @@ response_t SRV_STAGE_NEW (Request* request) {
 	 * random generated str
 	 */
 	
-	CHECK_STRUCTURES({STRCT_STAGESELECT})
+	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
 	
 	HostTemplate* t = stage_new(request->conn->parent, request->structures[0].ss.index);
 	
@@ -370,7 +371,7 @@ response_t SRV_STAGE_NEW (Request* request) {
 }
 
 response_t SRV_STAGE (Request* request) {
-	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_STAGESELECT})
+	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_TEMPLATESELECT})
 	
 	HostTemplate* t = small_map_get(request->conn->parent->stages, request->structures[0].hs.host_id);
 	if (t == NULL)
@@ -417,7 +418,7 @@ response_t SRV_GETSTAGED (Request* request) {
 }
 
 response_t SRV_GETSTAGE (Request* request) {
-	CHECK_STRUCTURES({STRCT_STAGESELECT})
+	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
 	
 	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, request->structures[0].ss.index);
 	
@@ -447,8 +448,7 @@ response_t SRV_GETSTAGE (Request* request) {
 }
 
 response_t SRV_HANDOFF (Request* request) {
-	CHECK_STRUCTURES({STRCT_STAGESELECT})
-	
+	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
 	
 	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, request->structures[0].ss.index);
 	if (!__t)
@@ -538,47 +538,29 @@ response_t SRV_HOSTWRITE (Request* request) {
 	return OK;
 }
 
-/*
 response_t SRV_HOSTUPLOAD(Request* request) {
-	struct {
-		char host_id[16];
-		char* hostname;
-		char* profile;
-		char* cflags;
-		char* use;
-	} _in_template = {{}, NULL, NULL, NULL, NULL};
+	if (request->struct_c < 2 || request->types[0] != STRCT_HOSTSELECT)
+		return BAD_REQUEST;
+	Host* selected = server_host_search (request->conn->parent, request->structures[0].hs.host_id);
 	
-	strncpy (_in_template.host_id, conn->request + start, 15);
-	start += 15;
-	
-	size_t ptr_size = sizeof (void*);
-	
-	Host* target = server_host_search (conn->parent, _in_template.host_id);
-	if (!target)
-		return NOT_FOUND;
-	
-	int lengths[4];
-	memcpy(lengths, conn->request + start, sizeof (int) * 4);
-	start += sizeof (int) * 4;
-	
-	for (int i = 0; i != 4; i++, start++) {
-		char** current_string = ((char**)&_in_template + 16 + sizeof (void*) * i);
-		*current_string = strndup (conn->request + start, (size_t)lengths[i]);
-		start += lengths[i];
-	}
-	
-	size_t offsets[4] = {
-		offsetof (Host, hostname),
-		offsetof (Host, profile),
-		offsetof (Host, cflags),
-		offsetof (Host, use)
-	};
-	
-	for (int i = 0; i != 4; i++) {
-		if ((char*)(target + offsets[i]))
-			free (target + offsets[i]);
-		memcpy(target + offsets[i], &_in_template + 16 + sizeof (void*) * i, ptr_size);
+	for (int i = 1; i < request->struct_c; i++) {
+		if (request->types[i] != STRCT_HOSTOFFSET)
+			return BAD_REQUEST;
+		
+		host_offset_t offset_item = host_valid_offset[request->structures[i].ho.offset_index];
+		if (offset_item.type == VOIDTYPE_STRING)
+			*(char**)(selected + offset_item.offset) = strdup (request->structures[i].ho.data);
+		else if (offset_item.type == VOIDTYPE_INT)
+			*(int*)(selected + offset_item.offset) = *(int*)(request->structures[i].ho.data);
+		else if (offset_item.type == VOIDTYPE_STRINGVECTOR) {
+			size_t off = 0;
+			int j = 0;
+			for (char* temp = strdup (request->structures[i].ho.data);
+				 strlen(temp);
+				 temp = strdup (request->structures[i].ho.data + off), j++)
+				string_vector_set((StringVector*)(selected + offset_item.offset), temp, j);
+		}
 	}
 	
 	return OK;
-}*/
+}

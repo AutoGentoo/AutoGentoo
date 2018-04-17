@@ -7,9 +7,9 @@
 #include <limits.h>
 #include <sys/wait.h>
 
-host_id host_id_new() {
+char* host_id_new() {
 	int len = 15;
-	host_id out = malloc((size_t) len + 1);
+	char* out = malloc((size_t) len + 1);
 	
 	srandom((unsigned int) time(NULL));  // Correct seeding function for random()
 	
@@ -24,7 +24,7 @@ host_id host_id_new() {
 	return out;
 }
 
-Host* host_new(Server* server, host_id id) {
+Host* host_new(Server* server, char* id) {
 	Host* out = malloc(sizeof(Host));
 	out->parent = server;
 	out->id = id; // Dont need to dup, never accessed elsewhere

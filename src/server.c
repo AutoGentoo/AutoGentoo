@@ -278,11 +278,11 @@ void server_bind(Connection* conn, Host* host) {
 		loc->host = host;
 }
 
-Host* server_host_search(Server* server, host_id id) {
+Host* server_host_search(Server* server, char* id) {
 	int i;
 	for (i = 0; i != server->hosts->n; i++) {
 		Host* current_host = *(Host**) vector_get(server->hosts, i);
-		if (strcmp((char*) id, current_host->id) == 0)
+		if (strcmp(id, current_host->id) == 0)
 			return current_host;
 	}
 	
