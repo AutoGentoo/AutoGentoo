@@ -546,6 +546,8 @@ response_t SRV_HOSTUPLOAD(Request* request) {
 	for (int i = 1; i < request->struct_c; i++) {
 		if (request->types[i] != STRCT_HOSTOFFSET)
 			return BAD_REQUEST;
+		if (request->structures[i].ho.offset_index > sizeof (host_valid_offset) / sizeof (host_valid_offset[0]))
+			return BAD_REQUEST;
 		
 		host_offset_t offset_item = host_valid_offset[request->structures[i].ho.offset_index];
 		if (offset_item.type == VOIDTYPE_STRING)
