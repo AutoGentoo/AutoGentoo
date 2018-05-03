@@ -1,3 +1,4 @@
+from libc.stdio cimport printf, fflush, stdout
 from libc.stdlib cimport malloc, realloc, free
 from libc.string cimport strlen, strdup, memcpy
 from interface cimport AUTOGENTOO_FILE_END
@@ -21,9 +22,7 @@ cdef class DynamicBuffer:
 		self.ptr = realloc (self.ptr, self.size)
 	
 	cdef void append_string (self, char* ptr):
-		self.append (ptr, strlen(ptr))
-		cdef char k = 0
-		self.append (&k, 1)
+		self.append (ptr, strlen(ptr) + 1)
 	
 	cdef void append (self, void* ptr, size_t size):
 		if size == 0 or ptr == NULL:
@@ -48,6 +47,17 @@ cdef class DynamicBuffer:
 	
 	def __dealloc__ (self):
 		free (self.ptr)
+	
+	cpdef void print_raw (self, align=True):
+		align = 25
+		cdef int last_i = 1
+		
+		for i in range (self.n):
+			printf ("%02x ", (<char*>self.ptr)[i] & 0xff)
+			if last_i % 25 == 0 and align:
+				printf ("\n")
+			last_i += 1
+		fflush (stdout)
 
 cdef class Binary:
 	def __init__ (self, DynamicBuffer buffer):

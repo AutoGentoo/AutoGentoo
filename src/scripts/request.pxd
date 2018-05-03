@@ -75,7 +75,8 @@ cdef extern from "<autogentoo/request.h>":
 		void* ptr;
 	
 	ctypedef enum request_structure_t:
-		STRCT_HOSTEDIT = 1,
+		STRCT_END,
+		STRCT_HOSTEDIT,
 		STRCT_HOSTSELECT,
 		STRCT_HOSTINSTALL,
 		STRCT_TEMPLATECREATE,
@@ -143,5 +144,8 @@ cdef class Request:
 	cdef add_templatecreate (self, char* host_id, char* arch, char* cflags, char* chost, extras=*)
 	cdef add_templateselect (self, int index)
 	cdef add_stagecommand (self, stage_command_t command)
-	cdef increment (self)
+	cdef add_hostupload_int (self, hostoffsets_t offset, int ob)
+	cdef add_hostupload_str (self, hostoffsets_t offset, char* ob)
+	cdef add_hostupload_list (self, hostoffsets_t offset, list ob)
 	cdef add_int (self, int to_add)
+	cdef finish (self)

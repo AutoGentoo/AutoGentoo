@@ -71,8 +71,6 @@ union __FunctionHandler {
 	HTTP_FH http_fh;
 };
 
-
-
 struct __Request {
 	protocol_t protocol;
 	request_t request_type;
@@ -80,8 +78,8 @@ struct __Request {
 	Connection* conn;
 	
 	int struct_c;
-	RequestData* structures;
-	request_structure_t* types;
+	Vector* structures;
+	Vector* types;
 };
 
 /**

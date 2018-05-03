@@ -59,6 +59,7 @@ struct __StageCommand {
 } __attribute__((packed));
 
 typedef enum {
+	STRCT_END,
 	STRCT_HOSTEDIT = 1,
 	STRCT_HOSTSELECT,
 	STRCT_HOSTINSTALL,

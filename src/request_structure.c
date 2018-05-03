@@ -16,7 +16,7 @@ char* prv_safe_strdup (char* original, void* end_ptr) {
 	char* out = malloc (len + 1);
 	
 	char* p = out + len;
-	while (p != out)
+	while (p >= out)
 		*p-- = *(original-- + len);
 	return out;
 }
@@ -38,10 +38,8 @@ int prv_handle_item (void* dest, void* data, char type, size_t item_size, void* 
 		*(void**)dest = ptr;
 		item_size += sizeof (size_t); // Make sure we skip over size_t
 	}
-	else if (type == 's') {
-		*(void**)data = prv_safe_strdup(data, end);
-		memcpy (dest, data, item_size);
-	}
+	else if (type == 's')
+		*(void**)dest = prv_safe_strdup(data, end);
 	else
 		memcpy (dest, data, item_size);
 	
@@ -75,8 +73,10 @@ int parse_request_structure (RequestData* out, char* template, void* data, void*
 	void* ptr = out;
 	void* old = data;
 	
-	char* i = template;
-	for (; i != NULL; i++) {
+	char* i = strdup(template);
+	char* orig = i;
+	
+	for (; *i != 0; i++) {
 		int len = 0;
 		
 		if (*i == 'a') {
@@ -101,6 +101,7 @@ int parse_request_structure (RequestData* out, char* template, void* data, void*
 						free_request_structure(((void**)ptr)[j], i, NULL);
 					free (ptr);
 					free_request_structure (out, template, i);
+					free (orig);
 					return -1;
 				}
 			}
@@ -112,13 +113,16 @@ int parse_request_structure (RequestData* out, char* template, void* data, void*
 		size_t item_size = get_sizeof(*i);
 		len = prv_handle_item (ptr, data, *i, item_size, end);
 		
-		if (len == -1)
+		if (len == -1) {
+			free(orig);
 			return -1;
+		}
 		
 		ptr += len;
 		data += len;
 	}
 	
+	free (orig);
 	return (int)(data - old);
 }
 
@@ -130,7 +134,7 @@ size_t get_sizeof (char c) {
 			{'c', sizeof(char)},
 			{'i', sizeof(int)},
 			{'l', sizeof(long)},
-			{'s', sizeof(char*)},
+			{'s', 1},
 			{'a', sizeof(void*)},
 			{'v', sizeof(size_t)}, /* Use size_t because the data size is checked dynamically */
 	};
@@ -151,10 +155,11 @@ size_t get_ssizeof (char* template) {
 }
 
 void free_request_structure (RequestData* to_free, char* template, const char* end) {
-	char* i = template;
+	char* i = strdup(template);
+	char* orig = i;
 	
 	size_t offset = 0;
-	for (; i != NULL; i++) {
+	for (; *i != 0; i++) {
 		if (end && i >= end)
 			break;
 		
@@ -181,8 +186,10 @@ void free_request_structure (RequestData* to_free, char* template, const char* e
 		size_t item_size = get_sizeof(*i);
 		
 		if (*i == 's')
-			free (to_free + offset);
+			free (*((char**)to_free + offset));
 		
 		offset += item_size;
 	}
+	
+	free (orig);
 }

@@ -3,11 +3,19 @@
 //
 
 #include <autogentoo/request.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unitypes.h>
 #include <netinet/in.h>
 #include <autogentoo/handle.h>
+
+int prv_read_int (void** data, void* end, int* out) {
+	if (*data + sizeof (uint32_t) > end)
+		return -1;
+	
+	*out = ntohl(*(uint32_t*)*data);
+	*data += sizeof (uint32_t);
+	return 0;
+}
 
 Request* request_handle (Connection* conn) {
 	Request* out = malloc (sizeof (Request));
@@ -28,32 +36,42 @@ Request* request_handle (Connection* conn) {
 	if (out->protocol == PROT_HTTP)
 		return out;
 	
-	memcpy (&out->request_type, current_request, sizeof (request_t));
-	out->request_type = (request_t)ntohl((uint32_t) out->request_type);
-	current_request += sizeof (request_t);
-	
-	memcpy (&out->struct_c, current_request, sizeof (request_t));
-	out->struct_c = ntohl((uint32_t) out->struct_c);
-	current_request += sizeof (int);
-	
-	out->structures = malloc (sizeof (RequestData) * out->struct_c);
-	out->types = malloc (sizeof (request_structure_t) * out->struct_c);
-	
 	void* end = out->conn->request + out->conn->size;
-	request_structure_t current;
+	if (prv_read_int (&current_request, end, (int*)&out->request_type) == -1) {
+		free (out);
+		return NULL;
+	}
 	
-	for (int i = 0; i < out->struct_c; i++) {
-		memcpy(&current, current_request, sizeof (request_structure_t));
-		current = (request_structure_t)ntohl((uint32_t) current);
-		out->types[i] = current;
-		current_request += sizeof (request_structure_t);
-		
-		int len = parse_request_structure (&out->structures[i], request_structure_linkage[out->types[i]], current_request, end);
+	out->structures = vector_new (sizeof (RequestData), REMOVE | ORDERED);
+	out->types = vector_new (sizeof (request_structure_t), REMOVE | ORDERED);
+	
+	request_structure_t current;
+	if (prv_read_int (&current_request, end, (int*)&current) == -1) {
+		vector_free (out->structures);
+		vector_free (out->types);
+		free (out);
+		return NULL;
+	}
+	
+	long d = 0;
+	while (current != STRCT_END) {
+		vector_add(out->types, &current);
+		vector_add(out->structures, &d);
+		out->struct_c++;
+		int len = parse_request_structure (
+				(RequestData*)vector_get(out->structures, out->struct_c - 1),
+				request_structure_linkage[current - 1],
+				current_request, end);
 		if (len == -1) {
 			request_free (out);
 			return NULL;
 		}
 		current_request += len;
+		
+		if (prv_read_int (&current_request, end, (int*)&current) == -1) {
+			request_free (out);
+			return NULL;
+		}
 	}
 	
 	return out;
@@ -100,9 +118,10 @@ response_t request_call (Request* req) {
 
 void request_free (Request* req) {
 	for (int i = 0; i != req->struct_c; i++)
-		free_request_structure(&req->structures[i], request_structure_linkage[req->types[i]], NULL);
+		free_request_structure(&(((RequestData*)req->structures->ptr)[i]),
+							   request_structure_linkage[((request_structure_t*)req->types)[i]], NULL);
 	
-	free (req->structures);
-	free (req->types);
+	vector_free (req->structures);
+	vector_free (req->types);
 	free (req);
 }

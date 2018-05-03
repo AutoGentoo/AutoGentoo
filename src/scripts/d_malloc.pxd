@@ -8,6 +8,7 @@ cdef class DynamicBuffer:
 	cdef void append (self, void* ptr, size_t size)
 	cdef void append_string (self, char* ptr)
 	cdef void set (self, void* ptr, int start, size_t size)
+	cpdef void print_raw (self, align=*)
 
 cdef class Binary:
 	cdef DynamicBuffer buffer

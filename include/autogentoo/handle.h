@@ -7,7 +7,10 @@
 
 #define CHECK_STRUCTURES(...) ({ \
 	int check_types[] = __VA_ARGS__; \
-	if (prv_check_data_structs (request, check_types, sizeof (check_types) / sizeof (int)) == -1) \
+	int __check_types_n = sizeof (check_types) / sizeof (int); \
+	if (__check_types_n != request->struct_c) \
+		return BAD_REQUEST; \
+	if (prv_check_data_structs (request, check_types, __check_types_n) == -1) \
 		return BAD_REQUEST; \
 });
 

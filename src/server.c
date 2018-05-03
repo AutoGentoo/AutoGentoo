@@ -251,8 +251,11 @@ void server_respond(Connection* conn) {
 	response_t res;
 	Request* request = request_handle(conn);
 	
-	linfo("handle %s on pthread_t 0x%llx (%s)", conn->ip, conn->pid, conn->request);
-	res = request_call (request);
+	linfo("handle %s on pthread_t 0x%llx", conn->ip, conn->pid);
+	if (request == NULL)
+		res = BAD_REQUEST;
+	else
+		res = request_call (request);
 	if (res.len != 0)
 		rsend(conn, res);
 	linfo("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
@@ -261,7 +264,8 @@ void server_respond(Connection* conn) {
 	conn->parent->thandler->to_join = conn->pid;
 	pthread_t parent = conn->parent->pthread;
 	connection_free(conn);
-	request_free (request);
+	if (request)
+		request_free (request);
 	
 #ifndef AUTOGENTOO_NO_THREADS
 	pthread_kill(parent, SIGUSR1);

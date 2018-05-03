@@ -20,13 +20,13 @@ cdef class Server:
 		cdef Request n_stage_req = Request (REQ_STAGE_NEW, PROT_AUTOGENTOO)
 		n_stage_req.add_templateselect(template)
 		
-		cdef DynamicBuffer res = self.sock.request(n_stage_req.data)
+		cdef DynamicBuffer res = self.sock.request(n_stage_req.finish())
 		cdef char* new_id_name = strtok (<char*>res.ptr, "\n")
 		
 		cdef Request stage_req = Request (REQ_STAGE, PROT_AUTOGENTOO)
 		stage_req.add_stagecommand(STAGE_ALL)
 		
-		cdef DynamicBuffer bres = self.sock.request(stage_req.data, _print=True, _print_raw=False, _store=False)
+		cdef DynamicBuffer bres = self.sock.request(stage_req.finish(), _print=True, _print_raw=False, _store=False)
 		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
 		if check_tr(b"HTTP/1.0 200 OK\n") != 0:
 			Log.error ("Download or extract failed\n")
@@ -35,7 +35,7 @@ cdef class Server:
 		cdef Request handoff_req = Request(REQ_HANDOFF, PROT_AUTOGENTOO)
 		handoff_req.add_templateselect(template)
 		
-		bres = self.sock.request(handoff_req.data)
+		bres = self.sock.request(handoff_req.finish())
 		if check_tr(b"HTTP/1.0 200 OK\n") != 0:
 			Log.error ("Host handoff failed\n")
 			return None
@@ -47,8 +47,13 @@ cdef class Server:
 		# 2 cflags
 		# 3 use
 		
-		cdef Request edit_req = Request(REQ_EDIT, PROT_AUTOGENTOO)
-		edit_req
+		cdef Request edit_req = Request(REQ_HOSTUPLOAD, PROT_AUTOGENTOO)
+		edit_req.add_hostupload_str (HOSTOFF_HOSTNAME, hostname.encode('utf-8'))
+		edit_req.add_hostupload_str (HOSTOFF_PROFILE, profile.encode('utf-8'))
+		edit_req.add_hostupload_str (HOSTOFF_CFLAGS, cflags.encode('utf-8'))
+		edit_req.add_hostupload_str (HOSTOFF_USE, use.encode('utf-8'))
+		edit_req.add_hostupload_list (HOSTOFF_EXTRA, extra)
+		self.sock.request(edit_req.finish())
 		
 		return new_id_name.decode ("utf-8")
 	
@@ -56,7 +61,8 @@ cdef class Server:
 	def activate (self, str host_id):
 		cdef Request req = Request(REQ_ACTIVATE, PROT_AUTOGENTOO)
 		req.add_hostselect(host_id.encode("utf-8"))
-		cdef DynamicBuffer bres = self.sock.request(req.data)
+		
+		cdef DynamicBuffer bres = self.sock.request(req.finish())
 		
 		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
 		
@@ -71,7 +77,7 @@ cdef class Server:
 		cdef Request req = Request (REQ_INSTALL, PROT_AUTOGENTOO)
 		req.add_hostinstall(c_str)
 		
-		cdef DynamicBuffer bres = self.sock.request(req.data, _print=True, _print_raw=False, _store=False)
+		cdef DynamicBuffer bres = self.sock.request(req.finish(), _print=True, _print_raw=False, _store=False)
 		
 		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
 		
@@ -81,7 +87,7 @@ cdef class Server:
 		elif check_tr (b"HTTP/1.0 403 Forbidden\n") == 0:
 			Log.error("You must select a build host first\n")
 		elif check_tr (b"HTTP/1.0 504 Chroot Not Mounted\n") == 0:
-			if strncmp (<char*>self.sock.request(Request(REQ_MNTCHROOT, PROT_AUTOGENTOO).data).ptr, "HTTP/1.0 2", 10) == 0:
+			if strncmp (<char*>self.sock.request(Request(REQ_MNTCHROOT, PROT_AUTOGENTOO).finish()).ptr, "HTTP/1.0 2", 10) == 0:
 				return self.install (_str)
 			Log.error("Failed to mount chroot\n")
 			Log.error("Check the server logs\n")
@@ -129,7 +135,7 @@ cdef class Server:
 		cdef Request req = Request (REQ_TEMPLATE_CREATE, PROT_AUTOGENTOO)
 		req.add_templatecreate(send[0], arch[1], cflags[2], chost[3], me_out)
 		
-		if strncmp (<char*>self.sock.request(req.data).ptr, "HTTP/1.0 200 OK", 15) == 0:
+		if strncmp (<char*>self.sock.request(req.finish()).ptr, "HTTP/1.0 200 OK", 15) == 0:
 			self.read_server()
 			return name
 		return None
@@ -145,7 +151,7 @@ cdef class Server:
 		self.templates = []
 		self.stages = []
 		
-		cdef Binary server_bin = Binary (self.sock.request(Request(REQ_BINSERVER, PROT_AUTOGENTOO).data ))
+		cdef Binary server_bin = Binary (self.sock.request(Request(REQ_BINSERVER, PROT_AUTOGENTOO).finish() ))
 		
 		p_a = False
 		p_h = False
@@ -216,11 +222,9 @@ cdef class Host(PyOb):
 	
 	def set_field (self, f1, f2, value):
 		cdef Request request = Request (REQ_EDIT, PROT_AUTOGENTOO)
-		
 		request.add_hostselect(self.id)
-		request.add_hostedit(f1, f2, (<unicode>value).encode('utf8'))
-		
-		self.parent.sock.request (request.data)
+		request.add_hostedit(f1, f2, value.encode('utf8'))
+		self.parent.sock.request (request.finish())
 		self.parent.read_server()
 	
 	cdef void parse (self, Binary _bin):
