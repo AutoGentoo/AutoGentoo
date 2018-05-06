@@ -372,7 +372,8 @@ response_t SRV_STAGE_NEW (Request* request) {
 response_t SRV_STAGE (Request* request) {
 	CHECK_STRUCTURES({STRCT_TEMPLATESELECT, STRCT_STAGECOMMAND})
 	
-	HostTemplate* t = small_map_get(request->conn->parent->stages, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
+	HostTemplate* t = small_map_get_index(request->conn->parent->stages,
+			(*(RequestData*)vector_get(request->structures, 0)).ss.index);
 	if (t == NULL)
 		return NOT_FOUND;
 	
