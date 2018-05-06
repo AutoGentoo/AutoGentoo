@@ -91,5 +91,4 @@ cdef class Request:
 	
 	cdef finish (self):
 		self.add_int(0)
-		self.data.print_raw()
 		return self.data

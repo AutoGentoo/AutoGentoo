@@ -55,6 +55,11 @@ Request* request_handle (Connection* conn) {
 	
 	long d = 0;
 	while (current != STRCT_END) {
+		if (current >= STRCT_MAX) {
+			request_free(out);
+			return NULL;
+		}
+		
 		vector_add(out->types, &current);
 		vector_add(out->structures, &d);
 		out->struct_c++;
@@ -118,8 +123,8 @@ response_t request_call (Request* req) {
 
 void request_free (Request* req) {
 	for (int i = 0; i != req->struct_c; i++)
-		free_request_structure(&(((RequestData*)req->structures->ptr)[i]),
-							   request_structure_linkage[((request_structure_t*)req->types)[i]], NULL);
+		free_request_structure((RequestData*)vector_get (req->structures, i),
+							   request_structure_linkage[*(int*)vector_get(req->types, i) - 1], NULL);
 	
 	vector_free (req->structures);
 	vector_free (req->types);

@@ -135,7 +135,7 @@ response_t INSTALL (Request* request) {
 	
 	int backup_conn, backup_stdout;
 	backup_stdout = prv_pipe_to_client(request->conn->fd, &backup_conn);
-	response_t res = host_install(request->conn->bounded_host, ((RequestData*)request->structures)[0].hi.argument);
+	response_t res = host_install(request->conn->bounded_host, (*(RequestData*)vector_get(request->structures, 0)).hi.argument);
 	prv_pipe_back(&request->conn->fd, backup_stdout, backup_conn);
 	
 	return res;
@@ -148,40 +148,38 @@ response_t SRV_CREATE (Connection* conn, char** args, int start) {
 response_t SRV_EDIT (Request* request) {
 	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_HOSTEDIT});
 	
-	Host* target;
-	if (!(target = server_host_search(request->conn->parent, ((RequestData*)request->structures)[0].hs.host_id)))
+	Host* target = server_host_search(request->conn->parent, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
+	if (!target)
 		return NOT_FOUND;
 	
-	int field_one = ((RequestData*)request->structures)[1].he.selection_one;
-	int field_two = ((RequestData*)request->structures)[1].he.selection_two;
-	
-	printf ("%d %d\n", field_one, field_two);
+	int field_one = (*(RequestData*)vector_get(request->structures, 1)).he.selection_one;
+	int field_two = (*(RequestData*)vector_get(request->structures, 1)).he.selection_two;
 	
 	if (field_one == 4) {
 		if (field_two >= target->extra->n)
-			string_vector_add(target->extra, ((RequestData*)request->structures)[1].he.edit);
+			string_vector_add(target->extra, (*(RequestData*)vector_get(request->structures, 1)).he.edit);
 		else {
 			void** t_ptr = vector_get(target->extra, field_two);
 			free(*t_ptr);
 			
-			if (strlen(((RequestData*)request->structures)[1].he.edit) == 0)
+			if (strlen((*(RequestData*)vector_get(request->structures, 1)).he.edit) == 0)
 				vector_remove(target->extra, field_two);
 			else
-				*t_ptr = strdup(((RequestData*)request->structures)[1].he.edit);
+				*t_ptr = strdup((*(RequestData*)vector_get(request->structures, 1)).he.edit);
 		}
 	} else {
 		if (field_one == 0) {
 			free(target->hostname);
-			target->hostname = strdup(((RequestData*)request->structures)[1].he.edit);
+			target->hostname = strdup((*(RequestData*)vector_get(request->structures, 1)).he.edit);
 		} else if (field_one == 1) {
 			free(target->profile);
-			target->profile = strdup(((RequestData*)request->structures)[1].he.edit);
+			target->profile = strdup((*(RequestData*)vector_get(request->structures, 1)).he.edit);
 		} else if (field_one == 2) {
 			free(target->cflags);
-			target->hostname = strdup(((RequestData*)request->structures)[1].he.edit);
+			target->hostname = strdup((*(RequestData*)vector_get(request->structures, 1)).he.edit);
 		} else if (field_one == 3) {
 			free(target->use);
-			target->use = strdup(((RequestData*)request->structures)[1].he.edit);
+			target->use = strdup((*(RequestData*)vector_get(request->structures, 1)).he.edit);
 		} else
 			return BAD_REQUEST;
 	}
@@ -191,7 +189,7 @@ response_t SRV_EDIT (Request* request) {
 
 response_t SRV_ACTIVATE (Request* request) {
 	CHECK_STRUCTURES({STRCT_HOSTSELECT})
-	Host* found = server_host_search(request->conn->parent, ((RequestData*)request->structures)[0].hs.host_id);
+	Host* found = server_host_search(request->conn->parent, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
 	
 	if (!found)
 		return NOT_FOUND;
@@ -208,7 +206,7 @@ response_t SRV_HOSTREMOVE (Request* request) {
 	// Remove the binding
 	for (i = 0; i != request->conn->parent->host_bindings->n; i++) {
 		Host** tmp = (Host**) (((void***) vector_get(request->conn->parent->host_bindings, i))[1]);
-		if (strcmp((*tmp)->id, ((RequestData*)request->structures)[0].hs.host_id) == 0) {
+		if (strcmp((*tmp)->id, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id) == 0) {
 			vector_remove(request->conn->parent->host_bindings, i);
 			// dont break because multiple clients can point to the same host
 		}
@@ -216,7 +214,7 @@ response_t SRV_HOSTREMOVE (Request* request) {
 	
 	// Remove the definition
 	for (i = 0; i != request->conn->parent->hosts->n; i++) {
-		if (strcmp((*(Host**) vector_get(request->conn->parent->host_bindings, i))->id, ((RequestData*)request->structures)[0].hs.host_id) == 0) {
+		if (strcmp((*(Host**) vector_get(request->conn->parent->host_bindings, i))->id, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id) == 0) {
 			vector_remove(request->conn->parent->host_bindings, i);
 			break; // Two hosts cant have the same id (at least they are not support to...)
 		}
@@ -246,7 +244,7 @@ void prv_fd_write_str (int fd, char* str) {
 response_t SRV_GETHOST (Request* request) {
 	CHECK_STRUCTURES ({STRCT_HOSTSELECT});
 	
-	Host* host = server_host_search(request->conn->parent, ((RequestData*)request->structures)[0].hs.host_id);
+	Host* host = server_host_search(request->conn->parent, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
 	
 	if (host == NULL)
 		return NOT_FOUND;
@@ -337,14 +335,14 @@ response_t SRV_TEMPLATE_CREATE (Request* request) {
 	CHECK_STRUCTURES({STRCT_TEMPLATECREATE})
 	
 	HostTemplate in_data;
-	in_data.arch = ((RequestData*)request->structures)[0].tc.arch;
-	in_data.cflags = ((RequestData*)request->structures)[0].tc.cflags;
-	in_data.chost = ((RequestData*)request->structures)[0].tc.chost;
-	in_data.extra_c = ((RequestData*)request->structures)[0].tc.make_extra_c;
+	in_data.arch = (*(RequestData*)vector_get(request->structures, 0)).tc.arch;
+	in_data.cflags = (*(RequestData*)vector_get(request->structures, 0)).tc.cflags;
+	in_data.chost = (*(RequestData*)vector_get(request->structures, 0)).tc.chost;
+	in_data.extra_c = (*(RequestData*)vector_get(request->structures, 0)).tc.make_extra_c;
 	
 	for (int i = 0; i < in_data.extra_c; i++) {
-		in_data.extras[i].select = (template_selects)((RequestData*)request->structures)[0].tc.extras[i].select;
-		in_data.extras[i].make_extra = ((RequestData*)request->structures)[0].tc.extras[i].make_extra;
+		in_data.extras[i].select = (template_selects)(*(RequestData*)vector_get(request->structures, 0)).tc.extras[i].select;
+		in_data.extras[i].make_extra = (*(RequestData*)vector_get(request->structures, 0)).tc.extras[i].make_extra;
 	}
 	
 	
@@ -362,7 +360,7 @@ response_t SRV_STAGE_NEW (Request* request) {
 	
 	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
 	
-	HostTemplate* t = stage_new(request->conn->parent, ((RequestData*)request->structures)[0].ss.index);
+	HostTemplate* t = stage_new(request->conn->parent, (*(RequestData*)vector_get(request->structures, 0)).ss.index);
 	
 	small_map_insert(t->parent->stages, t->new_id, t);
 	
@@ -374,7 +372,7 @@ response_t SRV_STAGE_NEW (Request* request) {
 response_t SRV_STAGE (Request* request) {
 	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_TEMPLATESELECT})
 	
-	HostTemplate* t = small_map_get(request->conn->parent->stages, ((RequestData*)request->structures)[0].hs.host_id);
+	HostTemplate* t = small_map_get(request->conn->parent->stages, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
 	if (t == NULL)
 		return NOT_FOUND;
 	
@@ -385,12 +383,12 @@ response_t SRV_STAGE (Request* request) {
 	response_t res = OK;
 	
 	char* fname = NULL;
-	if (((RequestData*)request->structures)[0].sc.command & STAGE_DOWNLOAD) {
+	if ((*(RequestData*)vector_get(request->structures, 0)).sc.command & STAGE_DOWNLOAD) {
 		fname = host_template_download(t);
 		if (fname == NULL)
 			res = INTERNAL_ERROR;
 	}
-	if (((RequestData*)request->structures)[0].sc.command & STAGE_EXTRACT) {
+	if ((*(RequestData*)vector_get(request->structures, 0)).sc.command & STAGE_EXTRACT) {
 		if (fname == NULL)
 			fname = host_template_download(t);
 		res = host_template_extract(t, fname);
@@ -421,7 +419,7 @@ response_t SRV_GETSTAGED (Request* request) {
 response_t SRV_GETSTAGE (Request* request) {
 	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
 	
-	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, ((RequestData*)request->structures)[0].ss.index);
+	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, (*(RequestData*)vector_get(request->structures, 0)).ss.index);
 	
 	if (__t == NULL)
 		return NOT_FOUND;
@@ -451,7 +449,7 @@ response_t SRV_GETSTAGE (Request* request) {
 response_t SRV_HANDOFF (Request* request) {
 	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
 	
-	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, ((RequestData*)request->structures)[0].ss.index);
+	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, (*(RequestData*)vector_get(request->structures, 0)).ss.index);
 	if (!__t)
 		return NOT_FOUND;
 	
@@ -542,7 +540,7 @@ response_t SRV_HOSTWRITE (Request* request) {
 response_t SRV_HOSTUPLOAD(Request* request) {
 	if (request->struct_c < 2 || ((request_structure_t*)request->types)[0] != STRCT_HOSTSELECT)
 		return BAD_REQUEST;
-	Host* selected = server_host_search (request->conn->parent, ((RequestData*)request->structures)[0].hs.host_id);
+	Host* selected = server_host_search (request->conn->parent, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
 	
 	for (int i = 1; i < request->struct_c; i++) {
 		if (((RequestData*)request->structures)[i].ho.offset_index > sizeof (host_valid_offset) / sizeof (host_valid_offset[0])) {

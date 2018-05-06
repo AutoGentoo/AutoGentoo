@@ -9,22 +9,17 @@
 #include <stdio.h>
 #include <pthread.h>
 
-
 typedef struct _ThreadHandler ThreadHandler;
 typedef struct _ThreadRegister ThreadRegister;
+#include "server.h"
 
 struct _ThreadHandler {
 	pthread_t to_join;
 	size_t conn_max;
-	ThreadRegister* threads;
+	Connection** threads;
 };
 
 #include "server.h"
-
-struct _ThreadRegister {
-	pthread_t thread;
-	Connection* conn;
-};
 
 Connection* thread_get_conn (ThreadHandler* handler, pthread_t thread);
 

@@ -1,9 +1,8 @@
 #define _GNU_SOURCE
 #include <autogentoo/autogentoo.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdio.h>
+#include <signal.h>
 
 #ifndef AUTOGENTOO_CLIENT
 #define AUTOGENTOO_CLIENT "/usr/lib/autogentoo/client.py"
@@ -65,25 +64,7 @@ void pipe_to_log(Opt* op, char* logfile) {
 	lset(f);
 }
 
-#define TESTING
-
 int main(int argc, char** argv) {
-#ifdef TESTING
-	Request r;
-	Connection c;
-	c.request = "GET /index.html HTTP/1.0\r\n";
-	r.conn = &c;
-	r.protocol = PROT_HTTP;
-	r.struct_c = 0;
-	
-	HTTPRequest o;
-	
-	printf ("%d\n", http_request_parse (&r, &o));
-	printf ("request: '%s'\npath: '%s'\nversion: '%s'\n", o.function, o.arg, o.version);
-	
-	Server* main_server = read_server(".", port, server_opts);
-	server_start(main_server);
-#else
 	opt_handle(opt_handlers, argc, argv + 1);
 	if (!location)
 		location = strdup(".");
@@ -104,7 +85,6 @@ int main(int argc, char** argv) {
 	free(location);
 	if (logfile_fd != -1)
 		close(logfile_fd);
-#endif
 	return 0;
 
 }

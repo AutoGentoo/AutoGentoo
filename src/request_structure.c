@@ -7,7 +7,7 @@
 #include <autogentoo/request_structure.h>
 #include <netinet/in.h>
 
-char* prv_safe_strdup (char* original, void* end_ptr) {
+size_t prv_safe_strdup (char** dest, char* original, void* end_ptr) {
 	char* i = original;
 	while (i < (char*)end_ptr && *i)
 		i++;
@@ -18,7 +18,8 @@ char* prv_safe_strdup (char* original, void* end_ptr) {
 	char* p = out + len;
 	while (p >= out)
 		*p-- = *(original-- + len);
-	return out;
+	*dest = out;
+	return len + 1;
 }
 
 int prv_handle_item (void* dest, void* data, char type, size_t item_size, void* end) {
@@ -38,8 +39,9 @@ int prv_handle_item (void* dest, void* data, char type, size_t item_size, void* 
 		*(void**)dest = ptr;
 		item_size += sizeof (size_t); // Make sure we skip over size_t
 	}
-	else if (type == 's')
-		*(void**)dest = prv_safe_strdup(data, end);
+	else if (type == 's') {
+		item_size = prv_safe_strdup((char**)dest, data, end);
+	}
 	else
 		memcpy (dest, data, item_size);
 	
@@ -93,7 +95,7 @@ int parse_request_structure (RequestData* out, char* template, void* data, void*
 			
 			for (int j = 0; j < array_length; j++) {
 				len = parse_request_structure(((void**)ptr)[j], i, data, end);
-				ptr += len;
+				ptr += get_ssizeof(i);
 				data += len;
 				
 				if (len == -1) {
@@ -118,7 +120,7 @@ int parse_request_structure (RequestData* out, char* template, void* data, void*
 			return -1;
 		}
 		
-		ptr += len;
+		ptr += item_size;
 		data += len;
 	}
 	
@@ -134,7 +136,7 @@ size_t get_sizeof (char c) {
 			{'c', sizeof(char)},
 			{'i', sizeof(int)},
 			{'l', sizeof(long)},
-			{'s', 1},
+			{'s', sizeof(char*)},
 			{'a', sizeof(void*)},
 			{'v', sizeof(size_t)}, /* Use size_t because the data size is checked dynamically */
 	};
@@ -156,11 +158,12 @@ size_t get_ssizeof (char* template) {
 
 void free_request_structure (RequestData* to_free, char* template, const char* end) {
 	char* i = strdup(template);
+	size_t dif = end - template;
 	char* orig = i;
 	
 	size_t offset = 0;
 	for (; *i != 0; i++) {
-		if (end && i >= end)
+		if (end && i - orig >= dif)
 			break;
 		
 		if (*i == 'a') {
@@ -186,7 +189,7 @@ void free_request_structure (RequestData* to_free, char* template, const char* e
 		size_t item_size = get_sizeof(*i);
 		
 		if (*i == 's')
-			free (*((char**)to_free + offset));
+			free (*(char**)((void*)to_free + offset));
 		
 		offset += item_size;
 	}

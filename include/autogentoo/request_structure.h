@@ -67,6 +67,8 @@ typedef enum {
 	STRCT_TEMPLATESELECT,
 	STRCT_STAGECOMMAND,
 	STRCT_HOSTOFFSET, /* Custom offset on Host struct */
+	
+	STRCT_MAX
 } request_structure_t;
 
 static char* request_structure_linkage[] = {

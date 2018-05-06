@@ -180,4 +180,6 @@ void server_free(Server* server);
 
 void server_kill(Server* server);
 
+void handle_sigint (int sig);
+
 #endif

@@ -12,7 +12,7 @@
 
 static Server* srv = NULL;
 
-void handle_thread_kill(int signum) {
+void handle_thread_kill (int signum) {
 	thread_join(srv->thandler, srv->thandler->to_join);
 	if (srv->keep_alive == 0) {
 		server_kill(srv);
@@ -20,10 +20,10 @@ void handle_thread_kill(int signum) {
 	}
 }
 
-Server* server_new(char* location, char* port, server_t opts) {
+Server* server_new (char* location, char* port, server_t opts) {
 	Server* out = malloc(sizeof(Server));
 	
-	out->templates = vector_new (sizeof(HostTemplate*), REMOVE | UNORDERED);
+	out->templates = vector_new(sizeof(HostTemplate*), REMOVE | UNORDERED);
 	out->hosts = vector_new(sizeof(Host*), REMOVE | UNORDERED);
 	out->stages = small_map_new(sizeof(HostTemplate*), 5);
 	out->host_bindings = vector_new(sizeof(HostBind), REMOVE | UNORDERED);
@@ -35,7 +35,7 @@ Server* server_new(char* location, char* port, server_t opts) {
 	return out;
 }
 
-Host* server_get_active(Server* server, char* ip) {
+Host* server_get_active (Server* server, char* ip) {
 	int i;
 	for (i = 0; i != server->host_bindings->n; i++) {
 		HostBind* current_bind = (HostBind*) vector_get(server->host_bindings, i);
@@ -46,7 +46,7 @@ Host* server_get_active(Server* server, char* ip) {
 	return NULL;
 }
 
-HostBind* prv_server_get_active_location(Server* server, char* ip) {
+HostBind* prv_server_get_active_location (Server* server, char* ip) {
 	int i;
 	for (i = 0; i != server->host_bindings->n; i++) {
 		HostBind* current_bind = (HostBind*) vector_get(server->host_bindings, i);
@@ -57,7 +57,7 @@ HostBind* prv_server_get_active_location(Server* server, char* ip) {
 	return NULL;
 }
 
-Connection* connection_new(Server* server, int conn_fd) {
+Connection* connection_new (Server* server, int conn_fd) {
 	Connection* out = malloc(sizeof(Connection));
 	out->parent = server;
 	out->fd = conn_fd;
@@ -71,7 +71,7 @@ Connection* connection_new(Server* server, int conn_fd) {
 	return out;
 }
 
-void server_start(Server* server) {
+void server_start (Server* server) {
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	server->pthread = pthread_self();
@@ -87,6 +87,7 @@ void server_start(Server* server) {
 	server->pid = getpid();
 	srv = server;
 	signal(SIGUSR1, handle_thread_kill);
+	signal (SIGINT, handle_sigint);
 	
 	addrlen = sizeof(clientaddr);
 	server->keep_alive = 1;
@@ -108,7 +109,7 @@ void server_start(Server* server) {
 #ifndef AUTOGENTOO_NO_THREADS
 		pthread_t p_pid;
 		
-		if (pthread_create(&p_pid, NULL, (void* (*)(void*)) server_respond, current_conn)) {
+		if (pthread_create(&p_pid, NULL, (void* (*) (void*)) server_respond, current_conn)) {
 			lerror("Error creating thread");
 			fflush(stdout);
 			exit(1);
@@ -119,15 +120,16 @@ void server_start(Server* server) {
 	}
 }
 
-void server_kill(Server* server) {
+void server_kill (Server* server) {
 	write_server(server);
 	thread_handler_join_all(server->thandler);
 	thread_handler_free(server->thandler);
 	server_free(server);
 	linfo("server exited succuessfully");
+	exit (0);
 }
 
-int server_init(char* port) {
+int server_init (char* port) {
 	struct addrinfo hints, * res, * p;
 	int listenfd = -1;
 	
@@ -180,8 +182,8 @@ int server_init(char* port) {
 	return listenfd;
 }
 
-void connection_free(Connection* conn) {
-	if (conn->status != CLOSED) {;
+void connection_free (Connection* conn) {
+	if (conn->status != CLOSED) { ;
 		if (fcntl(conn->fd, F_GETFD) != -1 || errno != EBADF)
 			close(conn->fd);
 		conn->status = CLOSED;
@@ -192,9 +194,14 @@ void connection_free(Connection* conn) {
 	free(conn);
 }
 
+void handle_sigint (int sig) {
+	srv->keep_alive = 0;
+	server_kill (srv);
+}
+
 void handle_segv (int signum) {
 	Connection* failed_thread = thread_get_conn(srv->thandler, pthread_self());
-	rsend (failed_thread, AUTOGENTOO_SEGV);
+	rsend(failed_thread, AUTOGENTOO_SEGV);
 	
 	failed_thread->parent->thandler->to_join = failed_thread->pid;
 	connection_free(failed_thread);
@@ -202,12 +209,15 @@ void handle_segv (int signum) {
 	pthread_kill(failed_thread->parent->pthread, SIGUSR1);
 #endif
 }
+#define AUTOGENTOO_IGNORE_SEGV
 
-void server_respond(Connection* conn) {
+void server_respond (Connection* conn) {
 #ifndef AUTOGENTOO_NO_THREADS
 	conn->pid = pthread_self();
 	thread_register(conn->parent->thandler, conn->pid, conn);
-	signal (SIGSEGV, handle_segv);
+#ifndef AUTOGENTOO_IGNORE_SEGV
+	signal(SIGSEGV, handle_segv);
+#endif
 #else
 	conn->pid = 0;
 #endif
@@ -218,7 +228,7 @@ void server_respond(Connection* conn) {
 	ssize_t total_read = 0, current_bytes = 0;
 	
 	size_t buffer_size = chunk_len;
-	current_bytes = read(conn->fd, conn->request , chunk_len);
+	current_bytes = read(conn->fd, conn->request, chunk_len);
 	total_read += current_bytes;
 	while (current_bytes == chunk_len) {
 		if (total_read + chunk_len >= buffer_size) {
@@ -236,8 +246,7 @@ void server_respond(Connection* conn) {
 		connection_free(conn);
 		pthread_kill(conn->parent->pthread, SIGUSR1);
 		return;
-	}
-	else if (total_read == 0) { // receive socket closed
+	} else if (total_read == 0) { // receive socket closed
 		lwarning("Client disconnected upexpectedly.");
 		conn->status = FAILED;
 		connection_free(conn);
@@ -246,7 +255,7 @@ void server_respond(Connection* conn) {
 	}
 	
 	conn->status = CONNECTED;
-	conn->size = (size_t)total_read;
+	conn->size = (size_t) total_read;
 	
 	response_t res;
 	Request* request = request_handle(conn);
@@ -255,7 +264,7 @@ void server_respond(Connection* conn) {
 	if (request == NULL)
 		res = BAD_REQUEST;
 	else
-		res = request_call (request);
+		res = request_call(request);
 	if (res.len != 0)
 		rsend(conn, res);
 	linfo("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
@@ -265,24 +274,23 @@ void server_respond(Connection* conn) {
 	pthread_t parent = conn->parent->pthread;
 	connection_free(conn);
 	if (request)
-		request_free (request);
-	
+		request_free(request);
+
 #ifndef AUTOGENTOO_NO_THREADS
 	pthread_kill(parent, SIGUSR1);
 #endif
 }
 
-void server_bind(Connection* conn, Host* host) {
+void server_bind (Connection* conn, Host* host) {
 	HostBind* loc = prv_server_get_active_location(conn->parent, conn->ip);
 	if (loc == NULL) {
 		HostBind new_binding = {.ip = strdup(conn->ip), .host = host};
 		vector_add(conn->parent->host_bindings, &new_binding);
-	}
-	else
+	} else
 		loc->host = host;
 }
 
-Host* server_host_search(Server* server, char* id) {
+Host* server_host_search (Server* server, char* id) {
 	int i;
 	for (i = 0; i != server->hosts->n; i++) {
 		Host* current_host = *(Host**) vector_get(server->hosts, i);
@@ -293,7 +301,7 @@ Host* server_host_search(Server* server, char* id) {
 	return NULL;
 }
 
-void daemonize(char* _cwd) {
+void daemonize (char* _cwd) {
 	pid_t pid, sid;
 	
 	/* already a daemon */
@@ -329,7 +337,7 @@ void daemonize(char* _cwd) {
 	umask(027);
 }
 
-void server_free(Server* server) {
+void server_free (Server* server) {
 	free(server->location);
 	
 	int i;
