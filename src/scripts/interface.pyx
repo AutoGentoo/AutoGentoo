@@ -16,7 +16,7 @@ cdef class Server:
 		self.adr = adr
 		self.sock = Socket (self.adr)
 	
-	def new_host (self, int template, str hostname, str profile, str cflags, str use, list[str] extra):
+	def new_host (self, int template, str hostname, str profile, str cflags, str use, extra):
 		cdef Request n_stage_req = Request (REQ_STAGE_NEW, PROT_AUTOGENTOO)
 		n_stage_req.add_templateselect(template)
 		

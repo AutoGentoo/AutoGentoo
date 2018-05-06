@@ -370,7 +370,7 @@ response_t SRV_STAGE_NEW (Request* request) {
 }
 
 response_t SRV_STAGE (Request* request) {
-	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_TEMPLATESELECT})
+	CHECK_STRUCTURES({STRCT_TEMPLATESELECT, STRCT_STAGECOMMAND})
 	
 	HostTemplate* t = small_map_get(request->conn->parent->stages, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
 	if (t == NULL)
@@ -381,14 +381,15 @@ response_t SRV_STAGE (Request* request) {
 	
 	
 	response_t res = OK;
+	int command = (*(RequestData*)vector_get(request->structures, 1)).sc.command;
 	
 	char* fname = NULL;
-	if ((*(RequestData*)vector_get(request->structures, 0)).sc.command & STAGE_DOWNLOAD) {
+	if (command & STAGE_DOWNLOAD) {
 		fname = host_template_download(t);
 		if (fname == NULL)
 			res = INTERNAL_ERROR;
 	}
-	if ((*(RequestData*)vector_get(request->structures, 0)).sc.command & STAGE_EXTRACT) {
+	if (command & STAGE_EXTRACT) {
 		if (fname == NULL)
 			fname = host_template_download(t);
 		res = host_template_extract(t, fname);

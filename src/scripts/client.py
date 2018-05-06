@@ -175,12 +175,18 @@ def edit_host(host: Host):
 	host.set_field(f1 - 1, f2 - 1, new_val)
 
 
+def get_new_extra():
+	x = input("make.conf > ")
+	while len(x):
+		yield x
+
+
 def new_host(server: Server):
 	print("Choose a template for new environ, or new")
 	for x in server.templates:
 		print("%s (%s)" % (x.get("id"), x.get("arch")))
 	
-	template = None
+	template = -1
 	templ = input("template > ")
 	if templ == "new":
 		while 1:
@@ -214,11 +220,13 @@ def new_host(server: Server):
 		
 		templ = server.new_template(spec_arch + feature, arch, chost, cflags, make_extra)
 	
+	i = 0
 	for t in server.templates:
 		if t.get("id") == templ:
-			template = t
+			template = i
 			break
-	if template is None:
+		i += 1
+	if template is -1:
 		Log.error("template '%s' could not be found\n" % templ)
 		return
 	
@@ -228,8 +236,9 @@ def new_host(server: Server):
 		rlinput("profile > ", "default/linux/amd64/17.0/desktop/gnome/systemd"),
 		rlinput(
 			"cflags (-march=native is auto converted) > ",
-			template.get('cflags').replace("-march=native", native_cflags)),
-		rlinput("use > ", "mmx sse sse2 systemd")
+			server.templates[template].get('cflags').replace("-march=native", native_cflags)),
+		rlinput("use > ", "mmx sse sse2 systemd"),
+		list(get_new_extra())
 	)
 
 
