@@ -9,12 +9,14 @@ cdef extern from "<arpa/inet.h>":
 
 cdef class DynamicBuffer:
 	def __init__ (self, char* start=NULL, size_t size=32, short align=32):
-		self.ptr = malloc (size)
+		if size != 0:
+			self.ptr = malloc (size)
+		
 		self.size = size
 		self.n = 0
 		self.align = align
 		
-		if start:
+		if start or start is not None:
 			self.append (start, strlen(start))
 	
 	cdef realloc (self):
@@ -59,20 +61,24 @@ cdef class DynamicBuffer:
 			last_i += 1
 		fflush (stdout)
 
-cdef class Binary:
+cdef class Binary(DynamicBuffer):
 	def __init__ (self, DynamicBuffer buffer):
-		self.buffer = buffer
+		super (Binary, self).__init__ (None, 0, 32)
+		
+		self.size = buffer.size
+		self.ptr = buffer.ptr
 		self.pos = 0
 	
+	
 	cdef char* read_string (self):
-		cdef char* out = <char*>(<void*>self.buffer.ptr + self.pos)
+		cdef char* out = <char*>(<void*>self.ptr + self.pos)
 		self.pos += strlen (out) + 1
 		
 		return strdup (out)
 	
 	cdef int read_int (self):
 		cdef int out
-		memcpy (&out, self.buffer.ptr + self.pos, sizeof (int))
+		memcpy (&out, self.ptr + self.pos, sizeof (int))
 		self.pos += sizeof (int)
 		return ntohl(out)
 	
@@ -85,13 +91,25 @@ cdef class Binary:
 		cdef int eof_be = htonl (AUTOGENTOO_FILE_END)
 		cdef int c
 		
-		while c not in to_find and c != eof_be and self.pos < self.buffer.n:
-			memcpy (&c, self.buffer.ptr + self.pos, sizeof (int))
+		while c not in to_find and c != eof_be and self.pos < self.n:
+			memcpy (&c, self.ptr + self.pos, sizeof (int))
 			
 			self.pos += 1
 		self.pos -= 1
 		
-		return self.pos + 1 < self.buffer.n
+		return self.pos + 1 < self.n
 	
 	cdef inside (self):
-		return self.pos < self.buffer.n
+		return self.pos < self.n
+	
+	cpdef read_template (self, char* template):
+		out = []
+		cdef char* i = template
+		while i != NULL:
+			if i[0] == 'i':
+				out.append (self.read_int())
+			elif i[0] == 's':
+				out.append (self.read_string())
+			
+			i += 1
+		return out

@@ -25,7 +25,7 @@ set(src_SOURCES
         src/thread.c
         src/request.c
         src/request_structure.c
-        src/http.c)
+        src/http.c src/queue.c)
 
 set(client_SOURCES
         src/render.c src/command_line.c)
@@ -51,7 +51,7 @@ set(include_HEADERS
         include/autogentoo/getopt.h
         include/autogentoo/thread.h
         include/autogentoo/request_structure.h
-        include/autogentoo/http.h)
+        include/autogentoo/http.h include/autogentoo/queue.h)
 
 set(arch_SOURCES
         arch/main.c

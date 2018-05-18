@@ -10,7 +10,7 @@
 SmallMap* small_map_new(int start_size, int increment) {
 	SmallMap* out = vector_new(sizeof(void*), REMOVE | UNORDERED);
 	out->increment = (size_t) increment;
-	vector_allocate_to_size(out, start_size);
+	vector_allocate_to_size(out, (size_t)start_size);
 	return out;
 }
 
@@ -47,6 +47,15 @@ void* small_map_delete(SmallMap* smap, char* key) {
 	if (current_key != NULL)
 		return current_key[1];
 	return NULL;
+}
+
+void* small_map_delete_index (SmallMap* smap, int index) {
+	if (index >= smap->n || index < 0)
+		return NULL;
+	
+	void** current_key = *(void***) vector_get(smap, index);
+	vector_remove (smap, index);
+	return current_key[1];
 }
 
 void small_map_free(SmallMap* smap, int free_data) {

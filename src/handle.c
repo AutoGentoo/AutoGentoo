@@ -451,7 +451,8 @@ response_t SRV_GETSTAGE (Request* request) {
 response_t SRV_HANDOFF (Request* request) {
 	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
 	
-	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, (*(RequestData*)vector_get(request->structures, 0)).ss.index);
+	HostTemplate* __t = small_map_get_index(request->conn->parent->stages,
+			(*(RequestData*)vector_get(request->structures, 0)).ss.index);
 	if (!__t)
 		return NOT_FOUND;
 	

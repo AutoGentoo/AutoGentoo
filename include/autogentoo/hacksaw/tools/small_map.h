@@ -25,6 +25,8 @@ void* small_map_get(SmallMap* smap, char* key);
 
 void* small_map_delete(SmallMap* smap, char* key);
 
+void* small_map_delete_index (SmallMap* smap, int index);
+
 void small_map_free(SmallMap* smap, int free_data);
 
 char* small_map_get_key(SmallMap* smap, void* data);

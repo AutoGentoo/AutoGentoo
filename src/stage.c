@@ -51,13 +51,13 @@ HostTemplate* prv_host_template_alloc (HostTemplate* t) {
 }
 
 void host_template_list_init (Server* srv) {
-	for (int i = 0; i != sizeof (host_templates_init) / sizeof (HostTemplate); i++)
-		host_template_add (srv, &host_templates_init[i]);
+	for (int i = 0; i != sizeof(host_templates_init) / sizeof(HostTemplate); i++)
+		host_template_add(srv, &host_templates_init[i]);
 }
 
 void host_template_add (Server* srv, HostTemplate* ht) {
 	HostTemplate* temp = prv_host_template_alloc(ht);
-	vector_add (srv->templates, &temp);
+	vector_add(srv->templates, &temp);
 }
 
 /*
@@ -78,7 +78,7 @@ HostTemplate* stage_new (Server* parent, int index) {
 	return host_template_init(parent, *vector_get(parent->templates, index));
 }
 
-HostTemplate* host_template_init(Server* parent, HostTemplate* t) {
+HostTemplate* host_template_init (Server* parent, HostTemplate* t) {
 	HostTemplate* out = prv_host_template_alloc(t);
 	out->parent = parent;
 	
@@ -88,7 +88,7 @@ HostTemplate* host_template_init(Server* parent, HostTemplate* t) {
 	return out;
 }
 
-char* host_template_download(HostTemplate* t) {
+char* host_template_download (HostTemplate* t) {
 	char distfile_dir[256];
 	sprintf(distfile_dir, "%s/distfiles", t->parent->location);
 	
@@ -156,7 +156,7 @@ char* host_template_download(HostTemplate* t) {
 	return fname;
 }
 
-response_t host_template_extract(HostTemplate* t, char* fname) {
+response_t host_template_extract (HostTemplate* t, char* fname) {
 	int ext_ret;
 	prv_mkdir(t->dest_dir);
 	command("tar", "extract to", NULL, &ext_ret, fname, t->dest_dir);
@@ -169,7 +169,7 @@ response_t host_template_extract(HostTemplate* t, char* fname) {
 	return OK;
 }
 
-response_t host_template_stage(HostTemplate* t) {
+response_t host_template_stage (HostTemplate* t) {
 	char* fname = host_template_download(t);
 	if (!fname)
 		return INTERNAL_ERROR;
@@ -177,10 +177,10 @@ response_t host_template_stage(HostTemplate* t) {
 	return host_template_extract(t, fname);
 }
 
-Host* host_template_handoff(HostTemplate* src) {
+Host* host_template_handoff (HostTemplate* src) {
 	Host* out = host_new(src->parent, strdup(src->new_id));
 	char old_stage[32];
-	sprintf (old_stage, "stage-%s", src->new_id);
+	sprintf(old_stage, "stage-%s", src->new_id);
 	
 	out->extra = string_vector_new();
 	if (rename(old_stage, out->id) != 0) {
@@ -201,7 +201,7 @@ Host* host_template_handoff(HostTemplate* src) {
 		
 		asprintf(&t_profile_l, "%s/etc/portage/make.profile", out->id);
 		ssize_t profile_len = readlink(t_profile_l, profile_dest, sizeof(profile_dest) - 1);
-		profile_dest[(int) profile_len] = 0; // Readlink does not null terminal
+		profile_dest[(int) profile_len] = 0; // Readlink does not null terminate
 		
 		char* t_profile_split = strstr(profile_dest, "profiles/");
 		if (t_profile_split)
@@ -226,18 +226,17 @@ Host* host_template_handoff(HostTemplate* src) {
 		out->chost = strdup(src->chost);
 	}
 	
-	struct {
-		template_selects sel;
-		char** ptr;
-	} _t[] = {
-			{OTHER, NULL},
-			{CXXFLAGS, &out->cxxflags},
-			{TMPDIR,   &out->portage_tmpdir},
-			{PORTDIR,  &out->portdir},
-			{DISTDIR,  &out->distdir},
-			{PKGDIR,   &out->pkgdir},
-			{LOGDIR,   &out->port_logdir}
+	char** _t[] = {
+			NULL,
+			&out->cxxflags,
+			&out->portage_tmpdir,
+			&out->portdir,
+			&out->distdir,
+			&out->pkgdir,
+			&out->port_logdir
 	};
+	
+	size_t _t_size = sizeof(_t) / sizeof(_t[0]);
 	
 	int i;
 	for (i = 0; i != src->extra_c; i++) {
@@ -246,21 +245,19 @@ Host* host_template_handoff(HostTemplate* src) {
 			continue;
 		}
 		
-		int j;
-		for (j = 0; j != sizeof(_t) / sizeof(_t[0]); j++) {
-			if (src->extras[i].select == _t[j].sel) {
-				*_t[j].ptr = strdup(src->extras[i].make_extra);
-				break;
-			}
-		}
+		int j = 0;
+		for (int temp = src->extras[i].select; temp >>= 1; j++);
+		if (j < _t_size && j > 0)
+			*_t[j] = strdup(src->extras[i].make_extra);
 	}
 	
-	src = small_map_delete(src->parent->stages, src->new_id);
+	src = small_map_delete_index(src->parent->stages,);
 	host_template_free(src);
 	return out;
 }
 
-void host_template_free(HostTemplate* temp) {
+
+void host_template_free (HostTemplate* temp) {
 	free(temp->id);
 	free(temp->arch);
 	free(temp->cflags);

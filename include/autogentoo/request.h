@@ -51,6 +51,7 @@ typedef enum {
 	
 	/* Binary requests */
 	REQ_BINSERVER,
+	REQ_BINQUEUE,
 	
 	/* General */
 	REQ_EXIT

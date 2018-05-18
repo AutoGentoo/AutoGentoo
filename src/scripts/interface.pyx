@@ -9,12 +9,20 @@ cdef extern from "<arpa/inet.h>":
 	int htonl (int)
 
 cdef class Server:
-	def __init__ (self, Address adr):
+	def __init__ (self, Address adr, message=True):
 		self.hosts = []
 		self.stages = []
 		self.templates = []
 		self.adr = adr
 		self.sock = Socket (self.adr)
+		self.message = message
+	
+	def error (self, mess, *vargs, **kwargs):
+		if self.message:
+			Log.error (mess, *vargs, **kwargs)
+	def info (self, mess, *vargs, **kwargs):
+		if self.message:
+			Log.info (mess, *vargs, **kwargs)
 	
 	def new_host (self, int template, str hostname, str profile, str cflags, str use, extra):
 		cdef Request n_stage_req = Request (REQ_STAGE_NEW, PROT_AUTOGENTOO)
@@ -29,7 +37,7 @@ cdef class Server:
 		cdef DynamicBuffer bres = self.sock.request(stage_req.finish(), _print=True, _print_raw=False, _store=False)
 		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
 		if check_tr(b"HTTP/1.0 200 OK\n") != 0:
-			Log.error ("Download or extract failed\n")
+			self.error ("Download or extract failed\n")
 			return None
 		
 		cdef Request handoff_req = Request(REQ_HANDOFF, PROT_AUTOGENTOO)
@@ -37,7 +45,7 @@ cdef class Server:
 		
 		bres = self.sock.request(handoff_req.finish())
 		if check_tr(b"HTTP/1.0 200 OK\n") != 0:
-			Log.error ("Host handoff failed\n")
+			self.error ("Host handoff failed\n")
 			return None
 		
 		self.read_server()
@@ -85,12 +93,12 @@ cdef class Server:
 		if check_tr (b"HTTP/1.0 200 OK\n") == 0:
 			return True
 		elif check_tr (b"HTTP/1.0 403 Forbidden\n") == 0:
-			Log.error("You must select a build host first\n")
+			self.error("You must select a build host first\n")
 		elif check_tr (b"HTTP/1.0 504 Chroot Not Mounted\n") == 0:
 			if strncmp (<char*>self.sock.request(Request(REQ_MNTCHROOT, PROT_AUTOGENTOO).finish()).ptr, "HTTP/1.0 2", 10) == 0:
 				return self.install (_str)
-			Log.error("Failed to mount chroot\n")
-			Log.error("Check the server logs\n")
+			self.error("Failed to mount chroot\n")
+			self.error("Check the server selfs\n")
 			return False
 		
 		return True
@@ -109,7 +117,7 @@ cdef class Server:
 			("PORTAGE_TMPDIR", TMPDIR),
 			("DISTDIR", DISTDIR),
 			("PKGDIR", PKGDIR),
-			("PORT_LOGDIR", LOGDIR),
+			("PORT_selfDIR", LOGDIR),
 		]
 		
 		me_out = []
@@ -163,8 +171,8 @@ cdef class Server:
 			if current == AUTOGENTOO_HOST:
 				if not p_h:
 					if p_a:
-						Log.info ("ok", color_only=True, newline=True)
-					Log.info ("Processing hosts...", flush=True)
+						self.info ("ok", color_only=True, newline=True)
+					self.info ("Processing hosts...", flush=True)
 					p_a = True
 					p_h = True
 				hbuff = Host (self)
@@ -173,8 +181,8 @@ cdef class Server:
 			elif current == AUTOGENTOO_STAGE:
 				if not p_s:
 					if p_a:
-						Log.info ("ok", color_only=True, newline=True)
-					Log.info ("Processing stages...", flush=True)
+						self.info ("ok", color_only=True, newline=True)
+					self.info ("Processing stages...", flush=True)
 					p_s = True
 					p_a = True
 				sbuff = Stage (self)
@@ -183,8 +191,8 @@ cdef class Server:
 			elif current == AUTOGENTOO_TEMPLATE:
 				if not p_t:
 					if p_a:
-						Log.info ("ok", color_only=True, newline=True)
-					Log.info ("Processing templates...", flush=True)
+						self.info ("ok", color_only=True, newline=True)
+					self.info ("Processing templates...", flush=True)
 					p_t = True
 					p_a = True
 				__sbuff = Stage (self)
@@ -196,7 +204,7 @@ cdef class Server:
 			current = server_bin.read_int()
 			
 		if p_a:
-			Log.info ("ok", color_only=True, newline=True)
+			self.info ("ok", color_only=True, newline=True)
 	
 
 cdef class Host(PyOb):
