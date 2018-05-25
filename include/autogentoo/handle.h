@@ -249,6 +249,15 @@ response_t EXIT(Request* request);
  * @return HTTP standard codes
  */
 response_t BIN_SERVER(Request* request);
+/**
+ * Write the Server struct back to the client
+ * @param conn the connection that holds the request
+ * @param args (none)
+ * @param start Start index to read from request
+ * @param argc the argument count in args
+ * @return HTTP standard codes
+ */
+response_t BIN_QUEUE(Request* request);
 
 /**
  * Links host_environ directory and write configs

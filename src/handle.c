@@ -33,6 +33,7 @@ RequestLink requests[] = {
 		
 		/* Binary requests */
 		{REQ_BINSERVER,       {.ag_fh=BIN_SERVER}},
+		{REQ_BINQUEUE,        {.ag_fh=BIN_QUEUE}},
 		
 		/* General */
 		{REQ_EXIT,            {.ag_fh=EXIT}}
@@ -568,4 +569,8 @@ response_t SRV_HOSTUPLOAD(Request* request) {
 	}
 	
 	return OK;
+}
+
+response_t BIN_QUEUE(Request* request) {
+	request->conn->parent->
 }

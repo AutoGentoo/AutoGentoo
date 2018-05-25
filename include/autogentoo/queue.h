@@ -8,6 +8,7 @@
 #include "request.h"
 
 typedef struct __Queue Queue;
+typedef struct __WorkerParent WorkerParent;
 
 typedef enum {
 	QUEUE_END,
@@ -21,6 +22,11 @@ struct __Queue {
 	void* args;
 	size_t size;
 	Queue* last;
+};
+
+struct __WorkerParent {
+	Queue* head;
+	pid_t proc_id;
 };
 
 Queue* queue_new (queue_t type, char* template, ...);

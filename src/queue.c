@@ -8,9 +8,29 @@
 #include <string.h>
 #include <stdarg.h>
 
+int prv_handle_item (void* dest, void* data, char type, size_t item_size, void* end);
+
 Queue* queue_new (queue_t type, char* template, ...) {
+	Queue* out = malloc (sizeof (Queue));
+	out->type = type;
+	out->template = strdup (template);
+	out->size = 0;
+	
 	va_list args;
 	va_start (args, template);
+	
+	out->args = malloc (get_ssizeof (template));
+	size_t offset = 0;
+	for (char* i = template; *i; i++) {
+		if (*i == 'i')
+			*(int*)(out->args + offset) = va_arg(args, int);
+		else if (*i == 's')
+			*(char**)(out->args + offset) = strdup(va_arg(args, char*));
+		offset += get_sizeof(*i);
+	}
+	
+	va_end (args);
+	return out;
 }
 
 Queue** queue_find_end (Queue* q) {

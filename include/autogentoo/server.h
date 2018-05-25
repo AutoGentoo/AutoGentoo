@@ -48,6 +48,7 @@ typedef enum {
 } con_t;
 
 #include "thread.h"
+#include "queue.h"
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -62,6 +63,7 @@ struct __Server {
 	SmallMap* stages; //!< A list of active templates awaiting handoff to a host
 	Vector* host_bindings; //!< A list of host bindings
 	Vector* templates; //!< A list of availiable host templates
+	Queue* queue_head; //!< Jobs waiting in the queue, NULL if empty queue
 	
 	volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
 	ThreadHandler* thandler;
@@ -181,5 +183,7 @@ void server_free(Server* server);
 void server_kill(Server* server);
 
 void handle_sigint (int sig);
+
+void server_add_queue (Server* parent, Queue* new);
 
 #endif

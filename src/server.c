@@ -357,3 +357,10 @@ void server_free (Server* server) {
 	
 	free(server);
 }
+
+void server_add_queue (Server* parent, Queue* new) {
+	new->last = parent->queue_head;
+	parent->queue_head = new;
+	
+	
+}
