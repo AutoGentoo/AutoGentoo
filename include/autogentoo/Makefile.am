@@ -15,4 +15,5 @@ maininclude_HEADERS =   autogentoo.h \
                         kernel.h \
                         getopt.h \
                         thread.h \
-                        request_structure.h
+                        request_structure.h \
+                        queue.h

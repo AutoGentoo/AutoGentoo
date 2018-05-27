@@ -7,6 +7,7 @@ cdef class DynamicBuffer:
 	cdef realloc (self)
 	cdef void append (self, void* ptr, size_t size)
 	cdef void append_string (self, char* ptr)
+	cdef void append_int (self, int k)
 	cdef void set (self, void* ptr, int start, size_t size)
 	cpdef void print_raw (self, align=*)
 

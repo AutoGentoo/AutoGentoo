@@ -86,3 +86,5 @@ cdef class Stage(PyOb):
 	
 	cdef parse (self, Binary _bin, template=*)
 	cdef char* send_dup (self, char* cflags=*)
+	cdef char* find_extra (self, template_selects key, char* default, destroy=*)
+	cdef Host handoff (self, char* hostname)

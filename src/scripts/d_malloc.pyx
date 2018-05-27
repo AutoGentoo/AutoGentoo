@@ -26,6 +26,9 @@ cdef class DynamicBuffer:
 	cdef void append_string (self, char* ptr):
 		self.append (ptr, strlen(ptr) + 1)
 	
+	cdef void append_int (self, int k):
+		self.append (&k, sizeof (int))
+	
 	cdef void append (self, void* ptr, size_t size):
 		if size == 0 or ptr == NULL:
 			return

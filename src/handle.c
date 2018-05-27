@@ -545,7 +545,7 @@ response_t SRV_HOSTWRITE (Request* request) {
 	return OK;
 }
 
-response_t SRV_HOSTUPLOAD(Request* request) {
+response_t SRV_HOSTADVEDIT (Request* request) {
 	if (request->struct_c < 2 || request->types[0] != STRCT_HOSTSELECT)
 		return BAD_REQUEST;
 	Host* selected = server_host_search (request->conn->parent, request->structures[0].hs.host_id);
@@ -575,6 +575,37 @@ response_t SRV_HOSTUPLOAD(Request* request) {
 	return OK;
 }
 
+response_t SRV_HOSTUPLOAD(Request* request) {
+	CHECK_STRUCTURES ({STRCT_HOSTSELECT, STRCT_RAW})
+	
+	FILE* f = fmemopen (request->structures[1].raw.data, request->structures[1].raw.n, "r");
+	
+	Server* srv = request->conn->parent;
+	Host* target = read_host(f);
+	target->parent = srv;
+	
+	Host** out_pos = NULL;
+	
+	int i;
+	for (i = 0; i < srv->hosts->n; i++) {
+		Host** t = (Host**)vector_get (srv->hosts, i);
+		if (strcmp ((*t)->id, request->structures[0].hs.host_id) == 0) {
+			out_pos = t;
+			break;
+		}
+	}
+	
+	if (out_pos == NULL)
+		vector_add (request->conn->parent->hosts, &target);
+	else {
+		host_free (*out_pos);
+		*out_pos = target;
+	}
+	
+	fclose (f);
+	return OK;
+}
+
 response_t BIN_QUEUE(Request* request) {
 	queue_write (request->conn->parent->queue->head, request->conn->fd);
 	queue_free(request->conn->parent->queue->head);
@@ -588,51 +619,15 @@ response_t BIN_QUEUE(Request* request) {
 response_t WORKER_HANDOFF(Request* request) {
 	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_WORKERRESPONSE});
 	
-	{
-		string_overwrite(&out->cxxflags, "${CFLAGS}", 1);
-		string_overwrite(&out->portage_tmpdir, "/autogentoo/tmp", 1);
-		string_overwrite(&out->portdir, "/usr/portage", 1);
-		string_overwrite(&out->distdir, "/usr/portage/distfiles", 1);
-		string_overwrite(&out->pkgdir, "/autogentoo/pkg", 1);
-		string_overwrite(&out->port_logdir, "/autogentoo/log", 1);
-	}
+	if (request->structures[1].wr.response != 0)
+		return OK;
 	
-	// make.conf stuff
-	{
-		out->cflags = strdup(src->cflags);
-		out->arch = strdup(src->arch);
-		out->chost = strdup(src->chost);
-	}
-	
-	char** _t[] = {
-			NULL,
-			&out->cxxflags,
-			&out->portage_tmpdir,
-			&out->portdir,
-			&out->distdir,
-			&out->pkgdir,
-			&out->port_logdir
-	};
-	
-	size_t _t_size = sizeof(_t) / sizeof(_t[0]);
-	
-	int i;
-	for (i = 0; i != src->extra_c; i++) {
-		if (src->extras[i].select == OTHER) {
-			string_vector_add(out->extra, src->extras[i].make_extra);
-			continue;
-		}
-		
-		int j = 0;
-		for (int temp = src->extras[i].select; temp >>= 1; j++);
-		if (j < _t_size && j > 0)
-			*_t[j] = strdup(src->extras[i].make_extra);
-	}
-	
-	//src = small_map_delete_index(src->parent->stages,);
+	HostTemplate* src = small_map_delete(request->conn->parent->stages, request->structures[0].hs.host_id);
 	host_template_free(src);
+	
+	return OK;
 }
 
 response_t WORKER_MAKECONF(Request* request) {
-
+	return OK;
 }

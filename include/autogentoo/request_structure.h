@@ -72,9 +72,15 @@ typedef enum {
 	STRCT_STAGECOMMAND,
 	STRCT_HOSTOFFSET, /* Custom offset on Host struct */
 	STRCT_WORKERRESPONSE,
+	STRCT_RAW,
 	
 	STRCT_MAX
 } request_structure_t;
+
+struct __Raw {
+	size_t n;
+	void* data;
+};
 
 static char* request_structure_linkage[] = {
 		"iis",
@@ -84,7 +90,8 @@ static char* request_structure_linkage[] = {
 		"i",
 		"i",
 		"iv",
-		"i"
+		"i",
+		"v"
 };
 
 union __RequestData {
@@ -96,6 +103,7 @@ union __RequestData {
 	struct __StageCommand sc;
 	struct __HostOffset ho;
 	struct __WorkerResponse wr;
+	struct __Raw raw;
 };
 
 int parse_request_structure (RequestData* out, char* template, void* data, void* end);

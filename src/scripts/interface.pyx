@@ -264,9 +264,12 @@ cdef class Host(PyOb):
 			if current == AUTOGENTOO_HOST_KERNEL:
 				pass
 			else:
-				printf("Could not understand autogentoo data type: 0x%x", current)
+				Log.error ("Could not understand autogentoo data type: 0x%x\n", current)
 				break
 			current = _bin.read_int()
+	
+	def upload (self):
+		
 	
 	def get_extra (self):
 		out = []
@@ -370,6 +373,42 @@ cdef class Stage(PyOb):
 		for i in range (self.extra_c):
 			out.append (self.extra[i].make_extra, strlen(self.extra[i].make_extra))
 			out.append (&self.extra[i].select, sizeof(int))
+	
+	cdef char* find_extra (self, template_selects key, char* default):
+		for i in range(self.extra_c):
+			if self.extra[i].select == key:
+				return self.extra[i].make_extra
+		return default
+	
+	cdef Host handoff (self, char* hostname, char* profile, char* use):
+		cdef DynamicBuffer temp = DynamicBuffer ()
+		temp.append_string(self.new_id)
+		temp.append_int (CHR_NOT_MOUNTED)
+		temp.append_string(hostname)
+		temp.append_string(profile)
+		temp.append_string(self.cflags)
+		temp.append_string(self.find_extra (CXXFLAGS, "${CFLAGS}"))
+		temp.append_string(use)
+		temp.append_string(self.arch)
+		temp.append_string(self.chost)
+		temp.append_int(self.extra_c)
+		for i in range (self.extra_c):
+			if self.extra[i].select == OTHER:
+				temp.append_string(self.extra[i].make)
+		
+		temp.append_string(self.find_extra (TMPDIR, "/autogentoo/tmp"))
+		temp.append_string(self.find_extra (PORTDIR, "/usr/portage"))
+		temp.append_string(self.find_extra (DISTDIR, "/usr/portage/distfiles"))
+		temp.append_string(self.find_extra (PKGDIR, "/autogentoo/pkg"))
+		temp.append_string(self.find_extra (LOGDIR, "/autogentoo/log"))
+		
+		temp.append_int (AUTOGENTOO_HOST_END)
+		
+		cdef Binary _bin = Binary (temp)
+		
+		cdef Host out = Host (self.parent)
+		out.parse (_bin)
+		return out
 	
 	def __dealloc__ (self):
 		free (self.id)
