@@ -4,9 +4,10 @@
 
 
 #include <autogentoo/queue.h>
-#include <unistd.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <autogentoo/request.h>
 
 int prv_handle_item (void* dest, void* data, char type, size_t item_size, void* end);
 

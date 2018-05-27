@@ -4,10 +4,6 @@
 #include <unistd.h>
 #include <signal.h>
 
-#ifndef AUTOGENTOO_CLIENT
-#define AUTOGENTOO_CLIENT "/usr/lib/autogentoo/client.py"
-#endif
-
 Opt opt_handlers[] = {
 		{'s', "server", "Start the autogentoo server (instead of client)", set_is_server,      OPT_SHORT | OPT_LONG},
 		{'r', "root",   "Set the root directory of the server",            set_location,       OPT_SHORT | OPT_LONG

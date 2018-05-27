@@ -58,6 +58,10 @@ struct __StageCommand {
 	 stage_command_t command;
 } __attribute__((packed));
 
+struct __WorkerResponse {
+	 int response;
+} __attribute__((packed));
+
 typedef enum {
 	STRCT_END,
 	STRCT_HOSTEDIT = 1,
@@ -67,6 +71,7 @@ typedef enum {
 	STRCT_TEMPLATESELECT,
 	STRCT_STAGECOMMAND,
 	STRCT_HOSTOFFSET, /* Custom offset on Host struct */
+	STRCT_WORKERRESPONSE,
 	
 	STRCT_MAX
 } request_structure_t;
@@ -79,6 +84,7 @@ static char* request_structure_linkage[] = {
 		"i",
 		"i",
 		"iv",
+		"i"
 };
 
 union __RequestData {
@@ -89,6 +95,7 @@ union __RequestData {
 	struct __StageSelect ss;
 	struct __StageCommand sc;
 	struct __HostOffset ho;
+	struct __WorkerResponse wr;
 };
 
 int parse_request_structure (RequestData* out, char* template, void* data, void* end);

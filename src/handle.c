@@ -29,11 +29,15 @@ RequestLink requests[] = {
 		{REQ_HANDOFF,         {.ag_fh=SRV_HANDOFF}},
 		{REQ_SAVE,            {.ag_fh=SRV_SAVE}},
 		{REQ_HOSTWRITE,       {.ag_fh=SRV_HOSTWRITE}},
-		{REQ_HOSTUPLOAD,       {.ag_fh=SRV_HOSTUPLOAD}},
+		{REQ_HOSTUPLOAD,      {.ag_fh=SRV_HOSTUPLOAD}},
 		
 		/* Binary requests */
 		{REQ_BINSERVER,       {.ag_fh=BIN_SERVER}},
 		{REQ_BINQUEUE,        {.ag_fh=BIN_QUEUE}},
+		
+		/* Worker requests */
+		{REQ_WORKERHANDOFF,   {.ag_fh=WORKER_HANDOFF}},
+		{REQ_WORKERMAKECONF,  {.ag_fh=WORKER_MAKECONF}},
 		
 		/* General */
 		{REQ_EXIT,            {.ag_fh=EXIT}}
@@ -86,7 +90,7 @@ int prv_check_data_structs (Request* req, const int* to_check, int count) {
 		return 1;
 	
 	for (int i = 0; i < count; i++)
-		if (((request_structure_t*)req->types->ptr)[i] != to_check[i])
+		if (req->types[i] != to_check[i])
 			return 1;
 	
 	return 0;
@@ -136,7 +140,7 @@ response_t INSTALL (Request* request) {
 	
 	int backup_conn, backup_stdout;
 	backup_stdout = prv_pipe_to_client(request->conn->fd, &backup_conn);
-	response_t res = host_install(request->conn->bounded_host, (*(RequestData*)vector_get(request->structures, 0)).hi.argument);
+	response_t res = host_install(request->conn->bounded_host, request->structures[0].hi.argument);
 	prv_pipe_back(&request->conn->fd, backup_stdout, backup_conn);
 	
 	return res;
@@ -149,38 +153,38 @@ response_t SRV_CREATE (Connection* conn, char** args, int start) {
 response_t SRV_EDIT (Request* request) {
 	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_HOSTEDIT});
 	
-	Host* target = server_host_search(request->conn->parent, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
+	Host* target = server_host_search(request->conn->parent, request->structures[0].hs.host_id);
 	if (!target)
 		return NOT_FOUND;
 	
-	int field_one = (*(RequestData*)vector_get(request->structures, 1)).he.selection_one;
-	int field_two = (*(RequestData*)vector_get(request->structures, 1)).he.selection_two;
+	int field_one = request->structures[1].he.selection_one;
+	int field_two = request->structures[1].he.selection_two;
 	
 	if (field_one == 4) {
 		if (field_two >= target->extra->n)
-			string_vector_add(target->extra, (*(RequestData*)vector_get(request->structures, 1)).he.edit);
+			string_vector_add(target->extra, request->structures[1].he.edit);
 		else {
 			void** t_ptr = vector_get(target->extra, field_two);
 			free(*t_ptr);
 			
-			if (strlen((*(RequestData*)vector_get(request->structures, 1)).he.edit) == 0)
+			if (strlen(request->structures[1].he.edit) == 0)
 				vector_remove(target->extra, field_two);
 			else
-				*t_ptr = strdup((*(RequestData*)vector_get(request->structures, 1)).he.edit);
+				*t_ptr = strdup(request->structures[1].he.edit);
 		}
 	} else {
 		if (field_one == 0) {
 			free(target->hostname);
-			target->hostname = strdup((*(RequestData*)vector_get(request->structures, 1)).he.edit);
+			target->hostname = strdup(request->structures[1].he.edit);
 		} else if (field_one == 1) {
 			free(target->profile);
-			target->profile = strdup((*(RequestData*)vector_get(request->structures, 1)).he.edit);
+			target->profile = strdup(request->structures[1].he.edit);
 		} else if (field_one == 2) {
 			free(target->cflags);
-			target->hostname = strdup((*(RequestData*)vector_get(request->structures, 1)).he.edit);
+			target->hostname = strdup(request->structures[1].he.edit);
 		} else if (field_one == 3) {
 			free(target->use);
-			target->use = strdup((*(RequestData*)vector_get(request->structures, 1)).he.edit);
+			target->use = strdup(request->structures[1].he.edit);
 		} else
 			return BAD_REQUEST;
 	}
@@ -190,7 +194,7 @@ response_t SRV_EDIT (Request* request) {
 
 response_t SRV_ACTIVATE (Request* request) {
 	CHECK_STRUCTURES({STRCT_HOSTSELECT})
-	Host* found = server_host_search(request->conn->parent, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
+	Host* found = server_host_search(request->conn->parent, request->structures[0].hs.host_id);
 	
 	if (!found)
 		return NOT_FOUND;
@@ -207,7 +211,7 @@ response_t SRV_HOSTREMOVE (Request* request) {
 	// Remove the binding
 	for (i = 0; i != request->conn->parent->host_bindings->n; i++) {
 		Host** tmp = (Host**) (((void***) vector_get(request->conn->parent->host_bindings, i))[1]);
-		if (strcmp((*tmp)->id, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id) == 0) {
+		if (strcmp((*tmp)->id, request->structures[0].hs.host_id) == 0) {
 			vector_remove(request->conn->parent->host_bindings, i);
 			// dont break because multiple clients can point to the same host
 		}
@@ -215,7 +219,7 @@ response_t SRV_HOSTREMOVE (Request* request) {
 	
 	// Remove the definition
 	for (i = 0; i != request->conn->parent->hosts->n; i++) {
-		if (strcmp((*(Host**) vector_get(request->conn->parent->host_bindings, i))->id, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id) == 0) {
+		if (strcmp((*(Host**) vector_get(request->conn->parent->host_bindings, i))->id, request->structures[0].hs.host_id) == 0) {
 			vector_remove(request->conn->parent->host_bindings, i);
 			break; // Two hosts cant have the same id (at least they are not support to...)
 		}
@@ -245,7 +249,7 @@ void prv_fd_write_str (int fd, char* str) {
 response_t SRV_GETHOST (Request* request) {
 	CHECK_STRUCTURES ({STRCT_HOSTSELECT});
 	
-	Host* host = server_host_search(request->conn->parent, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
+	Host* host = server_host_search(request->conn->parent, request->structures[0].hs.host_id);
 	
 	if (host == NULL)
 		return NOT_FOUND;
@@ -336,14 +340,14 @@ response_t SRV_TEMPLATE_CREATE (Request* request) {
 	CHECK_STRUCTURES({STRCT_TEMPLATECREATE})
 	
 	HostTemplate in_data;
-	in_data.arch = (*(RequestData*)vector_get(request->structures, 0)).tc.arch;
-	in_data.cflags = (*(RequestData*)vector_get(request->structures, 0)).tc.cflags;
-	in_data.chost = (*(RequestData*)vector_get(request->structures, 0)).tc.chost;
-	in_data.extra_c = (*(RequestData*)vector_get(request->structures, 0)).tc.make_extra_c;
+	in_data.arch = request->structures[0].tc.arch;
+	in_data.cflags = request->structures[0].tc.cflags;
+	in_data.chost = request->structures[0].tc.chost;
+	in_data.extra_c = request->structures[0].tc.make_extra_c;
 	
 	for (int i = 0; i < in_data.extra_c; i++) {
-		in_data.extras[i].select = (template_selects)(*(RequestData*)vector_get(request->structures, 0)).tc.extras[i].select;
-		in_data.extras[i].make_extra = (*(RequestData*)vector_get(request->structures, 0)).tc.extras[i].make_extra;
+		in_data.extras[i].select = (template_selects)request->structures[0].tc.extras[i].select;
+		in_data.extras[i].make_extra = request->structures[0].tc.extras[i].make_extra;
 	}
 	
 	
@@ -361,7 +365,7 @@ response_t SRV_STAGE_NEW (Request* request) {
 	
 	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
 	
-	HostTemplate* t = stage_new(request->conn->parent, (*(RequestData*)vector_get(request->structures, 0)).ss.index);
+	HostTemplate* t = stage_new(request->conn->parent, request->structures[0].ss.index);
 	
 	small_map_insert(t->parent->stages, t->new_id, t);
 	
@@ -374,7 +378,7 @@ response_t SRV_STAGE (Request* request) {
 	CHECK_STRUCTURES({STRCT_TEMPLATESELECT, STRCT_STAGECOMMAND})
 	
 	HostTemplate* t = small_map_get_index(request->conn->parent->stages,
-			(*(RequestData*)vector_get(request->structures, 0)).ss.index);
+			request->structures[0].ss.index);
 	if (t == NULL)
 		return NOT_FOUND;
 	
@@ -383,7 +387,7 @@ response_t SRV_STAGE (Request* request) {
 	
 	
 	response_t res = OK;
-	int command = (*(RequestData*)vector_get(request->structures, 1)).sc.command;
+	int command = request->structures[1].sc.command;
 	
 	char* fname = NULL;
 	if (command & STAGE_DOWNLOAD) {
@@ -422,7 +426,7 @@ response_t SRV_GETSTAGED (Request* request) {
 response_t SRV_GETSTAGE (Request* request) {
 	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
 	
-	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, (*(RequestData*)vector_get(request->structures, 0)).ss.index);
+	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, request->structures[0].ss.index);
 	
 	if (__t == NULL)
 		return NOT_FOUND;
@@ -453,7 +457,7 @@ response_t SRV_HANDOFF (Request* request) {
 	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
 	
 	HostTemplate* __t = small_map_get_index(request->conn->parent->stages,
-			(*(RequestData*)vector_get(request->structures, 0)).ss.index);
+			request->structures[0].ss.index);
 	if (!__t)
 		return NOT_FOUND;
 	
@@ -542,28 +546,28 @@ response_t SRV_HOSTWRITE (Request* request) {
 }
 
 response_t SRV_HOSTUPLOAD(Request* request) {
-	if (request->struct_c < 2 || ((request_structure_t*)request->types)[0] != STRCT_HOSTSELECT)
+	if (request->struct_c < 2 || request->types[0] != STRCT_HOSTSELECT)
 		return BAD_REQUEST;
-	Host* selected = server_host_search (request->conn->parent, (*(RequestData*)vector_get(request->structures, 0)).hs.host_id);
+	Host* selected = server_host_search (request->conn->parent, request->structures[0].hs.host_id);
 	
 	for (int i = 1; i < request->struct_c; i++) {
-		if (((RequestData*)request->structures)[i].ho.offset_index > sizeof (host_valid_offset) / sizeof (host_valid_offset[0])) {
-			if (((request_structure_t*)request->types)[i] != STRCT_HOSTOFFSET)
+		if (request->structures[i].ho.offset_index > sizeof (host_valid_offset) / sizeof (host_valid_offset[0])) {
+			if (request->types[i] != STRCT_HOSTOFFSET)
 				return BAD_REQUEST;
 			return BAD_REQUEST;
 		}
 		
-		host_offset_t offset_item = host_valid_offset[((RequestData*)request->structures)[i].ho.offset_index];
+		host_offset_t offset_item = host_valid_offset[request->structures[i].ho.offset_index];
 		if (offset_item.type == VOIDTYPE_STRING)
-			*(char**)(selected + offset_item.offset) = strdup (((RequestData*)request->structures)[i].ho.data);
+			*(char**)(selected + offset_item.offset) = strdup (request->structures[i].ho.data);
 		else if (offset_item.type == VOIDTYPE_INT)
-			*(int*)(selected + offset_item.offset) = *(int*)(((RequestData*)request->structures)[i].ho.data);
+			*(int*)(selected + offset_item.offset) = *(int*)(request->structures[i].ho.data);
 		else if (offset_item.type == VOIDTYPE_STRINGVECTOR) {
 			size_t off = 0;
 			int j = 0;
-			for (char* temp = strdup (((RequestData*)request->structures)[i].ho.data);
+			for (char* temp = strdup (request->structures[i].ho.data);
 				 strlen(temp);
-				 temp = strdup (((RequestData*)request->structures)[i].ho.data + off), j++)
+				 temp = strdup (request->structures[i].ho.data + off), j++)
 				string_vector_set((StringVector*)(selected + offset_item.offset), temp, j);
 		}
 	}
@@ -572,5 +576,63 @@ response_t SRV_HOSTUPLOAD(Request* request) {
 }
 
 response_t BIN_QUEUE(Request* request) {
-	request->conn->parent->
+	queue_write (request->conn->parent->queue->head, request->conn->fd);
+	queue_free(request->conn->parent->queue->head);
+	
+	response_t out = OK;
+	out.len = 0;
+	
+	return out;
+}
+
+response_t WORKER_HANDOFF(Request* request) {
+	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_WORKERRESPONSE});
+	
+	{
+		string_overwrite(&out->cxxflags, "${CFLAGS}", 1);
+		string_overwrite(&out->portage_tmpdir, "/autogentoo/tmp", 1);
+		string_overwrite(&out->portdir, "/usr/portage", 1);
+		string_overwrite(&out->distdir, "/usr/portage/distfiles", 1);
+		string_overwrite(&out->pkgdir, "/autogentoo/pkg", 1);
+		string_overwrite(&out->port_logdir, "/autogentoo/log", 1);
+	}
+	
+	// make.conf stuff
+	{
+		out->cflags = strdup(src->cflags);
+		out->arch = strdup(src->arch);
+		out->chost = strdup(src->chost);
+	}
+	
+	char** _t[] = {
+			NULL,
+			&out->cxxflags,
+			&out->portage_tmpdir,
+			&out->portdir,
+			&out->distdir,
+			&out->pkgdir,
+			&out->port_logdir
+	};
+	
+	size_t _t_size = sizeof(_t) / sizeof(_t[0]);
+	
+	int i;
+	for (i = 0; i != src->extra_c; i++) {
+		if (src->extras[i].select == OTHER) {
+			string_vector_add(out->extra, src->extras[i].make_extra);
+			continue;
+		}
+		
+		int j = 0;
+		for (int temp = src->extras[i].select; temp >>= 1; j++);
+		if (j < _t_size && j > 0)
+			*_t[j] = strdup(src->extras[i].make_extra);
+	}
+	
+	//src = small_map_delete_index(src->parent->stages,);
+	host_template_free(src);
+}
+
+response_t WORKER_MAKECONF(Request* request) {
+
 }

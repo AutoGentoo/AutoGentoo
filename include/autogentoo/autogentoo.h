@@ -21,6 +21,18 @@
 #include "writeconfig.h"
 #include "render.h"
 
+#ifndef AUTOGENTOO_LBIN_PATH
+#define AUTOGENTOO_LBIN_PATH "/usr/lib/autogentoo/"
+#endif
+
+#ifndef AUTOGENTOO_CLIENT
+#define AUTOGENTOO_CLIENT AUTOGENTOO_LBIN_PATH "client.py"
+#endif
+
+#ifndef AUTOGENTOO_WORKER
+#define AUTOGENTOO_WORKER AUTOGENTOO_LBIN_PATH "worker.py"
+#endif
+
 
 /* Port to 9491 so we don't overlap with our main service */
 //#define AUTOGENTOO_DEBUG

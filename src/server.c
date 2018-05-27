@@ -359,8 +359,15 @@ void server_free (Server* server) {
 }
 
 void server_add_queue (Server* parent, Queue* new) {
-	new->last = parent->queue_head;
-	parent->queue_head = new;
+	new->last = parent->queue->head;
+	parent->queue->head = new;
 	
-	
+	kill (parent->queue->proc_id, SIGUSR1);
+}
+
+pid_t server_spawn_worker (Server* parent) {
+	parent->queue->proc_id = fork ();
+	if (parent->queue->proc_id == 0)
+		execl (AUTOGENTOO_WORKER, (const char*)NULL, (char*)NULL);
+	return parent->queue->proc_id;
 }

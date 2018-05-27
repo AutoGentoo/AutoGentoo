@@ -272,6 +272,11 @@ response_t SRV_HOSTWRITE(Request* request);
 
 response_t SRV_HOSTUPLOAD(Request* request);
 
+response_t WORKER_HANDOFF(Request* request);
+
+response_t WORKER_MAKECONF(Request* request);
+
+
 /* SRV Kernel request (unimplmented) */
 
 

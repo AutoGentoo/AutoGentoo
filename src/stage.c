@@ -210,49 +210,7 @@ Host* host_template_handoff (HostTemplate* src) {
 	}
 	
 	// defaults
-	{
-		string_overwrite(&out->cxxflags, "${CFLAGS}", 1);
-		string_overwrite(&out->portage_tmpdir, "/autogentoo/tmp", 1);
-		string_overwrite(&out->portdir, "/usr/portage", 1);
-		string_overwrite(&out->distdir, "/usr/portage/distfiles", 1);
-		string_overwrite(&out->pkgdir, "/autogentoo/pkg", 1);
-		string_overwrite(&out->port_logdir, "/autogentoo/log", 1);
-	}
 	
-	// make.conf stuff
-	{
-		out->cflags = strdup(src->cflags);
-		out->arch = strdup(src->arch);
-		out->chost = strdup(src->chost);
-	}
-	
-	char** _t[] = {
-			NULL,
-			&out->cxxflags,
-			&out->portage_tmpdir,
-			&out->portdir,
-			&out->distdir,
-			&out->pkgdir,
-			&out->port_logdir
-	};
-	
-	size_t _t_size = sizeof(_t) / sizeof(_t[0]);
-	
-	int i;
-	for (i = 0; i != src->extra_c; i++) {
-		if (src->extras[i].select == OTHER) {
-			string_vector_add(out->extra, src->extras[i].make_extra);
-			continue;
-		}
-		
-		int j = 0;
-		for (int temp = src->extras[i].select; temp >>= 1; j++);
-		if (j < _t_size && j > 0)
-			*_t[j] = strdup(src->extras[i].make_extra);
-	}
-	
-	src = small_map_delete_index(src->parent->stages,);
-	host_template_free(src);
 	return out;
 }
 

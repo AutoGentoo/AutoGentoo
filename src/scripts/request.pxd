@@ -29,6 +29,11 @@ cdef extern from "<autogentoo/request.h>":
 		
 		# Binary requests
 		REQ_BINSERVER,
+		REQ_BINQUEUE,
+		
+		# Worker requests
+		REQ_WORKERHANDOFF,
+		REQ_WORKERMAKECONF,
 		
 		# General
 		REQ_EXIT

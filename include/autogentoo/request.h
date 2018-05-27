@@ -53,6 +53,9 @@ typedef enum {
 	REQ_BINSERVER,
 	REQ_BINQUEUE,
 	
+	REQ_WORKERHANDOFF,
+	REQ_WORKERMAKECONF,
+	
 	/* General */
 	REQ_EXIT
 } request_t;
@@ -79,8 +82,11 @@ struct __Request {
 	Connection* conn;
 	
 	int struct_c;
-	Vector* structures;
-	Vector* types;
+	Vector* structures_parent;
+	Vector* types_parent;
+	
+	RequestData* structures;
+	request_structure_t* types;
 };
 
 /**

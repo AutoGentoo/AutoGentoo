@@ -63,7 +63,7 @@ struct __Server {
 	SmallMap* stages; //!< A list of active templates awaiting handoff to a host
 	Vector* host_bindings; //!< A list of host bindings
 	Vector* templates; //!< A list of availiable host templates
-	Queue* queue_head; //!< Jobs waiting in the queue, NULL if empty queue
+	WorkerParent* queue; //!< Jobs waiting in the queue, NULL if empty queue
 	
 	volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
 	ThreadHandler* thandler;
@@ -185,5 +185,7 @@ void server_kill(Server* server);
 void handle_sigint (int sig);
 
 void server_add_queue (Server* parent, Queue* new);
+
+pid_t server_spawn_worker (Server* parent);
 
 #endif

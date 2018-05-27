@@ -22,6 +22,7 @@ Request* request_handle (Connection* conn) {
 	
 	out->conn = conn;
 	out->structures = NULL;
+	out->structures_parent = NULL;
 	out->struct_c = 0;
 	
 	void* current_request = conn->request;
@@ -42,13 +43,15 @@ Request* request_handle (Connection* conn) {
 		return NULL;
 	}
 	
-	out->structures = vector_new (sizeof (RequestData), REMOVE | ORDERED);
-	out->types = vector_new (sizeof (request_structure_t), REMOVE | ORDERED);
+	out->structures_parent = vector_new (sizeof (RequestData), REMOVE | ORDERED);
+	out->types_parent = vector_new (sizeof (request_structure_t), REMOVE | ORDERED);
+	out->structures = out->structures_parent->ptr;
+	out->types = out->types_parent->ptr;
 	
 	request_structure_t current;
 	if (prv_read_int (&current_request, end, (int*)&current) == -1) {
-		vector_free (out->structures);
-		vector_free (out->types);
+		vector_free (out->structures_parent);
+		vector_free (out->types_parent);
 		free (out);
 		return NULL;
 	}
@@ -60,11 +63,11 @@ Request* request_handle (Connection* conn) {
 			return NULL;
 		}
 		
-		vector_add(out->types, &current);
-		vector_add(out->structures, &d);
+		vector_add(out->types_parent, &current);
+		vector_add(out->structures_parent, &d);
 		out->struct_c++;
 		int len = parse_request_structure (
-				(RequestData*)vector_get(out->structures, out->struct_c - 1),
+				(RequestData*)vector_get(out->structures_parent, out->struct_c - 1),
 				request_structure_linkage[current - 1],
 				current_request, end);
 		if (len == -1) {
@@ -123,10 +126,10 @@ response_t request_call (Request* req) {
 
 void request_free (Request* req) {
 	for (int i = 0; i != req->struct_c; i++)
-		free_request_structure((RequestData*)vector_get (req->structures, i),
-							   request_structure_linkage[*(int*)vector_get(req->types, i) - 1], NULL);
+		free_request_structure(&req->structures[i],
+							   request_structure_linkage[req->types[i] - 1], NULL);
 	
-	vector_free (req->structures);
-	vector_free (req->types);
+	vector_free (req->structures_parent);
+	vector_free (req->types_parent);
 	free (req);
 }

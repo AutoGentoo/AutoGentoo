@@ -5,10 +5,11 @@
 #ifndef AUTOGENTOO_QUEUE_H
 #define AUTOGENTOO_QUEUE_H
 
-#include "request.h"
-
 typedef struct __Queue Queue;
 typedef struct __WorkerParent WorkerParent;
+
+#include <stdio.h>
+#include <unistd.h>
 
 typedef enum {
 	QUEUE_END,
