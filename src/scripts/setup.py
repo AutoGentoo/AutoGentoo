@@ -8,7 +8,9 @@ ex = [
 	"op_socket",
 	"d_malloc",
 	"interface",
-	"request"
+	"request",
+	"worker",
+	"job"
 ]
 
 extensions = []

@@ -486,10 +486,7 @@ response_t BIN_SERVER (Request* request) {
 	write_server_fp(request->conn->parent, fp);
 	fflush(fp);
 	
-	response_t res = OK;
-	res.len = 0;
-	
-	return res;
+	return NONE;
 }
 
 response_t SRV_HOSTWRITE (Request* request) {
@@ -607,13 +604,10 @@ response_t SRV_HOSTUPLOAD(Request* request) {
 }
 
 response_t BIN_QUEUE(Request* request) {
-	queue_write (request->conn->parent->queue->head, request->conn->fd);
+	queue_write(request->conn->parent->queue->head, request->conn->fd);
 	queue_free(request->conn->parent->queue->head);
 	
-	response_t out = OK;
-	out.len = 0;
-	
-	return out;
+	return NONE;
 }
 
 response_t WORKER_HANDOFF(Request* request) {

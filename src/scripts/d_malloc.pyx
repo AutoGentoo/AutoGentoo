@@ -71,15 +71,22 @@ cdef class Binary(DynamicBuffer):
 		self.size = buffer.size
 		self.ptr = buffer.ptr
 		self.pos = 0
+		self.sentinels = []
 	
 	
 	cdef char* read_string (self):
+		if not self.inside():
+			return NULL
+		
 		cdef char* out = <char*>(<void*>self.ptr + self.pos)
 		self.pos += strlen (out) + 1
 		
 		return strdup (out)
 	
 	cdef int read_int (self):
+		if not self.inside(sizeof (int)):
+			return 0
+		
 		cdef int out
 		memcpy (&out, self.ptr + self.pos, sizeof (int))
 		self.pos += sizeof (int)
@@ -102,8 +109,25 @@ cdef class Binary(DynamicBuffer):
 		
 		return self.pos + 1 < self.n
 	
-	cdef inside (self):
-		return self.pos < self.n
+	cpdef add_sentinel (self, int sentinel):
+		self.sentinels.append (sentinel)
+	
+	cdef check_sentinels (self):
+		if not self.inside(sizeof (int)):
+			return True
+		
+		cdef int out
+		memcpy (&out, self.ptr + self.pos, sizeof (int))
+		
+		for sentinel in self.sentinels:
+			if out == sentinel:
+				return True
+		return False
+	
+	cdef inside (self, size_t next_size=0):
+		self.check_sentinels()
+		
+		return self.pos < (self.n + next_size)
 	
 	cpdef read_template (self, char* template):
 		out = []

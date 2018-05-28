@@ -24,6 +24,10 @@ log.c: log.pyx
 	cython log.pyx
 request.c: request.pyx
 	cython request.pyx
+worker.c: worker.pyx
+	cython worker.pyx
+job.c: job.pyx
+	cython job.pyx
 
 d_malloc$(PYTHON_EXTENSION_SUFFIX): d_malloc.c
 	$(CC) -pthread -fPIC $(CYTHON_INCLUDES) $(PYTHON_INCLUDES) -c d_malloc.c -o build/d_malloc.o
@@ -43,6 +47,12 @@ log$(PYTHON_EXTENSION_SUFFIX): log.c
 request$(PYTHON_EXTENSION_SUFFIX): request.c
 	$(CC) -pthread -fPIC $(CYTHON_INCLUDES) $(PYTHON_INCLUDES) -c request.c -o build/request.o
 	$(CC) $(PYTHON_LIBS) -shared build/request.o $(CYTHON_LD_PATH) $(CYTHON_LIBS) -o request$(PYTHON_EXTENSION_SUFFIX)
+worker$(PYTHON_EXTENSION_SUFFIX): worker.c
+	$(CC) -pthread -fPIC $(CYTHON_INCLUDES) $(PYTHON_INCLUDES) -c worker.c -o build/worker.o
+	$(CC) $(PYTHON_LIBS) -shared build/worker.o $(CYTHON_LD_PATH) $(CYTHON_LIBS) -o worker$(PYTHON_EXTENSION_SUFFIX)
+job$(PYTHON_EXTENSION_SUFFIX): job.c
+	$(CC) -pthread -fPIC $(CYTHON_INCLUDES) $(PYTHON_INCLUDES) -c job.c -o build/job.o
+	$(CC) $(PYTHON_LIBS) -shared build/job.o $(CYTHON_LD_PATH) $(CYTHON_LIBS) -o job$(PYTHON_EXTENSION_SUFFIX)
 
 clean-local:
 	rm -rf d_malloc$(PYTHON_EXTENSION_SUFFIX) build/d_malloc.o d_malloc.c
@@ -51,6 +61,8 @@ clean-local:
 	rm -rf op_string$(PYTHON_EXTENSION_SUFFIX) build/op_string.o op_string.c
 	rm -rf log$(PYTHON_EXTENSION_SUFFIX) build/log.o log.c
 	rm -rf request$(PYTHON_EXTENSION_SUFFIX) build/request.o request.c
+	rm -rf worker$(PYTHON_EXTENSION_SUFFIX) build/worker.o worker.c
+	rm -rf job$(PYTHON_EXTENSION_SUFFIX) build/job.o job.c
 	rm -rf build
 
 mainlib_DATA = client.py \
@@ -59,4 +71,6 @@ mainlib_DATA = client.py \
                  op_socket$(PYTHON_EXTENSION_SUFFIX) \
                  interface$(PYTHON_EXTENSION_SUFFIX) \
                  op_string$(PYTHON_EXTENSION_SUFFIX) \
-                 request$(PYTHON_EXTENSION_SUFFIX)
+                 request$(PYTHON_EXTENSION_SUFFIX) \
+                 worker$(PYTHON_EXTENSION_SUFFIX) \
+                 job$(PYTHON_EXTENSION_SUFFIX)

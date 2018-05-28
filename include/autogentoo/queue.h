@@ -27,12 +27,13 @@ struct __Queue {
 
 struct __WorkerParent {
 	Queue* head;
+	Queue* tail;
 	pid_t proc_id;
 };
 
 Queue* queue_new (queue_t type, char* template, ...);
 Queue** queue_find_end (Queue* q);
-Queue* queue_add (Queue* dest, Queue* src);
+Queue* queue_add (WorkerParent* dest, Queue* src);
 Queue* queue_shrink (Queue* q);
 void queue_write (Queue* q, int fd);
 Queue* queue_free_single (Queue* q);

@@ -227,6 +227,7 @@ cdef class Host(PyOb):
 		self.pkgdir = NULL
 		self.port_logdir = NULL
 		self.chroot_status = <chroot_t>-1
+		self.extra_c = 0
 	
 	def set_field (self, f1, f2, value):
 		cdef Request request = Request (REQ_EDIT, PROT_AUTOGENTOO)
@@ -247,11 +248,11 @@ cdef class Host(PyOb):
 		self.arch = _bin.read_string()
 		self.chost = _bin.read_string()
 		
-		n = _bin.read_int()
-		self.extra = <char**>malloc (sizeof(char*) * (n + 1))
-		for i in range (n):
+		self.extra_c = _bin.read_int()
+		self.extra = <char**>malloc (sizeof(char*) * (self.extra_c + 1))
+		for i in range (self.extra_c):
 			self.extra[i] = _bin.read_string()
-		self.extra[n] = NULL
+		self.extra[self.extra_c] = NULL
 		
 		self.portage_tmpdir = _bin.read_string()
 		self.portdir = _bin.read_string()
@@ -264,12 +265,31 @@ cdef class Host(PyOb):
 			if current == AUTOGENTOO_HOST_KERNEL:
 				pass
 			else:
-				Log.error ("Could not understand autogentoo data type: 0x%x\n", current)
+				self.parent.error ("Could not understand autogentoo data type: 0x%x\n", current)
 				break
 			current = _bin.read_int()
 	
 	def upload (self):
+		cdef DynamicBuffer b = DynamicBuffer ()
+		b.append_string(self.id)
+		b.append_int(self.chroot_status)
+		b.append_string(self.hostname)
+		b.append_string(self.profile)
+		b.append_string(self.cflags)
+		b.append_string(self.cxxflags)
+		b.append_string(self.use)
+		b.append_string(self.arch)
+		b.append_string(self.chost)
+		b.append_int(self.extra_c)
 		
+		for i in range (self.extra_c):
+			b.append_string(self.extra[i])
+		
+		b.append_string(self.portage_tmpdir)
+		b.append_string(self.portdir)
+		b.append_string(self.pkgdir)
+		b.append_string(self.port_logdir)
+		b.append_int(AUTOGENTOO_HOST_END)
 	
 	def get_extra (self):
 		out = []
@@ -394,7 +414,7 @@ cdef class Stage(PyOb):
 		temp.append_int(self.extra_c)
 		for i in range (self.extra_c):
 			if self.extra[i].select == OTHER:
-				temp.append_string(self.extra[i].make)
+				temp.append_string(self.extra[i].make_extra)
 		
 		temp.append_string(self.find_extra (TMPDIR, "/autogentoo/tmp"))
 		temp.append_string(self.find_extra (PORTDIR, "/usr/portage"))

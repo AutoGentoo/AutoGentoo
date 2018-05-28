@@ -41,8 +41,10 @@ Queue** queue_find_end (Queue* q) {
 	return &(end->last);
 }
 
-Queue* queue_add (Queue* dest, Queue* src) {
-	*queue_find_end(dest) = src;
+Queue* queue_add (WorkerParent* dest, Queue* src) {
+	dest->tail->last = src;
+	dest->tail = src;
+	
 	return src;
 }
 

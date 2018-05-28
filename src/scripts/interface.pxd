@@ -36,6 +36,7 @@ cdef class Server:
 	cdef readonly stages
 	cdef readonly templates
 	cdef public Socket sock
+	cdef readonly message
 	
 	cpdef void read_server (self)
 	cdef Host find_host (self, char* name)
@@ -51,6 +52,7 @@ cdef class Host(PyOb):
 	cdef readonly char* arch #  The portage-arch (eg. amd64)
 	cdef readonly char* chost # The system chost (should not be changed after it is set)
 	cdef readonly char* use # use flags
+	cdef readonly int extra_c
 	cdef char** extra # A list of extra entries to go into make.conf
 	
 	cdef readonly char* portage_tmpdir # build dir
@@ -86,5 +88,5 @@ cdef class Stage(PyOb):
 	
 	cdef parse (self, Binary _bin, template=*)
 	cdef char* send_dup (self, char* cflags=*)
-	cdef char* find_extra (self, template_selects key, char* default, destroy=*)
-	cdef Host handoff (self, char* hostname)
+	cdef char* find_extra (self, template_selects key, char* default)
+	cdef Host handoff (self, char* hostname, char* profile, char* use)

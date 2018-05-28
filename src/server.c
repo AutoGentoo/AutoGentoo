@@ -359,9 +359,7 @@ void server_free (Server* server) {
 }
 
 void server_add_queue (Server* parent, Queue* new) {
-	new->last = parent->queue->head;
-	parent->queue->head = new;
-	
+	queue_add (parent->queue, new);
 	kill (parent->queue->proc_id, SIGUSR1);
 }
 

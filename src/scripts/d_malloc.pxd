@@ -13,9 +13,12 @@ cdef class DynamicBuffer:
 
 cdef class Binary(DynamicBuffer):
 	cdef size_t pos
+	cdef readonly sentinels
 	
 	cdef char* read_string (self)
 	cdef int read_int (self)
 	cdef skip_until (self, to_find)
-	cdef inside (self)
+	cdef inside (self, size_t next_size=*)
+	cpdef add_sentinel (self, int sentinel)
+	cdef check_sentinels (self)
 	cpdef read_template (self, char* template)

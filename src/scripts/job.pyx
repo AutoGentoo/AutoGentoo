@@ -35,14 +35,9 @@ cdef class Job:
 		self.srv = srv
 		self.message = message
 		
-		self.objects = []
-		self.type = <JobType>self.message.read_int()
+		self.type = <queue_t>self.message.read_int()
 		self.template = self.message.read_string()
-		for i in str(self.template):
-			if i == 'i':
-				self.objects.append (<int>self.message.read_int())
-			elif i == 's':
-				self.objects.append (str(self.message.read_string()))
+		self.objects = message.read_template(self.template)
 	
 	def run (self):
 		job_link[self.type] (*self.objects)
