@@ -8,16 +8,19 @@ cdef extern from "<arpa/inet.h>":
 	int htonl (int)
 
 cdef class DynamicBuffer:
-	def __init__ (self, char* start=NULL, size_t size=32, short align=32):
-		if size != 0:
+	def __init__ (self, char* start=<char*>NULL, size_t size=32, short align=32):
+		if size > 0:
 			self.ptr = malloc (size)
+			self.size = size
+		else:
+			self.ptr = malloc (32)
+			self.size = 32
 		
-		self.size = size
 		self.n = 0
 		self.align = align
 		
-		if start or start is not None:
-			self.append (start, strlen(start))
+		if start and start is not None:
+			self.append (<char*>start, strlen(<char*>start))
 	
 	cdef realloc (self):
 		self.size *= 2
@@ -50,11 +53,16 @@ cdef class DynamicBuffer:
 		
 		self.n = start + size
 	
-	def __dealloc__ (self):
-		free (self.ptr)
+	cdef void* get_ptr (self):
+		return self.ptr
 	
-	cpdef void print_raw (self, align=True):
-		align = 25
+	def __dealloc__ (self):
+		if self.ptr != NULL:
+			free (self.ptr)
+			self.ptr = NULL
+		
+	
+	cpdef void print_raw (self, align=25):
 		cdef int last_i = 1
 		
 		for i in range (self.n):
@@ -64,16 +72,14 @@ cdef class DynamicBuffer:
 			last_i += 1
 		fflush (stdout)
 
-cdef class Binary(DynamicBuffer):
+cdef class Binary:
 	def __init__ (self, DynamicBuffer buffer):
-		super (Binary, self).__init__ (None, 0, 32)
+		self.buffer = buffer
+		self.ptr = buffer.get_ptr ()
 		
-		self.size = buffer.size
-		self.ptr = buffer.ptr
 		self.pos = 0
 		self.sentinels = []
-	
-	
+		
 	cdef char* read_string (self):
 		if not self.inside():
 			return NULL
@@ -101,19 +107,24 @@ cdef class Binary(DynamicBuffer):
 		cdef int eof_be = htonl (AUTOGENTOO_FILE_END)
 		cdef int c
 		
-		while c not in to_find and c != eof_be and self.pos < self.n:
+		while c not in to_find and c != eof_be and self.pos < self.buffer.n:
 			memcpy (&c, self.ptr + self.pos, sizeof (int))
-			
 			self.pos += 1
 		self.pos -= 1
 		
-		return self.pos + 1 < self.n
+		return self.pos + 1 < self.buffer.n
 	
 	cpdef add_sentinel (self, int sentinel):
 		self.sentinels.append (sentinel)
 	
+	cdef inside_size (self, size_t size=0):
+		return self.pos < (self.buffer.n + size)
+	
 	cdef check_sentinels (self):
-		if not self.inside(sizeof (int)):
+		if len(self.sentinels) == 0:
+			return False
+		
+		if not self.inside_size(sizeof (int)):
 			return True
 		
 		cdef int out
@@ -125,9 +136,7 @@ cdef class Binary(DynamicBuffer):
 		return False
 	
 	cdef inside (self, size_t next_size=0):
-		self.check_sentinels()
-		
-		return self.pos < (self.n + next_size)
+		return not self.check_sentinels() and self.inside_size(next_size)
 	
 	cpdef read_template (self, char* template):
 		out = []

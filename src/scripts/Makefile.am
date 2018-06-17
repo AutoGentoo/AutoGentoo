@@ -12,21 +12,21 @@ build_dir:
 
 BUILT_SOURCES = build_dir
 
-d_malloc.c: d_malloc.pyx
+d_malloc.c: d_malloc.pyx d_malloc.pxd
 	cython d_malloc.pyx
-interface.c: interface.pyx
+interface.c: interface.pyx interface.pxd
 	cython interface.pyx
-op_socket.c: op_socket.pyx
+op_socket.c: op_socket.pyx op_socket.pxd
 	cython op_socket.pyx
-op_string.c: op_string.pyx
+op_string.c: op_string.pyx op_string.pxd
 	cython op_string.pyx
 log.c: log.pyx
 	cython log.pyx
-request.c: request.pyx
+request.c: request.pyx request.pxd
 	cython request.pyx
-worker.c: worker.pyx
+worker.c: worker.pyx worker.pxd
 	cython worker.pyx
-job.c: job.pyx
+job.c: job.pyx job.pxd
 	cython job.pyx
 
 d_malloc$(PYTHON_EXTENSION_SUFFIX): d_malloc.c

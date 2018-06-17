@@ -28,6 +28,11 @@ Server* server_new (char* location, char* port, server_t opts) {
 	out->stages = small_map_new(sizeof(HostTemplate*), 5);
 	out->host_bindings = vector_new(sizeof(HostBind), REMOVE | UNORDERED);
 	out->location = strdup(location);
+	out->queue = malloc (sizeof (WorkerParent));
+	out->queue->tail = NULL;
+	out->queue->head = NULL;
+	out->queue->proc_id = -1;
+	
 	chdir(out->location);
 	out->opts = opts;
 	out->port = strdup(port);

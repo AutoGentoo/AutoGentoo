@@ -16,8 +16,8 @@ cdef class Job:
 	cdef char* template
 	cdef objects
 
-cpdef job_handoff (stage_id, hostname, profile)
-cpdef job_makeconf (hostid)
+cpdef job_handoff (Server srv, int stage_id, char* hostname, char* profile)
+cpdef job_makeconf (Server srv, char* hostid)
 
 # List of jobs
 cdef job_link = {

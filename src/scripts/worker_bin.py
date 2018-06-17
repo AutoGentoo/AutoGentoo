@@ -1,19 +1,23 @@
 from worker import Worker
 from interface import Server
 from op_socket import Address
+import os, signal
 
-import signal
-import os
+
+def handle_usr1(i, stack):
+	main_worker.flush_queue()
 
 
 def main(args):
+	signal.signal(signal.SIGUSR1, handle_usr1)
+	signal.signal(signal.SIGINT, handle_usr1)
 	parent = Server(Address("localhost", int(args[1])), False)
-	worker = Worker(parent)
 	
+	global main_worker
+	main_worker = Worker(parent)
 	print(os.getpid())
 	
-	signal.signal(signal.SIGUSR1, worker.flush_queue)
-	worker.start()
+	main_worker.start()
 
 
 if __name__ == "__main__":
