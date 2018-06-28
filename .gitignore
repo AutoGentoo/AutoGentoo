@@ -35,7 +35,7 @@ src/*.config*
 *~
 **/.deps/*
 
-.idea/*
+#.idea/*
 cmake-build-debug/*
 include/*Makefile.in
 include/*Makefile

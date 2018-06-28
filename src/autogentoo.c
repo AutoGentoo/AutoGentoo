@@ -1,20 +1,19 @@
 #define _GNU_SOURCE
+
 #include <autogentoo/autogentoo.h>
 #include <string.h>
-#include <unistd.h>
-#include <signal.h>
 
 Opt opt_handlers[] = {
 		{'s', "server", "Start the autogentoo server (instead of client)", set_is_server,      OPT_SHORT | OPT_LONG},
-		{'r', "root",   "Set the root directory of the server",            set_location,       OPT_SHORT | OPT_LONG
-																							   | OPT_ARG},
+		{'r', "root",   "Set the root directory of the server",            set_location,       OPT_SHORT | OPT_LONG |
+		                                                                                       OPT_ARG},
 		{'h', "help",   "Print the help message and exit",                 print_help_wrapper, OPT_SHORT | OPT_LONG},
 		{0,   "port",   "Set the port to bind the server to",              set_port,           OPT_LONG | OPT_ARG},
 		{0,   "debug",  "Turn on the debug feature (nothing right now)",   set_debug,          OPT_LONG},
 		{0,   "daemon", "Run in background and detach from the terminal",  set_daemon,         OPT_LONG},
 		{0,   "log",    "Pipe output to logfile",                          pipe_to_log,        OPT_LONG | OPT_ARG},
-		{'t', "target", "Target server (localhost default)",               set_target,         OPT_SHORT | OPT_LONG
-																							   | OPT_ARG},
+		{'t', "target", "Target server (localhost default)",               set_target,         OPT_SHORT | OPT_LONG |
+		                                                                                       OPT_ARG},
 		{0, NULL, NULL, NULL,                                                                  (opt_opts_t) 0}
 };
 
@@ -72,9 +71,9 @@ int main(int argc, char** argv) {
 		server_start(main_server);
 	} else {
 		char* cmd;
-		asprintf (&cmd, "python " AUTOGENTOO_CLIENT " %s", client_opts);
-		system (cmd);
-		free (cmd);
+		asprintf(&cmd, "python " AUTOGENTOO_CLIENT " %s", client_opts);
+		system(cmd);
+		free(cmd);
 	}
 	
 	/* Exit sequence */
@@ -82,5 +81,5 @@ int main(int argc, char** argv) {
 	if (logfile_fd != -1)
 		close(logfile_fd);
 	return 0;
-
+	
 }

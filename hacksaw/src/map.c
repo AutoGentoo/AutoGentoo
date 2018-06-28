@@ -35,7 +35,7 @@ void map_realloc(Map* map, size_t size) {
 	
 	map->hash_table = realloc(map->hash_table, size * sizeof (MapItem*));
 	map->size = size;
-	memset(map->hash_table + old_size * sizeof (MapItem*), 0, (map->size - old_size) * sizeof (MapItem*));
+	memset(map->hash_table + old_size * sizeof (MapItem*), 0, (map->size - old_size) * sizeof (MapItem*)); // Only set the new data to NULL
 	
 	int i;
 	for (i = 0; i < map->n; i++)
