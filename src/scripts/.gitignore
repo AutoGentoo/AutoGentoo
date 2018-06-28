@@ -2,5 +2,6 @@
 build/*
 *.c
 cmake-build-debug/*
-.idea/*
+#.idea/*
 venv/*
+.idea/workspace.xml

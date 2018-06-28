@@ -36,6 +36,7 @@ src/*.config*
 **/.deps/*
 
 #.idea/*
+**/workspace.xml
 cmake-build-debug/*
 include/*Makefile.in
 include/*Makefile
