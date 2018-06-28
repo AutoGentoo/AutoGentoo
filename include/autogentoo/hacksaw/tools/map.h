@@ -9,7 +9,8 @@
 #include "string_vector.h"
 
 typedef struct __Map Map;
-typedef struct __Key Key;
+typedef struct __MapItem MapItem;
+typedef void (*free_function) (void*);
 
 /**
  * @class __Map
@@ -20,17 +21,17 @@ typedef struct __Key Key;
  *          Only support array of pointers
  */
 struct __Map {
-	Key* hash_table; // similar to Vector position are arbitrary
-	int filled; // Only need if we need to resize the array
-	size_t size; // Maximum number of keys
-	int threshold;
-
-	StringVector* keys;
+	MapItem** hash_table; // similar to Vector position are arbitrary
+	int n; // Only need if we need to resize the array
+	size_t size; // Current size of map
+	size_t realloc_at; // Target size to trigger a reallocation
+	double threshold; // Upper bound percent full
 };
 
-struct __Key {
+struct __MapItem {
 	char* key;
 	void* data;
+	MapItem* next;
 };
 
 /**
@@ -61,10 +62,18 @@ unsigned long map_insert(Map* map, char* key, void* data);
  */
 void* map_get_from_hash(Map* map, char* key, unsigned long hash);
 
-Map* map_new(size_t new_size, int threshold);
+Map* map_new(size_t new_size, double threshold);
 
 void map_realloc(Map* map, size_t size);
 
 unsigned long get_hash(char* key); // Returns offset from hash_table[0]
+
+/**
+ * Free the map and all its data
+ * @param map to free
+ * @param __free for each MapItem allocated, __free (item->data) will be called
+ * NULL to not free data
+ */
+void map_free (Map* map, free_function __free);
 
 #endif // HACKSAW_MAP_H
