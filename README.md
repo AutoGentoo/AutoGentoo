@@ -20,3 +20,4 @@ affect your client computer, only the chroot environment on the build server.
 ### Runtime dependencies
  - pcre2
  - curl
+ - libarchive
