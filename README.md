@@ -15,3 +15,9 @@ affect your client computer, only the chroot environment on the build server.
 
 ### How it works
 ![alt text](https://raw.githubusercontent.com/AutoGentoo/AutoGentoo/master/resources/autogentoo.png)
+
+
+### Runtime dependencies
+ - pcre2
+ - curl
+ - libarchive
