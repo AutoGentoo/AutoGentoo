@@ -375,10 +375,10 @@ response_t SRV_STAGE_NEW (Request* request) {
 }
 
 response_t SRV_STAGE (Request* request) {
-	CHECK_STRUCTURES({STRCT_TEMPLATESELECT, STRCT_STAGECOMMAND})
+	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_STAGECOMMAND}) // Host_id is actually a stage
 	
-	HostTemplate* t = small_map_get_index(request->conn->parent->stages,
-			request->structures[0].ss.index);
+	HostTemplate* t = small_map_get(request->conn->parent->stages,
+			request->structures[0].hs.host_id);
 	if (t == NULL)
 		return NOT_FOUND;
 	

@@ -186,7 +186,7 @@ find_library(ARCHIVE archive)
 
 set(LOCALSTATEDIR /var)
 add_definitions(-DDBPATH="test")
-add_definitions(-DAUTOGENTOO_DEBUG)
+#add_definitions(-DAUTOGENTOO_DEBUG)
 
 add_executable(autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
 add_executable(autogentoo

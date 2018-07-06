@@ -9,8 +9,8 @@ ex = [
 	"d_malloc",
 	"interface",
 	"request",
-	"worker",
-	"job"
+#	"worker",
+#	"job"
 ]
 
 extensions = []

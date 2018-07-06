@@ -60,7 +60,7 @@ cdef class Socket:
 		cdef size_t size = self.recv_into(buffer, 128)
 		while size > 0:
 			if _print_raw:
-				k = print_raw (<char*>buffer, size, k)
+				print_raw (<char*>buffer, size)
 			if _print:
 				write (STDOUT_FILENO, buffer, size)
 			if _store:

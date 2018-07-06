@@ -27,13 +27,12 @@ cdef class Server:
 	def new_host (self, int template, str hostname, str profile, str cflags, str use, extra):
 		cdef Request n_stage_req = Request (REQ_STAGE_NEW, PROT_AUTOGENTOO)
 		n_stage_req.add_templateselect(template)
-		
 		cdef DynamicBuffer res = self.sock.request(n_stage_req.finish())
 		cdef char* new_id_name = strtok (<char*>res.ptr, "\n")
 		
 		cdef Request stage_req = Request (REQ_STAGE, PROT_AUTOGENTOO)
+		stage_req.add_hostselect(new_id_name)
 		stage_req.add_stagecommand(STAGE_ALL)
-		
 		cdef DynamicBuffer bres = self.sock.request(stage_req.finish(), _print=True, _print_raw=False, _store=False)
 		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
 		if check_tr(b"HTTP/1.0 200 OK\n") != 0:
