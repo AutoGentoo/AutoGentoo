@@ -30,15 +30,15 @@ class Shell:
 
 cpdef job_makeconf (Server srv, char* hostid):
 	cdef Host target = srv.find_host(hostid)
-	cdef Shell sh = Shell (os.path.realpath(srv.))
-	char buf[PATH_MAX];
-	char* dest_temp = realpath(host->parent->location, buf);
-	if (dest_temp == NULL) {
-		lerror("Failed to get realpath()");
-		return;
-	}
+	#cdef Shell sh = Shell (os.path.realpath(srv.))
+	#char buf[PATH_MAX];
+	#char* dest_temp = realpath(host->parent->location, buf);
+	#if (dest_temp == NULL) {
+	#	lerror("Failed to get realpath()");
+	#	return;
+	#}
 	
-	asprintf(dest, "%s/%s", dest_temp, host->id);
+	#asprintf(dest, "%s/%s", dest_temp, host->id);
 
 cpdef job_handoff (Server srv, stage_id, hostname, profile):
 	pass

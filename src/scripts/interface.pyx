@@ -23,16 +23,32 @@ cdef class Server:
 	def info (self, mess, *vargs, **kwargs):
 		if self.message:
 			Log.info (mess, *vargs, **kwargs)
-	
+
+	def stage (self, stage, int command):
+		cdef Request stage_req = Request (REQ_STAGE, PROT_AUTOGENTOO)
+		stage_req.add_hostselect(stage.encode('utf-8'))
+		stage_req.add_stagecommand(<stage_command_t>command)
+		cdef DynamicBuffer bres = self.sock.request(stage_req.finish(), _print=True, _print_raw=False, _store=False)
+		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
+		if check_tr(b"HTTP/1.0 200 OK\n") != 0:
+			self.error ("Download or extract failed\n")
+
+	def handoff (self, stage):
+		cdef Request stage_req = Request (REQ_HANDOFF, PROT_AUTOGENTOO)
+		stage_req.add_hostselect(stage.encode('utf-8'))
+		self.sock.request(stage_req.finish(), _print=True)
+
 	def new_host (self, int template, str hostname, str profile, str cflags, str use, extra):
 		cdef Request n_stage_req = Request (REQ_STAGE_NEW, PROT_AUTOGENTOO)
 		n_stage_req.add_templateselect(template)
+		n_stage_req.data.print_raw()
 		cdef DynamicBuffer res = self.sock.request(n_stage_req.finish())
 		cdef char* new_id_name = strtok (<char*>res.ptr, "\n")
 		
 		cdef Request stage_req = Request (REQ_STAGE, PROT_AUTOGENTOO)
 		stage_req.add_hostselect(new_id_name)
 		stage_req.add_stagecommand(STAGE_ALL)
+		stage_req.data.print_raw()
 		cdef DynamicBuffer bres = self.sock.request(stage_req.finish(), _print=True, _print_raw=False, _store=False)
 		check_tr = lambda s: strncmp (<char*>bres.ptr + (bres.n - len(s)), s, len(s))
 		if check_tr(b"HTTP/1.0 200 OK\n") != 0:

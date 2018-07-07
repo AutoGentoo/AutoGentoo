@@ -249,13 +249,13 @@ void server_respond (Connection* conn) {
 		lerror("recv() error");
 		conn->status = SERVER_ERROR;
 		connection_free(conn);
-		pthread_kill(conn->parent->pthread, SIGUSR1);
+		pthread_kill(conn->pid, SIGUSR1);
 		return;
 	} else if (total_read == 0) { // receive socket closed
 		lwarning("Client disconnected upexpectedly.");
 		conn->status = FAILED;
 		connection_free(conn);
-		pthread_kill(conn->parent->pthread, SIGUSR1);
+		pthread_kill(conn->pid, SIGUSR1);
 		return;
 	}
 	

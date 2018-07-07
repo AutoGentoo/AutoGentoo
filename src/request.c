@@ -111,20 +111,26 @@ int http_request_parse (Request* req, HTTPRequest* dest) {
 }
 
 response_t request_call (Request* req) {
-	req->resolved_call = resolve_call(req->request_type);
-	
-	if (req->resolved_call.ag_fh == NULL)
-		return NOT_IMPLEMENTED;
-	if (req->protocol == PROT_AUTOGENTOO)
+	if (req->protocol == PROT_AUTOGENTOO) {
+		req->resolved_call = resolve_call(req->request_type);
+		if (req->resolved_call.ag_fh == NULL)
+			return NOT_IMPLEMENTED;
 		return (*req->resolved_call.ag_fh) (req);
+	}
 	
 	HTTPRequest http_req;
 	if (http_request_parse (req, &http_req) != 0)
 		return BAD_REQUEST;
+	req->resolved_call = http_resolve_call (http_req.function);
 	return (*req->resolved_call.http_fh)(req->conn, http_req);
 }
 
 void request_free (Request* req) {
+	if (req->protocol == PROT_HTTP) {
+		free (req);
+		return;
+	}
+	
 	for (int i = 0; i != req->struct_c; i++)
 		free_request_structure(&req->structures[i],
 							   request_structure_linkage[req->types[i] - 1], NULL);

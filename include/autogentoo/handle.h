@@ -19,6 +19,8 @@
  */
 extern RequestLink requests[];
 
+FunctionHandler http_resolve_call (char* function);
+
 /**
  * Parse the request and write the arguemnts to args
  * @param type resolved type from request_handle

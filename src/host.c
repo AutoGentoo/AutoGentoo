@@ -37,11 +37,11 @@ Host* host_new(Server* server, char* id) {
 	out->use = NULL;
 	out->chost = NULL;
 	out->extra = NULL;
-	out->portage_tmpdir = NULL;
-	out->portdir = NULL;
-	out->distdir = NULL;
-	out->pkgdir = NULL;
-	out->port_logdir = NULL;
+	out->portage_tmpdir = strdup ("/autogentoo/tmp");
+	out->portdir = strdup ("/usr/portage");
+	out->distdir = strdup ("/usr/portage/distfiles");
+	out->pkgdir = strdup ("/autogentoo/pkg");
+	out->port_logdir = strdup ("/autogentoo/log");
 	
 	out->kernel = NULL;
 	

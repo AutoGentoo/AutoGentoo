@@ -179,21 +179,22 @@ response_t host_template_stage (HostTemplate* t) {
 
 Host* host_template_handoff (HostTemplate* src) {
 	Host* out = host_new(src->parent, strdup(src->new_id));
-	char old_stage[32];
+	out->extra = string_vector_new();
+	out->hostname = strdup("default");
+	out->use = strdup(""); // Give it an empty just in case
+	
+	/*char old_stage[32];
 	sprintf(old_stage, "stage-%s", src->new_id);
 	
-	out->extra = string_vector_new();
 	if (rename(old_stage, out->id) != 0) {
 		lerror("Failed to rename %s to %s", old_stage, out->id);
 		free(out->id);
 		free(out);
 		string_vector_free(out->extra);
 		return NULL;
-	}
+	}*/
 	
-	out->hostname = strdup("default");
-	out->use = strdup(""); // Give it an empty just in case
-	
+	/*
 	// Profile
 	{
 		char* t_profile_l;
@@ -210,7 +211,7 @@ Host* host_template_handoff (HostTemplate* src) {
 	}
 	
 	// defaults
-	
+	*/
 	return out;
 }
 

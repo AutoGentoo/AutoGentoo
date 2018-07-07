@@ -290,6 +290,11 @@ void read_template(Server* server, HostTemplate* dest, FILE* fp) {
 }
 
 size_t write_string(char* src, FILE* fp) {
+	if (!src) {
+		fputc(0, fp);
+		return 1;
+	}
+	
 	fputs(src, fp);
 	fputc(0, fp);
 	
@@ -300,8 +305,12 @@ char* read_string(FILE* fp) {
 	int i, c;
 	for (i = 0, c = fgetc(fp); c != 0; i++, c = fgetc(fp));
 	fseek(fp, -i - 1, SEEK_CUR);
-	char* out = malloc((size_t) i + 1);
-	fread(out, 1, (size_t) i + 1, fp);
+	
+	char* out = NULL;
+	if ((size_t) i + 1) {
+		out = malloc((size_t) i + 1);
+		fread(out, 1, (size_t) i + 1, fp);
+	}
 	
 	return out;
 }

@@ -176,9 +176,12 @@ def edit_host(host: Host):
 
 
 def get_new_extra():
+	out = []
 	x = input("make.conf > ")
-	while len(x):
-		yield x
+	while len(x) > 0:
+		out.append(x)
+		x = input("make.conf > ")
+	return out
 
 
 def new_host(server: Server):
@@ -238,7 +241,7 @@ def new_host(server: Server):
 			"cflags (-march=native is auto converted) > ",
 			server.templates[template].get('cflags').replace("-march=native", native_cflags)),
 		rlinput("use > ", "mmx sse sse2 systemd"),
-		list(get_new_extra())
+		get_new_extra()
 	)
 
 
@@ -294,7 +297,9 @@ def main(argv):
 		Command(cmdline, "emerge", lambda x: install(server, x), string=True, _help="Run emerge in the build environment"),
 		Command(cmdline, "lemerge", lambda x: emerge(x), string=True, _help="Run emerge in local environment"),
 		Command(cmdline, "select", lambda x: activate_host(server, x), ["host_id"], "Select a host to bind to this client"),
-		Command(cmdline, "clear", lambda: os.system("clear"), _help="clear the screen")
+		Command(cmdline, "clear", lambda: os.system("clear"), _help="clear the screen"),
+		Command(cmdline, "stage", lambda __id, command: server.stage(__id, int(command)), ["stage_id", "stage_command"], _help="run stage specific command"),
+		Command(cmdline, "handoff", lambda __id: server.handoff(__id), ["stage_id"], _help="handoff a stage to a usable host")
 	]
 	
 	for cmd in commands:

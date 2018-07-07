@@ -43,6 +43,30 @@ RequestLink requests[] = {
 		{REQ_EXIT,            {.ag_fh=EXIT}}
 };
 
+static struct {
+	char* ident;
+	request_t type;
+} http_links[] = {
+		{"GET", REQ_GET}
+};
+
+FunctionHandler http_resolve_call (char* function) {
+	request_t t = (request_t)-1;
+	
+	int i;
+	for (i = 0; i < sizeof (http_links) / sizeof (http_links[0]); i++) {
+		if (strcmp (function, http_links[i].ident) == 0) {
+			t = http_links[i].type;
+			break;
+		}
+	}
+	
+	FunctionHandler k = {NULL};
+	if (t == -1)
+		return k;
+	return resolve_call(t);
+}
+
 FunctionHandler resolve_call (request_t type) {
 	int i;
 	for (i = 0; i < sizeof (requests) / sizeof (RequestLink); i++)
@@ -181,7 +205,7 @@ response_t SRV_EDIT (Request* request) {
 			target->profile = strdup(request->structures[1].he.edit);
 		} else if (field_one == 2) {
 			free(target->cflags);
-			target->hostname = strdup(request->structures[1].he.edit);
+			target->cflags = strdup(request->structures[1].he.edit);
 		} else if (field_one == 3) {
 			free(target->use);
 			target->use = strdup(request->structures[1].he.edit);
@@ -454,11 +478,11 @@ response_t SRV_GETSTAGE (Request* request) {
 }
 
 response_t SRV_HANDOFF (Request* request) {
-	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
-	
-	HostTemplate* __t = small_map_get_index(request->conn->parent->stages,
-			request->structures[0].ss.index);
-	if (!__t)
+	CHECK_STRUCTURES({STRCT_HOSTSELECT})
+	printf ("%s\n", request->structures[0].hs.host_id);
+	fflush(stdout);
+	HostTemplate* __t = small_map_get(request->conn->parent->stages, request->structures[0].hs.host_id);
+	if (__t == NULL)
 		return NOT_FOUND;
 	
 	Host* new_host = host_template_handoff(__t);
@@ -506,7 +530,7 @@ response_t SRV_HOSTWRITE (Request* request) {
 		unlink(profile_dest);
 	}
 	
-	linfo("Setting profile to %s", profile_src);
+	linfo("ls to %s", profile_src);
 	if (symlink(profile_src, profile_dest) != 0) {
 		free(profile_dest);
 		free(profile_src);
