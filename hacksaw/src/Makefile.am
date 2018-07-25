@@ -24,7 +24,7 @@ libhacksaw_a_SOURCES =      dependency.c \
                             linked_vector.c \
                             util.c
 
-#bin_PROGRAMS    =   hacksaw
-#hacksaw_CFLAGS  =   ${AM_CFLAGS}
-#hacksaw_SOURCES =   main.c
-#hacksaw_LDADD   =   libhacksaw.la
+bin_PROGRAMS    =   hacksaw
+hacksaw_CFLAGS  =   ${AM_CFLAGS}
+hacksaw_SOURCES =   main.c
+hacksaw_LDADD   =   libhacksaw.a ../language/liblanguage.a

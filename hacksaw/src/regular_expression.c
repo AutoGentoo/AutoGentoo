@@ -11,47 +11,55 @@
 #include <regex.h>
 
 #include <autogentoo/hacksaw/tools/string_vector.h>
+#include <autogentoo/hacksaw/tools/regular_expression.h>
 
-Vector* regex_full(const char* value, char* pattern) {
+RegexMatch* regex_full(const char* value, char* pattern) {
 	pcre2_code* re;
 	pcre2_match_data* match_data;
-	PCRE2_SIZE erroffset, * ovector;
+	PCRE2_SIZE erroffset, *ovector;
+	
 	int errorcode;
 	int rc;
 	
-	re = pcre2_compile((PCRE2_SPTR8) pattern, (size_t) -1, 0, &errorcode, &erroffset, NULL);
+	re = pcre2_compile((PCRE2_SPTR)pattern, -1, 0, &errorcode, &erroffset, NULL);
 	if (re == NULL) {
-		PCRE2_UCHAR8 buffer[128];
-		(void) pcre2_get_error_message(errorcode, buffer, 128);
-		return NULL;
+		PCRE2_UCHAR8 buffer[120];
+		(void)pcre2_get_error_message(errorcode, buffer, 120);
+		fprintf(stderr, "pcre2 compile error: %s\n", buffer);
+		fprintf(stderr, "%s\n", pattern);
+		fprintf(stderr, "%*s^\n", (int)erroffset, "");
+		exit(1);
 	}
+	
+	RegexMatch* out = NULL;
+	
 	match_data = pcre2_match_data_create(20, NULL);
-	PCRE2_SPTR8 cursor = (PCRE2_SPTR8) value;
-	Vector* out = vector_new(sizeof(StringVector*), REMOVE | UNORDERED);
-	while (1) {
-		rc = pcre2_match(re, cursor, (size_t) -1, 0, 0, match_data, NULL);
-		if (rc <= 0) {
-			break;
-		}
-		StringVector* entry = string_vector_new();
+	
+	out = malloc (sizeof (RegexMatch) * rc);
+	
+	for (rc = pcre2_match(re, (PCRE2_SPTR)value, -1, 0, 0, match_data, NULL);
+			rc; rc = pcre2_match(re, (PCRE2_SPTR)value, -1, 0, 0, match_data, NULL)) {
+		
 		ovector = pcre2_get_ovector_pointer(match_data);
+		printf( "Match succeeded at offset %zu\n", ovector[0] );
+		/* Use ovector to get matched strings */
 		int i;
-		for (i = 1; i < rc; i++) {
-			char* substring_start = (char*) cursor + ovector[2 * i];
-			size_t substring_length = ovector[2 * i + 1] - ovector[2 * i];
-			char copy[substring_length + 1];
-			strncpy(copy, substring_start, substring_length);
-			copy[substring_length] = 0;
-			if (substring_length != 0) {
-				string_vector_add(entry, copy);
-			}
+		for(i = 0; i < rc; i++) {
+			PCRE2_SPTR start = (PCRE2_SPTR)value + ovector[2*i];
+			PCRE2_SIZE slen = ovector[2*i+1] - ovector[2*i];
+			printf("%2d: %.*s\n", i, (int)slen, (char *)start);
+			
+			out[i].length = (size_t)slen;
+			out[i].match = strndup(value + (size_t)start, slen);
+			out[i].name = strdup((char*)pcre2_get_mark(match_data));
+			printf("name: %s\nmatch: %s\nlength: %zu\n", out[i].name, out[i].match, out[i].length);
 		}
-		cursor += ovector[1];
-		vector_add(out, &entry);
 	}
+	
+	
+	
 	pcre2_match_data_free(match_data);
 	pcre2_code_free(re);
-	return out;
 }
 
 int regex_simple(char* dest, char* string, char* pattern) {

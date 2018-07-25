@@ -34,7 +34,7 @@ aabs_svec_t* aabs_ini_getsections(aabs_ini_t* ini) {
 	
 	int i;
 	for (i = 0; i != ini->sections->n; i++)
-		string_vector_add(out, (*(aabs_inisec_t**) vector_get(ini->sections, i))->name);
+		//string_vector_add(out, (*(aabs_inisec_t**) string_vector_get(ini->sections, i)));
 	
 	return out;
 }
@@ -44,12 +44,12 @@ char* aabs_ini_getvariable(aabs_ini_t* ini, char* section, char* varname) {
 }
 
 char* aabs_ini_getsecvariable(aabs_inisec_t* sec, char* varname) {
-	int i;
+	/*int i;
 	for (i = 0; i != sec->variables->n; i++) {
 		aabs_inivar_t* curr_var = *(aabs_inivar_t**) vector_get(sec->variables, i);
 		if (strcmp(curr_var->identifier, varname) == 0)
 			return curr_var->value;
 	}
-	
+	*/
 	return NULL;
 }

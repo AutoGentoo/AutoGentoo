@@ -7,7 +7,15 @@
 
 #include "string_vector.h"
 
-Vector* regex_full(const char* value, char* pattern);
+typedef struct __RegexMatch RegexMatch;
+
+struct __RegexMatch {
+	char* name;
+	char* match;
+	size_t length;
+};
+
+RegexMatch* regex_full(const char* value, char* pattern);
 
 int regex_simple(char* dest, char* string, char* pattern);
 

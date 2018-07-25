@@ -61,7 +61,7 @@ RepoConfig* repo_config_new();
 
 void repo_config_read(RepoConfig* repo_config, char* filepath);
 
-Repository* parse_repository(ConfSection*);
+Repository* parse_repository(Conf*, char *);
 
 void repository_sync(Repository* repo);
 

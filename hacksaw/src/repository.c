@@ -39,47 +39,46 @@ void repo_config_read(RepoConfig* repo_conf, char* filepath) {
 	
 	int i;
 	for (i = 0; i != conf->sections->n; i++) {
-		ConfSection* current_section = *(ConfSection**) vector_get(conf->sections, i);
-		if (strcmp(current_section->name, "DEFAULT") == 0) {
+		char* current_section = string_vector_get(conf->sections, i);
+		if (strcmp(current_section, "DEFAULT") == 0)
 			continue;
-		}
-		Repository* temp = parse_repository(current_section);
+		Repository* temp = parse_repository(conf, current_section);
 		vector_add(repo_conf->repositories, &temp);
 	}
 }
 
-Repository* parse_repository(ConfSection* section) {
+Repository* parse_repository(Conf* conf, char *section) {
 	Repository* repo = malloc(sizeof(Repository));
-	strcpy(repo->name, section->name);
+	strcpy(repo->name, section);
 	
-	repo->eclass_overrides = conf_get_vector(section->parent, section->name, "eclass-overrides");
-	repo->force = conf_get_vector(section->parent, section->name, "force");
-	conf_get_convert(section->parent, (char*) repo->location, section->name, "location");
-	conf_get_convert(section->parent, (char*) repo->sync_cvs_repo, section->name, "sync-cvs-repo");
-	conf_get_convert(section->parent, (char*) repo->sync_uri, section->name, "sync-uri");
+	repo->eclass_overrides = conf_get_vector(conf, section, "eclass-overrides");
+	repo->force = conf_get_vector(conf, section, "force");
+	conf_get_convert(conf, (char*) repo->location, section, "location");
+	conf_get_convert(conf, (char*) repo->sync_cvs_repo, section, "sync-cvs-repo");
+	conf_get_convert(conf, (char*) repo->sync_uri, section, "sync-uri");
 	char sync_type_buff[32];
-	int has = conf_get_convert(section->parent, (char*) sync_type_buff, section->name, "sync-type");
+	int has = conf_get_convert(conf, (char*) sync_type_buff, section, "sync-type");
 	if (has) {
 		if ((repo->sync_type = (repo_t) string_find(sync_types, sync_type_buff, 5)) == -1) {
-			lerror("error in file %s", section->parent->path);
+			lerror("error in file %s", conf->path);
 			lerror("sync type '%s' is invalid", sync_type_buff);
 			exit(1);
 		}
 	}
 	
 	char auto_sync_buff[16];
-	if (conf_get_convert(section->parent, (char*) auto_sync_buff, section->name, "auto-sync")) {
+	if (conf_get_convert(conf, (char*) auto_sync_buff, section, "auto-sync")) {
 		if (strcmp("yes", auto_sync_buff) == 0) {
 			repo->auto_sync = 0;
 		} else if (strcmp("no", auto_sync_buff) == 0) {
 			repo->auto_sync = 1;
 		} else {
-			lwarning("invalid token: '%s' (%s)", auto_sync_buff, section->parent->path);
+			lwarning("invalid token: '%s' (%s)", auto_sync_buff, conf->path);
 		}
 	}
 	
 	char priority_buff[8];
-	if (conf_get_convert(section->parent, (char*) priority_buff, section->name, "priority")) {
+	if (conf_get_convert(conf, (char*) priority_buff, section, "priority")) {
 		repo->priority = (int) strtol(priority_buff, NULL, 10);
 	}
 	
@@ -92,6 +91,11 @@ Repository* parse_repository(ConfSection* section) {
 	char* line;
 	size_t len = 0;
 	ssize_t read;
+	
+	if (fp == NULL) {
+		lerror("no such file or directory: %s", cat_file);
+		exit(1);
+	}
 	
 	while ((read = getline(&line, &len, fp)) != -1) {
 		line[strlen(line) - 1] = 0; // Remove the newline

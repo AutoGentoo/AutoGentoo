@@ -30,6 +30,8 @@ void string_allocate(String* string);
 
 int string_find(char** array, char* element, size_t n);
 
+char* string_strip (char*);
+
 void string_free(String* string);
 
 void fix_path(char* ptr);

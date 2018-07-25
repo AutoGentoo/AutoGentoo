@@ -29,22 +29,3 @@ void print_string_vec(StringVector* vec) {
 	}
 	printf("\n");
 }
-
-void print_config_variable(ConfVariable* var) {
-	printf("%s = %s\n", var->identifier, var->value);
-}
-
-void print_config(Conf* config) {
-	int i;
-	for (i = 0; i != config->default_variables->n; i++) {
-		print_config_variable((ConfVariable*)vector_get(config->default_variables, i));
-	}
-	for (i = 0; i != config->sections->n; i++) {
-		ConfSection* current_section = *(ConfSection**) vector_get(config->sections, i);
-		printf("[%s]\n", current_section->name);
-		int j;
-		for (j = 0; j != current_section->variables->n; j++) {
-			print_config_variable((ConfVariable*)vector_get(current_section->variables, j));
-		}
-	}
-}

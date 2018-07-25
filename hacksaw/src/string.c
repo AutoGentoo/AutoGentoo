@@ -74,6 +74,18 @@ void string_overwrite(char** dest, char* src, int dup) {
 	}
 }
 
+char* string_strip (char* str) {
+	size_t len = strlen (str);
+	
+	int i;
+	for (i = 0; i < len && str[i] == ' '; i++);
+	
+	int j;
+	for (j = (int)len; j > i && str[j] == ' '; j--);
+	
+	return strndup(str + i, (size_t)j - i);
+}
+
 char* string_join(char** src, char* delim, int n) {
 	String* buff = string_new(strlen(src[0]));
 	

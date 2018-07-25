@@ -6,6 +6,7 @@
 #define HACKSAW_CONFIG_H
 
 #include "string_vector.h"
+#include "map.h"
 
 typedef struct __Conf Conf;
 typedef struct __ConfSection ConfSection;
@@ -13,36 +14,13 @@ typedef struct __ConfVariable ConfVariable;
 
 struct __Conf {
 	char* path;
-	Vector* sections;
-	Vector* default_variables;
-};
-
-struct __ConfVariable {
-	Conf* parent;
-	ConfSection* parent_section;
-	char* identifier;
-	char* value;
-};
-
-struct __ConfSection {
-	Conf* parent;
-	char* name;
-	Vector* variables;
+	StringVector* sections;
+	Map* variables; // Key: [sectionName](variableName)
 };
 
 Conf* conf_new(char* path);
 
-void conf_section_read(Conf* conf, ConfSection* section, Vector* variables, long start, long stop, FILE* fp);
-
-ConfSection* conf_section_new(char* name);
-
-void conf_variable_new(Conf* conf, ConfSection* section, ConfVariable* var, StringVector* data);
-
 void conf_free(Conf* conf);
-
-void conf_section_free(ConfSection* section);
-
-void conf_variable_free(ConfVariable* var);
 
 char* conf_get(Conf* conf, char* section, char* variable_name);
 

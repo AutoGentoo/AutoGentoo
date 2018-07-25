@@ -16,8 +16,6 @@ void print_vec(Vector* vec);
 
 void print_string_vec(StringVector* vec);
 
-void print_conf(Conf* config);
-
 struct __test1 {
 	int a;
 	int b;

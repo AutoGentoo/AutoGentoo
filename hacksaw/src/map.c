@@ -62,15 +62,15 @@ unsigned long prv_map_insert_item (Map* map, MapItem* item) {
 	size_t offset = hash % map->size;
 	
 	MapItem** current_pos = current_pos = &map->hash_table[offset];
-	while (*current_pos) {
-		if ((*current_pos)->next == NULL) {
-			(*current_pos)->next = item;
-			break;
-		}
-		current_pos = &(*current_pos)->next;
+	
+	if ((*current_pos) == NULL)
+		*current_pos = item;
+	else {
+		while ((*current_pos)->next != NULL)
+			current_pos = &(*current_pos)->next;
+		(*current_pos)->next = item;
 	}
 	
-	*current_pos = item;
 	map->n++;
 	
 	return hash;
@@ -83,6 +83,7 @@ unsigned long map_insert(Map* map, char* key, void* data) {
 	MapItem* to_copy = malloc (sizeof (MapItem));
 	to_copy->key = strdup(key);
 	to_copy->data = data;
+	to_copy->next = NULL;
 	
 	return prv_map_insert_item(map, to_copy);
 };
