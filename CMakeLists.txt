@@ -117,7 +117,6 @@ set(hacksaw_SRC
         hacksaw/src/map.c
         hacksaw/src/package.c
         hacksaw/src/package_config.c
-        hacksaw/src/regular_expression.c
         hacksaw/src/repository.c
         hacksaw/src/small_map.c
         hacksaw/src/string.c
@@ -145,7 +144,6 @@ set(hacksaw_HEADERS
         include/autogentoo/hacksaw/tools/debug.h
         include/autogentoo/hacksaw/tools/log.h
         include/autogentoo/hacksaw/tools/map.h
-        include/autogentoo/hacksaw/tools/regular_expression.h
         include/autogentoo/hacksaw/tools/small_map.h
         include/autogentoo/hacksaw/tools/string.h
         include/autogentoo/hacksaw/tools/string_vector.h
@@ -180,7 +178,9 @@ add_library(hacksaw STATIC
 
 add_executable(hacksaw-test hacksaw/src/main.c)
 add_test(hacksaw-test hacksaw-test)
-target_link_libraries(hacksaw-test hacksaw pcre2-8)
+target_link_libraries(hacksaw-test hacksaw
+#        pcre2-8
+        )
 
 find_library(ARCHIVE archive)
 
@@ -197,10 +197,12 @@ add_executable(autogentoo
 
 TARGET_LINK_LIBRARIES(autogentoo curl
         ${ARCHIVE}
-        pcre2-8
+#        pcre2-8
         hacksaw
         pthread
         curses
         )
 
-TARGET_LINK_LIBRARIES(autogentoo-build curl ${ARCHIVE} pcre2-8 hacksaw)
+TARGET_LINK_LIBRARIES(autogentoo-build curl ${ARCHIVE}
+#        pcre2-8
+        hacksaw)

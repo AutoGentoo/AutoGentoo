@@ -30,18 +30,18 @@ AC_CHECK_LIB([curl], [curl_easy_init], [], [
     AC_MSG_ERROR(["libcurl could not be found"])
 ])
 
-AC_CHECK_LIB(pcre2-8, pcre2_compile_8,
-[
-    AC_CHECK_LIB(pcre2-8, pcre2_match_data_create_8)
-    AC_CHECK_LIB(pcre2-8, pcre2_match_8)
-    AC_CHECK_LIB(pcre2-8, pcre2_get_error_message_8)
-    AC_CHECK_LIB(pcre2-8, pcre2_get_ovector_pointer_8)
-    AC_CHECK_LIB(pcre2-8, pcre2_match_data_free_8)
-    AC_CHECK_LIB(pcre2-8, pcre2_code_free_8)
-],
-[
-    AC_MSG_ERROR([Could not found the PCRE2 library])
-])
+#AC_CHECK_LIB(pcre2-8, pcre2_compile_8,
+#![
+#    AC_CHECK_LIB(pcre2-8, pcre2_match_data_create_8)
+#    AC_CHECK_LIB(pcre2-8, pcre2_match_8)
+#    AC_CHECK_LIB(pcre2-8, pcre2_get_error_message_8)
+#    AC_CHECK_LIB(pcre2-8, pcre2_get_ovector_pointer_8)
+#    AC_CHECK_LIB(pcre2-8, pcre2_match_data_free_8)
+#    AC_CHECK_LIB(pcre2-8, pcre2_code_free_8)
+#],
+#[
+#    AC_MSG_ERROR([Could not found the PCRE2 library])
+#])
 
 # Checks for header files.
 AC_CHECK_HEADERS([memory.h stddef.h stdlib.h string.h])

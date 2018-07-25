@@ -16,7 +16,6 @@ libhacksaw_a_SOURCES =      dependency.c \
                             debug.c \
                             log.c \
                             map.c \
-                            regular_expression.c \
                             small_map.c \
                             string.c \
                             string_vector.c \

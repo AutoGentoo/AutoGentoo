@@ -2,7 +2,6 @@
 #include <autogentoo/hacksaw/tools/debug.h>
 #include <autogentoo/hacksaw/tools/log.h>
 #include <autogentoo/hacksaw/tools/map.h>
-#include <autogentoo/hacksaw/tools/regular_expression.h>
 #include <autogentoo/hacksaw/tools/small_map.h>
 #include <autogentoo/hacksaw/tools/string.h>
 #include <autogentoo/hacksaw/tools/string_vector.h>
