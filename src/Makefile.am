@@ -1,4 +1,4 @@
-SUBDIRS = scripts
+SUBDIRS = ui
 AM_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/ -Wno-unused-result
 ACLOCAL_AMFLAGS='-I m4'
 

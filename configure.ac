@@ -66,7 +66,7 @@ AC_CONFIG_FILES([
     include/autogentoo/hacksaw/tools/Makefile
     Makefile
     src/Makefile
-    src/scripts/Makefile
+    src/ui/Makefile
     include/Makefile
     include/autogentoo/Makefile
 ])

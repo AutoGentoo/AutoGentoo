@@ -9,7 +9,6 @@ execute_process(
 )
 
 set(src_SOURCES
-        src/autogentoo.c
         src/chroot.c
         src/command.c
         src/download.c
@@ -25,13 +24,8 @@ set(src_SOURCES
         src/thread.c
         src/request.c
         src/request_structure.c
-        src/http.c src/queue.c src/gentoo_config.c)
-
-set(client_SOURCES
-        src/render.c src/command_line.c)
-
-set(client_HEADERS
-        include/autogentoo/render.h include/autogentoo/command_line.h)
+        src/http.c src/queue.c
+        src/gentoo_config.c)
 
 set(include_HEADERS
         include/autogentoo/autogentoo.h
@@ -51,7 +45,9 @@ set(include_HEADERS
         include/autogentoo/getopt.h
         include/autogentoo/thread.h
         include/autogentoo/request_structure.h
-        include/autogentoo/http.h include/autogentoo/queue.h include/autogentoo/gentoo_config.h)
+        include/autogentoo/http.h
+        include/autogentoo/queue.h
+        include/autogentoo/gentoo_config.h)
 
 set(arch_SOURCES
         arch/main.c
@@ -127,6 +123,14 @@ set(hacksaw_SRC
         hacksaw/src/util.c
         )
 
+set(gui_SOURCES
+        src/gui/event.c
+        src/gui/gui.c)
+
+set(gui_HEADERS
+        include/autogentoo/gui/event.h
+        )
+
 set(hacksaw_HEADERS
         include/autogentoo/hacksaw/hacksaw.h
         include/autogentoo/hacksaw/language.h
@@ -175,6 +179,8 @@ add_library(hacksaw STATIC
         ${language_PARSER}
         ${language_SOURCES}
         )
+set_target_properties(hacksaw
+        PROPERTIES COMPILE_FLAGS "-fPIC")
 
 add_executable(hacksaw-test hacksaw/src/main.c)
 add_test(hacksaw-test hacksaw-test)
@@ -188,21 +194,36 @@ set(LOCALSTATEDIR /var)
 add_definitions(-DDBPATH="test")
 #add_definitions(-DAUTOGENTOO_DEBUG)
 
-add_executable(autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
-add_executable(autogentoo
+add_library(autogentoo SHARED
         ${src_SOURCES}
-        ${include_HEADERS}
-        ${client_SOURCES}
-        ${client_HEADERS})
+        )
+target_link_libraries(autogentoo hacksaw)
 
-TARGET_LINK_LIBRARIES(autogentoo curl
-        ${ARCHIVE}
-#        pcre2-8
-        hacksaw
-        pthread
-        curses
+add_executable(autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
+add_executable(autogentoo-exec
+        ${include_HEADERS}
+        src/autogentoo.c
         )
 
-TARGET_LINK_LIBRARIES(autogentoo-build curl ${ARCHIVE}
+
+add_executable(autogentoo-gui
+        ${gui_SOURCES}
+        ${gui_HEADERS})
+
+target_link_libraries(autogentoo-exec
+        curl
+        ${ARCHIVE}
+#        pcre2-8
+        autogentoo
+        pthread
+        )
+
+target_link_libraries(autogentoo-gui
+        curl
+        pthread
+        autogentoo
+        )
+
+target_link_libraries(autogentoo-build curl ${ARCHIVE}
 #        pcre2-8
         hacksaw)
