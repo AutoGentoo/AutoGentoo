@@ -70,6 +70,10 @@ class DscCustomStruct(Gtk.Box):
 			self.register = register
 			self.valid = CheckValid(self.is_valid_enum, self.value, "%s is not a valid enum or integer")
 			self.value.set_completion(self.register)
+			self.int_value = -1
+		
+		def __int__(self):
+			return self.int_value
 		
 		def is_valid_enum(self, text):
 			try:
@@ -77,17 +81,56 @@ class DscCustomStruct(Gtk.Box):
 				return True
 			except ValueError:
 				try:
-					self.register.get(text)
+					self.int_value = self.register[text]
 					return True
 				except KeyError:
 					return False
+
+
+class EnumRegister(Gtk.Notebook):
+	def __init__(self, file_parse):
+		super().__init__()
+		
+		self.file = open(file_parse, "r")
+		self.lines = self.file.readlines()
+		self.registry_table = {}
+		self.pages = []
+	
+	def append_page(self, name, enum_list):
+		page = Gtk.TreeStore()
+		page.set_border_width(10)
+		
+		self.append_page(page, Gtk.Label(name))
+		self.pages.append(page)
+	
+	def get(self, enum_name):
+		return self.registry_table[enum_name]
+	
+	def parse(self):
+		i = 0
+		while i < len(self.lines):
+			if self.lines[i][0] == '-':
+				current_file = self.lines[i][1:]
+				current_enum = {}
+				current = 0
+				i += 1
+				while self.lines[i][0] != '-':
+					splt = [y.strip() for y in self.lines[i].split("=")]
+					if len(splt) == 2:
+						current = splt[1]
+					current_enum[splt[0]] = current
+					self.registry_table[splt[0]] = current
+					current += 1
+					i += 1
+				self.append_page(current_file, current_enum)
+			else:
+				i += 1
 
 
 class DscDialog(Dialog):
 	def __init__(self, builder, name):
 		super().__init__(builder, name)
 		
-	
 	def ok(self, widget):
 		super().ok(widget)
 	

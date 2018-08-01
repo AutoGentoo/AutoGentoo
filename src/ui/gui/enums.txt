@@ -1,0 +1,121 @@
+-response.h
+typedef enum {
+	HTTP_OK = 200,
+	HTTP_CREATED = 201,
+	HTTP_NO_CONTENT = 204,
+	HTTP_BAD_REQUEST = 400,
+	HTTP_UNAUTHORIZED = 401,
+	HTTP_FORBIDDEN = 403,
+	HTTP_NOT_FOUND = 404,
+	HTTP_METHOD_NOT_ALLOWED = 405,
+	HTTP_REQUEST_TIMEOUT = 408,
+	HTTP_INTERNAL_ERROR = 500,
+	HTTP_NOT_IMPLEMENTED = 501,
+	HTTP_BAD_GATEWAY = 502,
+	HTTP_SERVICE_UNAVAILABLE = 503,
+	HTTP_CHROOT_NOT_MOUNTED = 504,
+	SIG_AUTOGENTOO_SEGV = 999
+} response_nt;
+-host.h
+typedef enum {
+	VOIDTYPE_STRING,
+	VOIDTYPE_INT,
+	VOIDTYPE_STRINGVECTOR
+} voidtype_t;
+typedef enum {
+	HOSTOFF_ID,
+	HOSTOFF_PROFILE,
+	HOSTOFF_HOSTNAME,
+	HOSTOFF_CHROOT_STATUS,
+	HOSTOFF_CFLAGS,
+	HOSTOFF_CXXFLAGS,
+	HOSTOFF_ARCH,
+	HOSTOFF_CHOST,
+	HOSTOFF_USE,
+	HOSTOFF_EXTRA,
+	HOSTOFF_PORTAGE_TMPDIR,
+	HOSTOFF_PORTDIR,
+	HOSTOFF_DISTDIR,
+	HOSTOFF_PKGDIR,
+	HOSTOFF_PORT_LOGDIR
+} hostoffsets_t;
+typedef struct {
+	voidtype_t type;
+	size_t offset;
+} host_offset_t;
+-request.h
+typedef enum {
+	PROT_AUTOGENTOO = 0, // guarentees first byte is 0 (cant be HTTP)
+	PROT_HTTP
+} protocol_t;
+typedef enum {
+	REQ_GET,
+	REQ_INSTALL,
+	REQ_EDIT,
+	REQ_ACTIVATE,
+	REQ_HOSTREMOVE,
+	REQ_MNTCHROOT,
+	REQ_GETHOSTS,
+	REQ_GETHOST,
+	REQ_GETACTIVE,
+	REQ_GETSPEC,
+	REQ_GETTEMPLATES,
+	REQ_STAGE_NEW,
+	REQ_TEMPLATE_CREATE,
+	REQ_STAGE,
+	REQ_GETSTAGED,
+	REQ_GETSTAGE,
+	REQ_HANDOFF,
+	REQ_SAVE,
+	REQ_HOSTWRITE,
+	REQ_HOSTUPLOAD,
+	/* Binary requests */
+	REQ_BINSERVER,
+	REQ_BINQUEUE,
+	REQ_WORKERHANDOFF,
+	REQ_WORKERMAKECONF,
+	/* General */
+	REQ_EXIT
+} request_t;
+-writeconfig.h
+typedef enum {
+	AUTOGENTOO_FILE_END = 0xffffffff,
+	AUTOGENTOO_HOST = 0xfffffff0,
+	AUTOGENTOO_HOST_BINDING = 0xffffff00,
+	AUTOGENTOO_STAGE = 0xfffff000,
+	// Because Host* is extensible this is required
+	AUTOGENTOO_HOST_END = 0xaaaaaaaa,
+	// Host entries for autogentoo extensions
+	AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb,
+	AUTOGENTOO_TEMPLATE = 0xcccccccc
+} AutoGentoo_WriteConfig;
+-stage.h
+typedef enum {
+	OTHER = 0x00, //!< Anything else
+	CXXFLAGS = 0x01, //!< The gcc flags to pass to CXX
+	TMPDIR = 0x02, //!< The direcory to build ebuilds in (/autogentoo/tmp)
+	PORTDIR = 0x04, //!< The path to the portage repo (/usr/portage)
+	DISTDIR = 0x08, //!< The path to the distfiles (/usr/portage/distfiles)
+	PKGDIR = 0x10, //!< The path to the built binaries (/autogentoo/pkg) dont change!
+	LOGDIR = 0x20 //!< The path to the logs for ebuild builds (/autogentoo/log)
+} template_selects;
+-request_structure.h
+typedef enum {
+	STAGE_NONE = 0,
+	STAGE_DOWNLOAD = 0x1,
+	STAGE_EXTRACT = 0x2,
+	STAGE_ALL = STAGE_DOWNLOAD | STAGE_EXTRACT
+} stage_command_t;
+typedef enum {
+	STRCT_END,
+	STRCT_HOSTEDIT = 1,
+	STRCT_HOSTSELECT,
+	STRCT_HOSTINSTALL,
+	STRCT_TEMPLATECREATE,
+	STRCT_TEMPLATESELECT,
+	STRCT_STAGECOMMAND,
+	STRCT_HOSTOFFSET, /* Custom offset on Host struct */
+	STRCT_WORKERRESPONSE,
+	STRCT_RAW,
+	STRCT_MAX
+} request_structure_t;
