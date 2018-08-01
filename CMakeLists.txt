@@ -123,14 +123,6 @@ set(hacksaw_SRC
         hacksaw/src/util.c
         )
 
-set(gui_SOURCES
-        src/gui/event.c
-        src/gui/gui.c)
-
-set(gui_HEADERS
-        include/autogentoo/gui/event.h
-        )
-
 set(hacksaw_HEADERS
         include/autogentoo/hacksaw/hacksaw.h
         include/autogentoo/hacksaw/language.h
@@ -205,23 +197,12 @@ add_executable(autogentoo-exec
         src/autogentoo.c
         )
 
-
-add_executable(autogentoo-gui
-        ${gui_SOURCES}
-        ${gui_HEADERS})
-
 target_link_libraries(autogentoo-exec
         curl
         ${ARCHIVE}
 #        pcre2-8
         autogentoo
         pthread
-        )
-
-target_link_libraries(autogentoo-gui
-        curl
-        pthread
-        autogentoo
         )
 
 target_link_libraries(autogentoo-build curl ${ARCHIVE}

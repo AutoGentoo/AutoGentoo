@@ -3,46 +3,19 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from .dialog import *
+from .dialog_send_custom import DscDialog
 
 print("GTK VERSION %s.%s" % (Gtk.get_major_version(), Gtk.get_minor_version()))
 
 
-class Dialog:
-	def __init__(self, builder, name):
-		self.builder = builder
-		self.dialog = builder.get_object(name)
-		self.name = name
-	
-	def close(self, widget):
-		self.dialog.hide()
-	
-	def ok(self, widget):
-		self.close(widget)
-	
-	def open(self, widget):
-		self.dialog.run()
-
-
-class DscDialog(Dialog):
-	def __init__(self, builder, name):
-		Dialog.__init__(self, builder, name)
-		
-		self.template_select = self.builder.get_object("dnh_templates")
-		self.template_entry = self.builder.get_object("dnh_template_new")
-		self.profile = self.builder.get_object("dnh_profile")
-		
-		self.template_select.ad
-	def ok(self, widget):
-		super().ok(widget)
-	
-	def open(self, widget):
-	
-
-
 class ServerWindow(Gtk.Window):
 	def __init__(self, builder):
-		Gtk.Window.__init__(self, title="AutoGentoo server control")
+		super().__init__(title="AutoGentoo server control")
 		self.builder = builder
+		self.dialogs = DialogRegister({
+			'send_custom':
+		})
 		
 		self.top = builder.get_object("top")
 		self.connect("destroy", Gtk.main_quit)
@@ -50,7 +23,7 @@ class ServerWindow(Gtk.Window):
 	
 	def open_dialog(self, widget):
 		dialog_linker = {
-			"menu_file_new_host": DscDialog
+			# "menu_file_new_host": DscDialog
 		}
 		
 		name = Gtk.Buildable.get_name(widget)
@@ -69,7 +42,7 @@ def main(argc, args):
 	server_gui = ServerWindow(server_builder)
 	
 	dialogs = {
-		"new_host": DscDialog(server_builder, "dnh")
+		# "new_host": DscDialog(server_builder, "dnh")
 	}
 	
 	server_builder.connect_signals({
