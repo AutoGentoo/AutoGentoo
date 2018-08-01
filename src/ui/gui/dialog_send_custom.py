@@ -111,18 +111,22 @@ class EnumRegister(Gtk.Notebook):
 		while i < len(self.lines):
 			if self.lines[i][0] == '-':
 				current_file = self.lines[i][1:]
-				current_enum = {}
-				current = 0
+				file_enum = {}
 				i += 1
 				while self.lines[i][0] != '-':
-					splt = [y.strip() for y in self.lines[i].split("=")]
-					if len(splt) == 2:
-						current = splt[1]
-					current_enum[splt[0]] = current
-					self.registry_table[splt[0]] = current
-					current += 1
-					i += 1
-				self.append_page(current_file, current_enum)
+					current = 0
+					current_enum = {}
+					while self.lines[i][0] != '}':
+						splt = [y.strip() for y in self.lines[i].split("=")]
+						if len(splt) == 2:
+							current = splt[1]
+						current_enum[splt[0]] = current
+						self.registry_table[splt[0]] = current
+						current += 1
+						i += 1
+					c_line = self.lines[i]
+					file_enum[c_line[2:c_line.find(";")]] = current_enum
+				self.append_page(current_file, file_enum)
 			else:
 				i += 1
 
