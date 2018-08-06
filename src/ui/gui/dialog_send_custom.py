@@ -1,6 +1,6 @@
-from .dialog import Dialog
+from dialog import Dialog
 from gi.repository import Gtk
-from .check_valid import CheckValid
+from check_valid import CheckValid
 
 
 class DscCustomStruct(Gtk.Box):
@@ -95,13 +95,16 @@ class EnumRegister(Gtk.Notebook):
 		self.lines = self.file.readlines()
 		self.registry_table = {}
 		self.pages = []
+		
+		self.parse()
 	
 	def append_page(self, name, enum_list):
-		page = Gtk.TreeStore()
-		page.set_border_width(10)
+		# page = Gtk.TreeStore()
+		# page.set_border_width(10)
 		
-		self.append_page(page, Gtk.Label(name))
-		self.pages.append(page)
+		# self.append_page(page, Gtk.Label(name))
+		# self.pages.append(page)
+		pass
 	
 	def get(self, enum_name):
 		return self.registry_table[enum_name]
@@ -113,30 +116,44 @@ class EnumRegister(Gtk.Notebook):
 				current_file = self.lines[i][1:]
 				file_enum = {}
 				i += 1
-				while self.lines[i][0] != '-':
+				while i < len(self.lines) and self.lines[i][0] != '-':
 					current = 0
 					current_enum = {}
 					while self.lines[i][0] != '}':
+						do_eval = False
 						splt = [y.strip() for y in self.lines[i].split("=")]
 						if len(splt) == 2:
-							current = splt[1]
+							current = splt[1].replace(",", "")
+							do_eval = True
 						current_enum[splt[0]] = current
 						self.registry_table[splt[0]] = current
+						if do_eval:
+							print(current)
+							current = eval(current)
+							print(current)
 						current += 1
 						i += 1
 					c_line = self.lines[i]
 					file_enum[c_line[2:c_line.find(";")]] = current_enum
+					i += 1
 				self.append_page(current_file, file_enum)
 			else:
 				i += 1
 
 
 class DscDialog(Dialog):
-	def __init__(self, builder, name):
-		super().__init__(builder, name)
+	def __init__(self, parent, builder):
+		super().__init__(parent, builder, "dsc")
 		
-	def ok(self, widget):
-		super().ok(widget)
+		self.init_children([
+			"content_box",
+			"left_paned",
+			"struct_box",
+			"structs_combo"
+		])
+		
+		self.enums = EnumRegister("enums.txt")
+		self.content_box.pack2(self.enums)
 	
-	def open(self, widget):
-		pass
+	def structs_change(self, widget):
+		print(self.structs_combo.get_active_text())

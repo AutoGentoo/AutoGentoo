@@ -3,10 +3,16 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from .dialog import *
-from .dialog_send_custom import DscDialog
+from dialog import *
+from dialog_send_custom import DscDialog
 
 print("GTK VERSION %s.%s" % (Gtk.get_major_version(), Gtk.get_minor_version()))
+
+
+class Dialogs:
+	SEND_CUSTOM = 1
+	NEW_HOST = 2
+	NEW_SERVER = 3
 
 
 class ServerWindow(Gtk.Window):
@@ -14,42 +20,57 @@ class ServerWindow(Gtk.Window):
 		super().__init__(title="AutoGentoo server control")
 		self.builder = builder
 		self.dialogs = DialogRegister({
-			'send_custom':
+			Dialogs.SEND_CUSTOM: DscDialog(self, self.builder),
+			# Dialogs.NEW_HOST: DnhDialog(self, self.builder)
 		})
+		
+		self.dialog_signal_links = {
+			"dsc": Dialogs.SEND_CUSTOM
+		}
 		
 		self.top = builder.get_object("top")
 		self.connect("destroy", Gtk.main_quit)
 		self.add(self.top)
 	
-	def open_dialog(self, widget):
-		dialog_linker = {
-			# "menu_file_new_host": DscDialog
-		}
-		
-		name = Gtk.Buildable.get_name(widget)
-		
-		try:
-			dialog_linker[name]
-		except KeyError:
-			print("%s is not handled by ServerWindow.open_dialog()" % name)
-		else:
-			dialog_linker[name](self.builder, dialog_linker[name])
+	def dialog(self, dialog_enum) -> Dialog:
+		return self.dialogs.get_object(dialog_enum)
 	
+	def open_dialog(self, dialog_enum):
+		self.dialog(dialog_enum).open()
+	
+	def handle_save_as(self, widget):
+		pass
+	
+	def handle_save(self, widget):
+		pass
+	
+	def handle_open(self, widget):
+		pass
+	
+	def handle_dialog_signal(self, widget, name):
+		self.dialog(self.dialog_signal_links[name[0:name.find("_")]]).handle_signal(widget, name)
+
 
 def main(argc, args):
 	server_builder = Gtk.Builder()
 	server_builder.add_from_file("server.ui")
-	server_gui = ServerWindow(server_builder)
-	
-	dialogs = {
-		# "new_host": DscDialog(server_builder, "dnh")
-	}
+	server_gui = ServerWindow(
+		server_builder)
 	
 	server_builder.connect_signals({
-		"menu_file_new_host_activate_cb": dialogs["new_host"].open,
-		"menu_file_open_activate_cb": server_gui.open_dialog,
-		"menu_file_quit_activate_cb": server_gui.open_dialog,
-		"dnh_close": dialogs["new_host"].close
+		"server_new": lambda x: server_gui.open_dialog(Dialogs.NEW_SERVER),
+		"server_send_custom": lambda x: server_gui.open_dialog(Dialogs.SEND_CUSTOM),
+		"server_quit": Gtk.main_quit,
+		"server_save_as": server_gui.handle_save_as,
+		"server_save": server_gui.handle_save,
+		"server_open": server_gui.handle_open,
+		
+		"dsc_close": lambda widget: server_gui.handle_dialog_signal(widget, "dsc_close"),
+		"dsc_control_add": lambda widget: server_gui.handle_dialog_signal(widget, "dsc_control_add"),
+		"dsc_structs_change": lambda widget: server_gui.handle_dialog_signal(widget, "dsc_structs_change"),
+		"dsc_ok": lambda widget: server_gui.handle_dialog_signal(widget, "dsc_ok"),
+		
+		# "dnh_close": server_gui.dialog(Dialogs.NEW_HOST).handle_signal,
 	})
 	
 	server_gui.show_all()

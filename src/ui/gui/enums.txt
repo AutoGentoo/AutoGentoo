@@ -45,7 +45,7 @@ typedef struct {
 } host_offset_t;
 -request.h
 typedef enum {
-	PROT_AUTOGENTOO = 0, // guarentees first byte is 0 (cant be HTTP)
+	PROT_AUTOGENTOO = 0, 
 	PROT_HTTP
 } protocol_t;
 typedef enum {
@@ -69,12 +69,10 @@ typedef enum {
 	REQ_SAVE,
 	REQ_HOSTWRITE,
 	REQ_HOSTUPLOAD,
-	/* Binary requests */
 	REQ_BINSERVER,
 	REQ_BINQUEUE,
 	REQ_WORKERHANDOFF,
 	REQ_WORKERMAKECONF,
-	/* General */
 	REQ_EXIT
 } request_t;
 -writeconfig.h
@@ -83,28 +81,28 @@ typedef enum {
 	AUTOGENTOO_HOST = 0xfffffff0,
 	AUTOGENTOO_HOST_BINDING = 0xffffff00,
 	AUTOGENTOO_STAGE = 0xfffff000,
-	// Because Host* is extensible this is required
+
 	AUTOGENTOO_HOST_END = 0xaaaaaaaa,
-	// Host entries for autogentoo extensions
+
 	AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb,
 	AUTOGENTOO_TEMPLATE = 0xcccccccc
 } AutoGentoo_WriteConfig;
 -stage.h
 typedef enum {
-	OTHER = 0x00, //!< Anything else
-	CXXFLAGS = 0x01, //!< The gcc flags to pass to CXX
-	TMPDIR = 0x02, //!< The direcory to build ebuilds in (/autogentoo/tmp)
-	PORTDIR = 0x04, //!< The path to the portage repo (/usr/portage)
-	DISTDIR = 0x08, //!< The path to the distfiles (/usr/portage/distfiles)
-	PKGDIR = 0x10, //!< The path to the built binaries (/autogentoo/pkg) dont change!
-	LOGDIR = 0x20 //!< The path to the logs for ebuild builds (/autogentoo/log)
+	OTHER = 0x00,
+	CXXFLAGS = 0x01,
+	TMPDIR = 0x02,
+	PORTDIR = 0x04,
+	DISTDIR = 0x08,
+	PKGDIR = 0x10,
+	LOGDIR = 0x20
 } template_selects;
 -request_structure.h
 typedef enum {
 	STAGE_NONE = 0,
 	STAGE_DOWNLOAD = 0x1,
 	STAGE_EXTRACT = 0x2,
-	STAGE_ALL = STAGE_DOWNLOAD | STAGE_EXTRACT
+	STAGE_ALL = 0x1 | 0x2
 } stage_command_t;
 typedef enum {
 	STRCT_END,
@@ -114,7 +112,7 @@ typedef enum {
 	STRCT_TEMPLATECREATE,
 	STRCT_TEMPLATESELECT,
 	STRCT_STAGECOMMAND,
-	STRCT_HOSTOFFSET, /* Custom offset on Host struct */
+	STRCT_HOSTOFFSET,
 	STRCT_WORKERRESPONSE,
 	STRCT_RAW,
 	STRCT_MAX
