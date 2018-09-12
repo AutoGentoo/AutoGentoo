@@ -120,16 +120,16 @@ char* read_string (FILE* fp);
  * @param src the integer to write
  * @param fp the file to write to
  */
-size_t write_int (int src, FILE* fp);
+inline size_t write_int (int src, FILE* fp);
 
 /**
  * Read an integer from file
  * @param fp the file to read from
  * @return the integer that has been read
  */
-int read_int (FILE* fp);
+inline int read_int (FILE* fp);
 
-void* read_void(size_t len, FILE* fp);
-size_t write_void(void* ptr, size_t len, FILE* fp);
+inline void* read_void(size_t len, FILE* fp);
+inline size_t write_void(void* ptr, size_t len, FILE* fp);
 
 #endif

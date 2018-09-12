@@ -333,23 +333,23 @@ char* read_string(FILE* fp) {
 	return out;
 }
 
-void* read_void(size_t len, FILE* fp) {
+inline void* read_void(size_t len, FILE* fp) {
 	void* out = malloc (len);
 	fread(out, 1, len, fp);
 	return out;
 }
 
-size_t write_void(void* ptr, size_t len, FILE* fp) {
+inline size_t write_void(void* ptr, size_t len, FILE* fp) {
 	return fwrite(ptr, 1, len, fp);
 }
 
-size_t write_int(int src, FILE* fp) {
+inline size_t write_int(int src, FILE* fp) {
 	int big_endian_src = htonl((uint32_t) src);
 	
 	return fwrite(&big_endian_src, sizeof(int), 1, fp);
 }
 
-int read_int(FILE* fp) {
+inline int read_int(FILE* fp) {
 	int out;
 	fread(&out, sizeof(int), 1, fp);
 	out = ntohl((uint32_t) out);
