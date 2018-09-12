@@ -25,7 +25,7 @@ set(src_SOURCES
         src/request.c
         src/request_structure.c
         src/http.c src/queue.c
-        src/gentoo_config.c)
+        src/gentoo_config.c src/user.c)
 
 set(include_HEADERS
         include/autogentoo/autogentoo.h
@@ -47,7 +47,7 @@ set(include_HEADERS
         include/autogentoo/request_structure.h
         include/autogentoo/http.h
         include/autogentoo/queue.h
-        include/autogentoo/gentoo_config.h)
+        include/autogentoo/gentoo_config.h include/autogentoo/user.h)
 
 set(arch_SOURCES
         arch/main.c
@@ -184,6 +184,9 @@ find_library(ARCHIVE archive)
 
 set(LOCALSTATEDIR /var)
 add_definitions(-DDBPATH="test")
+set(AUTH_ENCRYPT empty)
+string(RANDOM LENGTH 32 AUTH_ENCRYPT)
+add_definitions(-DAUTOGENTOO_USER_AUTH_ENCRYPT="${AUTH_ENCRYPT}")
 #add_definitions(-DAUTOGENTOO_DEBUG)
 
 add_library(autogentoo SHARED

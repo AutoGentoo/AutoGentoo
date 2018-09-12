@@ -56,6 +56,7 @@ struct __Host {
 	char* port_logdir; //!< logs
 	
 	Vector* kernel;
+	Vector* auth_tokens;
 };
 
 typedef enum {
@@ -154,5 +155,11 @@ int host_write_make_conf(Host* host);
  * @return OK if successful, INTERNAL_ERROR if not
  */
 response_t host_install(Host* host, char* arg);
+
+/**
+ * Initialize extras
+ * @param target target host
+ */
+void host_init_extras(Host* target);
 
 #endif

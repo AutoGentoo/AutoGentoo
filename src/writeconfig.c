@@ -2,6 +2,7 @@
 #include <string.h>
 #include <autogentoo/autogentoo.h>
 #include <netinet/in.h>
+#include <autogentoo/user.h>
 
 size_t write_server(Server* server) {
 	char* config_file_name = ".autogentoo.config";
@@ -222,11 +223,13 @@ Host* read_host(FILE* fp) {
 	out->distdir = read_string(fp);
 	out->pkgdir = read_string(fp);
 	out->port_logdir = read_string(fp);
-	out->kernel = vector_new(sizeof(Kernel*), UNORDERED | REMOVE);
+	
+	host_init_extras(out);
 	
 	int current = 0;
 	while (current != AUTOGENTOO_HOST_END) {
 		Kernel* new_kernel;
+		AccessToken new_token;
 		current = read_int(fp);
 		switch (current) {
 			case AUTOGENTOO_HOST_KERNEL:
@@ -235,6 +238,10 @@ Host* read_host(FILE* fp) {
 				new_kernel->version = read_string(fp);
 				vector_add(out->kernel, new_kernel);
 				break;
+			case AUTOGENTOO_ACCESS_TOKEN:
+				new_token.user_id = read_string(fp);
+				new_token.auth_token = read_void(fp, AUTOGENTOO_TOKEN_LENGTH);
+				new_token.access_level = read_int(fp);
 			case AUTOGENTOO_HOST_END:
 				break;
 			default:
@@ -313,6 +320,16 @@ char* read_string(FILE* fp) {
 	}
 	
 	return out;
+}
+
+void* read_void(FILE* fp, size_t len) {
+	void* out = malloc (len);
+	fread(out, 1, len, fp);
+	return out;
+}
+
+size_t write_void(FILE* fp, void* ptr, size_t len) {
+	return fwrite(ptr, 1, len, fp);
 }
 
 size_t write_int(int src, FILE* fp) {

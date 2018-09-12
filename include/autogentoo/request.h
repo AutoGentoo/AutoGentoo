@@ -102,6 +102,7 @@ typedef struct __RequestLink RequestLink;
 struct __RequestLink {
 	request_t request_ident; //!< The string that matches the request
 	FunctionHandler call; //!< A pointer to the function handler
+	
 };
 
 Request* request_handle (Connection* conn);

@@ -17,6 +17,7 @@ typedef enum {
 	
 	// Host entries for autogentoo extensions
 	AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb,
+	AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd,
 	AUTOGENTOO_TEMPLATE = 0xcccccccc
 } AutoGentoo_WriteConfig;
 
@@ -127,5 +128,7 @@ size_t write_int (int src, FILE* fp);
  * @return the integer that has been read
  */
 int read_int (FILE* fp);
+
+void* read_void(FILE* fp, size_t len);
 
 #endif

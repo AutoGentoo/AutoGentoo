@@ -6,6 +6,7 @@
 #include <string.h>
 #include <limits.h>
 #include <sys/wait.h>
+#include <autogentoo/user.h>
 
 char* host_id_new() {
 	int len = 15;
@@ -44,8 +45,16 @@ Host* host_new(Server* server, char* id) {
 	out->port_logdir = strdup ("/autogentoo/log");
 	
 	out->kernel = NULL;
+	out->auth_tokens = NULL;
+	
+	host_init_extras(out);
 	
 	return out;
+}
+
+void host_init_extras(Host* target) {
+	target->kernel = vector_new(sizeof(Kernel*), UNORDERED | REMOVE);
+	target->auth_tokens = vector_new(sizeof(AccessToken), UNORDERED | REMOVE);
 }
 
 void host_get_path (Host* host, char** dest) {
