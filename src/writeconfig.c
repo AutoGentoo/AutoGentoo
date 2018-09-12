@@ -80,11 +80,22 @@ size_t write_host_fp(Host* host, FILE* fp) {
 		for (i = 0; i != host->kernel->n; i++) {
 			size += write_int(AUTOGENTOO_HOST_KERNEL, fp);
 			
-			Kernel* current_kernel = (Kernel*)vector_get(host->kernel, i);
+			Kernel* current_kernel = *(Kernel**)vector_get(host->kernel, i);
 			size += write_string(current_kernel->kernel_target, fp);
 			size += write_string(current_kernel->version, fp);
 		}
 	}
+	
+	if (host->auth_tokens)
+		for (i = 0; i != host->auth_tokens->n; i++) {
+			size += write_int(AUTOGENTOO_ACCESS_TOKEN, fp);
+			
+			AccessToken current_token = *(AccessToken*)vector_get(host->auth_tokens, i);
+			
+			size += write_string(current_token.user_id, fp);
+			size += write_void(current_token.auth_token, AUTOGENTOO_TOKEN_LENGTH, fp);
+			size += write_int(current_token.access_level, fp);
+		}
 	
 	size += write_int(AUTOGENTOO_HOST_END, fp);
 	
@@ -240,7 +251,7 @@ Host* read_host(FILE* fp) {
 				break;
 			case AUTOGENTOO_ACCESS_TOKEN:
 				new_token.user_id = read_string(fp);
-				new_token.auth_token = read_void(fp, AUTOGENTOO_TOKEN_LENGTH);
+				new_token.auth_token = read_void(AUTOGENTOO_TOKEN_LENGTH, fp);
 				new_token.access_level = read_int(fp);
 			case AUTOGENTOO_HOST_END:
 				break;
@@ -322,13 +333,13 @@ char* read_string(FILE* fp) {
 	return out;
 }
 
-void* read_void(FILE* fp, size_t len) {
+void* read_void(size_t len, FILE* fp) {
 	void* out = malloc (len);
 	fread(out, 1, len, fp);
 	return out;
 }
 
-size_t write_void(FILE* fp, void* ptr, size_t len) {
+size_t write_void(void* ptr, size_t len, FILE* fp) {
 	return fwrite(ptr, 1, len, fp);
 }
 

@@ -129,6 +129,7 @@ size_t write_int (int src, FILE* fp);
  */
 int read_int (FILE* fp);
 
-void* read_void(FILE* fp, size_t len);
+void* read_void(size_t len, FILE* fp);
+size_t write_void(void* ptr, size_t len, FILE* fp);
 
 #endif
