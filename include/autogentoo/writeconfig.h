@@ -6,6 +6,8 @@
 #include "host.h"
 #include "stage.h"
 
+typedef struct __AutoGentoo_Memconfig AutoGentoo_Memconfig;
+
 typedef enum {
 	AUTOGENTOO_FILE_END = 0xffffffff,
 	AUTOGENTOO_HOST = 0xfffffff0,
@@ -20,6 +22,13 @@ typedef enum {
 	AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd,
 	AUTOGENTOO_TEMPLATE = 0xcccccccc
 } AutoGentoo_WriteConfig;
+
+struct __AutoGentoo_Memconfig {
+	void* buffer_file;
+	size_t size;
+};
+
+static AutoGentoo_Memconfig buffer_file;
 
 /**
  * Write the server to file
@@ -115,21 +124,23 @@ size_t write_string (char* src, FILE* fp);
  */
 char* read_string (FILE* fp);
 
+
 /**
  * Write an integer to file
  * @param src the integer to write
  * @param fp the file to write to
- */
+ *
 inline size_t write_int (int src, FILE* fp);
 
-/**
+**
  * Read an integer from file
  * @param fp the file to read from
  * @return the integer that has been read
- */
+ *
 inline int read_int (FILE* fp);
 
 inline void* read_void(size_t len, FILE* fp);
 inline size_t write_void(void* ptr, size_t len, FILE* fp);
 
+ */
 #endif

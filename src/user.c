@@ -31,5 +31,11 @@ void host_generate_token(
 }
 
 User* server_create_user (Server* server, char* id, char* hash) {
-
+	User* new_user = malloc (sizeof (User));
+	
+	new_user->id = strdup(id);
+	new_user->hash = strdup(id);
+	new_user->salt = strdup(AUTOGENTOO_USER_AUTH_ENCRYPT);
+	
+	new_user->tokens = vector_new(sizeof(AccessToken), REMOVE | UNORDERED);
 }

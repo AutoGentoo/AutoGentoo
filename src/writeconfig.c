@@ -4,6 +4,33 @@
 #include <netinet/in.h>
 #include <autogentoo/user.h>
 
+inline size_t rsa_write_void(size_t len, FILE* fp) {
+	return 
+}
+
+inline void* read_void(size_t len, FILE* fp) {
+	void* out = malloc (len);
+	fread(out, 1, len, fp);
+	return out;
+}
+
+inline size_t write_void(void* ptr, size_t len, FILE* fp) {
+	return fwrite(ptr, 1, len, fp);
+}
+
+inline size_t write_int(int src, FILE* fp) {
+	int big_endian_src = htonl((uint32_t) src);
+	
+	return fwrite(&big_endian_src, sizeof(int), 1, fp);
+}
+
+inline int read_int(FILE* fp) {
+	int out;
+	fread(&out, sizeof(int), 1, fp);
+	out = ntohl((uint32_t) out);
+	return out;
+}
+
 size_t write_server(Server* server) {
 	char* config_file_name = ".autogentoo.config";
 	char* config_file = malloc(strlen(server->location) + strlen(config_file_name) + 2);
@@ -330,28 +357,5 @@ char* read_string(FILE* fp) {
 		fread(out, 1, (size_t) i + 1, fp);
 	}
 	
-	return out;
-}
-
-inline void* read_void(size_t len, FILE* fp) {
-	void* out = malloc (len);
-	fread(out, 1, len, fp);
-	return out;
-}
-
-inline size_t write_void(void* ptr, size_t len, FILE* fp) {
-	return fwrite(ptr, 1, len, fp);
-}
-
-inline size_t write_int(int src, FILE* fp) {
-	int big_endian_src = htonl((uint32_t) src);
-	
-	return fwrite(&big_endian_src, sizeof(int), 1, fp);
-}
-
-inline int read_int(FILE* fp) {
-	int out;
-	fread(&out, sizeof(int), 1, fp);
-	out = ntohl((uint32_t) out);
 	return out;
 }

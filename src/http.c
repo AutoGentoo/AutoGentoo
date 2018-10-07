@@ -5,6 +5,8 @@
 #include <autogentoo/http.h>
 #include <stdlib.h>
 #include <string.h>
+#include <autogentoo/server.h>
+#include <autogentoo/request.h>
 
 http_request_header* parse_headers (char* str) {
 	if (*str == 0 || *str == '\n')
@@ -38,4 +40,8 @@ void free_headers (http_request_header* HEAD) {
 		free_headers(HEAD->next);
 	
 	free (HEAD);
+}
+
+void http_write_directory (Connection* conn, HTTPRequest req) {
+
 }
