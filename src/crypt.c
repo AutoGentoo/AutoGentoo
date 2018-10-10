@@ -48,3 +48,7 @@ int generate_cipher(Server* parent) {
 	
 	return (ret == 1);
 }
+
+int rsa_perform_handshake(Connection* conn) {
+	return 1;
+}

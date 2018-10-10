@@ -48,6 +48,8 @@ Request* request_handle (Connection* conn) {
 	if (out->request_type == REQ_SWITCH_SECURE) {
 		out->protocol = PROT_AUTOGENTOO_S;
 		
+		
+		
 		// Reread the request type
 		if (prv_read_int (&current_request, end, (int*)&out->request_type) == -1)
 			AUTOGENTOO_REQUEST_HANDLE_ERROR
