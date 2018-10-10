@@ -13,6 +13,8 @@
 
 int generate_cipher(Server* parent);
 
-size_t
+int rsa_perform_handshake(Connection* conn);
+size_t rsa_send(Connection* conn, void* data, size_t size);
+size_t rsa_recv(Connection* conn, void* data_buffer, size_t size);
 
 #endif //AUTOGENTOO_CRYPT_H

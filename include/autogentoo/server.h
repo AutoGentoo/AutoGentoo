@@ -4,6 +4,8 @@
 #include <autogentoo/hacksaw/hacksaw.h>
 #include <sys/types.h>
 #include <pthread.h>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -69,6 +71,14 @@ struct __Server {
 	ThreadHandler* thandler;
 	pid_t pid;
 	pthread_t pthread;
+	
+	/** HTTPS / AUTOGENTOO_S
+	 * 2048 RSA encryption
+	 * Serverside encryption
+	 **/
+	RSA* rsa;
+	BIO* rsa_public;
+	BIO* rsa_private;
 };
 
 /**
@@ -99,6 +109,14 @@ struct __Connection {
 	int fd; //!< The file descriptor that points to the open connections
 	pthread_t pid; //!< The pid of the pthread that the handle is runnning in
 	con_t status; //!< The status of the current Connection
+	
+	/** HTTPS / AUTOGENTOO_S
+	 * 2048 RSA encryption
+	 * Clientside encryption
+	 **/
+	
+	void* encrypted_data;
+	
 };
 
 #include "host.h"
