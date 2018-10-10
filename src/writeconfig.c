@@ -5,7 +5,7 @@
 #include <autogentoo/user.h>
 
 inline size_t rsa_write_void(size_t len, FILE* fp) {
-	return 
+	return 0;
 }
 
 inline void* read_void(size_t len, FILE* fp) {

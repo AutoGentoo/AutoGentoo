@@ -67,7 +67,7 @@ FunctionHandler http_resolve_call (char* function) {
 	return resolve_call(t);
 }
 
-FunctionHandler resolve_call (request_t type) {
+FunctionHandler resolve_call(request_t type) {
 	int i;
 	for (i = 0; i < sizeof (requests) / sizeof (RequestLink); i++)
 		if (requests[i].request_ident == type)

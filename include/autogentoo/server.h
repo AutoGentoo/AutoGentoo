@@ -72,7 +72,7 @@ struct __Server {
 	pid_t pid;
 	pthread_t pthread;
 	
-	/** HTTPS / AUTOGENTOO_S
+	/** ONLY AUTOGENTOO_S
 	 * 2048 RSA encryption
 	 * Serverside encryption
 	 **/
@@ -110,10 +110,11 @@ struct __Connection {
 	pthread_t pid; //!< The pid of the pthread that the handle is runnning in
 	con_t status; //!< The status of the current Connection
 	
-	/** HTTPS / AUTOGENTOO_S
+	/** ONLY AUTOGENTOO_S
 	 * 2048 RSA encryption
 	 * Clientside encryption
 	 **/
+	
 	
 	void* encrypted_data;
 	

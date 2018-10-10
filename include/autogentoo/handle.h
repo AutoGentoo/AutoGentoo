@@ -26,7 +26,7 @@ FunctionHandler http_resolve_call (char* function);
  * @param type resolved type from request_handle
  * @return a pointer to function that should be called
  */
-FunctionHandler resolve_call (request_t type);
+FunctionHandler resolve_call(request_t type);
 
 /**
  * HTTP request to download file

@@ -17,6 +17,10 @@ int prv_read_int (void** data, void* end, int* out) {
 	return 0;
 }
 
+#ifndef AUTOGENTOO_REQUEST_HANDLE_ERROR
+#define AUTOGENTOO_REQUEST_HANDLE_ERROR {free(out); return NULL;}
+#endif
+
 Request* request_handle (Connection* conn) {
 	Request* out = malloc (sizeof (Request));
 	
@@ -38,9 +42,15 @@ Request* request_handle (Connection* conn) {
 		return out;
 	
 	void* end = out->conn->request + out->conn->size;
-	if (prv_read_int (&current_request, end, (int*)&out->request_type) == -1) {
-		free (out);
-		return NULL;
+	if (prv_read_int (&current_request, end, (int*)&out->request_type) == -1)
+		AUTOGENTOO_REQUEST_HANDLE_ERROR
+	
+	if (out->request_type == REQ_SWITCH_SECURE) {
+		out->protocol = PROT_AUTOGENTOO_S;
+		
+		// Reread the request type
+		if (prv_read_int (&current_request, end, (int*)&out->request_type) == -1)
+			AUTOGENTOO_REQUEST_HANDLE_ERROR
 	}
 	
 	out->structures_parent = vector_new (sizeof (RequestData), REMOVE | ORDERED);
@@ -52,16 +62,13 @@ Request* request_handle (Connection* conn) {
 	if (prv_read_int (&current_request, end, (int*)&current) == -1) {
 		vector_free (out->structures_parent);
 		vector_free (out->types_parent);
-		free (out);
-		return NULL;
+		AUTOGENTOO_REQUEST_HANDLE_ERROR
 	}
 	
 	long d = 0;
 	while (current != STRCT_END) {
-		if (current >= STRCT_MAX) {
-			request_free(out);
-			return NULL;
-		}
+		if (current >= STRCT_MAX)
+			AUTOGENTOO_REQUEST_HANDLE_ERROR
 		
 		vector_add(out->types_parent, &current);
 		vector_add(out->structures_parent, &d);
@@ -70,16 +77,12 @@ Request* request_handle (Connection* conn) {
 				(RequestData*)vector_get(out->structures_parent, out->struct_c - 1),
 				request_structure_linkage[current - 1],
 				current_request, end);
-		if (len == -1) {
-			request_free (out);
-			return NULL;
-		}
+		if (len == -1)
+			AUTOGENTOO_REQUEST_HANDLE_ERROR
 		current_request += len;
 		
-		if (prv_read_int (&current_request, end, (int*)&current) == -1) {
-			request_free (out);
-			return NULL;
-		}
+		if (prv_read_int (&current_request, end, (int*)&current) == -1)
+			AUTOGENTOO_REQUEST_HANDLE_ERROR
 	}
 	
 	return out;
