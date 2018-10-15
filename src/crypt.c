@@ -50,8 +50,13 @@ int rsa_binding_verify(Server* parent, RSA* target, Connection* conn) {
 	return 1;
 }
 
-int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw) {
-	small_map_insert(parent->rsa_binding, conn->ip, strdup(rsa_raw));
+int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw, int len) {
+	struct {
+		char* rsa_raw;
+		int rsa_len;
+	} rsa_binding = {strdup(rsa_raw), len};
+	
+	small_map_insert(parent->rsa_binding, conn->ip, &rsa_binding);
 	return 0;
 }
 
@@ -80,12 +85,26 @@ int rsa_perform_handshake(Connection* conn) {
 	write(conn->fd, send_pub, send_len);
 	BIO_read(public_bio_recieve, rec_pub, (int)rec_len);
 	
-	rsa_ip_bind(conn->parent, conn, rec_pub);
+	conn->public_key = RSA_new();
+	conn->public_key = PEM_read_bio_RSA_PUBKEY(public_bio_recieve, &conn->public_key, NULL, NULL);
+	
+	rsa_ip_bind(conn->parent, conn, rec_pub, (int)rec_len);
 	return rsa_binding_verify(conn->parent, conn->public_key, conn);
 }
 
-int rsa_load_binding (Connection*) {
-
+int rsa_load_binding (Connection* conn) {
+	struct {
+		char* rsa_raw;
+		int rsa_len;
+	} *public_raw = small_map_get(conn->parent->rsa_binding, conn->ip);
+	if (!public_raw->rsa_raw)
+		return 1;
+	
+	BIO* target_public_bio = BIO_new(BIO_s_mem());
+	BIO_read(target_public_bio, public_raw, public_raw->rsa_len);
+	conn->public_key = PEM_read_bio_RSA_PUBKEY(target_public_bio, &conn->public_key, NULL, NULL);
+	
+	return 0;
 }
 
 ssize_t rsa_send(Connection* conn, void* data, size_t size) {
