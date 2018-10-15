@@ -11,10 +11,22 @@
 #define AUTOGENTOO_RSA_BITS 2048
 #endif
 
-int generate_cipher(Server* parent);
+typedef enum {
+	AUTOGENTOO_RSA_NOAUTH, //!< Needs public key from client
+	AUTOGENTOO_RSA_VERIFY, //!< Check if we have updated public key
+	AUTOGENTOO_RSA_CORRECT, //!< RSA exchange complete
+	AUTOGENTOO_RSA_INCORRECT //!< RSA wrong key
+} rsa_t;
 
+int rsa_binding_verify(Server* parent, RSA* target, Connection* conn);
+int rsa_ip_bind (Server* parent, Connection* conn);
+int rsa_generate(Server* parent);
 int rsa_perform_handshake(Connection* conn);
-size_t rsa_send(Connection* conn, void* data, size_t size);
-size_t rsa_recv(Connection* conn, void* data_buffer, size_t size);
+ssize_t rsa_send(Connection* conn, void* data, size_t size);
+ssize_t rsa_recv(Connection* conn, void* data_buffer)
+
+char* rsa_base64(const unsigned char* input, int length, size_t* base64_len);
+
+int rsa_load_binding (Connection*);
 
 #endif //AUTOGENTOO_CRYPT_H

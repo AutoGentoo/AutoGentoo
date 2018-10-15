@@ -76,9 +76,8 @@ struct __Server {
 	 * 2048 RSA encryption
 	 * Serverside encryption
 	 **/
-	RSA* rsa;
-	BIO* rsa_public;
-	BIO* rsa_private;
+	RSA* private_key;
+	SmallMap* rsa_binding;
 };
 
 /**
@@ -114,10 +113,8 @@ struct __Connection {
 	 * 2048 RSA encryption
 	 * Clientside encryption
 	 **/
-	
-	
+	RSA* public_key;
 	void* encrypted_data;
-	
 };
 
 #include "host.h"
