@@ -19,14 +19,12 @@ typedef enum {
 } rsa_t;
 
 int rsa_binding_verify(Server* parent, RSA* target, Connection* conn);
-int rsa_ip_bind (Server* parent, Connection* conn);
+int rsa_ip_bind (Server* parent, Connection* conn, char* rsa_raw);
 int rsa_generate(Server* parent);
 int rsa_perform_handshake(Connection* conn);
 ssize_t rsa_send(Connection* conn, void* data, size_t size);
 ssize_t rsa_recv(Connection* conn, void* data_buffer)
-
 char* rsa_base64(const unsigned char* input, int length, size_t* base64_len);
-
 int rsa_load_binding (Connection*);
 
 #endif //AUTOGENTOO_CRYPT_H

@@ -50,14 +50,42 @@ int rsa_binding_verify(Server* parent, RSA* target, Connection* conn) {
 	return 1;
 }
 
-int rsa_ip_bind(Server* parent, Connection* conn);
+int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw) {
+	small_map_insert(parent->rsa_binding, conn->ip, strdup(rsa_raw));
+	return 0;
+}
 
 int rsa_perform_handshake(Connection* conn) {
 	BIO* public_bio_send = BIO_new(BIO_s_mem());
 	BIO* public_bio_recieve = BIO_new(BIO_s_mem());
 	
 	FILE* conn_fp = fdopen(conn->fd, "rw");
+	PEM_write_bio_RSAPublicKey(public_bio_send, conn->parent->private_key);
 	
+	size_t send_len, rec_len;
+	send_len = (size_t)BIO_pending(public_bio_send);
+	
+	rsa_t c_rsa_request = AUTOGENTOO_RSA_NOAUTH;
+	write(conn->fd, &c_rsa_request, sizeof(rsa_t));
+	read(conn->fd, &rec_len, sizeof(rsa_t));
+	
+	char* rec_pub = malloc(rec_len + 1);
+	char* send_pub = malloc(send_len + 1);
+	
+	BIO_write(public_bio_send, send_pub, (int)send_len);
+	read(conn->fd, rec_pub, rec_len);
+	rec_pub[rec_len] = '\0';
+	
+	write(conn->fd, &send_len, sizeof(size_t));
+	write(conn->fd, send_pub, send_len);
+	BIO_read(public_bio_recieve, rec_pub, (int)rec_len);
+	
+	rsa_ip_bind(conn->parent, conn, rec_pub);
+	return rsa_binding_verify(conn->parent, conn->public_key, conn);
+}
+
+int rsa_load_binding (Connection*) {
+
 }
 
 ssize_t rsa_send(Connection* conn, void* data, size_t size) {
