@@ -25,11 +25,9 @@ typedef union __FunctionHandler FunctionHandler;
 typedef enum {
 	PROT_AUTOGENTOO = 0, // guarentees first byte is 0 (cant be HTTP)
 	PROT_HTTP,
-	PROT_AUTOGENTOO_S // Arbitrary number, switch on request byte
 } protocol_t;
 
 typedef enum {
-	REQ_SWITCH_SECURE = -1, // Switch protocol to PROT_AUTOGENTOO_S
 	REQ_GET,
 	REQ_INSTALL,
 	REQ_EDIT,

@@ -3,6 +3,7 @@
 #include <asm/errno.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <autogentoo/crypt.h>
 
 ssize_t rsend(Connection* conn, response_t code) {
 	char message[40];
@@ -37,11 +38,14 @@ response_t get_res(response_nt x) {
 	return OK;
 }
 
-ssize_t conn_write (int fd, void* data, size_t len) {
-	if (fcntl(fd, F_GETFD) == -1 || errno == EBADF) {
-		close (fd);
+ssize_t conn_write(Connection* conn, void* data, size_t len) {
+	if (fcntl(conn->fd, F_GETFD) == -1 || errno == EBADF) {
+		close (conn->fd);
 		return 0;
 	}
 	
-	return write (fd, data, len);
+	if (conn->communication_type == COM_RSA)
+		return rsa_send(conn, data, len);
+	
+	return write (conn->fd, data, len);
 }

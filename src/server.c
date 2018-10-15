@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <autogentoo/autogentoo.h>
 #include <signal.h>
+#include <autogentoo/crypt.h>
 
 static Server* srv = NULL;
 
@@ -36,6 +37,25 @@ Server* server_new (char* location, char* port, server_t opts) {
 	chdir(out->location);
 	out->opts = opts;
 	out->port = strdup(port);
+	
+	if (out->opts | ENCRYPT)
+		out->rsa_child = server_encrypt_new(out, "4950");
+	
+	return out;
+}
+
+EncryptServer* server_encrypt_new (Server* parent, char* port) {
+	EncryptServer* out = malloc (sizeof (EncryptServer));
+	
+	out->parent = parent;
+	out->port = strdup (port);
+	out->rsa_binding = small_map_new(16, 16);
+	
+	if (rsa_generate(parent) != 0) {
+		fprintf (stderr, "Failed to generate private key\n");
+		server_free(parent);
+		exit (1);
+	}
 	
 	return out;
 }
@@ -85,9 +105,8 @@ void server_start (Server* server) {
 	
 	linfo("Server started on port %s", server->port);
 	
-	if (server->opts & DAEMON) {
+	if (server->opts & DAEMON)
 		daemonize(server->location);
-	}
 	
 	server->pid = getpid();
 	srv = server;
@@ -110,6 +129,52 @@ void server_start (Server* server) {
 			continue;
 		}
 		Connection* current_conn = connection_new(server, temp_fd);
+		current_conn->communication_type = COM_PLAIN;
+
+#ifndef AUTOGENTOO_NO_THREADS
+		pthread_t p_pid;
+		
+		if (pthread_create(&p_pid, NULL, (void* (*) (void*)) server_respond, current_conn)) {
+			lerror("Error creating thread");
+			fflush(stdout);
+			exit(1);
+		}
+#else
+		server_respond (current_conn);
+#endif
+	}
+}
+
+void server_encrypt_start (EncryptServer* server) {
+	struct sockaddr_in clientaddr;
+	socklen_t addrlen;
+	
+	int listenfd = server_init(server->port);
+	
+	linfo("Encrypted server started on port %s", server->port);
+	
+	addrlen = sizeof(clientaddr);
+	
+	while (server->parent->keep_alive) { // Main accept loop
+		int temp_fd = accept(listenfd, (struct sockaddr*) &clientaddr, &addrlen);
+		if (temp_fd < 3) {
+			lwarning("accept() error");
+			continue;
+		}
+		if (fcntl(temp_fd, F_GETFD) == -1 || errno == EBADF) {
+			lwarning("Bad fd on accept()");
+			fflush(stdout);
+			continue;
+		}
+		Connection* current_conn = connection_new(server->parent, temp_fd);
+		current_conn->communication_type = COM_RSA;
+		
+		if (rsa_load_binding(current_conn) != 0 || rsa_perform_handshake(current_conn) != 0) {
+			fprintf (stderr, "Failed to perform rsa handshake\n");
+			connection_free(current_conn);
+			continue;
+		}
+		
 
 #ifndef AUTOGENTOO_NO_THREADS
 		pthread_t p_pid;
@@ -216,16 +281,7 @@ void handle_segv (int signum) {
 }
 #define AUTOGENTOO_IGNORE_SEGV
 
-void server_respond (Connection* conn) {
-#ifndef AUTOGENTOO_NO_THREADS
-	conn->pid = pthread_self();
-	thread_register(conn->parent->thandler, conn->pid, conn);
-#ifndef AUTOGENTOO_IGNORE_SEGV
-	signal(SIGSEGV, handle_segv);
-#endif
-#else
-	conn->pid = 0;
-#endif
+void server_recv (Connection* conn) {
 	/* Read the request */
 	size_t chunk_len = 128;
 	
@@ -259,8 +315,29 @@ void server_respond (Connection* conn) {
 		return;
 	}
 	
-	conn->status = CONNECTED;
 	conn->size = (size_t) total_read;
+	conn->status = CONNECTED;
+}
+
+void server_rsa_recv(Connection* conn) {
+
+}
+
+void server_respond (Connection* conn) {
+#ifndef AUTOGENTOO_NO_THREADS
+	conn->pid = pthread_self();
+	thread_register(conn->parent->thandler, conn->pid, conn);
+#ifndef AUTOGENTOO_IGNORE_SEGV
+	signal(SIGSEGV, handle_segv);
+#endif
+#else
+	conn->pid = 0;
+#endif
+	
+	if (conn->communication_type == COM_RSA)
+		rsa_recv(conn, );
+	else
+		server_recv(conn);
 	
 	response_t res;
 	Request* request = request_handle(conn);
@@ -371,6 +448,6 @@ void server_add_queue (Server* parent, Queue* new) {
 pid_t server_spawn_worker (Server* parent) {
 	parent->queue->proc_id = fork ();
 	if (parent->queue->proc_id == 0)
-		execl (AUTOGENTOO_WORKER, (const char*)NULL, (char*)NULL);
+		execl (AUTOGENTOO_WORKER, "");
 	return parent->queue->proc_id;
 }

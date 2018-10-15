@@ -14,6 +14,12 @@
 typedef struct __Server Server;
 
 /**
+ * @brief RSA encrypted connections for secure access
+ *  - All logins require encrypted connections
+ */
+typedef struct __EncryptServer EncryptServer;
+
+/**
  * @brief Bind an IP to a host
  *  - This is used when a request is made.
  *  - The IP of the request is matched to a Host using this struct
@@ -36,7 +42,8 @@ typedef enum {
 	ASYNC = 0x0, //!< Run the server in the terminal
 	DAEMON = 0x1, //!< Run the server in background as a service
 	NO_DEBUG = 0x0, //!< Turn off debug information
-	DEBUG = 0x2 //!< Turn on debug information
+	DEBUG = 0x2, //!< Turn on debug information
+	ENCRYPT = 0x4
 } server_t;
 
 /**
@@ -48,6 +55,11 @@ typedef enum {
 	FAILED, //!< Client disconnected closing the connection
 	CLOSED //!< Closed successfully with connection_free()
 } con_t;
+
+typedef enum {
+	COM_PLAIN,
+	COM_RSA
+} com_t;
 
 #include "thread.h"
 #include "queue.h"
@@ -71,6 +83,14 @@ struct __Server {
 	ThreadHandler* thandler;
 	pid_t pid;
 	pthread_t pthread;
+	
+	/** Secure server **/
+	EncryptServer* rsa_child;
+};
+
+struct __EncryptServer {
+	Server* parent;
+	char* port;
 	
 	/** ONLY AUTOGENTOO_S
 	 * 2048 RSA encryption
@@ -108,6 +128,7 @@ struct __Connection {
 	int fd; //!< The file descriptor that points to the open connections
 	pthread_t pid; //!< The pid of the pthread that the handle is runnning in
 	con_t status; //!< The status of the current Connection
+	com_t communication_type; //!< Are we using an encryption or not
 	
 	/** ONLY AUTOGENTOO_S
 	 * 2048 RSA encryption
@@ -127,6 +148,8 @@ struct __Connection {
  * @return a pointer to the newly created server
  */
 Server* server_new(char* location, char* port, server_t opts);
+
+EncryptServer* server_encrypt_new (Server* parent, char* port);
 
 /**
  * Creates a new Connection given a file desciptor from accept()

@@ -56,7 +56,7 @@ int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw, int len) {
 		int rsa_len;
 	} rsa_binding = {strdup(rsa_raw), len};
 	
-	small_map_insert(parent->rsa_binding, conn->ip, &rsa_binding);
+	small_map_insert(parent->rsa_child->rsa_binding, conn->ip, &rsa_binding);
 	return 0;
 }
 
@@ -65,7 +65,7 @@ int rsa_perform_handshake(Connection* conn) {
 	BIO* public_bio_recieve = BIO_new(BIO_s_mem());
 	
 	FILE* conn_fp = fdopen(conn->fd, "rw");
-	PEM_write_bio_RSAPublicKey(public_bio_send, conn->parent->private_key);
+	PEM_write_bio_RSAPublicKey(public_bio_send, conn->parent->rsa_child->private_key);
 	
 	size_t send_len, rec_len;
 	send_len = (size_t)BIO_pending(public_bio_send);
@@ -88,15 +88,14 @@ int rsa_perform_handshake(Connection* conn) {
 	conn->public_key = RSA_new();
 	conn->public_key = PEM_read_bio_RSA_PUBKEY(public_bio_recieve, &conn->public_key, NULL, NULL);
 	
-	rsa_ip_bind(conn->parent, conn, rec_pub, (int)rec_len);
-	return rsa_binding_verify(conn->parent, conn->public_key, conn);
+	return rsa_ip_bind(conn->parent, conn, rec_pub, (int)rec_len);
 }
 
 int rsa_load_binding (Connection* conn) {
 	struct {
 		char* rsa_raw;
 		int rsa_len;
-	} *public_raw = small_map_get(conn->parent->rsa_binding, conn->ip);
+	} *public_raw = small_map_get(conn->parent->rsa_child->rsa_binding, conn->ip);
 	if (!public_raw->rsa_raw)
 		return 1;
 	
@@ -104,7 +103,7 @@ int rsa_load_binding (Connection* conn) {
 	BIO_read(target_public_bio, public_raw, public_raw->rsa_len);
 	conn->public_key = PEM_read_bio_RSA_PUBKEY(target_public_bio, &conn->public_key, NULL, NULL);
 	
-	return 0;
+	return rsa_binding_verify(conn->parent, conn->public_key, conn);
 }
 
 ssize_t rsa_send(Connection* conn, void* data, size_t size) {
@@ -135,9 +134,9 @@ ssize_t rsa_recv(Connection* conn, void* data_buffer) {
 	read(conn->fd, &encrypt_len, sizeof(int));
 	
 	char* err = malloc(130);
-	char* decrypt = malloc((size_t) RSA_size(conn->parent->private_key));
+	char* decrypt = malloc((size_t) RSA_size(conn->parent->rsa_child->private_key));
 	if (RSA_private_decrypt(encrypt_len, (unsigned char*) data_buffer, (unsigned char*) decrypt,
-	                        conn->parent->private_key, RSA_PKCS1_OAEP_PADDING) == -1) {
+	                        conn->parent->rsa_child->private_key, RSA_PKCS1_OAEP_PADDING) == -1) {
 		ERR_load_crypto_strings();
 		ERR_error_string(ERR_get_error(), err);
 		fprintf(stderr, "Error decrypting message: %s\n", err);
