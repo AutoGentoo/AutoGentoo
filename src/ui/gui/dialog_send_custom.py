@@ -20,7 +20,7 @@ class DscCustomStruct(Gtk.Box):
 			if _type == 'i':
 				self.add(self.EnumItem(self.names[i], self.enum_register))
 			elif _type == 's':
-				self.add(self.GenericItem(self.names[i]), placeholder=self.placeholders[i])
+				self.add(self.GenericItem(self.names[i], placeholder=self.placeholders[i]))
 			elif _type == 'a':
 				template_i += 2
 				old_i = template_i
@@ -69,7 +69,7 @@ class DscCustomStruct(Gtk.Box):
 			
 			self.register = register
 			self.valid = CheckValid(self.is_valid_enum, self.value, "%s is not a valid enum or integer")
-			self.value.set_completion(self.register)
+			self.value.set_completion(self.register.completion)
 			self.int_value = -1
 		
 		def __int__(self):
@@ -95,9 +95,19 @@ class EnumRegister(Gtk.Notebook):
 		self.lines = self.file.readlines()
 		self.registry_table = {}
 		self.pages = []
+		self.completion = Gtk.EntryCompletion()
 		
 		self.parse()
+		self.generate_completion()
+		self.show_all()
 	
+	def generate_completion(self):
+		liststore = Gtk.ListStore(str)
+		for enum in self.registry_table:
+			liststore.append([enum])
+		self.completion.set_model(liststore)
+		self.completion.set_text_column(0)
+		
 	def append_page(self, name, enum_list):
 		# page = Gtk.TreeStore()
 		# page.set_border_width(10)
@@ -128,9 +138,7 @@ class EnumRegister(Gtk.Notebook):
 						current_enum[splt[0]] = current
 						self.registry_table[splt[0]] = current
 						if do_eval:
-							print(current)
 							current = eval(current)
-							print(current)
 						current += 1
 						i += 1
 					c_line = self.lines[i]
@@ -154,6 +162,30 @@ class DscDialog(Dialog):
 		
 		self.enums = EnumRegister("enums.txt")
 		self.content_box.pack2(self.enums)
+		self.structs = []
+		self.struct_current = None
+		
+		init_structs = [
+			("host_edit", "iis", ("Select one", "Select two", "Field"), ("", "", ""))
+		]
+		
+		for x in init_structs:
+			self.add_struct(*x)
+	
+	def add_struct(self, name, template, field_names, placeholders):
+		id_index = len(self.structs)
+		self.structs.append(DscCustomStruct(template, field_names, placeholders, self.enums))
+		self.structs_combo.append(str(id_index), name)
 	
 	def structs_change(self, widget):
-		print(self.structs_combo.get_active_text())
+		to_add = self.structs[int(self.structs_combo.get_active())]
+		print(to_add)
+		if to_add == self.struct_current:
+			return
+		
+		if self.struct_current is not None:
+			self.struct_box.remove(self.struct_current)
+		
+		self.struct_box.pack_end(to_add, True, True, 6)
+		self.struct_current = to_add
+		to_add.show_all()

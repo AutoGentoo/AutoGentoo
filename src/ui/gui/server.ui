@@ -244,6 +244,7 @@
     <property name="can_focus">False</property>
     <property name="type_hint">dialog</property>
     <signal name="close" handler="dsc_close" swapped="no"/>
+    <signal name="destroy" handler="dsc_close" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox" id="dsc_top">
         <property name="can_focus">False</property>

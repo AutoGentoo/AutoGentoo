@@ -6,8 +6,8 @@ class CheckValid(Gtk.Box):
 		super().__init__(orientation=Gtk.Orientation.HORIZONTAL)
 		
 		self.checking = Gtk.Spinner()
-		self.worked = Gtk.Image.new_from_icon_name("gtk-ok")
-		self.errored = Gtk.Image.new_from_icon_name("gtk-no")
+		self.worked = Gtk.Image.new_from_icon_name("gtk-ok", 8)
+		self.errored = Gtk.Image.new_from_icon_name("gtk-no", 8)
 		
 		self.handler = handler
 		self.input_entry = input_entry

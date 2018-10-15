@@ -28,7 +28,7 @@ class Dialog:
 		self.close()
 	
 	def open(self, widget=None):
-		self.dialog.run()
+		self.dialog.show_all()
 
 
 class ObjectNotFoundError(Exception):
