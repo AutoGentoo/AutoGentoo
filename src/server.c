@@ -320,7 +320,26 @@ void server_recv (Connection* conn) {
 }
 
 void server_rsa_recv(Connection* conn) {
-
+	int chunks_left;
+	read(conn->fd, &chunks_left, sizeof (int));
+	conn->size = 0;
+	
+	size_t chunk_size = (size_t)RSA_size(conn->public_key);
+	conn->request = malloc (chunk_size * chunks_left);
+	
+	void* current_pos = conn->request;
+	for (; chunks_left; chunks_left--, current_pos += chunk_size)
+		conn->size += rsa_recv(conn, current_pos);
+	
+	if (conn->size == 0) { // receive socket closed
+		lwarning("Client disconnected upexpectedly.");
+		conn->status = FAILED;
+		connection_free(conn);
+		pthread_kill(conn->pid, SIGUSR1);
+		return;
+	}
+	
+	conn->status = CONNECTED;
 }
 
 void server_respond (Connection* conn) {
@@ -335,7 +354,7 @@ void server_respond (Connection* conn) {
 #endif
 	
 	if (conn->communication_type == COM_RSA)
-		rsa_recv(conn, );
+		server_rsa_recv(conn);
 	else
 		server_recv(conn);
 	

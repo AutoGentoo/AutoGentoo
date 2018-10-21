@@ -95,9 +95,9 @@ response_t GET (Connection* conn, HTTPRequest req) {
 		ssize_t bytes_read;
 		rsend(conn, OK);
 		res = OK;
-		conn_write(conn->fd, "\n", 1);
+		conn_write(conn, "\n", 1);
 		while ((bytes_read = read(fd, (void*) &data_to_send, sizeof(data_to_send))) > 0)
-			conn_write(conn->fd, (void*) &data_to_send, (size_t) bytes_read);
+			conn_write(conn, (void*) &data_to_send, (size_t) bytes_read);
 		close(fd);
 	} else {
 		rsend(conn, NOT_FOUND);
@@ -261,12 +261,12 @@ response_t SRV_MNTCHROOT (Request* request) {
 	return chroot_mount(request->conn->bounded_host);
 }
 
-void prv_fd_write_str (int fd, char* str) {
+void prv_fd_write_str (Connection* conn, char* str) {
 	if (str == NULL) {
 		return;
 	}
-	conn_write(fd, str, strlen(str));
-	conn_write(fd, "\n", 1);
+	conn_write(conn, str, strlen(str));
+	conn_write(conn, "\n", 1);
 }
 
 /* SRV Metadata requests */
@@ -281,21 +281,21 @@ response_t SRV_GETHOST (Request* request) {
 	if (host->extra != NULL) {
 		char t[8];
 		sprintf(t, "%d", (int) host->extra->n);
-		prv_fd_write_str(request->conn->fd, t);
+		prv_fd_write_str(request->conn, t);
 		
 	}
-	prv_fd_write_str(request->conn->fd, host->cflags);
-	prv_fd_write_str(request->conn->fd, host->cxxflags);
-	prv_fd_write_str(request->conn->fd, host->chost);
-	prv_fd_write_str(request->conn->fd, host->use);
-	prv_fd_write_str(request->conn->fd, host->hostname);
-	prv_fd_write_str(request->conn->fd, host->profile);
+	prv_fd_write_str(request->conn, host->cflags);
+	prv_fd_write_str(request->conn, host->cxxflags);
+	prv_fd_write_str(request->conn, host->chost);
+	prv_fd_write_str(request->conn, host->use);
+	prv_fd_write_str(request->conn, host->hostname);
+	prv_fd_write_str(request->conn, host->profile);
 	
 	if (host->extra != NULL)
 		for (int i = 0; i != host->extra->n; i++) {
 			char* current_str = string_vector_get(host->extra, i);
-			conn_write(request->conn->fd, current_str, strlen(current_str));
-			conn_write(request->conn->fd, "\n", 1);
+			conn_write(request->conn, current_str, strlen(current_str));
+			conn_write(request->conn, "\n", 1);
 		}
 	
 	return OK;
@@ -304,13 +304,13 @@ response_t SRV_GETHOST (Request* request) {
 response_t SRV_GETHOSTS (Request* request) {
 	char t[8];
 	sprintf(t, "%d\n", (int) request->conn->parent->hosts->n);
-	conn_write(request->conn->fd, t, strlen(t));
+	conn_write(request->conn, t, strlen(t));
 	
 	int i;
 	for (i = 0; i != request->conn->parent->hosts->n; i++) {
 		char* temp = (*(Host**) vector_get(request->conn->parent->hosts, i))->id;
-		conn_write(request->conn->fd, temp, strlen(temp));
-		conn_write(request->conn->fd, "\n", 1);
+		conn_write(request->conn, temp, strlen(temp));
+		conn_write(request->conn, "\n", 1);
 	}
 	
 	return OK;
@@ -319,12 +319,12 @@ response_t SRV_GETHOSTS (Request* request) {
 response_t SRV_GETACTIVE (Request* request) {
 	if (request->conn->bounded_host == NULL) {
 		char* out = "invalid\n";
-		conn_write(request->conn->fd, out, strlen(out));
+		conn_write(request->conn, out, strlen(out));
 		return NOT_FOUND;
 	}
 	
-	conn_write(request->conn->fd, request->conn->bounded_host->id, strlen(request->conn->bounded_host->id));
-	conn_write(request->conn->fd, "\n", 1);
+	conn_write(request->conn, request->conn->bounded_host->id, strlen(request->conn->bounded_host->id));
+	conn_write(request->conn, "\n", 1);
 	
 	return OK;
 }
@@ -335,7 +335,7 @@ response_t SRV_GETSPEC (Request* request) {
 	int symbol;
 	if (lspcu_fp != NULL) {
 		while ((symbol = getc (lspcu_fp)) != EOF) {
-			conn_write(request->conn->fd, &symbol, sizeof(char));
+			conn_write(request->conn, &symbol, sizeof(char));
 		}
 		fclose(lspcu_fp);
 	}
@@ -347,16 +347,16 @@ response_t SRV_GETSPEC (Request* request) {
 response_t SRV_GETTEMPLATES (Request* request) {
 	char __n[16];
 	sprintf(__n, "%d", (int) request->conn->parent->templates->n);
-	conn_write(request->conn->fd, &__n, strlen(__n));
+	conn_write(request->conn, &__n, strlen(__n));
 	
 	int i;
 	for (i = 0; i != request->conn->parent->templates->n; i++) {
-		conn_write(request->conn->fd, "\n", 1);
+		conn_write(request->conn, "\n", 1);
 		
 		char* b = (*(HostTemplate**) vector_get(request->conn->parent->templates, i))->id;
-		conn_write(request->conn->fd, b, strlen(b));
+		conn_write(request->conn, b, strlen(b));
 	}
-	conn_write(request->conn->fd, "\n", 1);
+	conn_write(request->conn, "\n", 1);
 	return OK;
 }
 
@@ -393,8 +393,8 @@ response_t SRV_STAGE_NEW (Request* request) {
 	
 	small_map_insert(t->parent->stages, t->new_id, t);
 	
-	conn_write(request->conn->fd, t->new_id, strlen(t->new_id));
-	conn_write(request->conn->fd, "\n", 1);
+	conn_write(request->conn, t->new_id, strlen(t->new_id));
+	conn_write(request->conn, "\n", 1);
 	return OK;
 }
 
@@ -433,15 +433,15 @@ response_t SRV_STAGE (Request* request) {
 response_t SRV_GETSTAGED (Request* request) {
 	char __n[16];
 	sprintf(__n, "%d", (int) request->conn->parent->stages->n);
-	conn_write(request->conn->fd, &__n, strlen(__n));
-	conn_write(request->conn->fd, "\n", 1);
+	conn_write(request->conn, &__n, strlen(__n));
+	conn_write(request->conn, "\n", 1);
 	
 	int i;
 	for (i = 0; i != request->conn->parent->stages->n; i++) {
 		HostTemplate* __t = (*(HostTemplate***) vector_get(request->conn->parent->stages, i))[1];
 		
-		conn_write(request->conn->fd, __t->new_id, strlen(__t->new_id));
-		conn_write(request->conn->fd, "\n", 1);
+		conn_write(request->conn, __t->new_id, strlen(__t->new_id));
+		conn_write(request->conn, "\n", 1);
 	}
 	
 	return OK;
@@ -464,13 +464,13 @@ response_t SRV_GETSTAGE (Request* request) {
 			 __t->extra_c
 	);
 	
-	conn_write(request->conn->fd, buf, strlen(buf));
+	conn_write(request->conn, buf, strlen(buf));
 	free(buf);
 	
 	int j;
 	for (j = 0; j != __t->extra_c; j++) {
 		asprintf(&buf, "%s %d\n", __t->extras[j].make_extra, __t->extras[j].select);
-		conn_write(request->conn->fd, buf, strlen(buf));
+		conn_write(request->conn, buf, strlen(buf));
 		free(buf);
 	}
 	
