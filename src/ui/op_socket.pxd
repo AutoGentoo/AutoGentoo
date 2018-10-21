@@ -10,6 +10,11 @@ cdef extern from "<netinet/ip.h>":
 		in_port_t sin_port;
 		in_addr_t sin_addr;
 
+cdef extern from "<autogentoo/server.h>":
+	ctypedef enum com_t:
+		COM_PLAIN,
+		COM_RSA
+
 cdef class Address:
 	cdef char port[4]
 	cdef char* ip
@@ -19,6 +24,10 @@ cdef class Socket:
 	cdef Address adr
 	cdef sockaddr_in address
 	cdef int fd
+	cdef com_t communication_type
+	
+	cdef DynamicBuffer encrypt (self, DynamicBuffer data)
+	cdef DynamicBuffer decrypt (self, DynamicBuffer data)
 	
 	cdef send (self, DynamicBuffer data, do_connect)
 	cpdef recv (self, int size)

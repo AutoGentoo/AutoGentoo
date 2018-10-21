@@ -22,10 +22,17 @@ cdef extern from "<sys/socket.h>":
 from posix.unistd cimport STDOUT_FILENO
 
 cdef class Socket:
-	def __init__ (self, Address adr):
+	def __init__ (self, Address adr, com_t comm_type = COM_PLAIN):
 		self.adr = adr
 		self.socket = None
+		self.communication_type = comm_type
 		self.fd = -1
+	
+	cdef DynamicBuffer encrypt (self, DynamicBuffer data):
+		cdef int chunks_left = data.n /
+	
+	cdef DynamicBuffer decrypt (self, DynamicBuffer data):
+	
 	
 	cdef send (self, DynamicBuffer data, do_connect):
 		if do_connect:
