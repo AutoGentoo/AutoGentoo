@@ -23,7 +23,7 @@ int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw, int len);
 int rsa_generate(Server* parent);
 int rsa_perform_handshake(Connection* conn);
 ssize_t rsa_send(Connection* conn, void* data, size_t size);
-ssize_t rsa_recv(Connection* conn, void* data_buffer);
+ssize_t rsa_decrypt(Connection* conn, void* from, void* to, int encrypted_size, int decrypted_size);
 char* rsa_base64(const unsigned char* input, int length, size_t* base64_len);
 int rsa_load_binding (Connection* conn);
 

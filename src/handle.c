@@ -334,9 +334,8 @@ response_t SRV_GETSPEC (Request* request) {
 	FILE* lspcu_fp = fopen("build.spec", "r");
 	int symbol;
 	if (lspcu_fp != NULL) {
-		while ((symbol = getc (lspcu_fp)) != EOF) {
+		while ((symbol = getc (lspcu_fp)) != EOF)
 			conn_write(request->conn, &symbol, sizeof(char));
-		}
 		fclose(lspcu_fp);
 	}
 	remove("build.spec");

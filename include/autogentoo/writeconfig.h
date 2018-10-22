@@ -123,7 +123,8 @@ size_t write_string (char* src, FILE* fp);
  * @return a dynamically allocated string that has been read from file
  */
 char* read_string (FILE* fp);
-
+int read_int_fd(int fd);
+ssize_t write_int_fd(int fd, int i);
 
 /**
  * Write an integer to file

@@ -45,17 +45,6 @@ Request* request_handle (Connection* conn) {
 	if (prv_read_int (&current_request, end, (int*)&out->request_type) == -1)
 		AUTOGENTOO_REQUEST_HANDLE_ERROR
 	
-	if (out->request_type == REQ_SWITCH_SECURE) {
-		out->protocol = PROT_AUTOGENTOO_S;
-		
-		conn->encrypted_data = conn->request;
-		conn->request = NULL;
-		
-		// Reread the request type
-		if (prv_read_int (&current_request, end, (int*)&out->request_type) == -1)
-			AUTOGENTOO_REQUEST_HANDLE_ERROR
-	}
-	
 	out->structures_parent = vector_new (sizeof (RequestData), REMOVE | ORDERED);
 	out->types_parent = vector_new (sizeof (request_structure_t), REMOVE | ORDERED);
 	out->structures = out->structures_parent->ptr;

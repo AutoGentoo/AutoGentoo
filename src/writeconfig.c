@@ -31,6 +31,17 @@ inline int read_int(FILE* fp) {
 	return out;
 }
 
+int read_int_fd(int fd) {
+	int out;
+	read(fd, &out, sizeof (int));
+	return ntohl((uint32_t) out);
+}
+
+ssize_t write_int_fd(int fd, int i) {
+	int to_send = htonl((uint32_t) i);
+	return write(fd, &to_send, sizeof(int));
+}
+
 size_t write_server(Server* server) {
 	char* config_file_name = ".autogentoo.config";
 	char* config_file = malloc(strlen(server->location) + strlen(config_file_name) + 2);

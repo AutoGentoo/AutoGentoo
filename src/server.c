@@ -320,16 +320,22 @@ void server_recv (Connection* conn) {
 }
 
 void server_rsa_recv(Connection* conn) {
-	int chunks_left;
-	read(conn->fd, &chunks_left, sizeof (int));
+	int chunks_left = read_int_fd(conn->fd);
 	conn->size = 0;
 	
 	size_t chunk_size = (size_t)RSA_size(conn->public_key);
 	conn->request = malloc (chunk_size * chunks_left);
 	
+	void* encrypted_chunk = malloc(chunk_size);
 	void* current_pos = conn->request;
-	for (; chunks_left; chunks_left--, current_pos += chunk_size)
-		conn->size += rsa_recv(conn, current_pos);
+	while (chunks_left--) {
+		int encrypted_size = read_int_fd(conn->fd);
+		int decrypted_size = read_int_fd(conn->fd);
+		
+		read(conn->fd, encrypted_chunk, (size_t)encrypted_size);
+		conn->size += rsa_decrypt(conn, encrypted_chunk, current_pos, encrypted_size, decrypted_size);
+	}
+	free(encrypted_chunk);
 	
 	if (conn->size == 0) { // receive socket closed
 		lwarning("Client disconnected upexpectedly.");

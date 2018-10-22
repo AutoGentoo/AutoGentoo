@@ -8,6 +8,7 @@
 #include <autogentoo/crypt.h>
 #include <string.h>
 #include <openssl/err.h>
+#include <autogentoo/writeconfig.h>
 
 char* rsa_base64(const unsigned char* input, int length, size_t* base64_len) {
 	BIO* bmem, * b64;
@@ -40,7 +41,7 @@ int rsa_binding_verify(Server* parent, RSA* target, Connection* conn) {
 	conn->public_key = target;
 	
 	rsa_send(conn, autogentoo_verify, 16);
-	rsa_recv(conn, &rsa_response);
+	rsa_decrypt(NULL, conn, &rsa_response, 0, 0);
 	
 	if (rsa_response == AUTOGENTOO_RSA_CORRECT)
 		return 0;
@@ -107,44 +108,70 @@ int rsa_load_binding (Connection* conn) {
 }
 
 ssize_t rsa_send(Connection* conn, void* data, size_t size) {
-	unsigned char* encrypt = malloc((size_t) RSA_size(conn->public_key));
-	int encrypt_len;
+	/**
+	 * [int: chunknum]
+	 * { chunk
+	 *   [int: encrypted size (base64)]
+	 *   [int: decrypted size (x <= key size)]
+	 *   [encrypted size bytes of encrypted data (base64)]
+	 * }
+	 */
+	
+	int rsa_size = RSA_size(conn->public_key);
+	int chunk_number = (int)size / rsa_size;
+	unsigned char* encrypt = malloc((size_t)rsa_size);
 	char* err = malloc(130);
-	if ((encrypt_len =
-			     RSA_public_encrypt((int) size + 1, (unsigned char*) data,
-			                        encrypt, conn->public_key, RSA_PKCS1_OAEP_PADDING)) == -1) {
-		ERR_load_crypto_strings();
-		ERR_error_string(ERR_get_error(), err);
-		fprintf(stderr, "Error encrypting message: %s\n", err);
-	}
+	size_t sent = 0;
+	size_t offset = 0;
 	
-	size_t base64_len;
-	char* encrypt_base64 = rsa_base64(encrypt, encrypt_len, &base64_len);
-	
-	write(conn->fd, &encrypt_len, sizeof(int));
-	ssize_t sent = write(conn->fd, encrypt_base64, base64_len);
-	free(encrypt);
-	free(encrypt_base64);
-	
-	return sent;
-}
-
-ssize_t rsa_recv(Connection* conn, void* data_buffer) {
-	int encrypt_len;
-	read(conn->fd, &encrypt_len, sizeof(int));
-	
-	char* err = malloc(130);
-	char* decrypt = malloc((size_t) RSA_size(conn->parent->rsa_child->private_key));
-	if (RSA_private_decrypt(encrypt_len, (unsigned char*) data_buffer, (unsigned char*) decrypt,
-	                        conn->parent->rsa_child->private_key, RSA_PKCS1_OAEP_PADDING) == -1) {
-		ERR_load_crypto_strings();
-		ERR_error_string(ERR_get_error(), err);
-		fprintf(stderr, "Error decrypting message: %s\n", err);
-		return 0;
+	sent += write_int_fd(conn->fd, chunk_number);
+	for (; chunk_number >= 0; chunk_number--) {
+		int chunk_size = chunk_number == 0 ? (int)size % rsa_size : rsa_size;
+		int encrypt_len;
+		if ((encrypt_len =
+				     RSA_public_encrypt(chunk_size, (unsigned char*) data + offset,
+				                        encrypt, conn->public_key, RSA_PKCS1_OAEP_PADDING)) == -1) {
+			ERR_load_crypto_strings();
+			ERR_error_string(ERR_get_error(), err);
+			fprintf(stderr, "Error encrypting message: %s\n", err);
+			
+			free(err);
+			free(encrypt);
+			return 0;
+		}
+		
+		size_t base64_len;
+		char* encrypt_base64 = rsa_base64(encrypt, encrypt_len, &base64_len);
+		
+		sent += write_int_fd(conn->fd, encrypt_len);
+		sent += write_int_fd(conn->fd, chunk_size);
+		sent += write(conn->fd, encrypt_base64, base64_len);
+		
+		offset += chunk_size;
+		free(encrypt_base64);
 	}
 	
 	free(err);
-	return encrypt_len;
+	free(encrypt);
+	return sent;
+}
+
+ssize_t rsa_decrypt(Connection* conn, void* from, void* to, int encrypted_size, int decrypted_size) {
+	char* err = malloc(130);
+	decrypted_size = RSA_private_decrypt(
+			encrypted_size,
+			(unsigned char*) from,
+			(unsigned char*) to,
+			conn->parent->rsa_child->private_key,
+			RSA_PKCS1_OAEP_PADDING);
+	if (decrypted_size == -1) {
+		ERR_load_crypto_strings();
+		ERR_error_string(ERR_get_error(), err);
+		fprintf(stderr, "Error decrypting message: %s\n", err);
+	}
+	
+	free(err);
+	return decrypted_size;
 }
 
 int rsa_generate(Server* parent) {
