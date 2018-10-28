@@ -97,7 +97,7 @@ int rsa_load_binding (Connection* conn) {
 		char* rsa_raw;
 		int rsa_len;
 	} *public_raw = small_map_get(conn->parent->rsa_child->rsa_binding, conn->ip);
-	if (!public_raw->rsa_raw)
+	if (!public_raw)
 		return 1;
 	
 	BIO* target_public_bio = BIO_new(BIO_s_mem());
@@ -186,24 +186,27 @@ int rsa_generate(Server* parent) {
 	// 1. generate rsa key
 	bne = BN_new();
 	ret = BN_set_word(bne, e);
-	if (ret != 1)
+	if (ret != 1) {
+		fprintf(stderr, "bignum generation failed\n");
 		goto free_all;
+	}
 	
 	r = RSA_new();
 	ret = RSA_generate_key_ex(r, bits, bne, NULL);
-	if (ret != 1)
+	if (ret != 1) {
+		fprintf(stderr, "RSA key generation failed\n");
 		goto free_all;
+	}
 	
 	// 2. save public key
 	bp_public = BIO_new_file("public.pem", "w+");
 	ret = PEM_write_bio_RSAPublicKey(bp_public, r);
-	if (ret != 1) {
+	if (ret != 1)
 		goto free_all;
-	}
 	
 	// 3. save private key
 	bp_private = BIO_new_file("private.pem", "w+");
-	ret = PEM_write_bio_RSAPrivateKey(bp_private, r, NULL, NULL, 0, NULL, NULL);
+	ret = PEM_write_bio_RSAPrivateKey(bp_private, r, NULL, NULL, 0, NULL, NULL) == 1;
 	
 	// 4. free
 	free_all:
@@ -213,5 +216,5 @@ int rsa_generate(Server* parent) {
 	RSA_free(r);
 	BN_free(bne);
 	
-	return (ret == 1);
+	return (ret != 1);
 }

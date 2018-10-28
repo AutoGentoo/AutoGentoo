@@ -4,17 +4,18 @@
 #include <string.h>
 
 Opt opt_handlers[] = {
-		{'s', "server", "Start the autogentoo server (instead of client)", set_is_server,      OPT_SHORT | OPT_LONG},
-		{'r', "root",   "Set the root directory of the server",            set_location,       OPT_SHORT | OPT_LONG |
-		                                                                                       OPT_ARG},
-		{'h', "help",   "Print the help message and exit",                 print_help_wrapper, OPT_SHORT | OPT_LONG},
-		{0,   "port",   "Set the port to bind the server to",              set_port,           OPT_LONG | OPT_ARG},
-		{0,   "debug",  "Turn on the debug feature (nothing right now)",   set_debug,          OPT_LONG},
-		{0,   "daemon", "Run in background and detach from the terminal",  set_daemon,         OPT_LONG},
-		{0,   "log",    "Pipe output to logfile",                          pipe_to_log,        OPT_LONG | OPT_ARG},
-		{'t', "target", "Target server (localhost default)",               set_target,         OPT_SHORT | OPT_LONG |
-		                                                                                       OPT_ARG},
-		{0, NULL, NULL, NULL,                                                                  (opt_opts_t) 0}
+		{'s', "server",  "Start the autogentoo server (instead of client)", set_is_server,      OPT_SHORT | OPT_LONG},
+		{'r', "root",    "Set the root directory of the server",            set_location,       OPT_SHORT | OPT_LONG |
+		                                                                                        OPT_ARG},
+		{'h', "help",    "Print the help message and exit",                 print_help_wrapper, OPT_SHORT | OPT_LONG},
+		{0,   "port",    "Set the port to bind the server to",              set_port,           OPT_LONG | OPT_ARG},
+		{0,   "debug",   "Turn on the debug feature (nothing right now)",   set_debug,          OPT_LONG},
+		{0,   "daemon",  "Run in background and detach from the terminal",  set_daemon,         OPT_LONG},
+		{0,   "log",     "Pipe output to logfile",                          pipe_to_log,        OPT_LONG | OPT_ARG},
+		{'t', "target",  "Target server (localhost default)",               set_target,         OPT_SHORT | OPT_LONG |
+		                                                                                        OPT_ARG},
+		{0,   "encrypt", "Start an encrypted socket as well",               set_is_encrypted,   OPT_LONG},
+		{0, NULL, NULL, NULL, (opt_opts_t) 0 }
 };
 
 static char* location = NULL;
@@ -23,6 +24,10 @@ static server_t server_opts;
 static int logfile_fd = -1;
 static char is_server = 0;
 static char* client_opts = NULL;
+
+void set_is_encrypted (Opt* op, char* c) {
+	server_opts |= ENCRYPT;
+}
 
 void set_is_server(Opt* op, char* c) {
 	is_server = 1;
@@ -68,6 +73,9 @@ int main(int argc, char** argv) {
 	
 	if (is_server) {
 		Server* main_server = read_server(location, port, server_opts);
+		main_server->keep_alive = 1;
+		if (main_server->opts & ENCRYPT)
+			server_encrypt_start (main_server->rsa_child);
 		server_start(main_server);
 	} else {
 		char* cmd;

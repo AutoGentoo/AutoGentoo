@@ -9,6 +9,8 @@ ex = [
 	"d_malloc",
 	"interface",
 	"request",
+	"crypt",
+	"bignum"
 #	"worker",
 #	"job"
 ]

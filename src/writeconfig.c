@@ -8,23 +8,23 @@ inline size_t rsa_write_void(size_t len, FILE* fp) {
 	return 0;
 }
 
-inline void* read_void(size_t len, FILE* fp) {
+void* read_void(size_t len, FILE* fp) {
 	void* out = malloc (len);
 	fread(out, 1, len, fp);
 	return out;
 }
 
-inline size_t write_void(void* ptr, size_t len, FILE* fp) {
+size_t write_void(void* ptr, size_t len, FILE* fp) {
 	return fwrite(ptr, 1, len, fp);
 }
 
-inline size_t write_int(int src, FILE* fp) {
+size_t write_int(int src, FILE* fp) {
 	int big_endian_src = htonl((uint32_t) src);
 	
 	return fwrite(&big_endian_src, sizeof(int), 1, fp);
 }
 
-inline int read_int(FILE* fp) {
+int read_int(FILE* fp) {
 	int out;
 	fread(&out, sizeof(int), 1, fp);
 	out = ntohl((uint32_t) out);

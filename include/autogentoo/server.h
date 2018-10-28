@@ -43,7 +43,7 @@ typedef enum {
 	DAEMON = 0x1, //!< Run the server in background as a service
 	NO_DEBUG = 0x0, //!< Turn off debug information
 	DEBUG = 0x2, //!< Turn on debug information
-	ENCRYPT = 0x4
+	ENCRYPT = 0x4  //!< Start an encrypted socket
 } server_t;
 
 /**
@@ -149,6 +149,7 @@ struct __Connection {
  */
 Server* server_new(char* location, char* port, server_t opts);
 
+pid_t server_encrypt_start(EncryptServer* server);
 EncryptServer* server_encrypt_new (Server* parent, char* port);
 
 /**

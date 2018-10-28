@@ -38,7 +38,7 @@ Server* server_new (char* location, char* port, server_t opts) {
 	out->opts = opts;
 	out->port = strdup(port);
 	
-	if (out->opts | ENCRYPT)
+	if (out->opts & ENCRYPT)
 		out->rsa_child = server_encrypt_new(out, "4950");
 	
 	return out;
@@ -145,7 +145,11 @@ void server_start (Server* server) {
 	}
 }
 
-void server_encrypt_start (EncryptServer* server) {
+pid_t server_encrypt_start(EncryptServer* server) {
+	pid_t child_pid = fork();
+	if (child_pid)
+		return child_pid;
+	
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	
@@ -188,6 +192,8 @@ void server_encrypt_start (EncryptServer* server) {
 		server_respond (current_conn);
 #endif
 	}
+	
+	exit (0);
 }
 
 void server_kill (Server* server) {
@@ -473,6 +479,6 @@ void server_add_queue (Server* parent, Queue* new) {
 pid_t server_spawn_worker (Server* parent) {
 	parent->queue->proc_id = fork ();
 	if (parent->queue->proc_id == 0)
-		execl (AUTOGENTOO_WORKER, "");
+		execl (AUTOGENTOO_WORKER, "", NULL);
 	return parent->queue->proc_id;
 }

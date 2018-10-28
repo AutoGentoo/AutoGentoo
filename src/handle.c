@@ -90,8 +90,7 @@ response_t GET (Connection* conn, HTTPRequest req) {
 	
 	int fd, data_to_send;
 	
-	if ((fd = open(path, O_RDONLY)) != -1) // FILE FOUND
-	{
+	if ((fd = open(path, O_RDONLY)) != -1) { // FILE FOUND
 		ssize_t bytes_read;
 		rsend(conn, OK);
 		res = OK;

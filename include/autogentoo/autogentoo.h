@@ -45,6 +45,8 @@
 #define AUTOGENTOO_PORT "9490"
 #endif
 
+void set_is_encrypted (Opt* op, char* c);
+
 void set_is_server(Opt* op, char* c);
 
 void set_location(Opt* op, char* loc);
