@@ -173,7 +173,7 @@ pid_t server_encrypt_start(EncryptServer* server) {
 		Connection* current_conn = connection_new(server->parent, temp_fd);
 		current_conn->communication_type = COM_RSA;
 		
-		if (rsa_load_binding(current_conn) != 0 || rsa_perform_handshake(current_conn) != 0) {
+		if (rsa_perform_handshake(current_conn) != 0) {
 			fprintf (stderr, "Failed to perform rsa handshake\n");
 			connection_free(current_conn);
 			continue;

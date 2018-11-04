@@ -30,7 +30,9 @@ AC_CHECK_LIB([curl], [curl_easy_init], [], [
     AC_MSG_ERROR(["libcurl could not be found"])
 ])
 
-AC_CHECK_LIB([
+AC_CHECK_LIB([ssl], [curl_easy_init], [], [
+    AC_MSG_ERROR(["libcurl could not be found"])
+])
 
 #AC_CHECK_LIB(pcre2-8, pcre2_compile_8,
 #![

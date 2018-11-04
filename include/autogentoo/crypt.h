@@ -15,7 +15,8 @@ typedef enum {
 	AUTOGENTOO_RSA_NOAUTH, //!< Needs public key from client
 	AUTOGENTOO_RSA_VERIFY, //!< Check if we have updated public key
 	AUTOGENTOO_RSA_CORRECT, //!< RSA exchange complete
-	AUTOGENTOO_RSA_INCORRECT //!< RSA wrong key
+	AUTOGENTOO_RSA_INCORRECT, //!< RSA wrong key
+	AUTOGENTOO_RSA_AUTH_CONTINUE //!< Server has public key, continue with handshake
 } rsa_t;
 
 int rsa_binding_verify(Server* parent, RSA* target, Connection* conn);

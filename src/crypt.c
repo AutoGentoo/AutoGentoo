@@ -62,33 +62,53 @@ int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw, int len) {
 }
 
 int rsa_perform_handshake(Connection* conn) {
-	BIO* public_bio_send = BIO_new(BIO_s_mem());
+	rsa_t c_rsa_request;
+	if (rsa_load_binding(conn) != 0)
+		c_rsa_request = AUTOGENTOO_RSA_NOAUTH;
+	else
+		c_rsa_request = AUTOGENTOO_RSA_AUTH_CONTINUE;
+	FILE* conn_fp = fdopen(conn->fd, "rw");
+	
+	/* Ask for public key */
+	write(conn->fd, &c_rsa_request, sizeof(rsa_t));
+	
+	if (c_rsa_request == AUTOGENTOO_RSA_AUTH_CONTINUE)
+		goto send_to_client;
+	
 	BIO* public_bio_recieve = BIO_new(BIO_s_mem());
 	
-	FILE* conn_fp = fdopen(conn->fd, "rw");
-	PEM_write_bio_RSAPublicKey(public_bio_send, conn->parent->rsa_child->private_key);
-	
-	size_t send_len, rec_len;
-	send_len = (size_t)BIO_pending(public_bio_send);
-	
-	rsa_t c_rsa_request = AUTOGENTOO_RSA_NOAUTH;
-	write(conn->fd, &c_rsa_request, sizeof(rsa_t));
+	/* Get the length of the pub_key */
+	size_t rec_len;
 	read(conn->fd, &rec_len, sizeof(rsa_t));
-	
 	char* rec_pub = malloc(rec_len + 1);
-	char* send_pub = malloc(send_len + 1);
 	
-	BIO_write(public_bio_send, send_pub, (int)send_len);
+	/* Read the public key into the buffer */
 	read(conn->fd, rec_pub, rec_len);
 	rec_pub[rec_len] = '\0';
 	
+	/* Convert raw data into a BIO */
+	BIO_read(public_bio_recieve, rec_pub, (int)rec_len);
+	
+	send_to_client:
+	read(conn->fd, &c_rsa_request, sizeof(size_t));
+	
+	if (c_rsa_request == AUTOGENTOO_RSA_AUTH_CONTINUE)
+		goto finish;
+	
+	BIO* public_bio_send = BIO_new(BIO_s_mem());
+	PEM_write_bio_RSAPublicKey(public_bio_send, conn->parent->rsa_child->private_key);
+	size_t send_len = (size_t)BIO_pending(public_bio_send);
+	
+	char* send_pub = malloc(send_len + 1);
+	BIO_write(public_bio_send, send_pub, (int)send_len);
+	
 	write(conn->fd, &send_len, sizeof(size_t));
 	write(conn->fd, send_pub, send_len);
-	BIO_read(public_bio_recieve, rec_pub, (int)rec_len);
 	
 	conn->public_key = RSA_new();
 	conn->public_key = PEM_read_bio_RSA_PUBKEY(public_bio_recieve, &conn->public_key, NULL, NULL);
 	
+	finish:
 	return rsa_ip_bind(conn->parent, conn, rec_pub, (int)rec_len);
 }
 
