@@ -10,6 +10,43 @@
 #include <openssl/err.h>
 #include <autogentoo/writeconfig.h>
 
+int rsa_recv_public(Connection* conn) {
+	BIO* public_bio_recieve = BIO_new(BIO_s_mem());
+	
+	/* Get the length of the pub_key */
+	size_t rec_len;
+	read(conn->fd, &rec_len, sizeof(rsa_t));
+	char* rec_pub = malloc(rec_len + 1);
+	
+	/* Read the public key into the buffer */
+	read(conn->fd, rec_pub, rec_len);
+	rec_pub[rec_len] = '\0';
+	
+	/* Convert raw data into a BIO */
+	BIO_read(public_bio_recieve, rec_pub, (int)rec_len);
+	
+	conn->public_key = RSA_new();
+	conn->public_key = PEM_read_bio_RSA_PUBKEY(public_bio_recieve, &conn->public_key, NULL, NULL);
+	
+	free(rec_pub);
+	
+	return rsa_ip_bind(conn->parent, conn, rec_pub, (int)rec_len);
+}
+int rsa_send_public(Connection* conn) {
+	BIO* public_bio_send = BIO_new(BIO_s_mem());
+	PEM_write_bio_RSAPublicKey(public_bio_send, conn->parent->rsa_child->private_key);
+	size_t send_len = (size_t)BIO_pending(public_bio_send);
+	
+	char* send_pub = malloc(send_len + 1);
+	BIO_write(public_bio_send, send_pub, (int)send_len);
+	
+	write(conn->fd, &send_len, sizeof(size_t));
+	write(conn->fd, send_pub, send_len);
+	free(send_pub);
+	
+	return 0;
+}
+
 char* rsa_base64(const unsigned char* input, int length, size_t* base64_len) {
 	BIO* bmem, * b64;
 	BUF_MEM* bptr;
@@ -41,7 +78,7 @@ int rsa_binding_verify(Server* parent, RSA* target, Connection* conn) {
 	conn->public_key = target;
 	
 	rsa_send(conn, autogentoo_verify, 16);
-	rsa_decrypt(NULL, conn, &rsa_response, 0, 0);
+	read(conn->fd, &rsa_response, sizeof(size_t));
 	
 	if (rsa_response == AUTOGENTOO_RSA_CORRECT)
 		return 0;
@@ -62,54 +99,18 @@ int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw, int len) {
 }
 
 int rsa_perform_handshake(Connection* conn) {
-	rsa_t c_rsa_request;
-	if (rsa_load_binding(conn) != 0)
-		c_rsa_request = AUTOGENTOO_RSA_NOAUTH;
-	else
-		c_rsa_request = AUTOGENTOO_RSA_AUTH_CONTINUE;
-	FILE* conn_fp = fdopen(conn->fd, "rw");
-	
-	/* Ask for public key */
+	int ret = 0;
+	rsa_t c_rsa_request = rsa_load_binding(conn) != 0 ? AUTOGENTOO_RSA_NOAUTH : AUTOGENTOO_RSA_AUTH_CONTINUE;
 	write(conn->fd, &c_rsa_request, sizeof(rsa_t));
 	
-	if (c_rsa_request == AUTOGENTOO_RSA_AUTH_CONTINUE)
-		goto send_to_client;
+	if (c_rsa_request == AUTOGENTOO_RSA_NOAUTH)
+		ret += rsa_recv_public(conn);
 	
-	BIO* public_bio_recieve = BIO_new(BIO_s_mem());
-	
-	/* Get the length of the pub_key */
-	size_t rec_len;
-	read(conn->fd, &rec_len, sizeof(rsa_t));
-	char* rec_pub = malloc(rec_len + 1);
-	
-	/* Read the public key into the buffer */
-	read(conn->fd, rec_pub, rec_len);
-	rec_pub[rec_len] = '\0';
-	
-	/* Convert raw data into a BIO */
-	BIO_read(public_bio_recieve, rec_pub, (int)rec_len);
-	
-	send_to_client:
 	read(conn->fd, &c_rsa_request, sizeof(size_t));
+	if (c_rsa_request == AUTOGENTOO_RSA_NOAUTH)
+		ret += rsa_send_public(conn);
 	
-	if (c_rsa_request == AUTOGENTOO_RSA_AUTH_CONTINUE)
-		goto finish;
-	
-	BIO* public_bio_send = BIO_new(BIO_s_mem());
-	PEM_write_bio_RSAPublicKey(public_bio_send, conn->parent->rsa_child->private_key);
-	size_t send_len = (size_t)BIO_pending(public_bio_send);
-	
-	char* send_pub = malloc(send_len + 1);
-	BIO_write(public_bio_send, send_pub, (int)send_len);
-	
-	write(conn->fd, &send_len, sizeof(size_t));
-	write(conn->fd, send_pub, send_len);
-	
-	conn->public_key = RSA_new();
-	conn->public_key = PEM_read_bio_RSA_PUBKEY(public_bio_recieve, &conn->public_key, NULL, NULL);
-	
-	finish:
-	return rsa_ip_bind(conn->parent, conn, rec_pub, (int)rec_len);
+	return ret == 0;
 }
 
 int rsa_load_binding (Connection* conn) {

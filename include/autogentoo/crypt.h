@@ -19,6 +19,9 @@ typedef enum {
 	AUTOGENTOO_RSA_AUTH_CONTINUE //!< Server has public key, continue with handshake
 } rsa_t;
 
+int rsa_recv_public(Connection* conn);
+int rsa_send_public(Connection* conn);
+
 int rsa_binding_verify(Server* parent, RSA* target, Connection* conn);
 int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw, int len);
 int rsa_generate(Server* parent);

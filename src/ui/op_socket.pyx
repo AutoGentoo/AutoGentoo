@@ -29,12 +29,12 @@ cdef class Socket:
 		self.fd = -1
 	
 	cdef DynamicBuffer encrypt (self, DynamicBuffer data):
-		cdef int chunks_left = data.n /
+		pass
 	
 	cdef DynamicBuffer decrypt (self, DynamicBuffer data):
+		pass
 	
-	
-	cdef send (self, DynamicBuffer data, do_connect):
+	cdef c_send (self, void* data, size_t size, do_connect):
 		if do_connect:
 			self.socket = socket (AF_INET, SOCK_STREAM, 0)
 			self.fd = self.socket.fileno()
@@ -43,7 +43,10 @@ cdef class Socket:
 			if self.socket.connect ((self.adr.ip.decode ("UTF-8"), <object>atoi(self.adr.port))):
 				raise ConnectionError("Failed to connect")
 		
-		return write (self.fd, data.ptr, data.n)
+		return write (self.fd, data, size)
+	
+	cdef send (self, DynamicBuffer data, do_connect):
+		return self.c_send(data.ptr, data.n, do_connect)
 	
 	cpdef recv (self, int size):
 		cdef char* buffer = <char*>malloc (size)
