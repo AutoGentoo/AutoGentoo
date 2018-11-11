@@ -17,9 +17,21 @@ int prv_read_int (void** data, void* end, int* out) {
 	return 0;
 }
 
-#ifndef AUTOGENTOO_REQUEST_HANDLE_ERROR
 #define AUTOGENTOO_REQUEST_HANDLE_ERROR {free(out); return NULL;}
-#endif
+#define AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR {\
+vector_free (out->structures_parent); \
+vector_free (out->types_parent); \
+AUTOGENTOO_REQUEST_HANDLE_ERROR}
+
+#define AUTOGENTOO_READ_INT(destination) {\
+	if (prv_read_int (&current_request, end, (int*)&(destination)) == -1)\
+		AUTOGENTOO_REQUEST_HANDLE_ERROR\
+};
+#define AUTOGENTOO_READ_INT_ERROR(destination, error) {\
+	if (prv_read_int (&current_request, end, (int*)&(destination)) == -1){\
+		(error);\
+	}\
+};
 
 Request* request_handle (Connection* conn) {
 	Request* out = malloc (sizeof (Request));
@@ -42,8 +54,8 @@ Request* request_handle (Connection* conn) {
 		return out;
 	
 	void* end = out->conn->request + out->conn->size;
-	if (prv_read_int (&current_request, end, (int*)&out->request_type) == -1)
-		AUTOGENTOO_REQUEST_HANDLE_ERROR
+	
+	AUTOGENTOO_READ_INT(out->request_type);
 	
 	out->structures_parent = vector_new (sizeof (RequestData), REMOVE | ORDERED);
 	out->types_parent = vector_new (sizeof (request_structure_t), REMOVE | ORDERED);
@@ -51,16 +63,12 @@ Request* request_handle (Connection* conn) {
 	out->types = out->types_parent->ptr;
 	
 	request_structure_t current;
-	if (prv_read_int (&current_request, end, (int*)&current) == -1) {
-		vector_free (out->structures_parent);
-		vector_free (out->types_parent);
-		AUTOGENTOO_REQUEST_HANDLE_ERROR
-	}
+	AUTOGENTOO_READ_INT_ERROR(current, AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR);
 	
 	long d = 0;
 	while (current != STRCT_END) {
 		if (current >= STRCT_MAX)
-			AUTOGENTOO_REQUEST_HANDLE_ERROR
+			AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR
 		
 		vector_add(out->types_parent, &current);
 		vector_add(out->structures_parent, &d);
@@ -70,11 +78,10 @@ Request* request_handle (Connection* conn) {
 				request_structure_linkage[current - 1],
 				current_request, end);
 		if (len == -1)
-			AUTOGENTOO_REQUEST_HANDLE_ERROR
+			AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR
 		current_request += len;
 		
-		if (prv_read_int (&current_request, end, (int*)&current) == -1)
-			AUTOGENTOO_REQUEST_HANDLE_ERROR
+		AUTOGENTOO_READ_INT_ERROR(current, AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR);
 	}
 	
 	return out;

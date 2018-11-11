@@ -8,6 +8,12 @@ cdef extern from "<arpa/inet.h>":
 	int htonl (int)
 
 cdef class DynamicBuffer:
+	def __init__(self, void* initial, size_t size):
+		self.ptr = malloc(size)
+		self.size = size
+		
+		self.append(initial, size)
+	
 	def __init__ (self, char* start=<char*>NULL, size_t size=32, short align=32):
 		if size > 0:
 			self.ptr = malloc (size)

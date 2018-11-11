@@ -21,6 +21,8 @@ cdef extern from "openssl/bio.h":
 	void* BIO_s_mem(void);
 	BIO *BIO_new(void* type);
 	int BIO_read(BIO *b, void *data, int len);
+	int BIO_write(BIO *b, void *data, int len);
+	size_t BIO_pending (BIO* b)
 	void BIO_free_all(BIO *a);
 	BIO *BIO_new_file(const char *filename, const char *mode);
 
@@ -41,11 +43,13 @@ cdef extern from "<openssl/rsa.h>":
 
 cdef extern from "<autogentoo/writeconfig.h>":
 	cdef enum rsa_t:
-		AUTOGENTOO_RSA_NOAUTH, #!< Needs public key from client
 		AUTOGENTOO_RSA_VERIFY, #!< Check if we have updated public key
 		AUTOGENTOO_RSA_CORRECT, #!< RSA exchange complete
 		AUTOGENTOO_RSA_INCORRECT, #!< RSA wrong key
-		AUTOGENTOO_RSA_AUTH_CONTINUE #!< Server has public key, continue with handshake
+		AUTOGENTOO_RSA_AUTH_CONTINUE, #!< Server has public key, continue with handshake
+		AUTOGENTOO_RSA_SERVERSIDE_PUBLIC = 1 << 0,
+		AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC = 1 << 1,
+		AUTOGENTOO_RSA_NOAUTH = AUTOGENTOO_RSA_SERVERSIDE_PUBLIC | AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC
 
 cdef class Crypt:
 	cdef RSA* parent_key # Client-wide private key
@@ -63,4 +67,4 @@ cdef class Crypt:
 	# Private functions
 	#cdef send_public(self, Socket s)
 	#cdef recv_public(self, Socket s)
-	#cdef int rsa_verify(self, Socket s)
+	#cdef rsa_t rsa_verify(self, Socket s)

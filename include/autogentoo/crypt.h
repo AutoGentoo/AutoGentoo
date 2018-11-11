@@ -12,23 +12,26 @@
 #endif
 
 typedef enum {
-	AUTOGENTOO_RSA_NOAUTH, //!< Needs public key from client
 	AUTOGENTOO_RSA_VERIFY, //!< Check if we have updated public key
 	AUTOGENTOO_RSA_CORRECT, //!< RSA exchange complete
 	AUTOGENTOO_RSA_INCORRECT, //!< RSA wrong key
-	AUTOGENTOO_RSA_AUTH_CONTINUE //!< Server has public key, continue with handshake
+	AUTOGENTOO_RSA_AUTH_CONTINUE, //!< Server has public key, continue with handshake
+	
+	AUTOGENTOO_RSA_SERVERSIDE_PUBLIC = 1 << 0,
+	AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC = 1 << 1,
+	AUTOGENTOO_RSA_NOAUTH = AUTOGENTOO_RSA_SERVERSIDE_PUBLIC | AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC
 } rsa_t;
 
 int rsa_recv_public(Connection* conn);
 int rsa_send_public(Connection* conn);
 
-int rsa_binding_verify(Server* parent, RSA* target, Connection* conn);
+rsa_t rsa_binding_verify(Server* parent, RSA* target, Connection* conn);
 int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw, int len);
 int rsa_generate(Server* parent);
 int rsa_perform_handshake(Connection* conn);
 ssize_t rsa_send(Connection* conn, void* data, size_t size);
 ssize_t rsa_decrypt(Connection* conn, void* from, void* to, int encrypted_size, int decrypted_size);
 char* rsa_base64(const unsigned char* input, int length, size_t* base64_len);
-int rsa_load_binding (Connection* conn);
+rsa_t rsa_load_binding(Connection* conn);
 
 #endif //AUTOGENTOO_CRYPT_H

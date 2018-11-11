@@ -29,6 +29,7 @@ int rsa_recv_public(Connection* conn) {
 	conn->public_key = PEM_read_bio_RSA_PUBKEY(public_bio_recieve, &conn->public_key, NULL, NULL);
 	
 	free(rec_pub);
+	BIO_free_all(public_bio_recieve);
 	
 	return rsa_ip_bind(conn->parent, conn, rec_pub, (int)rec_len);
 }
@@ -43,6 +44,7 @@ int rsa_send_public(Connection* conn) {
 	write(conn->fd, &send_len, sizeof(size_t));
 	write(conn->fd, send_pub, send_len);
 	free(send_pub);
+	BIO_free_all(public_bio_send);
 	
 	return 0;
 }
@@ -68,24 +70,68 @@ char* rsa_base64(const unsigned char* input, int length, size_t* base64_len) {
 	return buff;
 }
 
-int rsa_binding_verify(Server* parent, RSA* target, Connection* conn) {
+rsa_t rsa_binding_verify(Server* parent, RSA* target, Connection* conn) {
 	rsa_t c_rsa_request = AUTOGENTOO_RSA_VERIFY;
 	write(conn->fd, &c_rsa_request, sizeof(rsa_t));
 	
 	char* autogentoo_verify = "AutoGentooVerify";
-	
 	rsa_t rsa_response = -1;
-	conn->public_key = target;
+	rsa_t exit_code = 0;
 	
-	rsa_send(conn, autogentoo_verify, 16);
-	read(conn->fd, &rsa_response, sizeof(size_t));
+	int rsa_size = RSA_size(conn->public_key);
+	unsigned char* encrypt = malloc((size_t)rsa_size);
+	char* err = malloc(130);
 	
-	if (rsa_response == AUTOGENTOO_RSA_CORRECT)
-		return 0;
+	int encrypt_len;
+	if ((encrypt_len =
+			     RSA_public_encrypt(rsa_size, (unsigned char*)autogentoo_verify,
+			                        encrypt, target, RSA_PKCS1_OAEP_PADDING)) == -1) {
+		ERR_load_crypto_strings();
+		ERR_error_string(ERR_get_error(), err);
+		fprintf(stderr, "Error encrypting message: %s\n", err);
+		
+		free(err);
+		free(encrypt);
+		return -1;
+	}
 	
-	fprintf(stderr, "key verification failed\n");
-	conn->public_key = NULL;
-	return 1;
+	size_t base64_len;
+	char* encrypt_base64 = rsa_base64(encrypt, encrypt_len, &base64_len);
+	
+	write_int_fd(conn->fd, encrypt_len);
+	write(conn->fd, encrypt_base64, base64_len);
+	
+	free(encrypt_base64);
+	free(err);
+	free(encrypt);
+	
+	read(conn->fd, &rsa_response, sizeof(int));
+	if (rsa_response == AUTOGENTOO_RSA_INCORRECT) {
+		fprintf(stderr, "Server has wrong client public key");
+		exit_code |= AUTOGENTOO_RSA_SERVERSIDE_PUBLIC;
+	}
+	
+	size_t incoming_size;
+	read(conn->fd, &incoming_size, sizeof(size_t));
+	
+	char* raw_encrypted = malloc (incoming_size);
+	char* decrypted = malloc(17);
+	read(conn->fd, raw_encrypted, incoming_size);
+	
+	rsa_decrypt(conn, raw_encrypted, decrypted, (int)incoming_size, 16);
+	if (strncmp(decrypted, autogentoo_verify, 16) != 0) {
+		fprintf(stderr, "Client has wrong server public key");
+		
+		rsa_response = AUTOGENTOO_RSA_INCORRECT;
+		exit_code |= AUTOGENTOO_RSA_SERVERSIDE_PUBLIC;
+	}
+	else
+		rsa_response = AUTOGENTOO_RSA_CORRECT;
+	write(conn->fd, &rsa_response, sizeof(int));
+	free(raw_encrypted);
+	free(decrypted);
+	
+	return exit_code;
 }
 
 int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw, int len) {
@@ -100,30 +146,41 @@ int rsa_ip_bind(Server* parent, Connection* conn, char* rsa_raw, int len) {
 
 int rsa_perform_handshake(Connection* conn) {
 	int ret = 0;
-	rsa_t c_rsa_request = rsa_load_binding(conn) != 0 ? AUTOGENTOO_RSA_NOAUTH : AUTOGENTOO_RSA_AUTH_CONTINUE;
-	write(conn->fd, &c_rsa_request, sizeof(rsa_t));
+	rsa_t c_rsa_request = rsa_load_binding(conn);
 	
-	if (c_rsa_request == AUTOGENTOO_RSA_NOAUTH)
+	/* Check if client and server have the same status */
+	int check_status;
+	write(conn->fd, &c_rsa_request, sizeof(rsa_t));
+	read(conn->fd, &check_status, sizeof(int));
+	if (!check_status) {
+		fprintf(stderr, "Client and server don't have same status code\n");
+		return 0;
+	}
+	
+	if (c_rsa_request & AUTOGENTOO_RSA_SERVERSIDE_PUBLIC)
 		ret += rsa_recv_public(conn);
 	
-	read(conn->fd, &c_rsa_request, sizeof(size_t));
-	if (c_rsa_request == AUTOGENTOO_RSA_NOAUTH)
+	if (c_rsa_request & AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC)
 		ret += rsa_send_public(conn);
 	
 	return ret == 0;
 }
 
-int rsa_load_binding (Connection* conn) {
+rsa_t rsa_load_binding(Connection* conn) {
 	struct {
 		char* rsa_raw;
 		int rsa_len;
 	} *public_raw = small_map_get(conn->parent->rsa_child->rsa_binding, conn->ip);
-	if (!public_raw)
-		return 1;
+	if (!public_raw) {
+		rsa_t send_binding_status = AUTOGENTOO_RSA_NOAUTH;
+		write(conn->fd, &send_binding_status, sizeof(rsa_t));
+		return AUTOGENTOO_RSA_NOAUTH;
+	}
 	
 	BIO* target_public_bio = BIO_new(BIO_s_mem());
 	BIO_read(target_public_bio, public_raw, public_raw->rsa_len);
 	conn->public_key = PEM_read_bio_RSA_PUBKEY(target_public_bio, &conn->public_key, NULL, NULL);
+	BIO_free_all(target_public_bio);
 	
 	return rsa_binding_verify(conn->parent, conn->public_key, conn);
 }

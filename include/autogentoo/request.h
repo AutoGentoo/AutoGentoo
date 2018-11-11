@@ -28,6 +28,11 @@ typedef enum {
 } protocol_t;
 
 typedef enum {
+	DIR_CONNECTION_END, //!< Kill the connection after this request ends
+	DIR_CONNECTION_OPEN, //!< Handle another request after this one
+} directive_t;
+
+typedef enum {
 	REQ_GET,
 	REQ_INSTALL,
 	REQ_EDIT,
@@ -80,6 +85,7 @@ struct __Request {
 	request_t request_type;
 	FunctionHandler resolved_call;
 	Connection* conn;
+	directive_t directive;
 	
 	int struct_c;
 	Vector* structures_parent;
