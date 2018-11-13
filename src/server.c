@@ -179,6 +179,9 @@ pid_t server_encrypt_start(EncryptServer* server) {
 			continue;
 		}
 		
+		current_conn->encrypted_fd = BIO_new(BIO_s_fd());
+		PEM_write_bio_RSAPublicKey(current_conn->encrypted_fd, current_conn->public_key);
+		PEM_write_bio_RSAPrivateKey(current_conn->encrypted_fd, server->private_key, NULL, NULL, 0, NULL, NULL);
 
 #ifndef AUTOGENTOO_NO_THREADS
 		pthread_t p_pid;
@@ -265,6 +268,11 @@ void connection_free (Connection* conn) {
 		conn->status = CLOSED;
 	}
 	
+	if (conn->communication_type == COM_RSA) {
+		BIO_free_all(conn->encrypted_fd);
+		RSA_free(conn->public_key);
+	}
+	
 	free(conn->request);
 	free(conn->ip);
 	free(conn);
@@ -303,7 +311,7 @@ void server_recv (Connection* conn) {
 			conn->request = realloc(conn->request, buffer_size);
 		}
 		
-		current_bytes = read(conn->fd, conn->request + total_read, chunk_len);
+		current_bytes = connection_read(conn->request + total_read, chunk_len);
 		total_read += current_bytes;
 	}
 	
@@ -325,35 +333,6 @@ void server_recv (Connection* conn) {
 	conn->status = CONNECTED;
 }
 
-void server_rsa_recv(Connection* conn) {
-	int chunks_left = read_int_fd(conn->fd);
-	conn->size = 0;
-	
-	size_t chunk_size = (size_t)RSA_size(conn->public_key);
-	conn->request = malloc (chunk_size * chunks_left);
-	
-	void* encrypted_chunk = malloc(chunk_size);
-	void* current_pos = conn->request;
-	while (chunks_left--) {
-		int encrypted_size = read_int_fd(conn->fd);
-		int decrypted_size = read_int_fd(conn->fd);
-		
-		read(conn->fd, encrypted_chunk, (size_t)encrypted_size);
-		conn->size += rsa_decrypt(conn, encrypted_chunk, current_pos, encrypted_size, decrypted_size);
-	}
-	free(encrypted_chunk);
-	
-	if (conn->size == 0) { // receive socket closed
-		lwarning("Client disconnected upexpectedly.");
-		conn->status = FAILED;
-		connection_free(conn);
-		pthread_kill(conn->pid, SIGUSR1);
-		return;
-	}
-	
-	conn->status = CONNECTED;
-}
-
 void server_respond (Connection* conn) {
 #ifndef AUTOGENTOO_NO_THREADS
 	conn->pid = pthread_self();
@@ -365,10 +344,7 @@ void server_respond (Connection* conn) {
 	conn->pid = 0;
 #endif
 	
-	if (conn->communication_type == COM_RSA)
-		server_rsa_recv(conn);
-	else
-		server_recv(conn);
+	server_recv(conn);
 	
 	response_t res;
 	Request* request = request_handle(conn);

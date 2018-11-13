@@ -26,9 +26,6 @@ cdef class Socket:
 	cdef int fd
 	cdef com_t communication_type
 	
-	cdef DynamicBuffer encrypt (self, DynamicBuffer data)
-	cdef DynamicBuffer decrypt (self, DynamicBuffer data)
-	
 	cdef c_send(self, void* data, size_t size, do_connect)
 	cdef send (self, DynamicBuffer data, do_connect)
 	cpdef recv (self, int size)

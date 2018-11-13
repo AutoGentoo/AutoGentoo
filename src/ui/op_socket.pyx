@@ -28,10 +28,11 @@ cdef class Socket:
 		self.communication_type = comm_type
 		self.fd = -1
 	
-	cdef DynamicBuffer encrypt (self, DynamicBuffer data):
-		pass
+	cdef write_wrapper (self, void* data, size_t size):
+		if self.communication_type == COM_RSA:
+		
 	
-	cdef DynamicBuffer decrypt (self, DynamicBuffer data):
+	cdef read_wrapper(self, void* data, size_t size):
 		pass
 	
 	cdef c_send (self, void* data, size_t size, do_connect):

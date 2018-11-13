@@ -88,6 +88,12 @@ struct __Server {
 	EncryptServer* rsa_child;
 };
 
+#ifndef connection_read
+#define connection_read(dest, size)\
+conn->communication_type == COM_RSA ? \
+	BIO_read(conn->encrypted_fd, dest, (int)size) : read(conn->fd, dest, size)
+#endif
+
 struct __EncryptServer {
 	Server* parent;
 	char* port;
@@ -135,7 +141,7 @@ struct __Connection {
 	 * Clientside encryption
 	 **/
 	RSA* public_key;
-	void* encrypted_data;
+	BIO* encrypted_fd; //!< Source/Sink BIO that does our encryption
 };
 
 #include "host.h"
