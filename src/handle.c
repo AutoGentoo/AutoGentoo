@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <autogentoo/autogentoo.h>
 #include <netinet/in.h>
+#include <autogentoo/http.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -43,30 +44,6 @@ RequestLink requests[] = {
 		{REQ_EXIT,            {.ag_fh=EXIT}}
 };
 
-static struct {
-	char* ident;
-	request_t type;
-} http_links[] = {
-		{"GET", REQ_GET}
-};
-
-FunctionHandler http_resolve_call (char* function) {
-	request_t t = (request_t)-1;
-	
-	int i;
-	for (i = 0; i < sizeof (http_links) / sizeof (http_links[0]); i++) {
-		if (strcmp (function, http_links[i].ident) == 0) {
-			t = http_links[i].type;
-			break;
-		}
-	}
-	
-	FunctionHandler k = {NULL};
-	if (t == -1)
-		return k;
-	return resolve_call(t);
-}
-
 FunctionHandler resolve_call(request_t type) {
 	int i;
 	for (i = 0; i < sizeof (requests) / sizeof (RequestLink); i++)
@@ -76,17 +53,18 @@ FunctionHandler resolve_call(request_t type) {
 	return k;
 }
 
-response_t GET(Connection* conn, HTTPRequest* req) {
+response_t GET(Connection* conn, HttpRequest* req) {
 	response_t res;
 	
 	if (conn->bounded_host == NULL)
 		return FORBIDDEN;
 	
-	if (!(strncmp(req->version, "HTTP/1.0", 8) == 0 || strncmp(req->version, "HTTP/1.1", 8) == 0))
+	/** HTTP/1.0 or HTTP/1.1 **/
+	if (req->version.maj != 1 && (req->version.min != 1 || req->version.min != 0))
 		return BAD_REQUEST;
 	
 	char* path;
-	asprintf(&path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->pkgdir, req->arg);
+	asprintf(&path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->pkgdir, req->path);
 	
 	int fd, data_to_send;
 	

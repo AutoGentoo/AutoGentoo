@@ -10,19 +10,6 @@
 
 typedef struct __Request Request;
 
-#include "autogentoo/http/http.h"
-
-/**
- * A function pointer for to handle requests
- * @param conn the connection of the request
- * @param args a list of arguments passed to the handler
- * @param the index to start reading the request at
- */
-typedef response_t (* HTTP_FH)(Connection* conn, HTTPRequest* req);
-typedef response_t (* AUTOGENTOO_FH) (Request* request);
-
-typedef union __FunctionHandler FunctionHandler;
-
 typedef enum {
 	PROT_AUTOGENTOO = 0, // guarentees first byte is 0 (cant be HTTP)
 	PROT_HTTP,
@@ -35,6 +22,8 @@ typedef enum {
 
 typedef enum {
 	REQ_GET,
+	REQ_HEAD,
+	REQ_POST,
 	REQ_INSTALL,
 	REQ_EDIT,
 	REQ_ACTIVATE,
@@ -66,6 +55,19 @@ typedef enum {
 	REQ_EXIT
 } request_t;
 
+#include "http.h"
+
+/**
+ * A function pointer for to handle requests
+ * @param conn the connection of the request
+ * @param args a list of arguments passed to the handler
+ * @param the index to start reading the request at
+ */
+typedef response_t (* HTTP_FH)(Connection* conn, HttpRequest* req);
+typedef response_t (* AUTOGENTOO_FH) (Request* request);
+
+typedef union __FunctionHandler FunctionHandler;
+
 union __FunctionHandler {
 	AUTOGENTOO_FH ag_fh;
 	HTTP_FH http_fh;
@@ -77,6 +79,9 @@ struct __Request {
 	FunctionHandler resolved_call;
 	Connection* conn;
 	directive_t directive;
+	
+	void* body;
+	size_t length;
 	
 	int struct_c;
 	Vector* structures_parent;
@@ -99,7 +104,6 @@ typedef struct __RequestLink RequestLink;
 struct __RequestLink {
 	request_t request_ident; //!< The string that matches the request
 	FunctionHandler call; //!< A pointer to the function handler
-	
 };
 
 Request* request_handle (Connection* conn);

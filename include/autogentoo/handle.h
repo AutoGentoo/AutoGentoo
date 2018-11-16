@@ -19,8 +19,6 @@
  */
 extern RequestLink requests[];
 
-FunctionHandler http_resolve_call (char* function);
-
 /**
  * Parse the request and write the arguemnts to args
  * @param type resolved type from request_handle
@@ -36,7 +34,7 @@ FunctionHandler resolve_call(request_t type);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t GET(Connection* conn, HTTPRequest* req);
+response_t GET(Connection* conn, HttpRequest* req);
 
 /**
  * Install a packages to the bounded host

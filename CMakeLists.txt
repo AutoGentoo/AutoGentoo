@@ -5,7 +5,7 @@ include_directories(include)
 SET(CMAKE_C_COMPILER gcc)
 
 execute_process(
-        COMMAND bash -c "mkdir -p hacksaw"
+        COMMAND bash -c "mkdir -p {hacksaw,http}"
 )
 
 set(src_SOURCES
@@ -45,8 +45,7 @@ set(include_HEADERS
         include/autogentoo/getopt.h
         include/autogentoo/thread.h
         include/autogentoo/request_structure.h
-        include/autogentoo/http/http.h
-        include/autogentoo/http/rfc.h
+        include/autogentoo/http.h
         include/autogentoo/queue.h
         include/autogentoo/gentoo_config.h
         include/autogentoo/user.h
@@ -80,11 +79,11 @@ set(arch_HEADERS
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
+# LANGUAGE
 flex_target(FLEX_ATOM ${CMAKE_SOURCE_DIR}/hacksaw/language/atom_flex.l
         ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/atom.flex.c)
 flex_target(FLEX_DEPEND ${CMAKE_SOURCE_DIR}/hacksaw/language/depend_flex.l
         ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/depend.flex.c)
-
 bison_target(LANG_ATOM
         ${CMAKE_SOURCE_DIR}/hacksaw/language/atom_bison.y
         ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/atom.tab.c)
@@ -101,6 +100,21 @@ set(language_BIN
         ${FLEX_FLEX_DEPEND_OUTPUTS}
         ${FLEX_FLEX_ATOM_OUTPUTS}
         )
+
+# HTTP
+flex_target(FLEX_HTTP ${CMAKE_SOURCE_DIR}/src/http/ag_http_flex.l
+        ${CMAKE_CURRENT_BINARY_DIR}/http/ag_http.flex.c)
+bison_target(LANG_HTTP
+        ${CMAKE_SOURCE_DIR}/src/http/ag_http_bison.y
+        ${CMAKE_CURRENT_BINARY_DIR}/http/ag_http.tab.c)
+
+add_flex_bison_dependency(FLEX_HTTP LANG_HTTP)
+
+set(http_BIN
+        ${BISON_LANG_HTTP_OUTPUTS}
+        ${FLEX_FLEX_HTTP_OUTPUTS}
+        )
+
 
 include_directories(hacksaw/language)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -167,6 +181,11 @@ set(language_PARSER
         hacksaw/language/depend_flex.l
         )
 
+set(http_PARSER
+        src/http/ag_http_flex.l
+        src/http/ag_http_bison.y
+        )
+
 add_library(hacksaw STATIC
         ${hacksaw_HEADERS}
         ${hacksaw_SRC}
@@ -176,12 +195,6 @@ add_library(hacksaw STATIC
         )
 set_target_properties(hacksaw
         PROPERTIES COMPILE_FLAGS "-fPIC")
-
-add_executable(hacksaw-test hacksaw/src/main.c)
-add_test(hacksaw-test hacksaw-test)
-target_link_libraries(hacksaw-test hacksaw
-#        pcre2-8
-        )
 
 find_library(ARCHIVE archive)
 
@@ -197,14 +210,18 @@ add_definitions(-DAUTOGENTOO_USER_AUTH_ENCRYPT="${AUTH_ENCRYPT}")
 #add_definitions(-DAUTOGENTOO_DEBUG)
 
 add_library(autogentoo SHARED
+        ${include_HEADERS}
         ${src_SOURCES}
+        ${http_BIN}
+        ${http_PARSER}
         )
 target_link_libraries(autogentoo hacksaw)
 
-add_executable(autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
+#add_executable(autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
 add_executable(autogentoo-exec
         ${include_HEADERS}
         src/autogentoo.c
+
         )
 
 target_link_libraries(autogentoo-exec
@@ -215,6 +232,6 @@ target_link_libraries(autogentoo-exec
         pthread
         )
 
-target_link_libraries(autogentoo-build curl ${ARCHIVE}
-#        pcre2-8
-        hacksaw)
+#target_link_libraries(autogentoo-build curl ${ARCHIVE}
+##        pcre2-8
+#        hacksaw)

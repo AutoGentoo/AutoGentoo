@@ -41,7 +41,10 @@ Request* request_handle (Connection* conn) {
 	out->structures_parent = NULL;
 	out->struct_c = 0;
 	
-	void* current_request = conn->request;
+	out->body = conn->request;
+	out->length = conn->size;
+	
+	void* current_request = out->body;
 	
 	if (*(char*)current_request != 0)
 		out->protocol = PROT_HTTP;
@@ -53,7 +56,7 @@ Request* request_handle (Connection* conn) {
 	if (out->protocol == PROT_HTTP)
 		return out;
 	
-	void* end = out->conn->request + out->conn->size;
+	void* end = out->body + out->length;
 	
 	AUTOGENTOO_READ_INT(out->request_type);
 	
@@ -92,15 +95,17 @@ response_t request_call (Request* req) {
 		req->resolved_call = resolve_call(req->request_type);
 		if (req->resolved_call.ag_fh == NULL)
 			return NOT_IMPLEMENTED;
-		return (*req->resolved_call.ag_fh) (req);
+		return (*req->resolved_call.ag_fh) (req->conn->request);
 	}
 	
-	HTTPRequest* http_req = http_request_parse(req);
+	HttpRequest* http_req = ag_http_parse(req->body);
 	if (http_req == NULL)
 		return BAD_REQUEST;
-	req->resolved_call = http_resolve_call (http_req->function);
+	req->resolved_call = resolve_call(http_req->function);
+	if (req->resolved_call.http_fh == NULL)
+		return NOT_IMPLEMENTED;
 	response_t res = (*req->resolved_call.http_fh)(req->conn, http_req);
-	
+	free_http_request(http_req);
 	
 	return res;
 }

@@ -11,17 +11,12 @@
 typedef struct __HttpHeader HttpHeader;
 typedef struct __HttpRequest HttpRequest;
 
+#include <autogentoo/request.h>
+
 typedef enum {
 	HEADER_NOT_FOUND,
 	HEADER_FOUND
 } http_header_t;
-
-typedef enum {
-	HTTP_FUNCTION_NOT_FOUND,
-	HTTP_FUNCTION_GET,
-	HTTP_FUNCTION_HEAD,
-	HTTP_FUNCTION_POST,
-} http_function_t;
 
 struct __HttpHeader {
 	char* name;
@@ -29,7 +24,7 @@ struct __HttpHeader {
 };
 
 struct __HttpRequest {
-	http_function_t function;
+	request_t function;
 	char* path;
 	int body_start; //!< Start of body on request body, For GET(optional) and POST
 	
@@ -42,12 +37,12 @@ struct __HttpRequest {
 	size_t request_size;
 };
 
-#include <autogentoo/request.h>
 
-HttpRequest* http_request_parse(Request* req);
-HttpHeader* parse_headers(char* str, char** end_str);
-char* get_header(HttpHeader* HEAD, char* to_find);
+char* get_header(HttpRequest* request, char* to_find);
 void free_headers (HttpHeader* HEAD);
 void free_http_request(HttpRequest* ptr);
+
+/* From flex/bison */
+HttpRequest* ag_http_parse (char* buffer);
 
 #endif //AUTOGENTOO_HTTP_H

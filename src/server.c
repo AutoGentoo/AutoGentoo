@@ -337,9 +337,6 @@ void server_respond (Connection* conn) {
 #ifndef AUTOGENTOO_NO_THREADS
 	conn->pid = pthread_self();
 	thread_register(conn->parent->thandler, conn->pid, conn);
-#ifndef AUTOGENTOO_IGNORE_SEGV
-	signal(SIGSEGV, handle_segv);
-#endif
 #else
 	conn->pid = 0;
 #endif
@@ -359,9 +356,8 @@ void server_respond (Connection* conn) {
 	linfo("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
 	if (conn->parent) // This went NULL once, won't take chances
 		write_server(conn->parent);
-	
-	conn->parent->thandler->to_join = conn->pid;
-	pthread_t parent = conn->parent->pthread;
+	srv->thandler->to_join = pthread_self();
+	pthread_t parent = srv->pthread;
 	connection_free(conn);
 	if (request)
 		request_free(request);
