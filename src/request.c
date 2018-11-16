@@ -87,31 +87,6 @@ Request* request_handle (Connection* conn) {
 	return out;
 }
 
-struct __http_header {
-
-};
-
-int http_request_parse (Request* req, HTTPRequest* dest) {
-	char* splt_1 = strpbrk((char*)req->conn->request, "\t ");
-	if (!splt_1)
-		return 1;
-	
-	char* splt_2 = strpbrk(splt_1 + 1, "\t\n\r ");
-	if (!splt_2)
-		return 1;
-	
-	char* splt_3 = strpbrk(splt_2 + 1, "\t\n\r ");
-	if (!splt_3)
-		return 1;
-	
-	
-	dest->function = strndup((char*)req->conn->request, splt_1 - (char*)req->conn->request);
-	dest->arg = strndup(splt_1 + 1, splt_2 - (splt_1 + 1));
-	dest->version = strndup (splt_2 + 1, splt_3 - (splt_2 + 1));
-	
-	return 0;
-}
-
 response_t request_call (Request* req) {
 	if (req->protocol == PROT_AUTOGENTOO) {
 		req->resolved_call = resolve_call(req->request_type);
@@ -120,18 +95,19 @@ response_t request_call (Request* req) {
 		return (*req->resolved_call.ag_fh) (req);
 	}
 	
-	HTTPRequest http_req;
-	if (http_request_parse (req, &http_req) != 0)
+	HTTPRequest* http_req = http_request_parse(req);
+	if (http_req == NULL)
 		return BAD_REQUEST;
-	req->resolved_call = http_resolve_call (http_req.function);
-	return (*req->resolved_call.http_fh)(req->conn, http_req);
+	req->resolved_call = http_resolve_call (http_req->function);
+	response_t res = (*req->resolved_call.http_fh)(req->conn, http_req);
+	
+	
+	return res;
 }
 
 void request_free (Request* req) {
-	if (req->protocol == PROT_HTTP) {
-		free (req);
-		return;
-	}
+	if (req->protocol == PROT_HTTP)
+		return free (req);
 	
 	for (int i = 0; i != req->struct_c; i++)
 		free_request_structure(&req->structures[i],

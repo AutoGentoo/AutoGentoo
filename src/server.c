@@ -293,7 +293,7 @@ void handle_segv (int signum) {
 	pthread_kill(failed_thread->parent->pthread, SIGUSR1);
 #endif
 }
-#define AUTOGENTOO_IGNORE_SEGV
+//#define AUTOGENTOO_IGNORE_SEGV
 
 void server_recv (Connection* conn) {
 	/* Read the request */
@@ -357,7 +357,8 @@ void server_respond (Connection* conn) {
 	if (res.len != 0)
 		rsend(conn, res);
 	linfo("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
-	write_server(conn->parent);
+	if (conn->parent) // This went NULL once, won't take chances
+		write_server(conn->parent);
 	
 	conn->parent->thandler->to_join = conn->pid;
 	pthread_t parent = conn->parent->pthread;

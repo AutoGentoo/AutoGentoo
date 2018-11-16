@@ -9,7 +9,8 @@
 #include "request_structure.h"
 
 typedef struct __Request Request;
-typedef struct __HTTPRequest HTTPRequest;
+
+#include "autogentoo/http/http.h"
 
 /**
  * A function pointer for to handle requests
@@ -17,7 +18,7 @@ typedef struct __HTTPRequest HTTPRequest;
  * @param args a list of arguments passed to the handler
  * @param the index to start reading the request at
  */
-typedef response_t (* HTTP_FH)(Connection* conn, HTTPRequest req);
+typedef response_t (* HTTP_FH)(Connection* conn, HTTPRequest* req);
 typedef response_t (* AUTOGENTOO_FH) (Request* request);
 
 typedef union __FunctionHandler FunctionHandler;
@@ -65,16 +66,6 @@ typedef enum {
 	REQ_EXIT
 } request_t;
 
-struct __HTTPRequest {
-	char* function;
-	char* arg;
-	char* version;
-	char** headers;
-	char* body;
-	
-	size_t request_size;
-};
-
 union __FunctionHandler {
 	AUTOGENTOO_FH ag_fh;
 	HTTP_FH http_fh;
@@ -112,7 +103,6 @@ struct __RequestLink {
 };
 
 Request* request_handle (Connection* conn);
-int http_request_parse (Request* req, HTTPRequest* dest);
 response_t request_call (Request* req);
 void request_free (Request* req);
 

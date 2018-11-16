@@ -45,9 +45,12 @@ set(include_HEADERS
         include/autogentoo/getopt.h
         include/autogentoo/thread.h
         include/autogentoo/request_structure.h
-        include/autogentoo/http.h
+        include/autogentoo/http/http.h
+        include/autogentoo/http/rfc.h
         include/autogentoo/queue.h
-        include/autogentoo/gentoo_config.h include/autogentoo/user.h include/autogentoo/crypt.h)
+        include/autogentoo/gentoo_config.h
+        include/autogentoo/user.h
+        include/autogentoo/crypt.h)
 
 set(arch_SOURCES
         arch/main.c

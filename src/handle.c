@@ -76,17 +76,17 @@ FunctionHandler resolve_call(request_t type) {
 	return k;
 }
 
-response_t GET (Connection* conn, HTTPRequest req) {
+response_t GET(Connection* conn, HTTPRequest* req) {
 	response_t res;
 	
 	if (conn->bounded_host == NULL)
 		return FORBIDDEN;
 	
-	if (!(strncmp(req.version, "HTTP/1.0", 8) == 0 || strncmp(req.version, "HTTP/1.1", 8) == 0))
+	if (!(strncmp(req->version, "HTTP/1.0", 8) == 0 || strncmp(req->version, "HTTP/1.1", 8) == 0))
 		return BAD_REQUEST;
 	
 	char* path;
-	asprintf(&path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->pkgdir, req.arg);
+	asprintf(&path, "%s/%s/%s/%s", conn->parent->location, conn->bounded_host->id, conn->bounded_host->pkgdir, req->arg);
 	
 	int fd, data_to_send;
 	
