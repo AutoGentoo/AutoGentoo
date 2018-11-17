@@ -22,8 +22,6 @@ typedef enum {
 
 typedef enum {
 	REQ_GET,
-	REQ_HEAD,
-	REQ_POST,
 	REQ_INSTALL,
 	REQ_EDIT,
 	REQ_ACTIVATE,
@@ -52,7 +50,9 @@ typedef enum {
 	REQ_WORKERMAKECONF,
 	
 	/* General */
-	REQ_EXIT
+	REQ_EXIT,
+	REQ_HEAD,
+	REQ_POST,
 } request_t;
 
 #include "http.h"
