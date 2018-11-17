@@ -7,6 +7,7 @@
 #include <unitypes.h>
 #include <netinet/in.h>
 #include <autogentoo/handle.h>
+#include <autogentoo/http.h>
 
 int prv_read_int (void** data, void* end, int* out) {
 	if (*data + sizeof (uint32_t) > end)
@@ -40,6 +41,7 @@ Request* request_handle (Connection* conn) {
 	out->structures = NULL;
 	out->structures_parent = NULL;
 	out->struct_c = 0;
+	out->protocol = PROT_HTTP; // Since vectors are set to NULL we assume HTTP
 	
 	out->body = conn->request;
 	out->length = conn->size;
@@ -101,6 +103,8 @@ response_t request_call (Request* req) {
 	HttpRequest* http_req = ag_http_parse(req->body);
 	if (http_req == NULL)
 		return BAD_REQUEST;
+	
+	linfo("%d %s HTTP/%d.%d", http_req->function, http_req->path, http_req->version.maj, http_req->version.min);
 	req->resolved_call = resolve_call(http_req->function);
 	if (req->resolved_call.http_fh == NULL)
 		return NOT_IMPLEMENTED;

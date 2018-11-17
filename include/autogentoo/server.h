@@ -3,9 +3,9 @@
 
 #include <autogentoo/hacksaw/hacksaw.h>
 #include <sys/types.h>
-#include <pthread.h>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
+#include <autogentoo/pool.h>
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -80,7 +80,8 @@ struct __Server {
 	WorkerParent* queue; //!< Jobs waiting in the queue, NULL if empty queue
 	
 	volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
-	ThreadHandler* thandler;
+	PoolHandler* pool_handler;
+	//ThreadHandler* thandler; // Old way to handle threading
 	pid_t pid;
 	pthread_t pthread;
 	
@@ -132,7 +133,6 @@ struct __Connection {
 	size_t size;
 	char* ip; //!< The IP of the connected client
 	int fd; //!< The file descriptor that points to the open connections
-	pthread_t pid; //!< The pid of the pthread that the handle is runnning in
 	con_t status; //!< The status of the current Connection
 	com_t communication_type; //!< Are we using an encryption or not
 	
@@ -206,7 +206,7 @@ int server_init(char* port);
  * Handle the conn's request
  * @param conn the connection to read request from
  */
-void server_respond(Connection* conn);
+void server_respond(Connection* conn, int worker_index);
 
 /**
  * Free the completed connection

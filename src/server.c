@@ -13,14 +13,6 @@
 
 static Server* srv = NULL;
 
-void handle_thread_kill (int signum) {
-	thread_join(srv->thandler, srv->thandler->to_join);
-	if (srv->keep_alive == 0) {
-		server_kill(srv);
-		exit(0);
-	}
-}
-
 Server* server_new (char* location, char* port, server_t opts) {
 	Server* out = malloc(sizeof(Server));
 	
@@ -110,35 +102,33 @@ void server_start (Server* server) {
 	
 	server->pid = getpid();
 	srv = server;
-	signal(SIGUSR1, handle_thread_kill);
 	signal (SIGINT, handle_sigint);
 	
 	addrlen = sizeof(clientaddr);
 	server->keep_alive = 1;
-	server->thandler = thread_handler_new(32);
+	//server->thandler = thread_handler_new(32);
+#ifndef AUTOGENTOO_NO_THREADS
+	server->pool_handler = pool_handler_new(32);
+#endif
 	
 	while (server->keep_alive) { // Main accept loop
 		int temp_fd = accept(listenfd, (struct sockaddr*) &clientaddr, &addrlen);
+		linfo("accepted on fd: %d", temp_fd);
 		if (temp_fd < 3) {
 			lwarning("accept() error");
 			continue;
 		}
 		if (fcntl(temp_fd, F_GETFD) == -1 || errno == EBADF) {
 			lwarning("Bad fd on accept()");
-			fflush(stdout);
 			continue;
 		}
 		Connection* current_conn = connection_new(server, temp_fd);
 		current_conn->communication_type = COM_PLAIN;
 
 #ifndef AUTOGENTOO_NO_THREADS
-		pthread_t p_pid;
-		
-		if (pthread_create(&p_pid, NULL, (void* (*) (void*)) server_respond, current_conn)) {
-			lerror("Error creating thread");
-			fflush(stdout);
-			exit(1);
-		}
+		printf("POOL_HANDLER_ADD %p\n", current_conn);
+		fflush(stdout);
+		pool_handler_add(server->pool_handler, (void (*)(void*, int))server_respond, current_conn);
 #else
 		server_respond (current_conn);
 #endif
@@ -184,13 +174,7 @@ pid_t server_encrypt_start(EncryptServer* server) {
 		PEM_write_bio_RSAPrivateKey(current_conn->encrypted_fd, server->private_key, NULL, NULL, 0, NULL, NULL);
 
 #ifndef AUTOGENTOO_NO_THREADS
-		pthread_t p_pid;
-		
-		if (pthread_create(&p_pid, NULL, (void* (*) (void*)) server_respond, current_conn)) {
-			lerror("Error creating thread");
-			fflush(stdout);
-			exit(1);
-		}
+		pool_handler_add(server->parent->pool_handler, (void (*)(void*, int))server_respond, current_conn);
 #else
 		server_respond (current_conn);
 #endif
@@ -201,8 +185,8 @@ pid_t server_encrypt_start(EncryptServer* server) {
 
 void server_kill (Server* server) {
 	write_server(server);
-	thread_handler_join_all(server->thandler);
-	thread_handler_free(server->thandler);
+	//thread_handler_join_all(server->thandler);
+	//thread_handler_free(server->thandler);
 	server_free(server);
 	linfo("server exited succuessfully");
 	exit (0);
@@ -283,19 +267,12 @@ void handle_sigint (int sig) {
 	server_kill (srv);
 }
 
-void handle_segv (int signum) {
-	Connection* failed_thread = thread_get_conn(srv->thandler, pthread_self());
-	rsend(failed_thread, AUTOGENTOO_SEGV);
-	
-	failed_thread->parent->thandler->to_join = failed_thread->pid;
-	connection_free(failed_thread);
-#ifndef AUTOGENTOO_NO_THREADS
-	pthread_kill(failed_thread->parent->pthread, SIGUSR1);
-#endif
-}
 //#define AUTOGENTOO_IGNORE_SEGV
 
 void server_recv (Connection* conn) {
+	struct timeval tv = {2, 0};
+	setsockopt(conn->fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
+	
 	/* Read the request */
 	size_t chunk_len = 128;
 	
@@ -303,7 +280,7 @@ void server_recv (Connection* conn) {
 	ssize_t total_read = 0, current_bytes = 0;
 	
 	size_t buffer_size = chunk_len;
-	current_bytes = read(conn->fd, conn->request, chunk_len);
+	current_bytes = connection_read(conn->request + total_read, chunk_len);
 	total_read += current_bytes;
 	while (current_bytes == chunk_len) {
 		if (total_read + chunk_len >= buffer_size) {
@@ -313,19 +290,18 @@ void server_recv (Connection* conn) {
 		
 		current_bytes = connection_read(conn->request + total_read, chunk_len);
 		total_read += current_bytes;
+		
+		printf("----------- %li\n", current_bytes);
 	}
 	
 	if (total_read < 0) { // receive error
 		lerror("recv() error");
 		conn->status = SERVER_ERROR;
-		connection_free(conn);
-		pthread_kill(conn->pid, SIGUSR1);
 		return;
-	} else if (total_read == 0) { // receive socket closed
+	}
+	else if (total_read == 0) { // receive socket closed
 		lwarning("Client disconnected upexpectedly.");
 		conn->status = FAILED;
-		connection_free(conn);
-		pthread_kill(conn->pid, SIGUSR1);
 		return;
 	}
 	
@@ -333,38 +309,41 @@ void server_recv (Connection* conn) {
 	conn->status = CONNECTED;
 }
 
-void server_respond (Connection* conn) {
-#ifndef AUTOGENTOO_NO_THREADS
-	conn->pid = pthread_self();
-	thread_register(conn->parent->thandler, conn->pid, conn);
-#else
-	conn->pid = 0;
-#endif
-	
+void server_respond(Connection* conn, int worker_index) {
+	linfo ("responding %d", worker_index);
+	/* Read from the client and parse request */
 	server_recv(conn);
-	
-	response_t res;
+	if (conn->status != CONNECTED) {
+		linfo("recv_failed %d\n", worker_index);
+		connection_free(conn);
+		return;
+	}
 	Request* request = request_handle(conn);
+	linfo("handle %s on worker %d", conn->ip, worker_index);
 	
-	linfo("handle %s on pthread_t 0x%llx", conn->ip, conn->pid);
+	/* Run the request */
+	response_t res;
 	if (request == NULL)
 		res = BAD_REQUEST;
 	else
 		res = request_call(request);
+	
+	/* Send the response */
 	if (res.len != 0)
 		rsend(conn, res);
-	linfo("request 0x%llx: %s (%d)", conn->pid, res.message, res.code);
-	if (conn->parent) // This went NULL once, won't take chances
-		write_server(conn->parent);
-	srv->thandler->to_join = pthread_self();
-	pthread_t parent = srv->pthread;
+	
+	linfo("%s (%d)  <==== %d", res.message, res.code, worker_index);
+	
+	/* Update the config */
+	write_server(conn->parent);
+	
+	if (request && request->directive == DIR_CONNECTION_OPEN)
+		server_respond(conn, worker_index);
+	
 	connection_free(conn);
+	
 	if (request)
 		request_free(request);
-
-#ifndef AUTOGENTOO_NO_THREADS
-	pthread_kill(parent, SIGUSR1);
-#endif
 }
 
 void server_bind (Connection* conn, Host* host) {

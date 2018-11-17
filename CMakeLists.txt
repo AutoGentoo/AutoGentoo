@@ -25,7 +25,7 @@ set(src_SOURCES
         src/request.c
         src/request_structure.c
         src/http.c src/queue.c
-        src/gentoo_config.c src/user.c src/crypt.c)
+        src/gentoo_config.c src/user.c src/crypt.c src/pool.c)
 
 set(include_HEADERS
         include/autogentoo/autogentoo.h
@@ -49,7 +49,7 @@ set(include_HEADERS
         include/autogentoo/queue.h
         include/autogentoo/gentoo_config.h
         include/autogentoo/user.h
-        include/autogentoo/crypt.h)
+        include/autogentoo/crypt.h include/autogentoo/pool.h)
 
 set(arch_SOURCES
         arch/main.c

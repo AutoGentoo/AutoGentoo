@@ -33,18 +33,13 @@ void ag_httperror(const char *message);
         int min;
     } http_version;
 
-    struct {
-        char* path;
-        struct __http_version version;
-    } request_line;
-
     HttpHeader* header;
     HttpRequest* request;
     SmallMap* smallmap;
     request_t function_type;
 }
 
-%token <str> HEADER;
+%token <header> HEADER;
 %token <http_version> VERSION;
 
 %token SPHT;
@@ -55,59 +50,43 @@ void ag_httperror(const char *message);
 %token POST;
 
 %token <str> STR;
+%token <str> HEADER_STR;
 %token END_OF_FILE;
 
-%type <request_line> requestline;
 %type <function_type> request_function;
-%type <header> header;
 %type <smallmap> headers;
-%type <str> text;
-%token <str> body;
+%type <str> end;
 
 %%
-
-requestline: SPHT STR[p] SPHT VERSION[v] CRLF{$$.version = $v; $$.path = $p;};
-request:      request_function requestline headers {
+request:      request_function[f] SPHT STR[p] SPHT VERSION[v] CRLF headers[h] end[e] {
                                                 ag_httpout = malloc(sizeof (HttpRequest));
-                                                ag_httpout->function = $1;
-                                                ag_httpout->path = $2.path;
-                                                ag_httpout->version.maj = $2.version.maj;
-                                                ag_httpout->version.min = $2.version.min;
-                                                ag_httpout->headers = $3;
-                                                ag_httpout->body_start = @3.last_column;
+                                                ag_httpout->function = $f;
+                                                ag_httpout->path = $p;
+                                                ag_httpout->version.maj = $v.maj;
+                                                ag_httpout->version.min = $v.min;
+                                                ag_httpout->headers = $h;
+                                                ag_httpout->body_start = @e.last_column;
                                             }
             ;
+
+end:                                        {$$ = NULL;}
+            | CRLF                          {@$.last_column = @1.last_column;};
 
 request_function:   GET                     {$$ = REQ_GET;}
                     | HEAD                  {$$ = REQ_HEAD;}
                     | POST                  {$$ = REQ_POST;}
+                    ;
 
-headers:      header                        {
+headers:                                    {$$ = small_map_new (5, 5);}
+            | HEADER                        {
                                                 $$ = small_map_new (5, 5);
                                                 vector_add($$, &$1);
                                                 @$.last_column = @1.last_column;
                                             }
-            | header headers                {
-                                                vector_add($2, &$1);
-                                                $$ = $2;
-                                                @$.last_column = @1.last_column;
+            | headers HEADER                {
+                                                vector_add($1, &$2);
+                                                $$ = $1;
+                                                @$.last_column = @2.last_column;
                                             }
-
-header: STR[h] SPHT text[i] CRLF[e]         {
-                                                $$ = malloc(sizeof (HttpHeader));
-                                                $$->name = $h;
-                                                $$->name[strlen($h) - 1] = 0; // Delete ':'
-                                                $$->value = $i;
-                                                @$.last_column = @e.last_column;
-                                            }
-
-text: SPHT                                  {$$ = strdup (" ");}
-    | STR                                   {$$ = $1;}
-    | text text                             {
-                                                asprintf(&$$, "%s%s", $1, $2);
-                                                free($1);
-                                                free($2);
-                                            }
-    ;
-
+            ;
 %%
