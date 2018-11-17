@@ -1,4 +1,4 @@
-SUBDIRS = ui
+SUBDIRS = http ui
 AM_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/ -Wno-unused-result
 ACLOCAL_AMFLAGS='-I m4'
 
@@ -10,7 +10,7 @@ libautogentoo_la_SOURCES =  \
 	request.c request_structure.c queue.c
 
 libautogentoo_la_CFLAGS = ${AM_CFLAGS}
-libautogentoo_la_LDFLAGS = ../hacksaw/src/libhacksaw.a -version-info 0
+libautogentoo_la_LDFLAGS = ../hacksaw/src/libhacksaw.a http/libhttp.a -version-info 0
 
 bin_PROGRAMS = autogentoo
 autogentoo_SOURCES = autogentoo.c

@@ -30,8 +30,8 @@ AC_CHECK_LIB([curl], [curl_easy_init], [], [
     AC_MSG_ERROR(["libcurl could not be found"])
 ])
 
-AC_CHECK_LIB([ssl], [curl_easy_init], [], [
-    AC_MSG_ERROR(["libcurl could not be found"])
+AC_CHECK_LIB([ssl], [SSL_library_init], [], [
+    AC_MSG_ERROR(["libssl could not be found"])
 ])
 
 #AC_CHECK_LIB(pcre2-8, pcre2_compile_8,
@@ -70,6 +70,7 @@ AC_CONFIG_FILES([
     include/autogentoo/hacksaw/tools/Makefile
     Makefile
     src/Makefile
+    src/http/Makefile
     src/ui/Makefile
     include/Makefile
     include/autogentoo/Makefile
