@@ -112,8 +112,7 @@ cdef class Crypt:
 		cdef void* encrypted = malloc (incoming_size);
 		s.recv_into(encrypted, incoming_size)
 		
-		cdef DynamicBuffer decrypted_temp = self.decrypt(DynamicBuffer.new_from_initial(encrypted, 
-incoming_size))
+		cdef DynamicBuffer decrypted_temp = self.decrypt(DynamicBuffer_new_from_initial(encrypted, incoming_size))
 		free(encrypted)
 		if strcmp(<char*>decrypted_temp.ptr, "AutoGentooVerify") == 0:
 			rsa_response = AUTOGENTOO_RSA_CORRECT

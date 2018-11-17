@@ -1,11 +1,17 @@
+cdef new_from_initial(void* initial, size_t size):
+        self = DynamicBuffer()
+        free(self.ptr)
+        self.ptr = malloc(size)
+        self.size = size
+        self.append(initial, size)
+        return self
+
 cdef class DynamicBuffer:
 	cdef void* ptr
 	cdef size_t size
 	cdef public size_t n
 	cdef short align
 
-	@classmethod	
-	cdef new_from_initial(void* initial, size_t size)	
 	cdef realloc (self)
 	cdef void append (self, void* ptr, size_t size)
 	cdef void append_string (self, char* ptr)
