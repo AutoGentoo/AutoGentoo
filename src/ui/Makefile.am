@@ -14,6 +14,8 @@ BUILT_SOURCES = build_dir
 
 d_malloc.c: d_malloc.pyx d_malloc.pxd
 	cython d_malloc.pyx
+crypt.c: crypt.pyx crypt.pxd
+	cython crypt.pyx
 interface.c: interface.pyx interface.pxd
 	cython interface.pyx
 op_socket.c: op_socket.pyx op_socket.pxd
@@ -29,6 +31,9 @@ request.c: request.pyx request.pxd
 #job.c: job.pyx job.pxd
 #	cython job.pyx
 
+crypt$(PYTHON_EXTENSION_SUFFIX): crypt.c
+	$(CC) -pthread -fPIC $(CYTHON_INCLUDES) $(PYTHON_INCLUDES) -c crypt.c -o build/crypt.o
+	$(CC) $(PYTHON_LIBS) -shared build/crypt.o $(CYTHON_LD_PATH) $(CYTHON_LIBS) -o crypt$(PYTHON_EXTENSION_SUFFIX)
 d_malloc$(PYTHON_EXTENSION_SUFFIX): d_malloc.c
 	$(CC) -pthread -fPIC $(CYTHON_INCLUDES) $(PYTHON_INCLUDES) -c d_malloc.c -o build/d_malloc.o
 	$(CC) $(PYTHON_LIBS) -shared build/d_malloc.o $(CYTHON_LD_PATH) $(CYTHON_LIBS) -o d_malloc$(PYTHON_EXTENSION_SUFFIX)
@@ -59,6 +64,7 @@ clean-local:
 	rm -rf interface$(PYTHON_EXTENSION_SUFFIX) build/interface.o interface.c
 	rm -rf op_socket$(PYTHON_EXTENSION_SUFFIX) build/op_socket.o op_socket.c
 	rm -rf op_string$(PYTHON_EXTENSION_SUFFIX) build/op_string.o op_string.c
+	rm -rf crypt$(PYTHON_EXTENSION_SUFFIX) build/crypt.o crypt.c
 	rm -rf log$(PYTHON_EXTENSION_SUFFIX) build/log.o log.c
 	rm -rf request$(PYTHON_EXTENSION_SUFFIX) build/request.o request.c
 	rm -rf worker$(PYTHON_EXTENSION_SUFFIX) build/worker.o worker.c
@@ -71,6 +77,7 @@ mainlib_DATA = client.py \
                  op_socket$(PYTHON_EXTENSION_SUFFIX) \
                  interface$(PYTHON_EXTENSION_SUFFIX) \
                  op_string$(PYTHON_EXTENSION_SUFFIX) \
+                 crypt$(PYTHON_EXTENSION_SUFFIX) \
                  request$(PYTHON_EXTENSION_SUFFIX)
 #                 worker$(PYTHON_EXTENSION_SUFFIX) \
 #                 job$(PYTHON_EXTENSION_SUFFIX)

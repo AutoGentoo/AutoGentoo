@@ -3,7 +3,9 @@ cdef class DynamicBuffer:
 	cdef size_t size
 	cdef public size_t n
 	cdef short align
-	
+
+	@classmethod	
+	cdef new_from_initial(void* initial, size_t size)	
 	cdef realloc (self)
 	cdef void append (self, void* ptr, size_t size)
 	cdef void append_string (self, char* ptr)
