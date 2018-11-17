@@ -30,7 +30,7 @@ cdef class Socket:
 	
 	cdef write_wrapper (self, void* data, size_t size):
 		if self.communication_type == COM_RSA:
-		
+			pass
 	
 	cdef read_wrapper(self, void* data, size_t size):
 		pass

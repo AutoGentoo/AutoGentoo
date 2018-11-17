@@ -7,7 +7,7 @@ cdef extern from "openssl/bn.h":
 	
 	ctypedef unsigned long BN_ULONG;
 	
-	BIGNUM *BN_new(void);
+	BIGNUM *BN_new();
 	int BN_set_word(BIGNUM *a, BN_ULONG w);
 	char *BN_bn2hex(BIGNUM *a)
 	int BN_hex2bn(BIGNUM ** a, char *s)
@@ -18,18 +18,13 @@ cdef extern from "openssl/bn.h":
 cdef extern from "openssl/bio.h":
 	ctypedef void BIO;
 	
-	void* BIO_s_mem(void);
+	void* BIO_s_mem();
 	BIO *BIO_new(void* type);
 	int BIO_read(BIO *b, void *data, int len);
 	int BIO_write(BIO *b, void *data, int len);
 	size_t BIO_pending (BIO* b)
 	void BIO_free_all(BIO *a);
 	BIO *BIO_new_file(const char *filename, const char *mode);
-
-cdef extern from "openssl/pem.h":
-	int PEM_write_bio_RSAPublicKey(BIO* b, RSA* r);
-	int PEM_write_bio_RSAPrivateKey(BIO* b, RSA* r, void* enc, unsigned char* kstr, int klen, void* pem_password, void* u);
-	RSA* PEM_read_bio_RSA_PUBKEY(BIO* b, RSA* r, void* password, void* u)
 
 cdef extern from "<openssl/rsa.h>":
 	ctypedef void RSA;
@@ -38,11 +33,16 @@ cdef extern from "<openssl/rsa.h>":
 	cdef unsigned long RSA_F4 = 0x10001L;
 	
 	void RSA_free(RSA *r);
-	RSA *RSA_new(void);
+	RSA *RSA_new();
 	int RSA_generate_key_ex(RSA *rsa, int bits, BIGNUM *e, BN_GENCB *cb);
 
-cdef extern from "<autogentoo/writeconfig.h>":
-	cdef enum rsa_t:
+cdef extern from "openssl/pem.h":
+	int PEM_write_bio_RSAPublicKey(BIO* b, RSA* r);
+	int PEM_write_bio_RSAPrivateKey(BIO* b, RSA* r, void* enc, unsigned char* kstr, int klen, void* pem_password, void* u);
+	RSA* PEM_read_bio_RSA_PUBKEY(BIO* b, RSA* r, void* password, void* u)
+
+cdef extern from "<autogentoo/crypt.h>":
+	ctypedef enum rsa_t:
 		AUTOGENTOO_RSA_VERIFY, #!< Check if we have updated public key
 		AUTOGENTOO_RSA_CORRECT, #!< RSA exchange complete
 		AUTOGENTOO_RSA_INCORRECT, #!< RSA wrong key
@@ -65,6 +65,6 @@ cdef class Crypt:
 	cdef handle_connect(self, Socket s)
 	
 	# Private functions
-	#cdef send_public(self, Socket s)
-	#cdef recv_public(self, Socket s)
-	#cdef rsa_t rsa_verify(self, Socket s)
+	cdef send_public(self, Socket s)
+	cdef recv_public(self, Socket s)
+	cdef rsa_t rsa_verify(self, Socket s)

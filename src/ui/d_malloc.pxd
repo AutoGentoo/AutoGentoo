@@ -1,11 +1,3 @@
-cdef new_from_initial(void* initial, size_t size):
-        self = DynamicBuffer()
-        free(self.ptr)
-        self.ptr = malloc(size)
-        self.size = size
-        self.append(initial, size)
-        return self
-
 cdef class DynamicBuffer:
 	cdef void* ptr
 	cdef size_t size
