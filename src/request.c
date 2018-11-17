@@ -97,7 +97,7 @@ response_t request_call (Request* req) {
 		req->resolved_call = resolve_call(req->request_type);
 		if (req->resolved_call.ag_fh == NULL)
 			return NOT_IMPLEMENTED;
-		return (*req->resolved_call.ag_fh) (req->conn->request);
+		return (*req->resolved_call.ag_fh) (req);
 	}
 	
 	HttpRequest* http_req = ag_http_parse(req->body);
