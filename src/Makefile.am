@@ -9,9 +9,10 @@ libautogentoo_la_SOURCES =  \
 	handle.c response.c server.c host.c chroot.c \
 	writeconfig.c stage.c download.c command.c \
 	kernel.c endian_convert.c getopt.c thread.c \
-	request.c request_structure.c queue.c
+	request.c request_structure.c queue.c pool.c \
+	http.c crypt.c
 
-libautogentoo_la_CFLAGS = ${AM_CFLAGS} -D$(CRYPT_KEY_COMMAND)
+libautogentoo_la_CFLAGS = ${AM_CFLAGS} -DAUTOGENTOO_USER_AUTH_ENCRYPT=`${CRYPT_KEY_COMMAND}`
 libautogentoo_la_LDFLAGS = ../hacksaw/src/libhacksaw.a http/libhttp.a -version-info 0
 
 bin_PROGRAMS = autogentoo
