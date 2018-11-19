@@ -55,8 +55,6 @@ EncryptServer* server_encrypt_new (Server* parent, char* port) {
 	out->certificate = NULL;
 	out->key_pair = NULL;
 	
-	;
-	
 	if (x509_generate_write(out) != 0) {
 		lerror ("Failed to initialize certificates");
 		free(out->port);
