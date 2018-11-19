@@ -69,12 +69,6 @@ void pool_handler_add(PoolHandler* handler, pool_function f, void* argument) {
 	pthread_mutex_unlock(&handler->cond_mutex);
 }
 
-
-/**
-void* signal_handler(int sig, struct sigaction* act, struct sigaction* old) {
-	if ()
-}**/
-
 void pool_loop(Pool* pool) {
 	pool->pid = pthread_self();
 	pthread_mutex_t* queue_mutex = &pool->parent->queue_mutex;
@@ -114,7 +108,6 @@ void pool_exit (PoolHandler* target) {
 		pthread_cancel(target->pools[i]->pid);
 		free(target->pools[i]);
 	}
-	
 	
 	pthread_mutex_destroy(&target->queue_mutex);
 	pthread_mutex_destroy(&target->cond_mutex);

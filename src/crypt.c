@@ -121,44 +121,60 @@ int cert_generate_serial () {
 	return 2;
 }
 
-void x509_generate_write(EncryptServer* parent) {
+int x509_generate_write(EncryptServer* parent) {
 	char* certificate_path = server_get_path(parent->parent, "certificate.pem");
 	char* rsa_path = server_get_path(parent->parent, "private.pem");
 	
 	int exists = access(certificate_path, F_OK) != -1 && access(rsa_path, F_OK) != -1;
 	if (!exists) {
 		linfo("Generating new certificate");
-		x509_generate(cert_generate_serial(), 128, &parent->certificate, &parent->key_pair);
+		x509_generate(cert_generate_serial(), 122147281, &parent->certificate, &parent->key_pair);
 		if (!parent->certificate || !parent->key_pair) {
 			free(certificate_path);
 			free(rsa_path);
-			return;
+			return 1;
 		}
 	}
 	
-	
 	int cert_fd = open(certificate_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
-	FILE* cert_fp = fdopen(cert_fd, "rw");
-	free(certificate_path);
 	
 	int rsa_fd = open(rsa_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
-	FILE* rsa_fp = fdopen(rsa_fd, "rw");
-	free(rsa_path);
+	
+	FILE* cert_fp;
+	FILE* rsa_fp;
 	
 	if (exists) {
+		cert_fp = fdopen(cert_fd, "r");
+		rsa_fp = fdopen(rsa_fd, "r");
 		parent->certificate = PEM_read_X509(cert_fp, &parent->certificate, NULL, NULL);
 		parent->key_pair = PEM_read_RSAPrivateKey(rsa_fp, &parent->key_pair, NULL, NULL);
 	}
-	
-	if(!exists) {
+	else {
+		cert_fp = fdopen(cert_fd, "w");
+		rsa_fp = fdopen(rsa_fd, "w");
+		
 		int x509_status = PEM_write_X509(cert_fp, parent->certificate);
 		int rsa_status = PEM_write_RSAPrivateKey(rsa_fp, parent->key_pair, NULL, NULL, 0, NULL, NULL);
 		if (!x509_status)
 			lerror ("Failed to write X509 certificate to file");
 		if (!rsa_status)
 			lerror ("Failed to write RSA private key to file");
+		if (!rsa_status || !x509_status) {
+			fclose (cert_fp);
+			fclose (rsa_fp);
+			
+			remove (certificate_path);
+			remove (rsa_path);
+			free(certificate_path);
+			free(rsa_path);
+			return 2;
+		}
 	}
 	
+	free(certificate_path);
+	free(rsa_path);
 	fclose (cert_fp);
 	fclose (rsa_fp);
+	
+	return 0;
 }

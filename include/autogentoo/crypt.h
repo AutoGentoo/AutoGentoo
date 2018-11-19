@@ -39,6 +39,6 @@ rsa_t rsa_load_binding(Connection* conn);
 
 /* OpenSSL Certificate */
 void x509_generate(int serial, int days_valid, X509** cert_out, RSA** key_pair);
-void x509_generate_write(EncryptServer* parent);
+int x509_generate_write(EncryptServer* parent);
 
 #endif //AUTOGENTOO_CRYPT_H

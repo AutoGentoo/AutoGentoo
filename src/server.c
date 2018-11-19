@@ -35,6 +35,11 @@ Server* server_new (char* location, char* port, server_t opts) {
 	
 	if (out->opts & ENCRYPT)
 		out->rsa_child = server_encrypt_new(out, "4950");
+	if (!out->rsa_child) {
+		server_free(out);
+		lerror("Failed to initialize server");
+		exit(1);
+	}
 	
 	return out;
 }
@@ -46,13 +51,17 @@ EncryptServer* server_encrypt_new (Server* parent, char* port) {
 	out->port = strdup (port);
 	out->rsa_binding = small_map_new(16, 16);
 	
-	x509_generate_write(out);
+	out->certificate = NULL;
+	out->key_pair = NULL;
 	
-	if (!out->certificate || !out->key_pair) {
+	;
+	
+	if (x509_generate_write(out) != 0) {
 		lerror ("Failed to initialize certificates");
 		free(out->port);
 		small_map_free(out->rsa_binding, 1);
 		free (out);
+		return NULL;
 	}
 	
 	OpenSSL_add_ssl_algorithms();
@@ -175,11 +184,11 @@ void server_start (Server* server) {
 
 void kill_encrypt_server(int sig) {
 	int ret = 0;
-	pthread_exit(&ret);
+	server_kill(srv);
+	exit(0);
 }
 
 void server_encrypt_start(EncryptServer* server) {
-	int res = 0;
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	
@@ -191,11 +200,9 @@ void server_encrypt_start(EncryptServer* server) {
 	addrlen = sizeof(clientaddr);
 	
 	if (!SSL_CTX_check_private_key(server->context)) {
-		fprintf(stderr, "Private key not loaded\n");
-		res = 1;
-		pthread_exit (&res);
+		lerror("Private key not loaded");
+		pthread_exit (NULL);
 	}
-	
 	
 	while (server->parent->keep_alive) { // Main accept loop
 		int temp_fd = accept(server->socket, (struct sockaddr*) &clientaddr, &addrlen);
@@ -217,8 +224,7 @@ void server_encrypt_start(EncryptServer* server) {
 #endif
 	}
 	
-	res = 0;
-	pthread_exit (&res);
+	pthread_exit (NULL);
 }
 
 void server_kill (Server* server) {
