@@ -132,8 +132,12 @@ int x509_generate_write(EncryptServer* parent) {
 	
 	int rsa_exists = access(rsa_path, F_OK) != -1;
 	if (!rsa_exists) {
-		if (!rsa_generate(&parent->key_pair))
+		if (!rsa_generate(&parent->key_pair)) {
 			lerror ("Failed to generate RSA key");
+			free (rsa_path);
+			free (certificate_path);
+			return 1;
+		}
 	}
 	
 	int x509_exists = access(certificate_path, F_OK) != -1;
@@ -143,7 +147,7 @@ int x509_generate_write(EncryptServer* parent) {
 		if (!parent->certificate || !parent->key_pair) {
 			free(certificate_path);
 			free(rsa_path);
-			return 1;
+			return 2;
 		}
 	}
 	
@@ -168,7 +172,7 @@ int x509_generate_write(EncryptServer* parent) {
 			remove(certificate_path);
 			free(certificate_path);
 			free(rsa_path);
-			return 2;
+			return 3;
 		}
 	}
 	
