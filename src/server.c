@@ -33,12 +33,13 @@ Server* server_new (char* location, char* port, server_t opts) {
 	out->opts = opts;
 	out->port = strdup(port);
 	
-	if (out->opts & ENCRYPT)
-		out->rsa_child = server_encrypt_new(out, "4950");
-	if (!out->rsa_child) {
-		server_free(out);
-		lerror("Failed to initialize server");
-		exit(1);
+	if (out->opts & ENCRYPT) {
+		out->rsa_child = server_encrypt_new(out, AUTOGENTOO_PORT_ENCRYPT);
+		if (!out->rsa_child) {
+			server_free(out);
+			lerror("Failed to initialize server");
+			exit(1);
+		}
 	}
 	
 	return out;

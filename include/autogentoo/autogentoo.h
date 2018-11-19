@@ -43,7 +43,8 @@
 #ifdef AUTOGENTOO_DEBUG
 #define AUTOGENTOO_PORT "9491"
 #else
-#define AUTOGENTOO_PORT "9490"
+#define AUTOGENTOO_PORT "80"
+#define AUTOGENTOO_PORT_ENCRYPT "443"
 #endif
 
 void set_is_encrypted (Opt* op, char* c);
