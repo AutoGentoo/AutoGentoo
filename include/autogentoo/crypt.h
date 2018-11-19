@@ -11,6 +11,8 @@
 #define AUTOGENTOO_RSA_BITS 2048
 #endif
 
+/* OLD */
+/*
 typedef enum {
 	AUTOGENTOO_RSA_VERIFY, //!< Check if we have updated public key
 	AUTOGENTOO_RSA_CORRECT, //!< RSA exchange complete
@@ -33,5 +35,10 @@ ssize_t rsa_send(Connection* conn, void* data, size_t size);
 ssize_t rsa_decrypt(Connection* conn, void* from, void* to, int encrypted_size, int decrypted_size);
 char* rsa_base64(const unsigned char* input, int length, size_t* base64_len);
 rsa_t rsa_load_binding(Connection* conn);
+*/
+
+/* OpenSSL Certificate */
+void x509_generate(int serial, int days_valid, X509** cert_out, RSA** key_pair);
+void x509_generate_write(EncryptServer* parent);
 
 #endif //AUTOGENTOO_CRYPT_H

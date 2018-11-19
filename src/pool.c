@@ -19,6 +19,7 @@ PoolHandler* pool_handler_new(int pool_num) {
 	
 	handler->queue = NULL;
 	handler->pools = malloc(sizeof(Pool*) * pool_num);
+	handler->pool_num = pool_num;
 	
 	for (int pool = 0; pool < pool_num; pool++) {
 		handler->pools[pool] = pool_new(handler, pool);
@@ -75,11 +76,13 @@ void* signal_handler(int sig, struct sigaction* act, struct sigaction* old) {
 }**/
 
 void pool_loop(Pool* pool) {
+	pool->pid = pthread_self();
 	pthread_mutex_t* queue_mutex = &pool->parent->queue_mutex;
 	pthread_mutex_t* condition_mutex = &pool->parent->cond_mutex;
 	pthread_cond_t* condition = &pool->parent->condition;
 	
 	PoolQueue* current_job = NULL;
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	
 	pthread_mutex_lock(condition_mutex);
 	pthread_cond_wait(condition, condition_mutex);
@@ -104,4 +107,16 @@ void pool_loop(Pool* pool) {
 		(*current_job->function)(current_job->stack, pool->index);
 		current_job = NULL;
 	}
+}
+
+void pool_exit (PoolHandler* target) {
+	for (int i = 0; i < target->pool_num; i++) {
+		pthread_cancel(target->pools[i]->pid);
+		free(target->pools[i]);
+	}
+	
+	
+	pthread_mutex_destroy(&target->queue_mutex);
+	pthread_mutex_destroy(&target->cond_mutex);
+	pthread_cond_destroy(&target->condition);
 }

@@ -34,9 +34,8 @@ struct __Pool {
 
 struct __PoolHandler {
 	Pool** pools;
+	int pool_num;
 	pthread_t scheduler;
-	
-	int kill;
 	
 	pthread_mutex_t queue_mutex;
 	PoolQueue* queue;
@@ -49,6 +48,7 @@ PoolHandler* pool_handler_new(int pool_num);
 Pool* pool_new (PoolHandler* parent, int index);
 void pool_handler_add(PoolHandler* handler, pool_function f, void* argument);
 void pool_loop(Pool* pool);
+void pool_exit (PoolHandler* target);
 
 
 #endif //AUTOGENTOO_POOL_H

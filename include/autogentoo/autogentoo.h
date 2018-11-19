@@ -1,5 +1,6 @@
 #ifndef __AUTOGENTOO_H__
 #define __AUTOGENTOO_H__
+#define _GNU_SOURCE
 
 #include "hacksaw/hacksaw.h"
 #include "chroot.h"

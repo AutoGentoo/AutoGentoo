@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <autogentoo/crypt.h>
+#include <openssl/ssl.h>
 
 ssize_t rsend(Connection* conn, response_t code) {
 	char message[40];
@@ -45,7 +46,7 @@ ssize_t conn_write(Connection* conn, void* data, size_t len) {
 	}
 	
 	if (conn->communication_type == COM_RSA)
-		return rsa_send(conn, data, len);
+		return SSL_write(conn->encrypted_connection, data, (int)len);
 	
 	return write (conn->fd, data, len);
 }

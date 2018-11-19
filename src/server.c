@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +11,8 @@
 #include <autogentoo/autogentoo.h>
 #include <signal.h>
 #include <autogentoo/crypt.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 static Server* srv = NULL;
 
@@ -43,11 +46,29 @@ EncryptServer* server_encrypt_new (Server* parent, char* port) {
 	out->port = strdup (port);
 	out->rsa_binding = small_map_new(16, 16);
 	
-	if (rsa_generate(parent) != 0) {
-		fprintf (stderr, "Failed to generate private key\n");
-		server_free(parent);
-		exit (1);
+	x509_generate_write(out);
+	
+	if (!out->certificate || !out->key_pair) {
+		lerror ("Failed to initialize certificates");
+		free(out->port);
+		small_map_free(out->rsa_binding, 1);
+		free (out);
 	}
+	
+	OpenSSL_add_ssl_algorithms();
+	SSL_load_error_strings();
+	
+	out->context = SSL_CTX_new(SSLv23_server_method());
+	if (!out->context) {
+		lerror("Error creating server context\n");
+		exit(1);
+	}
+	
+	SSL_CTX_use_certificate(out->context, out->certificate);
+	
+	EVP_PKEY* key_pair_evp = EVP_PKEY_new();
+	EVP_PKEY_set1_RSA(key_pair_evp, out->key_pair);
+	SSL_CTX_use_PrivateKey(out->context, key_pair_evp);
 	
 	return out;
 }
@@ -88,12 +109,29 @@ Connection* connection_new (Server* server, int conn_fd) {
 	return out;
 }
 
+Connection* connection_new_tls(EncryptServer* server, int accepted_fd) {
+	Connection* out = connection_new(server->parent, accepted_fd);
+	out->communication_type = COM_RSA;
+	out->encrypted_connection = SSL_new(server->context);
+	SSL_set_fd(out->encrypted_connection, accepted_fd);
+	out->encrypted_fd = SSL_accept(out->encrypted_connection);
+	
+	if (out->encrypted_fd <= 0) {
+		ERR_print_errors_fp(stderr);
+		
+		
+		return NULL;
+	}
+	
+	return out;
+}
+
 void server_start (Server* server) {
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	server->pthread = pthread_self();
 	
-	int listenfd = server_init(server->port);
+	server->socket = server_init(server->port);
 	
 	linfo("Server started on port %s", server->port);
 	
@@ -112,7 +150,7 @@ void server_start (Server* server) {
 #endif
 	
 	while (server->keep_alive) { // Main accept loop
-		int temp_fd = accept(listenfd, (struct sockaddr*) &clientaddr, &addrlen);
+		int temp_fd = accept(server->socket, (struct sockaddr*) &clientaddr, &addrlen);
 		linfo("accepted on fd: %d", temp_fd);
 		if (temp_fd < 3) {
 			lwarning("accept() error");
@@ -135,22 +173,32 @@ void server_start (Server* server) {
 	}
 }
 
-pid_t server_encrypt_start(EncryptServer* server) {
-	pid_t child_pid = fork();
-	if (child_pid)
-		return child_pid;
-	
+void kill_encrypt_server(int sig) {
+	int ret = 0;
+	pthread_exit(&ret);
+}
+
+void server_encrypt_start(EncryptServer* server) {
+	int res = 0;
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	
-	int listenfd = server_init(server->port);
+	server->socket = server_init(server->port);
+	signal (SIGINT, kill_encrypt_server);
 	
 	linfo("Encrypted server started on port %s", server->port);
 	
 	addrlen = sizeof(clientaddr);
 	
+	if (!SSL_CTX_check_private_key(server->context)) {
+		fprintf(stderr, "Private key not loaded\n");
+		res = 1;
+		pthread_exit (&res);
+	}
+	
+	
 	while (server->parent->keep_alive) { // Main accept loop
-		int temp_fd = accept(listenfd, (struct sockaddr*) &clientaddr, &addrlen);
+		int temp_fd = accept(server->socket, (struct sockaddr*) &clientaddr, &addrlen);
 		if (temp_fd < 3) {
 			lwarning("accept() error");
 			continue;
@@ -160,18 +208,7 @@ pid_t server_encrypt_start(EncryptServer* server) {
 			fflush(stdout);
 			continue;
 		}
-		Connection* current_conn = connection_new(server->parent, temp_fd);
-		current_conn->communication_type = COM_RSA;
-		
-		if (rsa_perform_handshake(current_conn) != 0) {
-			fprintf (stderr, "Failed to perform rsa handshake\n");
-			connection_free(current_conn);
-			continue;
-		}
-		
-		current_conn->encrypted_fd = BIO_new(BIO_s_fd());
-		PEM_write_bio_RSAPublicKey(current_conn->encrypted_fd, current_conn->public_key);
-		PEM_write_bio_RSAPrivateKey(current_conn->encrypted_fd, server->private_key, NULL, NULL, 0, NULL, NULL);
+		Connection* current_conn = connection_new_tls(server, temp_fd);
 
 #ifndef AUTOGENTOO_NO_THREADS
 		pool_handler_add(server->parent->pool_handler, (void (*)(void*, int))server_respond, current_conn);
@@ -180,13 +217,21 @@ pid_t server_encrypt_start(EncryptServer* server) {
 #endif
 	}
 	
-	exit (0);
+	res = 0;
+	pthread_exit (&res);
 }
 
 void server_kill (Server* server) {
 	write_server(server);
-	//thread_handler_join_all(server->thandler);
-	//thread_handler_free(server->thandler);
+	
+	if (server->opts & ENCRYPT) {
+		pthread_kill(server->rsa_child->pid, SIGINT);
+		close(server->rsa_child->socket);
+		pthread_join(server->rsa_child->pid, NULL);
+		linfo("encrypt server exited");
+	}
+	pool_exit(server->pool_handler);
+	close(server->socket);
 	server_free(server);
 	linfo("server exited succuessfully");
 	exit (0);
@@ -252,10 +297,8 @@ void connection_free (Connection* conn) {
 		conn->status = CLOSED;
 	}
 	
-	if (conn->communication_type == COM_RSA) {
-		BIO_free_all(conn->encrypted_fd);
-		RSA_free(conn->public_key);
-	}
+	if (conn->communication_type == COM_RSA)
+		SSL_free(conn->encrypted_connection);
 	
 	free(conn->request);
 	free(conn->ip);
@@ -310,11 +353,9 @@ void server_recv (Connection* conn) {
 }
 
 void server_respond(Connection* conn, int worker_index) {
-	linfo ("responding %d", worker_index);
 	/* Read from the client and parse request */
 	server_recv(conn);
 	if (conn->status != CONNECTED) {
-		linfo("recv_failed %d\n", worker_index);
 		connection_free(conn);
 		return;
 	}
@@ -433,4 +474,11 @@ pid_t server_spawn_worker (Server* parent) {
 	if (parent->queue->proc_id == 0)
 		execl (AUTOGENTOO_WORKER, "", NULL);
 	return parent->queue->proc_id;
+}
+
+char* server_get_path (Server* parent, char* path) {
+	char* out;
+	asprintf (&out, "%s/%s", parent->location, path);
+	
+	return out;
 }

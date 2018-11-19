@@ -17,5 +17,5 @@ libautogentoo_la_LDFLAGS = ../hacksaw/src/libhacksaw.a http/libhttp.a -version-i
 
 bin_PROGRAMS = autogentoo
 autogentoo_SOURCES = autogentoo.c
-autogentoo_CFLAGS = ${AM_CFLAGS} -D AUTOGENTOO_CLIENT=\"$(libdir)/autogentoo/client.py\"
+autogentoo_CFLAGS = ${AM_CFLAGS} -lpthread -D AUTOGENTOO_CLIENT=\"$(libdir)/autogentoo/client.py\"
 autogentoo_LDADD = libautogentoo.la

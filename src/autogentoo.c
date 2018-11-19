@@ -75,9 +75,14 @@ int main(int argc, char** argv) {
 		Server* main_server = read_server(location, port, server_opts);
 		main_server->keep_alive = 1;
 		if (main_server->opts & ENCRYPT)
-			server_encrypt_start (main_server->rsa_child);
+			pthread_create(
+					&main_server->rsa_child->pid,
+					NULL,
+					(void* (*)(void*))server_encrypt_start,
+					main_server->rsa_child);
 		server_start(main_server);
-	} else {
+	}
+	else {
 		char* cmd;
 		asprintf(&cmd, "python " AUTOGENTOO_CLIENT " %s", client_opts);
 		system(cmd);

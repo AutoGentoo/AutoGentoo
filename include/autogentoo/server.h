@@ -85,6 +85,8 @@ struct __Server {
 	pid_t pid;
 	pthread_t pthread;
 	
+	int socket;
+	
 	/** Secure server **/
 	EncryptServer* rsa_child;
 };
@@ -92,18 +94,24 @@ struct __Server {
 #ifndef connection_read
 #define connection_read(dest, size)\
 conn->communication_type == COM_RSA ? \
-	BIO_read(conn->encrypted_fd, dest, (int)size) : read(conn->fd, dest, size)
+	SSL_read(conn->encrypted_connection, dest, (int)size) : read(conn->fd, dest, size)
 #endif
 
 struct __EncryptServer {
 	Server* parent;
 	char* port;
+	pthread_t pid;
+	
+	int socket;
 	
 	/** ONLY AUTOGENTOO_S
 	 * 2048 RSA encryption
 	 * Serverside encryption
 	 **/
-	RSA* private_key;
+	X509* certificate;
+	SSL_CTX* context;
+	RSA* key_pair;
+	
 	SmallMap* rsa_binding;
 };
 
@@ -140,8 +148,8 @@ struct __Connection {
 	 * 2048 RSA encryption
 	 * Clientside encryption
 	 **/
-	RSA* public_key;
-	BIO* encrypted_fd; //!< Source/Sink BIO that does our encryption
+	SSL* encrypted_connection;
+	int encrypted_fd;
 };
 
 #include "host.h"
@@ -155,7 +163,7 @@ struct __Connection {
  */
 Server* server_new(char* location, char* port, server_t opts);
 
-pid_t server_encrypt_start(EncryptServer* server);
+void server_encrypt_start(EncryptServer* server);
 EncryptServer* server_encrypt_new (Server* parent, char* port);
 
 /**
@@ -165,6 +173,8 @@ EncryptServer* server_encrypt_new (Server* parent, char* port);
  * @return a pointer to the newly created Connection
  */
 Connection* connection_new(Server* server, int conn_fd);
+
+Connection* connection_new_tls(EncryptServer* server, int accepted_fd);
 
 /**
  * Get the host that is bounded to the given IP address
@@ -233,5 +243,7 @@ void handle_sigint (int sig);
 void server_add_queue (Server* parent, Queue* new);
 
 pid_t server_spawn_worker (Server* parent);
+
+char* server_get_path (Server* parent, char* path);
 
 #endif
