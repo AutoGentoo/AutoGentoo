@@ -105,6 +105,9 @@ response_t request_call (Request* req) {
 		return BAD_REQUEST;
 	
 	linfo("%d %s HTTP/%d.%d", http_req->function, http_req->path, http_req->version.maj, http_req->version.min);
+	int i;
+	for (i = 0; i < http_req->headers->n; i++)
+		linfo ("%s: %s", small_map_get_key_index(http_req->headers, i), small_map_get_index(http_req->headers, i));
 	req->resolved_call = resolve_call(http_req->function);
 	if (req->resolved_call.http_fh == NULL)
 		return NOT_IMPLEMENTED;

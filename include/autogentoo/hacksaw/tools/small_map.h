@@ -33,4 +33,6 @@ char* small_map_get_key(SmallMap* smap, void* data);
 
 void* small_map_get_index(SmallMap* smap, int index);
 
+void* small_map_get_key_index(SmallMap* smap, int index);
+
 #endif

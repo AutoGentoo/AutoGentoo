@@ -334,7 +334,7 @@ void handle_sigint (int sig) {
 //#define AUTOGENTOO_IGNORE_SEGV
 
 void server_recv (Connection* conn) {
-	struct timeval tv = {2, 0};
+	struct timeval tv = {4, 0};
 	setsockopt(conn->fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
 	
 	/* Read the request */
