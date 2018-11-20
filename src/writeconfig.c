@@ -124,6 +124,7 @@ size_t write_host_fp(Host* host, FILE* fp) {
 		}
 	}
 	
+	/*
 	if (host->auth_tokens)
 		for (i = 0; i != host->auth_tokens->n; i++) {
 			size += write_int(AUTOGENTOO_ACCESS_TOKEN, fp);
@@ -134,7 +135,7 @@ size_t write_host_fp(Host* host, FILE* fp) {
 			size += write_void(current_token.auth_token, AUTOGENTOO_TOKEN_LENGTH, fp);
 			size += write_int(current_token.access_level, fp);
 		}
-	
+	*/
 	size += write_int(AUTOGENTOO_HOST_END, fp);
 	
 	return size;
@@ -287,10 +288,10 @@ Host* read_host(FILE* fp) {
 				new_kernel->version = read_string(fp);
 				vector_add(out->kernel, new_kernel);
 				break;
-			case AUTOGENTOO_ACCESS_TOKEN:
-				new_token.user_id = read_string(fp);
-				new_token.auth_token = read_void(AUTOGENTOO_TOKEN_LENGTH, fp);
-				new_token.access_level = read_int(fp);
+			//case AUTOGENTOO_ACCESS_TOKEN:
+			//	new_token.user_id = read_string(fp);
+			//	//new_token.auth_token = read_void(AUTOGENTOO_TOKEN_LENGTH, fp);
+			//	new_token.access_level = read_int(fp);
 			case AUTOGENTOO_HOST_END:
 				break;
 			default:

@@ -215,10 +215,14 @@ void server_encrypt_start(EncryptServer* server) {
 		}
 		if (fcntl(temp_fd, F_GETFD) == -1 || errno == EBADF) {
 			lwarning("Bad fd on accept()");
-			fflush(stdout);
 			continue;
 		}
 		Connection* current_conn = connection_new_tls(server, temp_fd);
+		if (!current_conn) {
+			lerror ("Failed to create encrypted connection");
+			close (temp_fd);
+			continue;
+		}
 
 #ifndef AUTOGENTOO_NO_THREADS
 		pool_handler_add(server->parent->pool_handler, (void (*)(void*, int))server_respond, current_conn);

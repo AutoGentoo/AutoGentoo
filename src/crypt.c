@@ -17,7 +17,7 @@ void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair) {
 	
 	int status = 0;
 	
-	const unsigned char* country = (unsigned char*)"United States of America";
+	const unsigned char* country = (unsigned char*)"US";
 	const unsigned char* organization = (unsigned char*)"AutoGentoo";
 	const unsigned char* common = (unsigned char*)"autogentoo";
 	

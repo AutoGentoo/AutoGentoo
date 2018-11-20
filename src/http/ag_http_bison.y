@@ -58,7 +58,7 @@ void ag_httperror(const char *message);
 %type <str> end;
 
 %%
-request:      request_function[f] SPHT STR[p] SPHT VERSION[v] CRLF headers[h] end[e] {
+request:      request_function[f] SPHT STR[p] SPHT VERSION[v] headers[h] end[e] {
                                                 ag_httpout = malloc(sizeof (HttpRequest));
                                                 ag_httpout->function = $f;
                                                 ag_httpout->path = $p;

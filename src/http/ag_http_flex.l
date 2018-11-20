@@ -23,10 +23,9 @@ HttpRequest* ag_http_parse (char* buffer) {
 HttpHeader* header_new (char* text) {
     HttpHeader* out = malloc(sizeof(HttpHeader));
     char* split = strtok(text, ": ");
-    text[strlen(text) - 2] = 0;
-    *split = 0;
-    out->name = strdup(text);
-    out->value = strdup(split + 2);
+    char* end = strtok(NULL, "\r\n");
+    out->name = strdup(split);
+    out->value = strdup(++end);
 
     return out;
 }
@@ -44,9 +43,9 @@ spht            (" "|\t)
 "GET"                   {return GET;}
 "HEAD"                  {return HEAD;}
 "POST"                  {return POST;}
-"HTTP/"[0-9]+"."[0-9]+  {
+"HTTP/"[0-9]+"."[0-9]+"\r\n"  {
                             for (char* i = ag_httptext; *i; i++)
-                                if (*i == '/' || *i == '.')
+                                if (*i == '/' || *i == '.' || *i == '\r')
                                     *i = ' ';
                             sscanf(ag_httptext,
                                 "HTTP %d %d",
@@ -58,7 +57,7 @@ spht            (" "|\t)
 "\r\n"                  {return CRLF;}
 {spht}                  {return SPHT;}
 
-{header}+":"[^\r\n]+"\r\n" {ag_httplval.header = header_new(ag_httptext); return HEADER;}
+[^ \:\r\n]+":"[^\r\n]+"\r\n" {ag_httplval.header = header_new(ag_httptext); return HEADER;}
 [^ \r\n]+               {ag_httplval.str = strdup(ag_httptext); return STR;}
 
 .                       {printf("Unknown character: %s\n", ag_httptext);}

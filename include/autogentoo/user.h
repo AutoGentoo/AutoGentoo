@@ -9,13 +9,6 @@
 #include <openssl/evp.h>
 #include <autogentoo/hacksaw/tools.h>
 
-#ifndef AUTOGENTOO_TOKEN_LENGTH
-#define AUTOGENTOO_TOKEN_LENGTH 32
-#endif
-
-#ifndef AUTOGENTOO_USER_AUTH_ENCRYPT
-#error AUTOGENTOO_USER_AUTH_ENCRYPT needs to be generated
-#endif
 
 typedef struct __User User;
 typedef struct __AuthToken AuthToken;

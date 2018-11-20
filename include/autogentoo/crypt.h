@@ -12,7 +12,7 @@
 #endif
 
 /* OLD */
-/*
+
 typedef enum {
 	AUTOGENTOO_RSA_VERIFY, //!< Check if we have updated public key
 	AUTOGENTOO_RSA_CORRECT, //!< RSA exchange complete
@@ -23,7 +23,7 @@ typedef enum {
 	AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC = 1 << 1,
 	AUTOGENTOO_RSA_NOAUTH = AUTOGENTOO_RSA_SERVERSIDE_PUBLIC | AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC
 } rsa_t;
-
+/*
 int rsa_recv_public(Connection* conn);
 int rsa_send_public(Connection* conn);
 
