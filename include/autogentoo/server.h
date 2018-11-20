@@ -46,6 +46,14 @@ typedef enum {
 	ENCRYPT = 0x4  //!< Start an encrypted socket
 } server_t;
 
+typedef enum {
+	ENC_CERT_SIGN = 1 << 1,
+	ENC_GEN_RSA = 1 << 2 | ENC_CERT_SIGN,
+	ENC_GEN_CERT = 1 << 3 | ENC_CERT_SIGN,
+	ENC_READ_CERT = 1 << 4,
+	ENC_READ_RSA = 1 << 5,
+} enc_server_t;
+
 /**
  * Holds the status of a connection
  */
@@ -101,6 +109,10 @@ struct __EncryptServer {
 	Server* parent;
 	char* port;
 	pthread_t pid;
+	enc_server_t opts;
+	
+	char* rsa_path;
+	char* cert_path;
 	
 	int socket;
 	
@@ -111,8 +123,6 @@ struct __EncryptServer {
 	X509* certificate;
 	SSL_CTX* context;
 	RSA* key_pair;
-	
-	SmallMap* rsa_binding;
 };
 
 /**
@@ -164,7 +174,7 @@ struct __Connection {
 Server* server_new(char* location, char* port, server_t opts);
 
 void server_encrypt_start(EncryptServer* server);
-EncryptServer* server_encrypt_new (Server* parent, char* port);
+EncryptServer* server_encrypt_new(Server* parent, char* port, char* cert_path, char* rsa_path, enc_server_t opts);
 
 /**
  * Creates a new Connection given a file desciptor from accept()

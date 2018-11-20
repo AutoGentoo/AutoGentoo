@@ -14,69 +14,36 @@
 
 void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair) {
 	X509_NAME* name = NULL;
-	EVP_PKEY* priv_key = NULL;
 	
 	int status = 0;
 	
 	const unsigned char* country = (unsigned char*)"United States of America";
 	const unsigned char* organization = (unsigned char*)"AutoGentoo";
 	const unsigned char* common = (unsigned char*)"autogentoo";
-	do {
-		// Create the certificate object
-		*cert_out = X509_new();
-		if (!*cert_out) {
-			lerror ("Failed to initialize certificate");
-			break;
-		}
-		
-		X509_set_version (*cert_out, 3);
-		
-		// Set the certificate's properties
-		ASN1_INTEGER_set (X509_get_serialNumber (*cert_out), serial);
-		X509_gmtime_adj (X509_get_notBefore (*cert_out), 0);
-		X509_gmtime_adj (X509_get_notAfter (*cert_out), (long)(60 * 60 * 24 * (days_valid ? days_valid : 1)));
-		name = X509_get_subject_name (*cert_out);
-		
-		X509_NAME_add_entry_by_txt (name, "C", MBSTRING_ASC, country, -1, -1, 0);
-		X509_NAME_add_entry_by_txt (name, "CN", MBSTRING_ASC, common, -1, -1, 0);
-		X509_NAME_add_entry_by_txt (name, "O", MBSTRING_ASC, organization, -1, -1, 0);
-		X509_set_issuer_name (*cert_out, name);
-		
-		priv_key = EVP_PKEY_new();
-		if (!priv_key) {
-			lerror("Failed to initialize EVP_PKEY");
-			break;
-		}
-		
-		if (!EVP_PKEY_assign_RSA(priv_key, key_pair)) {
-			lerror("Failed to assign key_pair to private key");
-			break;
-		}
-		
-		// Set the certificate's public key from the private key object
-		if (!X509_set_pubkey (*cert_out, priv_key)) {
-			lerror("Failed to assign private key to certificate");
-			break;
-		}
-		
-		// Sign it with SHA-1
-		if (!X509_sign (*cert_out, priv_key, EVP_sha256())) {
-			lerror("Failed to sign certificate with EVP_sha256()");
-			break;
-		}
-		
-		priv_key = NULL;
-		
-		status = 1;
-	} while (!status);
 	
-	// Things we clean up only on failure
-	if (status == 0) {
+	// Create the certificate object
+	*cert_out = X509_new();
+	if (!*cert_out) {
 		X509_free (*cert_out);
-		if (priv_key)
-			EVP_PKEY_free (priv_key);
+		lerror ("Failed to initialize certificate");
 		*cert_out = NULL;
+		return;
 	}
+	
+	X509_set_version (*cert_out, 3);
+	
+	// Set the certificate's properties
+	ASN1_INTEGER_set (X509_get_serialNumber (*cert_out), serial);
+	X509_gmtime_adj (X509_get_notBefore (*cert_out), 0);
+	X509_gmtime_adj (X509_get_notAfter (*cert_out), (long)(60 * 60 * 24 * (days_valid ? days_valid : 1)));
+	name = X509_get_subject_name (*cert_out);
+	
+	X509_NAME_add_entry_by_txt (name, "C", MBSTRING_ASC, country, -1, -1, 0);
+	X509_NAME_add_entry_by_txt (name, "CN", MBSTRING_ASC, common, -1, -1, 0);
+	X509_NAME_add_entry_by_txt (name, "O", MBSTRING_ASC, organization, -1, -1, 0);
+	X509_set_issuer_name (*cert_out, name);
+	
+	certificate_sign(*cert_out, key_pair);
 }
 
 int certificate_sign(X509* cert, RSA* rsa) {
@@ -153,51 +120,74 @@ int rsa_generate(RSA** target) {
 }
 
 int x509_generate_write(EncryptServer* parent) {
-	if (!rsa_generate(&parent->key_pair)) {
-		lerror ("Failed to generate RSA key");
+	if (parent->opts & ENC_READ_RSA && parent->opts & ENC_GEN_RSA) {
+		lerror("invalid opts: Can't generate and read RSA");
+		return 1;
+	}
+	if (parent->opts & ENC_READ_CERT && parent->opts & ENC_GEN_CERT) {
+		lerror("invalid opts: Can't generate and read certificate");
 		return 1;
 	}
 	
-	char* certificate_path = server_get_path(parent->parent, "certificate.pem");
-	int x509_exists = access(certificate_path, F_OK) != -1;
-	if (!x509_exists) {
-		linfo("Generating new certificate");
-		x509_generate(cert_generate_serial(), 122147281, &parent->certificate, parent->key_pair);
-		if (!parent->certificate || !parent->key_pair) {
-			free(certificate_path);
+	if (parent->opts & ENC_READ_RSA) {
+		FILE* fp = fopen(parent->rsa_path, "r");
+		parent->key_pair = PEM_read_RSAPrivateKey(fp, &parent->key_pair, NULL, NULL);
+		fclose(fp);
+		if (!parent->key_pair) {
+			lerror("Failed to read RSA from file %s", parent->rsa_path);
 			return 2;
 		}
 	}
 	
-	FILE* cert_fp;
-	FILE* rsa_fp;
-	
-	int cert_fd = open(certificate_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
-	if (x509_exists) {
-		cert_fp = fdopen(cert_fd, "r");
-		parent->certificate = PEM_read_X509(cert_fp, &parent->certificate, NULL, NULL);
-		if (!certificate_sign(parent->certificate, parent->key_pair)) {
-			lerror("Failed to sign RSA key with certificate");
-			fclose(cert_fp);
-			free(certificate_path);
+	if (parent->opts & ENC_READ_CERT) {
+		FILE* fp = fopen(parent->cert_path, "r");
+		parent->certificate = PEM_read_X509(fp, &parent->certificate, NULL, NULL);
+		fclose(fp);
+		if (!parent->certificate) {
+			lerror("Failed to read certificate from file %s", parent->cert_path);
 			return 3;
 		}
 	}
-	else {
-		cert_fp = fdopen(cert_fd, "w");
-		
-		int x509_status = PEM_write_X509(cert_fp, parent->certificate);
-		if (!x509_status) {
-			lerror("Failed to write X509 certificate to file");
-			fclose(cert_fp);
-			remove(certificate_path);
-			free(certificate_path);
+	
+	if (parent->opts & ENC_GEN_RSA) {
+		if (!rsa_generate(&parent->key_pair)) {
+			lerror ("Failed to generate RSA key");
 			return 4;
 		}
+		
+		int rsa_fd = open(parent->rsa_path, O_RDWR | O_CREAT, 0 | S_IRUSR | S_IWUSR | S_IRGRP);
+		FILE* fp = fdopen(rsa_fd, "w");
+		if (!PEM_write_RSAPrivateKey(fp, parent->key_pair, NULL, NULL, 0, NULL, NULL)) {
+			fclose (fp);
+			lerror("Failed to write private key to file");
+			return 4;
+		}
+		fclose (fp);
 	}
 	
-	free(certificate_path);
-	fclose (cert_fp);
+	if (parent->opts & ENC_GEN_CERT) {
+		x509_generate(cert_generate_serial(), 120, &parent->certificate, parent->key_pair);
+		if (!parent->certificate) {
+			lerror("Failed to generate certificate");
+			return 5;
+		}
+		
+		int cert_fd = open(parent->cert_path, O_RDWR | O_CREAT, 0 | S_IRUSR | S_IWUSR | S_IRGRP);
+		FILE* fp = fdopen(cert_fd, "w");
+		if (!PEM_write_X509(fp, parent->certificate)) {
+			fclose (fp);
+			lerror("Failed to write certificate to file");
+			return 5;
+		}
+		fclose (fp);
+	}
+	
+	if (parent->opts & ENC_CERT_SIGN) {
+		if (!certificate_sign(parent->certificate, parent->key_pair)) {
+			lerror("Failed to sign RSA key with certificate");
+			return 6;
+		}
+	}
 	
 	return 0;
 }

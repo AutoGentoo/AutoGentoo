@@ -15,6 +15,11 @@ Opt opt_handlers[] = {
 		{'t', "target",  "Target server (localhost default)",               set_target,         OPT_SHORT | OPT_LONG |
 		                                                                                        OPT_ARG},
 		{0,   "encrypt", "Start an encrypted socket as well",               set_is_encrypted,   OPT_LONG},
+		{0,   "cert",    "speificy certificate file",                       set_is_encrypted,   OPT_LONG | OPT_ARG},
+		{0,   "rsa",     "speificy rsa private key file",                   set_is_encrypted,   OPT_LONG | OPT_ARG},
+		{0,   "sign",    "sign the rsa key with the certificate",           set_is_encrypted,   OPT_LONG},
+		{0,   "gencert", "generate new certicaite and self sign",           set_is_encrypted,   OPT_LONG},
+		{0,   "genrsa",  "generate new rsa and sign with cert",             set_is_encrypted,   OPT_LONG},
 		{0, NULL, NULL, NULL, (opt_opts_t) 0 }
 };
 
@@ -24,6 +29,27 @@ static server_t server_opts;
 static int logfile_fd = -1;
 static char is_server = 0;
 static char* client_opts = NULL;
+
+static char* cert_file = NULL;
+static char* rsa_file = NULL;
+static enc_server_t enc_server_options = 0;
+
+void set_encrypt_opts (Opt* op, char* arg) {
+	if (strcmp(op->_long, "cert") == 0) {
+		enc_server_options |= ENC_READ_CERT;
+		cert_file = strdup(arg);
+	}
+	if (strcmp(op->_long, "rsa") == 0) {
+		enc_server_options |= ENC_READ_RSA;
+		rsa_file = strdup(arg);
+	}
+	if (strcmp(op->_long, "sign") == 0)
+		enc_server_options |= ENC_CERT_SIGN;
+	if (strcmp(op->_long, "gencert") == 0)
+		enc_server_options |= ENC_GEN_CERT;
+	if (strcmp(op->_long, "genrsa") == 0)
+		enc_server_options |= ENC_GEN_RSA;
+}
 
 void set_is_encrypted (Opt* op, char* c) {
 	server_opts |= ENCRYPT;
@@ -74,6 +100,16 @@ int main(int argc, char** argv) {
 	if (is_server) {
 		Server* main_server = read_server(location, port, server_opts);
 		main_server->keep_alive = 1;
+		
+		if (main_server->opts & ENCRYPT) {
+			main_server->rsa_child = server_encrypt_new(main_server, AUTOGENTOO_PORT_ENCRYPT, cert_file, rsa_file, enc_server_options);
+			if (!main_server->rsa_child) {
+				server_free(main_server);
+				lerror("Failed to initialize server");
+				exit(1);
+			}
+		}
+		
 		if (main_server->opts & ENCRYPT)
 			pthread_create(
 					&main_server->rsa_child->pid,

@@ -39,6 +39,7 @@ rsa_t rsa_load_binding(Connection* conn);
 
 /* OpenSSL Certificate */
 int rsa_generate(RSA** target);
+int certificate_sign(X509* cert, RSA* rsa);
 void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair);
 int x509_generate_write(EncryptServer* parent);
 

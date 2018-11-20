@@ -33,32 +33,31 @@ Server* server_new (char* location, char* port, server_t opts) {
 	out->opts = opts;
 	out->port = strdup(port);
 	
-	if (out->opts & ENCRYPT) {
-		out->rsa_child = server_encrypt_new(out, AUTOGENTOO_PORT_ENCRYPT);
-		if (!out->rsa_child) {
-			server_free(out);
-			lerror("Failed to initialize server");
-			exit(1);
-		}
-	}
-	
 	return out;
 }
 
-EncryptServer* server_encrypt_new (Server* parent, char* port) {
+EncryptServer* server_encrypt_new(Server* parent, char* port, char* cert_path, char* rsa_path, enc_server_t opts) {
 	EncryptServer* out = malloc (sizeof (EncryptServer));
 	
 	out->parent = parent;
 	out->port = strdup (port);
-	out->rsa_binding = small_map_new(16, 16);
+	out->opts = opts;
 	
 	out->certificate = NULL;
 	out->key_pair = NULL;
+	out->cert_path = cert_path;
+	out->rsa_path = rsa_path;
+	
+	if (!out->cert_path)
+		out->cert_path = server_get_path(parent, "certificate.pem");
+	if (!out->rsa_path)
+		out->rsa_path = server_get_path(parent, "private.pem");
 	
 	if (x509_generate_write(out) != 0) {
 		lerror ("Failed to initialize certificates");
 		free(out->port);
-		small_map_free(out->rsa_binding, 1);
+		free(out->cert_path);
+		free(out->rsa_path);
 		free (out);
 		return NULL;
 	}
@@ -231,6 +230,17 @@ void server_encrypt_start(EncryptServer* server) {
 	pthread_exit (NULL);
 }
 
+void server_encrypt_free (EncryptServer* server) {
+	free(server->rsa_path);
+	free(server->cert_path);
+	free(server->port);
+	
+	X509_free(server->certificate);
+	RSA_free(server->key_pair);
+	SSL_CTX_free(server->context);
+	free(server);
+}
+
 void server_kill (Server* server) {
 	write_server(server);
 	
@@ -238,6 +248,7 @@ void server_kill (Server* server) {
 		pthread_kill(server->rsa_child->pid, SIGINT);
 		close(server->rsa_child->socket);
 		pthread_join(server->rsa_child->pid, NULL);
+		server_encrypt_free(server->rsa_child);
 		linfo("encrypt server exited");
 	}
 	pool_exit(server->pool_handler);
