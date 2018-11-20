@@ -354,8 +354,6 @@ void server_recv (Connection* conn) {
 		
 		current_bytes = connection_read(conn->request + total_read, chunk_len);
 		total_read += current_bytes;
-		
-		printf("----------- %li\n", current_bytes);
 	}
 	
 	if (total_read < 0) { // receive error

@@ -10,7 +10,7 @@ ssize_t rsend(Connection* conn, response_t code) {
 	char message[40];
 	sprintf(message, "HTTP/1.0 %d %s\n", code.code, code.message);
 	
-	return write(conn->fd, message, 14 + code.len);
+	return conn_write(conn, message, 14 + code.len);
 }
 
 response_t res_list[] = {
