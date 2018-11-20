@@ -73,8 +73,14 @@ EncryptServer* server_encrypt_new (Server* parent, char* port) {
 		exit(1);
 	}
 	
-	SSL_CTX_use_certificate(out->context, out->certificate);
-	SSL_CTX_use_RSAPrivateKey(out->context, out->key_pair);
+	if (!SSL_CTX_use_certificate(out->context, out->certificate)) {
+		lerror("Failed to load certificate into SSL context");
+		exit(1);
+	}
+	if (!SSL_CTX_use_RSAPrivateKey(out->context, out->key_pair)) {
+		lerror("Failed to load private into SSL context");
+		exit(1);
+	}
 	
 	return out;
 }
