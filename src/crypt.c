@@ -95,9 +95,6 @@ int rsa_generate(EVP_PKEY** target) {
 	}
 	
 	// 3. save private key
-	bp_private = BIO_new_file("private.pem", "w+");
-	ret = PEM_write_bio_RSAPrivateKey(bp_private, rsa_priv_key, NULL, NULL, 0, NULL, NULL) == 1;
-	
 	EVP_PKEY_set1_RSA(*target, rsa_priv_key);
 	
 	// 4. free
@@ -110,27 +107,18 @@ int rsa_generate(EVP_PKEY** target) {
 }
 
 int x509_generate_write(EncryptServer* parent) {
-	char* certificate_path = server_get_path(parent->parent, "certificate.pem");
-	char* rsa_path = server_get_path(parent->parent, "private.pem");
-	
-	int rsa_exists = access(rsa_path, F_OK) != -1;
-	if (!rsa_exists) {
-		
-		if (!rsa_generate(&parent->key_pair)) {
-			lerror ("Failed to generate RSA key");
-			free (rsa_path);
-			free (certificate_path);
-			return 1;
-		}
+	if (!rsa_generate(&parent->key_pair)) {
+		lerror ("Failed to generate RSA key");
+		return 1;
 	}
 	
+	char* certificate_path = server_get_path(parent->parent, "certificate.pem");
 	int x509_exists = access(certificate_path, F_OK) != -1;
 	if (!x509_exists) {
 		linfo("Generating new certificate");
 		x509_generate(cert_generate_serial(), 122147281, &parent->certificate, parent->key_pair);
 		if (!parent->certificate || !parent->key_pair) {
 			free(certificate_path);
-			free(rsa_path);
 			return 2;
 		}
 	}
@@ -152,22 +140,11 @@ int x509_generate_write(EncryptServer* parent) {
 			fclose(cert_fp);
 			remove(certificate_path);
 			free(certificate_path);
-			free(rsa_path);
 			return 3;
 		}
 	}
 	
-	if (rsa_exists) {
-		int rsa_fd = open(rsa_path, O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP);
-		rsa_fp = fdopen(rsa_fd, "r");
-		linfo("Reading RSA key from %s", rsa_path);
-		
-		parent->key_pair = PEM_read_PrivateKey(rsa_fp, &parent->key_pair, NULL, NULL);
-		fclose (rsa_fp);
-	}
-	
 	free(certificate_path);
-	free(rsa_path);
 	fclose (cert_fp);
 	
 	return 0;
