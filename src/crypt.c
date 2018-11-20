@@ -12,9 +12,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair) {
+void x509_generate(int serial, int days_valid, X509** cert_out, EVP_PKEY* key_pair_evp) {
 	X509_NAME* name = NULL;
-	EVP_PKEY* priv_key = NULL;
 	
 	int status = 0;
 	
@@ -42,45 +41,24 @@ void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair) {
 		X509_NAME_add_entry_by_txt (name, "O", MBSTRING_ASC, organization, -1, -1, 0);
 		X509_set_issuer_name (*cert_out, name);
 		
-		// Now we need a private key object
-		priv_key = EVP_PKEY_new();
-		if (!priv_key) {
-			lerror("Failed to initialize private key");
-			break;
-		}
-		
-		// Assign the key pair to the private key object
-		if (!EVP_PKEY_assign_RSA (priv_key, key_pair)) {
-			lerror("Failed to assign key_pair to private key");
-			break;
-		}
-		
 		// Set the certificate's public key from the private key object
-		if (!X509_set_pubkey (*cert_out, priv_key)) {
+		if (!X509_set_pubkey (*cert_out, key_pair_evp)) {
 			lerror("Failed to assign private key to certificate");
 			break;
 		}
 		
 		// Sign it with SHA-1
-		if (!X509_sign (*cert_out, priv_key, EVP_sha256())) {
+		if (!X509_sign (*cert_out, key_pair_evp, EVP_sha256())) {
 			lerror("Failed to sign certificate with EVP_sha256()");
 			break;
 		}
 		
-		// PrivateKey now belongs to cert_out, so don't clean it up separately
-		priv_key = NULL;
-		
 		status = 1;
 	} while (!status);
-	
-	if (priv_key)
-		EVP_PKEY_free (priv_key);
 	
 	// Things we clean up only on failure
 	if (status == 0) {
 		X509_free (*cert_out);
-		if (priv_key)
-			EVP_PKEY_free (priv_key);
 		*cert_out = NULL;
 	}
 }
@@ -89,10 +67,11 @@ int cert_generate_serial () {
 	return 2;
 }
 
-int rsa_generate(RSA** target) {
+int rsa_generate(EVP_PKEY** target) {
 	int ret = 0;
 	BIGNUM* bne = NULL;
 	BIO* bp_public = NULL, * bp_private = NULL;
+	*target = EVP_PKEY_new();
 	
 	int bits = AUTOGENTOO_RSA_BITS;
 	linfo("Create new RSA %d key", AUTOGENTOO_RSA_BITS);
@@ -106,8 +85,10 @@ int rsa_generate(RSA** target) {
 		goto free_all;
 	}
 	
-	*target = RSA_new();
-	ret = RSA_generate_key_ex(*target, bits, bne, NULL);
+	RSA* rsa_priv_key = NULL;
+	
+	rsa_priv_key = RSA_new();
+	ret = RSA_generate_key_ex(rsa_priv_key, bits, bne, NULL);
 	if (ret != 1) {
 		lerror("RSA key generation failed");
 		goto free_all;
@@ -115,7 +96,9 @@ int rsa_generate(RSA** target) {
 	
 	// 3. save private key
 	bp_private = BIO_new_file("private.pem", "w+");
-	ret = PEM_write_bio_RSAPrivateKey(bp_private, *target, NULL, NULL, 0, NULL, NULL) == 1;
+	ret = PEM_write_bio_RSAPrivateKey(bp_private, rsa_priv_key, NULL, NULL, 0, NULL, NULL) == 1;
+	
+	EVP_PKEY_set1_RSA(*target, rsa_priv_key);
 	
 	// 4. free
 	free_all:
@@ -132,6 +115,7 @@ int x509_generate_write(EncryptServer* parent) {
 	
 	int rsa_exists = access(rsa_path, F_OK) != -1;
 	if (!rsa_exists) {
+		
 		if (!rsa_generate(&parent->key_pair)) {
 			lerror ("Failed to generate RSA key");
 			free (rsa_path);
@@ -174,9 +158,11 @@ int x509_generate_write(EncryptServer* parent) {
 	}
 	
 	if (rsa_exists) {
-		int rsa_fd = open(rsa_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
+		int rsa_fd = open(rsa_path, O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP);
 		rsa_fp = fdopen(rsa_fd, "r");
-		parent->key_pair = PEM_read_RSAPrivateKey(rsa_fp, &parent->key_pair, NULL, NULL);
+		linfo("Reading RSA key from %s", rsa_path);
+		
+		parent->key_pair = PEM_read_PrivateKey(rsa_fp, &parent->key_pair, NULL, NULL);
 		fclose (rsa_fp);
 	}
 	

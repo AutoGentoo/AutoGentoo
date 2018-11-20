@@ -65,6 +65,7 @@ EncryptServer* server_encrypt_new (Server* parent, char* port) {
 	
 	OpenSSL_add_ssl_algorithms();
 	SSL_load_error_strings();
+	OpenSSL_add_all_ciphers();
 	
 	out->context = SSL_CTX_new(SSLv23_server_method());
 	if (!out->context) {
@@ -73,10 +74,7 @@ EncryptServer* server_encrypt_new (Server* parent, char* port) {
 	}
 	
 	SSL_CTX_use_certificate(out->context, out->certificate);
-	
-	EVP_PKEY* key_pair_evp = EVP_PKEY_new();
-	EVP_PKEY_set1_RSA(key_pair_evp, out->key_pair);
-	SSL_CTX_use_PrivateKey(out->context, key_pair_evp);
+	SSL_CTX_use_PrivateKey(out->context, out->key_pair);
 	
 	return out;
 }
@@ -126,8 +124,6 @@ Connection* connection_new_tls(EncryptServer* server, int accepted_fd) {
 	
 	if (out->encrypted_fd <= 0) {
 		ERR_print_errors_fp(stderr);
-		
-		
 		return NULL;
 	}
 	
@@ -200,7 +196,7 @@ void server_encrypt_start(EncryptServer* server) {
 	
 	if (!SSL_CTX_check_private_key(server->context)) {
 		lerror("Private key not loaded");
-		pthread_exit (NULL);
+		pthread_kill (pthread_self(), SIGINT);
 	}
 	
 	while (server->parent->keep_alive) { // Main accept loop
