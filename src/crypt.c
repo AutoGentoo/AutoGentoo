@@ -103,7 +103,7 @@ int rsa_generate(EVP_PKEY** target) {
 	BIO_free_all(bp_private);
 	BN_free(bne);
 	
-	return (ret != 1);
+	return (ret == 1);
 }
 
 int x509_generate_write(EncryptServer* parent) {
