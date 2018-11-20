@@ -21,9 +21,9 @@ void lset(FILE* _target) {
 }
 
 void lerror(char* format, ...) {
-	fprintf(target, ANSI_BOLD ANSI_RED " * " ANSI_COLOR);
 	va_list args;
 	va_start (args, format);
+	fprintf(target, ANSI_BOLD ANSI_RED " * " ANSI_COLOR);
 	vfprintf(target, format, args);
 	va_end (args);
 	fprintf(target, ANSI_RESET "\n");
@@ -31,9 +31,9 @@ void lerror(char* format, ...) {
 }
 
 void lwarning(char* format, ...) {
-	fprintf(target, ANSI_BOLD ANSI_YELLOW " * " ANSI_COLOR);
 	va_list args;
 	va_start (args, format);
+	fprintf(target, ANSI_BOLD ANSI_YELLOW " * " ANSI_COLOR);
 	vfprintf(target, format, args);
 	va_end (args);
 	fprintf(target, ANSI_RESET "\n");
@@ -41,9 +41,9 @@ void lwarning(char* format, ...) {
 }
 
 void linfo(char* format, ...) {
-	fprintf(target, ANSI_BOLD ANSI_GREEN " * " ANSI_COLOR);
 	va_list args;
 	va_start (args, format);
+	fprintf(target, ANSI_BOLD ANSI_GREEN " * " ANSI_COLOR);
 	vfprintf(target, format, args);
 	va_end (args);
 	fprintf(target, ANSI_RESET "\n");

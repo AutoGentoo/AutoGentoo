@@ -1,91 +1,15 @@
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
 #include <autogentoo/autogentoo.h>
-#include <signal.h>
 #include <autogentoo/crypt.h>
+#include <fcntl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-static Server* srv = NULL;
-
-Server* server_new (char* location, char* port, server_t opts) {
-	Server* out = malloc(sizeof(Server));
-	
-	out->templates = vector_new(sizeof(HostTemplate*), REMOVE | UNORDERED);
-	out->hosts = vector_new(sizeof(Host*), REMOVE | UNORDERED);
-	out->stages = small_map_new(sizeof(HostTemplate*), 5);
-	out->host_bindings = vector_new(sizeof(HostBind), REMOVE | UNORDERED);
-	out->location = strdup(location);
-	out->queue = malloc (sizeof (WorkerParent));
-	out->queue->tail = NULL;
-	out->queue->head = NULL;
-	out->queue->proc_id = -1;
-	
-	chdir(out->location);
-	out->opts = opts;
-	out->port = strdup(port);
-	
-	return out;
-}
-
-EncryptServer* server_encrypt_new(Server* parent, char* port, char* cert_path, char* rsa_path, enc_server_t opts) {
-	EncryptServer* out = malloc (sizeof (EncryptServer));
-	
-	out->parent = parent;
-	out->port = strdup (port);
-	out->opts = opts;
-	
-	out->certificate = NULL;
-	out->key_pair = NULL;
-	out->cert_path = cert_path;
-	out->rsa_path = rsa_path;
-	
-	if (!out->cert_path)
-		out->cert_path = server_get_path(parent, "certificate.pem");
-	if (!out->rsa_path)
-		out->rsa_path = server_get_path(parent, "private.pem");
-	
-	if (x509_generate_write(out) != 0) {
-		lerror ("Failed to initialize certificates");
-		free(out->port);
-		free(out->cert_path);
-		free(out->rsa_path);
-		free (out);
-		return NULL;
-	}
-	
-	OpenSSL_add_ssl_algorithms();
-	SSL_load_error_strings();
-	OpenSSL_add_all_ciphers();
-	
-	out->context = SSL_CTX_new(SSLv23_server_method());
-	if (!out->context) {
-		lerror("Error creating server context\n");
-		ERR_print_errors_fp(stderr);
-		exit(1);
-	}
-	
-	if (!SSL_CTX_use_certificate(out->context, out->certificate)) {
-		lerror("Failed to load certificate into SSL context");
-		ERR_print_errors_fp(stderr);
-		exit(1);
-	}
-	if (!SSL_CTX_use_RSAPrivateKey(out->context, out->key_pair)) {
-		lerror("Failed to load private into SSL context");
-		ERR_print_errors_fp(stderr);
-		exit(1);
-	}
-	
-	return out;
-}
+Server* srv = NULL;
 
 Host* server_get_active (Server* server, char* ip) {
 	int i;
@@ -118,6 +42,7 @@ Connection* connection_new (Server* server, int conn_fd) {
 	socklen_t addr_size = sizeof(struct sockaddr_in);
 	getpeername(out->fd, (struct sockaddr*) &addr, &addr_size);
 	out->ip = strdup(inet_ntoa(addr.sin_addr));
+	out->communication_type = COM_PLAIN;
 	out->bounded_host = server_get_active(out->parent, out->ip);
 	
 	return out;
@@ -138,102 +63,6 @@ Connection* connection_new_tls(EncryptServer* server, int accepted_fd) {
 	return out;
 }
 
-void server_start (Server* server) {
-	struct sockaddr_in clientaddr;
-	socklen_t addrlen;
-	server->pthread = pthread_self();
-	
-	server->socket = server_init(server->port);
-	
-	linfo("Server started on port %s", server->port);
-	
-	if (server->opts & DAEMON)
-		daemonize(server->location);
-	
-	server->pid = getpid();
-	srv = server;
-	signal (SIGINT, handle_sigint);
-	
-	addrlen = sizeof(clientaddr);
-	server->keep_alive = 1;
-	//server->thandler = thread_handler_new(32);
-#ifndef AUTOGENTOO_NO_THREADS
-	server->pool_handler = pool_handler_new(32);
-#endif
-	
-	while (server->keep_alive) { // Main accept loop
-		int temp_fd = accept(server->socket, (struct sockaddr*) &clientaddr, &addrlen);
-		linfo("accepted on fd: %d", temp_fd);
-		if (temp_fd < 3) {
-			lwarning("accept() error");
-			continue;
-		}
-		if (fcntl(temp_fd, F_GETFD) == -1 || errno == EBADF) {
-			lwarning("Bad fd on accept()");
-			continue;
-		}
-		Connection* current_conn = connection_new(server, temp_fd);
-		current_conn->communication_type = COM_PLAIN;
-
-#ifndef AUTOGENTOO_NO_THREADS
-		printf("POOL_HANDLER_ADD %p\n", current_conn);
-		fflush(stdout);
-		pool_handler_add(server->pool_handler, (void (*)(void*, int))server_respond, current_conn);
-#else
-		server_respond (current_conn);
-#endif
-	}
-}
-
-void kill_encrypt_server(int sig) {
-	int ret = 0;
-	server_kill(srv);
-	exit(0);
-}
-
-void server_encrypt_start(EncryptServer* server) {
-	struct sockaddr_in clientaddr;
-	socklen_t addrlen;
-	
-	server->socket = server_init(server->port);
-	signal (SIGINT, kill_encrypt_server);
-	
-	linfo("Encrypted server started on port %s", server->port);
-	
-	addrlen = sizeof(clientaddr);
-	
-	if (!SSL_CTX_check_private_key(server->context)) {
-		lerror("Private key not loaded");
-		pthread_kill (pthread_self(), SIGINT);
-	}
-	
-	while (server->parent->keep_alive) { // Main accept loop
-		int temp_fd = accept(server->socket, (struct sockaddr*) &clientaddr, &addrlen);
-		if (temp_fd < 3) {
-			lwarning("accept() error");
-			continue;
-		}
-		if (fcntl(temp_fd, F_GETFD) == -1 || errno == EBADF) {
-			lwarning("Bad fd on accept()");
-			continue;
-		}
-		Connection* current_conn = connection_new_tls(server, temp_fd);
-		if (!current_conn) {
-			lerror ("Failed to create encrypted connection");
-			close (temp_fd);
-			continue;
-		}
-
-#ifndef AUTOGENTOO_NO_THREADS
-		pool_handler_add(server->parent->pool_handler, (void (*)(void*, int))server_respond, current_conn);
-#else
-		server_respond (current_conn);
-#endif
-	}
-	
-	pthread_exit (NULL);
-}
-
 void server_encrypt_free (EncryptServer* server) {
 	free(server->rsa_path);
 	free(server->cert_path);
@@ -243,76 +72,6 @@ void server_encrypt_free (EncryptServer* server) {
 	RSA_free(server->key_pair);
 	SSL_CTX_free(server->context);
 	free(server);
-}
-
-void server_kill (Server* server) {
-	write_server(server);
-	
-	if (server->opts & ENCRYPT) {
-		pthread_kill(server->rsa_child->pid, SIGINT);
-		close(server->rsa_child->socket);
-		pthread_join(server->rsa_child->pid, NULL);
-		server_encrypt_free(server->rsa_child);
-		linfo("encrypt server exited");
-	}
-	pool_exit(server->pool_handler);
-	close(server->socket);
-	server_free(server);
-	linfo("server exited succuessfully");
-	exit (0);
-}
-
-int server_init (char* port) {
-	struct addrinfo hints, * res, * p;
-	int listenfd = -1;
-	
-	// getaddrinfo for host
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
-	if (getaddrinfo(NULL, port, &hints, &res) != 0) {
-		lerror("getaddrinfo() error");
-		exit(1);
-	}
-	// socket and bind
-	for (p = res; p != NULL; p = p->ai_next) {
-		listenfd = socket(p->ai_family, p->ai_socktype, 0);
-		if (listenfd == -1)
-			continue;
-		if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int)) < 0)
-			lerror("setsockopt(SO_REUSEADDR) failed");
-		if (bind(listenfd, p->ai_addr, p->ai_addrlen) == 0)
-			break;
-	}
-	if (p == NULL) {
-		lerror("socket() or bind()");
-		switch (errno) {
-			case EADDRINUSE:
-				lerror("Port %s in use", port);
-				break;
-			case EACCES:
-				lerror("Permission denied");
-				break;
-			case ENETUNREACH:
-				lerror("Network unreachable");
-				break;
-			default:
-				break;
-		}
-		exit(1);
-	}
-	
-	freeaddrinfo(res);
-	
-	// listen for incoming connections
-	
-	if (listen(listenfd, 64) != 0) {
-		lerror("listen() error");
-		exit(1);
-	}
-	
-	return listenfd;
 }
 
 void connection_free (Connection* conn) {
@@ -330,10 +89,7 @@ void connection_free (Connection* conn) {
 	free(conn);
 }
 
-void handle_sigint (int sig) {
-	srv->keep_alive = 0;
-	server_kill (srv);
-}
+
 
 //#define AUTOGENTOO_IGNORE_SEGV
 

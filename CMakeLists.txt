@@ -24,8 +24,14 @@ set(src_SOURCES
         src/thread.c
         src/request.c
         src/request_structure.c
-        src/http.c src/queue.c
-        src/gentoo_config.c src/user.c src/crypt.c src/pool.c)
+        src/http.c
+        src/queue.c
+        src/gentoo_config.c
+        src/user.c
+        src/crypt.c
+        src/pool.c
+        src/server_loop.c
+        hacksaw/src/server_handle.c hacksaw/src/server_init.c)
 
 set(include_HEADERS
         include/autogentoo/autogentoo.h
@@ -179,7 +185,7 @@ set(language_PARSER
         hacksaw/language/atom_flex.l
         hacksaw/language/depend_bison.y
         hacksaw/language/depend_flex.l
-        )
+        hacksaw/src/server_handle.c)
 
 set(http_PARSER
         src/http/ag_http_flex.l

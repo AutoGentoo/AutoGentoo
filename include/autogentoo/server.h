@@ -246,7 +246,11 @@ void daemonize(char* _cwd);
  */
 void server_free(Server* server);
 
+void server_encrypt_free (EncryptServer* server);
+
 void server_kill(Server* server);
+
+void kill_encrypt_server(int sig);
 
 void handle_sigint (int sig);
 
@@ -255,5 +259,7 @@ void server_add_queue (Server* parent, Queue* new);
 pid_t server_spawn_worker (Server* parent);
 
 char* server_get_path (Server* parent, char* path);
+
+extern Server* srv;
 
 #endif

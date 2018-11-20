@@ -21,6 +21,7 @@
 #include "stage.h"
 #include "writeconfig.h"
 #include "render.h"
+#include "crypt.h"
 
 #ifndef AUTOGENTOO_LBIN_PATH
 #define AUTOGENTOO_LBIN_PATH "/usr/lib/autogentoo/"

@@ -40,26 +40,26 @@ spht            (" "|\t)
 
 %%
 
-"GET"                   {return GET;}
-"HEAD"                  {return HEAD;}
-"POST"                  {return POST;}
-"HTTP/"[0-9]+"."[0-9]+"\r\n"  {
-                            for (char* i = ag_httptext; *i; i++)
-                                if (*i == '/' || *i == '.' || *i == '\r')
-                                    *i = ' ';
-                            sscanf(ag_httptext,
-                                "HTTP %d %d",
-                                &ag_httplval.http_version.maj,
-                                &ag_httplval.http_version.min);
-                            return VERSION;
-                        }
+"GET"                           {return GET;}
+"HEAD"                          {return HEAD;}
+"POST"                          {return POST;}
+"HTTP/"[0-9]+"."[0-9]+"\r\n"    {
+                                    for (char* i = ag_httptext; *i; i++)
+                                        if (*i == '/' || *i == '.' || *i == '\r')
+                                            *i = ' ';
+                                    sscanf(ag_httptext,
+                                        "HTTP %d %d",
+                                        &ag_httplval.http_version.maj,
+                                        &ag_httplval.http_version.min);
+                                    return VERSION;
+                                }
 
-"\r\n"                  {return CRLF;}
-{spht}                  {return SPHT;}
+"\r\n"                          {return CRLF;}
+{spht}                          {return SPHT;}
 
-[^ \:\r\n]+":"[^\r\n]+"\r\n" {ag_httplval.header = header_new(ag_httptext); return HEADER;}
-[^ \r\n]+               {ag_httplval.str = strdup(ag_httptext); return STR;}
+[^ \:\r\n]+":"[^\r\n]+"\r\n"    {ag_httplval.header = header_new(ag_httptext); return HEADER;}
+[^ \r\n]+                       {ag_httplval.str = strdup(ag_httptext); return STR;}
 
-.                       {printf("Unknown character: %s\n", ag_httptext);}
+.                               {printf("Unknown character: %s\n", ag_httptext);}
 
 %%
