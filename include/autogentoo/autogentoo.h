@@ -47,6 +47,8 @@
 #define AUTOGENTOO_PORT_ENCRYPT "443"
 #endif
 
+void set_encrypt_opts (Opt* op, char* arg);
+
 void set_is_encrypted (Opt* op, char* c);
 
 void set_is_server(Opt* op, char* c);

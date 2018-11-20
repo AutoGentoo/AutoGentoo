@@ -15,11 +15,11 @@ Opt opt_handlers[] = {
 		{'t', "target",  "Target server (localhost default)",               set_target,         OPT_SHORT | OPT_LONG |
 		                                                                                        OPT_ARG},
 		{0,   "encrypt", "Start an encrypted socket as well",               set_is_encrypted,   OPT_LONG},
-		{0,   "cert",    "speificy certificate file",                       set_is_encrypted,   OPT_LONG | OPT_ARG},
-		{0,   "rsa",     "speificy rsa private key file",                   set_is_encrypted,   OPT_LONG | OPT_ARG},
-		{0,   "sign",    "sign the rsa key with the certificate",           set_is_encrypted,   OPT_LONG},
-		{0,   "gencert", "generate new certicaite and self sign",           set_is_encrypted,   OPT_LONG},
-		{0,   "genrsa",  "generate new rsa and sign with cert",             set_is_encrypted,   OPT_LONG},
+		{0,   "cert",    "speificy certificate file",                       set_encrypt_opts,   OPT_LONG | OPT_ARG},
+		{0,   "rsa",     "speificy rsa private key file",                   set_encrypt_opts,   OPT_LONG | OPT_ARG},
+		{0,   "sign",    "sign the rsa key with the certificate",           set_encrypt_opts,   OPT_LONG},
+		{0,   "gencert", "generate new certicaite and self sign",           set_encrypt_opts,   OPT_LONG},
+		{0,   "genrsa",  "generate new rsa and sign with cert",             set_encrypt_opts,   OPT_LONG},
 		{0, NULL, NULL, NULL, (opt_opts_t) 0 }
 };
 
