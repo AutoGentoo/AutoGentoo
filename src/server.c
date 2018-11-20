@@ -74,7 +74,7 @@ EncryptServer* server_encrypt_new (Server* parent, char* port) {
 	}
 	
 	SSL_CTX_use_certificate(out->context, out->certificate);
-	SSL_CTX_use_PrivateKey(out->context, out->key_pair);
+	SSL_CTX_use_RSAPrivateKey(out->context, out->key_pair);
 	
 	return out;
 }

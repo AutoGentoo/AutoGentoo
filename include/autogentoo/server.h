@@ -110,7 +110,7 @@ struct __EncryptServer {
 	 **/
 	X509* certificate;
 	SSL_CTX* context;
-	EVP_PKEY* key_pair;
+	RSA* key_pair;
 	
 	SmallMap* rsa_binding;
 };

@@ -38,8 +38,8 @@ rsa_t rsa_load_binding(Connection* conn);
 */
 
 /* OpenSSL Certificate */
-int rsa_generate(EVP_PKEY** target);
-void x509_generate(int serial, int days_valid, X509** cert_out, EVP_PKEY* key_pair_evp);
+int rsa_generate(RSA** target);
+void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair);
 int x509_generate_write(EncryptServer* parent);
 
 #endif //AUTOGENTOO_CRYPT_H
