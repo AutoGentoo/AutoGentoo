@@ -373,13 +373,13 @@ void server_recv (Connection* conn) {
 
 void server_respond(Connection* conn, int worker_index) {
 	/* Read from the client and parse request */
+	linfo("handle %s on worker %d (%s)", conn->ip, worker_index, conn->communication_type == COM_RSA ? "RSA" : "PLAIN");
 	server_recv(conn);
 	if (conn->status != CONNECTED) {
 		connection_free(conn);
 		return;
 	}
 	Request* request = request_handle(conn);
-	linfo("handle %s on worker %d", conn->ip, worker_index);
 	
 	/* Run the request */
 	response_t res;
