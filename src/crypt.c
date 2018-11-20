@@ -53,7 +53,6 @@ void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair) {
 			break;
 		}
 		
-		
 		// Set the certificate's public key from the private key object
 		if (!X509_set_pubkey (*cert_out, priv_key)) {
 			lerror("Failed to assign private key to certificate");
@@ -74,11 +73,49 @@ void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair) {
 	// Things we clean up only on failure
 	if (status == 0) {
 		X509_free (*cert_out);
-		
 		if (priv_key)
 			EVP_PKEY_free (priv_key);
 		*cert_out = NULL;
 	}
+}
+
+int certificate_sign(X509* cert, RSA* rsa) {
+	int status = 0;
+	EVP_PKEY* priv_key;
+	
+	do {
+		// Create the certificate object
+		priv_key = EVP_PKEY_new();
+		if (!priv_key) {
+			lerror("Failed to initialize EVP_PKEY");
+			break;
+		}
+		
+		if (!EVP_PKEY_assign_RSA(priv_key, rsa)) {
+			lerror("Failed to assign key_pair to private key");
+			break;
+		}
+		
+		// Set the certificate's public key from the private key object
+		if (!X509_set_pubkey (cert, priv_key)) {
+			lerror("Failed to assign private key to certificate");
+			break;
+		}
+		
+		// Sign it with SHA-1
+		if (!X509_sign (cert, priv_key, EVP_sha256())) {
+			lerror("Failed to sign certificate with EVP_sha256()");
+			break;
+		}
+		
+		priv_key = NULL;
+		
+		status = 1;
+	} while (!status);
+	
+	EVP_PKEY_free(priv_key);
+	
+	return status;
 }
 
 int cert_generate_serial () {
@@ -88,7 +125,6 @@ int cert_generate_serial () {
 int rsa_generate(RSA** target) {
 	int ret = 0;
 	BIGNUM* bne = NULL;
-	BIO* bp_public = NULL, * bp_private = NULL;
 	
 	int bits = AUTOGENTOO_RSA_BITS;
 	linfo("Create new RSA %d key", AUTOGENTOO_RSA_BITS);
@@ -111,8 +147,6 @@ int rsa_generate(RSA** target) {
 	
 	// 4. free
 	free_all:
-	BIO_free_all(bp_public);
-	BIO_free_all(bp_private);
 	BN_free(bne);
 	
 	return (ret == 1);
@@ -142,6 +176,12 @@ int x509_generate_write(EncryptServer* parent) {
 	if (x509_exists) {
 		cert_fp = fdopen(cert_fd, "r");
 		parent->certificate = PEM_read_X509(cert_fp, &parent->certificate, NULL, NULL);
+		if (!certificate_sign(parent->certificate, parent->key_pair)) {
+			lerror("Failed to sign RSA key with certificate");
+			fclose(cert_fp);
+			free(certificate_path);
+			return 3;
+		}
 	}
 	else {
 		cert_fp = fdopen(cert_fd, "w");
@@ -152,7 +192,7 @@ int x509_generate_write(EncryptServer* parent) {
 			fclose(cert_fp);
 			remove(certificate_path);
 			free(certificate_path);
-			return 3;
+			return 4;
 		}
 	}
 	
