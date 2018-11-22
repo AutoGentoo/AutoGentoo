@@ -32,23 +32,21 @@ static char* client_opts = NULL;
 
 static char* cert_file = NULL;
 static char* rsa_file = NULL;
-static enc_server_t enc_server_options = 0;
+static enc_server_t enc_server_options = ENC_READ_CERT | ENC_READ_RSA;
 
 void set_encrypt_opts (Opt* op, char* arg) {
 	if (strcmp(op->_long, "cert") == 0) {
-		enc_server_options |= ENC_READ_CERT;
 		cert_file = strdup(arg);
 	}
 	if (strcmp(op->_long, "rsa") == 0) {
-		enc_server_options |= ENC_READ_RSA;
 		rsa_file = strdup(arg);
 	}
 	if (strcmp(op->_long, "sign") == 0)
 		enc_server_options |= ENC_CERT_SIGN;
 	if (strcmp(op->_long, "gencert") == 0)
-		enc_server_options |= ENC_GEN_CERT;
+		enc_server_options |= ENC_GEN_CERT & ~ENC_READ_CERT;
 	if (strcmp(op->_long, "genrsa") == 0)
-		enc_server_options |= ENC_GEN_RSA;
+		enc_server_options |= ENC_GEN_RSA & ~ENC_READ_RSA;
 }
 
 void set_is_encrypted (Opt* op, char* c) {
@@ -104,6 +102,7 @@ int main(int argc, char** argv) {
 		free(resolved_location);
 		return 1;
 	}
+	
 	free(location);
 	location = resolved_location;
 	
