@@ -31,7 +31,9 @@ set(src_SOURCES
         src/crypt.c
         src/pool.c
         src/server_loop.c
-        hacksaw/src/server_handle.c hacksaw/src/server_init.c)
+        hacksaw/src/server_handle.c
+        hacksaw/src/server_init.c
+        )
 
 set(include_HEADERS
         include/autogentoo/autogentoo.h
@@ -55,7 +57,7 @@ set(include_HEADERS
         include/autogentoo/queue.h
         include/autogentoo/gentoo_config.h
         include/autogentoo/user.h
-        include/autogentoo/crypt.h include/autogentoo/pool.h)
+        include/autogentoo/crypt.h include/autogentoo/pool.h include/autogentoo/header.h)
 
 set(arch_SOURCES
         arch/main.c

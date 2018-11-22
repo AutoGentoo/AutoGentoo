@@ -8,20 +8,15 @@
 #include <stdio.h>
 #include <autogentoo/hacksaw/tools.h>
 
-typedef struct __HttpHeader HttpHeader;
 typedef struct __HttpRequest HttpRequest;
 
 #include <autogentoo/request.h>
+#include <autogentoo/header.h>
 
 typedef enum {
 	HEADER_NOT_FOUND,
 	HEADER_FOUND
 } http_header_t;
-
-struct __HttpHeader {
-	char* name;
-	char* value;
-};
 
 struct __HttpRequest {
 	request_t function;
@@ -38,8 +33,7 @@ struct __HttpRequest {
 };
 
 
-char* get_header(HttpRequest* request, char* to_find);
-void free_headers (HttpHeader* HEAD);
+HttpHeader* get_header(HttpRequest* request, char* to_find);
 void free_http_request(HttpRequest* ptr);
 
 /* From flex/bison */

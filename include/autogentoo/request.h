@@ -96,8 +96,6 @@ struct __Request {
  */
 typedef struct __RequestLink RequestLink;
 
-#include "request.h"
-
 /**
  * Links a string to a request handler
  */
@@ -109,6 +107,5 @@ struct __RequestLink {
 Request* request_handle (Connection* conn);
 response_t request_call (Request* req);
 void request_free (Request* req);
-
 
 #endif //AUTOGENTOO_REQUEST_H

@@ -91,6 +91,11 @@ void pipe_to_log(Opt* op, char* logfile) {
 }
 
 int main(int argc, char** argv) {
+	char* test = strdup("christina");
+	print_bin(test, 1, sizeof(test));
+	
+	
+	return 0;
 	opt_handle(opt_handlers, argc, argv + 1);
 	if (!location)
 		location = strdup(".");

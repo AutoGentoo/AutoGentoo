@@ -80,13 +80,13 @@ request_function:   GET                     {$$ = REQ_GET;}
 headers:                                    {$$ = small_map_new (5, 5);}
             | HEADER                        {
                                                 $$ = small_map_new (5, 5);
-                                                small_map_insert($$, $1->name, $1->value);
+                                                small_map_insert($$, $1->name, $1);
                                                 free($1);
                                                 @$.last_column = @1.last_column;
                                             }
             | headers HEADER                {
                                                 $$ = $1;
-                                                small_map_insert($$, $2->name, $2->value);
+                                                small_map_insert($$, $2->name, $2);
                                                 @$.last_column = @2.last_column;
                                             }
             ;

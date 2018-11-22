@@ -8,7 +8,7 @@
 #include <autogentoo/server.h>
 #include <autogentoo/request.h>
 
-char* get_header(HttpRequest* request, char* to_find) {
+HttpHeader* get_header(HttpRequest* request, char* to_find) {
 	return small_map_get(request->headers, to_find);
 }
 

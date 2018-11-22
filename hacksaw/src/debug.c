@@ -7,12 +7,11 @@
 
 void print_bin(void* ptr, int n, size_t size) {
 	int i;
-	for (i = 0; i != (size * n); i++) {
-		printf("%02X", (((char*)ptr)[i]) & 0xff);
+	for (i = 0; i != size; i++) {
+		printf("%02X", ((char*)ptr)[i]);
 		
-		if (!((i + 1) % size)) {
+		if (!((i + 1) % size))
 			printf(" ");
-		}
 	}
 	printf("\n");
 }
