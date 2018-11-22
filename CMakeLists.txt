@@ -31,8 +31,8 @@ set(src_SOURCES
         src/crypt.c
         src/pool.c
         src/server_loop.c
-        hacksaw/src/server_handle.c
-        hacksaw/src/server_init.c
+        src/server_handle.c
+        src/server_init.c
         )
 
 set(include_HEADERS
@@ -187,7 +187,7 @@ set(language_PARSER
         hacksaw/language/atom_flex.l
         hacksaw/language/depend_bison.y
         hacksaw/language/depend_flex.l
-        hacksaw/src/server_handle.c)
+        src/server_handle.c)
 
 set(http_PARSER
         src/http/ag_http_flex.l

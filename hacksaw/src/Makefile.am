@@ -21,8 +21,7 @@ libhacksaw_a_SOURCES =      dependency.c \
                             string_vector.c \
                             vector.c \
                             linked_vector.c \
-                            util.c \
-                            server_loop.c
+                            util.c
 
 bin_PROGRAMS    =   hacksaw
 hacksaw_CFLAGS  =   ${AM_CFLAGS}
