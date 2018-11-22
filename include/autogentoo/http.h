@@ -13,11 +13,6 @@ typedef struct __HttpRequest HttpRequest;
 #include <autogentoo/request.h>
 #include <autogentoo/header.h>
 
-typedef enum {
-	HEADER_NOT_FOUND,
-	HEADER_FOUND
-} http_header_t;
-
 struct __HttpRequest {
 	request_t function;
 	char* path;

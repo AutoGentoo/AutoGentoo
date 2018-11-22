@@ -5,9 +5,6 @@
 #ifndef AUTOGENTOO_REQUEST_H
 #define AUTOGENTOO_REQUEST_H
 
-#include "response.h"
-#include "request_structure.h"
-
 typedef struct __Request Request;
 
 typedef enum {
@@ -55,7 +52,9 @@ typedef enum {
 	REQ_POST,
 } request_t;
 
-#include "http.h"
+#include <autogentoo/response.h>
+#include <autogentoo/http.h>
+#include <autogentoo/request_structure.h>
 
 /**
  * A function pointer for to handle requests
@@ -67,6 +66,7 @@ typedef response_t (* HTTP_FH)(Connection* conn, HttpRequest* req);
 typedef response_t (* AUTOGENTOO_FH) (Request* request);
 
 typedef union __FunctionHandler FunctionHandler;
+
 
 union __FunctionHandler {
 	AUTOGENTOO_FH ag_fh;

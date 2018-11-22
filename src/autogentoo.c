@@ -91,16 +91,21 @@ void pipe_to_log(Opt* op, char* logfile) {
 }
 
 int main(int argc, char** argv) {
-	char* test = strdup("christina");
-	print_bin(test, 1, sizeof(test));
-	
-	
-	return 0;
 	opt_handle(opt_handlers, argc, argv + 1);
 	if (!location)
 		location = strdup(".");
 	if (!client_opts)
 		client_opts = "";
+	
+	char* resolved_location = malloc (PATH_MAX);
+	if (realpath(location, resolved_location) != resolved_location) {
+		lerror ("Error expanding location: %s", location);
+		free(location);
+		free(resolved_location);
+		return 1;
+	}
+	free(location);
+	location = resolved_location;
 	
 	if (is_server) {
 		Server* main_server = read_server(location, port, server_opts);
@@ -124,6 +129,7 @@ int main(int argc, char** argv) {
 		server_start(main_server);
 	}
 	else {
+		free(location);
 		char* cmd;
 		asprintf(&cmd, "python " AUTOGENTOO_CLIENT " %s", client_opts);
 		system(cmd);
@@ -131,7 +137,6 @@ int main(int argc, char** argv) {
 	}
 	
 	/* Exit sequence */
-	free(location);
 	if (logfile_fd != -1)
 		close(logfile_fd);
 	return 0;
