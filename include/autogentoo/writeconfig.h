@@ -11,7 +11,6 @@ typedef struct __AutoGentoo_Memconfig AutoGentoo_Memconfig;
 typedef enum {
 	AUTOGENTOO_FILE_END = 0xffffffff,
 	AUTOGENTOO_HOST = 0xfffffff0,
-	AUTOGENTOO_HOST_BINDING = 0xffffff00,
 	AUTOGENTOO_STAGE = 0xfffff000,
 	
 	// Because Host* is extensible this is required
@@ -49,13 +48,6 @@ size_t write_server_fp (Server* server, FILE* fp);
  * @param fp the file to write to
  */
 size_t write_host_fp (Host* host, FILE* fp);
-
-/**
- * Write a binding to file
- * @param bind the binding to write to file
- * @param fp the file to write to
- */
-size_t write_host_binding_fp (HostBind* bind, FILE* fp);
 
 /**
  * Write an active HostTemplate/stage to file

@@ -5,6 +5,8 @@
 #ifndef HACKSAW_LOG_H
 #define HACKSAW_LOG_H
 
+#include <stdio.h>
+
 typedef enum __bash_t bash_t;
 
 #define ANSI_RED     "\x1b[31m"
@@ -28,5 +30,11 @@ void lerror(char* format, ...);
 void lwarning(char* format, ...);
 
 void linfo(char* format, ...);
+
+void lderror(char* format, ...);
+
+void ldwarning(char* format, ...);
+
+void ldinfo(char* format, ...);
 
 #endif //HACKSAW_LOG_H

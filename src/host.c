@@ -8,8 +8,7 @@
 #include <sys/wait.h>
 #include <autogentoo/user.h>
 
-char* host_id_new() {
-	int len = 15;
+char* prv_gen_random(size_t len) {
 	char* out = malloc((size_t) len + 1);
 	
 	srandom((unsigned int) time(NULL));  // Correct seeding function for random()
@@ -25,7 +24,11 @@ char* host_id_new() {
 	return out;
 }
 
-Host* host_new(Server* server, char* id) {
+inline char* host_id_new() {
+	return prv_gen_random(AUTOGETNOO_HOST_ID_LENGTH);
+}
+
+Host* host_new(Server* server, char* id, host_share_t share_level) {
 	Host* out = malloc(sizeof(Host));
 	out->parent = server;
 	out->id = id; // Dont need to dup, never accessed elsewhere
@@ -45,7 +48,7 @@ Host* host_new(Server* server, char* id) {
 	out->port_logdir = strdup ("/autogentoo/log");
 	
 	out->kernel = NULL;
-	out->auth_tokens = NULL;
+	out->private = share_level;
 	
 	host_init_extras(out);
 	
@@ -54,7 +57,6 @@ Host* host_new(Server* server, char* id) {
 
 void host_init_extras(Host* target) {
 	target->kernel = vector_new(sizeof(Kernel*), UNORDERED | REMOVE);
-	target->auth_tokens = vector_new(sizeof(AccessToken), UNORDERED | REMOVE);
 }
 
 void host_get_path (Host* host, char** dest) {

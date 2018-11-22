@@ -13,6 +13,7 @@ typedef enum {
 	HTTP_NOT_FOUND = 404,
 	HTTP_METHOD_NOT_ALLOWED = 405,
 	HTTP_REQUEST_TIMEOUT = 408,
+	HTTP_UPGRADE_REQUIRED = 426,
 	HTTP_INTERNAL_ERROR = 500,
 	HTTP_NOT_IMPLEMENTED = 501,
 	HTTP_BAD_GATEWAY = 502,
@@ -37,7 +38,8 @@ typedef struct {
 #define FORBIDDEN (response_t) {HTTP_FORBIDDEN, "Forbidden", 9}
 #define NOT_FOUND (response_t) {HTTP_NOT_FOUND, "Not found", 9}
 #define METHOD_NOT_ALLOWED (response_t) {HTTP_METHOD_NOT_ALLOWED, "Method Not Allowed", 18}
-#define REQUEST_TIMEOUT (response_t) {HTTP_REQUEST_TIMEOUT, "Requeset Timeout", 16}
+#define REQUEST_TIMEOUT (response_t) {HTTP_REQUEST_TIMEOUT, "Request Timeout", 15}
+#define UPGRADE_REQUIRED (response_t) {HTTP_UPGRADE_REQUIRED, "Upgrade Required", 16}
 #define INTERNAL_ERROR (response_t) {HTTP_INTERNAL_ERROR, "Internal Error", 14}
 #define NOT_IMPLEMENTED (response_t) {HTTP_NOT_IMPLEMENTED, "Method Not Implemented", 22}
 #define BAD_GATEWAY (response_t) {HTTP_BAD_GATEWAY, "Bad Gateway", 11}

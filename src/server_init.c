@@ -67,8 +67,8 @@ Server* server_new (char* location, char* port, server_t opts) {
 	
 	out->templates = vector_new(sizeof(HostTemplate*), REMOVE | UNORDERED);
 	out->hosts = vector_new(sizeof(Host*), REMOVE | UNORDERED);
+	out->users = map_new(64, 0.8);
 	out->stages = small_map_new(sizeof(HostTemplate*), 5);
-	out->host_bindings = vector_new(sizeof(HostBind), REMOVE | UNORDERED);
 	out->location = strdup(location);
 	out->queue = malloc (sizeof (WorkerParent));
 	out->queue->tail = NULL;

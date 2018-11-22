@@ -20,6 +20,33 @@ void lset(FILE* _target) {
 	target = _target;
 }
 
+void ldinfo(char* format, ...) {
+#ifdef AUTOGENTOO_SHOW_DEBUG
+	va_list args;
+	va_start(args, format);
+	lerror(format, args);
+	va_end(args);
+#endif
+}
+
+void ldwarning(char* format, ...) {
+#ifdef AUTOGENTOO_SHOW_DEBUG
+	va_list args;
+	va_start(args, format);
+	lerror(format, args);
+	va_end(args);
+#endif
+}
+
+void lderror(char* format, ...) {
+#ifdef AUTOGENTOO_SHOW_DEBUG
+	va_list args;
+	va_start(args, format);
+	lerror(format, args);
+	va_end(args);
+#endif
+}
+
 void lerror(char* format, ...) {
 	va_list args;
 	va_start (args, format);

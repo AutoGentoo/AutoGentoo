@@ -62,6 +62,12 @@ struct __WorkerResponse {
 	 int response;
 } __attribute__((packed));
 
+struct __Authorize {
+	char* user_id;
+	char* pass_hash;
+	char* token;
+} __attribute__((packed));
+
 typedef enum {
 	STRCT_END,
 	STRCT_HOSTEDIT = 1,
@@ -73,6 +79,7 @@ typedef enum {
 	STRCT_HOSTOFFSET, /* Custom offset on Host struct */
 	STRCT_WORKERRESPONSE,
 	STRCT_RAW,
+	STRCT_AUTHORIZE,
 	
 	STRCT_MAX
 } request_structure_t;
@@ -91,7 +98,8 @@ static char* request_structure_linkage[] = {
 		"i",
 		"iv",
 		"i",
-		"v"
+		"v",
+		"sss"
 };
 
 union __RequestData {
@@ -104,6 +112,7 @@ union __RequestData {
 	struct __HostOffset ho;
 	struct __WorkerResponse wr;
 	struct __Raw raw;
+	struct __Authorize auth;
 };
 
 int parse_request_structure (RequestData* out, char* template, void* data, void* end);

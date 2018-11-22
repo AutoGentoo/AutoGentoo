@@ -85,8 +85,10 @@ void server_encrypt_start(EncryptServer* server) {
 		Connection* current_conn = accept_conn(server, temp_fd, COM_RSA);
 		
 		if (!current_conn) {
-			lerror ("Failed to create encrypted connection");
-			current_conn = accept_conn(server->parent, temp_fd, COM_PLAIN);
+			current_conn = accept_conn(server, temp_fd, COM_PLAIN);
+			rsend(current_conn, UPGRADE_REQUIRED);
+			connection_free(current_conn);
+			continue;
 		}
 
 #ifndef AUTOGENTOO_NO_THREADS

@@ -25,6 +25,9 @@ struct __HttpRequest {
 	
 	SmallMap* headers;
 	size_t request_size;
+	
+	HttpRequestHeaders request_headers;
+	HttpResponseHeaders response_headers;
 };
 
 

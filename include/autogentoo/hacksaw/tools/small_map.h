@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include "vector.h"
 
+typedef struct __SmallMap_key SmallMap_key;
+
 /**
  * Vector is essentailly this:
  *              key   data_ptr
@@ -15,6 +17,12 @@
  * items :  |  char*   void*
  *          |   ...     ...
 */
+
+struct __SmallMap_key {
+	char* key;
+	void* data_ptr;
+};
+
 typedef Vector SmallMap;
 
 SmallMap* small_map_new(int start_size, int increment);

@@ -14,6 +14,7 @@ int ag_httperror(char *s) {
 }
 
 HttpRequest* ag_http_parse (char* buffer) {
+    printf("|%s|", buffer);
     YY_BUFFER_STATE bs = yy_scan_string(buffer);
     ag_http_switch_to_buffer(bs);
     ag_httpparse();

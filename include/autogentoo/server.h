@@ -81,18 +81,20 @@ struct __Server {
 	char* location; //!< The working directory of the server
 	char* port;  //!< The port to bind to
 	server_t opts; //!< The options that the server was initilized with
-	Vector* hosts; //!< A list of hosts
-	SmallMap* stages; //!< A list of active templates awaiting handoff to a host
-	Vector* host_bindings; //!< A list of host bindings
-	Vector* templates; //!< A list of availiable host templates
-	WorkerParent* queue; //!< Jobs waiting in the queue, NULL if empty queue
 	
+	/* AutoGentoo Related */
+	Vector* hosts; //!< A list of hosts
+	Map* users;
+	SmallMap* stages; //!< A list of active templates awaiting handoff to a host
+	Vector* templates; //!< A list of availiable host templates
+	
+	/* Socket server related */
+	WorkerParent* queue; //!< Jobs waiting in the queue, NULL if empty queue
 	volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
 	PoolHandler* pool_handler;
 	//ThreadHandler* thandler; // Old way to handle threading
 	pid_t pid;
 	pthread_t pthread;
-	
 	int socket;
 	
 	/** Secure server **/
@@ -146,7 +148,6 @@ struct __HostBind {
  */
 struct __Connection {
 	struct __Server* parent; //!< The parent server of the connection
-	struct __Host* bounded_host; //!< The Host bounded to the connections IP address (NULL if unbounded)
 	void* request; //!< The entire request
 	size_t size;
 	char* ip; //!< The IP of the connected client
@@ -187,25 +188,10 @@ Connection* connection_new(Server* server, int conn_fd);
 Connection* connection_new_tls(EncryptServer* server, int accepted_fd);
 
 /**
- * Get the host that is bounded to the given IP address
- * @param server the parent server to look in
- * @param ip the ip to search for
- * @return a pointer to the bounded host, NULL if was not found
- */
-Host* server_get_active(Server* server, char* ip);
-
-/**
  * Start the server and allow connections
  * @param server the server to start
  */
 void server_start(Server* server);
-
-/**
- * Bind an IP address to a host
- * @param conn the connection that holds our IP
- * @param host the host to bind to
- */
-void server_bind(Connection* conn, Host* host);
 
 /**
  * Search for a host given an ID
@@ -213,7 +199,7 @@ void server_bind(Connection* conn, Host* host);
  * @param id the ID to search for
  * @return a pointer to the Host that was found, NULL if not found
  */
-Host* server_host_search(Server* server, char* id);
+Host* server_get_host(Server* server, char* id);
 
 /**
  * Meta-function called by server_start (DO NOT CALL THIS)

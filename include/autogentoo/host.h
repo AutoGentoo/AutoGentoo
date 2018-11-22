@@ -16,6 +16,8 @@ typedef struct __Host Host;
 #include "server.h"
 #include "kernel.h"
 
+#define AUTOGETNOO_HOST_ID_LENGTH 15
+
 /**
  * @brief Are the chroot directories mounted
  * 
@@ -28,6 +30,11 @@ typedef enum {
 	CHR_NOT_MOUNTED,
 	CHR_MOUNTED
 } chroot_t;
+
+typedef enum {
+	HOST_SHARE_PUBLIC,
+	HOST_SHARE_PRIVATE
+} host_share_t;
 
 /**
  * @brief Holds information about a build environment
@@ -54,9 +61,9 @@ struct __Host {
 	char* distdir; //!< distfiles
 	char* pkgdir; //!< path to binaries
 	char* port_logdir; //!< logs
+	host_share_t private;
 	
 	Vector* kernel;
-	Vector* auth_tokens;
 };
 
 typedef enum {
@@ -80,7 +87,8 @@ typedef enum {
 	HOSTOFF_PORTDIR,
 	HOSTOFF_DISTDIR,
 	HOSTOFF_PKGDIR,
-	HOSTOFF_PORT_LOGDIR
+	HOSTOFF_PORT_LOGDIR,
+	HOSTOFF_END
 } hostoffsets_t;
 
 typedef struct {
@@ -118,7 +126,7 @@ char* host_id_new();
  * @param id the ID of the Host
  * @return a pointer to the Host
  */
-Host* host_new(Server* server, char* id);
+Host* host_new(Server* server, char* id, host_share_t share_level);
 
 /**
  * Updates the current status of the host by reading its directory

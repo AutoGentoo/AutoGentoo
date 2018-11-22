@@ -69,10 +69,6 @@ size_t write_server_fp(Server* server, FILE* fp) {
 		size += write_host_fp(*(Host**) vector_get(server->hosts, i), fp);
 	}
 	
-	for (i = 0; i != server->host_bindings->n; i++) {
-		size += write_host_binding_fp((HostBind*) vector_get(server->host_bindings, i), fp);
-	}
-	
 	for (i = 0; i != server->stages->n; i++) {
 		void** __t = *(void***) vector_get(server->stages, i);
 		size += write_stage_fp(__t[1], fp);
@@ -137,15 +133,6 @@ size_t write_host_fp(Host* host, FILE* fp) {
 		}
 	*/
 	size += write_int(AUTOGENTOO_HOST_END, fp);
-	
-	return size;
-}
-
-size_t write_host_binding_fp(HostBind* bind, FILE* fp) {
-	size_t size = 0;
-	size += write_int(AUTOGENTOO_HOST_BINDING, fp);
-	size += write_string(bind->host->id, fp);
-	size += write_string(bind->ip, fp);
 	
 	return size;
 }
@@ -218,10 +205,6 @@ Server* read_server(char* location, char* port, server_t opts) {
 				host_temp = read_host(fp);
 				host_temp->parent = out;
 				vector_add(out->hosts, &host_temp);
-				break;
-			case AUTOGENTOO_HOST_BINDING:
-				read_host_binding(out, &bind_temp, fp);
-				vector_add(out->host_bindings, &bind_temp);
 				break;
 			case AUTOGENTOO_STAGE:
 				stage_temp = malloc(sizeof(HostTemplate));
@@ -305,7 +288,7 @@ Host* read_host(FILE* fp) {
 
 void read_host_binding(Server* server, HostBind* dest, FILE* fp) {
 	char* _host_id = read_string(fp);
-	dest->host = server_host_search(server, _host_id);
+	dest->host = server_get_host(server, _host_id);
 	dest->ip = read_string(fp);
 	free(_host_id);
 }

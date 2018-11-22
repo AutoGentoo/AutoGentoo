@@ -11,28 +11,6 @@
 
 Server* srv = NULL;
 
-Host* server_get_active (Server* server, char* ip) {
-	int i;
-	for (i = 0; i != server->host_bindings->n; i++) {
-		HostBind* current_bind = (HostBind*) vector_get(server->host_bindings, i);
-		if (strcmp(ip, current_bind->ip) == 0)
-			return current_bind->host;
-	}
-	
-	return NULL;
-}
-
-HostBind* prv_server_get_active_location (Server* server, char* ip) {
-	int i;
-	for (i = 0; i != server->host_bindings->n; i++) {
-		HostBind* current_bind = (HostBind*) vector_get(server->host_bindings, i);
-		if (strcmp(ip, current_bind->ip) == 0)
-			return current_bind;
-	}
-	
-	return NULL;
-}
-
 Connection* connection_new (Server* server, int conn_fd) {
 	Connection* out = malloc(sizeof(Connection));
 	out->parent = server;
@@ -43,7 +21,6 @@ Connection* connection_new (Server* server, int conn_fd) {
 	getpeername(out->fd, (struct sockaddr*) &addr, &addr_size);
 	out->ip = strdup(inet_ntoa(addr.sin_addr));
 	out->communication_type = COM_PLAIN;
-	out->bounded_host = server_get_active(out->parent, out->ip);
 	
 	return out;
 }
@@ -166,16 +143,7 @@ void server_respond(Connection* conn, int worker_index) {
 		request_free(request);
 }
 
-void server_bind (Connection* conn, Host* host) {
-	HostBind* loc = prv_server_get_active_location(conn->parent, conn->ip);
-	if (loc == NULL) {
-		HostBind new_binding = {.ip = strdup(conn->ip), .host = host};
-		vector_add(conn->parent->host_bindings, &new_binding);
-	} else
-		loc->host = host;
-}
-
-Host* server_host_search (Server* server, char* id) {
+Host* server_get_host(Server* server, char* id) {
 	int i;
 	for (i = 0; i != server->hosts->n; i++) {
 		Host* current_host = *(Host**) vector_get(server->hosts, i);
@@ -232,12 +200,8 @@ void server_free (Server* server) {
 	for (i = 0; i != server->stages->n; i++)
 		host_template_free((*(HostTemplate***) vector_get(server->stages, i))[1]);
 	
-	for (i = 0; i != server->host_bindings->n; i++)
-		free((*(HostBind*) vector_get(server->host_bindings, i)).ip);
-	
 	small_map_free(server->stages, 0);
 	vector_free(server->hosts);
-	vector_free(server->host_bindings);
 	free(server->port);
 	
 	free(server);
