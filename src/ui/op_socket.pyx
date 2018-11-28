@@ -1,4 +1,3 @@
-from socket import AF_INET, SOCK_STREAM, socket
 from d_malloc cimport DynamicBuffer
 from op_socket cimport Address
 
@@ -6,7 +5,7 @@ from libc.stdio cimport sprintf, printf, stdout, fflush
 from libc.string cimport strdup
 from libc.stdlib cimport atoi, free, malloc
 from libc.stdint cimport uint16_t
-
+import ssl, socket
 
 cdef extern from "<arpa/inet.h>":
 	uint16_t htons(uint16_t hostshort);
@@ -27,24 +26,25 @@ cdef class Socket:
 		self.socket = None
 		self.communication_type = comm_type
 		self.fd = -1
+		self.socket_temp = None
 	
-	cdef write_wrapper (self, void* data, size_t size):
+	def do_connect(self):
+		try:
+			self.socket_temp = socket.create_connection((self.adr.ip.decode ("UTF-8"), <object>atoi(self.adr.port)))
+		except socket.gaierror:
+			raise ConnectionError("Failed to connect")
+		
+		self.fd = self.socket.fileno()
 		if self.communication_type == COM_RSA:
-			pass
-	
-	cdef read_wrapper(self, void* data, size_t size):
-		pass
+			context = ssl.create_default_context()
+			self.socket = context.wrap_socket(self.socket_temp)
+		else:
+			self.socket = self.socket_temp
 	
 	cdef c_send (self, void* data, size_t size, do_connect):
 		if do_connect:
-			self.socket = socket (AF_INET, SOCK_STREAM, 0)
-			self.fd = self.socket.fileno()
-			if self.fd < 0:
-				raise IOError ("Failed to create socket")
-			if self.socket.connect ((self.adr.ip.decode ("UTF-8"), <object>atoi(self.adr.port))):
-				raise ConnectionError("Failed to connect")
-		
-		return write (self.fd, data, size)
+			self.do_connect()
+		return self.socket.send() write (self.fd, data, size)
 	
 	cdef send (self, DynamicBuffer data, do_connect):
 		return self.c_send(data.ptr, data.n, do_connect)

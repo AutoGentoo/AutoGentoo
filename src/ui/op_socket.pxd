@@ -20,13 +20,12 @@ cdef class Address:
 	cdef char* ip
 
 cdef class Socket:
+	cdef socket_temp
 	cdef socket
 	cdef Address adr
 	cdef sockaddr_in address
 	cdef int fd
 	cdef com_t communication_type
-	cdef write_wrapper (self, void* data, size_t size)
-	cdef read_wrapper(self, void* data, size_t size)	
 	cdef c_send(self, void* data, size_t size, do_connect)
 	cdef send (self, DynamicBuffer data, do_connect)
 	cpdef recv (self, int size)
