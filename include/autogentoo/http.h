@@ -12,6 +12,7 @@ typedef struct __HttpRequest HttpRequest;
 
 #include <autogentoo/request.h>
 #include <autogentoo/header.h>
+#include "user.h"
 
 struct __HttpRequest {
 	request_t function;
@@ -31,8 +32,9 @@ struct __HttpRequest {
 };
 
 
-HttpHeader* get_header(HttpRequest* request, char* to_find);
-void free_http_request(HttpRequest* ptr);
+HttpHeader* http_get_header(HttpRequest* request, char* to_find);
+void http_free_request(HttpRequest* ptr);
+int http_check_authorization(Server* parent, HttpRequest* request, char* host_id, token_access_t access_level);
 
 /* From flex/bison */
 HttpRequest* ag_http_parse (char* buffer);

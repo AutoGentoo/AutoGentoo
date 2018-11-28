@@ -59,7 +59,7 @@ hash.access_level = (___access_level);\
 hash.user_id = request->structures[1].auth.user_id; \
 hash.host_id = request->structures[0].hs.host_id; \
 hash.auth_token = request->structures[1].auth.token; \
-if (host_verify_token(request->conn->parent, &hash, request->structures[1].auth.pass_hash) != 0) \
+if (host_verify_token(request->conn->parent, &hash) != 0) \
 	return FORBIDDEN;} \
 
 int server_create_user(Server* server,
@@ -70,9 +70,7 @@ int server_create_user(Server* server,
 
 User* server_get_user(Server* server, char* user_id);
 
-int host_verify_token(Server* server,
-                      AccessToken* request_token,
-                      char* pass_hash);
+int host_verify_token(Server* server, AccessToken* request_token);
 
 int user_generate_token(User* user,
                         char* host_id,

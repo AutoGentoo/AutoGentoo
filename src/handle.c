@@ -60,32 +60,22 @@ response_t GET(Connection* conn, HttpRequest* req) {
 	
 	int package_request = 0;
 	
-	char* path_temp = strdup (req->path + 1);
-	if (strcmp(strtok(path_temp, "/"), "host") == 0) {
-		package_request = 1;
-		size_t offset = strtok(NULL, "/") - path_temp;
-		free(path_temp);
-		path_temp = strdup(req->path + 1 + offset);
-		free(req->path);
-		req->path = path_temp;
-	}
-	else
-		free(path_temp);
+	char req_type[32];
+	char host_id[16];
 	
-	
+	size_t path_length = strlen(req->path);
+	char req_to_end[path_length];
 	char* path;
 	
-	if (package_request) {
-		char* host = strtok(path_temp, "/");
-		Host* resolved_host = server_get_host(conn->parent, host);
-		if (!resolved_host)
-			return NOT_FOUND;
-		
-		char* host_parent_dir = server_get_path(conn->parent, host);
-		asprintf(&path, "%s/%s/%s", host_parent_dir, resolved_host->pkgdir, strtok(NULL, "\0"));
+	if (sscanf(req->path, "/%[^/]/%20s/%s", req_type, host_id, req_to_end) == 3 && strcmp(req_type, "host") == 0) {
+		if (http_check_authorization(conn->parent, req, host_id, REQUEST_ACCESS_READ) != 0)
+			return FORBIDDEN;
+		Host* target = server_get_host(conn->parent, host_id);
+		asprintf(&path, "%s/%s/%s/%s", target->parent->location, target->id, target->pkgdir, req_to_end);
+		printf("register package: %s", path);
 	}
-	
-	
+	else
+		path = strdup(req->path);
 	
 	int fd, data_to_send;
 	
@@ -219,9 +209,8 @@ response_t SRV_MNTCHROOT (Request* request) {
 }
 
 void prv_fd_write_str (Connection* conn, char* str) {
-	if (str == NULL) {
+	if (str == NULL)
 		return;
-	}
 	conn_write(conn, str, strlen(str));
 	conn_write(conn, "\n", 1);
 }
@@ -236,8 +225,8 @@ response_t SRV_GETHOST (Request* request) {
 		char t[8];
 		sprintf(t, "%d", (int) resolved_host->extra->n);
 		prv_fd_write_str(request->conn, t);
-		
 	}
+	
 	prv_fd_write_str(request->conn, resolved_host->cflags);
 	prv_fd_write_str(request->conn, resolved_host->cxxflags);
 	prv_fd_write_str(request->conn, resolved_host->chost);

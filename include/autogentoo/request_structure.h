@@ -64,7 +64,6 @@ struct __WorkerResponse {
 
 struct __Authorize {
 	char* user_id;
-	char* pass_hash;
 	char* token;
 } __attribute__((packed));
 
@@ -99,7 +98,7 @@ static char* request_structure_linkage[] = {
 		"iv",
 		"i",
 		"v",
-		"sss"
+		"ss"
 };
 
 union __RequestData {

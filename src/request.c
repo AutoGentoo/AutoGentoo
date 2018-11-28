@@ -112,7 +112,7 @@ response_t request_call (Request* req) {
 	if (req->resolved_call.http_fh == NULL)
 		return NOT_IMPLEMENTED;
 	response_t res = (*req->resolved_call.http_fh)(req->conn, http_req);
-	free_http_request(http_req);
+	http_free_request(http_req);
 	
 	return res;
 }

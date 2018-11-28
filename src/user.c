@@ -55,9 +55,7 @@ if (stmt) { \
 } \
 error_no++;
 
-int host_verify_token(Server* server,
-                      AccessToken* request_token,
-                      char* pass_hash) {
+int host_verify_token(Server* server, AccessToken* request_token) {
 	int error_no = 1;
 	if (!request_token->user_id) {
 		Host* target = server_get_host(server, request_token->host_id);
@@ -68,8 +66,6 @@ int host_verify_token(Server* server,
 	
 	User* target_user = map_get(server->users, request_token->user_id);
 	HOST_VERIFY_STMT(!target_user, "user '%s' not found", request_token->user_id);
-	HOST_VERIFY_STMT(strlen(pass_hash) != AUTOGENTOO_HASH_LENGTH, "len(hash) error");
-	HOST_VERIFY_STMT(strncmp(pass_hash, target_user->hash, AUTOGENTOO_HASH_LENGTH) != 0, "hash incorrect");
 	HOST_VERIFY_STMT(strlen(request_token->auth_token) != AUTOGENTOO_TOKEN_LENGTH, "len(token) error");
 	
 	AccessToken* resolved_token = prv_user_get_token(target_user, request_token->auth_token);
