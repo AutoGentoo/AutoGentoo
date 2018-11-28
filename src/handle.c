@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <autogentoo/http.h>
 #include <autogentoo/user.h>
+#include <mcheck.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -61,16 +62,21 @@ void GET(Connection* conn, HttpRequest* req) {
 	FILE* fp = http_handle_path(conn->parent, req, &file_size);
 	http_send_headers(conn, req);
 	
-	if (!fp || req->response.code != HTTP_OK)
+	if (req->response.code != HTTP_OK) {
+		if (fp)
+			fclose(fp);
 		return;
+	}
 	
 	/* Send the file */
 	size_t chunk_size = 128;
-	void* chunk = malloc(chunk_size);
-	for (int i = 0; i < (file_size / chunk_size) + 1; i++) {
-		size_t read_len = fread(chunk, chunk_size, 1, fp);
-		conn_write(conn, chunk, read_len);
-	}
+	size_t read_len;
+	ssize_t total_write = 0;
+	char chunk[128];
+	while ((read_len = fread(chunk, 1, chunk_size, fp)) != 0)
+		total_write += conn_write(conn, chunk, read_len);
+	
+	ldinfo("Wrote %zu bytes to client", total_write);
 	
 	fclose(fp);
 }

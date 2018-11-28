@@ -4,8 +4,6 @@
 #include "ag_http.tab.h"
 #include <stdio.h>
 
-int error = 0;
-
 int ag_httperror(char *s) {
     fprintf(stderr, "%s in line %d near '%s'\n", s, ag_httplineno, ag_httptext);
     error = 1;
@@ -17,6 +15,9 @@ HttpRequest* ag_http_parse (char* buffer) {
     YY_BUFFER_STATE bs = yy_scan_string(buffer);
     ag_http_switch_to_buffer(bs);
     ag_httpparse();
+
+    if (error)
+        return NULL;
     return (HttpRequest*)ag_httpout;
 }
 

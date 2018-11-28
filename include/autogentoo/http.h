@@ -49,7 +49,7 @@ void http_add_default_headers(HttpRequest* req);
 
 FILE* http_handle_path(Server* parent, HttpRequest* req, long* size);
 size_t http_send_headers(Connection* conn, HttpRequest* req);
-ssize_t http_send_bad_request(Connection* conn);
+ssize_t http_send_default(Connection* conn, response_t res);
 
 /* From flex/bison */
 HttpRequest* ag_http_parse (char* buffer);

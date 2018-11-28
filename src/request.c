@@ -103,25 +103,28 @@ response_t request_call (Request* req) {
 	HttpRequest* http_req = ag_http_parse(req->body);
 	
 	if (http_req == NULL) {
-		http_send_bad_request(req->conn);
+		http_send_default(req->conn, BAD_REQUEST);
 		return BAD_REQUEST;
 	}
 	
+	http_req->response_headers = small_map_new(5, 5);
 	http_add_default_headers(http_req);
 	
-	int i;
+	if (((HttpHeader*)small_map_get(http_req->headers, "Connection")) != NULL)
+		if (strcmp(((HttpHeader*)small_map_get(http_req->headers, "Connection"))->value, "keep-alive") == 0)
+			req->directive = DIR_CONNECTION_OPEN;
 	req->resolved_call = resolve_call(http_req->function);
 	
 	if (req->resolved_call.http_fh == NULL) {
-		http_req->response = NOT_IMPLEMENTED;
-		http_send_headers(req->conn, http_req);
-		return http_req->response;
+		http_send_default(req->conn, NOT_IMPLEMENTED);
+		http_free_request(http_req);
+		return NOT_IMPLEMENTED;
 	}
 	
 	(*req->resolved_call.http_fh)(req->conn, http_req);
+	response_t res = http_req->response;
 	http_free_request(http_req);
-	
-	return http_req->response;
+	return res;
 }
 
 void request_free (Request* req) {

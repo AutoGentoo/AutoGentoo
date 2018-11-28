@@ -6,6 +6,9 @@
 #include <autogentoo/hacksaw/tools/log.h>
 #include <stdarg.h>
 
+#define AUTOGENTOO_SHOW_DEBUG
+
+
 static FILE* target = NULL;
 
 void init_log() {
@@ -24,7 +27,7 @@ void ldinfo(char* format, ...) {
 #ifdef AUTOGENTOO_SHOW_DEBUG
 	va_list args;
 	va_start(args, format);
-	lerror(format, args);
+	linfo(format, args);
 	va_end(args);
 #endif
 }
@@ -33,7 +36,7 @@ void ldwarning(char* format, ...) {
 #ifdef AUTOGENTOO_SHOW_DEBUG
 	va_list args;
 	va_start(args, format);
-	lerror(format, args);
+	lwarning(format, args);
 	va_end(args);
 #endif
 }

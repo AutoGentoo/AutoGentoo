@@ -197,8 +197,11 @@ Server* read_server(char* location, char* port, server_t opts) {
 	HostTemplate* stage_temp;
 	
 	int current = 0;
+	int __break = 0;
 	while (current != AUTOGENTOO_FILE_END) {
 		current = read_int(fp);
+		if (__break)
+			break;
 		
 		switch (current) {
 			case AUTOGENTOO_HOST:
@@ -219,6 +222,7 @@ Server* read_server(char* location, char* port, server_t opts) {
 				break;
 			default:
 				lerror("Could not understand autogentoo data type: 0x%x", current);
+				__break = 1;
 				break;
 		}
 	}

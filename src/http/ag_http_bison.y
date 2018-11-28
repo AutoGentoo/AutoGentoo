@@ -6,6 +6,7 @@
     #include <string.h>
     #include "autogentoo/http.h"
     #include "autogentoo/hacksaw/tools.h"
+    extern int error;
 }
 
 %{
@@ -18,6 +19,7 @@ int ag_httpparse(void);
 int ag_httpwrap() { return 1; }
 int ag_httplex();
 extern int ag_httplineno;
+extern int error;
 extern char* ag_httptext;
 extern HttpRequest* ag_httpout;
 
@@ -59,14 +61,19 @@ void ag_httperror(const char *message);
 
 %%
 request:      request_function[f] SPHT STR[p] SPHT VERSION[v] headers[h] end[e] {
-                                                ag_httpout = malloc(sizeof (HttpRequest));
-                                                ag_httpout->function = $f;
-                                                ag_httpout->path = $p;
-                                                ag_httpout->version.maj = $v.maj;
-                                                ag_httpout->version.min = $v.min;
-                                                ag_httpout->headers = $h;
-                                                ag_httpout->body_start = @e.last_column;
+                                                if (error)
+                                                    ag_httpout = NULL;
+                                                else {
+                                                    ag_httpout = malloc(sizeof (HttpRequest));
+                                                    ag_httpout->function = $f;
+                                                    ag_httpout->path = $p;
+                                                    ag_httpout->version.maj = $v.maj;
+                                                    ag_httpout->version.min = $v.min;
+                                                    ag_httpout->headers = $h;
+                                                    ag_httpout->body_start = @e.last_column;
+                                                }
                                             }
+            |                               {ag_httpout = NULL;}
             ;
 
 end:                                        {$$ = NULL;}

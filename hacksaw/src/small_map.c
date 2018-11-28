@@ -90,5 +90,5 @@ void* small_map_get_index(SmallMap* smap, int index) {
 }
 
 void* small_map_get_key_index(SmallMap* smap, int index) {
-	return (*(void***) vector_get(smap, index))[0];
+	return (*(SmallMap_key**) vector_get(smap, index))->key;
 }

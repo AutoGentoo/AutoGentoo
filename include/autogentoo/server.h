@@ -152,6 +152,7 @@ struct __Connection {
 	size_t size;
 	char* ip; //!< The IP of the connected client
 	int fd; //!< The file descriptor that points to the open connections
+	int worker;
 	con_t status; //!< The status of the current Connection
 	com_t communication_type; //!< Are we using an encryption or not
 	

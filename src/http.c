@@ -44,22 +44,28 @@ void http_free_request(HttpRequest* ptr) {
 }
 
 void http_add_header(HttpRequest* req, char* name, char* value) {
-	HttpHeader header = {strdup(name), strdup(value)};
-	small_map_insert(req->response_headers, name, &header);
+	HttpHeader* header = malloc(sizeof(HttpHeader));
+	header->name = strdup(name);
+	header->value = strdup(value);
+	small_map_insert(req->response_headers, strdup(header->name), header);
+	
+	printf("added header (%s: %s) - %d %s %d.%d\n", name, value, req->function, req->path, req->version.maj, req->version.min);
 }
 
-void prv_http_get_date(char** dest, size_t len) {
+char* prv_http_get_date(size_t len) {
 	time_t now = time(0);
 	struct tm tm = *gmtime(&now);
-	strftime(*dest, len, "%a, %d %b %Y %H:%M:%S %Z", &tm);
+	
+	char* dest = malloc (len);
+	strftime(dest, len, "%a, %d %b %Y %H:%M:%S %Z", &tm);
+	return dest;
 }
 
 void http_add_default_headers(HttpRequest* req) {
-	char date[128];
-	prv_http_get_date ((char**)&date, 128);
-	
+	char* date = prv_http_get_date (128);
 	http_add_header (req, "Date", date);
 	http_add_header (req, "Server", "AutoGentoo");
+	free(date);
 }
 
 FILE* http_handle_path(Server* parent, HttpRequest* req, long* size) {
@@ -80,22 +86,26 @@ FILE* http_handle_path(Server* parent, HttpRequest* req, long* size) {
 		asprintf(&path, "%s/%s/%s/%s", parent->location, target->id, target->pkgdir, req_to_end);
 	}
 	else
-		path = strdup(req->path);
+		asprintf(&path, "%s/%s", parent->location, req->path);
 	
 	char* resolved_path = realpath(path, NULL);
 	free(path);
+	if (!resolved_path) {
+		req->response = NOT_FOUND;
+		return NULL;
+	}
 	
 	if (strncmp(resolved_path, parent->location, strlen(parent->location)) != 0) {
 		req->response = FORBIDDEN;
 		return NULL;
 	}
 	
-	
 	FILE* fp = fopen(resolved_path, "r");
 	if (!fp) {
 		req->response = NOT_FOUND;
 		return NULL;
 	}
+	free(resolved_path);
 	
 	fseek(fp, 0L, SEEK_END);
 	*size = ftell(fp);
@@ -125,14 +135,14 @@ size_t http_send_headers(Connection* conn, HttpRequest* req) {
 	__prv_conn_write(conn, "\n", 1);
 }
 
-ssize_t http_send_bad_request(Connection* conn) {
+ssize_t http_send_default(Connection* conn, response_t res) {
 	rsend(conn, BAD_REQUEST);
 	char* default_headers;
-	char date[128];
-	prv_http_get_date ((char**)&date, 128);
+	char* date = prv_http_get_date(128);
 	
 	asprintf(&default_headers, "Date: %s\nServer: AutoGentoo\n\n", date);
 	ssize_t out_size = __prv_conn_write(conn, default_headers, strlen(default_headers));
+	free(date);
 	free(default_headers);
 	
 	return out_size;

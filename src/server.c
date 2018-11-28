@@ -66,12 +66,8 @@ void connection_free (Connection* conn) {
 	free(conn);
 }
 
-
-
-//#define AUTOGENTOO_IGNORE_SEGV
-
 void server_recv (Connection* conn) {
-	struct timeval tv = {4, 0};
+	struct timeval tv = {20, 0};
 	setsockopt(conn->fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
 	
 	/* Read the request */
@@ -94,12 +90,12 @@ void server_recv (Connection* conn) {
 	}
 	
 	if (total_read < 0) { // receive error
-		lerror("recv() error");
+		lderror("recv() error - %d", conn->worker);
 		conn->status = SERVER_ERROR;
 		return;
 	}
 	else if (total_read == 0) { // receive socket closed
-		lwarning("Client disconnected upexpectedly.");
+		ldwarning("Client disconnected upexpectedly. - %d", conn->worker);
 		conn->status = FAILED;
 		return;
 	}
@@ -108,9 +104,12 @@ void server_recv (Connection* conn) {
 	conn->status = CONNECTED;
 }
 
+
 void server_respond(Connection* conn, int worker_index) {
+	conn->worker = worker_index;
+	
 	/* Read from the client and parse request */
-	linfo("handle %s on worker %d (%s)", conn->ip, worker_index, conn->communication_type == COM_RSA ? "RSA" : "PLAIN");
+	ldinfo("handle %s on worker %d (%s)", conn->ip, worker_index, conn->communication_type == COM_RSA ? "RSA" : "PLAIN");
 	server_recv(conn);
 	if (conn->status != CONNECTED) {
 		connection_free(conn);
@@ -121,7 +120,7 @@ void server_respond(Connection* conn, int worker_index) {
 	/* Run the request */
 	response_t res;
 	if (request == NULL) {
-		http_send_bad_request(conn);
+		http_send_default(conn, BAD_REQUEST);
 		res = BAD_REQUEST;
 	}
 	else
