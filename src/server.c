@@ -132,8 +132,7 @@ void server_respond(Connection* conn, int worker_index) {
 	
 	linfo("%s (%d)  <==== %d", res.message, res.code, worker_index);
 	
-	/* Update the config */
-	write_server(conn->parent);
+	Server* parent = conn->parent;
 	
 	if (request && request->directive == DIR_CONNECTION_OPEN)
 		server_respond(conn, worker_index);
@@ -142,6 +141,9 @@ void server_respond(Connection* conn, int worker_index) {
 	
 	if (request)
 		request_free(request);
+	
+	/* Update the config */
+	write_server(parent);
 }
 
 Host* server_get_host(Server* server, char* id) {

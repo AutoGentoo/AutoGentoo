@@ -69,14 +69,11 @@ void GET(Connection* conn, HttpRequest* req) {
 	}
 	
 	/* Send the file */
-	size_t chunk_size = 128;
-	size_t read_len;
+	ssize_t read_len;
 	ssize_t total_write = 0;
-	char chunk[128];
-	while ((read_len = fread(chunk, 1, chunk_size, fp)) != 0)
-		total_write += conn_write(conn, chunk, read_len);
-	
-	ldinfo("Wrote %zu bytes to client", total_write);
+	int chunk;
+	while ((read_len = fread(&chunk, 1, sizeof(chunk), fp)) != 0)
+		total_write += conn_write(conn, &chunk, (size_t)read_len);
 	
 	fclose(fp);
 }

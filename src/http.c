@@ -31,7 +31,6 @@ void prv_http_free_header(SmallMap* headers) {
 		HttpHeader* current_header = small_map_get_index(headers, i);
 		free(current_header->name);
 		free(current_header->value);
-		free(small_map_get_key_index(headers, i));
 	}
 	small_map_free(headers, 1);
 }
@@ -47,7 +46,7 @@ void http_add_header(HttpRequest* req, char* name, char* value) {
 	HttpHeader* header = malloc(sizeof(HttpHeader));
 	header->name = strdup(name);
 	header->value = strdup(value);
-	small_map_insert(req->response_headers, strdup(header->name), header);
+	small_map_insert(req->response_headers, header->name, header);
 	
 	printf("added header (%s: %s) - %d %s %d.%d\n", name, value, req->function, req->path, req->version.maj, req->version.min);
 }
