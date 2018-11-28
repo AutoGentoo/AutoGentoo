@@ -59,7 +59,7 @@ typedef enum {
  * @param args a list of arguments passed to the handler
  * @param the index to start reading the request at
  */
-typedef response_t (* HTTP_FH)(Connection* conn, HttpRequest* req);
+typedef void (* HTTP_FH)(Connection* conn, HttpRequest* req);
 typedef response_t (* AUTOGENTOO_FH) (Request* request);
 
 typedef union __FunctionHandler FunctionHandler;

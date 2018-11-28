@@ -101,20 +101,27 @@ response_t request_call (Request* req) {
 	}
 	
 	HttpRequest* http_req = ag_http_parse(req->body);
-	if (http_req == NULL)
-		return BAD_REQUEST;
 	
-	linfo("%d %s HTTP/%d.%d", http_req->function, http_req->path, http_req->version.maj, http_req->version.min);
+	if (http_req == NULL) {
+		http_send_bad_request(req->conn);
+		return BAD_REQUEST;
+	}
+	
+	http_add_default_headers(http_req);
+	
 	int i;
-	for (i = 0; i < http_req->headers->n; i++)
-		linfo ("%s: %s", small_map_get_key_index(http_req->headers, i), small_map_get_index(http_req->headers, i));
 	req->resolved_call = resolve_call(http_req->function);
-	if (req->resolved_call.http_fh == NULL)
-		return NOT_IMPLEMENTED;
-	response_t res = (*req->resolved_call.http_fh)(req->conn, http_req);
+	
+	if (req->resolved_call.http_fh == NULL) {
+		http_req->response = NOT_IMPLEMENTED;
+		http_send_headers(req->conn, http_req);
+		return http_req->response;
+	}
+	
+	(*req->resolved_call.http_fh)(req->conn, http_req);
 	http_free_request(http_req);
 	
-	return res;
+	return http_req->response;
 }
 
 void request_free (Request* req) {

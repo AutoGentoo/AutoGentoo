@@ -29,7 +29,7 @@ typedef struct {
 } response_t;
 
 
-#define NONE (response_t) {0, "", 0}
+#define RESPONSE_SENT (response_t) {0, "", 0}
 #define OK (response_t) {HTTP_OK, "OK", 2}
 #define CREATED (response_t) {HTTP_CREATED, "Created", 7}
 #define NO_CONTENT (response_t) {HTTP_NO_CONTENT, "No Content", 10}

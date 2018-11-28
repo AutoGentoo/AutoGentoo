@@ -13,6 +13,7 @@
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
+		{REQ_HEAD,            {.http_fh=HEAD}},
 		{REQ_INSTALL,         {.ag_fh=INSTALL}},
 		{REQ_EDIT,            {.ag_fh=SRV_EDIT}},
 		{REQ_MNTCHROOT,       {.ag_fh=SRV_MNTCHROOT}},
@@ -51,50 +52,40 @@ FunctionHandler resolve_call(request_t type) {
 	return k;
 }
 
-response_t GET(Connection* conn, HttpRequest* req) {
-	response_t res;
-	
+void GET(Connection* conn, HttpRequest* req) {
 	/** HTTP/1.0 or HTTP/1.1 **/
 	if (req->version.maj != 1 && (req->version.min != 1 || req->version.min != 0))
-		return BAD_REQUEST;
+		req->response = BAD_REQUEST;
 	
-	int package_request = 0;
+	long file_size;
+	FILE* fp = http_handle_path(conn->parent, req, &file_size);
+	http_send_headers(conn, req);
 	
-	char req_type[32];
-	char host_id[16];
+	if (!fp || req->response.code != HTTP_OK)
+		return;
 	
-	size_t path_length = strlen(req->path);
-	char req_to_end[path_length];
-	char* path;
-	
-	if (sscanf(req->path, "/%[^/]/%20s/%s", req_type, host_id, req_to_end) == 3 && strcmp(req_type, "host") == 0) {
-		if (http_check_authorization(conn->parent, req, host_id, REQUEST_ACCESS_READ) != 0)
-			return FORBIDDEN;
-		Host* target = server_get_host(conn->parent, host_id);
-		asprintf(&path, "%s/%s/%s/%s", target->parent->location, target->id, target->pkgdir, req_to_end);
-		printf("register package: %s", path);
-	}
-	else
-		path = strdup(req->path);
-	
-	int fd, data_to_send;
-	
-	if ((fd = open(path, O_RDONLY)) != -1) { // FILE FOUND
-		ssize_t bytes_read;
-		rsend(conn, OK);
-		res = OK;
-		conn_write(conn, "\n", 1);
-		while ((bytes_read = read(fd, (void*) &data_to_send, sizeof(data_to_send))) > 0)
-			conn_write(conn, (void*) &data_to_send, (size_t) bytes_read);
-		close(fd);
-	} else {
-		rsend(conn, NOT_FOUND);
-		res = NOT_FOUND;
+	/* Send the file */
+	size_t chunk_size = 128;
+	void* chunk = malloc(chunk_size);
+	for (int i = 0; i < (file_size / chunk_size) + 1; i++) {
+		size_t read_len = fread(chunk, chunk_size, 1, fp);
+		conn_write(conn, chunk, read_len);
 	}
 	
-	free(path);
-	res.len = 0;
-	return res;
+	fclose(fp);
+}
+
+void HEAD(Connection* conn, HttpRequest* req) {
+	/** HTTP/1.0 or HTTP/1.1 **/
+	if (req->version.maj != 1 && (req->version.min != 1 || req->version.min != 0))
+		req->response = BAD_REQUEST;
+	
+	long file_size;
+	FILE* fp = http_handle_path(conn->parent, req, &file_size);
+	http_send_headers(conn, req);
+	
+	if (fp)
+		fclose(fp);
 }
 
 int prv_check_data_structs (Request* req, const int* to_check, int count) {
@@ -439,7 +430,9 @@ response_t BIN_SERVER (Request* request) {
 	write_server_fp(request->conn->parent, fp);
 	fflush(fp);
 	
-	return NONE;
+	response_t res = OK;
+	res.len = 0;
+	return res;
 }
 
 response_t SRV_HOSTWRITE (Request* request) {
@@ -561,7 +554,9 @@ response_t BIN_QUEUE(Request* request) {
 	queue_write(request->conn->parent->queue->head, request->conn->fd);
 	queue_free(request->conn->parent->queue->head);
 	
-	return NONE;
+	response_t res = OK;
+	res.len = 0;
+	return res;
 }
 
 response_t WORKER_HANDOFF(Request* request) {

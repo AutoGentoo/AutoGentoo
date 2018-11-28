@@ -120,13 +120,15 @@ void server_respond(Connection* conn, int worker_index) {
 	
 	/* Run the request */
 	response_t res;
-	if (request == NULL)
+	if (request == NULL) {
+		http_send_bad_request(conn);
 		res = BAD_REQUEST;
+	}
 	else
 		res = request_call(request);
 	
 	/* Send the response */
-	if (res.len != 0)
+	if (res.len > 0 && request && request->protocol == PROT_AUTOGENTOO)
 		rsend(conn, res);
 	
 	linfo("%s (%d)  <==== %d", res.message, res.code, worker_index);

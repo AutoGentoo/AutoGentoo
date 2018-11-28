@@ -32,12 +32,17 @@ response_t res_list[] = {
 
 response_t get_res(response_nt x) {
 	int i;
-	for (i = 0; i != sizeof(res_list) / sizeof(res_list[0]); i++) {
-		if (res_list[i].code == x) {
+	for (i = 0; i != sizeof(res_list) / sizeof(res_list[0]); i++)
+		if (res_list[i].code == x)
 			return res_list[i];
-		}
-	}
 	return OK;
+}
+
+ssize_t __prv_conn_write(Connection* conn, void* data, size_t len) {
+	if (conn->communication_type == COM_RSA)
+		return SSL_write(conn->encrypted_connection, data, (int)len);
+	
+	return write (conn->fd, data, len);
 }
 
 ssize_t conn_write(Connection* conn, void* data, size_t len) {
@@ -46,8 +51,5 @@ ssize_t conn_write(Connection* conn, void* data, size_t len) {
 		return 0;
 	}
 	
-	if (conn->communication_type == COM_RSA)
-		return SSL_write(conn->encrypted_connection, data, (int)len);
-	
-	return write (conn->fd, data, len);
+	return __prv_conn_write (conn, data, len);
 }

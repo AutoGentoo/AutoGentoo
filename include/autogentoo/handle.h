@@ -34,7 +34,8 @@ FunctionHandler resolve_call(request_t type);
  * @param argc the argument count in args
  * @return HTTP standard codes
  */
-response_t GET(Connection* conn, HttpRequest* req);
+void GET(Connection* conn, HttpRequest* req);
+void HEAD(Connection* conn, HttpRequest* req);
 
 /**
  * Install a packages to the bounded host
