@@ -57,7 +57,8 @@ set(include_HEADERS
         include/autogentoo/queue.h
         include/autogentoo/gentoo_config.h
         include/autogentoo/user.h
-        include/autogentoo/crypt.h include/autogentoo/pool.h include/autogentoo/header.h)
+        include/autogentoo/crypt.h
+        include/autogentoo/pool.h)
 
 set(arch_SOURCES
         arch/main.c

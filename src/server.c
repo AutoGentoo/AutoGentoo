@@ -67,7 +67,7 @@ void connection_free (Connection* conn) {
 }
 
 void server_recv (Connection* conn) {
-	struct timeval tv = {20, 0};
+	struct timeval tv = {2, 0};
 	setsockopt(conn->fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
 	
 	/* Read the request */
@@ -90,12 +90,10 @@ void server_recv (Connection* conn) {
 	}
 	
 	if (total_read < 0) { // receive error
-		lderror("recv() error - %d", conn->worker);
 		conn->status = SERVER_ERROR;
 		return;
 	}
 	else if (total_read == 0) { // receive socket closed
-		ldwarning("Client disconnected upexpectedly. - %d", conn->worker);
 		conn->status = FAILED;
 		return;
 	}
@@ -109,7 +107,6 @@ void server_respond(Connection* conn, int worker_index) {
 	conn->worker = worker_index;
 	
 	/* Read from the client and parse request */
-	ldinfo("handle %s on worker %d (%s)", conn->ip, worker_index, conn->communication_type == COM_RSA ? "RSA" : "PLAIN");
 	server_recv(conn);
 	if (conn->status != CONNECTED) {
 		connection_free(conn);
@@ -123,24 +120,22 @@ void server_respond(Connection* conn, int worker_index) {
 		http_send_default(conn, BAD_REQUEST);
 		res = BAD_REQUEST;
 	}
-	else
+	else {
 		res = request_call(request);
+		/* Send the response */
+		if (res.len > 0 && request->protocol == PROT_AUTOGENTOO)
+			rsend(conn, res);
+	}
 	
-	/* Send the response */
-	if (res.len > 0 && request && request->protocol == PROT_AUTOGENTOO)
-		rsend(conn, res);
-	
-	linfo("%s (%d)  <==== %d", res.message, res.code, worker_index);
-	
+	ldinfo("%s (%d)  <==== %d", res.message, res.code, worker_index);
 	Server* parent = conn->parent;
 	
-	if (request && request->directive == DIR_CONNECTION_OPEN)
-		server_respond(conn, worker_index);
-	
-	connection_free(conn);
-	
-	if (request)
+	if (request && request->directive == DIR_CONNECTION_OPEN) {
 		request_free(request);
+		server_respond(conn, worker_index);
+	}
+	else
+		connection_free(conn);
 	
 	/* Update the config */
 	write_server(parent);
