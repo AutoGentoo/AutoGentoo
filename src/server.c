@@ -127,7 +127,7 @@ void server_respond(Connection* conn, int worker_index) {
 			rsend(conn, res);
 	}
 	
-	ldinfo("%s (%d)  <==== %d", res.message, res.code, worker_index);
+	ldinfo("%s (%d)  <==== %d", res.message, (int)res.code, worker_index);
 	Server* parent = conn->parent;
 	
 	if (request && request->directive == DIR_CONNECTION_OPEN) {

@@ -74,6 +74,7 @@ void GET(Connection* conn, HttpRequest* req) {
 	int chunk;
 	while ((read_len = fread(&chunk, 1, sizeof(chunk), fp)) != 0)
 		total_write += conn_write(conn, &chunk, (size_t)read_len);
+	req->response = OK;
 	
 	fclose(fp);
 }

@@ -23,59 +23,41 @@ void lset(FILE* _target) {
 	target = _target;
 }
 
+#define AUTOGENTOO_LOG_PRINT(star_color) \
+va_list args; \
+va_start (args, format); \
+fprintf(target, ANSI_BOLD star_color " * " ANSI_COLOR); \
+vfprintf(target, format, args); \
+va_end (args); \
+fprintf(target, ANSI_RESET "\n"); \
+fflush(target);
+
 void ldinfo(char* format, ...) {
 #ifdef AUTOGENTOO_SHOW_DEBUG
-	va_list args;
-	va_start(args, format);
-	linfo(format, args);
-	va_end(args);
+	AUTOGENTOO_LOG_PRINT(ANSI_GREEN);
 #endif
 }
 
 void ldwarning(char* format, ...) {
 #ifdef AUTOGENTOO_SHOW_DEBUG
-	va_list args;
-	va_start(args, format);
-	lwarning(format, args);
-	va_end(args);
+	AUTOGENTOO_LOG_PRINT(ANSI_YELLOW);
 #endif
 }
 
 void lderror(char* format, ...) {
 #ifdef AUTOGENTOO_SHOW_DEBUG
-	va_list args;
-	va_start(args, format);
-	lerror(format, args);
-	va_end(args);
+	AUTOGENTOO_LOG_PRINT(ANSI_RED);
 #endif
 }
 
 void lerror(char* format, ...) {
-	va_list args;
-	va_start (args, format);
-	fprintf(target, ANSI_BOLD ANSI_RED " * " ANSI_COLOR);
-	vfprintf(target, format, args);
-	va_end (args);
-	fprintf(target, ANSI_RESET "\n");
-	fflush(target);
+	AUTOGENTOO_LOG_PRINT(ANSI_RED);
 }
 
 void lwarning(char* format, ...) {
-	va_list args;
-	va_start (args, format);
-	fprintf(target, ANSI_BOLD ANSI_YELLOW " * " ANSI_COLOR);
-	vfprintf(target, format, args);
-	va_end (args);
-	fprintf(target, ANSI_RESET "\n");
-	fflush(target);
+	AUTOGENTOO_LOG_PRINT(ANSI_YELLOW);
 }
 
 void linfo(char* format, ...) {
-	va_list args;
-	va_start (args, format);
-	fprintf(target, ANSI_BOLD ANSI_GREEN " * " ANSI_COLOR);
-	vfprintf(target, format, args);
-	va_end (args);
-	fprintf(target, ANSI_RESET "\n");
-	fflush(target);
+	AUTOGENTOO_LOG_PRINT(ANSI_GREEN);
 }
