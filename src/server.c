@@ -67,7 +67,7 @@ void connection_free (Connection* conn) {
 }
 
 void server_recv (Connection* conn) {
-	struct timeval tv = {2, 0};
+	struct timeval tv = {0, 500};
 	setsockopt(conn->fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
 	
 	/* Read the request */
@@ -127,7 +127,7 @@ void server_respond(Connection* conn, int worker_index) {
 			rsend(conn, res);
 	}
 	
-	ldinfo("%s (%d)  <==== %d", res.message, (int)res.code, worker_index);
+	ldinfo("%s -- %s (%d) <==== %d", conn->ip, res.message, (int)res.code, worker_index);
 	Server* parent = conn->parent;
 	
 	if (request && request->directive == DIR_CONNECTION_OPEN) {
