@@ -52,7 +52,7 @@ void server_encrypt_free (EncryptServer* server) {
 }
 
 void connection_free (Connection* conn) {
-	if (conn->status != CLOSED) { ;
+	if (conn->status != CLOSED) {
 		if (fcntl(conn->fd, F_GETFD) != -1 || errno != EBADF)
 			close(conn->fd);
 		conn->status = CLOSED;
@@ -101,7 +101,6 @@ void server_recv (Connection* conn) {
 	conn->size = (size_t) total_read;
 	conn->status = CONNECTED;
 }
-
 
 void server_respond(Connection* conn, int worker_index) {
 	conn->worker = worker_index;
@@ -161,9 +160,8 @@ void daemonize (char* _cwd) {
 	
 	/* Fork off the parent process */
 	pid = fork();
-	if (pid < 0) {
+	if (pid < 0)
 		exit(1);
-	}
 	
 	if (pid > 0) {
 		linfo("Forked to pid: %d", (int) pid);
@@ -176,9 +174,8 @@ void daemonize (char* _cwd) {
 	
 	/* Create a new SID for the child process */
 	sid = setsid();
-	if (sid < 0) {
+	if (sid < 0)
 		exit(1);
-	}
 	
 	/* Change the current working directory. */
 	if ((chdir(_cwd)) < 0)

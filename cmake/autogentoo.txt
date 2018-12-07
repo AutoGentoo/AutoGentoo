@@ -1,0 +1,73 @@
+set(src_SOURCES
+        src/chroot.c
+        src/command.c
+        src/download.c
+        src/handle.c
+        src/host.c
+        src/kernel.c
+        src/response.c
+        src/server.c
+        src/stage.c
+        src/writeconfig.c
+        src/endian_convert.c
+        src/getopt.c
+        src/thread.c
+        src/request.c
+        src/request_structure.c
+        src/http.c
+        src/queue.c
+        src/gentoo_config.c
+        src/user.c
+        src/crypt.c
+        src/pool.c
+        src/server_loop.c
+        src/server_handle.c
+        src/server_init.c
+        src/server_handle.c
+        )
+
+set(include_HEADERS
+        include/autogentoo/autogentoo.h
+        include/autogentoo/binpkg.h
+        include/autogentoo/chroot.h
+        include/autogentoo/command.h
+        include/autogentoo/download.h
+        include/autogentoo/handle.h
+        include/autogentoo/host.h
+        include/autogentoo/kernel.h
+        include/autogentoo/response.h
+        include/autogentoo/request.h
+        include/autogentoo/server.h
+        include/autogentoo/stage.h
+        include/autogentoo/writeconfig.h
+        include/autogentoo/endian_convert.h
+        include/autogentoo/getopt.h
+        include/autogentoo/thread.h
+        include/autogentoo/request_structure.h
+        include/autogentoo/http.h
+        include/autogentoo/queue.h
+        include/autogentoo/gentoo_config.h
+        include/autogentoo/user.h
+        include/autogentoo/crypt.h
+        include/autogentoo/pool.h
+        )
+
+
+# HTTP
+flex_target(FLEX_HTTP ${CMAKE_SOURCE_DIR}/src/http/ag_http_flex.l
+        ${CMAKE_CURRENT_BINARY_DIR}/http/ag_http.flex.c)
+bison_target(LANG_HTTP
+        ${CMAKE_SOURCE_DIR}/src/http/ag_http_bison.y
+        ${CMAKE_CURRENT_BINARY_DIR}/http/ag_http.tab.c)
+
+add_flex_bison_dependency(FLEX_HTTP LANG_HTTP)
+
+set(http_BIN
+        ${BISON_LANG_HTTP_OUTPUTS}
+        ${FLEX_FLEX_HTTP_OUTPUTS}
+        )
+
+set(http_PARSER
+        src/http/ag_http_flex.l
+        src/http/ag_http_bison.y
+        )

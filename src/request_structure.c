@@ -39,9 +39,8 @@ int prv_handle_item (void* dest, void* data, char type, size_t item_size, void* 
 		*(void**)dest = ptr;
 		item_size += sizeof (size_t); // Make sure we skip over size_t
 	}
-	else if (type == 's') {
+	else if (type == 's')
 		item_size = prv_safe_strdup((char**)dest, data, end);
-	}
 	else
 		memcpy (dest, data, item_size);
 	
