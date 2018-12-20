@@ -78,8 +78,9 @@ void pool_loop(Pool* pool) {
 	PoolQueue* current_job = NULL;
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	
-	pthread_mutex_lock(condition_mutex);
-	pthread_cond_wait(condition, condition_mutex);
+	/* PROBABLY DON'T NEED THIS */
+	//pthread_mutex_lock(condition_mutex);
+	//pthread_cond_wait(condition, condition_mutex);
 	
 	while (!pool->kill) {
 		pthread_mutex_lock(queue_mutex);
