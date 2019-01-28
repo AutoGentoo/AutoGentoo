@@ -36,10 +36,5 @@ int main(int argc, char** argv) {
 	}
 	
 	aabs_db_read(local_db);
-	
-	system("ls");
-	system(". ./PKGBUILD.txt");
-	printf("getenv('makedepends') = %s", getenv("makedepends"));
-	
 	return 0;
 }

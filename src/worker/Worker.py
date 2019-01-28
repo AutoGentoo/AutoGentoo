@@ -17,7 +17,7 @@ def get_string_bin(self, binary, start):
 
 type_defines = {
 	'i': lambda i, x: return struct.unpack("!i", x[i:i+4])
-	's': lambda i, x: 
+	's': lambda i, x: return 
 }
 
 def struct_read (format_str, array):

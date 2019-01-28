@@ -1,4 +1,5 @@
 set(arch_SOURCES
+        arch/aabs.c
         arch/main.c
         arch/aabs.c
         arch/db.c

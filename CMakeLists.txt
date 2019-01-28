@@ -60,9 +60,21 @@ add_executable(autogentoo-exec
         )
 
 target_link_libraries(autogentoo-exec
-        curl
         ${ARCHIVE}
         autogentoo
         pthread
         ${PYTHON_LIBRARY}
+        )
+
+add_executable(autogentoo-aabs
+        ${arch_SOURCES}
+        ${arch_HEADERS}
+        )
+
+target_link_libraries(
+        autogentoo-aabs
+        curl
+        autogentoo
+        ${ARCHIVE}
+        ssl
         )

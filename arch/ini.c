@@ -33,7 +33,8 @@ aabs_svec_t* aabs_ini_getsections(aabs_ini_t* ini) {
 	aabs_svec_t* out = string_vector_new();
 	
 	int i;
-	for (i = 0; i != ini->sections->n; i++)
+	for (i = 0; i < ini->sections->n; i++)
+		;
 		//string_vector_add(out, (*(aabs_inisec_t**) string_vector_get(ini->sections, i)));
 	
 	return out;
