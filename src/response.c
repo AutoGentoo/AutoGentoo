@@ -3,7 +3,6 @@
 #include <asm/errno.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <autogentoo/crypt.h>
 #include <openssl/ssl.h>
 
 ssize_t rsend(Connection* conn, response_t code) {

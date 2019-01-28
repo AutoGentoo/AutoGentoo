@@ -7,7 +7,6 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <autogentoo/stage.h>
-#include <autogentoo/command.h>
 
 /*
  * Arguments (Everything after chost is optional)
@@ -103,7 +102,7 @@ char* host_template_download (HostTemplate* t) {
 			t->id);
 	
 	int dl_ret;
-	command("wget", "download to quiet", NULL, &dl_ret, distfile_meta_url, "temp_dest");
+	//command("wget", "download to quiet", NULL, &dl_ret, distfile_meta_url, "temp_dest");
 	
 	
 	if (dl_ret != 0) {
@@ -149,7 +148,7 @@ char* host_template_download (HostTemplate* t) {
 	
 	if (access(fname, F_OK) == -1) {
 		linfo("Downloading stage3 from %s", stage3_dest);
-		command("wget", "download to", NULL, &dl_ret, stage3_dest, fname);
+		//command("wget", "download to", NULL, &dl_ret, stage3_dest, fname);
 	}
 	free(stage3_dest);
 	
@@ -159,7 +158,7 @@ char* host_template_download (HostTemplate* t) {
 response_t host_template_extract (HostTemplate* t, char* fname) {
 	int ext_ret;
 	prv_mkdir(t->dest_dir);
-	command("tar", "extract to", NULL, &ext_ret, fname, t->dest_dir);
+	//command("tar", "extract to", NULL, &ext_ret, fname, t->dest_dir);
 	
 	if (ext_ret != 0) {
 		lerror("Failed to extract stage3 tar");

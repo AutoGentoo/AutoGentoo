@@ -8,6 +8,7 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <autogentoo/autogentoo.h>
+#include <autogentoo/crypt.h>
 #include <string.h>
 
 int server_init (char* port) {

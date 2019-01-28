@@ -8,6 +8,22 @@
 #include <netinet/in.h>
 #include <byteswap.h>
 
+uint32_t htonl(uint32_t host) {
+	uint32_t to_change = host;
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	to_change = (uint32_t) bswap_32(to_change);
+#endif
+	return to_change;
+}
+
+uint32_t ntohl(uint32_t network) {
+	uint32_t to_change = network;
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	to_change = (uint32_t) bswap_32(to_change);
+#endif
+	return to_change;
+}
+
 uint64_t htonll(uint64_t host) {
 	uint64_t to_change = host;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__

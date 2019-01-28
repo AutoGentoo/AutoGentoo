@@ -1,7 +1,5 @@
 set(src_SOURCES
         src/chroot.c
-        src/command.c
-        src/download.c
         src/handle.c
         src/host.c
         src/kernel.c
@@ -18,20 +16,19 @@ set(src_SOURCES
         src/queue.c
         src/gentoo_config.c
         src/user.c
-        src/crypt.c
         src/pool.c
         src/server_loop.c
         src/server_handle.c
         src/server_init.c
         src/server_handle.c
+        src/crypt.c
         )
 
 set(include_HEADERS
         include/autogentoo/autogentoo.h
         include/autogentoo/binpkg.h
         include/autogentoo/chroot.h
-        include/autogentoo/command.h
-        include/autogentoo/download.h
+        include/autogentoo/crypt.h
         include/autogentoo/handle.h
         include/autogentoo/host.h
         include/autogentoo/kernel.h
@@ -53,6 +50,11 @@ set(include_HEADERS
         include/autogentoo/query.h
         )
 
+
+set(test_SOURCES
+        src/tests/test.c
+        src/tests/test.h
+        )
 
 # HTTP
 flex_target(FLEX_HTTP ${CMAKE_SOURCE_DIR}/src/http/ag_http_flex.l

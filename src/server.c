@@ -4,7 +4,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <autogentoo/autogentoo.h>
-#include <autogentoo/crypt.h>
 #include <fcntl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>

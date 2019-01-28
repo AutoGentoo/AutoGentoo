@@ -4,8 +4,6 @@
 
 #include "hacksaw/hacksaw.h"
 #include "chroot.h"
-#include "command.h"
-#include "download.h"
 #include "endian_convert.h"
 #include "getopt.h"
 #include "handle.h"
@@ -69,6 +67,6 @@ void pipe_to_log(Opt* op, char* logfile);
 
 void set_target(Opt* op, char* target);
 
-int main(int argc, char** argv);
+//int main(int argc, char** argv);
 
 #endif

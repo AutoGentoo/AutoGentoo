@@ -29,6 +29,10 @@ struct __Endian {
 	Vector* nodes;
 };
 
+uint32_t htonl(uint32_t host);
+
+uint32_t ntohl(uint32_t network);
+
 uint64_t htonll(uint64_t host);
 
 uint64_t ntohll(uint64_t network);

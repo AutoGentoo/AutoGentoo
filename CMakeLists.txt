@@ -60,9 +60,9 @@ add_executable(autogentoo-exec
         )
 
 target_link_libraries(autogentoo-exec
-        ${ARCHIVE}
         autogentoo
         pthread
+        ssl
         ${PYTHON_LIBRARY}
         )
 
@@ -71,9 +71,21 @@ add_executable(autogentoo-aabs
         ${arch_HEADERS}
         )
 
+add_executable(autogentoo-test
+        ${test_SOURCES}
+        )
+
+target_link_libraries(
+        autogentoo-test
+        cmocka
+        autogentoo
+        ssl
+        pthread
+        ${PYTHON_LIBRARY}
+)
+
 target_link_libraries(
         autogentoo-aabs
-        curl
         autogentoo
         ${ARCHIVE}
         ssl
