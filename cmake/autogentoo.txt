@@ -50,6 +50,7 @@ set(include_HEADERS
         include/autogentoo/user.h
         include/autogentoo/crypt.h
         include/autogentoo/pool.h
+        include/autogentoo/query.h
         )
 
 
