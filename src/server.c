@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include <string.h>
 
 Server* srv = NULL;
 
