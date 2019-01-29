@@ -47,6 +47,8 @@ typedef enum {
 	REQ_EXIT,
 	REQ_HEAD,
 	REQ_POST,
+	
+	REQ_MAX
 } request_t;
 
 #include <autogentoo/response.h>

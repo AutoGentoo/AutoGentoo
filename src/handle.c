@@ -493,6 +493,7 @@ response_t SRV_HOSTWRITE (Request* request) {
 }
 
 response_t SRV_HOSTADVEDIT (Request* request) {
+	return METHOD_NOT_ALLOWED;
 	if (request->struct_c < 2
 				|| request->types[0] != STRCT_HOSTSELECT
 				|| request->types[1] != STRCT_AUTHORIZE)
@@ -523,6 +524,7 @@ response_t SRV_HOSTADVEDIT (Request* request) {
 }
 
 response_t SRV_HOSTUPLOAD(Request* request) {
+	return METHOD_NOT_ALLOWED;
 	CHECK_STRUCTURES ({STRCT_HOSTSELECT, STRCT_AUTHORIZE, STRCT_RAW});
 	HOST_AUTHORIZE(REQUEST_ACCESS_WRITE);
 	
