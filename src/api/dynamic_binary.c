@@ -2,7 +2,7 @@
 // Created by atuser on 1/31/19.
 //
 
-#include <autogentoo/dynamic_binary.h>
+#include <autogentoo/api/dynamic_binary.h>
 #include <stdlib.h>
 #include <string.h>
 #include <autogentoo/hacksaw/tools.h>

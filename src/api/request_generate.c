@@ -3,7 +3,7 @@
 //
 
 #include <autogentoo/api/request_generate.h>
-#include <autogentoo/dynamic_binary.h>
+#include <autogentoo/api/dynamic_binary.h>
 #include <string.h>
 #include <autogentoo/endian_convert.h>
 
