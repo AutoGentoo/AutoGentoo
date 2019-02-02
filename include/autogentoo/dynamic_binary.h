@@ -10,6 +10,12 @@
 
 typedef struct __DynamicBinary DynamicBinary;
 
+typedef enum {
+	DYNAMIC_BIN_OK,
+	DYNAMIC_BIN_ETYPE,
+	DYNAMIC_BIN_EBIN /* Binary added using dynamic_binary_add */
+} dynamic_bin_t;
+
 struct array_node {
 	struct array_node* parent;
 	char* template_start;
@@ -32,8 +38,8 @@ DynamicBinary* dynamic_binary_new();
 void dynamic_binary_array_start(DynamicBinary* db);
 void dynamic_binary_array_next(DynamicBinary* db);
 void dynamic_binary_array_end(DynamicBinary* db);
-void dynamic_binary_add(DynamicBinary* db, char type, void* data);
-void dynamic_binary_add_binary(DynamicBinary* db, size_t n, void* data);
-
+dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data);
+dynamic_bin_t dynamic_binary_add_binary(DynamicBinary* db, size_t n, void* data);
+void* dynamic_binary_free(DynamicBinary* db);
 
 #endif //AUTOGENTOO_DYNAMIC_BINARY_H

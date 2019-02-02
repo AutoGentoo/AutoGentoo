@@ -16,12 +16,14 @@ request_check_error_t request_check(ClientRequest* req) {
 	if (req->arguments && req->arguments->n != found.n)
 		return REQ_CHK_EINCORRECT_N;
 	
-	if (req->types && req->types->n != found.n)
+	if (req->arguments->n != found.n)
 		return REQ_CHK_EINCORRECT_N;
 	
-	for (int i = 0; i < found.n; i++)
-		if (found.args[i] != *(request_structure_t*)vector_get(req->types, i))
+	for (int i = 0; i < found.n; i++) {
+		ClientRequestArgument* arg = (ClientRequestArgument*)vector_get(req->arguments, i);
+		if (found.args[i] != arg->struct_type)
 			return REQ_CHK_EINVALID_ARGS;
+	}
 	
 	return REQ_CHK_OK;
 }

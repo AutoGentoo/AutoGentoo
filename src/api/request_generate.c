@@ -3,53 +3,115 @@
 //
 
 #include <autogentoo/api/request_generate.h>
-
-struct __ClientRequestArgument_intermediate {
-	request_structure_t struct_type;
-	size_t size;
-	void* ptr;
-};
+#include <autogentoo/dynamic_binary.h>
+#include <string.h>
 
 ClientRequest* client_request_init(request_t type) {
 	ClientRequest* out = malloc (sizeof(ClientRequest));
 	out->null_byte = 0;
 	out->request_type = type;
 	
-	out->arguments = vector_new(sizeof(void*), ORDERED | REMOVE);
-	out->types = vector_new(sizeof(request_structure_t), ORDERED | REMOVE);
+	out->arguments = vector_new(sizeof(ClientRequestArgument), ORDERED | REMOVE);
 	
 	return out;
 }
 
-int client_request_add_V(ClientRequest* req, request_structure_t struct_type, ...) {
+
+int client_request_add_structure(ClientRequest* req, request_structure_t struct_type, ClientType* content) {
 	if (struct_type >= STRCT_MAX)
 		return -1;
-	
 	char* template = request_structure_linkage[(int)struct_type];
 	
 	
-	va_list args;
-	va_start(args, struct_type);
+	DynamicBinary* dyn = dynamic_binary_new();
 	
-	/* Size check */
-	size_t size = 0;
+	int i = 0;
 	
-	Vector* argument_tree = vector_new(sizeof(void*), ORDERED | KEEP);
+	struct array_pos_node {
+		struct array_pos_node* parent_array;
+		char* pos;
+	} *array_return = NULL;
 	
 	for (char* c = template; *c; c++) {
 		void* item;
-		int item_int;
-		if (*c == 'i') {
-			item_int = va_arg(args, int);
-			
-		}
+		if (*c == 'i')
+			item = &content[i++].integer;
 		else if (*c == 's')
+			item = content[i++].string;
+		else if (*c == 'v') {
+			item = content[i].binary.data;
+			dynamic_binary_add_binary(dyn, content[i++].binary.n, item);
+			continue;
+		}
+		else if (*c == 'a') {
+			struct array_pos_node* parent = array_return;
+			array_return = malloc(sizeof(struct array_pos_node));
+			array_return->parent_array = parent;
+			
+			array_return->pos = ++c;
+			dynamic_binary_array_start(dyn);
+			continue;
+		}
+		else if (*c == ')') {
+			if (content->array_directive == CLIENT_TYPE_ARRAY_NEXT) {
+				if (!array_return) {
+					lerror("Invalid template syntax\nToo many array closes");
+					return -2;
+				}
+				
+				c = array_return->pos;
+				dynamic_binary_array_next(dyn);
+				continue;
+			}
+			else if (content->array_directive == CLIENT_TYPE_ARRAY_END) {
+				if (!array_return) {
+					lerror("Invalid template syntax\nToo many array closes");
+					return -2;
+				}
+				
+				struct array_pos_node* parent = array_return->parent_array;
+				free(array_return);
+				array_return = parent;
+				dynamic_binary_array_end(dyn);
+				continue;
+			}
+		}
 		
+		dynamic_binary_add(dyn, *c, &item);
 	}
+	
+	ClientRequestArgument req_arg = {struct_type, dyn->used_size, dynamic_binary_free(dyn)};
+	vector_add(req->arguments, &req_arg);
+	
+	return 0;
 }
 
-int client_request_add_S(ClientRequest* req, request_structure_t struct_type, RequestData* structure) {
+#define current_add(item, size) \
+memcpy(current, item, size); \
+current += size;
 
+int client_request_generate(ClientRequest* req, size_t* size, void** out_ptr) {
+	(*size) += sizeof(request_t);
+	(*size) += sizeof(request_structure_t); // STRCT_END
+	for (int i = 0; i < req->arguments->n; i++) {
+		ClientRequestArgument* argument = (ClientRequestArgument*)vector_get(req->arguments, i);
+		(*size) += sizeof(request_structure_t);
+		(*size) += argument->size;
+	}
+	
+	(*out_ptr) = malloc(*size);
+	void* current = (*out_ptr);
+	
+	*(char*)current = 0;
+	current++;
+	current_add(&req->request_type, sizeof(request_t))
+	
+	for (int i = 0; i < req->arguments->n; i++) {
+		ClientRequestArgument* argument = (ClientRequestArgument*)vector_get(req->arguments, i);
+		
+		current_add(&argument->struct_type, sizeof(request_structure_t))
+		current_add(argument->ptr, argument->size)
+	}
+	
+	return (int)(current - (*out_ptr));
 }
-
-int client_send(ClientRequest* req);
