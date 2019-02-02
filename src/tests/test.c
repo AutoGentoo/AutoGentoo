@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include <autogentoo/api/request_generate.h>
 #include "test.h"
 
 void test_htonl(void** state) {
@@ -23,10 +24,37 @@ void test_htonll(void** state) {
 	(void) state;
 }
 
+void test_request(void** state) {
+	ClientRequest* req = client_request_init(REQ_INSTALL);
+	
+	ClientType host_select[] = {"HOST_ID"};
+	ClientType authorize[] = {"USER_ID", "TOKEN"};
+	ClientType install[] = {"EMERGE_STR"};
+	
+	client_request_add_structure(req, STRCT_HOSTSELECT, host_select);
+	client_request_add_structure(req, STRCT_AUTHORIZE, authorize);
+	client_request_add_structure(req, STRCT_HOSTINSTALL, install);
+	
+	size_t size;
+	void* request;
+	int size_check = client_request_generate(req, &size, &request);
+	assert_int_equal(size, size_check);
+	FILE* fp = fopen("client_request_test", "w+");
+	fwrite(request, 1, size, fp);
+	fclose(fp);
+	
+	(void) state;
+}
+
+void test_dynamic_binary(void** state) {
+
+}
+
 int main(void) {
 	const struct CMUnitTest tests[] = {
 			cmocka_unit_test(test_htonl),
 			cmocka_unit_test(test_htonll),
+			cmocka_unit_test(test_request),
 	};
 	
 	return cmocka_run_group_tests(tests, NULL, NULL);

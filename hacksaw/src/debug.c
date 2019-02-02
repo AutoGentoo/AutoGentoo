@@ -7,8 +7,8 @@
 
 void print_bin(void* ptr, int n, size_t size) {
 	int i;
-	for (i = 0; i != size; i++) {
-		printf("%02X", ((char*)ptr)[i]);
+	for (i = 0; i < n; i++) {
+		printf("%hhx", ((char*)ptr)[i]);
 		
 		if (!((i + 1) % size))
 			printf(" ");

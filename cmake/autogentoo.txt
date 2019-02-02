@@ -22,6 +22,7 @@ set(src_SOURCES
         src/server_init.c
         src/server_handle.c
         src/crypt.c
+        src/dynamic_binary.c
         src/api/request_generate.c
         src/api/request_check.c
         )
@@ -50,6 +51,7 @@ set(include_HEADERS
         include/autogentoo/crypt.h
         include/autogentoo/pool.h
         include/autogentoo/query.h
+        include/autogentoo/dynamic_binary.h
         include/autogentoo/api/request_generate.h
         include/autogentoo/api/request_check.h
         )

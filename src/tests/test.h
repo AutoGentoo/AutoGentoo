@@ -23,6 +23,8 @@ assert_int_equal(((value) >> (8*5)) & 0xFF, (__6)); \
 assert_int_equal(((value) >> (8*6)) & 0xFF, (__7)); \
 assert_int_equal(((value) >> (8*7)) & 0xFF, (__8));
 
+
+
 void test_htonl(void** state);
 
 #endif //AUTOGENTOO_TESTS_H

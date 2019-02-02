@@ -31,7 +31,7 @@ void* prv_dynamic_binary_add_item(DynamicBinary* db, size_t size, void* data_ptr
 	}
 	
 	void* out = db->ptr + db->used_size;
-	memcpy(db->ptr + db->used_size, data_ptr, size);
+	memcpy(out, data_ptr, size);
 	db->used_size += size;
 	
 	return out;
@@ -75,11 +75,11 @@ void dynamic_binary_array_next(DynamicBinary* db) {
 	(*db->array_size->size_ptr)++;
 }
 
-void dynamic_binary_add(DynamicBinary* db, char type, void* data) {
+dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {
 	if (*db->current_template) {
 		if (type != *db->current_template) {
 			lerror("Adding incorrect type. Expected '%c' got '%c'", db, type);
-			return;
+			return DYNAMIC_BIN_ETYPE;
 		}
 	}
 	else
@@ -90,17 +90,21 @@ void dynamic_binary_add(DynamicBinary* db, char type, void* data) {
 	if (type == 'i')
 		data_size = sizeof(int);
 	else if (type == 's')
-		data_size = strlen((char*)data);
-	else if (type == 'v')
+		data_size = strlen((char*)data) + 1; // Add the NULL byte
+	else if (type == 'v') {
 		lerror("Use dynamic_binary_add_binary() instead of dynamic_binary_add()");
+		return DYNAMIC_BIN_EBIN;
+	}
 	
+	prv_dynamic_binary_add_item(db, data_size, data);
+	return DYNAMIC_BIN_OK;
 }
 
-void dynamic_binary_add_binary(DynamicBinary* db, size_t n, void* data) {
+dynamic_bin_t dynamic_binary_add_binary(DynamicBinary* db, size_t n, void* data) {
 	if (*db->current_template) {
 		if (*db->current_template != 'v') {
-			lerror("Adding incorrect type. Expected '%c' got '%c'", db, 'v');
-			return;
+			lerror("Tried adding incorrect type. Expected '%c' got '%c'", db, 'v');
+			return DYNAMIC_BIN_ETYPE;
 		}
 	}
 	else
@@ -109,4 +113,20 @@ void dynamic_binary_add_binary(DynamicBinary* db, size_t n, void* data) {
 	
 	prv_dynamic_binary_add_item(db, sizeof(size_t), &n);
 	prv_dynamic_binary_add_item(db, n, data);
+	return DYNAMIC_BIN_OK;
+}
+
+void* dynamic_binary_free(DynamicBinary* db) {
+	while (db->array_size) {
+		lerror("Freeing unclosed array template");
+		struct array_node* parent = db->array_size;
+		free(db->array_size);
+		db->array_size = parent;
+	}
+	
+	void* out = db->ptr;
+	free(db->template);
+	free(db);
+	
+	return out;
 }
