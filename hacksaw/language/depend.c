@@ -19,7 +19,7 @@ DependExpression* new_dependexpression(void* ptr, expr_t type) {
 	} else if (out->type == SEL_EXPR) {
 		out->select = (Atom*) ptr;
 	} else if (out->type == EXPR_EXPR) {
-		out->dependexpressions = vector_new(sizeof(DependExpression), REMOVE | UNORDERED);
+		out->dependexpressions = vector_new(sizeof(DependExpression), VECTOR_REMOVE | VECTOR_UNORDERED);
 		add_dependexpression(out->dependexpressions, ptr);
 	}
 	return out;

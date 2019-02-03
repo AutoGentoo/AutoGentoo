@@ -1,19 +1,9 @@
 SUBDIRS = hacksaw
 mainincludedir = $(includedir)/autogentoo
-maininclude_HEADERS =   autogentoo.h \
-                        handle.h \
-                        host.h \
-                        response.h \
-                        request.h \
-                        server.h \
-                        writeconfig.h \
-                        chroot.h \
-                        stage.h \
-                        download.h \
-                        binpkg.h \
-                        command.h \
-                        kernel.h \
-                        getopt.h \
-                        thread.h \
-                        request_structure.h \
-                        queue.h
+maininclude_HEADERS =   getopt.h          request_structure.h \
+                        autogentoo.h      response.h binpkg.h \
+                        handle.h          pool.h     server.h \
+                        chroot.h          host.h     query.h      stage.h \
+                        crypt.h           http.h     queue.h      thread.h \
+                        endian_convert.h  kernel.h   render.h     user.h \
+                        gentoo_config.h   request.h  writeconfig.h

@@ -72,7 +72,7 @@ expr :  USE[out] '(' expr[in] ')'       {
                                         }
         | expr expr                     {
                                             Vector* ar = vector_new (sizeof (DependExpression),
-                                                                    REMOVE | UNORDERED);
+                                                                    VECTOR_REMOVE | VECTOR_UNORDERED);
                                             vector_add(ar, $1);
                                             vector_add(ar, $2);
                                             $$ = new_dependexpression (ar, EXPR_EXPR);
@@ -140,7 +140,7 @@ req_use :   req_use ',' req_use         {
                                             vector_free ($3);
                                         }
             | default_use_flag '?'      {
-                                            $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
+                                            $$ = vector_new (sizeof(RequireUse), VECTOR_REMOVE | VECTOR_UNORDERED);
                                             if ($1.status == DISABLED) {
                                                 $1.status = OPPOSOTE_CHECK;
                                             }
@@ -150,11 +150,11 @@ req_use :   req_use ',' req_use         {
                                             vector_add($$, &$1);
                                         }
             | use_flag                  {
-                                            $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
+                                            $$ = vector_new (sizeof(RequireUse), VECTOR_REMOVE | VECTOR_UNORDERED);
                                             vector_add($$, &$1);
                                         }
             | default_use_flag          {
-                                            $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
+                                            $$ = vector_new (sizeof(RequireUse), VECTOR_REMOVE | VECTOR_UNORDERED);
                                             vector_add($$, &$1);
                                         }
             | USE                       {
@@ -169,7 +169,7 @@ req_use :   req_use ',' req_use         {
                                             else {
                                                 dependerror("Invalid compact use");
                                             }
-                                            $$ = vector_new (sizeof(RequireUse), REMOVE | UNORDERED);
+                                            $$ = vector_new (sizeof(RequireUse), VECTOR_REMOVE | VECTOR_UNORDERED);
                                             vector_add($$, &temp);
                                         }
             ;

@@ -8,7 +8,7 @@
 #include <autogentoo/hacksaw/tools/string_vector.h>
 
 StringVector* string_vector_new() {
-	return vector_new(sizeof(char*), ORDERED | REMOVE);
+	return vector_new(sizeof(char*), VECTOR_ORDERED | VECTOR_REMOVE);
 }
 
 void string_vector_add(StringVector* vec, char* string) {
@@ -23,7 +23,7 @@ void string_vector_insert(StringVector* vec, char* string, int index) {
 	if (vec->s >= (vec->n + 1))
 		vector_allocate(vec);
 	
-	if (vec->ordered)
+	if (vec->opts & VECTOR_ORDERED)
 		memcpy (((char**) vec->ptr)[index + 1], ((char**) vec->ptr)[index], sizeof (char*) * (vec->n - index));
 	else
 		((char**) vec->ptr)[vec->n] = ((char**) vec->ptr)[index];

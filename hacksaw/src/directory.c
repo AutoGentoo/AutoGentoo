@@ -65,7 +65,7 @@ PortageDirectory* portage_directory_read(Portage* portage, char* location) {
 	out->parent = portage;
 	out->status = PD_CLOSED;
 	out->dir_name = strdup(location);
-	out->fp_list = vector_new(sizeof(FILE*), REMOVE | UNORDERED);
+	out->fp_list = vector_new(sizeof(FILE*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	
 	char path[256];
 	sprintf(path, "%s/%s", portage->root_dir, location);

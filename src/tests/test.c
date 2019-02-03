@@ -6,6 +6,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 #include <autogentoo/api/request_generate.h>
+#include <autogentoo/api/dynamic_binary.h>
 #include "test.h"
 
 void test_htonl(void** state) {
@@ -27,9 +28,9 @@ void test_htonll(void** state) {
 void test_request(void** state) {
 	ClientRequest* req = client_request_init(REQ_INSTALL);
 	
-	ClientType host_select[] = {"HOST_ID"};
-	ClientType authorize[] = {"USER_ID", "TOKEN"};
-	ClientType install[] = {"EMERGE_STR"};
+	DynamicType host_select[] = {"HOST_ID"};
+	DynamicType authorize[] = {"USER_ID", "TOKEN"};
+	DynamicType install[] = {"EMERGE_STR"};
 	
 	client_request_add_structure(req, STRCT_HOSTSELECT, host_select);
 	client_request_add_structure(req, STRCT_AUTHORIZE, authorize);
@@ -47,14 +48,36 @@ void test_request(void** state) {
 }
 
 void test_dynamic_binary(void** state) {
-
+	DynamicType content[] = {
+			{.string="hello"},
+			{.string="world"},
+			{.integer=32},
+			{.string="goodbye"},
+			{.integer=1},
+			{.string="test1"},
+			{.integer=2},
+			{.string="test2"},
+			{.integer=3},
+			{.string="test3"},
+	};
+	
+	char* template_full = "ssisaisnisnise)";
+	
+	DynamicBinary* test = dynamic_binary_new(DB_ENDIAN_TARGET_NETWORK);
+	dynamic_bin_t out = dynamic_binary_add_quick(test, template_full, content);
+	assert_int_equal(out, DYNAMIC_BIN_OK);
+	
+	dynamic_binary_free(test);
+	
+	(void)state;
 }
 
 int main(void) {
 	const struct CMUnitTest tests[] = {
 			cmocka_unit_test(test_htonl),
 			cmocka_unit_test(test_htonll),
-			cmocka_unit_test(test_request),
+			//cmocka_unit_test(test_request),
+			cmocka_unit_test(test_dynamic_binary),
 	};
 	
 	return cmocka_run_group_tests(tests, NULL, NULL);

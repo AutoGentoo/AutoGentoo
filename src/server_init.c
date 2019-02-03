@@ -67,8 +67,8 @@ int server_init (char* port) {
 Server* server_new (char* location, char* port, server_t opts) {
 	Server* out = malloc(sizeof(Server));
 	
-	out->templates = vector_new(sizeof(HostTemplate*), REMOVE | UNORDERED);
-	out->hosts = vector_new(sizeof(Host*), REMOVE | UNORDERED);
+	out->templates = vector_new(sizeof(HostTemplate*), VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->hosts = vector_new(sizeof(Host*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	out->users = map_new(64, 0.8);
 	out->stages = small_map_new(sizeof(HostTemplate*), 5);
 	out->location = strdup(location);

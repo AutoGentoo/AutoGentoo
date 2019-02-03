@@ -23,7 +23,7 @@ Dependency* dependency_scan(Ebuild* package) {
 	
 	int i;
 	for (i = 0; i != sizeof(ar_str) / sizeof(ar_str[0]); i++) {
-		*ar[i] = (DependencyVec) vector_new(sizeof(Ebuild*), REMOVE | UNORDERED);
+		*ar[i] = (DependencyVec) vector_new(sizeof(Ebuild*), VECTOR_REMOVE | VECTOR_UNORDERED);
 		char* temp_str = conf_get(package->metadata, "", ar_str[i]);
 		DependExpression* temp = depend_parse(temp_str);
 		parse_depend_expression(temp, *ar[i]);

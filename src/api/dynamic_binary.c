@@ -6,8 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/endian_convert.h>
 
-DynamicBinary* dynamic_binary_new() {
+DynamicBinary* dynamic_binary_new(dynamic_binary_endian_t endian) {
 	DynamicBinary* out = malloc(sizeof(DynamicBinary));
 	out->array_size = NULL;
 	
@@ -16,10 +17,11 @@ DynamicBinary* dynamic_binary_new() {
 	out->used_size = 0;
 	
 	out->template_str_size = 16;
-	out->template = malloc (out->template_str_size);
+	out->template = calloc (out->template_str_size, 1);
 	out->template_used_size = 0;
-	out->template[0] = 0;
 	out->current_template = out->template;
+	
+	out->endian = endian;
 	
 	return out;
 }
@@ -50,6 +52,7 @@ char* prv_dynamic_binary_template_add(DynamicBinary* db, char type) {
 void dynamic_binary_array_start(DynamicBinary* db) {
 	prv_dynamic_binary_template_add(db, 'a');
 	char* template_end = prv_dynamic_binary_template_add(db, '(');
+	db->current_template += 2;
 	
 	struct array_node* parent = db->array_size;
 	db->array_size = malloc(sizeof(struct array_node));
@@ -78,7 +81,7 @@ void dynamic_binary_array_next(DynamicBinary* db) {
 dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {
 	if (*db->current_template) {
 		if (type != *db->current_template) {
-			lerror("Adding incorrect type. Expected '%c' got '%c'", db, type);
+			lerror("Adding incorrect type. Expected '%c' got '%c'", *db->current_template, type);
 			return DYNAMIC_BIN_ETYPE;
 		}
 	}
@@ -87,8 +90,13 @@ dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {
 	db->current_template++;
 	
 	size_t data_size = 0;
-	if (type == 'i')
+	if (type == 'i') {
 		data_size = sizeof(int);
+		if (db->endian & DB_ENDIAN_TARGET_NETWORK && !(db->endian & DB_ENDIAN_INPUT_NETWORK))
+			*(int*)data = htonl(*(uint32_t*)data);
+		else if (!(db->endian & DB_ENDIAN_TARGET_NETWORK) && db->endian & DB_ENDIAN_INPUT_NETWORK)
+			*(int*)data = ntohl(*(uint32_t*)data);
+	}
 	else if (type == 's')
 		data_size = strlen((char*)data) + 1; // Add the NULL byte
 	else if (type == 'v') {
@@ -103,7 +111,7 @@ dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {
 dynamic_bin_t dynamic_binary_add_binary(DynamicBinary* db, size_t n, void* data) {
 	if (*db->current_template) {
 		if (*db->current_template != 'v') {
-			lerror("Tried adding incorrect type. Expected '%c' got '%c'", db, 'v');
+			lerror("Tried adding incorrect type. Expected '%c' got '%c'", *db->current_template, 'v');
 			return DYNAMIC_BIN_ETYPE;
 		}
 	}
@@ -113,6 +121,32 @@ dynamic_bin_t dynamic_binary_add_binary(DynamicBinary* db, size_t n, void* data)
 	
 	prv_dynamic_binary_add_item(db, sizeof(size_t), &n);
 	prv_dynamic_binary_add_item(db, n, data);
+	return DYNAMIC_BIN_OK;
+}
+
+dynamic_bin_t dynamic_binary_add_quick(DynamicBinary* db, char* template, DynamicType* content) {
+	int i = 0;
+	for (char* c = template; *c; c++, i++) {
+		if (*c == 'i')
+			dynamic_binary_add(db, 'i', &content[i].integer);
+		else if (*c == 's')
+			dynamic_binary_add(db, 's', content[i].string);
+		else if (*c == 'v')
+			dynamic_binary_add_binary(db, content[i].binary.n, content[i].binary.data);
+		else if (*c == 'a') {
+			i--;
+			dynamic_binary_array_start(db);
+		}
+		else if (*c == 'n') {
+			i--;
+			dynamic_binary_array_next(db);
+		}
+		else if (*c == 'e') {
+			i--;
+			dynamic_binary_array_end(db);
+		}
+	}
+	
 	return DYNAMIC_BIN_OK;
 }
 

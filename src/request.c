@@ -63,8 +63,8 @@ Request* request_handle (Connection* conn) {
 	
 	AUTOGENTOO_READ_INT(out->request_type);
 	
-	out->structures_parent = vector_new (sizeof (RequestData), REMOVE | ORDERED);
-	out->types_parent = vector_new (sizeof (request_structure_t), REMOVE | ORDERED);
+	out->structures_parent = vector_new (sizeof (RequestData), VECTOR_REMOVE | VECTOR_ORDERED);
+	out->types_parent = vector_new (sizeof (request_structure_t), VECTOR_REMOVE | VECTOR_ORDERED);
 	out->structures = out->structures_parent->ptr;
 	out->types = out->types_parent->ptr;
 	

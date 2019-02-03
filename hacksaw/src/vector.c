@@ -13,8 +13,7 @@ Vector* vector_new(size_t el_size, vector_opts opts) {
 	out_ptr->size = el_size;
 	out_ptr->ptr = malloc(out_ptr->size * out_ptr->s);
 	out_ptr->n = 0;
-	out_ptr->keep = !!(opts & KEEP);
-	out_ptr->ordered = !!(opts & ORDERED);
+	out_ptr->opts = opts;
 	
 	return out_ptr;
 }
@@ -34,8 +33,8 @@ void vector_remove(Vector* vec, int index) {
 	void* zero = malloc(vec->size);
 	memset(zero, 0, vec->size);
 	
-	if (!vec->keep) {
-		if (vec->ordered) {
+	if (!(vec->opts & VECTOR_KEEP)) {
+		if (vec->opts & VECTOR_KEEP) {
 			memcpy(vector_get(vec, index),
 				   vector_get(vec, index + 1),
 				   vec->size * (vec->n - index)

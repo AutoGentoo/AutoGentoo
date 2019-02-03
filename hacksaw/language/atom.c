@@ -21,7 +21,7 @@ void set_atom_selector_version(EbuildVersion* v, char* version_str, int r) {
 }
 
 Vector* parse_version(char* v_str) {
-	Vector* out = vector_new(sizeof(int), KEEP | ORDERED);
+	Vector* out = vector_new(sizeof(int), VECTOR_KEEP | VECTOR_ORDERED);
 	
 	char* buf;
 	int temp;

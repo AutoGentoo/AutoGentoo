@@ -7,10 +7,10 @@
 PackageMeta* package_meta_new() {
 	PackageMeta* out = malloc(sizeof(PackageMeta));
 	out->key = NULL;
-	out->use = vector_new(sizeof(PackageUse*), REMOVE | UNORDERED);
-	out->license = vector_new(sizeof(PackageLicense*), REMOVE | UNORDERED);
-	out->mask = vector_new(sizeof(PackageMask*), REMOVE | UNORDERED);
-	out->unmask = vector_new(sizeof(PackageUnmask*), REMOVE | UNORDERED);
+	out->use = vector_new(sizeof(PackageUse*), VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->license = vector_new(sizeof(PackageLicense*), VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->mask = vector_new(sizeof(PackageMask*), VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->unmask = vector_new(sizeof(PackageUnmask*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	
 	return out;
 }

@@ -71,7 +71,7 @@ AC_CONFIG_FILES([
     Makefile
     src/Makefile
     src/http/Makefile
-    src/ui/Makefile
+    src/api/Makefile
     include/Makefile
     include/autogentoo/Makefile
 ])

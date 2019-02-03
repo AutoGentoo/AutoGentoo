@@ -17,8 +17,8 @@ char* sync_types[] = {
 RepoConfig* repo_config_new() {
 	RepoConfig* repo_conf = malloc(sizeof(RepoConfig));
 	
-	repo_conf->config = vector_new(sizeof(Conf*), REMOVE | UNORDERED);
-	repo_conf->repositories = vector_new(sizeof(Repository*), REMOVE | UNORDERED);
+	repo_conf->config = vector_new(sizeof(Conf*), VECTOR_REMOVE | VECTOR_UNORDERED);
+	repo_conf->repositories = vector_new(sizeof(Repository*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	repo_conf->eclass_overrides = NULL;
 	repo_conf->force = NULL;
 	

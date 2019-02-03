@@ -9,6 +9,7 @@
 #include <autogentoo/hacksaw/tools/vector.h>
 
 typedef struct __DynamicBinary DynamicBinary;
+typedef union __DynamicType DynamicType;
 
 typedef enum {
 	DYNAMIC_BIN_OK,
@@ -22,6 +23,11 @@ struct array_node {
 	int* size_ptr;
 };
 
+typedef enum {
+	DB_ENDIAN_TARGET_NETWORK = 0x1, /* If true then we set to big_endian*/
+	DB_ENDIAN_INPUT_NETWORK = 0x2 /* Default set to host_endian */
+} dynamic_binary_endian_t;
+
 struct __DynamicBinary {
 	size_t template_str_size;
 	size_t ptr_size;
@@ -32,14 +38,26 @@ struct __DynamicBinary {
 	char* current_template;
 	
 	struct array_node* array_size;
+	dynamic_binary_endian_t endian;
 };
 
-DynamicBinary* dynamic_binary_new();
+union __DynamicType {
+	char* string;
+	int integer;
+	struct {
+		void* data;
+		size_t n;
+	} binary;
+};
+
+
+DynamicBinary* dynamic_binary_new(dynamic_binary_endian_t endian);
 void dynamic_binary_array_start(DynamicBinary* db);
 void dynamic_binary_array_next(DynamicBinary* db);
 void dynamic_binary_array_end(DynamicBinary* db);
 dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data);
 dynamic_bin_t dynamic_binary_add_binary(DynamicBinary* db, size_t n, void* data);
+dynamic_bin_t dynamic_binary_add_quick(DynamicBinary* db, char* template, DynamicType* content);
 void* dynamic_binary_free(DynamicBinary* db);
 
 #endif //AUTOGENTOO_DYNAMIC_BINARY_H

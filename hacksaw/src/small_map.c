@@ -8,7 +8,7 @@
 #include <autogentoo/hacksaw/tools.h>
 
 SmallMap* small_map_new(int start_size, int increment) {
-	SmallMap* out = vector_new(sizeof(void*), REMOVE | UNORDERED);
+	SmallMap* out = vector_new(sizeof(void*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	out->increment = (size_t) increment;
 	vector_allocate_to_size(out, (size_t)start_size);
 	return out;

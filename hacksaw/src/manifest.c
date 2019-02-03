@@ -12,7 +12,7 @@ void manifest_parse(Package* pkg) {
 	ssize_t read;
 	pkg->manifest->package = pkg;
 	
-	pkg->manifest->entries = vector_new(sizeof(ManifestEntry), REMOVE | UNORDERED);
+	pkg->manifest->entries = vector_new(sizeof(ManifestEntry), VECTOR_REMOVE | VECTOR_UNORDERED);
 	int pgp_status = 0; // 0: no, 1: message, 2: signature
 	while ((read = getline(&line, &len, fp)) != -1) {
 		line[strlen(line) - 1] = '\0'; // Remove the newline
@@ -80,7 +80,7 @@ manifest_t entry_parse(ManifestEntry* entry, char* str) {
 	entry->type = get_entry_type(string_vector_get(tokens, 0));
 	strcpy(entry->filename, string_vector_get(tokens, 1));
 	sscanf(string_vector_get(tokens, 2), "%u", (unsigned int*) &entry->size);
-	entry->hashes = vector_new(sizeof(HashEntry), UNORDERED | REMOVE);
+	entry->hashes = vector_new(sizeof(HashEntry), VECTOR_UNORDERED | VECTOR_REMOVE);
 	
 	int n;
 	for (n = 3; (n + 1) < j; n += 2) {

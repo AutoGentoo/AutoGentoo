@@ -16,10 +16,10 @@ typedef struct __Vector Vector;
 #endif
 
 enum __vector_opts {
-	UNORDERED = 0x0, // Any order can be used (most efficient)
-	ORDERED = 0x1, // Keep the elements in order (don't use if not needed)
-	KEEP = 0x2, // Keep the memory unallocated
-	REMOVE = 0x0, // Remove the memory and replace the location
+	VECTOR_UNORDERED = 0x0, // Any order can be used (most efficient)
+	VECTOR_ORDERED = 0x1, // Keep the elements in order (don't use if not needed)
+	VECTOR_KEEP = 0x2, // Keep the memory unallocated
+	VECTOR_REMOVE = 0x0, // Remove the memory and replace the location
 };
 
 struct __Vector {
@@ -30,8 +30,7 @@ struct __Vector {
 
 	size_t increment; // Default is HACKSAW_VECTOR_INCREMENT
 
-	bool ordered;
-	bool keep;
+	vector_opts opts;
 };
 
 Vector* vector_new(size_t el_size, vector_opts opts);

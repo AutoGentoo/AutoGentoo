@@ -27,7 +27,7 @@ Package* package_new(Repository* repo, char* category, char* name) {
 	pkg->category = strdup(category);
 	pkg->repo = repo;
 	pkg->manifest = malloc(sizeof(Manifest));
-	pkg->ebuilds = vector_new(sizeof(EbuildVersion), REMOVE | UNORDERED);
+	pkg->ebuilds = vector_new(sizeof(EbuildVersion), VECTOR_REMOVE | VECTOR_UNORDERED);
 	
 	return pkg;
 }

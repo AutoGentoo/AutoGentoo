@@ -56,7 +56,7 @@ Host* host_new(Server* server, char* id, host_share_t share_level) {
 }
 
 void host_init_extras(Host* target) {
-	target->kernel = vector_new(sizeof(Kernel*), UNORDERED | REMOVE);
+	target->kernel = vector_new(sizeof(Kernel*), VECTOR_UNORDERED | VECTOR_REMOVE);
 }
 
 void host_get_path (Host* host, char** dest) {
