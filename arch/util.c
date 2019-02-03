@@ -51,7 +51,7 @@ void* aabs_read_archive(aabs_filelist_t* dest, struct archive** ar, char* file_p
 	}
 	
 	/* Use the vector api and then copy it over */
-	Vector* temp = vector_new(sizeof(aabs_file_t), REMOVE | UNORDERED);
+	Vector* temp = vector_new(sizeof(aabs_file_t), VECTOR_REMOVE | VECTOR_UNORDERED);
 	
 	/* Expecting a lot of files */
 	temp->increment = 32;

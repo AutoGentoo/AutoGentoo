@@ -205,7 +205,7 @@ void aabs_db_read(aabs_db_t* db) {
 					}
 				} else if (db_pkg_read_offsets[handler_index].type == AABS_DB_HANDLE_TYPE_DEP) {
 					/* I want it ordered in anticipation of multiple constraints on one dependency problem */
-					aabs_vec_t* vec_dest = vector_new(sizeof(aabs_depend_t*), REMOVE | ORDERED);
+					aabs_vec_t* vec_dest = vector_new(sizeof(aabs_depend_t*), VECTOR_REMOVE | VECTOR_ORDERED);
 					
 					do {
 						READ_NEXT();

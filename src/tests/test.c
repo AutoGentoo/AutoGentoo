@@ -44,6 +44,9 @@ void test_request(void** state) {
 	fwrite(request, 1, size, fp);
 	fclose(fp);
 	
+	client_request_free(req);
+	free(request);
+	
 	(void) state;
 }
 
@@ -67,17 +70,20 @@ void test_dynamic_binary(void** state) {
 	dynamic_bin_t out = dynamic_binary_add_quick(test, template_full, content);
 	assert_int_equal(out, DYNAMIC_BIN_OK);
 	
-	dynamic_binary_free(test);
+	free(dynamic_binary_free(test));
 	
 	(void)state;
 }
+
+
 
 int main(void) {
 	const struct CMUnitTest tests[] = {
 			cmocka_unit_test(test_htonl),
 			cmocka_unit_test(test_htonll),
-			//cmocka_unit_test(test_request),
+			cmocka_unit_test(test_request),
 			cmocka_unit_test(test_dynamic_binary),
+			//cmocka_unit_test()
 	};
 	
 	return cmocka_run_group_tests(tests, NULL, NULL);

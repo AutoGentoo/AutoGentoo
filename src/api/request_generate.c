@@ -8,7 +8,6 @@
 
 ClientRequest* client_request_init(request_t type) {
 	ClientRequest* out = malloc (sizeof(ClientRequest));
-	out->null_byte = 0;
 	out->request_type = type;
 	out->arguments = vector_new(sizeof(ClientRequestArgument), VECTOR_ORDERED | VECTOR_REMOVE);
 	
@@ -60,4 +59,14 @@ int client_request_generate(ClientRequest* req, size_t* size, void** out_ptr) {
 	current_add(&struct_end, sizeof(request_structure_t))
 	
 	return (int)(current - (*out_ptr));
+}
+
+void client_request_free(ClientRequest* req) {
+	for (int i = 0; i < req->arguments->n; i++) {
+		ClientRequestArgument* arg = (ClientRequestArgument*)vector_get(req->arguments, i);
+		free(arg->ptr);
+	}
+	
+	vector_free(req->arguments);
+	free(req);
 }

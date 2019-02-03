@@ -119,7 +119,7 @@ cdef class DynamicBuffer:
 	
 	def __dealloc__ (self):
 		if self.parent:
-			dynamic_binary_free(self.parent)
+			free(dynamic_binary_free(self.parent))
 	
 	cpdef void print_raw (self, align=25):
 		cdef int last_i = 1
