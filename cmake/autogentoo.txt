@@ -22,6 +22,7 @@ set(src_SOURCES
         src/server_init.c
         src/server_handle.c
         src/crypt.c
+        src/http_handle.c
         src/api/dynamic_binary.c
         src/api/request_generate.c
         src/api/request_check.c

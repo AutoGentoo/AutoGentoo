@@ -23,7 +23,7 @@ int http_check_authorization(Server* parent, HttpRequest* request, char* host_id
 		return -1;
 	
 	AccessToken tok = {user_id->value, host_id, auth_key->value, access_level};
-	return host_verify_token(parent, &tok);
+	return auth_verify_token(parent, &tok) != NULL;
 }
 
 void prv_http_free_header(SmallMap* headers) {
@@ -79,14 +79,16 @@ FILE* http_handle_path(Server* parent, HttpRequest* req, long* size) {
 		char* host_id = strtok(NULL, "/");
 		char* file = strtok(NULL, "\0");
 		
-		if (http_check_authorization(parent, req, host_id, REQUEST_ACCESS_READ) != 0) {
+		if (http_check_authorization(parent, req, host_id, TOKEN_HOST_READ) != 0) {
 			req->response = FORBIDDEN;
 			free(temp_path);
 			return NULL;
 		}
 		
 		Host* target = server_get_host(parent, host_id);
-		asprintf(&path, "%s/%s/%s/%s", parent->location, target->id, target->pkgdir, file);
+		char* pkgdir = small_map_get(target->make_conf, "PKGDIR");
+		
+		asprintf(&path, "%s/%s/%s/%s", parent->location, target->id, pkgdir, file);
 	}
 	else
 		asprintf(&path, "%s/%s", parent->location, req->path);
@@ -95,7 +97,6 @@ FILE* http_handle_path(Server* parent, HttpRequest* req, long* size) {
 	char* resolved_path = realpath(path, path_buffer);
 	free(temp_path);
 	free(path);
-	
 	
 	if (!resolved_path) {
 		req->response = NOT_FOUND;

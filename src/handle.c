@@ -1,4 +1,6 @@
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,37 +13,12 @@
 #include <autogentoo/http.h>
 #include <autogentoo/user.h>
 #include <mcheck.h>
+#include <autogentoo/api/dynamic_binary.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
 		{REQ_HEAD,            {.http_fh=HEAD}},
-		{REQ_INSTALL,         {.ag_fh=INSTALL}},
-		{REQ_EDIT,            {.ag_fh=SRV_EDIT}},
-		{REQ_MNTCHROOT,       {.ag_fh=SRV_MNTCHROOT}},
-		{REQ_GETHOSTS,        {.ag_fh=SRV_GETHOSTS}},
-		{REQ_GETHOST,         {.ag_fh=SRV_GETHOST}},
-		{REQ_GETSPEC,         {.ag_fh=SRV_GETSPEC}},
-		{REQ_GETTEMPLATES,    {.ag_fh=SRV_GETTEMPLATES}},
-		{REQ_STAGE_NEW,       {.ag_fh=SRV_STAGE_NEW}},
-		{REQ_TEMPLATE_CREATE, {.ag_fh=SRV_TEMPLATE_CREATE}}, // Alias for the previous one
-		{REQ_STAGE,           {.ag_fh=SRV_STAGE}},
-		{REQ_GETSTAGED,       {.ag_fh=SRV_GETSTAGED}},
-		{REQ_GETSTAGE,        {.ag_fh=SRV_GETSTAGE}},
-		{REQ_HANDOFF,         {.ag_fh=SRV_HANDOFF}},
-		{REQ_SAVE,            {.ag_fh=SRV_SAVE}},
-		{REQ_HOSTWRITE,       {.ag_fh=SRV_HOSTWRITE}},
-		{REQ_HOSTUPLOAD,      {.ag_fh=SRV_HOSTUPLOAD}},
-		
-		/* Binary requests */
-		{REQ_BINSERVER,       {.ag_fh=BIN_SERVER}},
-		{REQ_BINQUEUE,        {.ag_fh=BIN_QUEUE}},
-		
-		/* Worker requests */
-		{REQ_WORKERHANDOFF,   {.ag_fh=WORKER_HANDOFF}},
-		{REQ_WORKERMAKECONF,  {.ag_fh=WORKER_MAKECONF}},
-		
-		/* General */
-		{REQ_EXIT,            {.ag_fh=EXIT}}
+		{REQ_HOST_NEW,        {.ag_fh=HOST_NEW}},
 };
 
 FunctionHandler resolve_call(request_t type) {
@@ -51,45 +28,6 @@ FunctionHandler resolve_call(request_t type) {
 			return requests[i].call;
 	FunctionHandler k = {NULL};
 	return k;
-}
-
-void GET(Connection* conn, HttpRequest* req) {
-	/** HTTP/1.0 or HTTP/1.1 **/
-	if (req->version.maj != 1 && (req->version.min != 1 || req->version.min != 0))
-		req->response = BAD_REQUEST;
-	
-	long file_size;
-	FILE* fp = http_handle_path(conn->parent, req, &file_size);
-	http_send_headers(conn, req);
-	
-	if (req->response.code != HTTP_OK) {
-		if (fp)
-			fclose(fp);
-		return;
-	}
-	
-	/* Send the file */
-	ssize_t read_len;
-	ssize_t total_write = 0;
-	int chunk;
-	while ((read_len = fread(&chunk, 1, sizeof(chunk), fp)) != 0)
-		total_write += conn_write(conn, &chunk, (size_t)read_len);
-	req->response = OK;
-	
-	fclose(fp);
-}
-
-void HEAD(Connection* conn, HttpRequest* req) {
-	/** HTTP/1.0 or HTTP/1.1 **/
-	if (req->version.maj != 1 && (req->version.min != 1 || req->version.min != 0))
-		req->response = BAD_REQUEST;
-	
-	long file_size;
-	FILE* fp = http_handle_path(conn->parent, req, &file_size);
-	http_send_headers(conn, req);
-	
-	if (fp)
-		fclose(fp);
 }
 
 int prv_check_data_structs (Request* req, const int* to_check, int count) {
@@ -103,480 +41,76 @@ int prv_check_data_structs (Request* req, const int* to_check, int count) {
 	return 0;
 }
 
-int prv_pipe_to_client (int conn_fd, int* backup_conn) {
-	int out = dup(1);
-	*backup_conn = conn_fd;
-	dup2(conn_fd, 1);
+/**
+ * PROT_AUTOGENTOO
+ */
+void HOST_NEW(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_NEW});
+	AccessToken* tok = authorize (request, TOKEN_SERVER_WRITE, AUTH_TOKEN_HOST);
 	
-	return out;
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
+	
+	/* Create the host */
+	Host* target = host_new(request->parent, host_id_new());
+	target->arch = strdup(request->structures[1].host_new.arch);
+	target->hostname = strdup(request->structures[1].host_new.hostname);
+	target->profile = strdup(request->structures[1].host_new.profile);
+	
+	AccessToken creat_tok;
+	creat_tok.access_level = TOKEN_HOST_WRITE;
+	creat_tok.host_id = target->id;
+	creat_tok.user_id = request->structures[0].auth.user_id;
+	
+	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
+	if (!issued)
+		HANDLE_RETURN(NOT_FOUND);
+	
+	dynamic_binary_add(res->content, 's', issued->user_id);
+	dynamic_binary_add(res->content, 's', issued->host_id);
+	dynamic_binary_add(res->content, 's', issued->auth_token);
+	dynamic_binary_add(res->content, 'i', &issued->access_level);
 }
 
-void prv_pipe_back (int* conn_fd, int backup, int backup_conn) {
-	close(1);
-	dup2(backup, 1);
-	*conn_fd = backup_conn;
-}
-
-char prv_conn_read_str (char** dest, char* request, int* offset, size_t size) {
-	if (*offset >= size)
-		return 1;
+void HOST_EDIT(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_HOST_EDIT});
+	AccessToken* tok = authorize (request, TOKEN_HOST_WRITE, AUTH_TOKEN_HOST);
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
 	
-	*dest = request + *offset;
-	*offset += strlen(*dest) + 1;
-	return 0;
-}
-
-char prv_conn_read_int (int* dest, char* request, int* offset, size_t size) {
-	if (*offset >= size)
-		return 1;
+	Host* host = server_get_host(request->parent, request->structures[1].host_select.hostname);
+	if (!host)
+		HANDLE_RETURN(NOT_FOUND);
 	
-	memcpy(dest, request + *offset, sizeof(int));
-	*offset += sizeof(int);
-	*dest = ntohl((uint32_t) *dest);
-	return 0;
-}
-
-response_t INSTALL (Request* request) {
-	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_AUTHORIZE, STRCT_HOSTINSTALL});
-	HOST_AUTHORIZE(REQUEST_ACCESS_WRITE);
+	struct __struct_Host_edit host_edit = request->structures[2].host_edit;
 	
-	if (resolved_host->chroot_status == CHR_NOT_MOUNTED)
-		return CHROOT_NOT_MOUNTED;
-	
-	int backup_conn, backup_stdout;
-	backup_stdout = prv_pipe_to_client(request->conn->fd, &backup_conn);
-	response_t res = host_install(resolved_host, request->structures[2].hi.argument);
-	prv_pipe_back(&request->conn->fd, backup_stdout, backup_conn);
-	
-	return res;
-}
-
-response_t SRV_CREATE (Connection* conn, char** args, int start) {
-	return METHOD_NOT_ALLOWED;
-}
-
-response_t SRV_EDIT (Request* request) {
-	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_AUTHORIZE, STRCT_HOSTEDIT});
-	HOST_AUTHORIZE(REQUEST_ACCESS_WRITE);
-	
-	int field_one = request->structures[2].he.selection_one;
-	int field_two = request->structures[2].he.selection_two;
-	
-	if (field_one == 4) {
-		if (field_two >= resolved_host->extra->n)
-			string_vector_add(resolved_host->extra, request->structures[2].he.edit);
-		else {
-			void** t_ptr = vector_get(resolved_host->extra, field_two);
-			free(*t_ptr);
-			
-			if (strlen(request->structures[1].he.edit) == 0)
-				vector_remove(resolved_host->extra, field_two);
-			else
-				*t_ptr = strdup(request->structures[1].he.edit);
+	if (host_edit.request_type == 1) {
+		free(small_map_delete(host->make_conf, host_edit.make_conf_var));
+		small_map_insert(host->make_conf, host_edit.make_conf_var, strdup(host_edit.make_conf_val));
+	}
+	else if (host_edit.request_type == 2) {
+		if (strcmp(host_edit.make_conf_var, "profile") == 0) {
+			if (host->profile)
+				free(host->profile);
+			host->profile = strdup(host_edit.make_conf_val);
 		}
-	} else {
-		if (field_one == 0) {
-			free(resolved_host->hostname);
-			resolved_host->hostname = strdup(request->structures[2].he.edit);
-		} else if (field_one == 1) {
-			free(resolved_host->profile);
-			resolved_host->profile = strdup(request->structures[2].he.edit);
-		} else if (field_one == 2) {
-			free(resolved_host->cflags);
-			resolved_host->cflags = strdup(request->structures[2].he.edit);
-		} else if (field_one == 3) {
-			free(resolved_host->use);
-			resolved_host->use = strdup(request->structures[2].he.edit);
-		} else
-			return BAD_REQUEST;
-	}
-	
-	return OK;
-}
-
-/* SRV Utility request */
-
-response_t SRV_MNTCHROOT (Request* request) {
-	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_AUTHORIZE});
-	HOST_AUTHORIZE(REQUEST_ACCESS_WRITE);
-	
-	return chroot_mount(resolved_host);
-}
-
-void prv_fd_write_str (Connection* conn, char* str) {
-	if (str == NULL)
-		return;
-	conn_write(conn, str, strlen(str));
-	conn_write(conn, "\n", 1);
-}
-
-/* SRV Metadata requests */
-response_t SRV_GETHOST (Request* request) {
-	CHECK_STRUCTURES ({STRCT_HOSTSELECT, STRCT_AUTHORIZE});
-	HOST_AUTHORIZE(REQUEST_ACCESS_NONE);
-	
-	
-	if (resolved_host->extra != NULL) {
-		char t[8];
-		sprintf(t, "%d", (int) resolved_host->extra->n);
-		prv_fd_write_str(request->conn, t);
-	}
-	
-	prv_fd_write_str(request->conn, resolved_host->cflags);
-	prv_fd_write_str(request->conn, resolved_host->cxxflags);
-	prv_fd_write_str(request->conn, resolved_host->chost);
-	prv_fd_write_str(request->conn, resolved_host->use);
-	prv_fd_write_str(request->conn, resolved_host->hostname);
-	prv_fd_write_str(request->conn, resolved_host->profile);
-	
-	if (resolved_host->extra != NULL)
-		for (int i = 0; i != resolved_host->extra->n; i++) {
-			char* current_str = string_vector_get(resolved_host->extra, i);
-			conn_write(request->conn, current_str, strlen(current_str));
-			conn_write(request->conn, "\n", 1);
+		else if (strcmp(host_edit.make_conf_var, "hostname") == 0) {
+			if (host->hostname)
+				free(host->hostname);
+			host->hostname = strdup(host_edit.make_conf_val);
 		}
-	
-	return OK;
-}
-
-response_t SRV_GETHOSTS (Request* request) {
-	char t[8];
-	sprintf(t, "%d\n", (int) request->conn->parent->hosts->n);
-	conn_write(request->conn, t, strlen(t));
-	
-	int i;
-	for (i = 0; i != request->conn->parent->hosts->n; i++) {
-		char* temp = (*(Host**) vector_get(request->conn->parent->hosts, i))->id;
-		conn_write(request->conn, temp, strlen(temp));
-		conn_write(request->conn, "\n", 1);
-	}
-	
-	return OK;
-}
-
-response_t SRV_GETSPEC (Request* request) {
-	system("lscpu > build.spec");
-	FILE* lspcu_fp = fopen("build.spec", "r");
-	int symbol;
-	if (lspcu_fp != NULL) {
-		while ((symbol = getc (lspcu_fp)) != EOF)
-			conn_write(request->conn, &symbol, sizeof(char));
-		fclose(lspcu_fp);
-	}
-	remove("build.spec");
-	
-	return OK;
-}
-
-response_t SRV_GETTEMPLATES (Request* request) {
-	char __n[16];
-	sprintf(__n, "%d", (int) request->conn->parent->templates->n);
-	conn_write(request->conn, &__n, strlen(__n));
-	
-	int i;
-	for (i = 0; i != request->conn->parent->templates->n; i++) {
-		conn_write(request->conn, "\n", 1);
-		
-		char* b = (*(HostTemplate**) vector_get(request->conn->parent->templates, i))->id;
-		conn_write(request->conn, b, strlen(b));
-	}
-	conn_write(request->conn, "\n", 1);
-	return OK;
-}
-
-response_t SRV_TEMPLATE_CREATE (Request* request) {
-	CHECK_STRUCTURES({STRCT_TEMPLATECREATE});
-	
-	HostTemplate in_data;
-	in_data.arch = request->structures[0].tc.arch;
-	in_data.cflags = request->structures[0].tc.cflags;
-	in_data.chost = request->structures[0].tc.chost;
-	in_data.extra_c = request->structures[0].tc.make_extra_c;
-	
-	for (int i = 0; i < in_data.extra_c; i++) {
-		in_data.extras[i].select = (template_selects)request->structures[0].tc.extras[i].select;
-		in_data.extras[i].make_extra = request->structures[0].tc.extras[i].make_extra;
-	}
-	
-	
-	host_template_add(request->conn->parent, &in_data);
-	
-	return OK;
-}
-
-response_t SRV_STAGE_NEW (Request* request) {
-	/* We need to bind template using
-	 * its index instead of ID
-	 * ID in this case is a name not
-	 * random generated str
-	 */
-	
-	CHECK_STRUCTURES({STRCT_TEMPLATESELECT});
-	
-	HostTemplate* t = stage_new(request->conn->parent, request->structures[0].ss.index);
-	
-	small_map_insert(t->parent->stages, t->new_id, t);
-	
-	conn_write(request->conn, t->new_id, strlen(t->new_id));
-	conn_write(request->conn, "\n", 1);
-	return OK;
-}
-
-response_t SRV_STAGE (Request* request) {
-	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_STAGECOMMAND}); // Host_id is actually a stage
-	
-	HostTemplate* t = small_map_get(request->conn->parent->stages,
-			request->structures[0].hs.host_id);
-	if (t == NULL)
-		return NOT_FOUND;
-	
-	int backup_conn, backup_stdout;
-	backup_stdout = prv_pipe_to_client(request->conn->fd, &backup_conn);
-	
-	
-	response_t res = OK;
-	int command = request->structures[1].sc.command;
-	
-	char* fname = NULL;
-	if (command & STAGE_DOWNLOAD) {
-		fname = host_template_download(t);
-		if (fname == NULL)
-			res = INTERNAL_ERROR;
-	}
-	if (command & STAGE_EXTRACT) {
-		if (fname == NULL)
-			fname = host_template_download(t);
-		res = host_template_extract(t, fname);
-	}
-	
-	fflush(stdout);
-	prv_pipe_back(&request->conn->fd, backup_stdout, backup_conn);
-	return res;
-}
-
-response_t SRV_GETSTAGED (Request* request) {
-	char __n[16];
-	sprintf(__n, "%d", (int) request->conn->parent->stages->n);
-	conn_write(request->conn, &__n, strlen(__n));
-	conn_write(request->conn, "\n", 1);
-	
-	int i;
-	for (i = 0; i != request->conn->parent->stages->n; i++) {
-		HostTemplate* __t = (*(HostTemplate***) vector_get(request->conn->parent->stages, i))[1];
-		
-		conn_write(request->conn, __t->new_id, strlen(__t->new_id));
-		conn_write(request->conn, "\n", 1);
-	}
-	
-	return OK;
-}
-
-response_t SRV_GETSTAGE (Request* request) {
-	CHECK_STRUCTURES({STRCT_TEMPLATESELECT})
-	
-	HostTemplate* __t = small_map_get_index(request->conn->parent->stages, request->structures[0].ss.index);
-	
-	if (__t == NULL)
-		return NOT_FOUND;
-	
-	char* buf;
-	asprintf(&buf, "%s\n%s\n%s\n%s\n%d\n",
-			 __t->new_id,
-			 __t->id,
-			 __t->cflags,
-			 __t->chost,
-			 __t->extra_c
-	);
-	
-	conn_write(request->conn, buf, strlen(buf));
-	free(buf);
-	
-	int j;
-	for (j = 0; j != __t->extra_c; j++) {
-		asprintf(&buf, "%s %d\n", __t->extras[j].make_extra, __t->extras[j].select);
-		conn_write(request->conn, buf, strlen(buf));
-		free(buf);
-	}
-	
-	return OK;
-}
-
-response_t SRV_HANDOFF (Request* request) {
-	CHECK_STRUCTURES({STRCT_HOSTSELECT})
-	printf ("%s\n", request->structures[0].hs.host_id);
-	fflush(stdout);
-	HostTemplate* __t = small_map_get(request->conn->parent->stages, request->structures[0].hs.host_id);
-	if (__t == NULL)
-		return NOT_FOUND;
-	
-	Host* new_host = host_template_handoff(__t);
-	if (!new_host)
-		return INTERNAL_ERROR;
-	
-	vector_add(request->conn->parent->hosts, &new_host);
-	write_server(request->conn->parent);
-	
-	return OK;
-}
-
-response_t SRV_SAVE (Request* request) {
-	write_server(request->conn->parent);
-	return OK;
-}
-
-response_t EXIT (Request* request) {
-	request->conn->parent->keep_alive = 0;
-	return OK;
-}
-
-response_t BIN_SERVER (Request* request) {
-	FILE* fp = fdopen(request->conn->fd, "wb");
-	write_server_fp(request->conn->parent, fp);
-	fflush(fp);
-	
-	response_t res = OK;
-	res.len = 0;
-	return res;
-}
-
-response_t SRV_HOSTWRITE (Request* request) {
-	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_AUTHORIZE});
-	HOST_AUTHORIZE(REQUEST_ACCESS_WRITE);
-	
-	host_write_make_conf(resolved_host);
-	
-	char* profile_dest;
-	char* profile_src;
-	struct stat __sym_buff;
-	
-	asprintf(&profile_src, "/usr/portage/profiles/%s/", resolved_host->profile);
-	asprintf(&profile_dest, "%s/%s/etc/portage/make.profile", request->conn->parent->location, resolved_host->id);
-	
-	if (lstat(profile_dest, &__sym_buff) == 0) {
-		unlink(profile_dest);
-	}
-	
-	linfo("ls to %s", profile_src);
-	if (symlink(profile_src, profile_dest) != 0) {
-		free(profile_dest);
-		free(profile_src);
-		lwarning("Failed to symlink %s!", profile_dest);
-		return INTERNAL_ERROR;
-	}
-	
-	free(profile_dest);
-	free(profile_src);
-	
-	char* new_dirs[] = {
-			resolved_host->pkgdir,
-			resolved_host->port_logdir,
-			resolved_host->portage_tmpdir,
-			"usr/portage/",
-			NULL
-	};
-	
-	
-	char* curr;
-	for (curr = new_dirs[0]; curr != NULL; curr++) {
-		char* autogentoo_tmp;
-		asprintf(&autogentoo_tmp, "%s/%s/%s", request->conn->parent->location, resolved_host->id, curr);
-		mkdir(autogentoo_tmp, 0700);
-		free(autogentoo_tmp);
-	}
-	
-	char* autogentoo_tmp;
-	asprintf(&autogentoo_tmp, "%s/%s/etc/resolv.conf", request->conn->parent->location, resolved_host->id);
-	file_copy("/etc/resolv.conf", autogentoo_tmp);
-	free(autogentoo_tmp);
-	
-	return OK;
-}
-
-response_t SRV_HOSTADVEDIT (Request* request) {
-	return METHOD_NOT_ALLOWED;
-	if (request->struct_c < 2
-				|| request->types[0] != STRCT_HOSTSELECT
-				|| request->types[1] != STRCT_AUTHORIZE)
-		return BAD_REQUEST;
-	
-	HOST_AUTHORIZE(REQUEST_ACCESS_WRITE);
-	
-	for (int i = 2; i < request->struct_c; i++) {
-		if (request->structures[i].ho.offset_index >= HOSTOFF_END || request->types[i] != STRCT_HOSTOFFSET)
-			return BAD_REQUEST;
-		
-		host_offset_t offset_item = host_valid_offset[request->structures[i].ho.offset_index];
-		if (offset_item.type == VOIDTYPE_STRING)
-			*(char**)(resolved_host + offset_item.offset) = strdup (request->structures[i].ho.data);
-		else if (offset_item.type == VOIDTYPE_INT)
-			*(int*)(resolved_host + offset_item.offset) = *(int*)(request->structures[i].ho.data);
-		else if (offset_item.type == VOIDTYPE_STRINGVECTOR) {
-			size_t off = 0;
-			int j = 0;
-			for (char* temp = strdup (request->structures[i].ho.data);
-				 strlen(temp);
-				 temp = strdup (request->structures[i].ho.data + off), j++)
-				string_vector_set((StringVector*)(resolved_host + offset_item.offset), temp, j);
+		else if (strcmp(host_edit.make_conf_var, "arch") == 0) {
+			if (host->arch)
+				free(host->arch);
+			host->arch = strdup(host_edit.make_conf_val);
 		}
+		else
+			HANDLE_RETURN(BAD_REQUEST);
 	}
-	
-	return OK;
 }
 
-response_t SRV_HOSTUPLOAD(Request* request) {
-	return METHOD_NOT_ALLOWED;
-	CHECK_STRUCTURES ({STRCT_HOSTSELECT, STRCT_AUTHORIZE, STRCT_RAW});
-	HOST_AUTHORIZE(REQUEST_ACCESS_WRITE);
-	
-	FILE* f = fmemopen (request->structures[1].raw.data, request->structures[1].raw.n, "r");
-	
-	Server* srv = request->conn->parent;
-	Host* target = read_host(f);
-	target->parent = srv;
-	
-	Host** out_pos = NULL;
-	
-	int i;
-	for (i = 0; i < srv->hosts->n; i++) {
-		Host** t = (Host**)vector_get (srv->hosts, i);
-		if (strcmp ((*t)->id, request->structures[0].hs.host_id) == 0) {
-			out_pos = t;
-			break;
-		}
-	}
-	
-	if (out_pos == NULL)
-		vector_add (request->conn->parent->hosts, &target);
-	else {
-		host_free (*out_pos);
-		*out_pos = target;
-	}
-	
-	fclose (f);
-	return OK;
-}
+void HOST_DEL(Response* res, Request* request);
+void HOST_EMERGE(Response* res, Request* request);
 
-response_t BIN_QUEUE(Request* request) {
-	queue_write(request->conn->parent->queue->head, request->conn->fd);
-	queue_free(request->conn->parent->queue->head);
-	
-	response_t res = OK;
-	res.len = 0;
-	return res;
-}
-
-response_t WORKER_HANDOFF(Request* request) {
-	CHECK_STRUCTURES({STRCT_HOSTSELECT, STRCT_WORKERRESPONSE});
-	
-	if (request->structures[1].wr.response != 0)
-		return OK;
-	
-	HostTemplate* src = small_map_delete(request->conn->parent->stages, request->structures[0].hs.host_id);
-	host_template_free(src);
-	
-	return OK;
-}
-
-response_t WORKER_MAKECONF(Request* request) {
-	return OK;
-}
+void SRV_MNTCHROOT(Response* res, Request* request);
+void SRV_INFO(Response* res, Request* request);

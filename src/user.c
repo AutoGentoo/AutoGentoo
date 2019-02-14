@@ -5,6 +5,7 @@
 #include <autogentoo/user.h>
 #include <string.h>
 #include <fcntl.h>
+#include <autogentoo/request.h>
 
 void prv_random_string(char* out, size_t len) {
 	int random_fd = open ("/dev/random", O_RDONLY);
@@ -12,26 +13,29 @@ void prv_random_string(char* out, size_t len) {
 	close(random_fd);
 }
 
-int server_create_user(Server* server,
-                       char* id,
-                       char* hash,
-                       char* auth_token,
-                       access_t user_level) {
+AccessToken* authorize(Request* request, token_access_t access_level, auth_t type) {
+	AccessToken req_tok;
+	req_tok.user_id = request->structures[0].auth.user_id;
+	req_tok.auth_token = request->structures[0].auth.token;
+	req_tok.access_level = access_level;
+	
+	if (type == AUTH_TOKEN_HOST)
+		req_tok.host_id = request->structures[1].host_select.hostname;
+	else
+		req_tok.host_id = NULL;
+	
+	return auth_verify_token(request->parent, &req_tok);
+}
+
+User* server_user_new(Server* server, char* id) {
 	if (map_get(server->users, id) != NULL) {
 		lderror ("User: %s already exists!", id);
-		return 1;
-	}
-	if (!auth_token && user_level > ACCESS_USER) {
-		lderror("auth token is required to create sys_admin");
-		return 2;
+		return NULL;
 	}
 	
 	User* new_user = malloc (sizeof (User));
 	
 	new_user->id = strdup(id);
-	new_user->hash = strdup(id);
-	//new_user->salt = strdup(AUTOGENTOO_USER_AUTH_ENCRYPT);
-	
 	new_user->tokens = vector_new(sizeof(AccessToken*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	map_insert(server->users, new_user->id, new_user);
 	
@@ -48,67 +52,88 @@ AccessToken* prv_user_get_token(User* user, char* auth_token) {
 	return NULL;
 }
 
-#define HOST_VERIFY_STMT(stmt, ...) \
-if (stmt) { \
-	lderror(__VA_ARGS__); \
-	return error_no; \
-} \
-error_no++;
-
-int host_verify_token(Server* server, AccessToken* request_token) {
-	int error_no = 1;
-	if (!request_token->user_id) {
-		Host* target = server_get_host(server, request_token->host_id);
-		HOST_VERIFY_STMT(request_token->access_level != REQUEST_ACCESS_NONE, "requested access too high");
-		HOST_VERIFY_STMT(target->private, "host is not public");
-	}
-	
-	
-	User* target_user = map_get(server->users, request_token->user_id);
-	HOST_VERIFY_STMT(!target_user, "user '%s' not found", request_token->user_id);
-	HOST_VERIFY_STMT(strlen(request_token->auth_token) != AUTOGENTOO_TOKEN_LENGTH, "len(token) error");
-	
-	AccessToken* resolved_token = prv_user_get_token(target_user, request_token->auth_token);
-	HOST_VERIFY_STMT (resolved_token == NULL, "invalid token");
-	HOST_VERIFY_STMT(strncmp(resolved_token->host_id,
-					request_token->host_id,
-					AUTOGETNOO_HOST_ID_LENGTH) == 0, "host_id incorrect");
-	HOST_VERIFY_STMT(request_token->access_level > resolved_token->access_level, "insufficient permissions");
-	
-	return 0;
+User* server_get_user(Server* server, char* user_id) {
+	return map_get(server->users, user_id);
 }
 
-char* prv_gen_random(size_t len);
+AccessToken* auth_verify_token(Server* server, AccessToken* request_token) {
+	User* user = server_get_user(server, request_token->user_id);
+	/* User not found */
+	if (!user)
+		return NULL;
+	
+	AccessToken* found_token = prv_user_get_token(user, request_token->auth_token);
+	if (!found_token)
+		return NULL;
+	
+	if ((request_token->access_level & found_token->access_level) != found_token->access_level)
+		return NULL;
+	
+	if (found_token->host_id)
+		if (strcmp(found_token->host_id, request_token->host_id) != 0)
+			return NULL;
+	
+	return found_token;
+}
 
-int user_generate_token(User* user,
-                        char* host_id,
-                        token_access_t access_level,
-                        AccessToken* creation_token) {
-	int token_used = 0;
+AccessToken* auth_issue_token(Server* server, AccessToken* creation_token) {
+	User* user = server_get_user(server, creation_token->user_id);
+	if (!user)
+		return NULL;
 	
-	if (strncmp(creation_token->host_id, host_id, AUTOGETNOO_HOST_ID_LENGTH) != 0) {
-		lderror("creation_token has incorrect host_id");
-		return 1;
-	}
+	AccessToken* out = malloc(sizeof(AccessToken));
+	out->host_id = strdup(creation_token->host_id);
+	out->user_id = strdup(creation_token->user_id);
+	out->auth_token = malloc (AUTOGENTOO_TOKEN_LENGTH + 1);
 	
-	if (creation_token->access_level != REQUEST_ACCESS_SUPER) {
-		lderror("creation_token access level not high enough");
-		return 2;
-	}
-	
+	int token_used;
 	do {
 		token_used = 0;
-		creation_token->auth_token = prv_gen_random(AUTOGENTOO_TOKEN_LENGTH);
+		 prv_random_string(out->auth_token, AUTOGENTOO_TOKEN_LENGTH);
 		for (int i = 0; i < user->tokens->n; i++)
 			if (strncmp((*(AccessToken**)vector_get(user->tokens, i))->auth_token,
-					creation_token->auth_token,
-					AUTOGENTOO_TOKEN_LENGTH) == 0) {
+			            out->auth_token,
+			            AUTOGENTOO_TOKEN_LENGTH) == 0) {
 				token_used = 1;
-				free(creation_token->auth_token);
 				break;
 			}
 	} while(token_used);
 	
-	vector_add(user->tokens, &creation_token);
-	return 0;
+	out->auth_token[AUTOGENTOO_TOKEN_LENGTH] = 0;
+	vector_add(user->tokens, &out);
+	
+	return out;
+}
+
+/**
+ * autogentoo.org registers a user
+ * Requires autogentoo_org token */
+AccessToken* auth_register_user(Server* server, AccessToken* creation_token, AccessToken* auth_token) {
+	if ((auth_token->access_level & server->autogentoo_org_token->access_level) != server->autogentoo_org_token->access_level)
+		return NULL;
+	
+	User* new_user = server_user_new(server, creation_token->user_id);
+	if (!new_user) {
+		lwarning("User '%s' already exists", creation_token->user_id);
+		return NULL;
+	}
+	
+	creation_token->access_level = TOKEN_SERVER_READ;
+	return auth_issue_token(server, creation_token);
+}
+
+void token_free(AccessToken* tok) {
+	free(tok->auth_token);
+	free(tok->user_id);
+	free(tok->host_id);
+	free(tok);
+}
+
+void user_free(User* user) {
+	free(user->id);
+	for (int i = 0; i < user->tokens->n; i++)
+		token_free(*(AccessToken**)vector_get(user->tokens, i));
+	
+	vector_free(user->tokens);
+	free(user);
 }

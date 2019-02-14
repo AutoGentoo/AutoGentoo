@@ -1,6 +1,9 @@
 import threading
 from collections import namedtuple
-import os, socket
+import os
+import socket
+import struct
+
 
 ConnectionTup = namedtuple('ConnectionTup', ['sock_fd', 'client_addr'])
 JobTup = namedtuple('JobTup', ['id', 'script', 'args', 'next', 'res'])
@@ -15,10 +18,12 @@ def get_string_bin(self, binary, start):
 	for x in binary:
 		pass
 
+
 type_defines = {
-	'i': lambda i, x: return struct.unpack("!i", x[i:i+4])
-	's': lambda i, x: return 
+	'i': lambda i, x: struct.unpack("!i", x[i:i+4])
+	# 's': lambda i, x: return
 }
+
 
 def struct_read (format_str, array):
 	out = []
@@ -26,6 +31,7 @@ def struct_read (format_str, array):
 	for c in format_str:
 		if c == 'i':
 			out.append(struct.unpack())
+
 
 class RequestQueue:
 	def __init__(self):
@@ -42,8 +48,7 @@ class RequestQueue:
 		while data:
 			data_array.append(data)
 			data = conn.sock_fd.recv(16)
-		
-
+	
 	def add_request(self, req: JobTup):
 		self.queue_mutex.acquire()
 		if self.head is None:

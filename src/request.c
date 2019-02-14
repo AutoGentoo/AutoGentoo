@@ -37,6 +37,7 @@ AUTOGENTOO_REQUEST_HANDLE_ERROR}
 Request* request_handle (Connection* conn) {
 	Request* out = malloc (sizeof (Request));
 	
+	out->parent = conn->parent;
 	out->conn = conn;
 	out->structures = NULL;
 	out->structures_parent = NULL;
@@ -93,19 +94,19 @@ Request* request_handle (Connection* conn) {
 	return out;
 }
 
-response_t request_call (Request* req) {
+void request_call(Response* res, Request* req) {
 	if (req->protocol == PROT_AUTOGENTOO) {
 		req->resolved_call = resolve_call(req->request_type);
 		if (req->resolved_call.ag_fh == NULL)
-			return NOT_IMPLEMENTED;
-		return (*req->resolved_call.ag_fh) (req);
+			HANDLE_RETURN(NOT_IMPLEMENTED);
+		return (*req->resolved_call.ag_fh) (res, req);
 	}
 	
 	HttpRequest* http_req = ag_http_parse(req->body);
 	
 	if (http_req == NULL) {
 		http_send_default(req->conn, BAD_REQUEST);
-		return BAD_REQUEST;
+		HANDLE_RETURN(BAD_REQUEST);
 	}
 	
 	http_req->response_headers = small_map_new(5, 5);
@@ -119,13 +120,12 @@ response_t request_call (Request* req) {
 	if (req->resolved_call.http_fh == NULL) {
 		http_send_default(req->conn, NOT_IMPLEMENTED);
 		http_free_request(http_req);
-		return NOT_IMPLEMENTED;
+		HANDLE_RETURN(NOT_IMPLEMENTED);
 	}
 	
 	(*req->resolved_call.http_fh)(req->conn, http_req);
-	response_t res = http_req->response;
+	res->code = http_req->response;
 	http_free_request(http_req);
-	return res;
 }
 
 void request_free (Request* req) {

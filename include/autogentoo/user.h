@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <openssl/evp.h>
 #include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/request_structure.h>
 
 #define AUTOGENTOO_TOKEN_LENGTH 32
 #define AUTOGENTOO_HASH_LENGTH 128
@@ -17,26 +18,24 @@ typedef struct __AuthToken AuthToken;
 typedef struct __AccessToken AccessToken;
 
 typedef enum {
-	ACCESS_NONE, //!< Can fetch packaged from public hosts
-	ACCESS_USER, //!< Can request emerge from authorized hosts, can create new hosts and edit them
-	ACCESS_SYSTEM_ADMIN /** Unrestricted access
-						 * Only this user may create and delete users
-						 */
-} access_t;
+	TOKEN_HOST_NONE, //!< For private hosts
+	TOKEN_HOST_READ = 1,
+	TOKEN_HOST_EMERGE = TOKEN_HOST_READ | 1 << 1, //!< Can't change host settings
+	TOKEN_HOST_WRITE = TOKEN_HOST_EMERGE | 1 << 2,
+	TOKEN_SERVER_READ = 1 << 3,
+	TOKEN_SERVER_WRITE = TOKEN_SERVER_READ | 1 << 4, //!< Create hosts
+	TOKEN_SERVER_SUPER = 0xFF, //!< All permissions
+	TOKEN_SERVER_AUTOGENTOO_ORG = 1 << 5 //!< Register users from server (no read/write)
+} token_access_t;
 
 typedef enum {
-	REQUEST_ACCESS_NONE, //!< WHAT ?
-	REQUEST_ACCESS_READ, //!< Read only requests
-	REQUEST_ACCESS_EMERGE, //!< Read and emerge
-	REQUEST_ACCESS_WRITE, //!< Read, emerge, and write requests
-	REQUEST_ACCESS_SUPER, //!< All under and create/delete tokens
-} token_access_t;
+	AUTH_TOKEN_NONE,
+	AUTH_TOKEN_SERVER,
+	AUTH_TOKEN_HOST
+} auth_t;
 
 struct __User {
 	char* id;
-	char* hash;
-	char* salt;
-	access_t access_level;
 	Vector* tokens;
 };
 
@@ -48,33 +47,22 @@ struct __AccessToken { // Serverside auth
 };
 
 #include "host.h"
+#include <autogentoo/request.h>
 
-#define HOST_AUTHORIZE(___access_level) \
-Host* resolved_host = server_get_host(request->conn->parent, request->structures[0].hs.host_id); \
-if (!resolved_host) \
-	return NOT_FOUND; \
-{\
-AccessToken hash; \
-hash.access_level = (___access_level);\
-hash.user_id = request->structures[1].auth.user_id; \
-hash.host_id = request->structures[0].hs.host_id; \
-hash.auth_token = request->structures[1].auth.token; \
-if (host_verify_token(request->conn->parent, &hash) != 0) \
-	return FORBIDDEN;} \
-
-int server_create_user(Server* server,
-                       char* id,
-                       char* hash,
-                       char* auth_token,
-                       access_t user_level);
+AccessToken* authorize(Request* request, token_access_t access_level, auth_t type);
 
 User* server_get_user(Server* server, char* user_id);
 
-int host_verify_token(Server* server, AccessToken* request_token);
+AccessToken* auth_verify_token(Server* server, AccessToken* request_token);
 
-int user_generate_token(User* user,
-                        char* host_id,
-                        token_access_t access_level,
-                        AccessToken* creation_token);
+AccessToken* auth_issue_token(Server* server, AccessToken* creation_token);
+
+/**
+ * autogentoo.org registers a user
+ * Requires autogentoo_org token */
+AccessToken* auth_register_user(Server* server, AccessToken* creation_token, AccessToken* auth_token);
+
+void token_free(AccessToken* tok);
+void user_free(User* user);
 
 #endif //AUTOGENTOO_USER_H

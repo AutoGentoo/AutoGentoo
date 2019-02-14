@@ -26,17 +26,15 @@ void test_htonll(void** state) {
 }
 
 void test_request(void** state) {
-	ClientRequest* req = client_request_init(REQ_INSTALL);
+	ClientRequest* req = client_request_init(REQ_HOST_NEW);
 	
-	DynamicType host_select[] = {"HOST_ID"};
 	DynamicType authorize[] = {"USER_ID", "TOKEN"};
-	DynamicType install[] = {"EMERGE_STR"};
+	DynamicType host_new[] = {"ARCH", "PROFILE", "HOSTNAME"};
 	
-	client_request_add_structure(req, STRCT_HOSTSELECT, host_select);
 	client_request_add_structure(req, STRCT_AUTHORIZE, authorize);
-	client_request_add_structure(req, STRCT_HOSTINSTALL, install);
+	client_request_add_structure(req, STRCT_HOST_NEW, host_new);
 	
-	size_t size;
+	size_t size = 0;
 	void* request;
 	int size_check = client_request_generate(req, &size, &request);
 	assert_int_equal(size, size_check);

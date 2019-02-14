@@ -114,19 +114,22 @@ void server_respond(Connection* conn, int worker_index) {
 	Request* request = request_handle(conn);
 	
 	/* Run the request */
-	response_t res;
+	Response res;
+	res.code = OK;
 	if (request == NULL) {
 		http_send_default(conn, BAD_REQUEST);
-		res = BAD_REQUEST;
+		res.code = BAD_REQUEST;
 	}
 	else {
-		res = request_call(request);
+		request_call(&res, request);
 		/* Send the response */
-		if (res.len > 0 && request->protocol == PROT_AUTOGENTOO)
-			rsend(conn, res);
+		if (request->protocol == PROT_AUTOGENTOO) {
+			conn_write(conn, res.content->template, res.content->template_used_size + 1);
+			conn_write(conn, res.content->ptr, res.content->used_size);
+		}
 	}
 	
-	ldinfo("%s -- %s (%d) <==== %d", conn->ip, res.message, (int)res.code, worker_index);
+	ldinfo("%s -- %s (%d) <==== %d", conn->ip, res.code.message, (int)res.code.code, worker_index);
 	Server* parent = conn->parent;
 	
 	if (request && request->directive == DIR_CONNECTION_OPEN) {

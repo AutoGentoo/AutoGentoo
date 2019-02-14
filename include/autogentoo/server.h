@@ -71,6 +71,7 @@ typedef enum {
 
 #include "thread.h"
 #include "queue.h"
+#include "user.h"
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -97,8 +98,11 @@ struct __Server {
 	pthread_t pthread;
 	int socket;
 	
-	/** Secure server **/
+	/* Secure server */
 	EncryptServer* rsa_child;
+	
+	/* Authentication */
+	AccessToken* autogentoo_org_token;
 };
 
 #ifndef connection_read

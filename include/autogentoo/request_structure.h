@@ -9,76 +9,38 @@
 
 typedef union __RequestData RequestData;
 
-struct __HostEdit {
-	int selection_one;
-	int selection_two; //!< -1 for none, >= 0 for vector access at offset_1
-	
-	char* edit;
-} __attribute__((packed));
-
-
-struct __TemplateCreate {
-	char* id;
+struct __struct_Host_new {
 	char* arch;
-	char* cflags;
-	char* chost;
-	int make_extra_c;
-	struct {
-		char* make_extra;
-		int select;
-	} *extras __attribute__((packed));
-} __attribute__((packed));
+	char* profile;
+	char* hostname;
+};
 
-struct __HostSelect {
-	char* host_id;
-} __attribute__((packed));
+struct __struct_Host_edit {
+	int request_type; /* 1: make.conf, 2: general */
+	char* make_conf_var; /* Must be listed in allowed vars */
+	char* make_conf_val;
+};
 
-struct __StageSelect {
-	int index;
-} __attribute__((packed));
+struct __struct_Host_select {
+	char* hostname;
+};
 
-struct __HostInstall {
-	char* argument;
-} __attribute__((packed));
-
-struct __HostOffset {
-	size_t offset_index;
-	size_t n;
-	void* data;
-} __attribute__((packed));
-
-typedef enum {
-	STAGE_NONE = 0,
-	STAGE_DOWNLOAD = 0x1,
-	STAGE_EXTRACT = 0x2,
-	STAGE_ALL = STAGE_DOWNLOAD | STAGE_EXTRACT
-} stage_command_t;
-
-struct __StageCommand {
-	 stage_command_t command;
-} __attribute__((packed));
-
-struct __WorkerResponse {
-	 int response;
-} __attribute__((packed));
-
-struct __Authorize {
+struct __struct_Authorize {
 	char* user_id;
 	char* token;
 } __attribute__((packed));
 
+struct __struct_User {
+	char* user_id;
+} __attribute__((packed));
+
 typedef enum {
 	STRCT_END,
-	STRCT_HOSTEDIT = 1,
-	STRCT_HOSTSELECT,
-	STRCT_HOSTINSTALL,
-	STRCT_TEMPLATECREATE,
-	STRCT_TEMPLATESELECT,
-	STRCT_STAGECOMMAND,
-	STRCT_HOSTOFFSET, /* Custom offset on Host struct */
-	STRCT_WORKERRESPONSE,
-	STRCT_RAW,
+	STRCT_HOST_NEW = 1,
+	STRCT_HOST_SELECT,
+	STRCT_HOST_EDIT,
 	STRCT_AUTHORIZE,
+	STRCT_NEW_USER,
 	
 	STRCT_MAX
 } request_structure_t;
@@ -89,29 +51,19 @@ struct __Raw {
 };
 
 static char* request_structure_linkage[] = {
-		"iis",
-		"s",
-		"s",
-		"ssssa(si)",
-		"i",
-		"i",
-		"iv",
-		"i",
-		"v",
-		"ss"
+	"sss", /* Host new */
+	"s", /* Host select */
+	"iss", /* Host edit */
+	"ss", /* Host authorize */
+	"s", /* New User */
 };
 
 union __RequestData {
-	struct __HostEdit he;
-	struct __HostSelect hs;
-	struct __HostInstall hi;
-	struct __TemplateCreate tc;
-	struct __StageSelect ss;
-	struct __StageCommand sc;
-	struct __HostOffset ho;
-	struct __WorkerResponse wr;
-	struct __Raw raw;
-	struct __Authorize auth;
+	struct __struct_Host_new host_new;
+	struct __struct_Host_select host_select;
+	struct __struct_Host_edit host_edit;
+	struct __struct_Authorize auth;
+	struct __struct_User new_user;
 };
 
 int parse_request_structure (RequestData* out, char* template, void* data, void* end);

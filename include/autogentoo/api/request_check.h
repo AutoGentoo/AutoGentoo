@@ -13,7 +13,7 @@ static struct __request_check {
 	int n;
 	request_structure_t args[3];
 } request_checks[] = {
-		{REQ_INSTALL, 3, {STRCT_HOSTSELECT, STRCT_AUTHORIZE, STRCT_HOSTINSTALL}},
+/*		{REQ_INSTALL, 3, {STRCT_HOSTSELECT, STRCT_AUTHORIZE, STRCT_HOSTINSTALL}},
 		{REQ_EDIT, 3, {STRCT_HOSTSELECT, STRCT_AUTHORIZE, STRCT_HOSTEDIT}},
 		{REQ_MNTCHROOT, 2, {STRCT_HOSTSELECT, STRCT_AUTHORIZE}},
 		{REQ_GETHOST, 2, {STRCT_HOSTSELECT, STRCT_AUTHORIZE}},
@@ -23,10 +23,12 @@ static struct __request_check {
 		{REQ_GETSTAGE, 1, {STRCT_TEMPLATESELECT}},
 		{REQ_HANDOFF, 1, {STRCT_HOSTSELECT}},
 		{REQ_HOSTWRITE, 2, {STRCT_HOSTSELECT, STRCT_AUTHORIZE}},
-		{REQ_WORKERHANDOFF, 2, {STRCT_HOSTSELECT, STRCT_WORKERRESPONSE}}
+		{REQ_WORKERHANDOFF, 2, {STRCT_HOSTSELECT, STRCT_WORKERRESPONSE}} */
+		
+		{REQ_HOST_NEW, 2, {STRCT_AUTHORIZE, STRCT_HOST_NEW}}
 };
 
-static struct __request_check request_check_not_found = {-1, 0, {}};
+static struct __request_check request_check_not_found = {(request_t)-1, 0, {}};
 
 typedef enum {
 	REQ_CHK_OK,

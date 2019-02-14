@@ -5,6 +5,8 @@
 #ifndef AUTOGENTOO_REQUEST_H
 #define AUTOGENTOO_REQUEST_H
 
+#include <autogentoo/api/dynamic_binary.h>
+
 typedef struct __Request Request;
 
 typedef enum {
@@ -19,34 +21,16 @@ typedef enum {
 
 typedef enum {
 	REQ_GET,
-	REQ_INSTALL,
-	REQ_EDIT,
-	REQ_MNTCHROOT,
-	REQ_GETHOSTS,
-	REQ_GETHOST,
-	REQ_GETSPEC,
-	REQ_GETTEMPLATES,
-	REQ_STAGE_NEW,
-	REQ_TEMPLATE_CREATE,
-	REQ_STAGE,
-	REQ_GETSTAGED,
-	REQ_GETSTAGE,
-	REQ_HANDOFF,
-	REQ_SAVE,
-	REQ_HOSTWRITE,
-	REQ_HOSTUPLOAD,
-	
-	/* Binary requests */
-	REQ_BINSERVER,
-	REQ_BINQUEUE,
-	
-	REQ_WORKERHANDOFF,
-	REQ_WORKERMAKECONF,
-	
-	/* General */
-	REQ_EXIT,
 	REQ_HEAD,
 	REQ_POST,
+	
+	REQ_HOST_NEW,
+	REQ_HOST_EDIT,
+	REQ_HOST_DEL,
+	REQ_HOST_EMERGE,
+	
+	REQ_SRV_MNTCHROOT,
+	REQ_SRV_INFO,
 	
 	REQ_MAX
 } request_t;
@@ -62,21 +46,27 @@ typedef enum {
  * @param the index to start reading the request at
  */
 typedef void (* HTTP_FH)(Connection* conn, HttpRequest* req);
-typedef response_t (* AUTOGENTOO_FH) (Request* request);
+typedef struct __Response Response;
+typedef void (* AUTOGENTOO_FH) (Response* res, Request* request);
 
 typedef union __FunctionHandler FunctionHandler;
-
 
 union __FunctionHandler {
 	AUTOGENTOO_FH ag_fh;
 	HTTP_FH http_fh;
 };
 
+struct __Response {
+	DynamicBinary* content;
+	response_t code;
+};
+
 struct __Request {
+	Server* parent;
+	Connection* conn;
 	protocol_t protocol;
 	request_t request_type;
 	FunctionHandler resolved_call;
-	Connection* conn;
 	directive_t directive;
 	
 	void* body;
@@ -104,7 +94,7 @@ struct __RequestLink {
 };
 
 Request* request_handle (Connection* conn);
-response_t request_call (Request* req);
+void request_call(Response* res, Request* req);
 void request_free (Request* req);
 
 #endif //AUTOGENTOO_REQUEST_H

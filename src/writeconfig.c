@@ -91,24 +91,15 @@ size_t write_host_fp(Host* host, FILE* fp) {
 	
 	size += write_string(host->hostname, fp);
 	size += write_string(host->profile, fp);
-	size += write_string(host->cflags, fp);
-	size += write_string(host->cxxflags, fp);
-	size += write_string(host->use, fp);
 	size += write_string(host->arch, fp);
-	size += write_string(host->chost, fp);
 	
-	size += write_int((int)host->extra->n, fp);
+	size += write_int((int)host->make_conf->n, fp);
 	
 	int i;
-	for (i = 0; i != host->extra->n; i++) {
-		size += write_string(string_vector_get(host->extra, i), fp);
+	for (i = 0; i != host->make_conf->n; i++) {
+		size += write_string((*(SmallMap_key**)vector_get(host->make_conf, i))->key, fp);
+		size += write_string((*(SmallMap_key**)vector_get(host->make_conf, i))->data_ptr, fp);
 	}
-	
-	size += write_string(host->portage_tmpdir, fp);
-	size += write_string(host->portdir, fp);
-	size += write_string(host->distdir, fp);
-	size += write_string(host->pkgdir, fp);
-	size += write_string(host->port_logdir, fp);
 	
 	if (host->kernel) {
 		for (i = 0; i != host->kernel->n; i++) {
@@ -240,26 +231,21 @@ Host* read_host(FILE* fp) {
 	
 	out->hostname = read_string(fp);
 	out->profile = read_string(fp);
-	out->cflags = read_string(fp);
-	out->cxxflags = read_string(fp);
-	out->use = read_string(fp);
 	out->arch = read_string(fp);
-	out->chost = read_string(fp);
 	
-	out->extra = string_vector_new();
+	out->make_conf = small_map_new(20, 5);
 	int n, i;
 	n = read_int(fp);
-	for (i = 0; i != n; i++) {
-		char* temp = read_string(fp);
-		string_vector_add(out->extra, temp);
-		free(temp);
-	}
+	char* temp_name, *temp_val;
 	
-	out->portage_tmpdir = read_string(fp);
-	out->portdir = read_string(fp);
-	out->distdir = read_string(fp);
-	out->pkgdir = read_string(fp);
-	out->port_logdir = read_string(fp);
+	for (i = 0; i != n; i++) {
+		temp_name = read_string(fp);
+		temp_val = read_string(fp);
+		small_map_insert(out->make_conf, temp_name, temp_val);
+		
+		/* Dont free temp_val, we never dup it */
+		free(temp_name);
+	}
 	
 	host_init_extras(out);
 	

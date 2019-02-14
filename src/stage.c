@@ -177,10 +177,10 @@ response_t host_template_stage (HostTemplate* t) {
 }
 
 Host* host_template_handoff (HostTemplate* src) {
-	Host* out = host_new(src->parent, strdup(src->new_id), HOST_SHARE_PRIVATE);
-	out->extra = string_vector_new();
+	Host* out = host_new(src->parent, strdup(src->new_id));
+	//out->extra = string_vector_new();
 	out->hostname = strdup("default");
-	out->use = strdup(""); // Give it an empty just in case
+	//out->use = strdup(""); // Give it an empty just in case
 	
 	/*char old_stage[32];
 	sprintf(old_stage, "stage-%s", src->new_id);

@@ -31,11 +31,6 @@ typedef enum {
 	CHR_MOUNTED
 } chroot_t;
 
-typedef enum {
-	HOST_SHARE_PUBLIC,
-	HOST_SHARE_PRIVATE
-} host_share_t;
-
 /**
  * @brief Holds information about a build environment
  * 
@@ -47,11 +42,12 @@ struct __Host {
 	char* id; //!< The ID of the Host
 	char* profile; //!< Portage profile, see possible values with eselect profile list
 	char* hostname; //!< Hostname of the host (shows up in the graphical client)
+	char* arch; //!<  The portage-arch (eg. amd64)
 	chroot_t chroot_status; //!< Is the chroot ready?
 	
+	/*
 	char* cflags; //!< The gcc passed to C programs, try -march=native :)
 	char* cxxflags; //!< The gcc passed only to CXX programs
-	char* arch; //!<  The portage-arch (eg. amd64)
 	char* chost; //!< The system chost (should not be changed after it is set)
 	char* use; //!< use flags
 	StringVector* extra; //!< A list of extra entries to go into make.conf
@@ -61,57 +57,10 @@ struct __Host {
 	char* distdir; //!< distfiles
 	char* pkgdir; //!< path to binaries
 	char* port_logdir; //!< logs
-	host_share_t private;
+	*/
 	
+	SmallMap* make_conf;
 	Vector* kernel;
-};
-
-typedef enum {
-	VOIDTYPE_STRING,
-	VOIDTYPE_INT,
-	VOIDTYPE_STRINGVECTOR
-} voidtype_t;
-
-typedef enum {
-	HOSTOFF_ID,
-	HOSTOFF_PROFILE,
-	HOSTOFF_HOSTNAME,
-	HOSTOFF_CHROOT_STATUS,
-	HOSTOFF_CFLAGS,
-	HOSTOFF_CXXFLAGS,
-	HOSTOFF_ARCH,
-	HOSTOFF_CHOST,
-	HOSTOFF_USE,
-	HOSTOFF_EXTRA,
-	HOSTOFF_PORTAGE_TMPDIR,
-	HOSTOFF_PORTDIR,
-	HOSTOFF_DISTDIR,
-	HOSTOFF_PKGDIR,
-	HOSTOFF_PORT_LOGDIR,
-	HOSTOFF_END
-} hostoffsets_t;
-
-typedef struct {
-	voidtype_t type;
-	size_t offset;
-} host_offset_t;
-
-static host_offset_t host_valid_offset[] = {
-		{VOIDTYPE_STRING, offsetof(struct __Host, id)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, profile)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, hostname)},
-		{VOIDTYPE_INT, offsetof(struct __Host, chroot_status)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, cflags)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, cxxflags)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, arch)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, chost)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, use)},
-		{VOIDTYPE_STRINGVECTOR, offsetof(struct __Host, extra)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, portage_tmpdir)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, portdir)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, distdir)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, pkgdir)},
-		{VOIDTYPE_STRING, offsetof(struct __Host, port_logdir)},
 };
 
 /**
@@ -126,7 +75,7 @@ char* host_id_new();
  * @param id the ID of the Host
  * @return a pointer to the Host
  */
-Host* host_new(Server* server, char* id, host_share_t share_level);
+Host* host_new(Server* server, char* id);
 
 /**
  * Updates the current status of the host by reading its directory
