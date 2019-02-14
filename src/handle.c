@@ -19,6 +19,9 @@ RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
 		{REQ_HEAD,            {.http_fh=HEAD}},
 		{REQ_HOST_NEW,        {.ag_fh=HOST_NEW}},
+		{REQ_HOST_EDIT,       {.ag_fh=HOST_EDIT}},
+		{REQ_HOST_DEL,        {.ag_fh=HOST_DEL}},
+		{REQ_HOST_EMERGE,     {.ag_fh=HOST_EMERGE}},
 };
 
 FunctionHandler resolve_call(request_t type) {
