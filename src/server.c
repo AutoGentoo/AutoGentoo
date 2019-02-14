@@ -195,13 +195,12 @@ void server_free (Server* server) {
 	for (i = 0; i != server->hosts->n; i++)
 		host_free(*(Host**) vector_get(server->hosts, i));
 	
-	for (i = 0; i != server->stages->n; i++)
-		host_template_free((*(HostTemplate***) vector_get(server->stages, i))[1]);
-	
-	small_map_free(server->stages, 0);
 	vector_free(server->hosts);
-	free(server->port);
+	map_free(server->auth_tokens, (void (*)(void*))token_free);
+	queue_free(server->queue->head);
 	
+	free(server->port);
+	free(server->queue);
 	free(server);
 }
 

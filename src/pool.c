@@ -99,18 +99,30 @@ void pool_loop(Pool* pool) {
 		
 		pthread_mutex_unlock(queue_mutex);
 		
+		if (!current_job->function) {
+			free(current_job);
+			break;
+		}
+		
 		(*current_job->function)(current_job->stack, pool->index);
+		free(current_job);
 		current_job = NULL;
 	}
 }
 
 void pool_exit (PoolHandler* target) {
+	
+	for (int i = 0; i < target->pool_num; i++)
+		pool_handler_add(target, NULL, NULL);
 	for (int i = 0; i < target->pool_num; i++) {
-		pthread_cancel(target->pools[i]->pid);
+		pthread_join(target->pools[i]->pid, NULL);
 		free(target->pools[i]);
 	}
 	
 	pthread_mutex_destroy(&target->queue_mutex);
 	pthread_mutex_destroy(&target->cond_mutex);
 	pthread_cond_destroy(&target->condition);
+	
+	free(target->pools);
+	free(target);
 }

@@ -30,16 +30,13 @@ size_t vector_add(Vector* vec, void* el) {
 }
 
 void vector_remove(Vector* vec, int index) {
-	void* zero = malloc(vec->size);
-	memset(zero, 0, vec->size);
-	
 	if (!(vec->opts & VECTOR_KEEP)) {
 		if (vec->opts & VECTOR_KEEP) {
 			memcpy(vector_get(vec, index),
 				   vector_get(vec, index + 1),
 				   vec->size * (vec->n - index)
 			); // Moves everything back by vec->size
-			memcpy(vector_get(vec, (int)vec->n), zero, vec->size);
+			memset(vector_get(vec, (int)vec->n), 0, vec->size);
 		} else {
 			memmove(vector_get(vec, index),
 					vector_get(vec, (int)vec->n - 1),
@@ -47,11 +44,9 @@ void vector_remove(Vector* vec, int index) {
 			); // Moves the last element into the open place
 		}
 		vec->n--;
-	} else {
-		memcpy(vector_get(vec, index), zero, vec->size);
 	}
-	
-	free(zero);
+	else
+		memset(vector_get(vec, index), 0, vec->size);
 }
 
 void vector_insert(Vector* vec, void* el, int index) {

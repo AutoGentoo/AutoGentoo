@@ -14,6 +14,13 @@ HANDLE_SET_STATUS((ret)); \
 return; \
 })
 
+#define HANDLE_GET_HOST(name) \
+Host* host = server_get_host(request->parent, request->structures[1].host_select.hostname); \
+if (!host) { \
+	token_free(map_remove(request->parent->auth_tokens, request->structures[0].auth.token)); \
+	HANDLE_RETURN(NOT_FOUND);\
+}
+
 #define HANDLE_CHECK_STRUCTURES(...) (\
 { \
 	int check_types[] = __VA_ARGS__; \

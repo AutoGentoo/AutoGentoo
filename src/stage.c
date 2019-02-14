@@ -56,7 +56,7 @@ void host_template_list_init (Server* srv) {
 
 void host_template_add (Server* srv, HostTemplate* ht) {
 	HostTemplate* temp = prv_host_template_alloc(ht);
-	vector_add(srv->templates, &temp);
+	//vector_add(srv->templates, &temp);
 }
 
 /*
@@ -69,13 +69,6 @@ StringVector* host_template_get_all() {
 	
 	return out;
 }*/
-
-HostTemplate* stage_new (Server* parent, int index) {
-	if (!parent->templates || index >= parent->templates->n)
-		return NULL;
-	
-	return host_template_init(parent, *vector_get(parent->templates, index));
-}
 
 HostTemplate* host_template_init (Server* parent, HostTemplate* t) {
 	HostTemplate* out = prv_host_template_alloc(t);

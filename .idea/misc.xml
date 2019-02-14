@@ -7,6 +7,7 @@
       <file path="$PROJECT_DIR$/m4" />
       <file path="$PROJECT_DIR$/src/.deps" />
       <file path="$PROJECT_DIR$/src/.libs" />
+      <file path="$PROJECT_DIR$/src/api/venv" />
       <file path="$PROJECT_DIR$/src/scripts/.idea" />
       <file path="$PROJECT_DIR$/src/scripts/build" />
     </excludeRoots>

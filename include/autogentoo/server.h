@@ -85,9 +85,6 @@ struct __Server {
 	
 	/* AutoGentoo Related */
 	Vector* hosts; //!< A list of hosts
-	Map* users;
-	SmallMap* stages; //!< A list of active templates awaiting handoff to a host
-	Vector* templates; //!< A list of availiable host templates
 	
 	/* Socket server related */
 	WorkerParent* queue; //!< Jobs waiting in the queue, NULL if empty queue
@@ -103,6 +100,8 @@ struct __Server {
 	
 	/* Authentication */
 	AccessToken* autogentoo_org_token;
+	
+	Map* auth_tokens;
 };
 
 #ifndef connection_read

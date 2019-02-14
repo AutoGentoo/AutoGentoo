@@ -69,15 +69,6 @@ size_t write_server_fp(Server* server, FILE* fp) {
 		size += write_host_fp(*(Host**) vector_get(server->hosts, i), fp);
 	}
 	
-	for (i = 0; i != server->stages->n; i++) {
-		void** __t = *(void***) vector_get(server->stages, i);
-		size += write_stage_fp(__t[1], fp);
-	}
-	for (i = 0; i != server->templates->n; i++) {
-		void* __t = *vector_get(server->templates, i);
-		size += write_template_fp(__t, fp);
-	}
-	
 	size += write_int(AUTOGENTOO_FILE_END, fp);
 	
 	return size;
@@ -176,7 +167,6 @@ Server* read_server(char* location, char* port, server_t opts) {
 	if (fp == NULL) {
 		free(config_file);
 		Server* out = server_new(location, port, opts);
-		host_template_list_init(out);
 		return out;
 	}
 	
@@ -184,8 +174,6 @@ Server* read_server(char* location, char* port, server_t opts) {
 	Server* out = server_new(location, port, opts);
 	
 	Host* host_temp;
-	HostBind bind_temp;
-	HostTemplate* stage_temp;
 	
 	int current = 0;
 	int __break = 0;
@@ -200,15 +188,6 @@ Server* read_server(char* location, char* port, server_t opts) {
 				host_temp->parent = out;
 				vector_add(out->hosts, &host_temp);
 				break;
-			case AUTOGENTOO_STAGE:
-				stage_temp = malloc(sizeof(HostTemplate));
-				read_stage(out, stage_temp, fp);
-				small_map_insert(out->stages, stage_temp->new_id, stage_temp);
-				break;
-			case AUTOGENTOO_TEMPLATE:
-				stage_temp = malloc(sizeof(HostTemplate));
-				read_template (out, stage_temp, fp);
-				vector_add(out->templates, &stage_temp);
 			case AUTOGENTOO_FILE_END:
 				break;
 			default:

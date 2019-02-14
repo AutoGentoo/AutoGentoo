@@ -66,6 +66,8 @@ Map* map_new(size_t new_size, double threshold);
 
 void map_realloc(Map* map, size_t size);
 
+void* map_remove(Map* map, char* key);
+
 unsigned long get_hash(char* key); // Returns offset from hash_table[0]
 
 /**

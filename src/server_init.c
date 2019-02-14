@@ -67,10 +67,7 @@ int server_init (char* port) {
 Server* server_new (char* location, char* port, server_t opts) {
 	Server* out = malloc(sizeof(Server));
 	
-	out->templates = vector_new(sizeof(HostTemplate*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	out->hosts = vector_new(sizeof(Host*), VECTOR_REMOVE | VECTOR_UNORDERED);
-	out->users = map_new(64, 0.8);
-	out->stages = small_map_new(sizeof(HostTemplate*), 5);
 	out->location = strdup(location);
 	out->queue = malloc (sizeof (WorkerParent));
 	out->queue->tail = NULL;
@@ -80,6 +77,23 @@ Server* server_new (char* location, char* port, server_t opts) {
 	chdir(out->location);
 	out->opts = opts;
 	out->port = strdup(port);
+	out->auth_tokens = map_new(128, 0.8);
+	
+	AccessToken org_creation_token;
+	org_creation_token.host_id = NULL;
+	org_creation_token.access_level = TOKEN_SERVER_AUTOGENTOO_ORG;
+	org_creation_token.user_id = "autogentoo.org";
+	
+	out->autogentoo_org_token = auth_issue_token(out, &org_creation_token);
+	if (!out->autogentoo_org_token) {
+		lerror ("Failed to generate auth_token");
+		lerror ("You can not register this server without this token");
+	}
+	else {
+		linfo ("Your token is:");
+		linfo ("%s", out->autogentoo_org_token->auth_token);
+		linfo ("Copy this into the interface on autogentoo.org to register this server.");
+	}
 	
 	return out;
 }

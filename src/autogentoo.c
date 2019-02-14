@@ -108,6 +108,7 @@ int main(int argc, char** argv) {
 	
 	if (is_server) {
 		Server* main_server = read_server(location, port, server_opts);
+		free(location);
 		main_server->keep_alive = 1;
 		
 		if (main_server->opts & ENCRYPT) {

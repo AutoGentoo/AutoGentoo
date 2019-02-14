@@ -78,10 +78,7 @@ void HOST_EDIT(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 	
-	Host* host = server_get_host(request->parent, request->structures[1].host_select.hostname);
-	if (!host)
-		HANDLE_RETURN(NOT_FOUND);
-	
+	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
 	struct __struct_Host_edit host_edit = request->structures[2].host_edit;
 	
 	if (host_edit.request_type == 1) {
@@ -109,7 +106,23 @@ void HOST_EDIT(Response* res, Request* request) {
 	}
 }
 
-void HOST_DEL(Response* res, Request* request);
+void HOST_DEL(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT});
+	AccessToken* tok = authorize (request, TOKEN_HOST_MOD, AUTH_TOKEN_HOST);
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
+	
+	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
+	
+	for (int i = 0; i < request->parent->hosts->n; i++)
+		if (*(Host**)vector_get(request->parent->hosts, i) == host) {
+			vector_remove(request->parent->hosts, i);
+			break;
+		}
+	
+	host_free(host);
+}
+
 void HOST_EMERGE(Response* res, Request* request);
 
 void SRV_MNTCHROOT(Response* res, Request* request);

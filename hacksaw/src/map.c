@@ -57,11 +57,30 @@ void* map_get(Map* map, char* key) {
 	return NULL;
 };
 
+void* map_remove(Map* map, char* key) {
+	size_t index = get_hash(key) % map->size;
+	
+	MapItem* current = map->hash_table[index];
+	while (current) {
+		if (strcmp (current->key, key) == 0) {
+			void* out = current->data;
+			map->hash_table[index] = current->next;
+			free(current->key);
+			free(current);
+			
+			return out;
+		}
+		current = current->next;
+	}
+	
+	return NULL;
+}
+
 unsigned long prv_map_insert_item (Map* map, MapItem* item) {
 	unsigned long hash = get_hash(item->key);
 	size_t offset = hash % map->size;
 	
-	MapItem** current_pos = current_pos = &map->hash_table[offset];
+	MapItem** current_pos = &map->hash_table[offset];
 	
 	if ((*current_pos) == NULL)
 		*current_pos = item;
@@ -100,7 +119,7 @@ unsigned long get_hash(char* key) {
 }
 
 void prv_map_free_bucket (Map* map, MapItem* item, free_function __free) {
-	if (item->next != NULL)
+	if (item->next)
 		prv_map_free_bucket(map, item->next, __free);
 	
 	free(item->key);
@@ -110,7 +129,7 @@ void prv_map_free_bucket (Map* map, MapItem* item, free_function __free) {
 }
 
 void map_free (Map* map, free_function __free) {
-	for (int i = 0; i < map->n; i++)
+	for (int i = 0; i < map->size; i++)
 		if (map->hash_table[i])
 			prv_map_free_bucket (map, map->hash_table[i], __free);
 	free (map->hash_table);
