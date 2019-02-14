@@ -114,6 +114,7 @@ void HOST_DEL(Response* res, Request* request) {
 	
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
 	
+	/* Remove the host */
 	for (int i = 0; i < request->parent->hosts->n; i++)
 		if (*(Host**)vector_get(request->parent->hosts, i) == host) {
 			vector_remove(request->parent->hosts, i);
@@ -123,7 +124,16 @@ void HOST_DEL(Response* res, Request* request) {
 	host_free(host);
 }
 
-void HOST_EMERGE(Response* res, Request* request);
+void HOST_EMERGE(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_EMERGE});
+	AccessToken* tok = authorize (request, TOKEN_HOST_MOD, AUTH_TOKEN_HOST);
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
+	
+	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
+	
+	//host_emerge(host, request->structures[2].emerge.emerge);
+}
 
 void SRV_MNTCHROOT(Response* res, Request* request);
 void SRV_INFO(Response* res, Request* request);

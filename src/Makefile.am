@@ -11,7 +11,7 @@ libautogentoo_la_SOURCES =  \
 	chroot.c          handle.c  queue.c              server.c         thread.c \
 	crypt.c           host.c    server_handle.c      user.c           endian_convert.c  \
 	http.c            request.c server_init.c        writeconfig.c    server_loop.c \
-	gentoo_config.c   kernel.c  request_structure.c   \
+	gentoo_config.c   kernel.c  request_structure.c  http_handle.c  \
 	api/dynamic_binary.c api/request_generate.c api/request_check.c \
 	 ../hacksaw/src/libhacksaw.a http/libhttp.a
 

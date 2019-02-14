@@ -34,6 +34,10 @@ struct __struct_User {
 	char* user_id;
 } __attribute__((packed));
 
+struct __struct_Emerge {
+	char* emerge;
+} __attribute__((packed));
+
 typedef enum {
 	STRCT_END,
 	STRCT_HOST_NEW = 1,
@@ -41,6 +45,7 @@ typedef enum {
 	STRCT_HOST_EDIT,
 	STRCT_AUTHORIZE,
 	STRCT_NEW_USER,
+	STRCT_EMERGE,
 	
 	STRCT_MAX
 } request_structure_t;
@@ -56,6 +61,7 @@ static char* request_structure_linkage[] = {
 	"iss", /* Host edit */
 	"ss", /* Host authorize */
 	"s", /* New User */
+	"s", /* Emerge arguments */
 };
 
 union __RequestData {
@@ -64,6 +70,7 @@ union __RequestData {
 	struct __struct_Host_edit host_edit;
 	struct __struct_Authorize auth;
 	struct __struct_User new_user;
+	struct __struct_Emerge emerge;
 };
 
 int parse_request_structure (RequestData* out, char* template, void* data, void* end);
