@@ -3,14 +3,8 @@
 
 #include "request.h"
 
-#define HANDLE_SET_STATUS(ret)({ \
-dynamic_binary_add(res->content, 'i', &(ret).code); \
-dynamic_binary_add(res->content, 's', (ret).message); \
-res->code = ret; \
-})
-
 #define HANDLE_RETURN(ret) ({ \
-HANDLE_SET_STATUS((ret)); \
+res->code = ((ret)); \
 return; \
 })
 
@@ -60,8 +54,10 @@ void HOST_NEW(Response* res, Request* request);
 void HOST_EDIT(Response* res, Request* request);
 void HOST_DEL(Response* res, Request* request);
 void HOST_EMERGE(Response* res, Request* request);
+void HOST_MNTCHROOT(Response* res, Request* request);
 
-void SRV_MNTCHROOT(Response* res, Request* request);
 void SRV_INFO(Response* res, Request* request);
+void AUTH_ISSUE_TOK(Response* res, Request* request);
+void AUTH_REFRESH_TOK(Response* res, Request* request);
 
 #endif

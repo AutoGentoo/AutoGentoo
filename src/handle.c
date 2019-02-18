@@ -8,12 +8,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <autogentoo/autogentoo.h>
+#include <autogentoo/handle.h>
 #include <netinet/in.h>
 #include <autogentoo/http.h>
 #include <autogentoo/user.h>
 #include <mcheck.h>
 #include <autogentoo/api/dynamic_binary.h>
+#include <autogentoo/chroot.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -22,6 +23,8 @@ RequestLink requests[] = {
 		{REQ_HOST_EDIT,       {.ag_fh=HOST_EDIT}},
 		{REQ_HOST_DEL,        {.ag_fh=HOST_DEL}},
 		{REQ_HOST_EMERGE,     {.ag_fh=HOST_EMERGE}},
+		{REQ_HOST_MNTCHROOT,  {.ag_fh=HOST_MNTCHROOT}},
+		{REQ_AUTH_ISSUE_TOK,  {.ag_fh=AUTH_ISSUE_TOK}},
 };
 
 FunctionHandler resolve_call(request_t type) {
@@ -138,5 +141,66 @@ void HOST_EMERGE(Response* res, Request* request) {
 	//host_emerge(host, request->structures[2].emerge.emerge);
 }
 
-void SRV_MNTCHROOT(Response* res, Request* request);
+void HOST_MNTCHROOT(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT});
+	AccessToken* tok = authorize (request, TOKEN_HOST_MOD, AUTH_TOKEN_HOST);
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
+	
+	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
+	
+	response_t ret = chroot_mount(host);
+	HANDLE_RETURN(ret);
+}
+
 void SRV_INFO(Response* res, Request* request);
+
+void AUTH_ISSUE_TOK(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_ISSUE_TOK});
+	AccessToken auth_tok;
+	AccessToken creat_tok;
+	
+	auth_tok.host_id = request->structures[1].host_select.hostname;
+	auth_tok.auth_token = request->structures[0].auth.token;
+	auth_tok.user_id = request->structures[0].auth.user_id;
+	
+	creat_tok.user_id = request->structures[2].issue_tok.user_id;
+	creat_tok.host_id = request->structures[2].issue_tok.target_host;
+	creat_tok.access_level = request->structures[2].issue_tok.permission;
+	
+	AccessToken* issued = autogentoo_issue(request->parent, &auth_tok, &creat_tok);
+	if (!issued)
+		HANDLE_RETURN(FORBIDDEN);
+	
+	dynamic_binary_add(res->content, 's', issued->auth_token);
+	dynamic_binary_add(res->content, 's', issued->user_id);
+	dynamic_binary_add(res->content, 's', issued->host_id);
+	dynamic_binary_add(res->content, 'i', &issued->access_level);
+}
+
+void AUTH_REFRESH_TOK(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE})
+	
+	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
+	
+	StringVector* token_keys = map_all_keys(request->parent->auth_tokens);
+	
+	dynamic_binary_array_start(res->content);
+	for (int i = 0; i < token_keys->n; i++) {
+		AccessToken* token = map_get(request->parent->auth_tokens, string_vector_get(token_keys, i));
+		if (!token) {
+			string_vector_free(token_keys);
+			HANDLE_RETURN(INTERNAL_ERROR);
+		}
+		
+		dynamic_binary_add(res->content, 's', token->auth_token);
+		dynamic_binary_add(res->content, 's', token->user_id);
+		dynamic_binary_add(res->content, 's', token->host_id);
+		dynamic_binary_add(res->content, 'i', &token->access_level);
+		dynamic_binary_array_next(res->content);
+	}
+	dynamic_binary_array_end(res->content);
+	string_vector_free(token_keys);
+}

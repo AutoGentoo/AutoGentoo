@@ -19,7 +19,6 @@
 #include "response.h"
 #include "server.h"
 #include "thread.h"
-#include "stage.h"
 #include "writeconfig.h"
 #include "render.h"
 #include "crypt.h"

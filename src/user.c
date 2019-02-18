@@ -38,6 +38,23 @@ AccessToken* authorize(Request* request, token_access_t access_level, auth_t typ
 	return auth_verify_token(request->parent, &req_tok);
 }
 
+AccessToken* autogentoo_issue(Server* server, AccessToken* auth_tok, AccessToken* creat_tok) {
+	auth_tok->access_level = creat_tok->access_level;
+	
+	AccessToken* resolved = auth_verify_token(server, auth_tok);
+	if (!resolved)
+		return NULL;
+	
+	if (creat_tok->host_id && *creat_tok->host_id && resolved->host_id) {
+		if (strcmp(resolved->host_id, creat_tok->host_id) != 0)
+			return NULL;
+	}
+	else if (creat_tok->host_id != resolved->host_id) // NULL
+		return NULL;
+	
+	return auth_issue_token(server, creat_tok);
+}
+
 AccessToken* auth_verify_token(Server* server, AccessToken* request_token) {
 	AccessToken* found_token = map_get(server->auth_tokens, request_token->auth_token);
 	if (!found_token)
@@ -64,7 +81,7 @@ AccessToken* auth_issue_token(Server* server, AccessToken* creation_token) {
 	
 	do
 		prv_random_string(out->auth_token, AUTOGENTOO_TOKEN_LENGTH);
-	while(map_get(server->auth_tokens, out->auth_token) != NULL);
+	while(map_get(server->auth_tokens, out->auth_token) == NULL);
 	
 	map_insert(server->auth_tokens, out->auth_token, out);
 	return out;

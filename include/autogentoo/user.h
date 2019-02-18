@@ -8,12 +8,10 @@
 #include <stdio.h>
 #include <openssl/evp.h>
 #include <autogentoo/hacksaw/tools.h>
-#include <autogentoo/request_structure.h>
 
 #define AUTOGENTOO_TOKEN_LENGTH 32
 #define AUTOGENTOO_HASH_LENGTH 128
 
-typedef struct __User User;
 typedef struct __AuthToken AuthToken;
 typedef struct __AccessToken AccessToken;
 
@@ -49,14 +47,10 @@ AccessToken* authorize(Request* request, token_access_t access_level, auth_t typ
 
 AccessToken* auth_verify_token(Server* server, AccessToken* request_token);
 
+AccessToken* autogentoo_issue(Server* server, AccessToken* auth_tok, AccessToken* creat_tok);
+
 AccessToken* auth_issue_token(Server* server, AccessToken* creation_token);
 
-/**
- * autogentoo.org registers a user
- * Requires autogentoo_org token */
-AccessToken* auth_register_user(Server* server, AccessToken* creation_token, AccessToken* auth_token);
-
 void token_free(AccessToken* tok);
-void user_free(User* user);
 
 #endif //AUTOGENTOO_USER_H

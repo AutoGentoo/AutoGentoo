@@ -7,7 +7,21 @@
 
 #include <stdio.h>
 
+typedef enum {
+	STRCT_END,
+	STRCT_HOST_NEW = 1,
+	STRCT_HOST_SELECT,
+	STRCT_HOST_EDIT,
+	STRCT_AUTHORIZE,
+	STRCT_EMERGE,
+	STRCT_ISSUE_TOK,
+	
+	STRCT_MAX
+} request_structure_t;
+
 typedef union __RequestData RequestData;
+
+#include "user.h"
 
 struct __struct_Host_new {
 	char* arch;
@@ -30,25 +44,15 @@ struct __struct_Authorize {
 	char* token;
 } __attribute__((packed));
 
-struct __struct_User {
-	char* user_id;
-} __attribute__((packed));
-
 struct __struct_Emerge {
 	char* emerge;
 } __attribute__((packed));
 
-typedef enum {
-	STRCT_END,
-	STRCT_HOST_NEW = 1,
-	STRCT_HOST_SELECT,
-	STRCT_HOST_EDIT,
-	STRCT_AUTHORIZE,
-	STRCT_NEW_USER,
-	STRCT_EMERGE,
-	
-	STRCT_MAX
-} request_structure_t;
+struct __struct_Issue_token {
+	char* user_id;
+	char* target_host;
+	token_access_t permission;
+} __attribute__((packed));
 
 struct __Raw {
 	size_t n;
@@ -60,8 +64,8 @@ static char* request_structure_linkage[] = {
 	"s", /* Host select */
 	"iss", /* Host edit */
 	"ss", /* Host authorize */
-	"s", /* New User */
 	"s", /* Emerge arguments */
+	"ssi", /* Issue Token */
 };
 
 union __RequestData {
@@ -69,7 +73,7 @@ union __RequestData {
 	struct __struct_Host_select host_select;
 	struct __struct_Host_edit host_edit;
 	struct __struct_Authorize auth;
-	struct __struct_User new_user;
+	struct __struct_Issue_token issue_tok;
 	struct __struct_Emerge emerge;
 };
 

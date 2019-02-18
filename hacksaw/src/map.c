@@ -38,11 +38,26 @@ void map_realloc(Map* map, size_t size) {
 	memset(map->hash_table + old_size * sizeof (MapItem*), 0, (map->size - old_size) * sizeof (MapItem*)); // Only set the new data to NULL
 	
 	int i;
-	for (i = 0; i < map->n; i++)
+	for (i = 0; i < map->size; i++)
 		if (map->hash_table[i] != NULL)
 			prv_map_realloc_item (map, map->hash_table[i]);
 }
 
+StringVector* map_all_keys(Map* map) {
+	StringVector* out = string_vector_new();
+	
+	MapItem* current = NULL;
+	int i;
+	for (i = 0; i < map->size && out->n < map->n; i++) {
+		current = map->hash_table[i];
+		while (current) {
+			string_vector_add(out, current->key);
+			current = current->next;
+		}
+	}
+	
+	return out;
+}
 
 void* map_get(Map* map, char* key) {
 	size_t index = get_hash(key) % map->size;

@@ -124,6 +124,11 @@ void server_respond(Connection* conn, int worker_index) {
 		request_call(&res, request);
 		/* Send the response */
 		if (request->protocol == PROT_AUTOGENTOO) {
+			/* Response code */
+			conn_write(conn, &res.code.code, sizeof(response_nt));
+			conn_write(conn, res.code.message, res.code.len + 1);
+			
+			/* Response content */
 			conn_write(conn, res.content->template, res.content->template_used_size + 1);
 			conn_write(conn, res.content->ptr, res.content->used_size);
 		}

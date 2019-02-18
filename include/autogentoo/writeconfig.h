@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include "server.h"
 #include "host.h"
-#include "stage.h"
 
 typedef struct __AutoGentoo_Memconfig AutoGentoo_Memconfig;
 
@@ -54,14 +53,14 @@ size_t write_host_fp (Host* host, FILE* fp);
  * @param temp the template to write to file
  * @param fp the file to write to
  */
-size_t write_stage_fp (HostTemplate* temp, FILE* fp);
+//size_t write_stage_fp (HostTemplate* temp, FILE* fp);
 
 /**
  * Write a Template to file
  * @param temp the template to write to file
  * @param fp the file to write to
  */
-size_t write_template_fp (HostTemplate* temp, FILE* fp);
+//size_t write_template_fp (HostTemplate* temp, FILE* fp);
 
 /**
  * Read server from localtion
@@ -91,7 +90,7 @@ void read_host_binding (Server* server, HostBind* dest, FILE* fp);
  * @param dest the HostTemplate in which content will be written
  * @param fp the file to read from
  */
-void read_stage (Server* server, HostTemplate* dest, FILE* fp);
+//void read_stage (Server* server, HostTemplate* dest, FILE* fp);
 
 /**
  * Read a HostTemplate as a Template not Stage (dont read dest_dir) from file
@@ -99,7 +98,7 @@ void read_stage (Server* server, HostTemplate* dest, FILE* fp);
  * @param dest the HostTemplate in which content will be written
  * @param fp the file to read from
  */
-void read_template(Server* server, HostTemplate* dest, FILE* fp);
+//void read_template(Server* server, HostTemplate* dest, FILE* fp);
 
 /**
  * Writes a string to file (also writes the NULL terminator)

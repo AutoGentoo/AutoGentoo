@@ -70,6 +70,8 @@ void* map_remove(Map* map, char* key);
 
 unsigned long get_hash(char* key); // Returns offset from hash_table[0]
 
+StringVector* map_all_keys(Map* map);
+
 /**
  * Free the map and all its data
  * @param map to free

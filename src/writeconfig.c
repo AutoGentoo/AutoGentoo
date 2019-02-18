@@ -119,6 +119,7 @@ size_t write_host_fp(Host* host, FILE* fp) {
 	return size;
 }
 
+/*
 size_t write_stage_fp(HostTemplate* temp, FILE* fp) {
 	size_t size = 0;
 	size += write_int(AUTOGENTOO_STAGE, fp);
@@ -157,6 +158,7 @@ size_t write_template_fp (HostTemplate* temp, FILE* fp) {
 	
 	return size;
 }
+*/
 
 Server* read_server(char* location, char* port, server_t opts) {
 	char* config_file_name = ".autogentoo.config";
@@ -262,6 +264,7 @@ void read_host_binding(Server* server, HostBind* dest, FILE* fp) {
 	free(_host_id);
 }
 
+/*
 void read_stage(Server* server, HostTemplate* dest, FILE* fp) {
 	dest->parent = server;
 	dest->id = read_string(fp);
@@ -297,6 +300,7 @@ void read_template(Server* server, HostTemplate* dest, FILE* fp) {
 	dest->dest_dir = NULL;
 	dest->new_id = NULL;
 }
+*/
 
 size_t write_string(char* src, FILE* fp) {
 	if (!src) {
