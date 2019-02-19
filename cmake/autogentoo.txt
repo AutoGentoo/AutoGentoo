@@ -26,6 +26,7 @@ set(src_SOURCES
         src/api/dynamic_binary.c
         src/api/request_generate.c
         src/api/request_check.c
+        src/api/ssl_wrap.c
         )
 
 set(include_HEADERS
@@ -55,6 +56,7 @@ set(include_HEADERS
         include/autogentoo/api/dynamic_binary.h
         include/autogentoo/api/request_generate.h
         include/autogentoo/api/request_check.h
+        include/autogentoo/api/ssl_wrap.h
         )
 
 

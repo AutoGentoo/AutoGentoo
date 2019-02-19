@@ -7,21 +7,17 @@
 #include <fcntl.h>
 #include <autogentoo/request.h>
 
-void prv_random_string(char* out, size_t len) {
-	int random_fd = open ("/dev/random", O_RDONLY);
-	if (read(random_fd, out, len) != len) {
-		*out = 0;
-		lerror ("Failed to generate random string");
-		return;
-	}
-	close(random_fd);
-	out[len] = 0;
+int prv_random_string(char* out, size_t len) {
+	srand((unsigned int)time(0));
 	
 	char* chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	size_t chars_len = 62;
 	
-	for (char* c = out; *c; c++)
-		*c = chars[*c % chars_len];
+	for (int i = 0; i < len; i++)
+		out[i] = chars[rand() % chars_len];
+	out[len] = 0;
+	
+	return 0;
 }
 
 AccessToken* authorize(Request* request, token_access_t access_level, auth_t type) {
@@ -80,8 +76,11 @@ AccessToken* auth_issue_token(Server* server, AccessToken* creation_token) {
 	out->auth_token = malloc (AUTOGENTOO_TOKEN_LENGTH + 1);
 	
 	do
-		prv_random_string(out->auth_token, AUTOGENTOO_TOKEN_LENGTH);
-	while(map_get(server->auth_tokens, out->auth_token) == NULL);
+		if (prv_random_string(out->auth_token, AUTOGENTOO_TOKEN_LENGTH) != 0) {
+			token_free(out);
+			return NULL;
+		}
+	while(map_get(server->auth_tokens, out->auth_token) != NULL);
 	
 	map_insert(server->auth_tokens, out->auth_token, out);
 	return out;

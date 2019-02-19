@@ -18,7 +18,6 @@ cdef class DynamicBuffer:
 		temp |= DB_ENDIAN_TARGET_NETWORK if to_network else 0
 		temp |= DB_ENDIAN_INPUT_NETWORK if is_network else 0
 		self.parent.endian = <dynamic_binary_endian_t>temp
-		printf("%d\n", <int>self.parent.endian)
 		if start and start is not None:
 			self.append_string(start)
 	
@@ -32,7 +31,7 @@ cdef class DynamicBuffer:
 		dynamic_binary_add(self.parent, _type, data)
 	
 	
-	def append(self, py_template, array):
+	cpdef append(self, str py_template, list array):
 		if len(array) == 0:
 			return
 		py_pass_template = ""
@@ -45,9 +44,7 @@ cdef class DynamicBuffer:
 		
 		i = 0
 		parent_array_index = 0
-		
 		cdef DynamicType temp_dyn;
-		
 		while i < len(py_template):
 			item = None
 			if current_array is None:
@@ -123,7 +120,6 @@ cdef class DynamicBuffer:
 	
 	cpdef void print_raw (self, align=25):
 		cdef int last_i = 1
-		
 		for i in range (self.get_size()):
 			printf ("%02x ", (<char*>self.parent.ptr)[i] & 0xff)
 			if last_i % 25 == 0 and align:

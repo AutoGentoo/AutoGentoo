@@ -9,6 +9,7 @@ cdef class DynamicBuffer:
 	cdef void append_bin (self, void* data, size_t size)
 	cdef void append_string (self, char* ptr)
 	cdef void append_int (self, int k)
+	cpdef append(self, str template, list args)
 	cdef void* get_ptr (self)
 	cpdef size_t get_size(self)
 	cpdef void print_raw (self, align=*)

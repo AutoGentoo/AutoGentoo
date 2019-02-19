@@ -20,7 +20,8 @@ typedef enum {
 struct array_node {
 	struct array_node* parent;
 	char* template_start;
-	int* size_ptr;
+	size_t size_offset;
+	int size;
 };
 
 typedef enum {

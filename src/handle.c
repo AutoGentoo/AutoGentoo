@@ -15,6 +15,7 @@
 #include <mcheck.h>
 #include <autogentoo/api/dynamic_binary.h>
 #include <autogentoo/chroot.h>
+#include<sys/utsname.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -25,6 +26,7 @@ RequestLink requests[] = {
 		{REQ_HOST_EMERGE,     {.ag_fh=HOST_EMERGE}},
 		{REQ_HOST_MNTCHROOT,  {.ag_fh=HOST_MNTCHROOT}},
 		{REQ_AUTH_ISSUE_TOK,  {.ag_fh=AUTH_ISSUE_TOK}},
+		{REQ_SRV_INFO,        {.ag_fh=SRV_INFO}},
 };
 
 FunctionHandler resolve_call(request_t type) {
@@ -153,7 +155,27 @@ void HOST_MNTCHROOT(Response* res, Request* request) {
 	HANDLE_RETURN(ret);
 }
 
-void SRV_INFO(Response* res, Request* request);
+void SRV_INFO(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({})
+	
+	struct utsname uname_pointer;
+	uname(&uname_pointer);
+	char* sys_info[][2] = {
+			{"System name", uname_pointer.sysname},
+			{"Nodename", uname_pointer.nodename},
+			{"Release", uname_pointer.release},
+			{"Version", uname_pointer.version},
+			{"Machine", uname_pointer.machine},
+	};
+	
+	dynamic_binary_array_start(res->content);
+	for (int i = 0; i < sizeof(sys_info) / sizeof(sys_info[0]); i++) {
+		dynamic_binary_add(res->content, 's', sys_info[i][0]);
+		dynamic_binary_add(res->content, 's', sys_info[i][1]);
+		dynamic_binary_array_next(res->content);
+	}
+	dynamic_binary_array_end(res->content);
+}
 
 void AUTH_ISSUE_TOK(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_ISSUE_TOK});

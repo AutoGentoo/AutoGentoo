@@ -7,6 +7,7 @@
 #include <string.h>
 #include <autogentoo/hacksaw/tools.h>
 #include <autogentoo/endian_convert.h>
+#include <autogentoo/hacksaw/tools/debug.h>
 
 DynamicBinary* dynamic_binary_new(dynamic_binary_endian_t endian) {
 	DynamicBinary* out = malloc(sizeof(DynamicBinary));
@@ -58,9 +59,11 @@ void dynamic_binary_array_start(DynamicBinary* db) {
 	db->array_size = malloc(sizeof(struct array_node));
 	db->array_size->template_start = template_end;
 	db->array_size->parent = parent;
+	db->array_size->size_offset = db->used_size;
+	db->array_size->size = 0;
 	
 	int current_array_size = 0;
-	db->array_size->size_ptr = prv_dynamic_binary_add_item(db, sizeof(int), &current_array_size);
+	prv_dynamic_binary_add_item(db, sizeof(int), &current_array_size);
 }
 
 void dynamic_binary_array_end(DynamicBinary* db) {
@@ -69,13 +72,19 @@ void dynamic_binary_array_end(DynamicBinary* db) {
 	
 	db->current_template = prv_dynamic_binary_template_add(db, ')'); /* Skip over the parenthesis */
 	struct array_node* parent = db->array_size->parent;
+	
+	int size_temp = db->array_size->size;
+	if (db->endian & DB_ENDIAN_TARGET_NETWORK && !(db->endian & DB_ENDIAN_INPUT_NETWORK))
+		size_temp = htonl((uint32_t)size_temp);
+	memcpy(db->ptr + db->array_size->size_offset, &size_temp, sizeof(int));
+	
 	free(db->array_size);
 	db->array_size = parent;
 }
 
 void dynamic_binary_array_next(DynamicBinary* db) {
 	db->current_template = db->array_size->template_start;
-	(*db->array_size->size_ptr)++;
+	db->array_size->size++;
 }
 
 dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {

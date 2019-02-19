@@ -43,10 +43,14 @@ void set_encrypt_opts (Opt* op, char* arg) {
 	}
 	if (strcmp(op->_long, "sign") == 0)
 		enc_server_options |= ENC_CERT_SIGN;
-	if (strcmp(op->_long, "gencert") == 0)
-		enc_server_options |= ENC_GEN_CERT & ~ENC_READ_CERT;
-	if (strcmp(op->_long, "genrsa") == 0)
-		enc_server_options |= ENC_GEN_RSA & ~ENC_READ_RSA;
+	if (strcmp(op->_long, "gencert") == 0) {
+		enc_server_options |= ENC_GEN_CERT;
+		enc_server_options &= ~ENC_READ_CERT;
+	}
+	if (strcmp(op->_long, "genrsa") == 0) {
+		enc_server_options |= ENC_GEN_RSA;
+		enc_server_options &= ~ENC_READ_RSA;
+	}
 }
 
 void set_is_encrypted (Opt* op, char* c) {

@@ -82,7 +82,7 @@ Request* request_handle (Connection* conn) {
 		out->struct_c++;
 		int len = parse_request_structure (
 				(RequestData*)vector_get(out->structures_parent, out->struct_c - 1),
-				request_structure_linkage[current - 1],
+				request_structure_linkage[current - (REQ_START + 1)],
 				current_request, end);
 		if (len == -1)
 			AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR

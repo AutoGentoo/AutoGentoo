@@ -7,6 +7,7 @@
 #include <cmocka.h>
 #include <autogentoo/api/request_generate.h>
 #include <autogentoo/api/dynamic_binary.h>
+#include <autogentoo/api/ssl_wrap.h>
 #include "test.h"
 
 void test_htonl(void** state) {
@@ -34,16 +35,13 @@ void test_request(void** state) {
 	client_request_add_structure(req, STRCT_AUTHORIZE, authorize);
 	client_request_add_structure(req, STRCT_HOST_NEW, host_new);
 	
-	size_t size = 0;
-	void* request;
-	int size_check = client_request_generate(req, &size, &request);
-	assert_int_equal(size, size_check);
+	int size_check = client_request_generate(req);
+	assert_int_equal(req->size, size_check);
 	FILE* fp = fopen("client_request_test", "w+");
-	fwrite(request, 1, size, fp);
+	fwrite(req->ptr, 1, req->size, fp);
 	fclose(fp);
 	
 	client_request_free(req);
-	free(request);
 	
 	(void) state;
 }
@@ -62,7 +60,7 @@ void test_dynamic_binary(void** state) {
 			{.string="test3"},
 	};
 	
-	char* template_full = "ssisaisnisnise)";
+	char* template_full = "ssisaisnisnise";
 	
 	DynamicBinary* test = dynamic_binary_new(DB_ENDIAN_TARGET_NETWORK);
 	dynamic_bin_t out = dynamic_binary_add_quick(test, template_full, content);
@@ -73,7 +71,24 @@ void test_dynamic_binary(void** state) {
 	(void)state;
 }
 
-
+void test_ssl_client(void** state) {
+	SSocket* ssl_socket = ssocket_new("localhost", 9491);
+	assert_non_null(ssl_socket);
+	
+	ClientRequest* request = client_request_init(REQ_SRV_INFO);
+	ssocket_request(ssl_socket, request);
+	
+	void* res;
+	ssize_t res_size = ssocket_read_response(ssl_socket, &res);
+	
+	FILE* fp = fopen("ssl_test", "w+");
+	fwrite(res, 1, (size_t)res_size, fp);
+	fclose(fp);
+	
+	client_request_free(request);
+	ssocket_free(ssl_socket);
+	free(res);
+}
 
 int main(void) {
 	const struct CMUnitTest tests[] = {
@@ -81,7 +96,7 @@ int main(void) {
 			cmocka_unit_test(test_htonll),
 			cmocka_unit_test(test_request),
 			cmocka_unit_test(test_dynamic_binary),
-			//cmocka_unit_test()
+			cmocka_unit_test(test_ssl_client),
 	};
 	
 	return cmocka_run_group_tests(tests, NULL, NULL);

@@ -46,7 +46,6 @@ FunctionHandler resolve_call(request_t type);
 void GET(Connection* conn, HttpRequest* req);
 void HEAD(Connection* conn, HttpRequest* req);
 
-
 /**
  * PROT_AUTOGENTOO
  */

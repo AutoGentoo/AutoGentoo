@@ -10,6 +10,8 @@ ClientRequest* client_request_init(request_t type) {
 	ClientRequest* out = malloc (sizeof(ClientRequest));
 	out->request_type = type;
 	out->arguments = vector_new(sizeof(ClientRequestArgument), VECTOR_ORDERED | VECTOR_REMOVE);
+	out->size = 0;
+	out->ptr = NULL;
 	
 	return out;
 }
@@ -32,33 +34,40 @@ int client_request_add_structure(ClientRequest* req, request_structure_t struct_
 memcpy(current, item, size); \
 current += size;
 
-int client_request_generate(ClientRequest* req, size_t* size, void** out_ptr) {
-	(*size) += 1;
-	(*size) += sizeof(request_t);
-	(*size) += sizeof(request_structure_t); // STRCT_END
+#define current_add_int(integer) { \
+	int big_endian = htonl((integer));\
+	memcpy(current, &big_endian, sizeof(int)); \
+	current += sizeof(int); \
+}
+
+int client_request_generate(ClientRequest* req) {
+	req->size = 1;
+	req->size += sizeof(request_t);
+	req->size += sizeof(request_structure_t); // STRCT_END
 	for (int i = 0; i < req->arguments->n; i++) {
 		ClientRequestArgument* argument = (ClientRequestArgument*)vector_get(req->arguments, i);
-		(*size) += sizeof(request_structure_t);
-		(*size) += argument->size;
+		req->size += sizeof(request_structure_t);
+		req->size += argument->size;
 	}
 	
-	(*out_ptr) = malloc(*size);
-	void* current = (*out_ptr);
+	if (req->ptr)
+		free(req->ptr);
+	req->ptr = malloc(req->size);
+	void* current = req->ptr;
 	
 	*(char*)current = 0;
 	current++;
-	current_add(&req->request_type, sizeof(int))
+	current_add_int(req->request_type);
 	
 	for (int i = 0; i < req->arguments->n; i++) {
 		ClientRequestArgument* argument = (ClientRequestArgument*)vector_get(req->arguments, i);
-		
-		current_add(&argument->struct_type, sizeof(int))
+		current_add_int(argument->struct_type)
 		current_add(argument->ptr, argument->size)
 	}
 	request_structure_t struct_end = STRCT_END;
-	current_add(&struct_end, sizeof(request_structure_t))
+	current_add_int(struct_end)
 	
-	return (int)(current - (*out_ptr));
+	return (int)(current - req->ptr);
 }
 
 void client_request_free(ClientRequest* req) {
@@ -68,5 +77,7 @@ void client_request_free(ClientRequest* req) {
 	}
 	
 	vector_free(req->arguments);
+	if (req->ptr)
+		free(req->ptr);
 	free(req);
 }

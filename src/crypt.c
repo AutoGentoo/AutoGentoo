@@ -131,6 +131,10 @@ int x509_generate_write(EncryptServer* parent) {
 	
 	if (parent->opts & ENC_READ_RSA) {
 		FILE* fp = fopen(parent->rsa_path, "r");
+		if (!fp) {
+			lerror("Failed to open RSA file: %s", parent->rsa_path);
+			return 2;
+		}
 		parent->key_pair = PEM_read_RSAPrivateKey(fp, &parent->key_pair, NULL, NULL);
 		fclose(fp);
 		if (!parent->key_pair) {

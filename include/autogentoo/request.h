@@ -23,6 +23,7 @@ typedef enum {
 	REQ_GET,
 	REQ_HEAD,
 	REQ_POST,
+	REQ_START,
 	
 	REQ_HOST_NEW,
 	REQ_HOST_EDIT,

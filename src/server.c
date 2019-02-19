@@ -72,14 +72,11 @@ void server_recv (Connection* conn) {
 	
 	/* Read the request */
 	size_t chunk_len = 128;
-	
-	conn->request = malloc(chunk_len);
+	size_t buffer_size = chunk_len * 2;
 	ssize_t total_read = 0, current_bytes = 0;
 	
-	size_t buffer_size = chunk_len;
-	current_bytes = connection_read(conn->request + total_read, chunk_len);
-	total_read += current_bytes;
-	while (current_bytes == chunk_len) {
+	conn->request = malloc(buffer_size);
+	do {
 		if (total_read + chunk_len >= buffer_size) {
 			buffer_size *= 2;
 			conn->request = realloc(conn->request, buffer_size);
@@ -87,7 +84,7 @@ void server_recv (Connection* conn) {
 		
 		current_bytes = connection_read(conn->request + total_read, chunk_len);
 		total_read += current_bytes;
-	}
+	} while (current_bytes == chunk_len);
 	
 	if (total_read < 0) { // receive error
 		conn->status = SERVER_ERROR;
@@ -116,6 +113,7 @@ void server_respond(Connection* conn, int worker_index) {
 	/* Run the request */
 	Response res;
 	res.code = OK;
+	res.content = dynamic_binary_new(DB_ENDIAN_TARGET_NETWORK);
 	if (request == NULL) {
 		http_send_default(conn, BAD_REQUEST);
 		res.code = BAD_REQUEST;
@@ -125,7 +123,10 @@ void server_respond(Connection* conn, int worker_index) {
 		/* Send the response */
 		if (request->protocol == PROT_AUTOGENTOO) {
 			/* Response code */
-			conn_write(conn, &res.code.code, sizeof(response_nt));
+			linfo("Writing response");
+			int code_big_endian = htonl(res.code.code);
+			
+			conn_write(conn, &code_big_endian, sizeof(int));
 			conn_write(conn, res.code.message, res.code.len + 1);
 			
 			/* Response content */
@@ -134,7 +135,10 @@ void server_respond(Connection* conn, int worker_index) {
 		}
 	}
 	
-	ldinfo("%s -- %s (%d) <==== %d", conn->ip, res.code.message, (int)res.code.code, worker_index);
+	if (request)
+		ldinfo("%s -- %s (%d) code = %d", conn->ip, res.code.message, (int)res.code.code, request->request_type);
+	else
+		ldinfo("%s -- %s (%d)", conn->ip, res.code.message, (int)res.code.code);
 	Server* parent = conn->parent;
 	
 	if (request && request->directive == DIR_CONNECTION_OPEN) {
