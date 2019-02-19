@@ -18,28 +18,28 @@
 #include <autogentoo/api/request_generate.h>
 
 int prv_ssocket_connect(char* hostname, unsigned short port) {
-	int sockfd;
-	struct hostent* host;
-	struct sockaddr_in dest_addr;
-	char* tmp_ptr;
+	char str_port[8];
+	sprintf(str_port, "%d", port);
 	
-	if ((host = gethostbyname(hostname)) == NULL) {
+	
+	struct addrinfo* resolved;
+	struct addrinfo hints;
+	memset(&hints, 0, sizeof (hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM; // TCP ONLY
+	
+	
+	if ((getaddrinfo(hostname, str_port, &hints, &resolved)) != 0) {
 		lerror("Cannot resolve hostname: %s", hostname);
 		return -1;
 	}
 	
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	dest_addr.sin_family = AF_INET;
-	dest_addr.sin_port = htons(port);
-	dest_addr.sin_addr.s_addr = *(in_addr_t*)(host->h_addr);
-	memset(&(dest_addr.sin_zero), '\0', 8);
-	
-	tmp_ptr = inet_ntoa(dest_addr.sin_addr);
-	
-	if (connect(sockfd, (struct sockaddr *) &dest_addr, sizeof(struct sockaddr)) == -1 ) {
-		lerror("Cannot connect to host %s [%s] on port %d.\n", hostname, tmp_ptr, port);
+	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (connect(sockfd, resolved->ai_addr, sizeof(struct sockaddr)) == -1 ) {
+		lerror("Cannot connect to host %s [%s] on port %d.\n", hostname, resolved->ai_canonname, port);
 		return -1;
 	}
+	freeaddrinfo(resolved);
 	
 	return sockfd;
 }
@@ -47,8 +47,6 @@ int prv_ssocket_connect(char* hostname, unsigned short port) {
 #define SSOCKET_ERROR() { \
     int err = SSL_get_error(out_sock->ssl, ret); \
     if(err == SSL_ERROR_SSL){ \
-        ERR_load_crypto_strings(); \
-        SSL_load_error_strings(); \
         char msg[1024]; \
         ERR_error_string_n(ERR_get_error(), msg, sizeof(msg)); \
         printf("%s %s %s %s\n", msg, ERR_lib_error_string(0), ERR_func_error_string(0), ERR_reason_error_string(0)); \
@@ -57,11 +55,7 @@ int prv_ssocket_connect(char* hostname, unsigned short port) {
 
 SSocket* ssocket_new(char* server_hostname, unsigned short port) {
 	/* Initialize ssl */
-	autogentoo_client_ssl_init();
-	if (SSL_library_init() < 0) {
-		lerror("Could not initialize ssl library");
-		return NULL; /* Nothing to free */
-	}
+	//autogentoo_client_ssl_init();
 	
 	SSocket* out_sock = malloc(sizeof(SSocket));
 	out_sock->hostname = strdup(server_hostname);
@@ -97,7 +91,6 @@ SSocket* ssocket_new(char* server_hostname, unsigned short port) {
 		goto error;
 	}
 	
-	out_sock->cert_name = X509_NAME_new();
 	out_sock->cert_name = X509_get_subject_name(out_sock->cert);
 	
 	return out_sock;
@@ -122,6 +115,10 @@ void autogentoo_client_ssl_init() {
 	ERR_load_BIO_strings();
 	ERR_load_crypto_strings();
 	SSL_load_error_strings();
+	if (SSL_library_init() < 0) {
+		lerror("Could not initialize ssl library");
+		exit(1);
+	}
 }
 
 void ssocket_request(SSocket* sock, ClientRequest* request) {

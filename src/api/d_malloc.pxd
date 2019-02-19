@@ -17,6 +17,7 @@ cdef class DynamicBuffer:
 cdef class Binary:
 	cdef size_t pos
 	cdef readonly sentinels
+	cdef is_network_endian
 	cdef void* ptr
 	cdef DynamicBuffer buffer
 	

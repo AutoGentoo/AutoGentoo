@@ -123,7 +123,6 @@ void server_respond(Connection* conn, int worker_index) {
 		/* Send the response */
 		if (request->protocol == PROT_AUTOGENTOO) {
 			/* Response code */
-			linfo("Writing response");
 			int code_big_endian = htonl(res.code.code);
 			
 			conn_write(conn, &code_big_endian, sizeof(int));
