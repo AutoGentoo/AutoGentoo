@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = subdir-objects
 SUBDIRS = http . api
-AM_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/ -Wno-unused-result ${CRYPT_KEY}
+AM_CFLAGS = ${AUTOGENTOO_CFLAGS} -I$(top_srcdir)/include/ -Wno-unused-result
 
 ACLOCAL_AMFLAGS='-I m4'
 
@@ -11,7 +11,7 @@ libautogentoo_la_SOURCES =  \
 	crypt.c           host.c    server_handle.c      user.c           endian_convert.c  \
 	http.c            request.c server_init.c        writeconfig.c    server_loop.c \
 	gentoo_config.c   kernel.c  request_structure.c  http_handle.c  \
-	api/dynamic_binary.c api/request_generate.c api/request_check.c \
+	api/dynamic_binary.c api/request_generate.c api/request_check.c api/ssl_wrap.c \
 	 ../hacksaw/src/libhacksaw.a http/libhttp.a
 
 libautogentoo_la_CFLAGS = ${AM_CFLAGS} -fPIC

@@ -33,6 +33,7 @@ typedef enum {
 	REQ_HOST_MNTCHROOT,
 	REQ_SRV_INFO,
 	REQ_AUTH_ISSUE_TOK,
+	REQ_AUTH_REFRESH_TOK,
 	
 	REQ_MAX
 } request_t;

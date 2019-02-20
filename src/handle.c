@@ -26,6 +26,7 @@ RequestLink requests[] = {
 		{REQ_HOST_EMERGE,     {.ag_fh=HOST_EMERGE}},
 		{REQ_HOST_MNTCHROOT,  {.ag_fh=HOST_MNTCHROOT}},
 		{REQ_AUTH_ISSUE_TOK,  {.ag_fh=AUTH_ISSUE_TOK}},
+		{REQ_AUTH_REFRESH_TOK,{.ag_fh=AUTH_REFRESH_TOK}},
 		{REQ_SRV_INFO,        {.ag_fh=SRV_INFO}},
 };
 

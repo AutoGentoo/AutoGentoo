@@ -1,1 +1,0 @@
-cdef class Authorize:
