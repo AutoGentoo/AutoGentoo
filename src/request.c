@@ -50,16 +50,14 @@ Request* request_handle (Connection* conn) {
 	void* current_request = out->body;
 	
 	/* If our first byte is a NULL byte, protocol == PROT_AUTOGENTOO */
-	if (*(char*)current_request != 0)
+	if (*(char*)current_request != 0) {
 		out->protocol = PROT_HTTP;
-	else {
-		out->protocol = PROT_AUTOGENTOO;
-		current_request++;
-	}
-	
-	if (out->protocol == PROT_HTTP)
 		return out;
+	}
+	else
+		out->protocol = PROT_AUTOGENTOO;
 	
+	current_request++;
 	void* end = out->body + out->length;
 	
 	AUTOGENTOO_READ_INT(out->request_type);
@@ -82,7 +80,7 @@ Request* request_handle (Connection* conn) {
 		out->struct_c++;
 		int len = parse_request_structure (
 				(RequestData*)vector_get(out->structures_parent, out->struct_c - 1),
-				request_structure_linkage[current - (REQ_START + 1)],
+				request_structure_linkage[current - 1],
 				current_request, end);
 		if (len == -1)
 			AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR

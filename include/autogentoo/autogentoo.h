@@ -20,7 +20,6 @@
 #include "server.h"
 #include "thread.h"
 #include "writeconfig.h"
-#include "render.h"
 #include "crypt.h"
 
 #ifndef AUTOGENTOO_LBIN_PATH

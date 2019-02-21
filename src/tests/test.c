@@ -73,8 +73,8 @@ void test_dynamic_binary(void** state) {
 
 void test_ssl_client(void** state) {
 	autogentoo_client_ssl_init();
-	SSocket* ssl_socket = ssocket_new("localhost", 9491);
-	assert_non_null(ssl_socket);
+	SSocket* ssl_socket;
+	assert_int_equal(ssocket_new(&ssl_socket, "localhost", 9491), 0);
 	
 	ClientRequest* request = client_request_init(REQ_SRV_INFO);
 	ssocket_request(ssl_socket, request);

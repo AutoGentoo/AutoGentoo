@@ -36,8 +36,8 @@ int prv_ssocket_connect(char* hostname, unsigned short port) {
 	
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (connect(sockfd, resolved->ai_addr, sizeof(struct sockaddr)) == -1 ) {
-		lerror("Cannot connect to host %s [%s] on port %d.\n", hostname, resolved->ai_canonname, port);
-		return -1;
+		lerror("Cannot connect to host %s on port %d.", hostname, port);
+		sockfd = -1;
 	}
 	freeaddrinfo(resolved);
 	
@@ -53,7 +53,7 @@ int prv_ssocket_connect(char* hostname, unsigned short port) {
     } \
 }
 
-SSocket* ssocket_new(char* server_hostname, unsigned short port) {
+int ssocket_new(SSocket** socket_ptr, char* server_hostname, unsigned short port) {
 	/* Initialize ssl */
 	//autogentoo_client_ssl_init();
 	
@@ -93,11 +93,12 @@ SSocket* ssocket_new(char* server_hostname, unsigned short port) {
 	
 	out_sock->cert_name = X509_get_subject_name(out_sock->cert);
 	
-	return out_sock;
+	(*socket_ptr) = out_sock;
+	return 0;
 	
 error:
 	ssocket_free(out_sock);
-	return NULL;
+	return 1;
 }
 
 void ssocket_free(SSocket* ptr) {

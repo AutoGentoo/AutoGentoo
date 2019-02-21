@@ -21,7 +21,7 @@ struct __SSocket {
 	int socket;
 };
 
-SSocket* ssocket_new(char* server_hostname, unsigned short port);
+int ssocket_new(SSocket** socket_ptr, char* server_hostname, unsigned short port);
 void ssocket_free(SSocket* ptr);
 void autogentoo_client_ssl_init();
 void ssocket_request(SSocket* ptr, ClientRequest* request);
