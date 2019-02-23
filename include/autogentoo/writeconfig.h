@@ -10,7 +10,6 @@ typedef struct __AutoGentoo_Memconfig AutoGentoo_Memconfig;
 typedef enum {
 	AUTOGENTOO_FILE_END = 0xffffffff,
 	AUTOGENTOO_HOST = 0xfffffff0,
-	AUTOGENTOO_STAGE = 0xfffff000,
 	
 	// Because Host* is extensible this is required
 	AUTOGENTOO_HOST_END = 0xaaaaaaaa,
@@ -18,7 +17,7 @@ typedef enum {
 	// Host entries for autogentoo extensions
 	AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb,
 	AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd,
-	AUTOGENTOO_TEMPLATE = 0xcccccccc
+	AUTOGENTOO_SERVER_TOKEN = 0xfffff000
 } AutoGentoo_WriteConfig;
 
 struct __AutoGentoo_Memconfig {
@@ -33,6 +32,9 @@ static AutoGentoo_Memconfig buffer_file;
  * @param server the server to write
  */
 size_t write_server (Server* server);
+
+size_t write_access_token_fp(AccessToken* token, FILE* fp);
+AccessToken* read_access_token(FILE* fp);
 
 /**
  * Write server to file given an open fp

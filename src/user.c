@@ -59,7 +59,7 @@ AccessToken* auth_verify_token(Server* server, AccessToken* request_token) {
 	if ((request_token->access_level & found_token->access_level) != found_token->access_level)
 		return NULL;
 	
-	if (found_token->host_id)
+	if (found_token->host_id && *found_token->host_id)
 		if (strcmp(found_token->host_id, request_token->host_id) != 0)
 			return NULL;
 	

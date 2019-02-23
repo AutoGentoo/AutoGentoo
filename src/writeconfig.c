@@ -69,7 +69,36 @@ size_t write_server_fp(Server* server, FILE* fp) {
 		size += write_host_fp(*(Host**) vector_get(server->hosts, i), fp);
 	}
 	
+	StringVector* token_keys = map_all_keys(server->auth_tokens);
+	
+	for (i = 0; i < token_keys->n; i++) {
+		AccessToken* token = map_get(server->auth_tokens, string_vector_get(token_keys, i));
+		if (!token) {
+			string_vector_free(token_keys);
+			lerror("An error occured which writing token to config");
+			exit (1);
+		}
+		
+		size += write_access_token_fp(token, fp);
+	}
+	string_vector_free(token_keys);
+	
+	size += write_int(AUTOGENTOO_SERVER_TOKEN, fp);
+	size += write_string(server->autogentoo_org_token, fp);
+	
 	size += write_int(AUTOGENTOO_FILE_END, fp);
+	
+	return size;
+}
+
+size_t write_access_token_fp(AccessToken* token, FILE* fp) {
+	size_t size = 0;
+	
+	size += write_int(AUTOGENTOO_ACCESS_TOKEN, fp);
+	size += write_string(token->auth_token, fp);
+	size += write_string(token->user_id, fp);
+	size += write_string(token->host_id, fp);
+	size += write_int(token->access_level, fp);
 	
 	return size;
 }
@@ -102,18 +131,6 @@ size_t write_host_fp(Host* host, FILE* fp) {
 		}
 	}
 	
-	/*
-	if (host->auth_tokens)
-		for (i = 0; i != host->auth_tokens->n; i++) {
-			size += write_int(AUTOGENTOO_ACCESS_TOKEN, fp);
-			
-			AccessToken current_token = *(AccessToken*)vector_get(host->auth_tokens, i);
-			
-			size += write_string(current_token.user_id, fp);
-			size += write_void(current_token.auth_token, AUTOGENTOO_TOKEN_LENGTH, fp);
-			size += write_int(current_token.access_level, fp);
-		}
-	*/
 	size += write_int(AUTOGENTOO_HOST_END, fp);
 	
 	return size;
@@ -176,6 +193,7 @@ Server* read_server(char* location, char* port, server_t opts) {
 	Server* out = server_new(location, port, opts);
 	
 	Host* host_temp;
+	AccessToken* token_temp;
 	
 	int current = 0;
 	int __break = 0;
@@ -191,6 +209,14 @@ Server* read_server(char* location, char* port, server_t opts) {
 				vector_add(out->hosts, &host_temp);
 				break;
 			case AUTOGENTOO_FILE_END:
+				__break = 1;
+				break;
+			case AUTOGENTOO_SERVER_TOKEN:
+				out->autogentoo_org_token = read_string(fp);
+				break;
+			case AUTOGENTOO_ACCESS_TOKEN:
+				token_temp = read_access_token(fp);
+				map_insert(out->auth_tokens, token_temp->auth_token, token_temp);
 				break;
 			default:
 				lerror("Could not understand autogentoo data type: 0x%x", current);
@@ -202,6 +228,17 @@ Server* read_server(char* location, char* port, server_t opts) {
 	fclose(fp);
 	
 	return out;
+}
+
+AccessToken* read_access_token(FILE* fp) {
+	AccessToken* token = malloc(sizeof(AccessToken));
+	
+	token->auth_token = read_string(fp);
+	token->user_id = read_string(fp);
+	token->host_id = read_string(fp);
+	token->access_level = read_int(fp);
+	
+	return token;
 }
 
 Host* read_host(FILE* fp) {

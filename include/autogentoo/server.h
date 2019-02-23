@@ -99,7 +99,7 @@ struct __Server {
 	EncryptServer* rsa_child;
 	
 	/* Authentication */
-	AccessToken* autogentoo_org_token;
+	char* autogentoo_org_token; //!< Just a dup of the key
 	
 	Map* auth_tokens;
 };

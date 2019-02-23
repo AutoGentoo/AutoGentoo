@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <openssl/ssl.h>
+#include <autogentoo/writeconfig.h>
 
 Connection* accept_conn (void* server, int fd, com_t type) {
 	if (fd < 3) {
@@ -47,6 +48,25 @@ void server_start (Server* server) {
 #ifndef AUTOGENTOO_NO_THREADS
 	server->pool_handler = pool_handler_new(32);
 #endif
+	
+	AccessToken org_creation_token;
+	org_creation_token.host_id = NULL;
+	org_creation_token.access_level = TOKEN_SERVER_AUTOGENTOO_ORG;
+	org_creation_token.user_id = "autogentoo.org";
+	
+	if (!server->autogentoo_org_token)
+		server->autogentoo_org_token = strdup(auth_issue_token(server, &org_creation_token)->auth_token);
+	if (!server->autogentoo_org_token) {
+		lerror ("Failed to generate auth_token");
+		lerror ("You can not register this server without this token");
+	}
+	else {
+		linfo ("Your token is:");
+		linfo ("%s", server->autogentoo_org_token);
+		linfo ("Copy this into the interface on autogentoo.org to register this server.");
+	}
+	
+	write_server(server);
 	
 	while (server->keep_alive) { // Main accept loop
 		int temp_fd = accept(server->socket, (struct sockaddr*) &clientaddr, &addrlen);

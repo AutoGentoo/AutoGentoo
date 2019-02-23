@@ -56,6 +56,7 @@ void HOST_EMERGE(Response* res, Request* request);
 void HOST_MNTCHROOT(Response* res, Request* request);
 
 void SRV_INFO(Response* res, Request* request);
+void SRV_REFRESH(Response* res, Request* request);
 void AUTH_ISSUE_TOK(Response* res, Request* request);
 void AUTH_REFRESH_TOK(Response* res, Request* request);
 

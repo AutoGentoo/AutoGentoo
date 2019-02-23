@@ -15,7 +15,7 @@
 #include <mcheck.h>
 #include <autogentoo/api/dynamic_binary.h>
 #include <autogentoo/chroot.h>
-#include<sys/utsname.h>
+#include <sys/utsname.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -28,6 +28,7 @@ RequestLink requests[] = {
 		{REQ_AUTH_ISSUE_TOK,  {.ag_fh=AUTH_ISSUE_TOK}},
 		{REQ_AUTH_REFRESH_TOK,{.ag_fh=AUTH_REFRESH_TOK}},
 		{REQ_SRV_INFO,        {.ag_fh=SRV_INFO}},
+		{REQ_SRV_REFRESH,     {.ag_fh=SRV_REFRESH}},
 };
 
 FunctionHandler resolve_call(request_t type) {
@@ -173,6 +174,33 @@ void SRV_INFO(Response* res, Request* request) {
 	for (int i = 0; i < sizeof(sys_info) / sizeof(sys_info[0]); i++) {
 		dynamic_binary_add(res->content, 's', sys_info[i][0]);
 		dynamic_binary_add(res->content, 's', sys_info[i][1]);
+		dynamic_binary_array_next(res->content);
+	}
+	dynamic_binary_array_end(res->content);
+}
+
+void SRV_REFRESH(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE})
+	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
+	
+	dynamic_binary_array_start(res->content);
+	for (int i = 0; i < request->parent->hosts->n; i++) {
+		Host* current = *(Host**)vector_get(request->parent->hosts, i);
+		dynamic_binary_add(res->content, 's', current->id);
+		dynamic_binary_add(res->content, 's', current->hostname);
+		dynamic_binary_add(res->content, 's', current->profile);
+		dynamic_binary_add(res->content, 's', current->arch);
+		
+		dynamic_binary_array_start(res->content);
+		for (int j = 0; j < current->make_conf->n; j++) {
+			SmallMap_key* variable = *(SmallMap_key**)vector_get(current->make_conf, j);
+			dynamic_binary_add(res->content, 's', variable->key);
+			dynamic_binary_add(res->content, 's', (char*)variable->data_ptr);
+			dynamic_binary_array_next(res->content);
+		}
+		dynamic_binary_array_end(res->content);
 		dynamic_binary_array_next(res->content);
 	}
 	dynamic_binary_array_end(res->content);
