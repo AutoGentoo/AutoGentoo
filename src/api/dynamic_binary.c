@@ -106,8 +106,14 @@ dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {
 		else if (!(db->endian & DB_ENDIAN_TARGET_NETWORK) && db->endian & DB_ENDIAN_INPUT_NETWORK)
 			*(int*)data = ntohl(*(uint32_t*)data);
 	}
-	else if (type == 's')
-		data_size = strlen((char*)data) + 1; // Add the NULL byte
+	else if (type == 's') {
+		if (data == NULL) {
+			data_size = 1;
+			data = calloc (data_size, 1);
+		}
+		else
+			data_size = strlen((char*)data) + 1; // Add the NULL byte
+	}
 	else if (type == 'v') {
 		lerror("Use dynamic_binary_add_binary() instead of dynamic_binary_add()");
 		return DYNAMIC_BIN_EBIN;

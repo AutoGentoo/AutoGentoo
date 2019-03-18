@@ -35,6 +35,7 @@ typedef enum {
 	REQ_SRV_REFRESH,
 	REQ_AUTH_ISSUE_TOK,
 	REQ_AUTH_REFRESH_TOK,
+	REQ_AUTH_REGISTER,
 	
 	REQ_MAX
 } request_t;

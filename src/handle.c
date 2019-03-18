@@ -29,6 +29,7 @@ RequestLink requests[] = {
 		{REQ_AUTH_REFRESH_TOK,{.ag_fh=AUTH_REFRESH_TOK}},
 		{REQ_SRV_INFO,        {.ag_fh=SRV_INFO}},
 		{REQ_SRV_REFRESH,     {.ag_fh=SRV_REFRESH}},
+		{REQ_AUTH_REGISTER,   {.ag_fh=AUTH_REGISTER}},
 };
 
 FunctionHandler resolve_call(request_t type) {
@@ -254,4 +255,26 @@ void AUTH_REFRESH_TOK(Response* res, Request* request) {
 	}
 	dynamic_binary_array_end(res->content);
 	string_vector_free(token_keys);
+}
+
+void AUTH_REGISTER(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_ISSUE_TOK});
+	AccessToken auth_tok;
+	AccessToken creat_tok;
+	
+	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
+	
+	creat_tok.user_id = request->structures[1].issue_tok.user_id;
+	creat_tok.host_id = NULL;
+	creat_tok.access_level = TOKEN_SERVER_WRITE;
+	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
+	if (!issued)
+		HANDLE_RETURN(INTERNAL_ERROR);
+	
+	dynamic_binary_add(res->content, 's', issued->auth_token);
+	dynamic_binary_add(res->content, 's', issued->user_id);
+	dynamic_binary_add(res->content, 's', issued->host_id);
+	dynamic_binary_add(res->content, 'i', &issued->access_level);
 }
