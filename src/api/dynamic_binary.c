@@ -81,7 +81,8 @@ int dynamic_binary_array_end(DynamicBinary* db) {
 	if (!db->array_size)
 		return 0;
 	
-	db->current_template = db->array_size->template_end;
+	if (db->array_size->size != 0)
+		db->current_template = db->array_size->template_end;
 	prv_dynamic_binary_template_add(db, ')');
 	struct array_node* parent = db->array_size->parent;
 	
