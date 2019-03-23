@@ -52,11 +52,12 @@ size_t write_server(Server* server) {
 		lerror("Failed to open '%s' for writing!", config_file);
 		exit(1);
 	}
-	
 	free(config_file);
-	size_t size = write_server_fp(server, to_write);
 	
+	size_t size = write_server_fp(server, to_write);
 	fclose(to_write);
+	
+	AccessToken* test = map_get(server->auth_tokens, server->autogentoo_org_token);
 	
 	return size;
 }
@@ -136,47 +137,6 @@ size_t write_host_fp(Host* host, FILE* fp) {
 	return size;
 }
 
-/*
-size_t write_stage_fp(HostTemplate* temp, FILE* fp) {
-	size_t size = 0;
-	size += write_int(AUTOGENTOO_STAGE, fp);
-	size += write_string(temp->id, fp);
-	size += write_string(temp->arch, fp);
-	size += write_string(temp->cflags, fp);
-	size += write_string(temp->chost, fp);
-	
-	size += write_int(temp->extra_c, fp);
-	int i;
-	for (i = 0; i != temp->extra_c; i++) {
-		size += write_string(temp->extras[i].make_extra, fp);
-		size += write_int(temp->extras[i].select, fp);
-	}
-	
-	size += write_string(temp->dest_dir, fp);
-	size += write_string(temp->new_id, fp);
-	
-	return size;
-}
-
-size_t write_template_fp (HostTemplate* temp, FILE* fp) {
-	size_t size = 0;
-	size += write_int(AUTOGENTOO_TEMPLATE, fp);
-	size += write_string(temp->id, fp);
-	size += write_string(temp->arch, fp);
-	size += write_string(temp->cflags, fp);
-	size += write_string(temp->chost, fp);
-	
-	size += write_int(temp->extra_c, fp);
-	int i;
-	for (i = 0; i != temp->extra_c; i++) {
-		size += write_string(temp->extras[i].make_extra, fp);
-		size += write_int(temp->extras[i].select, fp);
-	}
-	
-	return size;
-}
-*/
-
 Server* read_server(char* location, char* port, server_t opts) {
 	char* config_file_name = ".autogentoo.config";
 	char* config_file = malloc(strlen(location) + strlen(config_file_name) + 2);
@@ -194,6 +154,8 @@ Server* read_server(char* location, char* port, server_t opts) {
 	
 	Host* host_temp;
 	AccessToken* token_temp;
+	
+	//size_t len = (size_t)read_int(fp);
 	
 	int current = 0;
 	int __break = 0;
@@ -279,10 +241,10 @@ Host* read_host(FILE* fp) {
 				new_kernel->version = read_string(fp);
 				vector_add(out->kernel, new_kernel);
 				break;
-			//case AUTOGENTOO_ACCESS_TOKEN:
-			//	new_token.user_id = read_string(fp);
-			//	//new_token.auth_token = read_void(AUTOGENTOO_TOKEN_LENGTH, fp);
-			//	new_token.access_level = read_int(fp);
+			case AUTOGENTOO_ACCESS_TOKEN:
+				new_token.user_id = read_string(fp);
+				new_token.auth_token = read_void(AUTOGENTOO_TOKEN_LENGTH, fp);
+				new_token.access_level = read_int(fp);
 			case AUTOGENTOO_HOST_END:
 				break;
 			default:
@@ -294,73 +256,33 @@ Host* read_host(FILE* fp) {
 	return out;
 }
 
-void read_host_binding(Server* server, HostBind* dest, FILE* fp) {
-	char* _host_id = read_string(fp);
-	dest->host = server_get_host(server, _host_id);
-	dest->ip = read_string(fp);
-	free(_host_id);
-}
-
-/*
-void read_stage(Server* server, HostTemplate* dest, FILE* fp) {
-	dest->parent = server;
-	dest->id = read_string(fp);
-	dest->arch = read_string(fp);
-	dest->cflags = read_string(fp);
-	dest->chost = read_string(fp);
-	
-	dest->extra_c = read_int(fp);
-	int i;
-	for (i = 0; i != dest->extra_c; i++) {
-		dest->extras[i].make_extra = read_string(fp);
-		dest->extras[i].select = (template_selects)read_int(fp);
-	}
-	
-	dest->dest_dir = read_string(fp);
-	dest->new_id = read_string(fp);
-}
-
-void read_template(Server* server, HostTemplate* dest, FILE* fp) {
-	dest->parent = server;
-	dest->id = read_string(fp);
-	dest->arch = read_string(fp);
-	dest->cflags = read_string(fp);
-	dest->chost = read_string(fp);
-	
-	dest->extra_c = read_int(fp);
-	int i;
-	for (i = 0; i != dest->extra_c; i++) {
-		dest->extras[i].make_extra = read_string(fp);
-		dest->extras[i].select = (template_selects)read_int(fp);
-	}
-	
-	dest->dest_dir = NULL;
-	dest->new_id = NULL;
-}
-*/
-
 size_t write_string(char* src, FILE* fp) {
-	if (!src) {
-		fputc(0, fp);
-		return 1;
-	}
+	size_t len;
+	if (!src)
+		len = 0;
+	else
+		len = strlen(src);
+	write_int((int)len, fp);
 	
-	fputs(src, fp);
-	fputc(0, fp);
+	if (len)
+		fwrite(src, 1, len, fp);
 	
-	return strlen(src) + 1;
+	return len + sizeof(size_t);
 }
 
 char* read_string(FILE* fp) {
-	int i, c;
-	for (i = 0, c = fgetc(fp); c != 0; i++, c = fgetc(fp));
-	fseek(fp, -i - 1, SEEK_CUR);
+	size_t len = (size_t)read_int(fp);
 	
-	char* out = NULL;
-	if ((size_t) i + 1) {
-		out = malloc((size_t) i + 1);
-		fread(out, 1, (size_t) i + 1, fp);
-	}
+	if (!len)
+		return NULL;
+	
+	char* out = malloc(len + 1);
+	
+	if (!out)
+		exit(1);
+	
+	fread(out, 1, len, fp);
+	out[len] = 0;
 	
 	return out;
 }

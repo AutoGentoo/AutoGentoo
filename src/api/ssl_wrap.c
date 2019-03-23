@@ -127,15 +127,13 @@ void ssocket_request(SSocket* sock, ClientRequest* request) {
 		client_request_generate(request);
 	
 	int out_size = 0;
-	if ((out_size = SSL_write(sock->ssl, request->ptr, (int)request->size)) != request->size) {
-		lerror("Error writing to server");
-		lerror("Expected to write %d, wrote %d", request->size, out_size);
-	}
+	if ((out_size = SSL_write(sock->ssl, request->ptr, (int)request->size)) != request->size)
+		lerror("Error writing to server\nExpected to write %d, wrote %d", request->size, out_size);
 }
 
 ssize_t ssocket_read_response(SSocket* sock, void** dest) {
-	struct timeval tv = {0, 500};
-	setsockopt(sock->socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
+	//struct timeval tv = {0, 500};
+	//setsockopt(sock->socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
 	
 	/* Read the request */
 	size_t chunk_len = 128;

@@ -16,6 +16,7 @@
 #include <autogentoo/api/dynamic_binary.h>
 #include <autogentoo/chroot.h>
 #include <sys/utsname.h>
+#include <autogentoo/writeconfig.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -57,7 +58,7 @@ int prv_check_data_structs (Request* req, const int* to_check, int count) {
  */
 void HOST_NEW(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_NEW});
-	AccessToken* tok = authorize (request, TOKEN_SERVER_WRITE, AUTH_TOKEN_HOST);
+	AccessToken* tok = authorize (request, TOKEN_SERVER_WRITE, AUTH_TOKEN_SERVER);
 	
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
@@ -76,6 +77,8 @@ void HOST_NEW(Response* res, Request* request) {
 	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
 	if (!issued)
 		HANDLE_RETURN(NOT_FOUND);
+	
+	vector_add(request->parent->hosts, &target);
 	
 	dynamic_binary_add(res->content, 's', issued->user_id);
 	dynamic_binary_add(res->content, 's', issued->host_id);
@@ -204,7 +207,7 @@ void SRV_REFRESH(Response* res, Request* request) {
 		dynamic_binary_array_end(res->content);
 		dynamic_binary_array_next(res->content);
 	}
-	dynamic_binary_array_end(res->content);
+	int host_num = dynamic_binary_array_end(res->content);
 }
 
 void AUTH_ISSUE_TOK(Response* res, Request* request) {
@@ -228,14 +231,15 @@ void AUTH_ISSUE_TOK(Response* res, Request* request) {
 	dynamic_binary_add(res->content, 's', issued->user_id);
 	dynamic_binary_add(res->content, 's', issued->host_id);
 	dynamic_binary_add(res->content, 'i', &issued->access_level);
+	
 }
 
 void AUTH_REFRESH_TOK(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE})
 	
 	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
-	if (!tok)
-		HANDLE_RETURN(FORBIDDEN);
+	//if (!tok)
+	//	HANDLE_RETURN(FORBIDDEN);
 	
 	StringVector* token_keys = map_all_keys(request->parent->auth_tokens);
 	
@@ -250,6 +254,7 @@ void AUTH_REFRESH_TOK(Response* res, Request* request) {
 		dynamic_binary_add(res->content, 's', token->auth_token);
 		dynamic_binary_add(res->content, 's', token->user_id);
 		dynamic_binary_add(res->content, 's', token->host_id);
+		linfo("%d", token->access_level);
 		dynamic_binary_add(res->content, 'i', &token->access_level);
 		dynamic_binary_array_next(res->content);
 	}
@@ -272,6 +277,8 @@ void AUTH_REGISTER(Response* res, Request* request) {
 	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
 	if (!issued)
 		HANDLE_RETURN(INTERNAL_ERROR);
+	
+	//linfo("%d\n", )
 	
 	dynamic_binary_add(res->content, 's', issued->auth_token);
 	dynamic_binary_add(res->content, 's', issued->user_id);

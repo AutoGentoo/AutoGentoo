@@ -41,23 +41,34 @@ void* prv_dynamic_binary_add_item(DynamicBinary* db, size_t size, void* data_ptr
 }
 
 char* prv_dynamic_binary_template_add(DynamicBinary* db, char type) {
-	if (db->template_used_size + 1 >= db->template_str_size) {
+	if (db->template_used_size + 2 >= db->template_str_size) {
 		db->template_str_size += 16;
 		db->template = realloc(db->template, db->template_str_size);
 	}
 	
-	db->template[db->template_used_size] = type;
-	return db->template + ++db->template_used_size;
+	if (*db->current_template == 0) { // Adding to the end
+		db->template_used_size++;
+		db->current_template[1] = 0; // NULL end of string
+	}
+	else
+		if (*db->current_template != type) {
+			lerror("Tried adding incorrect type. Expected '%c' got '%c'", *db->current_template, type);
+			return NULL;
+		}
+	
+	*db->current_template = type;
+	db->current_template++;
+	
+	return db->current_template;
 }
 
 void dynamic_binary_array_start(DynamicBinary* db) {
 	prv_dynamic_binary_template_add(db, 'a');
-	char* template_end = prv_dynamic_binary_template_add(db, '(');
-	db->current_template += 2;
+	prv_dynamic_binary_template_add(db, '(');
 	
 	struct array_node* parent = db->array_size;
 	db->array_size = malloc(sizeof(struct array_node));
-	db->array_size->template_start = template_end;
+	db->array_size->template_start = db->current_template;
 	db->array_size->parent = parent;
 	db->array_size->size_offset = db->used_size;
 	db->array_size->size = 0;
@@ -66,41 +77,42 @@ void dynamic_binary_array_start(DynamicBinary* db) {
 	prv_dynamic_binary_add_item(db, sizeof(int), &current_array_size);
 }
 
-void dynamic_binary_array_end(DynamicBinary* db) {
+int dynamic_binary_array_end(DynamicBinary* db) {
 	if (!db->array_size)
-		return;
+		return 0;
 	
-	db->current_template = prv_dynamic_binary_template_add(db, ')'); /* Skip over the parenthesis */
+	db->current_template = db->array_size->template_end;
+	prv_dynamic_binary_template_add(db, ')');
 	struct array_node* parent = db->array_size->parent;
 	
 	int size_temp = db->array_size->size;
 	if (db->endian & DB_ENDIAN_TARGET_NETWORK && !(db->endian & DB_ENDIAN_INPUT_NETWORK))
 		size_temp = htonl((uint32_t)size_temp);
 	memcpy(db->ptr + db->array_size->size_offset, &size_temp, sizeof(int));
+	int out = db->array_size->size;
 	
 	free(db->array_size);
 	db->array_size = parent;
+	
+	return out;
 }
 
 void dynamic_binary_array_next(DynamicBinary* db) {
+	db->array_size->template_end = db->current_template;
 	db->current_template = db->array_size->template_start;
 	db->array_size->size++;
 }
 
 dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {
-	if (*db->current_template) {
-		if (type != *db->current_template) {
-			lerror("Adding incorrect type. Expected '%c' got '%c'", *db->current_template, type);
-			return DYNAMIC_BIN_ETYPE;
-		}
-	}
-	else
-		prv_dynamic_binary_template_add(db, type);
-	db->current_template++;
+	if (prv_dynamic_binary_template_add(db, type) == NULL)
+		return DYNAMIC_BIN_ETYPE;
 	
 	size_t data_size = 0;
 	if (type == 'i') {
 		data_size = sizeof(int);
+		int* src_data = data;
+		data = malloc (sizeof(int));
+		*(int*)data = *src_data;
 		if (db->endian & DB_ENDIAN_TARGET_NETWORK && !(db->endian & DB_ENDIAN_INPUT_NETWORK))
 			*(int*)data = htonl(*(uint32_t*)data);
 		else if (!(db->endian & DB_ENDIAN_TARGET_NETWORK) && db->endian & DB_ENDIAN_INPUT_NETWORK)
@@ -124,15 +136,8 @@ dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {
 }
 
 dynamic_bin_t dynamic_binary_add_binary(DynamicBinary* db, size_t n, void* data) {
-	if (*db->current_template) {
-		if (*db->current_template != 'v') {
-			lerror("Tried adding incorrect type. Expected '%c' got '%c'", *db->current_template, 'v');
-			return DYNAMIC_BIN_ETYPE;
-		}
-	}
-	else
-		prv_dynamic_binary_template_add(db, 'v');
-	db->current_template++;
+	if (prv_dynamic_binary_template_add(db, 'v') == NULL)
+		return DYNAMIC_BIN_ETYPE;
 	
 	prv_dynamic_binary_add_item(db, sizeof(size_t), &n);
 	prv_dynamic_binary_add_item(db, n, data);

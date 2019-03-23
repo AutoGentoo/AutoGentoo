@@ -12,7 +12,6 @@
 #define AUTOGENTOO_TOKEN_LENGTH 32
 #define AUTOGENTOO_HASH_LENGTH 128
 
-typedef struct __AuthToken AuthToken;
 typedef struct __AccessToken AccessToken;
 
 typedef enum {

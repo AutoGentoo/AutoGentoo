@@ -20,6 +20,7 @@ typedef enum {
 struct array_node {
 	struct array_node* parent;
 	char* template_start;
+	char* template_end;
 	size_t size_offset;
 	int size;
 };
@@ -55,7 +56,7 @@ union __DynamicType {
 DynamicBinary* dynamic_binary_new(dynamic_binary_endian_t endian);
 void dynamic_binary_array_start(DynamicBinary* db);
 void dynamic_binary_array_next(DynamicBinary* db);
-void dynamic_binary_array_end(DynamicBinary* db);
+int dynamic_binary_array_end(DynamicBinary* db);
 dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data);
 dynamic_bin_t dynamic_binary_add_binary(DynamicBinary* db, size_t n, void* data);
 dynamic_bin_t dynamic_binary_add_quick(DynamicBinary* db, char* template, DynamicType* content);

@@ -84,7 +84,7 @@ Host* read_host (FILE* fp);
  * @param dest the binding destination
  * @param fp the file to read from
  */
-void read_host_binding (Server* server, HostBind* dest, FILE* fp);
+//void read_host_binding (Server* server, HostBind* dest, FILE* fp);
 
 /**
  * Read a HostTemplate from file

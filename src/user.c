@@ -55,7 +55,7 @@ AccessToken* auth_verify_token(Server* server, AccessToken* request_token) {
 	AccessToken* found_token = map_get(server->auth_tokens, request_token->auth_token);
 	if (!found_token)
 		return NULL;
-	
+		
 	if ((request_token->access_level & found_token->access_level) != found_token->access_level)
 		return NULL;
 	
@@ -75,6 +75,7 @@ AccessToken* auth_issue_token(Server* server, AccessToken* creation_token) {
 	out->user_id = strdup(creation_token->user_id);
 	out->auth_token = malloc (AUTOGENTOO_TOKEN_LENGTH + 1);
 	out->access_level = creation_token->access_level;
+	printf("%d\n", out->access_level);
 	
 	do
 		if (prv_random_string(out->auth_token, AUTOGENTOO_TOKEN_LENGTH) != 0) {
