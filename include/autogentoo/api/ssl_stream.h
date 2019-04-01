@@ -72,6 +72,7 @@ SMWServer* smw_server_new (char* port, char* cert_file, char* rsa_file);
 pthread_t smw_server_start(SMWServer* server);
 void smw_server_free(SMWServer* server);
 SMWConnection* smw_server_connect(SMWServer* server, int fd);
+void smw_server_loop(SMWServer* server);
 
 SMWPool* smw_fork(SMWServer* server, int accepted_sock);
 void smw_stream(SMWConnection* conn);

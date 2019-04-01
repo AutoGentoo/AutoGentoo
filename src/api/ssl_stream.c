@@ -27,6 +27,41 @@ SMWServer* smw_server_new (char* port, char* cert_file, char* rsa_file) {
 	
 	server->pid = 0;
 	
+	if (!rsa_file)
+		rsa_file = "smw.rsa";
+	if (access(rsa_file, F_OK) != -1) {
+		server->rsa_file = strdup(rsa_file);
+		FILE* fp = fopen(server->rsa_file, "r");
+		
+		if (!fp) {
+			lerror("Failed to open RSA file: %s", server->rsa_file);
+			goto error;
+		}
+		server->key_pair = PEM_read_RSAPrivateKey(fp, &server->key_pair, NULL, NULL);
+		fclose(fp);
+		if (!server->key_pair) {
+			lerror("Failed to read RSA from file %s", server->rsa_file);
+			goto error;
+		}
+	}
+	else {
+		server->rsa_file = strdup(rsa_file);
+		
+		if (!rsa_generate(&server->key_pair)) {
+			lerror ("Failed to generate RSA key");
+			goto error;
+		}
+		
+		int rsa_fd = open(server->rsa_file, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
+		FILE* fp = fdopen(rsa_fd, "w+");
+		if (!PEM_write_RSAPrivateKey(fp, server->key_pair, NULL, NULL, 0, NULL, NULL)) {
+			fclose (fp);
+			lerror("Failed to write private key to file");
+			goto error;
+		}
+		fclose (fp);
+	}
+	
 	if (!cert_file)
 		cert_file = "smw.cert";
 	if (access(cert_file, F_OK) != -1) {
@@ -53,30 +88,6 @@ SMWServer* smw_server_new (char* port, char* cert_file, char* rsa_file) {
 		if (!PEM_write_X509(fp, server->certificate)) {
 			fclose (fp);
 			lerror("Failed to write certificate to file");
-			goto error;
-		}
-		fclose (fp);
-	}
-	
-	if (!rsa_file)
-		rsa_file = "smw.rsa";
-	if (access(rsa_file, F_OK) != -1) {
-		server->rsa_file = strdup(cert_file);
-		FILE* fp = fopen(server->rsa_file, "r");
-	}
-	else {
-		server->rsa_file = strdup(rsa_file);
-		
-		if (!rsa_generate(&server->key_pair)) {
-			lerror ("Failed to generate RSA key");
-			goto error;
-		}
-		
-		int rsa_fd = open(server->rsa_file, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
-		FILE* fp = fdopen(rsa_fd, "w+");
-		if (!PEM_write_RSAPrivateKey(fp, server->key_pair, NULL, NULL, 0, NULL, NULL)) {
-			fclose (fp);
-			lerror("Failed to write private key to file");
 			goto error;
 		}
 		fclose (fp);
@@ -164,12 +175,23 @@ SMWConnection* smw_server_connect(SMWServer* server, int fd) {
 	int server_id_len;
 	SSL_read(out->write_side, &server_id_len, sizeof(int));
 	char* server_id = malloc((size_t)server_id_len + 1);
-	SSL_read(out->write_side, server_id, server_id_len);
+	SSL_read(out->write_side, server_id, server_id_len); // Read server id from client (django id)
+	
+	int request_len;
+	SSL_read(out->write_side, &request_len, sizeof(int));
+	char* request = malloc((size_t)request_len + 1);
+	SSL_read(out->write_side, request, request_len); // Read request from client
 	
 	linfo("Streaming from %s", server_id);
-	
 	char* autogentoo_side_ip = server->django_callback(server_id);
 	ssocket_new(&out->read_side, autogentoo_side_ip, 9491);
+	free(server_id);
+	
+	
+	SSL_write(out->read_side->ssl, request, request_len); //
+	
+	
+	free(request);
 	
 	return out;
 }

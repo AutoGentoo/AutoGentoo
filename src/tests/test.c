@@ -94,7 +94,7 @@ void test_ssl_client(void** state) {
 
 void test_ssl_stream(void** state) {
 	SMWServer* server = smw_server_new("9492", "smw.cert", "smw.rsa");
-	
+	assert_non_null(server);
 }
 
 int main(void) {
@@ -103,7 +103,7 @@ int main(void) {
 			cmocka_unit_test(test_htonll),
 			cmocka_unit_test(test_request),
 			cmocka_unit_test(test_dynamic_binary),
-			cmocka_unit_test(test_ssl_client),
+//			cmocka_unit_test(test_ssl_client),
 			cmocka_unit_test(test_ssl_stream),
 	};
 	

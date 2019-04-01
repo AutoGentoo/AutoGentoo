@@ -11,9 +11,7 @@
 typedef enum __vector_opts vector_opts;
 typedef struct __Vector Vector;
 
-#ifndef HACKSAW_VECTOR_INCREMENT
 #define HACKSAW_VECTOR_INCREMENT 5
-#endif
 
 enum __vector_opts {
 	VECTOR_UNORDERED = 0x0, // Any order can be used (most efficient)

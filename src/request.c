@@ -60,7 +60,7 @@ Request* request_handle (Connection* conn) {
 	current_request++;
 	void* end = out->body + out->length;
 	
-	AUTOGENTOO_READ_INT(out->request_type);
+	AUTOGENTOO_READ_INT(out->request_type)
 	
 	out->structures_parent = vector_new (sizeof (RequestData), VECTOR_REMOVE | VECTOR_ORDERED);
 	out->types_parent = vector_new (sizeof (request_structure_t), VECTOR_REMOVE | VECTOR_ORDERED);
@@ -68,7 +68,7 @@ Request* request_handle (Connection* conn) {
 	out->types = out->types_parent->ptr;
 	
 	request_structure_t current;
-	AUTOGENTOO_READ_INT_ERROR(current, AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR);
+	AUTOGENTOO_READ_INT_ERROR(current, AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR)
 	
 	long d = 0;
 	while (current != STRCT_END) {
@@ -86,7 +86,7 @@ Request* request_handle (Connection* conn) {
 			AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR
 		current_request += len;
 		
-		AUTOGENTOO_READ_INT_ERROR(current, AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR);
+		AUTOGENTOO_READ_INT_ERROR(current, AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR)
 	}
 	
 	return out;

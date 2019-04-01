@@ -92,7 +92,7 @@ void HOST_EDIT(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
-	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
+	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
 	struct __struct_Host_edit host_edit = request->structures[2].host_edit;
 
 	if (host_edit.request_type == 1) {
@@ -126,7 +126,7 @@ void HOST_DEL(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
-	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
+	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
 
 	/* Remove the host */
 	for (int i = 0; i < request->parent->hosts->n; i++)
@@ -144,7 +144,7 @@ void HOST_EMERGE(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
-	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
+	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
 
 	//host_emerge(host, request->structures[2].emerge.emerge);
 }
@@ -155,14 +155,14 @@ void HOST_MNTCHROOT(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
-	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
+	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
 
 	response_t ret = chroot_mount(host);
 	HANDLE_RETURN(ret);
 }
 
 void SRV_INFO(Response* res, Request* request) {
-	HANDLE_CHECK_STRUCTURES({})
+	HANDLE_CHECK_STRUCTURES({});
 
 	struct utsname uname_pointer;
 	uname(&uname_pointer);
@@ -184,7 +184,7 @@ void SRV_INFO(Response* res, Request* request) {
 }
 
 void SRV_REFRESH(Response* res, Request* request) {
-	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE})
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE});
 	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
@@ -237,7 +237,7 @@ void AUTH_ISSUE_TOK(Response* res, Request* request) {
 }
 
 void AUTH_REFRESH_TOK(Response* res, Request* request) {
-	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE})
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE});
 
 	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
 	//if (!tok)

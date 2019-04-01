@@ -17,6 +17,7 @@ typedef enum {
 typedef enum {
 	DIR_CONNECTION_END, //!< Kill the connection after this request ends
 	DIR_CONNECTION_OPEN, //!< Handle another request after this one
+	DIR_CONNECTION_STREAM, //!< PROT_AUTOGENTOO only, stream content through SMW
 } directive_t;
 
 typedef enum {
@@ -37,7 +38,10 @@ typedef enum {
 	REQ_AUTH_REFRESH_TOK,
 	REQ_AUTH_REGISTER,
 	
-	REQ_MAX
+	REQ_MAX,
+	
+	/* Modify request with options */
+	OPT_RSTREAM = 1 << 30
 } request_t;
 
 #include <autogentoo/response.h>

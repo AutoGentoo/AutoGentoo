@@ -23,7 +23,7 @@ if (!host) { \
 		HANDLE_RETURN(BAD_REQUEST); \
 	if (prv_check_data_structs (request, check_types, __check_types_n) == -1) \
 		HANDLE_RETURN(BAD_REQUEST); \
-});
+})
 
 /**
  * Holds all of the valid requests
