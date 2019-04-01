@@ -90,7 +90,7 @@ struct __Server {
 	WorkerParent* queue; //!< Jobs waiting in the queue, NULL if empty queue
 	volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
 	PoolHandler* pool_handler;
-	//ThreadHandler* thandler; // Old way to handle threading
+	
 	pid_t pid;
 	pthread_t pthread;
 	int socket;

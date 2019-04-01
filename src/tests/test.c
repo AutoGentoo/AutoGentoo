@@ -8,21 +8,22 @@
 #include <autogentoo/api/request_generate.h>
 #include <autogentoo/api/dynamic_binary.h>
 #include <autogentoo/api/ssl_wrap.h>
+#include <autogentoo/api/ssl_stream.h>
 #include "test.h"
 
 void test_htonl(void** state) {
-	assert_byte_32(htonl(0x0000aabb), 0, 0, 0xaa, 0xbb);
-	assert_byte_32(htonl(0xddccbbaa), 0xdd, 0xcc, 0xbb, 0xaa);
-	assert_byte_32(ntohl(0x0000aabb), 0, 0, 0xaa, 0xbb);
-	assert_byte_32(ntohl(0xddccbbaa), 0xdd, 0xcc, 0xbb, 0xaa);
+	assert_byte_32(htonl(0x0000aabb), 0, 0, 0xaa, 0xbb)
+	assert_byte_32(htonl(0xddccbbaa), 0xdd, 0xcc, 0xbb, 0xaa)
+	assert_byte_32(ntohl(0x0000aabb), 0, 0, 0xaa, 0xbb)
+	assert_byte_32(ntohl(0xddccbbaa), 0xdd, 0xcc, 0xbb, 0xaa)
 	(void) state;
 }
 
 void test_htonll(void** state) {
-	assert_byte_64(htonll(0xeeffccdd0000aabb), 0xee, 0xff, 0xcc, 0xdd, 0, 0, 0xaa, 0xbb);
-	assert_byte_64(htonll(0xaabbccddddccbbaa), 0xaa, 0xbb, 0xcc, 0xdd, 0xdd, 0xcc, 0xbb, 0xaa);
-	assert_byte_64(ntohll(0xbbaa00000000aabb), 0xbb, 0xaa, 0, 0, 0, 0, 0xaa, 0xbb);
-	assert_byte_64(ntohll(0xeeffccdd0000aabb), 0xee, 0xff, 0xcc, 0xdd, 0, 0, 0xaa, 0xbb);
+	assert_byte_64(htonll(0xeeffccdd0000aabb), 0xee, 0xff, 0xcc, 0xdd, 0, 0, 0xaa, 0xbb)
+	assert_byte_64(htonll(0xaabbccddddccbbaa), 0xaa, 0xbb, 0xcc, 0xdd, 0xdd, 0xcc, 0xbb, 0xaa)
+	assert_byte_64(ntohll(0xbbaa00000000aabb), 0xbb, 0xaa, 0, 0, 0, 0, 0xaa, 0xbb)
+	assert_byte_64(ntohll(0xeeffccdd0000aabb), 0xee, 0xff, 0xcc, 0xdd, 0, 0, 0xaa, 0xbb)
 	(void) state;
 }
 
@@ -91,6 +92,11 @@ void test_ssl_client(void** state) {
 	free(res);
 }
 
+void test_ssl_stream(void** state) {
+	SMWServer* server = smw_server_new("9492", "smw.cert", "smw.rsa");
+	
+}
+
 int main(void) {
 	const struct CMUnitTest tests[] = {
 			cmocka_unit_test(test_htonl),
@@ -98,6 +104,7 @@ int main(void) {
 			cmocka_unit_test(test_request),
 			cmocka_unit_test(test_dynamic_binary),
 			cmocka_unit_test(test_ssl_client),
+			cmocka_unit_test(test_ssl_stream),
 	};
 	
 	return cmocka_run_group_tests(tests, NULL, NULL);

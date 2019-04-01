@@ -45,11 +45,11 @@ FunctionHandler resolve_call(request_t type) {
 int prv_check_data_structs (Request* req, const int* to_check, int count) {
 	if (count != req->struct_c)
 		return 1;
-	
+
 	for (int i = 0; i < count; i++)
 		if (req->types[i] != to_check[i])
 			return 1;
-	
+
 	return 0;
 }
 
@@ -59,27 +59,27 @@ int prv_check_data_structs (Request* req, const int* to_check, int count) {
 void HOST_NEW(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_NEW});
 	AccessToken* tok = authorize (request, TOKEN_SERVER_WRITE, AUTH_TOKEN_SERVER);
-	
+
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
-	
+
 	/* Create the host */
 	Host* target = host_new(request->parent, host_id_new());
 	target->arch = strdup(request->structures[1].host_new.arch);
 	target->hostname = strdup(request->structures[1].host_new.hostname);
 	target->profile = strdup(request->structures[1].host_new.profile);
-	
+
 	AccessToken creat_tok;
 	creat_tok.access_level = TOKEN_HOST_WRITE;
 	creat_tok.host_id = target->id;
 	creat_tok.user_id = request->structures[0].auth.user_id;
-	
+
 	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
 	if (!issued)
 		HANDLE_RETURN(NOT_FOUND);
-	
+
 	vector_add(request->parent->hosts, &target);
-	
+
 	dynamic_binary_add(res->content, 's', issued->user_id);
 	dynamic_binary_add(res->content, 's', issued->host_id);
 	dynamic_binary_add(res->content, 's', issued->auth_token);
@@ -91,10 +91,10 @@ void HOST_EDIT(Response* res, Request* request) {
 	AccessToken* tok = authorize (request, TOKEN_HOST_WRITE, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
-	
+
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
 	struct __struct_Host_edit host_edit = request->structures[2].host_edit;
-	
+
 	if (host_edit.request_type == 1) {
 		free(small_map_delete(host->make_conf, host_edit.make_conf_var));
 		small_map_insert(host->make_conf, host_edit.make_conf_var, strdup(host_edit.make_conf_val));
@@ -125,16 +125,16 @@ void HOST_DEL(Response* res, Request* request) {
 	AccessToken* tok = authorize (request, TOKEN_HOST_MOD, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
-	
+
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
-	
+
 	/* Remove the host */
 	for (int i = 0; i < request->parent->hosts->n; i++)
 		if (*(Host**)vector_get(request->parent->hosts, i) == host) {
 			vector_remove(request->parent->hosts, i);
 			break;
 		}
-	
+
 	host_free(host);
 }
 
@@ -143,9 +143,9 @@ void HOST_EMERGE(Response* res, Request* request) {
 	AccessToken* tok = authorize (request, TOKEN_HOST_MOD, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
-	
+
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
-	
+
 	//host_emerge(host, request->structures[2].emerge.emerge);
 }
 
@@ -154,16 +154,16 @@ void HOST_MNTCHROOT(Response* res, Request* request) {
 	AccessToken* tok = authorize (request, TOKEN_HOST_MOD, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
-	
+
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname);
-	
+
 	response_t ret = chroot_mount(host);
 	HANDLE_RETURN(ret);
 }
 
 void SRV_INFO(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({})
-	
+
 	struct utsname uname_pointer;
 	uname(&uname_pointer);
 	char* sys_info[][2] = {
@@ -173,7 +173,7 @@ void SRV_INFO(Response* res, Request* request) {
 			{"Version", uname_pointer.version},
 			{"Machine", uname_pointer.machine},
 	};
-	
+
 	dynamic_binary_array_start(res->content);
 	for (int i = 0; i < sizeof(sys_info) / sizeof(sys_info[0]); i++) {
 		dynamic_binary_add(res->content, 's', sys_info[i][0]);
@@ -188,7 +188,7 @@ void SRV_REFRESH(Response* res, Request* request) {
 	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
-	
+
 	dynamic_binary_array_start(res->content);
 	for (int i = 0; i < request->parent->hosts->n; i++) {
 		Host* current = *(Host**)vector_get(request->parent->hosts, i);
@@ -196,7 +196,7 @@ void SRV_REFRESH(Response* res, Request* request) {
 		dynamic_binary_add(res->content, 's', current->hostname);
 		dynamic_binary_add(res->content, 's', current->profile);
 		dynamic_binary_add(res->content, 's', current->arch);
-		
+
 		dynamic_binary_array_start(res->content);
 		for (int j = 0; j < current->make_conf->n; j++) {
 			SmallMap_key* variable = *(SmallMap_key**)vector_get(current->make_conf, j);
@@ -207,42 +207,44 @@ void SRV_REFRESH(Response* res, Request* request) {
 		dynamic_binary_array_end(res->content);
 		dynamic_binary_array_next(res->content);
 	}
-	int host_num = dynamic_binary_array_end(res->content);
+	dynamic_binary_array_end(res->content);
+
+
 }
 
 void AUTH_ISSUE_TOK(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_ISSUE_TOK});
 	AccessToken auth_tok;
 	AccessToken creat_tok;
-	
+
 	auth_tok.host_id = request->structures[1].host_select.hostname;
 	auth_tok.auth_token = request->structures[0].auth.token;
 	auth_tok.user_id = request->structures[0].auth.user_id;
-	
+
 	creat_tok.user_id = request->structures[2].issue_tok.user_id;
 	creat_tok.host_id = request->structures[2].issue_tok.target_host;
 	creat_tok.access_level = request->structures[2].issue_tok.permission;
-	
+
 	AccessToken* issued = autogentoo_issue(request->parent, &auth_tok, &creat_tok);
 	if (!issued)
 		HANDLE_RETURN(FORBIDDEN);
-	
+
 	dynamic_binary_add(res->content, 's', issued->auth_token);
 	dynamic_binary_add(res->content, 's', issued->user_id);
 	dynamic_binary_add(res->content, 's', issued->host_id);
 	dynamic_binary_add(res->content, 'i', &issued->access_level);
-	
+
 }
 
 void AUTH_REFRESH_TOK(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE})
-	
+
 	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
 	//if (!tok)
 	//	HANDLE_RETURN(FORBIDDEN);
-	
+
 	StringVector* token_keys = map_all_keys(request->parent->auth_tokens);
-	
+
 	dynamic_binary_array_start(res->content);
 	for (int i = 0; i < token_keys->n; i++) {
 		AccessToken* token = map_get(request->parent->auth_tokens, string_vector_get(token_keys, i));
@@ -250,7 +252,7 @@ void AUTH_REFRESH_TOK(Response* res, Request* request) {
 			string_vector_free(token_keys);
 			HANDLE_RETURN(INTERNAL_ERROR);
 		}
-		
+
 		dynamic_binary_add(res->content, 's', token->auth_token);
 		dynamic_binary_add(res->content, 's', token->user_id);
 		dynamic_binary_add(res->content, 's', token->host_id);
@@ -266,20 +268,20 @@ void AUTH_REGISTER(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_ISSUE_TOK});
 	AccessToken auth_tok;
 	AccessToken creat_tok;
-	
+
 	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
-	
+
 	creat_tok.user_id = request->structures[1].issue_tok.user_id;
 	creat_tok.host_id = NULL;
 	creat_tok.access_level = TOKEN_SERVER_WRITE;
 	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
 	if (!issued)
 		HANDLE_RETURN(INTERNAL_ERROR);
-	
+
 	//linfo("%d\n", )
-	
+
 	dynamic_binary_add(res->content, 's', issued->auth_token);
 	dynamic_binary_add(res->content, 's', issued->user_id);
 	dynamic_binary_add(res->content, 's', issued->host_id);

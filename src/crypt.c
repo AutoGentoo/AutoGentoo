@@ -159,7 +159,7 @@ int x509_generate_write(EncryptServer* parent) {
 			return 4;
 		}
 		
-		int rsa_fd = open(parent->rsa_path, O_RDWR | O_CREAT, 0 | S_IRUSR | S_IWUSR | S_IRGRP);
+		int rsa_fd = open(parent->rsa_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
 		FILE* fp = fdopen(rsa_fd, "w");
 		if (!PEM_write_RSAPrivateKey(fp, parent->key_pair, NULL, NULL, 0, NULL, NULL)) {
 			fclose (fp);
@@ -176,7 +176,7 @@ int x509_generate_write(EncryptServer* parent) {
 			return 5;
 		}
 		
-		int cert_fd = open(parent->cert_path, O_RDWR | O_CREAT, 0 | S_IRUSR | S_IWUSR | S_IRGRP);
+		int cert_fd = open(parent->cert_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
 		FILE* fp = fdopen(cert_fd, "w");
 		if (!PEM_write_X509(fp, parent->certificate)) {
 			fclose (fp);

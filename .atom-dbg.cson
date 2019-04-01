@@ -1,0 +1,5 @@
+"cmake-build-debug/autogentoo-exec":
+	debugger: "dbg-gdb"
+	path: "cmake-build-debug/autogentoo-exec"
+	args: ["--server --encrypt"]
+	cwd: "cmake-build-debug"
