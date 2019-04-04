@@ -41,7 +41,12 @@ typedef enum {
 	REQ_MAX,
 	
 	/* Modify request with options */
-	OPT_RSTREAM = 1 << 30
+	/** Set the request a stream (send the response code immediatly)
+	  * Also flushes data and writes as fast as posible for realtime responses
+ 	  * Incompatible request type will return 400 Bad Request
+ 	 **/
+	REQ_OPT_STREAM = 1 << 30
+	
 } request_t;
 
 #include <autogentoo/response.h>

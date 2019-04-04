@@ -25,7 +25,7 @@ RequestLink requests[] = {
 		{REQ_HOST_EDIT,       {.ag_fh=HOST_EDIT}},
 		{REQ_HOST_DEL,        {.ag_fh=HOST_DEL}},
 		{REQ_HOST_EMERGE,     {.ag_fh=HOST_EMERGE}},
-		{REQ_HOST_MNTCHROOT,  {.ag_fh=HOST_MNTCHROOT}},
+		{REQ_HOST_MNTCHROOT,  {.ag_fh=HOST_MNTCHROOT}}, //!< Wont be a very long stream
 		{REQ_AUTH_ISSUE_TOK,  {.ag_fh=AUTH_ISSUE_TOK}},
 		{REQ_AUTH_REFRESH_TOK,{.ag_fh=AUTH_REFRESH_TOK}},
 		{REQ_SRV_INFO,        {.ag_fh=SRV_INFO}},
@@ -38,8 +38,9 @@ FunctionHandler resolve_call(request_t type) {
 	for (i = 0; i < sizeof (requests) / sizeof (RequestLink); i++)
 		if (requests[i].request_ident == type)
 			return requests[i].call;
-	FunctionHandler k = {NULL};
-	return k;
+	FunctionHandler ret;
+	ret.ag_fh = NULL;
+	return ret;
 }
 
 int prv_check_data_structs (Request* req, const int* to_check, int count) {
@@ -59,7 +60,7 @@ int prv_check_data_structs (Request* req, const int* to_check, int count) {
 void HOST_NEW(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_NEW});
 	AccessToken* tok = authorize (request, TOKEN_SERVER_WRITE, AUTH_TOKEN_SERVER);
-
+	
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
@@ -143,9 +144,8 @@ void HOST_EMERGE(Response* res, Request* request) {
 	AccessToken* tok = authorize (request, TOKEN_HOST_MOD, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
-
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
-
+	//START_STREAM()
 	//host_emerge(host, request->structures[2].emerge.emerge);
 }
 

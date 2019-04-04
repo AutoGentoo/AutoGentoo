@@ -15,6 +15,14 @@ if (!host) { \
 	HANDLE_RETURN(NOT_FOUND);\
 }
 
+#define START_STREAM() \
+if (request->directive == DIR_CONNECTION_STREAM && !res->sent_response) {\
+	/* Response code */ \
+	int code_big_endian = htonl(res->code.code); \
+	conn_write(request->conn, &code_big_endian, sizeof(int)); \
+	conn_write(request->conn, res->code.message, res->code.len + 1); \
+}
+
 #define HANDLE_CHECK_STRUCTURES(...) (\
 { \
 	int check_types[] = __VA_ARGS__; \

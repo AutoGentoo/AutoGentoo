@@ -62,6 +62,11 @@ Request* request_handle (Connection* conn) {
 	
 	AUTOGENTOO_READ_INT(out->request_type)
 	
+	if (out->request_type & REQ_OPT_STREAM) {
+		out->request_type &= ~REQ_OPT_STREAM;
+		out->directive = DIR_CONNECTION_STREAM;
+	}
+	
 	out->structures_parent = vector_new (sizeof (RequestData), VECTOR_REMOVE | VECTOR_ORDERED);
 	out->types_parent = vector_new (sizeof (request_structure_t), VECTOR_REMOVE | VECTOR_ORDERED);
 	out->structures = out->structures_parent->ptr;

@@ -187,7 +187,6 @@ SMWConnection* smw_server_connect(SMWServer* server, int fd) {
 	ssocket_new(&out->read_side, autogentoo_side_ip, 9491);
 	free(server_id);
 	
-	
 	SSL_write(out->read_side->ssl, request, request_len); //
 	
 	
