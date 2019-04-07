@@ -164,6 +164,7 @@ dynamic_bin_t dynamic_binary_add_quick(DynamicBinary* db, char* template, Dynami
 		}
 		else if (*c == 'e') {
 			i--;
+			dynamic_binary_array_next(db);
 			dynamic_binary_array_end(db);
 		}
 	}

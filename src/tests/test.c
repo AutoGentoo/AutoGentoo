@@ -81,7 +81,7 @@ void test_ssl_client(void** state) {
 	ssocket_request(ssl_socket, request);
 	
 	void* res;
-	ssize_t res_size = ssocket_read_response(ssl_socket, &res);
+	ssize_t res_size = ssocket_read(ssl_socket, &res, 0);
 	
 	FILE* fp = fopen("ssl_test", "w+");
 	fwrite(res, 1, (size_t)res_size, fp);

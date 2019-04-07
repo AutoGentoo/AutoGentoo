@@ -20,8 +20,9 @@ Queue* queue_new (queue_t type, char* template, ...) {
 	va_list args;
 	va_start (args, template);
 	
-	out->args = malloc (get_ssizeof (template));
+	out->args = malloc (get_item_size (template));
 	size_t offset = 0;
+	/*
 	for (char* i = template; *i; i++) {
 		if (*i == 'i')
 			*(int*)(out->args + offset) = va_arg(args, int);
@@ -29,7 +30,7 @@ Queue* queue_new (queue_t type, char* template, ...) {
 			*(char**)(out->args + offset) = strdup(va_arg(args, char*));
 		offset += get_sizeof(*i);
 	}
-	
+	*/
 	va_end (args);
 	return out;
 }

@@ -22,7 +22,8 @@ execute_process(COMMAND bash -c "mkdir -p {hacksaw,http}")
 
 set(worker_SOURCES
         src/worker/worker.c
-        src/worker/worker.h)
+        src/worker/worker.h
+        )
 
 add_library(hacksaw STATIC
         ${hacksaw_HEADERS}
@@ -41,17 +42,16 @@ add_definitions(-DDBPATH="test")
 add_definitions(-DAUTOGENTOO_DEBUG)
 #add_definitions(-DAUTOGENTOO_DEBUG)
 
-add_library(worker STATIC
-        ${worker_SOURCES}
-        )
 
 add_library(autogentoo SHARED
         ${include_HEADERS}
         ${src_SOURCES}
         ${http_BIN}
         ${http_PARSER}
+        ${worker_SOURCES}
         )
-target_link_libraries(autogentoo hacksaw worker)
+
+target_link_libraries(autogentoo hacksaw)
 
 #add_executable(autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
 add_executable(autogentoo-exec
@@ -59,11 +59,22 @@ add_executable(autogentoo-exec
         src/autogentoo.c
         )
 
+add_executable(autogentoo-worker
+        src/worker/worker_main.c
+        )
+
+target_link_libraries(autogentoo-worker
+        autogentoo
+        pthread
+        ssl
+        m
+        )
+
 target_link_libraries(autogentoo-exec
         autogentoo
         pthread
         ssl
-        ${PYTHON_LIBRARY}
+        m
         )
 
 add_executable(autogentoo-aabs
@@ -81,7 +92,7 @@ target_link_libraries(
         autogentoo
         ssl
         pthread
-        ${PYTHON_LIBRARY}
+        m
 )
 
 target_link_libraries(
@@ -92,7 +103,6 @@ target_link_libraries(
         )
 
 MACRO(INSTALL_HEADERS_WITH_DIRECTORY HEADER_LIST)
-
         FOREACH(HEADER ${${HEADER_LIST}})
                 STRING(REGEX MATCH "(.*)[/]" DIR ${HEADER})
                 INSTALL(FILES ${HEADER} DESTINATION ${DIR})

@@ -77,9 +77,8 @@ union __RequestData {
 	struct __struct_Emerge emerge;
 };
 
-int parse_request_structure (RequestData* out, char* template, void* data, void* end);
-void free_request_structure (RequestData* to_free, char* template, const char* end);
-size_t get_sizeof (char c);
-size_t get_ssizeof (char* template);
+int parse_request_structure(RequestData* out, char* template, void* data, void* end_ptr);
+void free_request_structure (RequestData* to_free, char* template, void* end_ptr);
+size_t get_item_size(char* template);
 
 #endif //AUTOGENTOO_REQUEST_STRUCTURE_H

@@ -6,6 +6,11 @@
 #include <autogentoo/hacksaw/tools.h>
 
 void print_bin(void* ptr, int n, size_t size) {
+	if (!size) {
+		lerror("print_bin() - Divide by 0");
+		return;
+	}
+	
 	int i;
 	for (i = 0; i < n; i++) {
 		printf("%02x", ((char*)ptr)[i]);

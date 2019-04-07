@@ -22,176 +22,198 @@ size_t prv_safe_strdup (char** dest, char* original, void* end_ptr) {
 	return len + 1;
 }
 
-int prv_handle_item (void* dest, void* data, char type, size_t item_size, void* end) {
-	if (data + item_size > end)
-		return -1;
+int parse_request_structure(RequestData* out, char* template, void* data, void* end_ptr) {
+	void* read_ptr = data;
+	void* write_ptr = out;
+	char* i;
 	
-	if (type == 'v') {
-		item_size = *(size_t*)dest = *(size_t*)data;
-		dest += sizeof (size_t);
-		data += sizeof (size_t);
-		
-		if (data + item_size > end)
+	int buff_i;
+	char* buff_s;
+	void* buff_v;
+	Vector* buff_a;
+	
+	
+	for (i = strdup(template); *i; i++) {
+		size_t item_size = -1;
+		if (*i == 'i')
+			item_size = sizeof(int);
+		else if (*i == 's')
+			item_size = 1; // NULL byte
+		else if (*i == 'v')
+			item_size = sizeof(size_t); // Read length first
+		else if (*i == 'a')
+			item_size = sizeof(int); // Read length first
+		else {
+			lerror("Invalid template item '%c'", *i);
 			return -1;
+		}
 		
-		void* ptr = malloc (item_size);
-		memcpy(ptr, data, item_size);
-		*(void**)dest = ptr;
-		item_size += sizeof (size_t); // Make sure we skip over size_t
-	}
-	else if (type == 's')
-		item_size = prv_safe_strdup((char**)dest, data, end);
-	else
-		memcpy (dest, data, item_size);
-	
-	if (type == 'i')
-		*(int*)dest = ntohl((uint32_t) (*(int*)dest));
-	
-	return (int)item_size;
-}
-
-int memcmp_c (void* __s1, char c, size_t size) {
-	for (int i = 0; i < size; i++)
-		if (((char*)__s1)[0] != c)
-			return 1;
-	
-	return 0;
-}
-
-int prv_handle_array (void* dest, void* data, char type, size_t item_size, int count, void* end) {
-	int len = 0;
-	for (int i = 0; i < count; data += (++i + item_size)) {
-		int temp = prv_handle_item(dest + (i * item_size), data, type, item_size, end);
-		if (temp == -1)
+		if (read_ptr + item_size > end_ptr) {
+			lerror("parse_request_structure passed end_ptr");
 			return -1;
-		len += temp;
-	}
-	
-	return len;
-}
-
-int parse_request_structure (RequestData* out, char* template, void* data, void* end) {
-	void* ptr = out;
-	void* old = data;
-	
-	char* i = strdup(template);
-	char* orig = i;
-	
-	for (; *i != 0; i++) {
-		int len = 0;
+		}
 		
-		if (*i == 'a') {
-			i += 2;
-			int array_length = ntohl((uint32_t) (*(int*)data));
-			memcpy(ptr, &array_length, sizeof (int));
-			data += sizeof (int);
-			ptr += sizeof (int);
+		if (*i == 'i') {
+			buff_i = *(int*)read_ptr;
+			buff_i = ntohl(buff_i);
+			memcpy(write_ptr, &buff_i, sizeof(int));
 			
-			char* i_next  = strchr(i, ')');
-			*i_next = 0;
+			read_ptr += item_size;
+			write_ptr += item_size;
+		}
+		else if (*i == 's') {
+			item_size = prv_safe_strdup(&buff_s, read_ptr, end_ptr);
+			memcpy(write_ptr, &buff_s, sizeof(char*)); // Copy the malloced pointer
 			
-			*(void**) ptr = malloc (get_ssizeof(i) * array_length);
+			read_ptr += item_size;
+			write_ptr += sizeof(char*);
+		}
+		else if (*i == 'v') {
+			/* Length is an int */
+			item_size = *(int*)read_ptr;
+			item_size = ntohl(item_size);
+			memcpy(write_ptr, &item_size, sizeof(int));
 			
-			for (int j = 0; j < array_length; j++) {
-				len = parse_request_structure(((void**)ptr)[j], i, data, end);
-				ptr += get_ssizeof(i);
-				data += len;
-				
-				if (len == -1) {
-					for (--j; j >= 0; j--)
-						free_request_structure(((void**)ptr)[j], i, NULL);
-					free (ptr);
-					free_request_structure (out, template, i);
-					free (orig);
-					return -1;
-				}
+			/* Move to the start of void* memory */
+			read_ptr += sizeof(int);
+			write_ptr += sizeof(int);
+			
+			if (read_ptr + item_size > end_ptr) {
+				lerror("parse_request_structure passed end_ptr");
+				return -1;
 			}
 			
-			i = i_next + 1;
-			continue;
+			buff_v = malloc(item_size);
+			memcpy(buff_v, read_ptr, item_size);
+			memcpy(write_ptr, &buff_v, sizeof(void*));
+			
+			read_ptr += item_size;
+			write_ptr += sizeof(void*);
 		}
-		
-		size_t item_size = get_sizeof(*i);
-		len = prv_handle_item (ptr, data, *i, item_size, end);
-		
-		if (len == -1) {
-			free(orig);
-			return -1;
+		else if (*i == 'a') {
+			/* Length of array */
+			int n = *(int*)read_ptr;
+			n = ntohl(n);
+			memcpy(write_ptr, &n, sizeof(int));
+			
+			read_ptr += sizeof(int);
+			write_ptr += sizeof(int);
+			
+			/* Skip over array start and open paren */
+			i += 2;
+			
+			char* array_end = strchr(i, ')');
+			char* array_template = strndup(i, array_end - i);
+			i += strlen(array_template);
+			
+			item_size = get_item_size(array_template);
+			void* array_item = malloc(item_size);
+			buff_a = vector_new(item_size, VECTOR_REMOVE | VECTOR_ORDERED);
+			
+			/* read each item */
+			for (int j = 0; j < n; j++) {
+				size_t read_size = parse_request_structure(array_item, array_template, read_ptr, end_ptr);
+				vector_add(buff_a, array_item);
+				read_ptr += read_size;
+			}
+			
+			memcpy(write_ptr, &buff_a->ptr, sizeof(void*));
+			write_ptr += sizeof(void*);
+			
+			free(buff_a); // Dont free buff_a->ptr
+			item_size = 0; // We already moved everything
 		}
-		
-		ptr += item_size;
-		data += len;
 	}
 	
-	free (orig);
-	return (int)(data - old);
+	return read_ptr - data;
 }
 
-size_t get_sizeof (char c) {
-	struct {
-		char type;
-		size_t size;
-	} type_sizes[] = {
-			{'c', sizeof(char)},
-			{'i', sizeof(int)},
-			{'l', sizeof(long)},
-			{'s', sizeof(char*)},
-			{'a', sizeof(void*)},
-			{'v', sizeof(size_t)}, /* Use size_t because the data size is checked dynamically */
-	};
-	
-	size_t item_size = 1;
-	for (int j = 0; j < sizeof(type_sizes) / sizeof(type_sizes[0]); j++)
-		if (c == type_sizes[j].type)
-			item_size = type_sizes[j].size;
-	
-	return item_size;
-}
-
-size_t get_ssizeof (char* template) {
+size_t get_item_size(char* template) {
 	size_t out = 0;
-	for (char* i = template; i != NULL; i++)
-		out += get_sizeof(*i);
+	
+	for (char* i = template; *i; i++) {
+		if (*i == 'a')
+			out += sizeof(int) + sizeof(void*); // Length plus array ptr
+		else if (*i == 's')
+			out += sizeof(char*);
+		else if (*i == 'v')
+			out += sizeof(size_t) + sizeof(void*); // Length plus void* ptr
+		else if (*i == 'i')
+			out += sizeof(int);
+		else {
+			lerror("Invalid template item '%c'", *i);
+			return -1;
+		}
+	}
+	
 	return out;
 }
 
-void free_request_structure (RequestData* to_free, char* template, const char* end) {
-	char* i = strdup(template);
-	size_t dif = end - template;
-	char* orig = i;
+void free_request_structure (RequestData* to_free, char* template, void* end_ptr) {
+	void* read_ptr = to_free;
+	char* i;
 	
-	size_t offset = 0;
-	for (; *i != 0; i++) {
-		if (end && i - orig >= dif)
-			break;
+	int buff_i;
+	char* buff_s;
+	void* buff_v;
+	Vector* buff_a;
+	
+	
+	for (i = strdup(template); *i; i++) {
+		size_t item_size = -1;
+		if (*i == 'i')
+			item_size = sizeof(int);
+		else if (*i == 's')
+			item_size = sizeof(char*); // NULL byte
+		else if (*i == 'v')
+			item_size = sizeof(size_t) + sizeof(void*); // Read length first
+		else if (*i == 'a')
+			item_size = sizeof(int) + sizeof(void*); // Read length first
+		else {
+			lerror("Invalid template item '%c'", *i);
+			return;
+		}
 		
-		if (*i == 'a') {
+		if (read_ptr + item_size > end_ptr) {
+			lerror("parse_request_structure passed end_ptr");
+			return;
+		}
+		
+		if (*i == 'i')
+			;// Nothing to free
+		else if (*i == 's')
+			free(*(char**)read_ptr);
+		else if (*i == 'v') {
+			/* Move to the start of void* memory */
+			free(*(void**) (read_ptr + sizeof(int)));
+		}
+		else if (*i == 'a') {
+			int n = *(int*)read_ptr;
+			read_ptr += sizeof(int);
+			/* Skip over open paren */
 			i += 2;
 			
-			int array_length = *(int*) (to_free + offset);
-			offset += sizeof (int);
+			char* array_end = strchr(i, ')');
+			char* array_template = strndup(i, array_end - i);
+			i += strlen(array_template);
 			
-			char* i_next  = strchr(i, ')');
-			*i_next = 0;
+			item_size = get_item_size(array_template);
+			void* array_item = malloc(item_size);
+			buff_a = vector_new(item_size, VECTOR_REMOVE | VECTOR_ORDERED);
+			free(buff_a->ptr);
+			buff_a->ptr = *(void**)read_ptr;
+			buff_a->n = n;
 			
-			for (int j = 0; j < array_length; j++)
-				free_request_structure((*(void***)(to_free + offset))[j], i, NULL);
+			/* read each item */
+			for (int j = 0; j < n; j++) {
+				void* item_free = vector_get(buff_a, j);
+				free_request_structure(item_free, array_template, item_free + item_size);
+			}
 			
-			i = i_next + 1;
-			offset += sizeof (void*);
-			
-			continue;
+			vector_free(buff_a); // Frees *read_ptr and buff_a
+			item_size = sizeof(void*);
 		}
-		if (*i == 'v')
-			free (to_free + offset + sizeof (size_t));
 		
-		size_t item_size = get_sizeof(*i);
-		
-		if (*i == 's')
-			free (*(char**)((void*)to_free + offset));
-		
-		offset += item_size;
+		read_ptr += item_size;
 	}
-	
-	free (orig);
 }

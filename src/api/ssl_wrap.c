@@ -17,7 +17,7 @@
 #include <autogentoo/api/ssl_wrap.h>
 #include <autogentoo/api/request_generate.h>
 
-int prv_ssocket_connect(char* hostname, unsigned short port) {
+int socket_connect(char* hostname, unsigned short port) {
 	char str_port[8];
 	sprintf(str_port, "%d", port);
 	
@@ -70,7 +70,7 @@ int ssocket_new(SSocket** socket_ptr, char* server_hostname, unsigned short port
 	}
 	
 	out_sock->ssl = SSL_new(out_sock->context);
-	out_sock->socket = prv_ssocket_connect(out_sock->hostname, out_sock->port);
+	out_sock->socket = socket_connect(out_sock->hostname, out_sock->port);
 	if (out_sock->socket == -1) {
 		lerror("Failed to connect to server");
 		goto error;
@@ -81,7 +81,7 @@ int ssocket_new(SSocket** socket_ptr, char* server_hostname, unsigned short port
 	int ret;
 	if ((ret = SSL_connect(out_sock->ssl)) != 1) {
 		lerror("Failed to run SSL_connect()");
-		SSOCKET_ERROR();
+		SSOCKET_ERROR()
 		goto error;
 	}
 	
@@ -102,7 +102,8 @@ error:
 }
 
 void ssocket_free(SSocket* ptr) {
-	SSL_free(ptr->ssl);
+	if (ptr->ssl)
+		SSL_free(ptr->ssl);
 	close(ptr->socket);
 	if (ptr->cert)
 		X509_free(ptr->cert);
@@ -122,23 +123,32 @@ void autogentoo_client_ssl_init() {
 	}
 }
 
-void ssocket_request(SSocket* sock, ClientRequest* request) {
+typedef ssize_t (*prv_socket_func) (void* sock, void* ptr, int size);
+
+void prv_socket_template_send(void* socket, ClientRequest* request, prv_socket_func function) {
 	if (!request->ptr)
 		client_request_generate(request);
 	
-	int out_size = 0;
-	if ((out_size = SSL_write(sock->ssl, request->ptr, (int)request->size)) != request->size)
+	int out_size = function(socket, request->ptr, (int)request->size);
+	if (out_size != request->size)
 		lerror("Error writing to server\nExpected to write %d, wrote %d", request->size, out_size);
 }
 
-ssize_t ssocket_read_response(SSocket* sock, void** dest) {
-	//struct timeval tv = {0, 500};
-	//setsockopt(sock->socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
-	
+void ssocket_request(SSocket* sock, ClientRequest* request) {
+	prv_socket_template_send(sock->ssl, request, (ssize_t (*)(void*,void*,int))SSL_write);
+}
+
+void socket_request(int sock, ClientRequest* request) {
+	prv_socket_template_send((void*)(long)sock, request, (ssize_t (*)(void*,void*,int))write);
+}
+
+int prv_socket_template_read(void* sock, void** dest, ssize_t (*function)(void*,void*,int), int is_server) {
 	/* Read the request */
-	size_t chunk_len = 128;
+	size_t chunk_len = 32;
 	size_t buffer_size = chunk_len * 2;
-	ssize_t total_read = 0, current_bytes = 0;
+	int total_read = 0, current_bytes = 0;
+	
+	int sentinal = is_server ? chunk_len : 1;
 	
 	(*dest) = malloc(buffer_size);
 	do {
@@ -147,13 +157,31 @@ ssize_t ssocket_read_response(SSocket* sock, void** dest) {
 			(*dest) = realloc(*dest, buffer_size);
 		}
 		
-		current_bytes = SSL_read(sock->ssl, (*dest) + total_read, (int)chunk_len);
+		current_bytes = function(sock, (*dest) + total_read, (int)chunk_len);
 		total_read += current_bytes;
-	} while (current_bytes);
-	
+	} while (current_bytes >= sentinal);
 	return total_read;
 }
 
-ssize_t ssocket_read(SSocket* ptr, void* dest, size_t n) {
-	return SSL_read(ptr->ssl, dest, (int)n);
+int ssocket_read(SSocket* sock, void** dest, int is_server) {
+	return prv_socket_template_read(sock->ssl, dest, (ssize_t (*)(void*,void*,int))SSL_read, is_server);
+}
+
+int socket_read(int sock, void** dest, int is_server) {
+	/* Read the request */
+	size_t chunk_len = 32;
+	size_t buffer_size = chunk_len * 2;
+	int total_read = 0, current_bytes = 0;
+	
+	(*dest) = malloc(buffer_size);
+	do {
+		if (total_read + chunk_len >= buffer_size) {
+			buffer_size *= 2;
+			(*dest) = realloc(*dest, buffer_size);
+		}
+		
+		current_bytes = read(sock, (*dest) + total_read, (int)chunk_len);
+		total_read += current_bytes;
+	} while (current_bytes == chunk_len);
+	return total_read;
 }

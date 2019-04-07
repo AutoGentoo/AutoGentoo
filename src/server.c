@@ -124,12 +124,13 @@ void server_respond(Connection* conn, int worker_index) {
 		/* Response code */
 		int code_big_endian = htonl(res.code.code);
 		
-		conn_write(conn, &code_big_endian, sizeof(int));
-		conn_write(conn, res.code.message, res.code.len + 1);
+		size_t write_size = 0;
+		write_size += conn_write(conn, &code_big_endian, sizeof(int));
+		write_size += conn_write(conn, res.code.message, res.code.len + 1);
 		
 		/* Response content */
-		conn_write(conn, res.content->template, res.content->template_used_size + 1);
-		conn_write(conn, res.content->ptr, res.content->used_size);
+		write_size += conn_write(conn, res.content->template, res.content->template_used_size + 1);
+		write_size += conn_write(conn, res.content->ptr, res.content->used_size);
 	}
 	
 	if (request)
