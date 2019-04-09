@@ -34,9 +34,7 @@ WorkerHandler* worker_handler_new() {
 
 void worker_handler_start(WorkerHandler* worker_handler) {
 	worker_handler->sock = socket(AF_UNIX, SOCK_STREAM, 0);
-	
-	if (access(WORKER_TCP, F_OK) == 0)
-		remove(WORKER_TCP);
+	setsockopt(worker_handler->sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int));
 	
 	struct sockaddr_un addr;
 	socklen_t addrlen = sizeof(addr);
@@ -68,14 +66,45 @@ void worker_handler_start(WorkerHandler* worker_handler) {
 
 void worker_start(Worker* worker) {
 	void* request_data;
-	worker->id = worker_register();
-	size_t request_size = socket_read(worker->accept, &request_data, 1);
-	write(worker->accept, worker->id, 25);
-	close(worker->accept);
-	
-	worker->request_size = request_size;
+	worker->request_size = socket_read(worker->accept, &request_data, 1);
 	worker->request = malloc(sizeof(WorkerRequest));
-	parse_request_structure ((RequestData*)worker->request, WORKER_REQUEST_TEMPLATE, request_data, request_data + request_size);
+	parse_request_structure ((RequestData*)worker->request, WORKER_REQUEST_TEMPLATE, request_data, request_data + worker->request_size);
+	
+	if (worker->request->req == WORKER_START) {
+		worker->id = worker_register();
+		write(worker->accept, worker->id, 25);
+		close(worker->accept);
+	}
+	else {
+		Worker* current = worker->parent->worker_head;
+		DynamicBinary* out = dynamic_binary_new(DB_ENDIAN_TARGET_NETWORK);
+		
+		dynamic_binary_array_start(out);
+		while (current) {
+			dynamic_binary_add(out, 's', current->id);
+			dynamic_binary_add(out, 's', current->request->script);
+			dynamic_binary_add(out, 's', current->request->parent_directory);
+			dynamic_binary_add(out, 'i', &current->request->chroot);
+			
+			dynamic_binary_array_start(out);
+			for (int i = 0; i < current->request->argument_n; i++) {
+				dynamic_binary_add(out, 's', current->request->arguments[i]);
+				dynamic_binary_array_next(out);
+			}
+			dynamic_binary_array_end(out);
+			dynamic_binary_array_next(out);
+			
+			current = current->next;
+		}
+		dynamic_binary_array_end(out);
+		
+		write(worker->accept, out->template, out->template_used_size + 1);
+		write(worker->accept, out->ptr, out->ptr_size);
+		close(worker->accept);
+		
+		dynamic_binary_free(out);
+		return;
+	}
 	
 	worker->accept = 0;
 	
@@ -99,7 +128,7 @@ void worker_start(Worker* worker) {
 	
 	if (self_pid == 0) {
 		char* filename;
-		asprintf(&filename, "%s.log", worker->id);
+		asprintf(&filename, "log/%s.log", worker->id);
 		FILE* log = fopen(filename, "w+");
 		free(filename);
 		
@@ -115,8 +144,6 @@ void worker_start(Worker* worker) {
 	
 	int ret;
 	waitpid (self_pid, &ret, 0);
-	
-	worker_free(worker);
 }
 
 void worker_free(Worker* worker) {

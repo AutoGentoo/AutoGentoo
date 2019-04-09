@@ -1,0 +1,18 @@
+Do dependency checks
+
+per package:
+export constants:
+	const.py
+	instance variables
+	add portage/bin to PATH
+
+initialize: (From metadata)
+
+["BDEPEND", "BUILD_TIME", "CHOST", "COUNTER", "DEPEND",
+			"DESCRIPTION", "EAPI", "HDEPEND", "HOMEPAGE",
+			"BUILD_ID", "IUSE", "KEYWORDS",
+			"LICENSE", "PDEPEND", "PROPERTIES", "RDEPEND",
+			"repository", "RESTRICT" , "SLOT", "USE", "DEFINED_PHASES",
+			"PROVIDES", "REQUIRES"
+			]
+

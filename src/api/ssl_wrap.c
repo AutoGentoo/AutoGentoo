@@ -148,7 +148,7 @@ int prv_socket_template_read(void* sock, void** dest, ssize_t (*function)(void*,
 	size_t buffer_size = chunk_len * 2;
 	int total_read = 0, current_bytes = 0;
 	
-	int sentinal = is_server ? chunk_len : 1;
+	int sentinal = is_server ? chunk_len : 0;
 	
 	(*dest) = malloc(buffer_size);
 	do {

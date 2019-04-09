@@ -92,6 +92,7 @@ int parse_request_structure(RequestData* out, char* template, void* data, void* 
 		}
 		else if (*i == 'a') {
 			/* Length of array */
+			fflush(stdout);
 			int n = *(int*)read_ptr;
 			n = ntohl(n);
 			memcpy(write_ptr, &n, sizeof(int));
@@ -120,7 +121,7 @@ int parse_request_structure(RequestData* out, char* template, void* data, void* 
 			memcpy(write_ptr, &buff_a->ptr, sizeof(void*));
 			write_ptr += sizeof(void*);
 			
-			free(buff_a); // Dont free buff_a->ptr
+			//free(buff_a); // Dont free buff_a->ptr
 			item_size = 0; // We already moved everything
 		}
 	}

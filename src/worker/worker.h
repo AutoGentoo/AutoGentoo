@@ -8,20 +8,26 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#define WORKER_REQUEST_TEMPLATE "ssia(s)"
+#define WORKER_REQUEST_TEMPLATE "issia(s)"
 
 typedef struct __WorkerHandler WorkerHandler;
 typedef struct __Worker Worker;
 typedef struct __WorkerRequest WorkerRequest;
 
+typedef enum {
+	WORKER_START,
+	WORKER_STAT
+} worker_request_t;
+
 struct __WorkerRequest {
+	worker_request_t req;
 	char* script;
 	char* parent_directory;
 	int chroot;
 	
-	size_t argument_n;
+	int argument_n;
 	char** arguments;
-};
+} __attribute__((packed));
 
 /* Worker never needs to do a search because its saved to a file */
 struct __Worker {
