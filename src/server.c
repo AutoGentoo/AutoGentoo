@@ -204,23 +204,9 @@ void server_free (Server* server) {
 	
 	vector_free(server->hosts);
 	map_free(server->auth_tokens, (void (*)(void*))token_free);
-	queue_free(server->queue->head);
 	
 	free(server->port);
-	free(server->queue);
 	free(server);
-}
-
-void server_add_queue (Server* parent, Queue* new) {
-	queue_add (parent->queue, new);
-	kill (parent->queue->proc_id, SIGUSR1);
-}
-
-pid_t server_spawn_worker (Server* parent) {
-	parent->queue->proc_id = fork ();
-	if (parent->queue->proc_id == 0)
-		execl (AUTOGENTOO_WORKER, "", NULL);
-	return parent->queue->proc_id;
 }
 
 char* server_get_path (Server* parent, char* path) {

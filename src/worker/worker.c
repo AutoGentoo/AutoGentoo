@@ -15,10 +15,9 @@
 #include <fcntl.h>
 #include <wait.h>
 #include <autogentoo/api/ssl_wrap.h>
+#include <sys/file.h>
 
-#define WORKER_TCP "worker.tcp"
 #define WORKER_CONFIG ".worker.config"
-#define WORKER_RECV_CHUNK_SIZE 32
 
 WorkerHandler* worker_handler_new() {
 	WorkerHandler* out = malloc(sizeof(WorkerHandler));
@@ -40,9 +39,28 @@ void worker_handler_start(WorkerHandler* worker_handler) {
 	socklen_t addrlen = sizeof(addr);
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	strncpy(addr.sun_path, WORKER_TCP, sizeof(addr.sun_path)-1);
+	strncpy(addr.sun_path, WORKER_SOCK, sizeof(addr.sun_path)-1);
+	
+	int lock_fd = open(WORKER_SOCK_LCK, O_RDONLY | O_CREAT, 0600);
+	if (lock_fd == -1) {
+		lerror("Failed to open lock file (%s)", WORKER_SOCK_LCK);
+		close(worker_handler->sock);
+		return;
+	}
+
+	// try to acquire lock
+	int ret = flock(lock_fd, LOCK_EX | LOCK_NB);
+	if (ret != 0) {
+		lerror("Failed to aquire lock (%s)", WORKER_SOCK_LCK);
+		close(worker_handler->sock);
+		return;
+	}
+	
+	// remove socket file
+	unlink(WORKER_SOCK);
+	
 	if (bind(worker_handler->sock, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
-		lerror("Failed to bind socket to %s", WORKER_TCP);
+		lerror("Failed to bind socket to %s", WORKER_SOCK);
 		close (worker_handler->sock);
 		return;
 	}
@@ -53,7 +71,7 @@ void worker_handler_start(WorkerHandler* worker_handler) {
 		return;
 	}
 	
-	linfo("Started worker handler at %s", WORKER_TCP);
+	linfo("Started worker handler at %s", WORKER_SOCK);
 	while(worker_handler->keep_alive) {
 		int accepted = accept(worker_handler->sock, (struct sockaddr*) &addr, &addrlen);
 		Worker* worker = malloc(sizeof(Worker));

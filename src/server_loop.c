@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <openssl/ssl.h>
 #include <autogentoo/writeconfig.h>
+#include "worker/worker.h"
 
 Connection* accept_conn (void* server, int fd, com_t type) {
 	if (fd < 3) {
@@ -37,6 +38,8 @@ void server_start (Server* server) {
 	
 	if (server->opts & DAEMON)
 		daemonize(server->location);
+	
+	pthread_create(&server->worker_thread, NULL, (void* (*) (void*))worker_handler_start, server->worker_handler);
 	
 	server->pid = getpid();
 	srv = server;

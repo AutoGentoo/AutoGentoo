@@ -87,7 +87,9 @@ struct __Server {
 	Vector* hosts; //!< A list of hosts
 	
 	/* Socket server related */
-	WorkerParent* queue; //!< Jobs waiting in the queue, NULL if empty queue
+	void* worker_handler; //!< Jobs waiting in the queue, NULL if empty queue
+	pthread_t worker_thread;
+	
 	volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
 	PoolHandler* pool_handler;
 	
@@ -244,12 +246,10 @@ void kill_encrypt_server(int sig);
 
 void handle_sigint (int sig);
 
-void server_add_queue (Server* parent, Queue* new);
-
-pid_t server_spawn_worker (Server* parent);
-
 char* server_get_path (Server* parent, char* path);
 
 extern Server* srv;
+
+char* server_start_job(Server* server, void* request);
 
 #endif

@@ -8,6 +8,10 @@
 #include <stdio.h>
 #include <pthread.h>
 
+#define WORKER_SOCK "/tmp/autogentoo_worker.sock"
+#define WORKER_SOCK_LCK "/tmp/autogentoo_worker.sock.lock"
+#define WORKER_RECV_CHUNK_SIZE 32
+
 #define WORKER_REQUEST_TEMPLATE "issia(s)"
 
 typedef struct __WorkerHandler WorkerHandler;
