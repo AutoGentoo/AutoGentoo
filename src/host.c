@@ -33,6 +33,7 @@ Host* host_new(Server* server, char* id) {
 	out->parent = server;
 	out->id = id; // Dont need to dup, never accessed elsewhere
 	out->chroot_status = CHR_NOT_MOUNTED;
+	out->environment_status = HOST_ENV_VOID;
 	
 	out->arch = NULL;
 	out->hostname = NULL;

@@ -226,6 +226,7 @@ void SRV_REFRESH(Response* res, Request* request) {
 		dynamic_binary_add(res->content, 's', current->hostname);
 		dynamic_binary_add(res->content, 's', current->profile);
 		dynamic_binary_add(res->content, 's', current->arch);
+		dynamic_binary_add(res->content, 'i', &current->environment_status);
 
 		dynamic_binary_array_start(res->content);
 		for (int j = 0; j < current->make_conf->n; j++) {

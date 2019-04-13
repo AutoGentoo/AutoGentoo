@@ -109,6 +109,7 @@ size_t write_host_fp(Host* host, FILE* fp) {
 	size += write_int(AUTOGENTOO_HOST, fp);
 	size += write_string(host->id, fp);
 	size += write_int(CHR_NOT_MOUNTED, fp); // What if system restarted (might as well assume unmounted)
+	size += write_int(host->environment_status, fp);
 	
 	size += write_string(host->hostname, fp);
 	size += write_string(host->profile, fp);
@@ -208,6 +209,7 @@ Host* read_host(FILE* fp) {
 	
 	out->id = read_string(fp);
 	out->chroot_status = (chroot_t)read_int(fp);
+	out->environment_status = (host_env_t)read_int(fp);
 	
 	out->hostname = read_string(fp);
 	out->profile = read_string(fp);

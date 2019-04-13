@@ -31,6 +31,13 @@ typedef enum {
 	CHR_MOUNTED
 } chroot_t;
 
+typedef enum {
+	HOST_ENV_VOID,   // Environment does not exist
+	HOST_ENV_STAGE3, // Stage3 is unpacked but configs need writing
+	HOST_ENV_BASE,   // Stage3 packages still need to be made into binaries
+	HOST_ENV_READY   // Everything is ready to go
+} host_env_t;
+
 /**
  * @brief Holds information about a build environment
  * 
@@ -44,6 +51,7 @@ struct __Host {
 	char* hostname; //!< Hostname of the host (shows up in the graphical client)
 	char* arch; //!<  The portage-arch (eg. amd64)
 	chroot_t chroot_status; //!< Is the chroot ready?
+	host_env_t environment_status; //!< Is the environment ready to compile
 	
 	/*
 	char* cflags; //!< The gcc passed to C programs, try -march=native :)
@@ -118,5 +126,9 @@ response_t host_install(Host* host, char* arg);
  * @param target target host
  */
 void host_init_extras(Host* target);
+
+/**
+ *
+ */
 
 #endif
