@@ -18,30 +18,26 @@ typedef struct __WorkerHandler WorkerHandler;
 typedef struct __Worker Worker;
 typedef struct __WorkerRequest WorkerRequest;
 
-typedef enum {
-	WORKER_START,
-	WORKER_STAT
-} worker_request_t;
-
 struct __WorkerRequest {
-	worker_request_t req;
+	Worker* parent;
+	
 	char* script;
 	char* parent_directory;
 	int chroot;
 	
 	int argument_n;
 	char** arguments;
-} __attribute__((packed));
+};
 
 /* Worker never needs to do a search because its saved to a file */
 struct __Worker {
-	int accept; /* 0 during script exec */
 	WorkerHandler* parent;
 	Worker* next;
 	Worker* back;
 	
-	size_t request_size;
 	WorkerRequest* request;
+	
+	int exit_code;
 	
 	char* id;
 	pthread_t pid;
@@ -51,19 +47,22 @@ struct __WorkerHandler {
 	Worker* worker_head;
 	pthread_mutex_t worker_mutex;
 	
-	int sock;
-	char* config;
+	pthread_mutex_t worker_wait_mutex;
+	pthread_cond_t worker_wait;
 	
+	Worker* current_request; // stack
+	
+	pthread_t handler_pid;
 	int keep_alive;
 };
 
 WorkerHandler* worker_handler_new();
 void worker_handler_start(WorkerHandler* worker_handler);
-void worker_handler_handle(WorkerHandler* worker_handler, int accept);
-Worker* worker_handler_job(WorkerHandler* worker_handler);
 void worker_start(Worker* worker);
 void worker_free(Worker* worker);
 
 char* worker_register();
+
+char* worker_request(WorkerHandler* worker_handler, WorkerRequest* request);
 
 #endif //AUTOGENTOO_WORKER_H

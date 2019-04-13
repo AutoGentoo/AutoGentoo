@@ -14,8 +14,10 @@ StringVector* string_vector_new() {
 void string_vector_add(StringVector* vec, char* string) {
 	if (vec->s >= (vec->n + 1))
 		vector_allocate(vec);
-	
-	((char**) vec->ptr)[vec->n] = strdup(string);
+	if (!string)
+		((char**) vec->ptr)[vec->n] = NULL;
+	else
+		((char**) vec->ptr)[vec->n] = strdup(string);
 	vec->n++;
 }
 

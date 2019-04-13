@@ -49,6 +49,12 @@ typedef struct {
 
 extern response_t res_list[];
 
+#define SOCK_CHECK_CONN(sock, ret_size)\
+if (fcntl(sock, F_GETFD) == -1 || errno == EBADF) { \
+	close (sock); \
+	return ret_size; \
+}
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "server.h"

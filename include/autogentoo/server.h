@@ -6,6 +6,7 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <autogentoo/pool.h>
+#include <autogentoo/worker.h>
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -86,12 +87,9 @@ struct __Server {
 	/* AutoGentoo Related */
 	Vector* hosts; //!< A list of hosts
 	
-	/* Socket server related */
-	void* worker_handler; //!< Jobs waiting in the queue, NULL if empty queue
-	pthread_t worker_thread;
-	
 	volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
-	PoolHandler* pool_handler;
+	PoolHandler* pool_handler; //!< For socket requests
+	WorkerHandler* job_handler; //!< For running jobs
 	
 	pid_t pid;
 	pthread_t pthread;
@@ -107,9 +105,14 @@ struct __Server {
 };
 
 #ifndef connection_read
-#define connection_read(dest, size)\
+#define connection_read(dest, size) \
 conn->communication_type == COM_RSA ? \
 	SSL_read(conn->encrypted_connection, dest, (int)size) : read(conn->fd, dest, size)
+#endif
+
+#ifndef connection_write
+#define connection_write(src, size) \
+conn->communication_type == COM_RSA ? SSL_write(conn->encrypted_connection, src, (int)size) : write (conn->fd, src, size);
 #endif
 
 struct __EncryptServer {
@@ -249,7 +252,5 @@ void handle_sigint (int sig);
 char* server_get_path (Server* parent, char* path);
 
 extern Server* srv;
-
-char* server_start_job(Server* server, void* request);
 
 #endif

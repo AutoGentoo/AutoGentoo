@@ -17,6 +17,7 @@
 #include <autogentoo/chroot.h>
 #include <sys/utsname.h>
 #include <autogentoo/writeconfig.h>
+#include "autogentoo/worker.h"
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -141,12 +142,41 @@ void HOST_DEL(Response* res, Request* request) {
 
 void HOST_EMERGE(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_EMERGE});
-	AccessToken* tok = authorize (request, TOKEN_HOST_MOD, AUTH_TOKEN_HOST);
+	AccessToken* tok = authorize (request, TOKEN_HOST_EMERGE, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
-	//START_STREAM()
-	//host_emerge(host, request->structures[2].emerge.emerge);
+	
+	char* directory = server_get_path(request->parent, host->id);
+	
+	WorkerRequest* strct_worker_request = malloc(sizeof(WorkerRequest));
+	strct_worker_request->chroot = 1;
+	strct_worker_request->script = "/usr/bin/emerge";
+	strct_worker_request->parent_directory = directory;
+	
+	StringVector* worker_args = string_vector_new();
+	string_vector_add(worker_args, "-v");
+	
+	char* token = strtok(request->structures[2].emerge.emerge, " ");
+	while(token) {
+		string_vector_add(worker_args, token);
+		token = strtok(NULL, " ");
+	}
+	string_vector_add(worker_args, NULL);
+	
+	strct_worker_request->arguments = worker_args->ptr;
+	strct_worker_request->argument_n = worker_args->n - 1; // Ignore NULL at end
+	
+	free(worker_args);
+	
+	char* job_name = worker_request(request->parent->job_handler, strct_worker_request);
+	
+	if (!job_name)
+		HANDLE_RETURN(INTERNAL_ERROR);
+	
+	free(directory);
+	
+	dynamic_binary_add(res->content, 's', job_name);
 }
 
 void HOST_MNTCHROOT(Response* res, Request* request) {
@@ -279,8 +309,6 @@ void AUTH_REGISTER(Response* res, Request* request) {
 	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
 	if (!issued)
 		HANDLE_RETURN(INTERNAL_ERROR);
-
-	//linfo("%d\n", )
 
 	dynamic_binary_add(res->content, 's', issued->auth_token);
 	dynamic_binary_add(res->content, 's', issued->user_id);

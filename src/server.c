@@ -8,6 +8,9 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <string.h>
+#include <autogentoo/api/ssl_wrap.h>
+#include <sys/un.h>
+#include "autogentoo/worker.h"
 
 Server* srv = NULL;
 
@@ -99,8 +102,13 @@ void server_recv (Connection* conn) {
 	conn->status = CONNECTED;
 }
 
+void handle_sigpipe(int signal) {
+	write(2, "sigpipe()", 9);
+}
+
 void server_respond(Connection* conn, int worker_index) {
 	conn->worker = worker_index;
+	//signal(SIGPIPE, handle_sigpipe);
 	
 	/* Read from the client and parse request */
 	server_recv(conn);
@@ -125,13 +133,15 @@ void server_respond(Connection* conn, int worker_index) {
 		int code_big_endian = htonl(res.code.code);
 		
 		size_t write_size = 0;
-		write_size += conn_write(conn, &code_big_endian, sizeof(int));
-		write_size += conn_write(conn, res.code.message, res.code.len + 1);
+		write_size += connection_write(&code_big_endian, sizeof(int))
+		write_size += connection_write(res.code.message, res.code.len + 1)
 		
 		/* Response content */
-		write_size += conn_write(conn, res.content->template, res.content->template_used_size + 1);
-		write_size += conn_write(conn, res.content->ptr, res.content->used_size);
+		write_size += connection_write(res.content->template, res.content->template_used_size + 1)
+		write_size += connection_write(res.content->ptr, res.content->used_size)
 	}
+	
+	close(conn->fd);
 	
 	if (request)
 		ldinfo("%s -- %s (%d) code = %d", conn->ip, res.code.message, (int)res.code.code, request->request_type);

@@ -13,6 +13,7 @@
 #include <openssl/x509.h>
 #include <openssl/x509_vfy.h>
 #include <autogentoo/hacksaw/tools.h>
+#include <fcntl.h>
 
 #include <autogentoo/api/ssl_wrap.h>
 #include <autogentoo/api/request_generate.h>
@@ -142,29 +143,24 @@ void socket_request(int sock, ClientRequest* request) {
 	prv_socket_template_send((void*)(long)sock, request, (ssize_t (*)(void*,void*,int))write);
 }
 
-int prv_socket_template_read(void* sock, void** dest, ssize_t (*function)(void*,void*,int), int is_server) {
+int ssocket_read(SSocket* sock, void** dest, int is_server) {
 	/* Read the request */
 	size_t chunk_len = 32;
 	size_t buffer_size = chunk_len * 2;
 	int total_read = 0, current_bytes = 0;
 	
-	int sentinal = is_server ? chunk_len : 0;
-	
 	(*dest) = malloc(buffer_size);
 	do {
+		//SOCK_CHECK_CONN(sock->socket, total_read)
 		if (total_read + chunk_len >= buffer_size) {
 			buffer_size *= 2;
 			(*dest) = realloc(*dest, buffer_size);
 		}
 		
-		current_bytes = function(sock, (*dest) + total_read, (int)chunk_len);
+		current_bytes = SSL_read(sock->ssl, (*dest) + total_read, (int)chunk_len);
 		total_read += current_bytes;
-	} while (current_bytes >= sentinal);
+	} while (is_server ? current_bytes != -1 : current_bytes > 0);
 	return total_read;
-}
-
-int ssocket_read(SSocket* sock, void** dest, int is_server) {
-	return prv_socket_template_read(sock->ssl, dest, (ssize_t (*)(void*,void*,int))SSL_read, is_server);
 }
 
 int socket_read(int sock, void** dest, int is_server) {
@@ -180,8 +176,12 @@ int socket_read(int sock, void** dest, int is_server) {
 			(*dest) = realloc(*dest, buffer_size);
 		}
 		
-		current_bytes = read(sock, (*dest) + total_read, (int)chunk_len);
+		current_bytes = recv(sock, (*dest) + total_read, (int)chunk_len, MSG_DONTWAIT);
+		if (current_bytes == -1)
+			break;
+		
 		total_read += current_bytes;
-	} while (current_bytes == chunk_len);
+	} while (is_server ? current_bytes == chunk_len : current_bytes > 0);
+	
 	return total_read;
 }

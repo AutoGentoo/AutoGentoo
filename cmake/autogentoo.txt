@@ -28,6 +28,7 @@ set(src_SOURCES
         src/api/request_check.c
         src/api/ssl_wrap.c
         src/api/ssl_stream.c
+        src/worker.c
         )
 
 set(include_HEADERS
@@ -59,6 +60,7 @@ set(include_HEADERS
         include/autogentoo/api/request_check.h
         include/autogentoo/api/ssl_wrap.h
         include/autogentoo/api/ssl_stream.h
+        include/autogentoo/worker.h
         )
 
 

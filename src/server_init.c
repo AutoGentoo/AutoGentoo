@@ -10,7 +10,7 @@
 #include <autogentoo/autogentoo.h>
 #include <autogentoo/crypt.h>
 #include <string.h>
-#include "worker/worker.h"
+#include "autogentoo/worker.h"
 
 int server_init (char* port) {
 	struct addrinfo hints, * res, * p;
@@ -71,8 +71,6 @@ Server* server_new (char* location, char* port, server_t opts) {
 	out->hosts = vector_new(sizeof(Host*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	out->location = strdup(location);
 	out->autogentoo_org_token = NULL;
-	
-	out->worker_handler = worker_handler_new();
 	
 	chdir(out->location);
 	out->opts = opts;

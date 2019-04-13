@@ -37,18 +37,9 @@ response_t get_res(response_nt x) {
 	return OK;
 }
 
-ssize_t __prv_conn_write(Connection* conn, void* data, size_t len) {
+ssize_t conn_write(Connection* conn, void* data, size_t len) {
 	if (conn->communication_type == COM_RSA)
 		return SSL_write(conn->encrypted_connection, data, (int)len);
 	
 	return write (conn->fd, data, len);
-}
-
-ssize_t conn_write(Connection* conn, void* data, size_t len) {
-	if (fcntl(conn->fd, F_GETFD) == -1 || errno == EBADF) {
-		close (conn->fd);
-		return 0;
-	}
-	
-	return __prv_conn_write (conn, data, len);
 }

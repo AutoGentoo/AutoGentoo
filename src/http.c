@@ -136,20 +136,18 @@ FILE* http_handle_path(Server* parent, HttpRequest* req, long* size) {
 	return fp;
 }
 
-ssize_t __prv_conn_write(Connection* conn, void* data, size_t len);
-
 size_t http_send_headers(Connection* conn, HttpRequest* req) {
 	rsend(conn, req->response);
 	
 	for (int i = 0; i < req->response_headers->n; i++) {
 		HttpHeader* c_header = small_map_get_index(req->response_headers, i);
-		__prv_conn_write(conn, c_header->name, strlen(c_header->name));
-		__prv_conn_write(conn, ": ", 2);
-		__prv_conn_write(conn, c_header->value, strlen(c_header->value));
-		__prv_conn_write(conn, "\n", 1);
+		conn_write(conn, c_header->name, strlen(c_header->name));
+		conn_write(conn, ": ", 2);
+		conn_write(conn, c_header->value, strlen(c_header->value));
+		conn_write(conn, "\n", 1);
 	}
 	
-	__prv_conn_write(conn, "\n", 1);
+	conn_write(conn, "\n", 1);
 }
 
 ssize_t http_send_default(Connection* conn, response_t res) {
@@ -159,7 +157,7 @@ ssize_t http_send_default(Connection* conn, response_t res) {
 	prv_http_get_date (date, 32);
 	
 	asprintf(&default_headers, "Date: %s\nServer: AutoGentoo\n\n", date);
-	ssize_t out_size = __prv_conn_write(conn, default_headers, strlen(default_headers));
+	ssize_t out_size = conn_write(conn, default_headers, strlen(default_headers));
 	free(default_headers);
 	
 	return out_size;

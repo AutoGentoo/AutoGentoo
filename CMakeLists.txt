@@ -20,11 +20,6 @@ SET(CMAKE_C_COMPILER gcc)
 
 execute_process(COMMAND bash -c "mkdir -p {hacksaw,http}")
 
-set(worker_SOURCES
-        src/worker/worker.c
-        src/worker/worker.h
-        )
-
 add_library(hacksaw STATIC
         ${hacksaw_HEADERS}
         ${hacksaw_SRC}
@@ -57,17 +52,6 @@ target_link_libraries(autogentoo hacksaw)
 add_executable(autogentoo-exec
         ${include_HEADERS}
         src/autogentoo.c
-        )
-
-add_executable(autogentoo-worker
-        src/worker/worker_main.c
-        )
-
-target_link_libraries(autogentoo-worker
-        autogentoo
-        pthread
-        ssl
-        m
         )
 
 target_link_libraries(autogentoo-exec

@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <openssl/ssl.h>
 #include <autogentoo/writeconfig.h>
-#include "worker/worker.h"
+#include "autogentoo/worker.h"
 
 Connection* accept_conn (void* server, int fd, com_t type) {
 	if (fd < 3) {
@@ -39,8 +39,6 @@ void server_start (Server* server) {
 	if (server->opts & DAEMON)
 		daemonize(server->location);
 	
-	pthread_create(&server->worker_thread, NULL, (void* (*) (void*))worker_handler_start, server->worker_handler);
-	
 	server->pid = getpid();
 	srv = server;
 	signal (SIGINT, handle_sigint);
@@ -51,6 +49,10 @@ void server_start (Server* server) {
 #ifndef AUTOGENTOO_NO_THREADS
 	server->pool_handler = pool_handler_new(32);
 #endif
+	
+	server->job_handler = worker_handler_new();
+	server->job_handler->keep_alive = 1;
+	pthread_create(&server->job_handler->handler_pid, NULL, (void* (*) (void*))worker_handler_start, server->job_handler);
 	
 	AccessToken org_creation_token;
 	org_creation_token.host_id = NULL;
