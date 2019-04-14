@@ -17,12 +17,15 @@
 typedef struct __WorkerHandler WorkerHandler;
 typedef struct __Worker Worker;
 typedef struct __WorkerRequest WorkerRequest;
+typedef struct __WorkerWaitor WorkerWaitor;
+
+#include "host.h"
 
 struct __WorkerRequest {
 	Worker* parent;
 	
+	Host* host;
 	char* script;
-	char* parent_directory;
 	int chroot;
 	
 	int argument_n;
@@ -36,6 +39,7 @@ struct __Worker {
 	Worker* back;
 	
 	WorkerRequest* request;
+	pthread_mutex_t running;
 	
 	int exit_code;
 	

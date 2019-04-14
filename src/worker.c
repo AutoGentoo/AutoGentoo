@@ -45,7 +45,8 @@ void worker_handler_start(WorkerHandler* worker_handler) {
 
 void worker_start(Worker* worker) {
 	// Worker mutex is locked
-	
+	pthread_mutex_init(&worker->running, NULL);
+	pthread_mutex_lock(&worker->running);
 	worker->next = worker->parent->worker_head;
 	worker->back = NULL;
 	worker->parent->worker_head = worker;
@@ -55,18 +56,23 @@ void worker_start(Worker* worker) {
 	
 	pthread_mutex_unlock(&worker->parent->worker_mutex);
 	
-	if (worker->request->chroot)
-		chroot(worker->request->parent_directory);
-	else
-		chdir(worker->request->parent_directory);
+	char* parent_directory = host_path(worker->request->host, "");
 	
 	int self_pid = fork();
 	
 	if (self_pid == 0) {
 		char* filename;
-		asprintf(&filename, "log/%s.log", worker->id);
+		asprintf(&filename, "log/%s-%s.log", worker->request->host->id, worker->id);
 		FILE* log = fopen(filename, "w+");
 		free(filename);
+		
+		if (worker->request->chroot)
+			chroot(parent_directory);
+		else
+			chdir(parent_directory);
+		free(parent_directory);
+		
+		
 		
 		int fdlog = fileno(log);
 		dup2(fdlog, 1);
@@ -77,9 +83,10 @@ void worker_start(Worker* worker) {
 		lerror("error running %s", worker->request->script);
 		exit(-1);
 	}
-	
+	free(parent_directory);
 	waitpid (self_pid, &worker->exit_code, 0);
 	linfo("worker (%s) exited with %d", worker->id, worker->exit_code);
+	pthread_mutex_unlock(&worker->running);
 }
 
 void worker_free(Worker* worker) {

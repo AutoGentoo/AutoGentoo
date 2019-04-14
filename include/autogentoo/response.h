@@ -74,6 +74,4 @@ ssize_t rsend(Connection* conn, response_t code);
  */
 response_t get_res(response_nt x);
 
-ssize_t conn_write(Connection* conn, void* data, size_t len);
-
 #endif

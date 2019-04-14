@@ -9,15 +9,16 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <autogentoo/handle.h>
-#include <netinet/in.h>
 #include <autogentoo/http.h>
 #include <autogentoo/user.h>
-#include <mcheck.h>
 #include <autogentoo/api/dynamic_binary.h>
 #include <autogentoo/chroot.h>
 #include <sys/utsname.h>
 #include <autogentoo/writeconfig.h>
+#include <errno.h>
+#include <sys/inotify.h>
 #include "autogentoo/worker.h"
+#include <openssl/ssl.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -26,12 +27,13 @@ RequestLink requests[] = {
 		{REQ_HOST_EDIT,       {.ag_fh=HOST_EDIT}},
 		{REQ_HOST_DEL,        {.ag_fh=HOST_DEL}},
 		{REQ_HOST_EMERGE,     {.ag_fh=HOST_EMERGE}},
-		{REQ_HOST_MNTCHROOT,  {.ag_fh=HOST_MNTCHROOT}}, //!< Wont be a very long stream
+		{REQ_HOST_MNTCHROOT,  {.ag_fh=HOST_MNTCHROOT}},
 		{REQ_AUTH_ISSUE_TOK,  {.ag_fh=AUTH_ISSUE_TOK}},
 		{REQ_AUTH_REFRESH_TOK,{.ag_fh=AUTH_REFRESH_TOK}},
 		{REQ_SRV_INFO,        {.ag_fh=SRV_INFO}},
 		{REQ_SRV_REFRESH,     {.ag_fh=SRV_REFRESH}},
 		{REQ_AUTH_REGISTER,   {.ag_fh=AUTH_REGISTER}},
+		{REQ_JOB_STREAM,      {.ag_fh=JOB_STREAM}},
 };
 
 FunctionHandler resolve_call(request_t type) {
@@ -150,9 +152,9 @@ void HOST_EMERGE(Response* res, Request* request) {
 	char* directory = server_get_path(request->parent, host->id);
 	
 	WorkerRequest* strct_worker_request = malloc(sizeof(WorkerRequest));
-	strct_worker_request->chroot = 1;
+	strct_worker_request->chroot = 0;
 	strct_worker_request->script = "/usr/bin/emerge";
-	strct_worker_request->parent_directory = directory;
+	strct_worker_request->host = host;
 	
 	StringVector* worker_args = string_vector_new();
 	string_vector_add(worker_args, "-v");
@@ -287,7 +289,6 @@ void AUTH_REFRESH_TOK(Response* res, Request* request) {
 		dynamic_binary_add(res->content, 's', token->auth_token);
 		dynamic_binary_add(res->content, 's', token->user_id);
 		dynamic_binary_add(res->content, 's', token->host_id);
-		linfo("%d", token->access_level);
 		dynamic_binary_add(res->content, 'i', &token->access_level);
 		dynamic_binary_array_next(res->content);
 	}
@@ -315,4 +316,103 @@ void AUTH_REGISTER(Response* res, Request* request) {
 	dynamic_binary_add(res->content, 's', issued->user_id);
 	dynamic_binary_add(res->content, 's', issued->host_id);
 	dynamic_binary_add(res->content, 'i', &issued->access_level);
+}
+
+void JOB_STREAM(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_JOB_SELECT});
+	AccessToken* tok = authorize (request, TOKEN_HOST_READ, AUTH_TOKEN_HOST);
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
+	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
+	
+	/* Check if worker is running */
+	char* job_id = request->structures[2].job_select.job_name;
+	pthread_mutex_lock(&request->parent->job_handler->worker_mutex);
+	Worker* worker;
+	for (worker = request->parent->job_handler->worker_head; worker; worker = worker->next)
+		if (strcmp(job_id, worker->id) == 0)
+			break;
+	pthread_mutex_unlock(&request->parent->job_handler->worker_mutex);
+	
+	char* filename;
+	asprintf(&filename, "log/%s-%s.log", host->id, job_id);
+	
+	struct stat log_stat;
+	if (stat(filename, &log_stat) != 0) {
+		lerror("Failed to open %s", filename);
+		lerror("Error [%d] %s", errno, strerror(errno));
+		
+		if (errno == ENOENT)
+			HANDLE_RETURN_HTTP(NOT_FOUND);
+		HANDLE_RETURN_HTTP(INTERNAL_ERROR);
+	}
+	
+	FILE* log_fp = fopen(filename, "rb");
+	if (!log_fp) {
+		lerror ("Failed to open %s for reading", filename);
+		lerror ("Error [%d] %s", errno, strerror(errno));
+		HANDLE_RETURN_HTTP(INTERNAL_ERROR);
+	}
+	
+	START_STREAM()
+	
+	fseek(log_fp, 0L, SEEK_END);
+	long offset = ftell(log_fp);
+	rewind(log_fp);
+	
+	size_t chunk_size = 32;
+	char buff[chunk_size];
+	for (int current_chunk = 0; current_chunk < offset/chunk_size + 1; current_chunk++) {
+		ssize_t s = fread(buff, 1, chunk_size, log_fp);
+		connection_write(request->conn, buff, s)
+	}
+	
+	/* Job is done. exit now */
+	if (!worker || pthread_mutex_trylock(&worker->running) != EBUSY)
+		HANDLE_RETURN(OK);
+	
+	int iwatch = inotify_init();
+	if (iwatch < 0) {
+		lerror("inotify_init()");
+		return;
+	}
+	
+	int watch_d = inotify_add_watch(iwatch, filename, IN_MODIFY | IN_CLOSE_WRITE);
+	if (watch_d < 0) {
+		lerror("inotify_add_watch()");
+		HANDLE_RETURN(INTERNAL_ERROR);
+	}
+	
+	size_t evlen = sizeof(struct inotify_event);
+	char evbuff[evlen] __attribute__ ((aligned(8)));
+	
+	long pos = ftell(log_fp);
+	long log_read = 0;
+	
+	res->code = OK;
+	
+	for (;;) { // Event reading
+		ssize_t read_size = read(watch_d, evbuff, sizeof(struct inotify_event));
+		if (read_size <= 0)
+			break;
+		
+		struct inotify_event* ev = (struct inotify_event*)evbuff;
+		ssize_t name_read_size = read(watch_d, ev->name, ev->len);
+		
+		if (ev->mask & IN_CLOSE_WRITE) {
+			if (pthread_mutex_trylock(&worker->running) == EBUSY)
+				continue;
+			break;
+		}
+		
+		// ev->mask & IN_MODIFY
+		fseek(log_fp, 0L, SEEK_END);
+		log_read = ftell(log_fp) - pos;
+		fseek(log_fp, pos, SEEK_SET);
+		
+		for (int current_chunk = 0; current_chunk < offset/chunk_size + 1; current_chunk++) {
+			ssize_t s = fread(buff, chunk_size, 1, log_fp);
+			connection_write(request->conn, buff, s)
+		}
+	}
 }

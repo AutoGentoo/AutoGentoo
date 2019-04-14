@@ -6,7 +6,6 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <autogentoo/pool.h>
-#include <autogentoo/worker.h>
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -73,6 +72,7 @@ typedef enum {
 #include "thread.h"
 #include "queue.h"
 #include "user.h"
+#include <autogentoo/worker.h>
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -111,7 +111,7 @@ conn->communication_type == COM_RSA ? \
 #endif
 
 #ifndef connection_write
-#define connection_write(src, size) \
+#define connection_write(conn, src, size) \
 conn->communication_type == COM_RSA ? SSL_write(conn->encrypted_connection, src, (int)size) : write (conn->fd, src, size);
 #endif
 

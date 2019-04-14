@@ -89,14 +89,15 @@ Host* host_new(Server* server, char* id);
  * Updates the current status of the host by reading its directory
  * @param host the host to update the status of
  */
-void host_set_status(Host* host);
+void host_getstatus(Host* host);
+int host_setstatus(Host* host);
 
 /**
  * Writes the path of the host to dest
  * @param host the host to read path from
  * @param dest the destination of the Host's path
  */
-void host_get_path (Host* host, char** dest);
+char* host_path(Host* host, char* sub);
 
 /**
  * Free a host
@@ -104,22 +105,7 @@ void host_get_path (Host* host, char** dest);
  */
 void host_free(Host* host);
 
-/**
- * Write the make.conf (also updates it)
- * @param host the host of which to write the make.conf for
- * @return 0 if successful, 1 if not successful
- */
-int host_write_make_conf(Host* host);
-
 /* Request calls */
-
-/**
- * Safely install packages in the chroot
- * @param host the host to install packages for
- * @param arg the arguments passed to emerge
- * @return OK if successful, INTERNAL_ERROR if not
- */
-response_t host_install(Host* host, char* arg);
 
 /**
  * Initialize extras

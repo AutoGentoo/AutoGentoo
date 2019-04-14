@@ -11,6 +11,7 @@
 #include <autogentoo/request.h>
 #include <autogentoo/user.h>
 #include <math.h>
+#include <openssl/ssl.h>
 
 HttpHeader* http_get_header(HttpRequest* request, char* to_find) {
 	return small_map_get(request->headers, to_find);
@@ -141,13 +142,13 @@ size_t http_send_headers(Connection* conn, HttpRequest* req) {
 	
 	for (int i = 0; i < req->response_headers->n; i++) {
 		HttpHeader* c_header = small_map_get_index(req->response_headers, i);
-		conn_write(conn, c_header->name, strlen(c_header->name));
-		conn_write(conn, ": ", 2);
-		conn_write(conn, c_header->value, strlen(c_header->value));
-		conn_write(conn, "\n", 1);
+		connection_write(conn, c_header->name, strlen(c_header->name))
+		connection_write(conn, ": ", 2)
+		connection_write(conn, c_header->value, strlen(c_header->value))
+		connection_write(conn, "\n", 1)
 	}
 	
-	conn_write(conn, "\n", 1);
+	connection_write(conn, "\n", 1)
 }
 
 ssize_t http_send_default(Connection* conn, response_t res) {
@@ -157,7 +158,7 @@ ssize_t http_send_default(Connection* conn, response_t res) {
 	prv_http_get_date (date, 32);
 	
 	asprintf(&default_headers, "Date: %s\nServer: AutoGentoo\n\n", date);
-	ssize_t out_size = conn_write(conn, default_headers, strlen(default_headers));
+	ssize_t out_size = connection_write(conn, default_headers, strlen(default_headers))
 	free(default_headers);
 	
 	return out_size;

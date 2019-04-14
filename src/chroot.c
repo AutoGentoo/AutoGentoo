@@ -53,16 +53,12 @@ response_t chroot_mount(Host* host) {
 		return INTERNAL_ERROR;
 	}
 	
-	char* new_root;
-	host_get_path(host, &new_root);
-	
 	int i;
 	for (i = 0; i != sizeof(to_mount) / sizeof(to_mount[0]); i++) {
 		char* dest_temp;
 		ChrootMount mnt = to_mount[i];
 		
-		dest_temp = malloc(strlen(new_root) + strlen(mnt.dest) + 2);
-		sprintf(dest_temp, "%s/%s", new_root, mnt.dest);
+		dest_temp = host_path(host, mnt.dest);
 		fix_path(dest_temp);
 		
 		if (string_find(mounted->ptr, dest_temp, (size_t) mounted->n) == -1) {
@@ -82,7 +78,6 @@ response_t chroot_mount(Host* host) {
 		free(dest_temp);
 	}
 	
-	free(new_root);
 	string_vector_free(mounted);
 	host->chroot_status = CHR_MOUNTED;
 	return OK;

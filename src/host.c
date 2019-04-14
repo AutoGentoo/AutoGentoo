@@ -7,6 +7,8 @@
 #include <limits.h>
 #include <sys/wait.h>
 #include <autogentoo/user.h>
+#include <errno.h>
+#include <autogentoo/writeconfig.h>
 
 char* prv_gen_random(size_t len) {
 	char* out = malloc((size_t) len + 1);
@@ -60,15 +62,18 @@ void host_init_extras(Host* target) {
 	target->kernel = vector_new(sizeof(Kernel*), VECTOR_UNORDERED | VECTOR_REMOVE);
 }
 
-void host_get_path (Host* host, char** dest) {
+char* host_path(Host* host, char* sub) {
 	char buf[PATH_MAX];
 	char* dest_temp = realpath(host->parent->location, buf);
 	if (dest_temp == NULL) {
-		lerror("Failed to get realpath()");
-		return;
+		lerror("Failed to get realpath(%s)", host->parent->location);
+		lerror("Error [%d] %s", errno, strerror(errno));
+		return NULL;
 	}
 	
-	asprintf(dest, "%s/%s", dest_temp, host->id);
+	char* out;
+	asprintf(&out, "%s/%s/%s", dest_temp, host->id, sub);
+	return out;
 }
 
 void host_free(Host* host) {
@@ -87,232 +92,91 @@ void host_free(Host* host) {
 	free(host);
 }
 
-/*
-arch_t determine_arch (char* chost) {
-    char* dest = strdup (chost);
-    char* to_clear = strchr (dest, '-');
-    if (to_clear == NULL) {
-        return _INVALIDBIT;
-    }
-    *to_clear = 0;
-    
-    char* supported_32bit[] = {
-        "i386",
-        "i486",
-        "i586",
-        "i686"
-    };
-    
-    char* supported_64bit[] = {
-        "x86_64"
-    };
-    
-    if (string_find(supported_32bit, dest, sizeof(supported_32bit) / sizeof(*supported_32bit)) != -1) {
-        free (dest);
-        return _32BIT;
-    }
-    
-    if (string_find(supported_64bit, dest, sizeof(supported_64bit) / sizeof(*supported_64bit)) != -1) {
-        free (dest);
-        return _64BIT;
-    }
-    
-    free (dest);
-    return _INVALIDBIT;
-}
-*/
-
 int host_write_make_conf(Host* host) {
 	return 0;
 }
 
-/*
- * Deprecated
+int read_int(FILE* fp);
+size_t write_int(int src, FILE* fp);
 
-response_t host_init (Host* host) {
-    char host_path[256];
-    host_path[0] = 0;
-    host_get_path(host, host_path);
-    
-    if (host_path[0] == 0) {
-        return INTERNAL_ERROR;
-    }
-    
-    linfo ("Initializing host in %s", host_path);
-    
-    char *new_dirs [] = {
-        host->portage_tmpdir,
-        host->pkgdir,
-        host->port_logdir,
-        host->portdir,
-        "etc/portage",
-        "usr",
-        "lib32",
-        "lib64",
-        "usr/lib32",
-        "usr/lib64",
-        "proc",
-        "sys",
-        "dev"
-    };
-    
-    char target_dir[256];
-    
-    int i;
-    for (i=0; i!=sizeof (new_dirs) / sizeof (new_dirs[0]); i++) {
-        target_dir[0] = 0;
-        sprintf (target_dir, "%s/%s", host_path, new_dirs[i]);
-        prv_mkdir(target_dir);
-    }
-    
-    linfo ("Writing make.conf");
-    if (host_write_make_conf (host)) {
-        lerror ("Failed writing make.conf!");
-        return INTERNAL_ERROR;
-    }
-    
-    arch_t current_arch = determine_arch (host->chost);
-    if (current_arch == _INVALIDBIT) {
-        lerror ("invalid/unsupported chost: %s", host->chost);
-        return INTERNAL_ERROR;
-    }
-    
-    linfo ("Linking directories/profile");
-    pid_t link_fork = fork();
-    if (link_fork == -1) {
-        exit (-1);
-    }
-    if (link_fork == 0) {
-        chdir (host_path);
-        
-        int ret = 0;
-        
-        // Create the profile symlink
-        char sym_buf_p1 [128];
-        sprintf (sym_buf_p1, "/usr/portage/profiles/%s/", host->profile);
-        
-        char* lib_dest = current_arch == _32BIT ? "lib32" : "lib64";
-        
-        char* links[][2] = {
-            {sym_buf_p1, "etc/portage/make.profile"},
-            {lib_dest, "lib"},
-            {lib_dest, "usr/lib"}
-        };
-        
-        // Check if symlinks exist and remove them
-        struct stat __sym_buff;
-        
-        int i;
-        for (i = 0; i != sizeof (links) / sizeof (*links); i++) {
-            if (lstat (links[i][1], &__sym_buff) == 0) {
-                unlink (links[i][1]);
-            }
-            
-            linfo ("Linking %s to %s", links[i][0], links[i][1]);
-            if (symlink (links[i][0], links[i][1]) != 0) {
-                lwarning("Failed to symlink %s!", links[i][1]);
-                lwarning ("%d", errno);
-                ret = 1;
-            }
-        }
-        
-        exit(ret);
-    }
-    
-    int link_return;
-    waitpid (link_fork, &link_return, 0); // Wait until finished
-    
-    host->status = INIT;
-    
-    return link_return ? INTERNAL_ERROR : OK;
+void host_getstatus(Host* host) {
+	char* host_directory = host_path(host, "");
+	struct stat st;
+	
+	if (stat(host_directory, &st) != 0) {
+		lerror("Failed to open %s", host_directory);
+		lerror("Error [%d] %s", errno, strerror(errno));
+		host->environment_status = HOST_ENV_VOID;
+		write_server(host->parent);
+		free(host_directory);
+		
+		return;
+	}
+	
+	if (!S_ISDIR(st.st_mode)) {
+		lerror("Environment root %s is not a directory", host_directory);
+		host->environment_status = HOST_ENV_VOID;
+		write_server(host->parent);
+		free(host_directory);
+		
+		return;
+	}
+	
+	char* fp_stat_fn;
+	asprintf(&fp_stat_fn, "%s/.env_status", host_directory);
+	free(host_directory);
+	
+	FILE* fp_stat = fopen(fp_stat_fn, "rb");
+	free(fp_stat_fn);
+	if (!fp_stat) {
+		host->environment_status = HOST_ENV_VOID;
+		write_server(host->parent);
+		return;
+	}
+	
+	host->environment_status = read_int(fp_stat);
+	fclose(fp_stat);
+	
+	write_server(host->parent);
 }
-*/
 
-/*
-response_t host_stage1_install (Host* host, char* arg) {
-    String* cmd_full = string_new (128);
-    string_append(cmd_full, "emerge --autounmask-continue --buildpkg --root=\'");
-    string_append(cmd_full, host->parent->location);
-    string_append_c(cmd_full, '/');
-    string_append(cmd_full, host->id);
-    string_append(cmd_full, "\' --config-root=\'");
-    string_append(cmd_full, host->parent->location);
-    string_append_c(cmd_full, '/');
-    string_append(cmd_full, host->id);
-    string_append(cmd_full, "\' ");
-    string_append(cmd_full, arg);
-    
-    printf ("%s\n", cmd_full->ptr);
-    
-    char* args[64];
-    int i;
-    for (i = 0, args[i] = strtok(cmd_full->ptr, " "); args[i] != NULL; i++, args[i] = strtok (NULL, " "));
-    
-    pid_t install_pid = fork ();
-    if (install_pid == 0) {
-        linfo ("Starting emerge...");
-        fflush (stdout);
-        
-        execv ("/usr/bin/emerge", args);
-        exit(-1);
-    }
-    
-    int install_ret;
-    waitpid (install_pid, &install_ret, 0); // Wait until finished
-    
-    string_free (cmd_full);
-    
-    return install_ret == 0 ? OK : INTERNAL_ERROR;
-}*/
-
-response_t host_install(Host* host, char* arg) {
+int host_setstatus(Host* host) {
+	char* host_directory = host_path(host, "");
+	if (!host_directory)
+		return 1;
 	
-	char* new_line;
-	if ((new_line = strchr(arg, '\n')) != NULL) {
-		*new_line = 0;
+	struct stat st;
+	
+	if (stat(host_directory, &st) != 0) {
+		lerror("Error on stat [%d] %s", errno, strerror(errno));
+		
+		host->environment_status = HOST_ENV_VOID;
+		
+		if (errno == ENOENT) {
+			linfo("Creating environment directory %s", host_directory);
+			int status = mkdir(host_directory, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+			
+			if (status != 0) {
+				lerror("Error creating directory");
+				lerror("Error [%d] %s", errno, strerror(errno));
+				
+				free(host_directory);
+				return status;
+			}
+		}
 	}
 	
-	char* temp;
-	asprintf(&temp, "emerge --autounmask-continue --buildpkg %s", arg);
+	char* fp_stat_fn;
+	asprintf(&fp_stat_fn, "%s/.env_status", host_directory);
+	free(host_directory);
 	
-	char* k;
-	int spaces = 0;
-	for (k = temp; *k != 0; k++)
-		if (*k == ' ')
-			spaces++;
+	FILE* fp_stat = fopen(fp_stat_fn, "w+");
+	free(fp_stat_fn);
+	if (!fp_stat)
+		return -1;
 	
-	char** args = malloc(sizeof(char*) * (spaces + 2));
-	char** pos;
-	for (k = strtok(temp, " "), pos = args; k != NULL; pos++, k = strtok(NULL, " "))
-		*pos = k;
-	*pos = NULL;
+	write_int(host->environment_status, fp_stat);
+	fclose(fp_stat);
 	
-	pid_t install_pid = fork();
-	if (install_pid == 0) {
-		char* root;
-		host_get_path(host, &root);
-		if (chdir(root) == -1) {
-			lerror("chdir() failed");
-			exit(-1);
-		}
-		if (chroot(root) == -1) {
-			lerror("chroot() failed");
-			exit(-1);
-		}
-		free (root);
-		
-		linfo("Starting emerge...");
-		fflush(stdout);
-		
-		execv("/usr/bin/emerge", args);
-		exit(-1);
-	}
-	
-	int install_ret;
-	waitpid(install_pid, &install_ret, 0); // Wait until finished
-	free(temp);
-	free(args);
-	
-	return install_ret == 0 ? OK : INTERNAL_ERROR;
-	
+	return 0;
 }

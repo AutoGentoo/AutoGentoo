@@ -6,10 +6,10 @@
 #include <openssl/ssl.h>
 
 ssize_t rsend(Connection* conn, response_t code) {
-	char message[40];
-	sprintf(message, "HTTP/1.0 %d %s\n", code.code, code.message);
+	char message[64];
+	sprintf(message, "HTTP/1.1 %d %s\r\n\r\n", code.code, code.message);
 	
-	return conn_write(conn, message, 14 + code.len);
+	return connection_write(conn, message, strlen(message))
 }
 
 response_t res_list[] = {
@@ -35,11 +35,4 @@ response_t get_res(response_nt x) {
 		if (res_list[i].code == x)
 			return res_list[i];
 	return OK;
-}
-
-ssize_t conn_write(Connection* conn, void* data, size_t len) {
-	if (conn->communication_type == COM_RSA)
-		return SSL_write(conn->encrypted_connection, data, (int)len);
-	
-	return write (conn->fd, data, len);
 }

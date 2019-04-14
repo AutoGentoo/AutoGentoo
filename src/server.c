@@ -121,6 +121,7 @@ void server_respond(Connection* conn, int worker_index) {
 	/* Run the request */
 	Response res;
 	res.code = OK;
+	res.sent_response = 0;
 	res.content = dynamic_binary_new(DB_ENDIAN_TARGET_NETWORK);
 	if (request == NULL) {
 		http_send_default(conn, BAD_REQUEST);
@@ -128,17 +129,20 @@ void server_respond(Connection* conn, int worker_index) {
 	}
 	else {
 		request_call(&res, request);
-		/* Send the response */
-		/* Response code */
-		int code_big_endian = htonl(res.code.code);
 		
-		size_t write_size = 0;
-		write_size += connection_write(&code_big_endian, sizeof(int))
-		write_size += connection_write(res.code.message, res.code.len + 1)
-		
-		/* Response content */
-		write_size += connection_write(res.content->template, res.content->template_used_size + 1)
-		write_size += connection_write(res.content->ptr, res.content->used_size)
+		if (!res.sent_response) {
+			/* Send the response */
+			/* Response code */
+			int code_big_endian = htonl(res.code.code);
+			
+			size_t write_size = 0;
+			write_size += connection_write(conn, &code_big_endian, sizeof(int))
+			write_size += connection_write(conn, res.code.message, res.code.len + 1)
+			
+			/* Response content */
+			write_size += connection_write(conn, res.content->template, res.content->template_used_size + 1)
+			write_size += connection_write(conn, res.content->ptr, res.content->used_size)
+		}
 	}
 	
 	close(conn->fd);

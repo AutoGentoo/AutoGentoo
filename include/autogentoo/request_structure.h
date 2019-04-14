@@ -15,6 +15,7 @@ typedef enum {
 	STRCT_AUTHORIZE,
 	STRCT_EMERGE,
 	STRCT_ISSUE_TOK,
+	STRCT_JOB_SELECT,
 	
 	STRCT_MAX
 } request_structure_t;
@@ -48,6 +49,10 @@ struct __struct_Emerge {
 	char* emerge;
 } __attribute__((packed));
 
+struct __struct_Job {
+	char* job_name;
+} __attribute__((packed));
+
 struct __struct_Issue_token {
 	char* user_id;
 	char* target_host;
@@ -66,6 +71,7 @@ static char* request_structure_linkage[] = {
 	"ss", /* Host authorize */
 	"s", /* Emerge arguments */
 	"ssi", /* Issue Token */
+	"s"  /* Job select */
 };
 
 union __RequestData {
@@ -75,6 +81,7 @@ union __RequestData {
 	struct __struct_Authorize auth;
 	struct __struct_Issue_token issue_tok;
 	struct __struct_Emerge emerge;
+	struct __struct_Job job_select;
 };
 
 int parse_request_structure(RequestData* out, char* template, void* data, void* end_ptr);

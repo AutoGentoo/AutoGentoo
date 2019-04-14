@@ -37,6 +37,7 @@ typedef enum {
 	REQ_AUTH_ISSUE_TOK,
 	REQ_AUTH_REFRESH_TOK,
 	REQ_AUTH_REGISTER,
+	REQ_JOB_STREAM,
 	
 	REQ_MAX,
 	
@@ -73,6 +74,7 @@ union __FunctionHandler {
 struct __Response {
 	DynamicBinary* content;
 	response_t code;
+	int sent_response;
 };
 
 struct __Request {

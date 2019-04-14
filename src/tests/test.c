@@ -8,7 +8,6 @@
 #include <autogentoo/api/request_generate.h>
 #include <autogentoo/api/dynamic_binary.h>
 #include <autogentoo/api/ssl_wrap.h>
-#include <autogentoo/api/ssl_stream.h>
 #include "test.h"
 
 void test_htonl(void** state) {
@@ -92,11 +91,6 @@ void test_ssl_client(void** state) {
 	free(res);
 }
 
-void test_ssl_stream(void** state) {
-	SMWServer* server = smw_server_new("9492", "smw.cert", "smw.rsa");
-	assert_non_null(server);
-}
-
 int main(void) {
 	const struct CMUnitTest tests[] = {
 			cmocka_unit_test(test_htonl),
@@ -104,7 +98,6 @@ int main(void) {
 			cmocka_unit_test(test_request),
 			cmocka_unit_test(test_dynamic_binary),
 //			cmocka_unit_test(test_ssl_client),
-			cmocka_unit_test(test_ssl_stream),
 	};
 	
 	return cmocka_run_group_tests(tests, NULL, NULL);

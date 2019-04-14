@@ -2,10 +2,22 @@
 #define __AUTOGENTOO_HANDLE_H__
 
 #include "request.h"
+#include "endian_convert.h"
 
 #define HANDLE_RETURN(ret) ({ \
 res->code = ((ret)); \
 return; \
+})
+
+#define HTTP_RESPONSE_SEND() ({\
+	rsend(request->conn, res->code); \
+	res->sent_response = 1; \
+})
+
+#define HANDLE_RETURN_HTTP(ret) ({\
+	res->code = ((ret)); \
+	HTTP_RESPONSE_SEND(); \
+	return; \
 })
 
 #define HANDLE_GET_HOST(name) \
@@ -16,11 +28,8 @@ if (!host) { \
 }
 
 #define START_STREAM() \
-if (request->directive == DIR_CONNECTION_STREAM && !res->sent_response) {\
-	/* Response code */ \
-	int code_big_endian = htonl(res->code.code); \
-	conn_write(request->conn, &code_big_endian, sizeof(int)); \
-	conn_write(request->conn, res->code.message, res->code.len + 1); \
+if (!res->sent_response) {\
+	HTTP_RESPONSE_SEND(); \
 }
 
 #define HANDLE_CHECK_STRUCTURES(...) (\
@@ -68,5 +77,6 @@ void SRV_REFRESH(Response* res, Request* request);
 void AUTH_ISSUE_TOK(Response* res, Request* request);
 void AUTH_REFRESH_TOK(Response* res, Request* request);
 void AUTH_REGISTER(Response* res, Request* request);
+void JOB_STREAM(Response* res, Request* request);
 
 #endif

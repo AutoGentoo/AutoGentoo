@@ -3,6 +3,7 @@
 #include <autogentoo/autogentoo.h>
 #include <netinet/in.h>
 #include <autogentoo/user.h>
+#include <errno.h>
 
 inline size_t rsa_write_void(size_t len, FILE* fp) {
 	return 0;
@@ -50,7 +51,8 @@ size_t write_server(Server* server) {
 	FILE* to_write = fopen(config_file, "wb+");
 	if (to_write == NULL) {
 		lerror("Failed to open '%s' for writing!", config_file);
-		exit(1);
+		lerror("Error [%d] %s", errno, strerror(errno));
+		return 0;
 	}
 	free(config_file);
 	
@@ -134,6 +136,9 @@ size_t write_host_fp(Host* host, FILE* fp) {
 	}
 	
 	size += write_int(AUTOGENTOO_HOST_END, fp);
+	
+	if (host_setstatus(host) != 0)
+		lerror("Failed to set status for %s", host->id);
 	
 	return size;
 }
