@@ -50,8 +50,15 @@ size_t write_server(Server* server) {
 	
 	FILE* to_write = fopen(config_file, "wb+");
 	if (to_write == NULL) {
-		lerror("Failed to open '%s' for writing!", config_file);
+		lerror("Failed to open '%s' for writing-----------", config_file);
 		lerror("Error [%d] %s", errno, strerror(errno));
+		
+		char cwd[PATH_MAX];
+		if (getcwd(cwd, sizeof(cwd)) != NULL)
+			lerror("[%s]", cwd);
+		else
+			perror("getcwd() error");
+		
 		return 0;
 	}
 	free(config_file);
@@ -149,14 +156,10 @@ Server* read_server(char* location, char* port, server_t opts) {
 	sprintf(config_file, "%s/%s", location, config_file_name);
 	
 	FILE* fp = fopen(config_file, "rb");
-	if (fp == NULL) {
-		free(config_file);
-		Server* out = server_new(location, port, opts);
-		return out;
-	}
-	
 	free(config_file);
 	Server* out = server_new(location, port, opts);
+	if (fp == NULL)
+		return out;
 	
 	Host* host_temp;
 	AccessToken* token_temp;

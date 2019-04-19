@@ -7,15 +7,25 @@
 #include <fcntl.h>
 #include <autogentoo/request.h>
 
+pthread_mutex_t random_mutex;
+
 int prv_random_string(char* out, size_t len) {
-	srand((unsigned int)time(0));
+	pthread_mutex_lock(&random_mutex);
+	
+	int rand_d = open("/dev/urandom", O_RDONLY);
 	
 	char* chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	size_t chars_len = 62;
 	
-	for (int i = 0; i < len; i++)
-		out[i] = chars[rand() % chars_len];
+	int c;
+	for (int i = 0; i < len; i++) {
+		read(rand_d, &c, sizeof(int));
+		out[i] = chars[c % chars_len];
+	}
+	close(rand_d);
 	out[len] = 0;
+	
+	pthread_mutex_unlock(&random_mutex);
 	
 	return 0;
 }
@@ -93,4 +103,12 @@ void token_free(AccessToken* tok) {
 	free(tok->user_id);
 	free(tok->host_id);
 	free(tok);
+}
+
+void init_random_mutex() {
+	pthread_mutex_init(&random_mutex, NULL);
+}
+
+void free_random_mutex() {
+	pthread_mutex_destroy(&random_mutex);
 }

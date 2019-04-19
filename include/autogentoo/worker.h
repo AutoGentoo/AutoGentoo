@@ -41,6 +41,8 @@ struct __Worker {
 	WorkerRequest* request;
 	pthread_mutex_t running;
 	
+	char* parent_directory;
+	
 	int exit_code;
 	
 	char* id;
@@ -50,18 +52,9 @@ struct __Worker {
 struct __WorkerHandler {
 	Worker* worker_head;
 	pthread_mutex_t worker_mutex;
-	
-	pthread_mutex_t worker_wait_mutex;
-	pthread_cond_t worker_wait;
-	
-	Worker* current_request; // stack
-	
-	pthread_t handler_pid;
-	int keep_alive;
 };
 
 WorkerHandler* worker_handler_new();
-void worker_handler_start(WorkerHandler* worker_handler);
 void worker_start(Worker* worker);
 void worker_free(Worker* worker);
 

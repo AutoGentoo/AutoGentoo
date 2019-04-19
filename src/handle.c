@@ -140,6 +140,7 @@ void HOST_DEL(Response* res, Request* request) {
 		}
 
 	host_free(host);
+	write_server(request->parent);
 }
 
 void HOST_EMERGE(Response* res, Request* request) {
@@ -322,8 +323,12 @@ void JOB_STREAM(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_JOB_SELECT});
 	AccessToken* tok = authorize (request, TOKEN_HOST_READ, AUTH_TOKEN_HOST);
 	if (!tok)
-		HANDLE_RETURN(FORBIDDEN);
-	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
+		HANDLE_RETURN_HTTP(FORBIDDEN);
+	Host* host = server_get_host(request->parent, request->structures[1].host_select.hostname); \
+	if (!host) { \
+		token_free(map_remove(request->parent->auth_tokens, request->structures[0].auth.token)); \
+		HANDLE_RETURN_HTTP(NOT_FOUND);\
+	}
 	
 	/* Check if worker is running */
 	char* job_id = request->structures[2].job_select.job_name;
@@ -333,7 +338,6 @@ void JOB_STREAM(Response* res, Request* request) {
 		if (strcmp(job_id, worker->id) == 0)
 			break;
 	pthread_mutex_unlock(&request->parent->job_handler->worker_mutex);
-	
 	char* filename;
 	asprintf(&filename, "log/%s-%s.log", host->id, job_id);
 	
@@ -356,38 +360,37 @@ void JOB_STREAM(Response* res, Request* request) {
 	
 	START_STREAM()
 	
-	fseek(log_fp, 0L, SEEK_END);
-	long offset = ftell(log_fp);
-	rewind(log_fp);
-	
-	size_t chunk_size = 32;
-	char buff[chunk_size];
-	for (int current_chunk = 0; current_chunk < offset/chunk_size + 1; current_chunk++) {
-		ssize_t s = fread(buff, 1, chunk_size, log_fp);
-		connection_write(request->conn, buff, s)
-	}
+	clearerr(log_fp);
+	int c;
+	if (request->conn->communication_type == COM_RSA)
+		while ((c = fgetc(log_fp)) != EOF)
+			SSL_write(request->conn->encrypted_connection, &c, 1);
+	else
+		while ((c = fgetc(log_fp)) != EOF)
+			write(request->conn->fd, &c, 1);
 	
 	/* Job is done. exit now */
-	if (!worker || pthread_mutex_trylock(&worker->running) != EBUSY)
-		HANDLE_RETURN(OK);
+	if (!worker || pthread_mutex_trylock(&worker->running) != EBUSY) {
+		fclose(log_fp);
+		HANDLE_RETURN_HTTP(OK);
+	}
 	
 	int iwatch = inotify_init();
 	if (iwatch < 0) {
 		lerror("inotify_init()");
+		fclose(log_fp);
 		return;
 	}
 	
 	int watch_d = inotify_add_watch(iwatch, filename, IN_MODIFY | IN_CLOSE_WRITE);
 	if (watch_d < 0) {
 		lerror("inotify_add_watch()");
-		HANDLE_RETURN(INTERNAL_ERROR);
+		fclose(log_fp);
+		HANDLE_RETURN_HTTP(INTERNAL_ERROR);
 	}
 	
 	size_t evlen = sizeof(struct inotify_event);
 	char evbuff[evlen] __attribute__ ((aligned(8)));
-	
-	long pos = ftell(log_fp);
-	long log_read = 0;
 	
 	res->code = OK;
 	
@@ -406,13 +409,14 @@ void JOB_STREAM(Response* res, Request* request) {
 		}
 		
 		// ev->mask & IN_MODIFY
-		fseek(log_fp, 0L, SEEK_END);
-		log_read = ftell(log_fp) - pos;
-		fseek(log_fp, pos, SEEK_SET);
-		
-		for (int current_chunk = 0; current_chunk < offset/chunk_size + 1; current_chunk++) {
-			ssize_t s = fread(buff, chunk_size, 1, log_fp);
-			connection_write(request->conn, buff, s)
-		}
+		clearerr(log_fp);
+		if (request->conn->communication_type == COM_RSA)
+			while ((c = fgetc(log_fp)) != EOF)
+				SSL_write(request->conn->encrypted_connection, &c, 1);
+		else
+			while ((c = fgetc(log_fp)) != EOF)
+				write(request->conn->fd, &c, 1);
 	}
+	
+	fclose(log_fp);
 }

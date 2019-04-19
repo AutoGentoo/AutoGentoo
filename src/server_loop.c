@@ -51,8 +51,6 @@ void server_start (Server* server) {
 #endif
 	
 	server->job_handler = worker_handler_new();
-	server->job_handler->keep_alive = 1;
-	pthread_create(&server->job_handler->handler_pid, NULL, (void* (*) (void*))worker_handler_start, server->job_handler);
 	
 	AccessToken org_creation_token;
 	org_creation_token.host_id = NULL;

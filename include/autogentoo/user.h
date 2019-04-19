@@ -52,4 +52,7 @@ AccessToken* auth_issue_token(Server* server, AccessToken* creation_token);
 
 void token_free(AccessToken* tok);
 
+void init_random_mutex()__attribute__ ((constructor));
+void free_random_mutex()__attribute__ ((destructor));
+
 #endif //AUTOGENTOO_USER_H
