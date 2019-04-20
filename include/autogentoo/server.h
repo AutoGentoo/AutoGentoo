@@ -215,7 +215,7 @@ Host* server_get_host(Server* server, char* id);
  * @param port the port to bind on
  * @return the fd to read from
  */
-int server_init(char* port);
+int server_init(short port);
 
 /**
  * Handle the conn's request

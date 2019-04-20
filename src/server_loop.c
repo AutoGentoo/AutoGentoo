@@ -37,7 +37,7 @@ void server_start (Server* server) {
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	server->pthread = pthread_self();
-	server->socket = server_init(server->port);
+	server->socket = server_init(9490);
 	
 	linfo("Server started on port %s", server->port);
 	
@@ -96,7 +96,8 @@ void server_encrypt_start(EncryptServer* server) {
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	
-	server->socket = server_init(server->port);
+	
+	server->socket = server_init(9491);
 	signal (SIGINT, kill_encrypt_server);
 	
 	linfo("Encrypted server started on port %s", server->port);

@@ -12,50 +12,28 @@
 #include <string.h>
 #include "autogentoo/worker.h"
 
-int server_init (char* port) {
-	struct addrinfo hints, * res, * p;
+int server_init(short port) {
 	int listenfd = -1;
+	struct sockaddr_in addr;
 	
-	// getaddrinfo for host
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
-	if (getaddrinfo(NULL, port, &hints, &res) != 0) {
-		lerror("getaddrinfo() error");
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	
+	listenfd = socket(addr.sin_family, SOCK_STREAM | SOCK_CLOEXEC, 0);
+	if (listenfd == -1) {
+		lerror("socket() error");
 		exit(1);
 	}
-	// socket and bind
-	for (p = res; p != NULL; p = p->ai_next) {
-		listenfd = socket(p->ai_family, p->ai_socktype | SOCK_CLOEXEC, 0);
-		if (listenfd == -1)
-			continue;
-		if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int)) < 0)
-			lerror("setsockopt(SO_REUSEADDR) failed");
-		if (bind(listenfd, p->ai_addr, p->ai_addrlen) == 0)
-			break;
-	}
-	if (p == NULL) {
+	
+	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int)) < 0)
+		lerror("setsockopt(SO_REUSEADDR) failed");
+	
+	if (bind(listenfd, (struct sockaddr*)&addr, sizeof(addr)) != 0) {
 		lerror("socket() or bind()");
-		switch (errno) {
-			case EADDRINUSE:
-				lerror("Port %s in use", port);
-				break;
-			case EACCES:
-				lerror("Permission denied");
-				break;
-			case ENETUNREACH:
-				lerror("Network unreachable");
-				break;
-			default:
-				break;
-		}
+		lerror("Error [%d] %s", errno, strerror(errno));
 		exit(1);
 	}
-	
-	freeaddrinfo(res);
-	
-	// listen for incoming connections
 	
 	if (listen(listenfd, 64) != 0) {
 		lerror("listen() error");

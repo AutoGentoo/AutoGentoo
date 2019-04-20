@@ -70,9 +70,6 @@ void connection_free (Connection* conn) {
 }
 
 void server_recv (Connection* conn) {
-	struct timeval tv = {0, 500};
-	setsockopt(conn->fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
-	
 	/* Read the request */
 	size_t chunk_len = 128;
 	size_t buffer_size = chunk_len * 2;
