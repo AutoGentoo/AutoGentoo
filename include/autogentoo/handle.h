@@ -10,8 +10,10 @@ return; \
 })
 
 #define HTTP_RESPONSE_SEND() ({\
-	rsend(request->conn, res->code); \
-	res->sent_response = 1; \
+	if (!res->sent_response) { \
+		rsend(request->conn, res->code); \
+		res->sent_response = 1; \
+	} \
 })
 
 #define HANDLE_RETURN_HTTP(ret) ({\

@@ -27,7 +27,7 @@ int server_init (char* port) {
 	}
 	// socket and bind
 	for (p = res; p != NULL; p = p->ai_next) {
-		listenfd = socket(p->ai_family, p->ai_socktype, 0);
+		listenfd = socket(p->ai_family, p->ai_socktype | SOCK_CLOEXEC, 0);
 		if (listenfd == -1)
 			continue;
 		if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int)) < 0)

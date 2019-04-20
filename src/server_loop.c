@@ -2,12 +2,15 @@
 // Created by atuser on 11/20/18.
 //
 
+#define _GNU_SOURCE
+
 #include <autogentoo/server.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <openssl/ssl.h>
 #include <autogentoo/writeconfig.h>
+#include <sys/socket.h>
 #include "autogentoo/worker.h"
 
 Connection* accept_conn (void* server, int fd, com_t type) {
@@ -72,7 +75,7 @@ void server_start (Server* server) {
 	write_server(server);
 	
 	while (server->keep_alive) { // Main accept loop
-		int temp_fd = accept(server->socket, (struct sockaddr*) &clientaddr, &addrlen);
+		int temp_fd = accept4(server->socket, (struct sockaddr*) &clientaddr, &addrlen, SOCK_CLOEXEC);
 		Connection* current_conn = accept_conn(server, temp_fd, COM_PLAIN);
 		
 		if (!current_conn) {
@@ -104,7 +107,7 @@ void server_encrypt_start(EncryptServer* server) {
 	}
 	
 	while (server->parent->keep_alive) { // Main accept loop
-		int temp_fd = accept(server->socket, (struct sockaddr*) &clientaddr, &addrlen);
+		int temp_fd = accept4(server->socket, (struct sockaddr*) &clientaddr, &addrlen, SOCK_CLOEXEC);
 		Connection* current_conn = accept_conn(server, temp_fd, COM_RSA);
 		
 		if (!current_conn) {

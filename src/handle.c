@@ -331,13 +331,16 @@ void JOB_STREAM(Response* res, Request* request) {
 	}
 	
 	/* Check if worker is running */
-	char* job_id = request->structures[2].job_select.job_name;
+	lwarning("Waiting for lock...");
+	fflush(stdout);
 	pthread_mutex_lock(&request->parent->job_handler->worker_mutex);
+	char* job_id = request->structures[2].job_select.job_name;
 	Worker* worker;
 	for (worker = request->parent->job_handler->worker_head; worker; worker = worker->next)
 		if (strcmp(job_id, worker->id) == 0)
 			break;
 	pthread_mutex_unlock(&request->parent->job_handler->worker_mutex);
+	linfo("Finished with lock");
 	char* filename;
 	asprintf(&filename, "log/%s-%s.log", host->id, job_id);
 	
@@ -351,8 +354,8 @@ void JOB_STREAM(Response* res, Request* request) {
 		HANDLE_RETURN_HTTP(INTERNAL_ERROR);
 	}
 	
-	FILE* log_fp = fopen(filename, "rb");
-	if (!log_fp) {
+	int log_fd = open(filename, O_RDONLY);
+	if (log_fd == -1) {
 		lerror ("Failed to open %s for reading", filename);
 		lerror ("Error [%d] %s", errno, strerror(errno));
 		HANDLE_RETURN_HTTP(INTERNAL_ERROR);
@@ -360,63 +363,75 @@ void JOB_STREAM(Response* res, Request* request) {
 	
 	START_STREAM()
 	
-	clearerr(log_fp);
 	int c;
+	ssize_t log_read_size;
 	if (request->conn->communication_type == COM_RSA)
-		while ((c = fgetc(log_fp)) != EOF)
-			SSL_write(request->conn->encrypted_connection, &c, 1);
+		while ((log_read_size = read(log_fd, &c, sizeof(c))) == sizeof(c))
+			SSL_write(request->conn->encrypted_connection, &c, log_read_size);
 	else
-		while ((c = fgetc(log_fp)) != EOF)
-			write(request->conn->fd, &c, 1);
+		HANDLE_RETURN_HTTP(UPGRADE_REQUIRED);
 	
 	/* Job is done. exit now */
 	if (!worker || pthread_mutex_trylock(&worker->running) != EBUSY) {
-		fclose(log_fp);
+		linfo("No longer running - %p", worker);
+		close(log_fd);
 		HANDLE_RETURN_HTTP(OK);
 	}
 	
 	int iwatch = inotify_init();
 	if (iwatch < 0) {
 		lerror("inotify_init()");
-		fclose(log_fp);
+		close(log_fd);
 		return;
 	}
 	
 	int watch_d = inotify_add_watch(iwatch, filename, IN_MODIFY | IN_CLOSE_WRITE);
 	if (watch_d < 0) {
 		lerror("inotify_add_watch()");
-		fclose(log_fp);
+		close(log_fd);
+		close(iwatch);
 		HANDLE_RETURN_HTTP(INTERNAL_ERROR);
 	}
 	
-	size_t evlen = sizeof(struct inotify_event);
+	size_t evlen = (10 * (sizeof(struct inotify_event) + NAME_MAX + 1));
 	char evbuff[evlen] __attribute__ ((aligned(8)));
+	char* p;
+	struct inotify_event* event;
 	
 	res->code = OK;
+	ssize_t read_size;
 	
-	for (;;) { // Event reading
-		ssize_t read_size = read(watch_d, evbuff, sizeof(struct inotify_event));
+	int keep_reading = 1;
+	for (;keep_reading;) {
+		read_size = read(iwatch, evbuff, sizeof(struct inotify_event));
 		if (read_size <= 0)
 			break;
 		
-		struct inotify_event* ev = (struct inotify_event*)evbuff;
-		ssize_t name_read_size = read(watch_d, ev->name, ev->len);
-		
-		if (ev->mask & IN_CLOSE_WRITE) {
-			if (pthread_mutex_trylock(&worker->running) == EBUSY)
-				continue;
-			break;
+		for ( p = evbuff; p < evbuff + read_size; ) {
+			event = (struct inotify_event*) p;
+			
+			if (event->mask & IN_CLOSE_WRITE) {
+				if (pthread_mutex_trylock(&worker->running) != EBUSY)
+					keep_reading = 0;
+			}
+			
+			if (event->mask & IN_MODIFY) {
+				linfo("%s was modified", event->name);
+				while ((log_read_size = read(log_fd, &c, sizeof(c))) == sizeof(c)) {
+					SSL_write(request->conn->encrypted_connection, &c, log_read_size);
+					write(1, &c, 4);
+				}
+			}
+			
+			if (pthread_mutex_trylock(&worker->running) != EBUSY)
+				keep_reading = 0;
+			
+			p += sizeof(struct inotify_event) + event->len;
 		}
-		
-		// ev->mask & IN_MODIFY
-		clearerr(log_fp);
-		if (request->conn->communication_type == COM_RSA)
-			while ((c = fgetc(log_fp)) != EOF)
-				SSL_write(request->conn->encrypted_connection, &c, 1);
-		else
-			while ((c = fgetc(log_fp)) != EOF)
-				write(request->conn->fd, &c, 1);
 	}
+	linfo("log exited");
 	
-	fclose(log_fp);
+	inotify_rm_watch(iwatch, watch_d);
+	close(iwatch);
+	close(log_fd);
 }

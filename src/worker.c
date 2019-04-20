@@ -33,12 +33,14 @@ void worker_start(Worker* worker) {
 	if (self_pid == -1)
 		lerror("Failed to create child process");
 	
+	char* filename;
+	asprintf(&filename, "log/%s-%s.log", worker->request->host->id, worker->id);
+	
 	if (self_pid == 0) {
-		char* filename;
 		linfo("Registered worker with id: %s", worker->id);
-		asprintf(&filename, "log/%s-%s.log", worker->request->host->id, worker->id);
 		int log = open(filename, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IWUSR);
 		free(filename);
+		
 		
 		if (log == -1) {
 			lerror("Failed to open log file %s", filename);
@@ -73,7 +75,11 @@ void worker_start(Worker* worker) {
 	linfo("worker (%s) exited with %d", worker->id, worker->exit_code);
 	pthread_mutex_unlock(&worker->running);
 	
-	return worker_free(worker);
+	/* Signal the inotify */
+	int log = open(filename, O_WRONLY);
+	close(log);
+	
+	return;
 }
 
 void worker_free(Worker* worker) {
