@@ -416,10 +416,8 @@ void JOB_STREAM(Response* res, Request* request) {
 			}
 			
 			if (event->mask & IN_MODIFY) {
-				linfo("%s was modified", event->name);
 				while ((log_read_size = read(log_fd, &c, sizeof(c))) == sizeof(c)) {
 					SSL_write(request->conn->encrypted_connection, &c, log_read_size);
-					write(1, &c, 4);
 				}
 			}
 			

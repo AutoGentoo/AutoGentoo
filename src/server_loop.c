@@ -28,6 +28,8 @@ Connection* accept_conn (void* server, int fd, com_t type) {
 		out = connection_new_tls((EncryptServer*)server, fd);
 	if (type == COM_PLAIN)
 		out = connection_new((Server*)server, fd);
+	signal(SIGPIPE, SIG_IGN);
+	
 	return out;
 }
 
