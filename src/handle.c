@@ -98,7 +98,7 @@ void HOST_NEW(Response* res, Request* request) {
 	target->profile = strdup(request->structures[1].host_new.profile);
 
 	AccessToken creat_tok;
-	creat_tok.access_level = TOKEN_HOST_WRITE;
+	creat_tok.access_level = TOKEN_HOST_MOD;
 	creat_tok.host_id = target->id;
 	creat_tok.user_id = request->structures[0].auth.user_id;
 
