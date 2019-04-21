@@ -29,17 +29,14 @@ WorkerHandler* worker_handler_new() {
 
 void worker_start(Worker* worker) {
 	pthread_mutex_lock(&worker->running);
-	linfo("Inside child process");
 	pid_t self_pid = fork();
 	
 	if (self_pid == -1)
 		lerror("Failed to create child process");
 	
-	printf("%d\n", self_pid);
-	
 	char* filename;
 	asprintf(&filename, "log/%s-%s.log", worker->request->host->id, worker->id);
-	printf("%s %d\n", filename, self_pid);
+	
 	if (self_pid == 0) {
 		linfo("Registered worker with id: %s", worker->id);
 		int log = open(filename, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
