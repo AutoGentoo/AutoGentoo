@@ -10,6 +10,10 @@
 #include "string_vector.h"
 #include "conf.h"
 
+void init_log_mutex() __attribute__((constructor));
+
+void destroy_log_mutex() __attribute__((destructor));
+
 void print_bin(void* ptr, int n, size_t size);
 
 void print_vec(Vector* vec);

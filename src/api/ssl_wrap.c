@@ -32,6 +32,7 @@ int socket_connect(char* hostname, unsigned short port) {
 	
 	if ((getaddrinfo(hostname, str_port, &hints, &resolved)) != 0) {
 		lerror("Cannot resolve hostname: %s", hostname);
+		lerror("Error [%d] %s", errno, strerror(errno));
 		return -1;
 	}
 	

@@ -28,17 +28,21 @@ WorkerHandler* worker_handler_new() {
 }
 
 void worker_start(Worker* worker) {
+	pthread_mutex_lock(&worker->running);
+	linfo("Inside child process");
 	pid_t self_pid = fork();
 	
 	if (self_pid == -1)
 		lerror("Failed to create child process");
 	
+	printf("%d\n", self_pid);
+	
 	char* filename;
 	asprintf(&filename, "log/%s-%s.log", worker->request->host->id, worker->id);
-	
+	printf("%s %d\n", filename, self_pid);
 	if (self_pid == 0) {
 		linfo("Registered worker with id: %s", worker->id);
-		int log = open(filename, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IWUSR);
+		int log = open(filename, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 		free(filename);
 		
 		
@@ -68,6 +72,8 @@ void worker_start(Worker* worker) {
 		lerror("error running %s", worker->request->script);
 		exit(ret);
 	}
+	
+	worker->forked_pid = self_pid;
 	
 	if (self_pid != -1)
 		waitpid (self_pid, &worker->exit_code, 0);
@@ -99,6 +105,20 @@ void worker_free(Worker* worker) {
 	free(worker);
 }
 
+void worker_handler_free(WorkerHandler* worker_handler) {
+	for (Worker* worker = worker_handler->worker_head; worker; worker = worker->next) {
+		if (pthread_mutex_trylock(&worker->running) == EBUSY) {
+			pthread_cancel(worker->pid);
+			kill(worker->forked_pid, SIGKILL);
+		}
+	}
+	
+	while (worker_handler->worker_head)
+		worker_free(worker_handler->worker_head);
+	pthread_mutex_destroy(&worker_handler->worker_mutex);
+	free(worker_handler);
+}
+
 int prv_random_string(char* out, size_t len);
 
 char* worker_register() {
@@ -116,8 +136,6 @@ char* worker_register() {
 }
 
 char* worker_request(WorkerHandler* worker_handler, WorkerRequest* request) {
-	pthread_mutex_lock(&worker_handler->worker_mutex);
-	
 	Worker* worker = malloc(sizeof(Worker));
 	worker->parent = worker_handler;
 	worker->request = request;
@@ -125,6 +143,7 @@ char* worker_request(WorkerHandler* worker_handler, WorkerRequest* request) {
 	worker->request->parent = worker;
 	
 	pthread_mutex_init(&worker->running, NULL);
+	pthread_mutex_lock(&worker_handler->worker_mutex);
 	worker->next = worker->parent->worker_head;
 	worker->back = NULL;
 	worker->parent->worker_head = worker;
@@ -155,9 +174,11 @@ char* worker_request(WorkerHandler* worker_handler, WorkerRequest* request) {
 		return NULL;
 	}
 	
-	pthread_mutex_lock(&worker->running);
-	
-	pthread_create(&worker->pid, NULL, (void* (*) (void*))worker_start, worker);
+	int error = pthread_create(&worker->pid, NULL, (void* (*) (void*))worker_start, worker);
+	if (error == 0)
+		linfo("Worker created");
+	else
+		lerror("pthread_create() [%d] %s", error, strerror(error));
 	
 	return worker->id;
 }

@@ -85,7 +85,6 @@ AccessToken* auth_issue_token(Server* server, AccessToken* creation_token) {
 	out->user_id = strdup(creation_token->user_id);
 	out->auth_token = malloc (AUTOGENTOO_TOKEN_LENGTH + 1);
 	out->access_level = creation_token->access_level;
-	printf("%d\n", out->access_level);
 	
 	do
 		if (prv_random_string(out->auth_token, AUTOGENTOO_TOKEN_LENGTH) != 0) {

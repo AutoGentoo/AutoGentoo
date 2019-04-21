@@ -36,6 +36,30 @@ RequestLink requests[] = {
 		{REQ_JOB_STREAM,      {.ag_fh=JOB_STREAM}},
 };
 
+RequestNameLink request_names[] = {
+		{REQ_GET,             "GET"},
+		{REQ_HEAD,            "HEAD"},
+		{REQ_HOST_NEW,        "HOST_NEW"},
+		{REQ_HOST_EDIT,       "HOST_EDIT"},
+		{REQ_HOST_DEL,        "HOST_DEL"},
+		{REQ_HOST_EMERGE,     "HOST_EMERGE"},
+		{REQ_HOST_MNTCHROOT,  "HOST_MNTCHROOT"},
+		{REQ_AUTH_ISSUE_TOK,  "AUTH_ISSUE_TOK"},
+		{REQ_AUTH_REFRESH_TOK,"AUTH_REFRESH_TOK"},
+		{REQ_SRV_INFO,        "SRV_INFO"},
+		{REQ_SRV_REFRESH,     "SRV_REFRESH"},
+		{REQ_AUTH_REGISTER,   "AUTH_REGISTER"},
+		{REQ_JOB_STREAM,      "JOB_STREAM"},
+};
+
+char* str_request(request_t type) {
+	int i;
+	for (i = 0; i < sizeof (request_names) / sizeof (RequestNameLink); i++)
+		if (request_names[i].ident == type)
+			return request_names[i].name;
+	return NULL;
+}
+
 FunctionHandler resolve_call(request_t type) {
 	int i;
 	for (i = 0; i < sizeof (requests) / sizeof (RequestLink); i++)
@@ -150,11 +174,9 @@ void HOST_EMERGE(Response* res, Request* request) {
 		HANDLE_RETURN(FORBIDDEN);
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
 	
-	char* directory = server_get_path(request->parent, host->id);
-	
 	WorkerRequest* strct_worker_request = malloc(sizeof(WorkerRequest));
 	strct_worker_request->chroot = 0;
-	strct_worker_request->script = "/usr/bin/emerge";
+	strct_worker_request->script = strdup("/usr/bin/emerge");
 	strct_worker_request->host = host;
 	
 	StringVector* worker_args = string_vector_new();
@@ -176,8 +198,6 @@ void HOST_EMERGE(Response* res, Request* request) {
 	
 	if (!job_name)
 		HANDLE_RETURN(INTERNAL_ERROR);
-	
-	free(directory);
 	
 	dynamic_binary_add(res->content, 's', job_name);
 }
@@ -331,8 +351,6 @@ void JOB_STREAM(Response* res, Request* request) {
 	}
 	
 	/* Check if worker is running */
-	lwarning("Waiting for lock...");
-	fflush(stdout);
 	pthread_mutex_lock(&request->parent->job_handler->worker_mutex);
 	char* job_id = request->structures[2].job_select.job_name;
 	Worker* worker;
@@ -340,7 +358,6 @@ void JOB_STREAM(Response* res, Request* request) {
 		if (strcmp(job_id, worker->id) == 0)
 			break;
 	pthread_mutex_unlock(&request->parent->job_handler->worker_mutex);
-	linfo("Finished with lock");
 	char* filename;
 	asprintf(&filename, "log/%s-%s.log", host->id, job_id);
 	
@@ -373,7 +390,6 @@ void JOB_STREAM(Response* res, Request* request) {
 	
 	/* Job is done. exit now */
 	if (!worker || pthread_mutex_trylock(&worker->running) != EBUSY) {
-		linfo("No longer running - %p", worker);
 		close(log_fd);
 		HANDLE_RETURN_HTTP(OK);
 	}
@@ -427,7 +443,6 @@ void JOB_STREAM(Response* res, Request* request) {
 			p += sizeof(struct inotify_event) + event->len;
 		}
 	}
-	linfo("log exited");
 	
 	inotify_rm_watch(iwatch, watch_d);
 	close(iwatch);

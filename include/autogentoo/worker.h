@@ -47,6 +47,7 @@ struct __Worker {
 	
 	char* id;
 	pthread_t pid;
+	pid_t forked_pid;
 };
 
 struct __WorkerHandler {
@@ -57,6 +58,7 @@ struct __WorkerHandler {
 WorkerHandler* worker_handler_new();
 void worker_start(Worker* worker);
 void worker_free(Worker* worker);
+void worker_handler_free(WorkerHandler* worker_handler);
 
 char* worker_register();
 

@@ -23,6 +23,7 @@ int server_init(short port) {
 	listenfd = socket(addr.sin_family, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if (listenfd == -1) {
 		lerror("socket() error");
+		lerror("Error [%d] %s", errno, strerror(errno));
 		exit(1);
 	}
 	
@@ -37,6 +38,7 @@ int server_init(short port) {
 	
 	if (listen(listenfd, 64) != 0) {
 		lerror("listen() error");
+		lerror("Error [%d] %s", errno, strerror(errno));
 		exit(1);
 	}
 	

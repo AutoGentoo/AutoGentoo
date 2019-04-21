@@ -48,6 +48,7 @@ if (!res->sent_response) {\
  * Holds all of the valid requests
  */
 extern RequestLink requests[];
+extern RequestNameLink request_names[];
 
 /**
  * Parse the request and write the arguemnts to args
@@ -55,7 +56,7 @@ extern RequestLink requests[];
  * @return a pointer to function that should be called
  */
 FunctionHandler resolve_call(request_t type);
-
+char* str_request(request_t type);
 
 /**
  * HTTP Requests

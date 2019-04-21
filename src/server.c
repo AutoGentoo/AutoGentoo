@@ -105,7 +105,7 @@ void handle_sigpipe(int signal) {
 
 void server_respond(Connection* conn, int worker_index) {
 	conn->worker = worker_index;
-	//signal(SIGPIPE, handle_sigpipe);
+	signal(SIGPIPE, handle_sigpipe);
 	
 	/* Read from the client and parse request */
 	server_recv(conn);
@@ -145,7 +145,7 @@ void server_respond(Connection* conn, int worker_index) {
 	close(conn->fd);
 	
 	if (request)
-		ldinfo("%s -- %s (%d) code = %d", conn->ip, res.code.message, (int)res.code.code, request->request_type);
+		ldinfo("%s -- %s (%d) %s (%d)", conn->ip, res.code.message, (int)res.code.code, str_request(request->request_type), request->request_type);
 	else
 		ldinfo("%s -- %s (%d)", conn->ip, res.code.message, (int)res.code.code);
 	Server* parent = conn->parent;

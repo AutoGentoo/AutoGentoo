@@ -4,6 +4,7 @@
 
 #include <autogentoo/server.h>
 #include <autogentoo/writeconfig.h>
+#include <errno.h>
 
 void handle_sigint (int sig) {
 	srv->keep_alive = 0;
@@ -23,6 +24,9 @@ void server_kill (Server* server) {
 		pthread_kill(server->rsa_child->pid, SIGINT);
 		close(server->rsa_child->socket);
 		pthread_join(server->rsa_child->pid, NULL);
+		
+		worker_handler_free(server->job_handler);
+		
 		server_encrypt_free(server->rsa_child);
 		linfo("encrypt server exited");
 	}
