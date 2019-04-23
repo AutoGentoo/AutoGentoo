@@ -11,6 +11,7 @@
 #include <autogentoo/writeconfig.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <openssl/ssl.h>
 
 void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair) {
 	X509_NAME* name = NULL;
@@ -139,6 +140,7 @@ int x509_generate_write(EncryptServer* parent) {
 		fclose(fp);
 		if (!parent->key_pair) {
 			lerror("Failed to read RSA from file %s", parent->rsa_path);
+			ERR_print_errors_fp(stderr);
 			return 2;
 		}
 	}
@@ -149,6 +151,7 @@ int x509_generate_write(EncryptServer* parent) {
 		fclose(fp);
 		if (!parent->certificate) {
 			lerror("Failed to read certificate from file %s", parent->cert_path);
+			ERR_print_errors_fp(stderr);
 			return 3;
 		}
 	}
@@ -156,6 +159,7 @@ int x509_generate_write(EncryptServer* parent) {
 	if (parent->opts & ENC_GEN_RSA) {
 		if (!rsa_generate(&parent->key_pair)) {
 			lerror ("Failed to generate RSA key");
+			ERR_print_errors_fp(stderr);
 			return 4;
 		}
 		
@@ -164,6 +168,7 @@ int x509_generate_write(EncryptServer* parent) {
 		if (!PEM_write_RSAPrivateKey(fp, parent->key_pair, NULL, NULL, 0, NULL, NULL)) {
 			fclose (fp);
 			lerror("Failed to write private key to file");
+			ERR_print_errors_fp(stderr);
 			return 4;
 		}
 		fclose (fp);
@@ -173,6 +178,7 @@ int x509_generate_write(EncryptServer* parent) {
 		x509_generate(cert_generate_serial(), 120, &parent->certificate, parent->key_pair);
 		if (!parent->certificate) {
 			lerror("Failed to generate certificate");
+			ERR_print_errors_fp(stderr);
 			return 5;
 		}
 		
@@ -181,6 +187,7 @@ int x509_generate_write(EncryptServer* parent) {
 		if (!PEM_write_X509(fp, parent->certificate)) {
 			fclose (fp);
 			lerror("Failed to write certificate to file");
+			ERR_print_errors_fp(stderr);
 			return 5;
 		}
 		fclose (fp);
@@ -189,6 +196,7 @@ int x509_generate_write(EncryptServer* parent) {
 	if (parent->opts & ENC_CERT_SIGN) {
 		if (!certificate_sign(parent->certificate, parent->key_pair)) {
 			lerror("Failed to sign RSA key with certificate");
+			ERR_print_errors_fp(stderr);
 			return 6;
 		}
 	}

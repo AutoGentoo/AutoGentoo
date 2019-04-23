@@ -145,10 +145,10 @@ size_t http_send_headers(Connection* conn, HttpRequest* req) {
 		connection_write(conn, c_header->name, strlen(c_header->name))
 		connection_write(conn, ": ", 2)
 		connection_write(conn, c_header->value, strlen(c_header->value))
-		connection_write(conn, "\n", 1)
+		connection_write(conn, "\r\n", 1)
 	}
 	
-	connection_write(conn, "\n", 1)
+	connection_write(conn, "\r\n", 1)
 }
 
 ssize_t http_send_default(Connection* conn, response_t res) {

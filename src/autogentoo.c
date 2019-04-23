@@ -2,6 +2,8 @@
 
 #include <autogentoo/autogentoo.h>
 #include <string.h>
+#include <openssl/err.h>
+#include <openssl/ssl.h>
 
 Opt opt_handlers[] = {
 		{'s', "server",  "Start the autogentoo server (instead of client)", set_is_server,      OPT_SHORT | OPT_LONG},
@@ -55,6 +57,14 @@ void set_encrypt_opts (Opt* op, char* arg) {
 
 void set_is_encrypted (Opt* op, char* c) {
 	server_opts |= ENCRYPT;
+	OpenSSL_add_all_algorithms();
+	ERR_load_BIO_strings();
+	ERR_load_crypto_strings();
+	SSL_load_error_strings();
+	if (SSL_library_init() < 0) {
+		lerror("Could not initialize ssl library");
+		exit(1);
+	}
 }
 
 void set_is_server(Opt* op, char* c) {

@@ -382,9 +382,14 @@ void JOB_STREAM(Response* res, Request* request) {
 	
 	int c;
 	ssize_t log_read_size;
-	if (request->conn->communication_type == COM_RSA)
+	if (request->conn->communication_type == COM_RSA) {
 		while ((log_read_size = read(log_fd, &c, sizeof(c))) == sizeof(c))
-			SSL_write(request->conn->encrypted_connection, &c, log_read_size);
+			if (SSL_write(request->conn->encrypted_connection, &c, log_read_size) <= 0) {
+				// Client closed connection
+				HANDLE_RETURN(OK);
+				break;
+			}
+	}
 	else
 		HANDLE_RETURN_HTTP(UPGRADE_REQUIRED);
 	

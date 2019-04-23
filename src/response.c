@@ -7,7 +7,7 @@
 
 ssize_t rsend(Connection* conn, response_t code) {
 	char message[64];
-	sprintf(message, "HTTP/1.1 %d %s\r\n\r\n", code.code, code.message);
+	sprintf(message, "HTTP/1.1 %d %s\r\n", code.code, code.message);
 	
 	return connection_write(conn, message, strlen(message))
 }

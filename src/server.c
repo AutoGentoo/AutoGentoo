@@ -150,12 +150,9 @@ void server_respond(Connection* conn, int worker_index) {
 		ldinfo("%s -- %s (%d)", conn->ip, res.code.message, (int)res.code.code);
 	Server* parent = conn->parent;
 	
-	if (request && request->directive == DIR_CONNECTION_OPEN) {
+	if (request)
 		request_free(request);
-		server_respond(conn, worker_index);
-	}
-	else
-		connection_free(conn);
+	connection_free(conn);
 	
 	/* Update the config */
 	write_server(parent);

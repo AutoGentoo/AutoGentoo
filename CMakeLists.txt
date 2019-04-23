@@ -58,6 +58,7 @@ target_link_libraries(autogentoo-exec
         autogentoo
         pthread
         ssl
+        crypto
         m
         )
 
