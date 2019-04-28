@@ -85,3 +85,35 @@ set(http_PARSER
         src/http/ag_http_flex.l
         src/http/ag_http_bison.y
         )
+
+set(src_CPORTAGE
+        cportage/package.c
+        cportage/package.h
+        cportage/constants.h
+        cportage/portage.c
+        cportage/portage.h
+        cportage/portage_log.c
+        cportage/portage_log.h
+        cportage/database.c
+        cportage/database.h
+        cportage/manifest.c
+        cportage/manifest.h
+        cportage/compress.c
+        cportage/compress.h
+        )
+
+set(language_SOURCES
+        cportage/language/share.h
+        cportage/language/share.c
+        cportage/language/atom.c
+        cportage/language/atom.h
+        cportage/language/depend.c
+        cportage/language/depend.h
+        )
+
+set(language_PARSER
+        cportage/language/atom_bison.y
+        cportage/language/atom_flex.l
+        cportage/language/depend_bison.y
+        cportage/language/depend_flex.l
+        )

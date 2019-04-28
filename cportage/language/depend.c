@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <depend.h>
+#include "depend.h"
 #include <stdlib.h>
 #include <string.h>
-#include <share.h>
+#include "share.h"
 
 CheckUse* new_check_use(Use* use, DependExpression* inner) {
 	CheckUse* out = malloc(sizeof(CheckUse));

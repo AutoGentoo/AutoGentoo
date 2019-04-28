@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <autogentoo/hacksaw/tools.h>
+#include <stdint.h>
 
-unsigned long prv_map_insert_item (Map* map, MapItem* item);
+uint32_t prv_map_insert_item (Map* map, MapItem* item);
 void prv_map_realloc_item (Map* map, MapItem* list);
 
 
@@ -60,7 +61,8 @@ StringVector* map_all_keys(Map* map) {
 }
 
 void* map_get(Map* map, char* key) {
-	size_t index = get_hash(key) % map->size;
+	size_t n = strlen(key);
+	size_t index = map_get_hash(key, n) % map->size;
 	
 	MapItem* current = map->hash_table[index];
 	while (current) {
@@ -70,10 +72,11 @@ void* map_get(Map* map, char* key) {
 	}
 	
 	return NULL;
-};
+}
 
 void* map_remove(Map* map, char* key) {
-	size_t index = get_hash(key) % map->size;
+	size_t n = strlen(key);
+	size_t index = map_get_hash(key, n) % map->size;
 	
 	MapItem* current = map->hash_table[index];
 	while (current) {
@@ -91,9 +94,10 @@ void* map_remove(Map* map, char* key) {
 	return NULL;
 }
 
-unsigned long prv_map_insert_item (Map* map, MapItem* item) {
-	unsigned long hash = get_hash(item->key);
-	size_t offset = hash % map->size;
+uint32_t prv_map_insert_item (Map* map, MapItem* item) {
+	size_t n = strlen(item->key);
+	uint32_t hash = map_get_hash(item->key, n);
+	uint32_t offset = hash % map->size;
 	
 	MapItem** current_pos = &map->hash_table[offset];
 	
@@ -110,7 +114,7 @@ unsigned long prv_map_insert_item (Map* map, MapItem* item) {
 	return hash;
 }
 
-unsigned long map_insert(Map* map, char* key, void* data) {
+uint32_t map_insert(Map* map, char* key, void* data) {
 	if (map->n + 1 >= map->realloc_at)
 		map_realloc(map, map->size * 2);
 	
@@ -120,17 +124,65 @@ unsigned long map_insert(Map* map, char* key, void* data) {
 	to_copy->next = NULL;
 	
 	return prv_map_insert_item(map, to_copy);
-};
+}
 
-unsigned long get_hash(char* key) {
-	unsigned long hash = 0;
-	int c;
+
+/**
+ *
+ * @param data
+ * @param nbytes
+ * @return
+ */
+uint32_t map_get_hash(const void *data, size_t nbytes) {
+	if (data == NULL || nbytes == 0)
+		return 0;
 	
-	if (!key)
-		return hash;
-	while ((c = *key++))
-		hash = c + hash * 65599;
-	return hash;
+	const uint32_t c1 = 0xcc9e2d51;
+	const uint32_t c2 = 0x1b873593;
+	
+	const int nblocks = nbytes / 4;
+	const uint32_t *blocks = (const uint32_t *) (data);
+	const uint8_t *tail = (const uint8_t *) (data + (nblocks * 4));
+	
+	uint32_t h = 0;
+	
+	int i;
+	uint32_t k;
+	for (i = 0; i < nblocks; i++) {
+		k = blocks[i];
+		
+		k *= c1;
+		k = (k << 15) | (k >> (32 - 15));
+		k *= c2;
+		
+		h ^= k;
+		h = (h << 13) | (h >> (32 - 13));
+		h = (h * 5) + 0xe6546b64;
+	}
+	
+	k = 0;
+	switch (nbytes & 3) {
+		case 3:
+			k ^= tail[2] << 16;
+		case 2:
+			k ^= tail[1] << 8;
+		case 1:
+			k ^= tail[0];
+			k *= c1;
+			k = (k << 15) | (k >> (32 - 15));
+			k *= c2;
+			h ^= k;
+	}
+	
+	h ^= nbytes;
+	
+	h ^= h >> 16;
+	h *= 0x85ebca6b;
+	h ^= h >> 13;
+	h *= 0xc2b2ae35;
+	h ^= h >> 16;
+	
+	return h;
 }
 
 void prv_map_free_bucket (Map* map, MapItem* item, free_function __free) {

@@ -6,7 +6,6 @@
 #define HACKSAW_VECTOR_H
 
 #include <stdio.h>
-#include <stdbool.h>
 
 typedef enum __vector_opts vector_opts;
 typedef struct __Vector Vector;

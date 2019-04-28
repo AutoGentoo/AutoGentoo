@@ -5,8 +5,9 @@
 
 #include "manifest.h"
 
-#ifndef HACKSAW_PACKAGE_H
-#define HACKSAW_PACKAGE_H
+#ifdef AUTOGENTOO_PACKAGE_H
+#else
+#define AUTOGENTOO_PACKAGE_H
 
 #include "repository.h"
 

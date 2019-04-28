@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <share.h>
+#include "share.h"
 
 AtomSelector* atom_selector_new(char* cat, char* name) {
 	AtomSelector* out = malloc(sizeof(AtomSelector));

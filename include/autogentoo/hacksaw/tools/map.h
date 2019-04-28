@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include "string_vector.h"
+#include <stdint.h>
 
 typedef struct __Map Map;
 typedef struct __MapItem MapItem;
@@ -17,8 +18,7 @@ typedef void (*free_function) (void*);
  * @author atuser
  * @date 11/05/17
  * @file map.h
- * @brief Hash map structure
- *          Only support array of pointers
+ * @brief Hash map structure using murmur3 hashing
  */
 struct __Map {
 	MapItem** hash_table; // similar to Vector position are arbitrary
@@ -49,27 +49,45 @@ void* map_get(Map* map, char* key);
  * @param data Pointer to data that will be copied
  * @return returns the hash generated from the key
  */
-unsigned long map_insert(Map* map, char* key, void* data);
+uint32_t map_insert(Map* map, char* key, void* data);
 
 /**
- * @brief Instead of generating the hash take one
- * This is slightly faster that map_get and should be used
- * if you kept the hash
- * @param map Map in question
- * @param key Target key (you still need this)
- * @param hash Hash to use
- * @return a pointer to the data
+ * Create a new map with array size new_size
+ * Threshold triggers reallocation when n >= new_size * threshold
+ * @param new_size initial size of array
+ * @param threshold realloc at threshold per-cent full
+ * @return new array
  */
-void* map_get_from_hash(Map* map, char* key, unsigned long hash);
-
 Map* map_new(size_t new_size, double threshold);
 
+/**
+ * Realloc the map and repack the keys
+ * @param map map to repack
+ * @param size new array size
+ */
 void map_realloc(Map* map, size_t size);
 
+/**
+ * Remove a key from the map
+ * @param map
+ * @param key
+ * @return the data ptr from the key, NULL if key not found
+ */
 void* map_remove(Map* map, char* key);
 
-unsigned long get_hash(char* key); // Returns offset from hash_table[0]
+/**
+ * Get 32-bit Murmur3 hash
+ * @param data source data
+ * @param nbytes sizeof dataptr
+ * @return 32-bit unsigned hash value
+ */
+uint32_t map_get_hash(const void *data, size_t nbytes); // Returns offset from hash_table[0]
 
+/**
+ * Iterate through map and find all the keys
+ * @param map map to go through
+ * @return a StringVector of the keys
+ */
 StringVector* map_all_keys(Map* map);
 
 /**

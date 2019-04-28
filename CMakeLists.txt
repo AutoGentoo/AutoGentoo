@@ -10,7 +10,7 @@ include (${CMAKE_ROOT}/Modules/FindPythonInterp.cmake)
 find_package(PythonLibs)
 
 include_directories(include)
-include_directories(hacksaw/language)
+include_directories(cportage/language/language)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PYTHON_INCLUDE_DIR})
 
@@ -23,9 +23,6 @@ execute_process(COMMAND bash -c "mkdir -p {hacksaw,http}")
 add_library(hacksaw STATIC
         ${hacksaw_HEADERS}
         ${hacksaw_SRC}
-        ${language_BIN}
-        ${language_PARSER}
-        ${language_SOURCES}
         )
 
 set_target_properties(hacksaw PROPERTIES COMPILE_FLAGS "-fPIC")
@@ -46,13 +43,35 @@ add_library(autogentoo SHARED
         ${worker_SOURCES}
         )
 
+add_library(cportage SHARED
+        ${src_CPORTAGE}
+        ${language_BIN}
+        ${language_PARSER}
+        ${language_SOURCES}
+        )
+
 target_link_libraries(autogentoo hacksaw)
+target_link_libraries(cportage hacksaw)
 
 #add_executable(autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
 add_executable(autogentoo-exec
         ${include_HEADERS}
         src/autogentoo.c
         )
+
+set_target_properties(autogentoo-exec PROPERTIES OUTPUT_NAME autogentoo)
+
+add_executable(cportage-exec
+        cportage/cemerge.c
+        )
+
+target_link_libraries(cportage-exec
+        cportage
+        ssl
+        crypto
+        archive
+        )
+
 
 target_link_libraries(autogentoo-exec
         autogentoo
