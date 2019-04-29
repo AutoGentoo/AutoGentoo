@@ -94,8 +94,15 @@ typedef enum {
 	HAS_DEPEND,
 } depend_t;
 
+typedef enum {
+	ATOM_CMP_EQUAL,
+	ATOM_CMP_NO_MATCH, // Not the same package
+	ATOM_CMP_LESS,
+	ATOM_CMP_GREATER
+} atom_cmp_t;
+
 /**
- * target? ( selector selector selector ) next_target? ( ... )
+ * target? ( selector selector selector ) next_target? ( ... ) depend
  */
 struct __Dependency {
 	char* target;
@@ -109,5 +116,6 @@ struct __Dependency {
 	Dependency* next;
 };
 
+atom_cmp_t package_atom_compare(char* atom1, char* atom2);
 
 #endif //AUTOGENTOO_PACKAGE_H
