@@ -24,24 +24,24 @@ find_package(FLEX REQUIRED)
 #        )
 
 set(hacksaw_SRC
-        hacksaw/src/conf.c
-        hacksaw/src/debug.c
-        #hacksaw/src/dependency.c
-        hacksaw/src/directory.c
-        hacksaw/src/hash.c
-        hacksaw/src/log.c
-        #hacksaw/src/manifest.c
-        hacksaw/src/map.c
-        #hacksaw/src/package.c
-        #hacksaw/src/package_config.c
-        #hacksaw/src/repository.c
-        hacksaw/src/small_map.c
-        hacksaw/src/string.c
-        hacksaw/src/string_vector.c
-        #hacksaw/src/use_flag.c
-        hacksaw/src/vector.c
-        hacksaw/src/linked_vector.c
-        hacksaw/src/util.c
+        hacksaw/conf.c
+        hacksaw/debug.c
+        #hacksaw/dependency.c
+        hacksaw/directory.c
+        hacksaw/hash.c
+        hacksaw/log.c
+        #hacksaw/manifest.c
+        hacksaw/map.c
+        #hacksaw/package.c
+        #hacksaw/package_config.c
+        #hacksaw/repository.c
+        hacksaw/small_map.c
+        hacksaw/string.c
+        hacksaw/string_vector.c
+        #hacksaw/use_flag.c
+        hacksaw/vector.c
+        hacksaw/linked_vector.c
+        hacksaw/util.c
         )
 
 set(hacksaw_HEADERS

@@ -12,6 +12,8 @@
 typedef struct __Package Package;
 typedef struct __Ebuild Ebuild;
 typedef struct __Dependency Dependency;
+typedef struct __P_Atom P_Atom;
+typedef struct __AtomNode AtomNode;
 
 struct __Package {
 	uint32_t hash;
@@ -90,8 +92,8 @@ typedef enum {
 } use_select_t;
 
 typedef enum {
-	NO_DEPEND,
-	HAS_DEPEND,
+	IS_ATOM,
+	HAS_DEPENDS,
 } depend_t;
 
 typedef enum {
@@ -105,7 +107,9 @@ typedef enum {
  * target? ( selector selector selector ) next_target? ( ... ) depend
  */
 struct __Dependency {
-	char* target;
+	P_Atom* atom; // NULL if it has depends
+	char* target; // NULL if has atom
+	
 	use_select_t selector;
 	depend_t depends;
 	
@@ -116,6 +120,50 @@ struct __Dependency {
 	Dependency* next;
 };
 
-atom_cmp_t package_atom_compare(char* atom1, char* atom2);
+typedef enum {
+	ATOM_VERSION_ALL,//!< app-misc/foo-1.23		Any version
+	ATOM_VERSION_GE, //!< >=app-misc/foo-1.23	Version 1.23 or later is required.
+	ATOM_VERSION_G,  //!< >app-misc/foo-1.23	A version strictly later than 1.23 is required.
+	ATOM_VERSION_A,  //!< ~app-misc/foo-1.23	Version 1.23 (or any 1.23-r*) is required.
+	ATOM_VERSION_E,  //!< =app-misc/foo-1.23	Exactly version 1.23 is required. If at all possible, use the ~ form to simplify revision bumps.
+	ATOM_VERSION_LE, //!< <=app-misc/foo-1.23	Version 1.23 or older is required.
+	ATOM_VERSION_L,  //!< <app-misc/foo-1.23	A version strictly before 1.23 is required.
+} atom_version_t;
+
+typedef enum {
+	ATOM_BLOCK_NONE,
+	ATOM_BLOCK_SOFT,
+	ATOM_BLOCK_HARD
+} atom_block_t;
+
+typedef enum {
+	ATOM_SLOT_ALL = 0,
+	ATOM_SLOT_
+} atom_slot_t;
+
+struct __AtomNode {
+	char* v;
+	AtomNode* next;
+};
+
+/**
+ * Selects a range of packages (or blocks)
+ */
+struct __P_Atom {
+	char* category;
+	char* name;
+	
+	atom_version_t range;
+	atom_block_t blocks;
+	
+	AtomNode* version;
+	AtomNode* useflags;
+};
+
+atom_cmp_t ebuild_atom_compare(Ebuild* ebuild, P_Atom* atom);
+P_Atom* atom_new(char* cat, char* name);
+AtomNode* atom_version_new(char* version_str);
+void atomnode_free(AtomNode* parent);
+void atom_free(P_Atom* ptr);
 
 #endif //AUTOGENTOO_PACKAGE_H

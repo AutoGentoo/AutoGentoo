@@ -8,14 +8,14 @@
 
 %{
 #include <stdio.h>
-#include <share.h>
+#include "share.h"
 
 int atomparse(void);
 int atomwrap() { return 1; }
 int atomlex();
 extern int atomlineno;
 extern char* atomtext;
-extern AtomSelector* atomout;
+extern P_Atom* atomout;
 
 void atomerror(const char *message);
 %}
@@ -24,19 +24,18 @@ void atomerror(const char *message);
 
 %union {
     char* identifier;
-    AtomSelector* sel;
-    EbuildVersion version;
-    int r;
+    P_Atom* out_type;
+    AtomNode* version;
 }
 
 %token <identifier> IDENTIFIER
-%token <r> REVISION;
 %token <version> VERSION;
 %token END_OF_FILE
 
-%type <sel> atom
-%type <identifier> pkg_name
-%type <version> pkg_version
+%type <out_type> atom_simple
+%type <out_type> atom_version
+%type <out_type> atom
+%type <identifier> ident
 
 %%
 
@@ -46,68 +45,35 @@ program:    | atom                      {
             | END_OF_FILE
             ;
 
-atom :  pkg_name[cat] '/' pkg_name[name] '-' pkg_version[version] {
-                                            $$ = atom_selector_new ($cat, $name);
+atom :             '!' atom_version     {$$ = $2; $$->blocks = ATOM_BLOCK_SOFT;}
+            |  '!' '!' atom_version     {$$ = $3; $$->blocks = ATOM_BLOCK_HARD;}
+            |          atom_version     {$$ = $1; $$->blocks = ATOM_BLOCK_NONE;}
+            ;
+
+atom_version :       '=' atom_simple       {$$ = $2; $$->range = ATOM_VERSION_E;}
+               |     '>' atom_simple       {$$ = $2; $$->range = ATOM_VERSION_G;}
+               |     '<' atom_simple       {$$ = $2; $$->range = ATOM_VERSION_L;}
+               | '>' '=' atom_simple       {$$ = $3; $$->range = ATOM_VERSION_GE;}
+               | '<' '=' atom_simple       {$$ = $3; $$->range = ATOM_VERSION_LE;}
+               |         atom_simple       {$$ = $1; $$->range = ATOM_VERSION_ALL;}
+               ;
+
+atom_simple :  ident[cat] '/' ident[name] '-' VERSION[version] {
+                                            $$ = atom_new ($cat, $name);
                                             $$->version = $version;
                                         }
         ;
             
-pkg_name :  pkg_name '-' IDENTIFIER     {
+ident :  ident '-' IDENTIFIER           {
                                             $$ = $1;
                                             strcat ($$, "-");
                                             strcat ($$, $3);
-                                        }
-            | pkg_name '-' VERSION      {
-                                            $$ = $1;
-                                            int i;
-                                            char buf[16];
-                                            for (i = 0; i != $3.version->n; i++) {
-                                                sprintf (buf, "%d", *(int*)vector_get($3.version, i));
-                                                strcat ($$, buf);
-                                                if (i + 1 != $3.version->n) {
-                                                    strcat ($$, ".");
-                                                }
-                                            }
-                                        }
-            | pkg_name REVISION         {
-                                            $$ = $1;
-                                            strcat ($$, "-");
-                                            char temp[32];
-                                            sprintf (temp, "r%d", $2);
-                                            strcat ($$, temp);
                                         }
             | IDENTIFIER                {
                                             $$ = malloc (256);
                                             $$[0] = 0;
                                             strcat ($$, $1);
                                             free ($1);
-                                        }
-            | VERSION                   {
-                                            $$ = malloc (256);
-                                            $$[0] = 0;
-                                            int i;
-                                            char buf[16];
-                                            for (i = 0; i != $1.version->n; i++) {
-                                                sprintf (buf, "%d", *(int*)vector_get($1.version, i));
-                                                strcat ($$, buf);
-                                                if (i + 1 != $1.version->n) {
-                                                    strcat ($$, ".");
-                                                }
-                                            }
-                                        }
-            | REVISION                  {
-                                            $$ = malloc (256);
-                                            $$[0] = 0;
-                                            sprintf ($$, "r%d", $1);
-                                        }
-            ;
-
-pkg_version : VERSION REVISION          {
-                                            $$ = $1;
-                                            $$.revision = $2;
-                                        }
-            | VERSION                   {
-                                            $$ = $1;
                                         }
             ;
 

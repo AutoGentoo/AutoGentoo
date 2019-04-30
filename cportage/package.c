@@ -3,64 +3,57 @@
 //
 
 #include "package.h"
+#include "portage_log.h"
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
-atom_cmp_t package_atom_compare(char* atom1, char* atom2) {
-	atom_cmp_t out = ATOM_CMP_EQUAL;
-	
-	atom1 = strdup(atom1);
-	atom2 = strdup(atom2);
-	
-	char* category1 = atom1;
-	char* category2 = atom2;
-	
-	char* package_name1;
-	char* package_name2;
-	
-	char* version_str1 = NULL;
-	char* version_str2 = NULL;
-	
-	char* cat1_splt = strchr(atom1, '/');
-	char* cat2_splt = strchr(atom2, '/');
-	
-	*cat1_splt = 0;
-	*cat2_splt = 0;
-	
-	package_name1 = cat1_splt + 1;
-	package_name2 = cat2_splt + 1;
-	
-	char* ver1_splt = strrchr(package_name1, '-');
-	char* ver2_splt = strrchr(package_name2, '-');
-	
-	if (ver1_splt[1] >= '0' && ver2_splt[1] <= '9') { // Selector has version
-		*ver1_splt = 0;
-		*ver2_splt = 0;
-		
-		version_str1 = ver1_splt + 1;
-		version_str2 = ver2_splt + 1;
-	}
-	
-	if (strcmp(category1, category2) != 0) {
-		out = ATOM_CMP_NO_MATCH;
-		goto ret;
-	}
-	
-	if (strcmp(category1, category2) != 0) {
-		out = ATOM_CMP_NO_MATCH;
-		goto ret;
-	}
-	
-	if (!version_str1) {
-		out = ATOM_CMP_EQUAL;
-		goto ret;
-	}
-	
-	
-	
-ret:
-	free(atom1);
-	free(atom2);
+int wildcard_cmp(char* const_str, char* wildcard_str) {
+	char* wildcard_ptr = strchr(wildcard_str, '*');
+	if (!wildcard_ptr)
+		return strcmp(const_str, wildcard_ptr);
+	return strncmp (const_str, wildcard_str, wildcard_ptr - wildcard_str);
+}
+
+atom_cmp_t ebuild_atom_compare(Ebuild* ebuild, P_Atom* atom) {
+	return 0;
+}
+
+P_Atom* atom_new(char* cat, char* name) {
+	P_Atom* out = malloc(sizeof(P_Atom));
+	out->category = strdup(cat);
+	out->name = strdup(name);
+	out->range = ATOM_VERSION_ALL;
+	out->blocks = ATOM_BLOCK_NONE;
 	
 	return out;
+}
+
+AtomNode* atom_version_new(char* version_str) {
+	AtomNode* parent = malloc (sizeof(AtomNode));
+	AtomNode* current_node = parent;
+	
+	char* buf;
+	for (buf = strtok(version_str, "._-"); buf != NULL; buf = strtok(NULL, "._-")) {
+		current_node->next = malloc(sizeof(AtomNode));
+		current_node = current_node->next;
+		current_node->v = strdup(buf);
+	}
+	
+	return parent;
+}
+
+void atomnode_free(AtomNode* parent) {
+	AtomNode* next;
+	for (next = parent->next; parent; parent = next)
+		free(parent->v);
+}
+
+void atom_free(P_Atom* ptr) {
+	atomnode_free(ptr->version);
+	atomnode_free(ptr->useflags);
+	
+	free(ptr->category);
+	free(ptr->name);
+	free(ptr);
 }

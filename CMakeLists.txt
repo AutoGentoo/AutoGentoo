@@ -10,7 +10,7 @@ include (${CMAKE_ROOT}/Modules/FindPythonInterp.cmake)
 find_package(PythonLibs)
 
 include_directories(include)
-include_directories(cportage/language/language)
+include_directories(cportage/language)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PYTHON_INCLUDE_DIR})
 
@@ -18,7 +18,7 @@ include_directories(${PYTHON_INCLUDE_DIR})
 
 SET(CMAKE_C_COMPILER gcc)
 
-execute_process(COMMAND bash -c "mkdir -p {hacksaw,http}")
+execute_process(COMMAND bash -c "mkdir -p {cportage,http}")
 
 add_library(hacksaw STATIC
         ${hacksaw_HEADERS}
