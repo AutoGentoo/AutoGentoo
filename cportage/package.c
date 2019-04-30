@@ -33,11 +33,15 @@ AtomNode* atom_version_new(char* version_str) {
 	AtomNode* parent = malloc (sizeof(AtomNode));
 	AtomNode* current_node = parent;
 	
-	char* buf;
-	for (buf = strtok(version_str, "._-"); buf != NULL; buf = strtok(NULL, "._-")) {
-		current_node->next = malloc(sizeof(AtomNode));
-		current_node = current_node->next;
+	char* buf = strtok(version_str, "._-");
+	while (buf) {
 		current_node->v = strdup(buf);
+		if ((buf = strtok(NULL, "._-"))) {
+			current_node->next = malloc(sizeof(AtomNode));
+			current_node = current_node->next;
+		}
+		else
+			current_node->next = NULL;
 	}
 	
 	return parent;

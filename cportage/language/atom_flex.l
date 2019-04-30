@@ -33,15 +33,17 @@ identifier      ({letter}|{digit}|"_"|"+"|"*")+
 %%
 
 [ \n\t\r\\]+            ;
-"/"                     {return '/';}
-"-"                     {return '-';}
+[/]                     {return '/';}
+[-]                     {return '-';}
 {version}               {
                             atomlval.version = atom_version_new(atomtext);
+                            printf("got version");
                             return VERSION;
                         }
 
 {identifier}            {
                             atomlval.identifier = strdup (atomtext);
+                            printf("got ident: %s\n", atomtext);
                             return (IDENTIFIER);
                         }
 

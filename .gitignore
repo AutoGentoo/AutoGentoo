@@ -44,3 +44,4 @@ venv/*
 **/.autogentoo.config
 src/test/*
 src/temp_api/*
+/doc/*

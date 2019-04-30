@@ -59,20 +59,25 @@ atom_version :       '=' atom_simple       {$$ = $2; $$->range = ATOM_VERSION_E;
                ;
 
 atom_simple :  ident[cat] '/' ident[name] '-' VERSION[version] {
+                                            printf("atom_simple\n");
+                                            fflush(stdout);
                                             $$ = atom_new ($cat, $name);
                                             $$->version = $version;
                                         }
+              | ident[cat] '/' ident[name] {$$ = atom_new ($cat, $name); $$->version = NULL;}
         ;
             
 ident :  ident '-' IDENTIFIER           {
                                             $$ = $1;
                                             strcat ($$, "-");
                                             strcat ($$, $3);
+                                            printf("ident %s\n", $$);
                                         }
             | IDENTIFIER                {
                                             $$ = malloc (256);
                                             $$[0] = 0;
                                             strcat ($$, $1);
+                                            printf("ident %s\n", $$);
                                             free ($1);
                                         }
             ;

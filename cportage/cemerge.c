@@ -4,6 +4,7 @@
 
 
 #include <openssl/evp.h>
+#include <share.h>
 #include "portage.h"
 #include "portage_log.h"
 #include "manifest.h"
@@ -22,6 +23,9 @@ int main (int argc, char** argv) {
 		}
 	}, "CATEGORY_MANIFEST")
 	
+	
+	P_Atom* temp = atom_parse("sys-devel/gcc-4.8.3");
+	atom_free(temp);
 	
 	return 0;
 }
