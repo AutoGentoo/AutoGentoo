@@ -24,7 +24,7 @@ int main (int argc, char** argv) {
 	}, "CATEGORY_MANIFEST")
 	
 	
-	P_Atom* temp = atom_parse("sys-devel/gcc-4.8.3");
+	P_Atom* temp = atom_parse("sys-devel/gcc-4.800.3_pre_beta-r1");
 	atom_free(temp);
 	
 	return 0;

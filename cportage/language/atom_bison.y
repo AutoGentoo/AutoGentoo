@@ -39,13 +39,11 @@ void atomerror(const char *message);
 
 %%
 
-program:    | atom                      {
-                                            atomout = $1;
-                                        }
+program:    | atom                      {atomout = $1;}
             | END_OF_FILE
             ;
 
-atom :             '!' atom_version     {$$ = $2; $$->blocks = ATOM_BLOCK_SOFT;}
+atom  :      '!' atom_version     {$$ = $2; $$->blocks = ATOM_BLOCK_SOFT;}
             |  '!' '!' atom_version     {$$ = $3; $$->blocks = ATOM_BLOCK_HARD;}
             |          atom_version     {$$ = $1; $$->blocks = ATOM_BLOCK_NONE;}
             ;
@@ -58,13 +56,13 @@ atom_version :       '=' atom_simple       {$$ = $2; $$->range = ATOM_VERSION_E;
                |         atom_simple       {$$ = $1; $$->range = ATOM_VERSION_ALL;}
                ;
 
-atom_simple :  ident[cat] '/' ident[name] '-' VERSION[version] {
+atom_simple :      ident[cat] '/' ident[name] '-' VERSION[version] {
                                             printf("atom_simple\n");
                                             fflush(stdout);
                                             $$ = atom_new ($cat, $name);
                                             $$->version = $version;
                                         }
-              | ident[cat] '/' ident[name] {$$ = atom_new ($cat, $name); $$->version = NULL;}
+          | ident[cat] '/' ident[name] {$$ = atom_new ($cat, $name); $$->version = NULL;}
         ;
             
 ident :  ident '-' IDENTIFIER           {

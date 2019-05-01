@@ -23,6 +23,8 @@ P_Atom* atom_new(char* cat, char* name) {
 	P_Atom* out = malloc(sizeof(P_Atom));
 	out->category = strdup(cat);
 	out->name = strdup(name);
+	out->useflags = NULL;
+	out->version = NULL;
 	out->range = ATOM_VERSION_ALL;
 	out->blocks = ATOM_BLOCK_NONE;
 	
