@@ -99,7 +99,7 @@ Manifest* manifest_metadata_parse_fp(FILE* fp) {
 Manifest* manifest_metadata_parse(char* path) {
 	int parent_dir = open(path, O_RDONLY | O_CLOEXEC);
 	
-	FILE* fp = fread_archive("Manifest.gz", parent_dir);
+	FILE* fp = fread_archive("Manifest.gz", parent_dir, NULL);
 	if (!fp)
 		return NULL;
 	

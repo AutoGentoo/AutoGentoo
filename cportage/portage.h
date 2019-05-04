@@ -296,6 +296,6 @@ struct __UseSelector {
 };
 
 int portage_get_hash(SHA_HASH target, char* path, const EVP_MD* algorithm);
-
+int portage_get_hash_fd(SHA_HASH target, int fd, const EVP_MD* algorithm);
 
 #endif //AUTOGENTOO_PORTAGE_H

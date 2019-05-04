@@ -104,37 +104,22 @@ set(src_CPORTAGE
 
 set(language_SOURCES
         cportage/language/share.h
-        cportage/language/share.c
-#        cportage/language/atom.c
-#        cportage/language/atom.h
-#        cportage/language/depend.c
-#        cportage/language/depend.h
         )
 
 set(language_PARSER
-        cportage/language/atom_bison.y
-        cportage/language/atom_flex.l
-#        cportage/language/depend_bison.y
-#        cportage/language/depend_flex.l
+        cportage/language/depend_bison.y
+        cportage/language/depend_flex.l
         )
 
-flex_target(FLEX_ATOM ${CMAKE_SOURCE_DIR}/cportage/language/atom_flex.l
-        ${CMAKE_CURRENT_BINARY_DIR}/cportage/atom.flex.c)
-#flex_target(FLEX_DEPEND ${CMAKE_SOURCE_DIR}/cportage/language/depend_flex.l
-#        ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/depend.flex.c)
-bison_target(LANG_ATOM
-        ${CMAKE_SOURCE_DIR}/cportage/language/atom_bison.y
-        ${CMAKE_CURRENT_BINARY_DIR}/cportage/atom.tab.c)
-#bison_target(LANG_DEPEND
-#        ${CMAKE_SOURCE_DIR}/hacksaw/language/depend_bison.y
-#        ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/depend.tab.c)
+flex_target(FLEX_DEPEND ${CMAKE_SOURCE_DIR}/cportage/language/depend_flex.l
+        ${CMAKE_CURRENT_BINARY_DIR}/cportage/depend.flex.c)
+bison_target(LANG_DEPEND
+        ${CMAKE_SOURCE_DIR}/cportage/language/depend_bison.y
+        ${CMAKE_CURRENT_BINARY_DIR}/cportage/depend.tab.c)
 
-add_flex_bison_dependency(FLEX_ATOM LANG_ATOM)
-#add_flex_bison_dependency(FLEX_DEPEND LANG_DEPEND)
+add_flex_bison_dependency(FLEX_DEPEND LANG_DEPEND)
 
 set(language_BIN
-        ${BISON_LANG_ATOM_OUTPUTS}
-#        ${BISON_LANG_DEPEND_OUTPUTS}
-#        ${FLEX_FLEX_DEPEND_OUTPUTS}
-        ${FLEX_FLEX_ATOM_OUTPUTS}
+        ${BISON_LANG_DEPEND_OUTPUTS}
+        ${FLEX_FLEX_DEPEND_OUTPUTS}
         )

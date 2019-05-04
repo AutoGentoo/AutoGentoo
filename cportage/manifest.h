@@ -24,6 +24,7 @@ struct __ManifestHash {
 };
 
 struct __Manifest {
+	SHA_HASH gz_hash;
 	char* path;
 	manifest_t type;
 	size_t len;

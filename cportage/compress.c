@@ -10,8 +10,29 @@
 #include <fcntl.h>
 #include "compress.h"
 #include "portage_log.h"
+#include "portage.h"
+#include <string.h>
 
-FILE* fread_archive(char* path, int dirfd) {
+FILE* fread_archive(char* path, int dirfd, char* verify_sha) {
+	char* buffer_file;
+	asprintf(&buffer_file, "%s.cportage.decomp", path);
+	FILE* fp;
+	if (verify_sha) {
+		int out_fd = openat(dirfd, buffer_file, O_RDONLY);
+		if (out_fd > 0) {
+			SHA_HASH fd_hash;
+			portage_get_hash_fd(fd_hash, out_fd, EVP_sha256());
+			if (strcmp(verify_sha, (char*)fd_hash) != 0)
+				close(out_fd);
+			else {
+				fp = fdopen(out_fd, "r");
+				rewind(fp);
+				free(buffer_file);
+				return fp;
+			}
+		}
+	}
+	
 	struct archive* a = archive_read_new();
 	struct archive_entry* ae;
 	archive_read_support_format_all(a);
@@ -39,9 +60,7 @@ FILE* fread_archive(char* path, int dirfd) {
 		return NULL;
 	}
 	
-	char* buffer_file;
-	asprintf(&buffer_file, "%s.cportage.decomp", path);
-	FILE* fp = fopen(buffer_file, "w+");
+	fp = fopen(buffer_file, "w+");
 	
 	if (!fp) {
 		plog_error("Failed to open buffer file %s", buffer_file);

@@ -18,14 +18,10 @@ int main (int argc, char** argv) {
 	Manifest* category_manifest;
 	PLOG_BENCHMARK({
 		category_manifest = manifest_metadata_parse("test");
-		for (Manifest* current = category_manifest; current; current = current->next) {
-			;
-		}
 	}, "CATEGORY_MANIFEST")
 	
 	
-	P_Atom* temp = atom_parse("sys-devel/gcc-4.800.3_pre_beta-r1");
-	atom_free(temp);
+	PLOG_BENCHMARK({depend_parse("baz? (!=sys-devel/gcc-4.800.3_pre_beta-r1:1.0=[bar?,foo(-)]) foo?(cat-name/f)");}, "DEPEND_PARSE")
 	
 	return 0;
 }
