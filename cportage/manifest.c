@@ -41,7 +41,7 @@ ManifestHash* manifest_parse_hash (FILE* fp, int delim) {
 }
 
 /** Parse metadata from /usr/portage/metadata */
-Manifest* manifest_metadata_parse_fp(FILE* fp) {
+Manifest* manifest_metadata_parse_fp(FILE* fp, int dir) {
 	if (feof(fp)) {
 		fclose(fp);
 		return NULL;
@@ -61,10 +61,11 @@ Manifest* manifest_metadata_parse_fp(FILE* fp) {
 	}
 	if (type_buff[0] == '\n') {
 		free(type_buff);
-		return manifest_metadata_parse_fp(fp);
+		return manifest_metadata_parse_fp(fp, dir);
 	}
 	
 	Manifest* out = malloc(sizeof(Manifest));
+	out->dir = dir;
 	
 	for (int i = 0; i < sizeof(manifest_type_links) / sizeof(manifest_type_links)[0]; i++) {
 		struct __manifest_type_link_t link = manifest_type_links[i];
@@ -93,7 +94,7 @@ Manifest* manifest_metadata_parse_fp(FILE* fp) {
 	fscanf(fp, "%s %lu ", out->path, &out->len);
 	out->hashes = manifest_parse_hash(fp, ' '); // BLAKE2B
 	out->hashes->next = manifest_parse_hash(fp, '\n'); // SHA512
-	out->next = manifest_metadata_parse_fp(fp);
+	out->next = manifest_metadata_parse_fp(fp, dir);
 	
 	return out;
 }
@@ -105,8 +106,7 @@ Manifest* manifest_metadata_parse(char* path) {
 	if (!fp)
 		return NULL;
 	
-	Manifest* out = manifest_metadata_parse_fp(fp);
-	out->dir = parent_dir;
+	Manifest* out = manifest_metadata_parse_fp(fp, parent_dir);
 	
 	return out;
 }
@@ -117,11 +117,19 @@ void manifest_metadata_deep(Manifest* mans) {
 	
 	FILE* fp;
 	for (current = mans; current; current = current->next) {
+		char* target_path = strdup(current->path);
+		*strchr(target_path, '/') = 0;
+		int target_dir = openat(dir, target_path, O_RDONLY | O_CLOEXEC);
+		if (target_dir < 0) {
+			plog_error("Failed to open directory %s", target_path);
+			return;
+		}
+		
 		fp = fread_archive(current->path, dir, NULL);
 		if (!fp) {
 			plog_error("Failed to open file %s", current->path);
 			return;
 		}
-		current->parsed = manifest_metadata_parse_fp(fp);
+		current->parsed = manifest_metadata_parse_fp(fp, target_dir);
 	}
 }

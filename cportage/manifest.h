@@ -41,7 +41,7 @@ struct __manifest_type_link_t {
 	char* type_str;
 };
 
-Manifest* manifest_metadata_parse_fp(FILE* fp);
+Manifest* manifest_metadata_parse_fp(FILE* fp, int dir);
 Manifest* manifest_metadata_parse(char* path);
 void manifest_metadata_deep(Manifest* mans);
 

@@ -6,16 +6,45 @@
 
 #include "package.h"
 #include "portage_log.h"
+#include "manifest.h"
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <share.h>
 
 
-P_Atom* atom_new(char* cat, char* name) {
+P_Atom* atom_new(char* input) {
 	P_Atom* out = malloc(sizeof(P_Atom));
-	out->category = strdup(cat);
-	out->name = strdup(name);
+	out->version = NULL;
+	char* cat_splt = strchr(input, '/');
+	if (!cat_splt) {
+		plog_warn("Invalid atom: %s", input);
+		return NULL;
+	}
+	
+	char* rev_splt = strrchr(input, '-');
+	char* version_splt;
+	if (rev_splt) {
+		if (rev_splt[1] == 'r') {
+			*rev_splt = 0;
+			version_splt = strrchr(input, '-');
+			*rev_splt = '-';
+		}
+		else
+			version_splt = rev_splt;
+		if (version_splt) {
+			if (version_splt[1] >= '0' && version_splt[1] <= '9')
+				out->version = atom_version_new(version_splt);
+			*version_splt = 0;
+		}
+	}
+	
+	*cat_splt = 0;
+	out->category = strdup(input);
+	out->name = strdup(cat_splt + 1);
+	
 	out->useflags = NULL;
 	out->version = NULL;
 	out->slot = NULL;
@@ -40,15 +69,19 @@ static struct __link_atom_prefix_strct {
 };
 
 AtomVersion* atom_version_new(char* version_str) {
+	version_str = strdup(version_str);
 	AtomVersion* parent = malloc (sizeof(AtomVersion));
+	parent->full_version = strdup(version_str);
 	AtomVersion* current_node = parent;
 	
 	char* buf = strtok(version_str, "._-");
 	while (buf) {
 		char* prefix_splt = strpbrk(buf, "0123456789");
 		size_t prefix_len;
-		if (prefix_splt == NULL)
-			prefix_len = strlen(buf);
+		if (prefix_splt == NULL) { // No prefix
+			prefix_len = 0;
+			prefix_splt = buf;
+		}
 		else
 			prefix_len = prefix_splt - buf;
 		current_node->prefix = -1;
@@ -61,29 +94,40 @@ AtomVersion* atom_version_new(char* version_str) {
 					break;
 				}
 			}
-			if (current_node->prefix == -1) {
-				char* ebuf = strndup(buf, prefix_len);
-				plog_warn("Invalid version prefix: '%s'", ebuf);
-				free(ebuf);
-			}
+		}
+		if (current_node->prefix == -1) {
+			char* ebuf = strndup(buf, prefix_len);
+			plog_warn("Invalid version prefix: '%s'", ebuf);
+			free(ebuf);
+			free(version_str);
+			return NULL;
 		}
 		
-		current_node->v = strdup(&buf[prefix_len]);
+		current_node->v = strdup(prefix_splt);
 		if ((buf = strtok(NULL, "._-"))) {
 			current_node->next = malloc(sizeof(AtomVersion));
 			current_node = current_node->next;
+			current_node->full_version = NULL;
 		}
 		else
 			current_node->next = NULL;
 	}
 	
+	free(version_str);
 	return parent;
 }
 
-void atomnode_free(AtomVersion* parent) {
-	AtomVersion* next;
-	for (next = parent->next; parent; parent = next)
-		free(parent->v);
+void atomversion_free(AtomVersion* parent) {
+	if (!parent)
+		return;
+	
+	if (parent->next)
+		atomversion_free(parent->next);
+	if (parent->full_version)
+		free(parent->full_version);
+	
+	free(parent->v);
+	free(parent);
 }
 
 void atomflag_free(AtomFlag* parent) {
@@ -93,7 +137,7 @@ void atomflag_free(AtomFlag* parent) {
 }
 
 void atom_free(P_Atom* ptr) {
-	atomnode_free(ptr->version);
+	atomversion_free(ptr->version);
 	atomflag_free(ptr->useflags);
 	
 	free(ptr->category);
@@ -157,17 +201,62 @@ int atom_version_compare(AtomVersion* first, AtomVersion* second) {
 	return 0;
 }
 
-Ebuild* package_init(Repository* repo, char* category, char* atom, char* hash) {
-	category = strdup(category);
-	atom = strdup(atom);
-	*strchr(category, '/') = 0;
+void package_metadata_init(Ebuild* ebuild, Manifest* atom_man) {
+	int fd = openat(atom_man->dir, atom_man->path, O_RDONLY);
+	if (fd < 0) {
+		plog_error("Failed to open %s", atom_man->path);
+		return;
+	}
 	
+	FILE* fp = fdopen(fd, "r");
+	
+	size_t name_size;
+	char* name = NULL;
+	
+	size_t value_size;
+	char* value = NULL;
+	
+	size_t n = 0;
+	
+	while(!feof(fp)) {
+		name_size = getdelim(&name, &n, '=', fp);
+		value_size = getdelim(&value, &n, '\n', fp);
+		
+		if (!name || !value)
+			break;
+		
+		name[name_size - 1] = 0;
+		value[value_size - 1] = 0;
+		
+		if (strcmp(name, "DEPEND") == 0)
+			ebuild->depend = depend_parse(value);
+		else if (strcmp(name, "RDEPEND") == 0)
+			ebuild->rdepend = depend_parse(value);
+		else if (strcmp(name, "PDEPEND") == 0)
+			ebuild->pdepend = depend_parse(value);
+		else if (strcmp(name, "BDEPEND") == 0)
+			ebuild->bdepend = depend_parse(value);
+		else if (strcmp(name, "EAPI") == 0)
+			ebuild->eapi = strdup(value);
+		else if (strcmp(name, "SLOT") == 0)
+			ebuild->slot = strdup(value);
+	}
+	
+	fclose(fp);
+}
+
+Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man) {
+	char* category = strdup(category_man->path);
+	char* atom = strdup(atom_man->path);
+	*strchr(category, '/') = 0;
 	
 	char* name_splt = strrchr(atom, '-');
 	char* rev_splt = NULL;
 	if (!name_splt) {
 		errno = EINVAL;
 		plog_error("Invalid atom %s", atom);
+		free(atom);
+		free(category);
 		return NULL;
 	}
 	
@@ -224,6 +313,8 @@ Ebuild* package_init(Repository* repo, char* category, char* atom, char* hash) {
 	new_ebuild->older = NULL;
 	new_ebuild->newer = NULL;
 	
+	package_metadata_init(new_ebuild, atom_man);
+	
 	Ebuild* head;
 	if (!target->ebuilds)
 		target->ebuilds = new_ebuild;
@@ -244,6 +335,9 @@ Ebuild* package_init(Repository* repo, char* category, char* atom, char* hash) {
 			}
 		}
 	}
+	
+	free(category);
+	free(atom);
 	
 	return new_ebuild;
 }

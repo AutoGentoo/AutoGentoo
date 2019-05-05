@@ -152,7 +152,7 @@ typedef enum {
 	
 	ATOM_VERSION_ALL = ATOM_VERSION_E | ATOM_VERSION_L | ATOM_VERSION_G,//!< app-misc/foo-1.23		Any version
 	ATOM_VERSION_GE = ATOM_VERSION_E | ATOM_VERSION_G, //!< >=app-misc/foo-1.23	Version 1.23 or later is required.
-	ATOM_VERSION_A,  //!< ~app-misc/foo-1.23	Version 1.23 (or any 1.23-r*) is required.
+	ATOM_VERSION_REV,  //!< ~app-misc/foo-1.23	Version 1.23 (or any 1.23-r*) is required.
 	ATOM_VERSION_LE = ATOM_VERSION_L | ATOM_VERSION_E, //!< <=app-misc/foo-1.23	Version 1.23 or older is required.
 } atom_version_t;
 
@@ -178,6 +178,7 @@ typedef enum {
 } atom_version_pre_t;
 
 struct __AtomVersion {
+	char* full_version; //!< Only set on the first one
 	char* v; //!< If there is a prefix, only include the integer part, if none 0
 	atom_version_pre_t prefix;
 	AtomVersion* next;
@@ -202,10 +203,11 @@ struct __P_Atom {
 };
 
 #include "database.h"
+#include "manifest.h"
 
-P_Atom* atom_new(char* cat, char* name);
+P_Atom* atom_new(char* input);
 AtomVersion* atom_version_new(char* version_str);
-void atomnode_free(AtomVersion* parent);
+void atomversion_free(AtomVersion* parent);
 void atom_free(P_Atom* ptr);
 void atomflag_free(AtomFlag* parent);
 
@@ -215,6 +217,8 @@ Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* 
 AtomFlag* atomflag_build(char* name);
 
 int atom_version_compare(AtomVersion* first, AtomVersion* second);
-Ebuild* package_init(Repository* repo, char* category, char* atom, char* hash);
+
+void package_metadata_init(Ebuild* ebuild, Manifest* atom_man);
+Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man);
 
 #endif //AUTOGENTOO_PACKAGE_H
