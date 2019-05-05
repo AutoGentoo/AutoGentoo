@@ -288,15 +288,6 @@ typedef enum {
 	FEATURE_XATTR,
 } feature_t;
 
-#include "package.h"
-
-struct __UseSelector {
-	char* package_name; //!< sys-devel/gcc
-	char* selector; //!< =sys-devel/gcc-8.4.0
-	char* use_flag;
-	use_select_t status; // USE_ENABLE or USE_DISABLE
-};
-
 Repository* repository_new (char* name, char* root, char* conf_dir);
 
 int portage_get_hash(sha_hash* target, char* path, const EVP_MD* algorithm);

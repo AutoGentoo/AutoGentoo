@@ -6,10 +6,11 @@
 #define AUTOGENTOO_DATABASE_H
 
 #include <stdio.h>
+#include "portage.h"
+#include "package.h"
 
 typedef struct __Database Database;
 
-#include "portage.h"
 
 typedef enum {
 	DATABASE_STOP,
