@@ -41,7 +41,7 @@ Host* host_new(Server* server, char* id) {
 	out->arch = NULL;
 	out->hostname = NULL;
 	out->profile = NULL;
-	out->make_conf = small_map_new(20, 5);
+	out->make_conf = small_map_new(20);
 	
 	small_map_insert(out->make_conf, "CFLAGS", strdup("-O2 -pipe"));
 	small_map_insert(out->make_conf, "CXXFLAGS", strdup("${CFLAGS}"));

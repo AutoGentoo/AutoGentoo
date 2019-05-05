@@ -10,7 +10,7 @@
 typedef enum __vector_opts vector_opts;
 typedef struct __Vector Vector;
 
-#define HACKSAW_VECTOR_INCREMENT 5
+#define HACKSAW_VECTOR_INITIAL 32
 
 enum __vector_opts {
 	VECTOR_UNORDERED = 0x0, // Any order can be used (most efficient)
@@ -24,9 +24,7 @@ struct __Vector {
 	size_t n; // Number of filled places
 	size_t s; // Max number of elements (increments by HACKSAW_VECTOR_INCREMENT)
 	size_t size; // size of each element
-
-	size_t increment; // Default is HACKSAW_VECTOR_INCREMENT
-
+	
 	vector_opts opts;
 };
 

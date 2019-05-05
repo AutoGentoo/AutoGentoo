@@ -8,8 +8,7 @@
 
 Vector* vector_new(size_t el_size, vector_opts opts) {
 	Vector* out_ptr = malloc(sizeof(Vector));
-	out_ptr->s = HACKSAW_VECTOR_INCREMENT;
-	out_ptr->increment = HACKSAW_VECTOR_INCREMENT;
+	out_ptr->s = 32;
 	out_ptr->size = el_size;
 	out_ptr->ptr = malloc(out_ptr->size * out_ptr->s);
 	out_ptr->n = 0;
@@ -66,7 +65,7 @@ void vector_extend(Vector* dest, Vector* ex) {
 }
 
 void vector_allocate(Vector* vec) { // A private function
-	vec->s += vec->increment;
+	vec->s *= 2;
 	vec->ptr = realloc(vec->ptr, vec->size * vec->s);
 }
 

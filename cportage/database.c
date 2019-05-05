@@ -87,7 +87,6 @@ Vector* database_read_vector(Database* db) {
 	
 	Vector* out_ptr = malloc(sizeof(Vector));
 	out_ptr->s = n + 1;
-	out_ptr->increment = HACKSAW_VECTOR_INCREMENT;
 	out_ptr->size = el_size;
 	out_ptr->ptr = malloc(out_ptr->size * out_ptr->s);
 	out_ptr->n = n;

@@ -2,11 +2,14 @@
 // Created by atuser on 4/23/19.
 //
 
+#define _GNU_SOURCE
+
 #include "package.h"
 #include "portage_log.h"
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <stdio.h>
 
 
 P_Atom* atom_new(char* cat, char* name) {
@@ -155,6 +158,11 @@ int atom_version_compare(AtomVersion* first, AtomVersion* second) {
 }
 
 Ebuild* package_init(Repository* repo, char* category, char* atom, char* hash) {
+	category = strdup(category);
+	atom = strdup(atom);
+	*strchr(category, '/') = 0;
+	
+	
 	char* name_splt = strrchr(atom, '-');
 	char* rev_splt = NULL;
 	if (!name_splt) {
@@ -201,8 +209,10 @@ Ebuild* package_init(Repository* repo, char* category, char* atom, char* hash) {
 	else
 		new_ebuild->pr = strdup("r0");
 	
+	asprintf(&new_ebuild->pvr, "%s-%s", new_ebuild->pv, new_ebuild->pr);
 	new_ebuild->slot = NULL;
 	new_ebuild->eapi = NULL;
+	new_ebuild->version = atom_version_new(new_ebuild->pvr);
 	
 	/* Cached in the database */
 	new_ebuild->depend = NULL;

@@ -54,7 +54,6 @@ void* aabs_read_archive(aabs_filelist_t* dest, struct archive** ar, char* file_p
 	Vector* temp = vector_new(sizeof(aabs_file_t), VECTOR_REMOVE | VECTOR_UNORDERED);
 	
 	/* Expecting a lot of files */
-	temp->increment = 32;
 	
 	while (archive_read_next_header(*ar, &entry) == ARCHIVE_OK) {
 		aabs_file_t t;

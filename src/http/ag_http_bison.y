@@ -84,9 +84,9 @@ request_function:   GET                     {$$ = REQ_GET;}
                     | POST                  {$$ = REQ_POST;}
                     ;
 
-headers:                                    {$$ = small_map_new (5, 5);}
+headers:                                    {$$ = small_map_new (5);}
             | HEADER                        {
-                                                $$ = small_map_new (5, 5);
+                                                $$ = small_map_new (5);
                                                 small_map_insert($$, $1->name, $1);
                                                 free($1);
                                                 @$.last_column = @1.last_column;

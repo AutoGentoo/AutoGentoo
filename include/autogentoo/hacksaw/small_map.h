@@ -25,7 +25,7 @@ struct __SmallMap_key {
 
 typedef Vector SmallMap;
 
-SmallMap* small_map_new(int start_size, int increment);
+SmallMap* small_map_new(int start_size);
 
 void small_map_insert(SmallMap* smap, char* key, void* data);
 

@@ -223,7 +223,7 @@ Host* read_host(FILE* fp) {
 	out->profile = read_string(fp);
 	out->arch = read_string(fp);
 	
-	out->make_conf = small_map_new(20, 5);
+	out->make_conf = small_map_new(20);
 	int n, i;
 	n = read_int(fp);
 	char* temp_name, *temp_val;

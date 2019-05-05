@@ -112,7 +112,7 @@ void request_call(Response* res, Request* req) {
 		HANDLE_RETURN(BAD_REQUEST);
 	}
 	
-	http_req->response_headers = small_map_new(5, 5);
+	http_req->response_headers = small_map_new(5);
 	http_add_default_headers(http_req);
 	
 	if (((HttpHeader*)small_map_get(http_req->headers, "Connection")) != NULL)

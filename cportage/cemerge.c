@@ -43,7 +43,7 @@ int main (int argc, char** argv) {
 	int pkg_num = 0;
 	for (current_cat = category_manifest; current_cat; current_cat = current_cat->next) {
 		for(current_pkg = current_cat->parsed; current_pkg; current_pkg = current_pkg->next) {
-			package_init(test_repo, current_cat->path, current_pkg->path, "");
+			package_init(test_repo, current_cat->path, current_pkg->path, current_pkg->hashes->next->hash);
 		}
 	}}, "PKG_INIT")
 	
