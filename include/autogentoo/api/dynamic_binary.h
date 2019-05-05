@@ -6,7 +6,7 @@
 #define AUTOGENTOO_DYNAMIC_BINARY_H
 
 #include <stdio.h>
-#include <autogentoo/hacksaw/tools/vector.h>
+#include <autogentoo/hacksaw/vector.h>
 
 typedef struct __DynamicBinary DynamicBinary;
 typedef union __DynamicType DynamicType;

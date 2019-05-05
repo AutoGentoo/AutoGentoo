@@ -11,6 +11,8 @@
 #include <autogentoo/api/ssl_wrap.h>
 #include <sys/un.h>
 #include "autogentoo/worker.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 
 Server* srv = NULL;
 

@@ -47,22 +47,24 @@ Manifest* manifest_metadata_parse_fp(FILE* fp) {
 		return NULL;
 	}
 	
-	Manifest* out = malloc(sizeof(Manifest));
-	
-	char* type_buff;
+	char* type_buff = NULL;
 	size_t s;
 	if (getdelim(&type_buff, &s, ' ', fp) == -1){
 		if (feof(fp)) {
 			fclose(fp);
+			free(type_buff);
 			return NULL;
 		}
-		plog_error("Failed to read from file--");
-		free (out);
+		plog_error("Failed to read from file");
+		free(type_buff);
 		return NULL;
 	}
 	if (type_buff[0] == '\n') {
+		free(type_buff);
 		return manifest_metadata_parse_fp(fp);
 	}
+	
+	Manifest* out = malloc(sizeof(Manifest));
 	
 	for (int i = 0; i < sizeof(manifest_type_links) / sizeof(manifest_type_links)[0]; i++) {
 		struct __manifest_type_link_t link = manifest_type_links[i];
@@ -103,5 +105,23 @@ Manifest* manifest_metadata_parse(char* path) {
 	if (!fp)
 		return NULL;
 	
-	return manifest_metadata_parse_fp(fp);
+	Manifest* out = manifest_metadata_parse_fp(fp);
+	out->dir = parent_dir;
+	
+	return out;
+}
+
+void manifest_metadata_deep(Manifest* mans) {
+	Manifest* current;
+	int dir = mans->dir;
+	
+	FILE* fp;
+	for (current = mans; current; current = current->next) {
+		fp = fread_archive(current->path, dir, NULL);
+		if (!fp) {
+			plog_error("Failed to open file %s", current->path);
+			return;
+		}
+		current->parsed = manifest_metadata_parse_fp(fp);
+	}
 }

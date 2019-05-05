@@ -3,7 +3,7 @@
 //
 
 #include <stdio.h>
-#include <autogentoo/hacksaw/tools/log.h>
+#include <autogentoo/hacksaw/log.h>
 #include <stdarg.h>
 #include <pthread.h>
 

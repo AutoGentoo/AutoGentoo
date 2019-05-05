@@ -13,4 +13,6 @@
 #define DEFAULT_ROOT "/"
 #define DEFAULT_DISTDIR "/usr/portage/distfiles/"
 
+typedef unsigned char* sha_hash;
+
 #endif //AUTOGENTOO_CONSTANTS_H

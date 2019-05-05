@@ -26,7 +26,7 @@ void dependerror(const char *message);
     char* identifier;
     P_Atom* atom_type;
     Dependency* depend_type;
-    AtomNode* version;
+    AtomVersion* version;
     atom_use_default use_default;
 
     struct {

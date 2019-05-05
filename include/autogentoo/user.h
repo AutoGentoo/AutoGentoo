@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <openssl/evp.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 
 #define AUTOGENTOO_TOKEN_LENGTH 32
 #define AUTOGENTOO_HASH_LENGTH 128

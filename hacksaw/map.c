@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 #include <stdint.h>
 
 uint32_t prv_map_insert_item (Map* map, MapItem* item);

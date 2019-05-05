@@ -183,11 +183,13 @@ void database_write_map(Database* db, Map* m) {
 		database_write_str(db, pkg->category);
 		database_write_str(db, pkg->name);
 		
-		// EBUILDS
-		database_write_int(db, pkg->ebuilds->n);
-		Ebuild* current;
-		for (int j = 0; j < pkg->ebuilds->n; j++) {
-			current = *(Ebuild**)vector_get(pkg->ebuilds, j);
+		for (Ebuild* current = pkg->ebuilds;; current = current->older) {
+			if (!current) {
+				database_write_int(db, DATABASE_STOP);
+				break;
+			}
+			database_write_int(db, DATABASE_EBUILD);
+			
 			database_write_str(db, current->pn);
 			database_write_str(db, current->pv);
 			database_write_str(db, current->pr);
@@ -227,10 +229,9 @@ Map* database_read_map(Database* db) {
 		pkg->category = database_read_str(db);
 		pkg->name = database_read_str(db);
 		
+		Ebuild* newer = NULL;
 		// EBUILDS
-		int ebuild_n = database_read_int(db);
-		pkg->ebuilds = vector_new(sizeof(Ebuild*), VECTOR_REMOVE | VECTOR_UNORDERED);
-		for (int j = 0; j < pkg->ebuilds->n; j++) {
+		for (database_t j = database_read_int(db); j == DATABASE_EBUILD; j = database_read_int(db)) {
 			Ebuild* current = malloc(sizeof(Ebuild));
 			current->pn = database_read_str(db);
 			current->pv = database_read_str(db);
@@ -250,7 +251,11 @@ Map* database_read_map(Database* db) {
 			
 			database_write_dependency(db, current->required_use);
 			database_write_dependency(db, current->src_uri);
-			vector_add(pkg->ebuilds, &current);
+			
+			current->newer = newer;
+			if (current->newer)
+				current->newer->older = current;
+			newer = current;
 		}
 		
 		map_insert(out, pkg->key, pkg);
@@ -273,9 +278,10 @@ void database_read(Database* db) {
 	}
 	
 	db->repo->name = database_read_str(db);
-	fread(db->repo->make_conf, sizeof(SHA_HASH), 1, db->target);
-	fread(db->repo->package_accept_keywords, sizeof(SHA_HASH), 1, db->target);
-	fread(db->repo->package_use, sizeof(SHA_HASH), 1, db->target);
+	db->repo->make_conf = (unsigned char*)database_read_str(db);
+	db->repo->package_accept_keywords = (unsigned char*)database_read_str(db);
+	db->repo->package_use = (unsigned char*)database_read_str(db);
+	
 	db->repo->packages = database_read_map(db);
 }
 
@@ -285,8 +291,8 @@ void database_write(Database* db) {
 	db->target = fopen("autogentoo.db", "w+");
 	
 	database_write_str(db, db->repo->name);
-	fwrite(db->repo->make_conf, sizeof(SHA_HASH), 1, db->target);
-	fwrite(db->repo->package_accept_keywords, sizeof(SHA_HASH), 1, db->target);
-	fwrite(db->repo->package_use, sizeof(SHA_HASH), 1, db->target);
+	database_write_str(db, (char*)db->repo->make_conf);
+	database_write_str(db, (char*)db->repo->package_accept_keywords);
+	database_write_str(db, (char*)db->repo->package_use);
 	database_write_map(db, db->repo->packages);
 }

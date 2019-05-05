@@ -20,8 +20,8 @@ FILE* fread_archive(char* path, int dirfd, char* verify_sha) {
 	if (verify_sha) {
 		int out_fd = openat(dirfd, buffer_file, O_RDONLY);
 		if (out_fd > 0) {
-			SHA_HASH fd_hash;
-			portage_get_hash_fd(fd_hash, out_fd, EVP_sha256());
+			sha_hash fd_hash;
+			portage_get_hash_fd(&fd_hash, out_fd, EVP_sha256());
 			if (strcmp(verify_sha, (char*)fd_hash) != 0)
 				close(out_fd);
 			else {
@@ -60,7 +60,11 @@ FILE* fread_archive(char* path, int dirfd, char* verify_sha) {
 		return NULL;
 	}
 	
-	fp = fopen(buffer_file, "w+");
+	int b_fd = openat(dirfd, buffer_file, O_RDWR | O_CREAT | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+	if (b_fd < 0) {
+		return NULL;
+	}
+	fp = fdopen(b_fd, "w+");
 	
 	if (!fp) {
 		plog_error("Failed to open buffer file %s", buffer_file);

@@ -6,7 +6,7 @@
 #define AUTOGENTOO_HTTP_H
 
 #include <stdio.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 
 typedef struct __HttpRequest HttpRequest;
 typedef struct __HttpHeader HttpHeader;

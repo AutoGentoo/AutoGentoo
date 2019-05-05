@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <autogentoo/hacksaw/tools/string_vector.h>
+#include <autogentoo/hacksaw/string_vector.h>
 
 StringVector* string_vector_new() {
 	return vector_new(sizeof(char*), VECTOR_ORDERED | VECTOR_REMOVE);

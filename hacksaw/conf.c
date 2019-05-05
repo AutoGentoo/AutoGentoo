@@ -3,7 +3,7 @@
 //
 
 #define _GNU_SOURCE
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 #include <string.h>
 #include <stdlib.h>
 

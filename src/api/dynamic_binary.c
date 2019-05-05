@@ -5,9 +5,9 @@
 #include <autogentoo/api/dynamic_binary.h>
 #include <stdlib.h>
 #include <string.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 #include <autogentoo/endian_convert.h>
-#include <autogentoo/hacksaw/tools/debug.h>
+#include <autogentoo/hacksaw/debug.h>
 
 DynamicBinary* dynamic_binary_new(dynamic_binary_endian_t endian) {
 	DynamicBinary* out = malloc(sizeof(DynamicBinary));

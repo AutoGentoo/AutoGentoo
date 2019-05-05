@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 
 SmallMap* small_map_new(int start_size, int increment) {
 	SmallMap* out = vector_new(sizeof(void*), VECTOR_REMOVE | VECTOR_UNORDERED);

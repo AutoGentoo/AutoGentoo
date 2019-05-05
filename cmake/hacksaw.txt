@@ -26,19 +26,12 @@ find_package(FLEX REQUIRED)
 set(hacksaw_SRC
         hacksaw/conf.c
         hacksaw/debug.c
-        #hacksaw/dependency.c
-        hacksaw/directory.c
         hacksaw/hash.c
         hacksaw/log.c
-        #hacksaw/manifest.c
         hacksaw/map.c
-        #hacksaw/package.c
-        #hacksaw/package_config.c
-        #hacksaw/repository.c
         hacksaw/small_map.c
         hacksaw/string.c
         hacksaw/string_vector.c
-        #hacksaw/use_flag.c
         hacksaw/vector.c
         hacksaw/linked_vector.c
         hacksaw/util.c
@@ -46,26 +39,15 @@ set(hacksaw_SRC
 
 set(hacksaw_HEADERS
         include/autogentoo/hacksaw/hacksaw.h
-        #include/autogentoo/hacksaw/language.h
-        include/autogentoo/hacksaw/tools.h
-        #include/autogentoo/hacksaw/portage/dependency.h
-        #include/autogentoo/hacksaw/portage/directory.h
-        #include/autogentoo/hacksaw/portage/hash.h
-        #include/autogentoo/hacksaw/portage/manifest.h
-        #include/autogentoo/hacksaw/portage/package.h
-        #include/autogentoo/hacksaw/portage/package_config.h
-        #include/autogentoo/hacksaw/portage/portage.h
-        #include/autogentoo/hacksaw/portage/repository.h
-        #include/autogentoo/hacksaw/portage/use_flags.h
-        include/autogentoo/hacksaw/tools/conf.h
-        include/autogentoo/hacksaw/tools/debug.h
-        include/autogentoo/hacksaw/tools/log.h
-        include/autogentoo/hacksaw/tools/map.h
-        include/autogentoo/hacksaw/tools/small_map.h
-        include/autogentoo/hacksaw/tools/string.h
-        include/autogentoo/hacksaw/tools/string_vector.h
-        include/autogentoo/hacksaw/tools/vector.h
-        include/autogentoo/hacksaw/tools/linked_vector.h
-        include/autogentoo/hacksaw/tools/util.h
+        include/autogentoo/hacksaw/conf.h
+        include/autogentoo/hacksaw/debug.h
+        include/autogentoo/hacksaw/log.h
+        include/autogentoo/hacksaw/map.h
+        include/autogentoo/hacksaw/small_map.h
+        include/autogentoo/hacksaw/string.h
+        include/autogentoo/hacksaw/string_vector.h
+        include/autogentoo/hacksaw/vector.h
+        include/autogentoo/hacksaw/linked_vector.h
+        include/autogentoo/hacksaw/util.h
         )
 

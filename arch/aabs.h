@@ -25,7 +25,7 @@
 #define AUTOGENTOO_ABS_AABS_H
 
 #include <sys/types.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 
 typedef Vector aabs_vec_t;
 typedef StringVector aabs_svec_t;

@@ -5,7 +5,7 @@
     #include <stdlib.h>
     #include <string.h>
     #include "autogentoo/http.h"
-    #include "autogentoo/hacksaw/tools.h"
+    #include "autogentoo/hacksaw/hacksaw.h"
     extern int error;
 }
 
@@ -13,7 +13,7 @@
 #define _GNU_SOURCE
 #include <stdio.h>
 #include "autogentoo/http.h"
-#include "autogentoo/hacksaw/tools.h"
+#include "autogentoo/hacksaw/hacksaw.h"
 
 int ag_httpparse(void);
 int ag_httpwrap() { return 1; }

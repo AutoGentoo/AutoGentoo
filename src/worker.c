@@ -10,13 +10,14 @@
 #include <arpa/inet.h>
 #include <sys/un.h>
 #include <unistd.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 #include <autogentoo/request_structure.h>
 #include <fcntl.h>
 #include <wait.h>
 #include <autogentoo/api/ssl_wrap.h>
 #include <sys/file.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 WorkerHandler* worker_handler_new() {
 	WorkerHandler* out = malloc(sizeof(WorkerHandler));

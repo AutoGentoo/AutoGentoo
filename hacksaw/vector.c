@@ -2,7 +2,7 @@
 // Created by atuser on 10/19/17.
 //
 
-#include <autogentoo/hacksaw/tools/vector.h>
+#include <autogentoo/hacksaw/vector.h>
 #include <stdlib.h>
 #include <memory.h>
 

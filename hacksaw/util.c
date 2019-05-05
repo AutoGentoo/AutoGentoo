@@ -2,7 +2,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <dirent.h>
-#include <autogentoo/hacksaw/tools/log.h>
+#include <autogentoo/hacksaw/log.h>
 
 void prv_mkdir(const char* dir) {
 	DIR* _dir = opendir(dir);

@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 
 String* string_new(size_t start) {
 	String* out = malloc(sizeof(String));

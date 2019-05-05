@@ -5,15 +5,16 @@
 #ifndef AUTOGENTOO_PACKAGE_H
 #define AUTOGENTOO_PACKAGE_H
 
-#include <autogentoo/hacksaw/tools/vector.h>
+#include <autogentoo/hacksaw/vector.h>
 #include <stdint.h>
-#include <autogentoo/hacksaw/tools/string_vector.h>
+#include <autogentoo/hacksaw/string_vector.h>
+#include "constants.h"
 
 typedef struct __Package Package;
 typedef struct __Ebuild Ebuild;
 typedef struct __Dependency Dependency;
 typedef struct __P_Atom P_Atom;
-typedef struct __AtomNode AtomNode;
+typedef struct __AtomVersion AtomVersion;
 typedef struct __AtomFlag AtomFlag;
 
 struct __Package {
@@ -23,7 +24,7 @@ struct __Package {
 	char* category;
 	char* name;
 	
-	Vector* ebuilds;
+	Ebuild* ebuilds;
 };
 
 typedef enum {
@@ -58,6 +59,7 @@ struct __Use {
  * Version of a specfic package, this is what is built
  */
 struct __Ebuild {
+	char* category;
 	char* pn;
 	char* pv;
 	char* pr;
@@ -68,20 +70,25 @@ struct __Ebuild {
 	char* p;
 	char* pvr;
 	char* pf;
-	char* category;
 	
 	/* Cached in the database */
 	Dependency* depend;
 	Dependency* bdepend;
 	Dependency* rdepend;
 	Dependency* pdepend; //!< Post install dependencies so no circular depends
-
+	
 	Vector* use; //!< Read iuse, then apply globals (make.conf), then package.use
 	Vector* feature_restrict;
 	keyword_t keywords[ARCH_END];
 	
 	Dependency* required_use;
 	Dependency* src_uri;
+	
+	AtomVersion* version;
+	sha_hash meta_sha512;
+	
+	Ebuild* older;
+	Ebuild* newer;
 };
 
 typedef enum {
@@ -97,13 +104,6 @@ typedef enum {
 	IS_ATOM,
 	HAS_DEPENDS,
 } depend_t;
-
-typedef enum {
-	ATOM_CMP_EQUAL,
-	ATOM_CMP_NO_MATCH, // Not the same package
-	ATOM_CMP_LESS,
-	ATOM_CMP_GREATER
-} atom_cmp_t;
 
 typedef enum {
 	ATOM_USE_DISABLE, //!< atom[-bar]
@@ -167,9 +167,20 @@ typedef enum {
 	ATOM_SLOT_REBUILD
 } atom_slot_t;
 
-struct __AtomNode {
-	char* v;
-	AtomNode* next;
+typedef enum {
+	ATOM_PREFIX_ALPHA,
+	ATOM_PREFIX_BETA,
+	ATOM_PREFIX_PRE,
+	ATOM_PREFIX_RC,
+	ATOM_PREFIX_NONE,
+	ATOM_PREFIX_P,
+	ATOM_REVISION
+} atom_version_pre_t;
+
+struct __AtomVersion {
+	char* v; //!< If there is a prefix, only include the integer part, if none 0
+	atom_version_pre_t prefix;
+	AtomVersion* next;
 };
 
 /**
@@ -186,14 +197,15 @@ struct __P_Atom {
 	atom_version_t range;
 	atom_block_t blocks;
 	
-	AtomNode* version;
+	AtomVersion* version;
 	AtomFlag* useflags;
 };
 
-atom_cmp_t ebuild_atom_compare(Ebuild* ebuild, P_Atom* atom);
+#include "database.h"
+
 P_Atom* atom_new(char* cat, char* name);
-AtomNode* atom_version_new(char* version_str);
-void atomnode_free(AtomNode* parent);
+AtomVersion* atom_version_new(char* version_str);
+void atomnode_free(AtomVersion* parent);
 void atom_free(P_Atom* ptr);
 void atomflag_free(AtomFlag* parent);
 
@@ -201,5 +213,8 @@ Dependency* dependency_build_atom(P_Atom* atom);
 Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* selector);
 
 AtomFlag* atomflag_build(char* name);
+
+int atom_version_compare(AtomVersion* first, AtomVersion* second);
+Ebuild* package_init(Repository* repo, char* category, char* atom, char* hash);
 
 #endif //AUTOGENTOO_PACKAGE_H

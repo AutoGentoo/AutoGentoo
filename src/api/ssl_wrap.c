@@ -12,7 +12,7 @@
 #include <openssl/pem.h>
 #include <openssl/x509.h>
 #include <openssl/x509_vfy.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 #include <fcntl.h>
 
 #include <autogentoo/api/ssl_wrap.h>

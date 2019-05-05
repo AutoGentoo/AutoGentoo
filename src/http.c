@@ -12,6 +12,7 @@
 #include <autogentoo/user.h>
 #include <math.h>
 #include <openssl/ssl.h>
+#include <sys/stat.h>
 
 HttpHeader* http_get_header(HttpRequest* request, char* to_find) {
 	return small_map_get(request->headers, to_find);

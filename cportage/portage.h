@@ -5,20 +5,22 @@
 #ifndef AUTOGENTOO_PORTAGE_H
 #define AUTOGENTOO_PORTAGE_H
 
-#include <autogentoo/hacksaw/tools/map.h>
+#include <autogentoo/hacksaw/map.h>
 #include <openssl/evp.h>
+#include "constants.h"
 
 typedef struct __Repository Repository;
 typedef struct __UseSelector UseSelector;
-typedef unsigned char SHA_HASH[EVP_MAX_MD_SIZE];
 
 struct __Repository {
 	Map* packages;
 	char* name;
+	char* root_path;
+	char* conf_dir;
 	
-	SHA_HASH package_accept_keywords;
-	SHA_HASH package_use;
-	SHA_HASH make_conf;
+	sha_hash package_accept_keywords;
+	sha_hash package_use;
+	sha_hash make_conf;
 };
 
 typedef enum {
@@ -295,7 +297,9 @@ struct __UseSelector {
 	use_select_t status; // USE_ENABLE or USE_DISABLE
 };
 
-int portage_get_hash(SHA_HASH target, char* path, const EVP_MD* algorithm);
-int portage_get_hash_fd(SHA_HASH target, int fd, const EVP_MD* algorithm);
+Repository* repository_new (char* name, char* root, char* conf_dir);
+
+int portage_get_hash(sha_hash* target, char* path, const EVP_MD* algorithm);
+int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm);
 
 #endif //AUTOGENTOO_PORTAGE_H

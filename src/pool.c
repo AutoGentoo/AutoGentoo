@@ -5,7 +5,7 @@
 #include <autogentoo/pool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 #include <unistd.h>
 #include <signal.h>
 

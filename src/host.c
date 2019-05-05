@@ -9,6 +9,7 @@
 #include <autogentoo/user.h>
 #include <errno.h>
 #include <autogentoo/writeconfig.h>
+#include <sys/stat.h>
 
 char* prv_gen_random(size_t len) {
 	char* out = malloc((size_t) len + 1);

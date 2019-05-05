@@ -3,7 +3,7 @@
 //
 
 #include <stdlib.h>
-#include <autogentoo/hacksaw/tools.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 
 LinkedNode* _linked_node_new() {
 	LinkedNode* out = malloc(sizeof(LinkedNode));
