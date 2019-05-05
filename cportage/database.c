@@ -205,7 +205,7 @@ void database_write_map(Database* db, Map* m) {
 			database_write_vector(db, current->feature_restrict, "i");
 			fwrite(current->keywords, sizeof(int), ARCH_END, db->target);
 			
-			database_write_dependency(db, current->required_use);
+			//database_write_dependency(db, current->required_use);
 			database_write_dependency(db, current->src_uri);
 		}
 	}
@@ -248,7 +248,7 @@ Map* database_read_map(Database* db) {
 			database_write_vector(db, current->feature_restrict, "i");
 			fwrite(current->keywords, sizeof(int), ARCH_END, db->target);
 			
-			database_write_dependency(db, current->required_use);
+			//database_write_dependency(db, current->required_use);
 			database_write_dependency(db, current->src_uri);
 			
 			current->newer = newer;

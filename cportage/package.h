@@ -50,47 +50,6 @@ typedef enum {
 	ARCH_END
 } arch_t;
 
-struct __Use {
-	char* name;
-	int enabled;
-};
-
-/**
- * Version of a specfic package, this is what is built
- */
-struct __Ebuild {
-	char* category;
-	char* pn;
-	char* pv;
-	char* pr;
-	char* slot;
-	char* eapi;
-	
-	/* Uninitalized until we emerge it */
-	char* p;
-	char* pvr;
-	char* pf;
-	
-	/* Cached in the database */
-	Dependency* depend;
-	Dependency* bdepend;
-	Dependency* rdepend;
-	Dependency* pdepend; //!< Post install dependencies so no circular depends
-	
-	Vector* use; //!< Read iuse, then apply globals (make.conf), then package.use
-	Vector* feature_restrict;
-	keyword_t keywords[ARCH_END];
-	
-	Dependency* required_use;
-	Dependency* src_uri;
-	
-	AtomVersion* version;
-	sha_hash meta_sha512;
-	
-	Ebuild* older;
-	Ebuild* newer;
-};
-
 typedef enum {
 	USE_NONE,
 	USE_DISABLE, //!< !
@@ -119,6 +78,45 @@ typedef enum {
 	ATOM_DEFAULT_ON, //!< use(+)
 	ATOM_DEFAULT_OFF, //!< use(-)
 } atom_use_default;
+
+
+#include "use.h"
+
+/**
+ * Version of a specfic package, this is what is built
+ */
+struct __Ebuild {
+	char* category;
+	char* pn;
+	char* pv;
+	char* pr;
+	char* slot;
+	char* eapi;
+	
+	/* Uninitalized until we emerge it */
+	char* p;
+	char* pvr;
+	char* pf;
+	
+	/* Cached in the database */
+	Dependency* depend;
+	Dependency* bdepend;
+	Dependency* rdepend;
+	Dependency* pdepend; //!< Post install dependencies so no circular depends
+	
+	Vector* use; //!< Read iuse, then apply globals (make.conf), then package.use
+	Vector* feature_restrict;
+	keyword_t keywords[ARCH_END];
+	
+	RequiredUse* required_use;
+	Dependency* src_uri;
+	
+	AtomVersion* version;
+	sha_hash meta_sha512;
+	
+	Ebuild* older;
+	Ebuild* newer;
+};
 
 struct __AtomFlag {
 	char* name;

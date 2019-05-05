@@ -100,6 +100,10 @@ set(src_CPORTAGE
         cportage/manifest.h
         cportage/compress.c
         cportage/compress.h
+        cportage/features.c
+        cportage/features.h
+        cportage/use.c
+        cportage/use.h
         )
 
 set(language_SOURCES

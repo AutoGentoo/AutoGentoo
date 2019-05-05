@@ -1,5 +1,3 @@
-%define api.prefix {depend}
-
 %code requires {
   #include "share.h"
   #include <stdlib.h>
@@ -10,14 +8,14 @@
 #include <stdio.h>
 #include "share.h"
 
-int dependparse(void);
-int dependwrap() { return 1; }
-int dependlex();
-extern int dependlineno;
-extern char* dependtext;
-extern Dependency* dependout;
+int yyparse(void);
+int yywrap() { return 1; }
+int yylex();
+extern int yylineno;
+extern char* yytext;
+extern void* yyout;
 
-void dependerror(const char *message);
+void yyerror(const char *message);
 %}
 
 %start program
@@ -27,6 +25,8 @@ void dependerror(const char *message);
     P_Atom* atom_type;
     Dependency* depend_type;
     atom_use_default use_default;
+    RequiredUse* use_type;
+    use_select_t use_select;
 
     struct {
         char* target;
@@ -46,6 +46,7 @@ void dependerror(const char *message);
 %token END_OF_FILE
 %token <use_default> USE_DEFAULT;
 %token <slot> SLOT
+%token <use_select> USESELECT
 
 %type <atom_type> atom_version
 %type <atom_type> atom_block
@@ -55,13 +56,21 @@ void dependerror(const char *message);
 %type <atom_flag> atom_flags
 %type <atom_flag> atom_flag
 %type <depend_type> depend_expr
+%type <use_type> required_use_expr
 %type <depend_expr_select> depend_expr_sel
+%type <depend_expr_select> use_expr
 
 %%
 
-program:    | depend_expr                      {dependout = $1;}
+program:    | depend_expr                       {yyout = (void*)$1;}
+            | required_use_expr                 {yyout = (void*)$1;}
             | END_OF_FILE
             ;
+
+required_use_expr   : depend_expr_sel '(' required_use_expr ')' {$$ = use_build_required_use($1.target, $1.t); $$->depend = $3;}
+                    | required_use_expr required_use_expr       {$$ = $1; $$->next = $2;}
+                    | use_expr                                  {$$ = use_build_required_use($1.target, $1.t);}
+                    | '(' required_use_expr ')'                 {$$ = $2;}
 
 depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_build_use($p.target, $p.t, $c);}
                 | '(' depend_expr[c] ')'                    {$$ = $c;}
@@ -69,12 +78,14 @@ depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_bui
                 | depend_expr depend_expr                   {$$ = $1; $1->next = $2;}
                 ;
 
-depend_expr_sel : '!' IDENTIFIER '?'    {$$.target = $2; $$.t = USE_DISABLE;}
-                | IDENTIFIER '?'        {$$.target = $1; $$.t = USE_ENABLE;}
-                | '|' '|'               {$$.target = "||"; $$.t = USE_LEAST_ONE;}
-                | '^' '^'               {$$.target = "^^"; $$.t = USE_EXACT_ONE;}
-                | '?' '?'               {$$.target = "??"; $$.t = USE_MOST_ONE;}
+depend_expr_sel : use_expr '?'          {$$ = $1;}
+                | '!' use_expr '?'      {$$ = $2;}
+                | USESELECT             {$$.target = NULL; $$.t = $1;}
                 ;
+
+use_expr: '!' IDENTIFIER        {$$.target = $2; $$.t = USE_DISABLE;}
+        | IDENTIFIER            {$$.target = $1; $$.t = USE_ENABLE;}
+        ;
 
 atom        : atom_slot_rebuild '[' atom_flags ']' {$$->useflags = $3;}
             | atom_slot_rebuild

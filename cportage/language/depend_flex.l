@@ -1,5 +1,3 @@
-%option prefix="depend"
-
 %{
 #define _GNU_SOURCE
 #include "depend.tab.h"
@@ -9,22 +7,30 @@
 
 int error = 0;
 
-static char* depend_buffer;
+static char* __yybuffer;
 
-int dependerror(char *s) {
-    fprintf(stderr, "%s\n", depend_buffer);
-    fprintf(stderr, "%s in line %d near '%s'\n", s, dependlineno, dependtext);
+int yyerror(char *s) {
+    fprintf(stderr, "%s\n", __yybuffer);
+    fprintf(stderr, "%s in line %d near '%s'\n", s, yylineno, yytext);
     error = 1;
     exit(1);
     return error;
 }
 
 Dependency* depend_parse (char* buffer) {
-    depend_buffer = strdup(buffer);
+    __yybuffer = strdup(buffer);
     YY_BUFFER_STATE bs = yy_scan_string(buffer);
-    depend_switch_to_buffer(bs);
-    dependparse();
-    return (Dependency*)dependout;
+    yy_switch_to_buffer(bs);
+    yyparse();
+    return (Dependency*)yyout;
+}
+
+RequiredUse* required_use_parse (char* buffer) {
+    __yybuffer = strdup(buffer);
+    YY_BUFFER_STATE bs = yy_scan_string(buffer);
+    yy_switch_to_buffer(bs);
+    yyparse();
+    return (RequiredUse*)yyout;
 }
 
 %}
@@ -39,27 +45,30 @@ slotname        ({letter}|{digit}|"_")({letter}|{digit}|"_"|"-"|"."|"+")*
 slot            [\:]({slotname}(\/{slotname})?)?
 
 %%
-[\n]                    {dependlineno++;}
+[\n]                    {yylineno++;}
 [ \t\r\\]+              ;
 {slot}                  {
-                            char* name_splt = strchr(dependtext + 1, '/');
+                            char* name_splt = strchr(yytext + 1, '/');
                             if (name_splt)
                                 *name_splt = 0;
-                            if (dependtext[1] == 0) {
-                                dependlval.slot.name = NULL;
-                                dependlval.slot.sub_name = NULL;
+                            if (yytext[1] == 0) {
+                                yylval.slot.name = NULL;
+                                yylval.slot.sub_name = NULL;
                                 return SLOT;
                             }
-                            dependlval.slot.name = strdup(dependtext + 1);
+                            yylval.slot.name = strdup(yytext + 1);
                             if (name_splt)
-                                dependlval.slot.sub_name = strdup(name_splt + 1);
+                                yylval.slot.sub_name = strdup(name_splt + 1);
                             else
-                                dependlval.slot.sub_name = NULL;
+                                yylval.slot.sub_name = NULL;
 
                             return SLOT;
                         }
-"(+)"                   {dependlval.use_default = ATOM_DEFAULT_ON; return USE_DEFAULT;}
-"(-)"                   {dependlval.use_default = ATOM_DEFAULT_OFF; return USE_DEFAULT;}
+"??"                    {yylval.use_select = USE_MOST_ONE; return USESELECT;}
+"||"                    {yylval.use_select = USE_LEAST_ONE; return USESELECT;}
+"^^"                    {yylval.use_select = USE_EXACT_ONE; return USESELECT;}
+"(+)"                   {yylval.use_default = ATOM_DEFAULT_ON; return USE_DEFAULT;}
+"(-)"                   {yylval.use_default = ATOM_DEFAULT_OFF; return USE_DEFAULT;}
 [-]                     {return '-';}
 [<]                     {return '<';}
 [>]                     {return '>';}
@@ -75,19 +84,19 @@ slot            [\:]({slotname}(\/{slotname})?)?
 [\,]                    {return ',';}
 [\~]                    {return '~';}
 {atom}                  {
-                            dependlval.atom_type = atom_new(dependtext);
+                            yylval.atom_type = atom_new(yytext);
                             return ATOM;
                         }
 
 [\*]                    {return '*';}
 
 {identifier}            {
-                            dependlval.identifier = strdup (dependtext);
+                            yylval.identifier = strdup (yytext);
                             return (IDENTIFIER);
                         }
 
 
 [<<EOF>>|'']            {return END_OF_FILE;}
-.                       {printf("Unknown character: %s\n", dependtext);}
+.                       {printf("Unknown character: %s\n", yytext);}
 
 %%

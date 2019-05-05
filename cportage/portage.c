@@ -48,7 +48,7 @@ int portage_get_hash(sha_hash* target, char* path, const EVP_MD* algorithm) {
 Repository* repository_new (char* name, char* root, char* conf_dir) {
 	Repository* out = malloc(sizeof(Repository));
 	
-	out->packages = map_new(65536, 0.8);
+	out->packages = map_new(32768, 0.8);
 	out->name = strdup(name);
 	out->root_path = strdup(root);
 	out->conf_dir = strdup(conf_dir);

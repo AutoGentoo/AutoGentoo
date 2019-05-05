@@ -160,7 +160,10 @@ Dependency* dependency_build_atom(P_Atom* atom) {
 Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* selector) {
 	Dependency* out = malloc(sizeof(Dependency));
 	out->atom = NULL;
-	out->target = strdup(use_flag);
+	if (use_flag)
+		out->target = strdup(use_flag);
+	else
+		out->target = NULL;
 	out->next = NULL;
 	out->depends = HAS_DEPENDS;
 	out->selector = type;
@@ -240,6 +243,8 @@ void package_metadata_init(Ebuild* ebuild, Manifest* atom_man) {
 			ebuild->eapi = strdup(value);
 		else if (strcmp(name, "SLOT") == 0)
 			ebuild->slot = strdup(value);
+		else if (strcmp(name, "REQUIRED_USE") == 0)
+			ebuild->required_use = required_use_parse(value);
 	}
 	
 	fclose(fp);
