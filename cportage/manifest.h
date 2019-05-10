@@ -6,7 +6,6 @@
 #define AUTOGENTOO_MANIFEST_H
 
 #include <stdio.h>
-#include "portage.h"
 
 typedef struct __Manifest Manifest;
 typedef struct __ManifestHash ManifestHash;
@@ -22,6 +21,8 @@ struct __ManifestHash {
 	char* hash;
 	ManifestHash* next;
 };
+
+#include "portage.h"
 
 struct __Manifest {
 	sha_hash gz_hash; // SHA512

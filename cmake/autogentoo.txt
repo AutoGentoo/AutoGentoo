@@ -8,7 +8,6 @@ set(src_SOURCES
         src/stage.c
         src/writeconfig.c
         src/endian_convert.c
-        src/getopt.c
         src/thread.c
         src/request.c
         src/request_structure.c
@@ -44,7 +43,6 @@ set(include_HEADERS
         include/autogentoo/stage.h
         include/autogentoo/writeconfig.h
         include/autogentoo/endian_convert.h
-        include/autogentoo/getopt.h
         include/autogentoo/thread.h
         include/autogentoo/request_structure.h
         include/autogentoo/http.h
@@ -60,7 +58,6 @@ set(include_HEADERS
         include/autogentoo/api/ssl_wrap.h
         include/autogentoo/worker.h
         )
-
 
 set(test_SOURCES
         src/tests/test.c
@@ -104,6 +101,13 @@ set(src_CPORTAGE
         cportage/features.h
         cportage/use.c
         cportage/use.h
+        cportage/keywords.c
+        cportage/keywords.h
+        cportage/atom.c
+        cportage/atom.h
+        cportage/emerge.c
+        cportage/emerge.h
+        cportage/cportage_defines.h
         )
 
 set(language_SOURCES

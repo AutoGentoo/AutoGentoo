@@ -14,200 +14,10 @@
 #include <fcntl.h>
 #include <share.h>
 
-
-P_Atom* atom_new(char* input) {
-	P_Atom* out = malloc(sizeof(P_Atom));
-	out->version = NULL;
-	char* cat_splt = strchr(input, '/');
-	if (!cat_splt) {
-		plog_warn("Invalid atom: %s", input);
-		return NULL;
-	}
-	
-	char* rev_splt = strrchr(input, '-');
-	char* version_splt;
-	if (rev_splt) {
-		if (rev_splt[1] == 'r') {
-			*rev_splt = 0;
-			version_splt = strrchr(input, '-');
-			*rev_splt = '-';
-		}
-		else
-			version_splt = rev_splt;
-		if (version_splt) {
-			if (version_splt[1] >= '0' && version_splt[1] <= '9')
-				out->version = atom_version_new(version_splt);
-			*version_splt = 0;
-		}
-	}
-	
-	*cat_splt = 0;
-	out->category = strdup(input);
-	out->name = strdup(cat_splt + 1);
-	
-	out->useflags = NULL;
-	out->version = NULL;
-	out->slot = NULL;
-	out->sub_slot = NULL;
-	out->sub_opts = ATOM_SLOT_IGNORE;
-	out->range = ATOM_VERSION_ALL;
-	out->blocks = ATOM_BLOCK_NONE;
-	
-	return out;
-}
-
-static struct __link_atom_prefix_strct {
-	size_t prefix_string_len;
-	atom_version_pre_t pre;
-} atom_prefix_links[] = {
-		{5, ATOM_PREFIX_ALPHA},
-		{4, ATOM_PREFIX_BETA},
-		{3, ATOM_PREFIX_PRE},
-		{2, ATOM_PREFIX_RC},
-		{0, ATOM_PREFIX_NONE},
-		{1, ATOM_PREFIX_P},
-};
-
-AtomVersion* atom_version_new(char* version_str) {
-	version_str = strdup(version_str);
-	AtomVersion* parent = malloc (sizeof(AtomVersion));
-	parent->full_version = strdup(version_str);
-	AtomVersion* current_node = parent;
-	
-	char* buf = strtok(version_str, "._-");
-	while (buf) {
-		char* prefix_splt = strpbrk(buf, "0123456789");
-		size_t prefix_len;
-		if (prefix_splt == NULL) { // No prefix
-			prefix_len = 0;
-			prefix_splt = buf;
-		}
-		else
-			prefix_len = prefix_splt - buf;
-		current_node->prefix = -1;
-		if (*buf == 'r')
-			current_node->prefix = ATOM_REVISION;
-		else {
-			for (int i = 0; i < sizeof(atom_prefix_links) / sizeof(atom_prefix_links[0]); i++) {
-				if (prefix_len == atom_prefix_links[i].prefix_string_len) {
-					current_node->prefix = atom_prefix_links[i].pre;
-					break;
-				}
-			}
-		}
-		if (current_node->prefix == -1) {
-			char* ebuf = strndup(buf, prefix_len);
-			plog_warn("Invalid version prefix: '%s'", ebuf);
-			free(ebuf);
-			free(version_str);
-			return NULL;
-		}
-		
-		current_node->v = strdup(prefix_splt);
-		if ((buf = strtok(NULL, "._-"))) {
-			current_node->next = malloc(sizeof(AtomVersion));
-			current_node = current_node->next;
-			current_node->full_version = NULL;
-		}
-		else
-			current_node->next = NULL;
-	}
-	
-	free(version_str);
-	return parent;
-}
-
-void atomversion_free(AtomVersion* parent) {
-	if (!parent)
-		return;
-	
-	if (parent->next)
-		atomversion_free(parent->next);
-	if (parent->full_version)
-		free(parent->full_version);
-	
-	free(parent->v);
-	free(parent);
-}
-
-void atomflag_free(AtomFlag* parent) {
-	AtomFlag* next;
-	for (next = parent->next; parent; parent = next)
-		free(parent->name);
-}
-
-void atom_free(P_Atom* ptr) {
-	atomversion_free(ptr->version);
-	atomflag_free(ptr->useflags);
-	
-	free(ptr->category);
-	free(ptr->name);
-	free(ptr);
-}
-
-Dependency* dependency_build_atom(P_Atom* atom) {
-	Dependency* out = malloc(sizeof(Dependency));
-	out->atom = atom;
-	out->target = NULL;
-	out->next = NULL;
-	out->depends = IS_ATOM;
-	out->selector = USE_NONE;
-	out->selectors = NULL;
-	
-	return out;
-}
-
-Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* selector) {
-	Dependency* out = malloc(sizeof(Dependency));
-	out->atom = NULL;
-	if (use_flag)
-		out->target = strdup(use_flag);
-	else
-		out->target = NULL;
-	out->next = NULL;
-	out->depends = HAS_DEPENDS;
-	out->selector = type;
-	out->selectors = selector;
-	
-	return out;
-}
-
-AtomFlag* atomflag_build(char* name) {
-	AtomFlag* out = malloc(sizeof(AtomFlag));
-	out->name = strdup(name);
-	
-	return out;
-}
-
-
-int atom_version_compare(AtomVersion* first, AtomVersion* second) {
-	AtomVersion* cf = first;
-	AtomVersion* cs = second;
-	
-	int cmp_temp;
-	for (; cf && cs; cf = cf->next, cs = cs->next) {
-		char* scf = cf->v;
-		char* scs = cs->v;
-		
-		if (cf->prefix != cs->prefix)
-			return cf->prefix - cs->prefix;
-		int off;
-		for (off = 0; scf[off] && scs[off]; off++)
-			if (scf[off] != scs[off])
-				return scf[off] - scs[off];
-		if (scf[off] == '\0')
-			return -1;
-		if (scs[off] == '\0')
-			return 1;
-	}
-	
-	return 0;
-}
-
-void package_metadata_init(Ebuild* ebuild, Manifest* atom_man) {
-	int fd = openat(atom_man->dir, atom_man->path, O_RDONLY);
+void package_metadata_init(Ebuild* ebuild) {
+	int fd = openat(ebuild->atom_manifest->dir, ebuild->atom_manifest->path, O_RDONLY);
 	if (fd < 0) {
-		plog_error("Failed to open %s", atom_man->path);
+		plog_error("Failed to open %s", ebuild->atom_manifest->path);
 		return;
 	}
 	
@@ -245,68 +55,55 @@ void package_metadata_init(Ebuild* ebuild, Manifest* atom_man) {
 			ebuild->slot = strdup(value);
 		else if (strcmp(name, "REQUIRED_USE") == 0)
 			ebuild->required_use = required_use_parse(value);
+		else if (strcmp(name, "KEYWORDS") == 0)
+			keyword_parse(ebuild->keywords, value);
 	}
 	
+	ebuild->metadata_init = 1;
 	fclose(fp);
 }
 
 Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man) {
-	char* category = strdup(category_man->path);
-	char* atom = strdup(atom_man->path);
-	*strchr(category, '/') = 0;
+	char* parsed_key;
+	char* pcat = strdup(category_man->path);
+	*strchr(pcat, '/') = 0;
+	asprintf(&parsed_key, "%s/%s", pcat, atom_man->path);
 	
-	char* name_splt = strrchr(atom, '-');
-	char* rev_splt = NULL;
-	if (!name_splt) {
-		errno = EINVAL;
-		plog_error("Invalid atom %s", atom);
-		free(atom);
-		free(category);
+	P_Atom* atom_parsed = atom_new(parsed_key);
+	if (atom_parsed == NULL)
 		return NULL;
-	}
+	free(parsed_key);
 	
-	if (name_splt[1] == 'r') {
-		rev_splt = name_splt;
-		name_splt = strrchr(name_splt - 1, '-');
-	}
-	
-	*name_splt = 0;
-	char* pkg_name = atom;
-	char* pkg_version = name_splt + 1;
-	
-	char key[256];
-	sprintf(key, "%s/%s", category, pkg_name);
-	
-	Package* target = map_get(repo->packages, key);
+	Package* target = map_get(repo->packages, atom_parsed->key);
 	if (!target) {
 		Package* new_package = malloc(sizeof(Package));
-		new_package->key = strdup(key);
-		new_package->category = strdup(category);
-		new_package->name = strdup(pkg_name);
+		new_package->key = strdup(atom_parsed->key);
+		new_package->category = strdup(atom_parsed->category);
+		new_package->name = strdup(atom_parsed->name);
 		
 		new_package->ebuilds = NULL;
 		target = new_package;
-		map_insert(repo->packages, key, new_package);
+		map_insert(repo->packages, atom_parsed->key, new_package);
 	}
 	
 	Ebuild* new_ebuild = malloc(sizeof(Ebuild));
 	
-	if (rev_splt)
-		*rev_splt = 0;
+	new_ebuild->category_manifest = category_man;
+	new_ebuild->atom_manifest = atom_man;
 	
-	new_ebuild->category = strdup(category);
-	new_ebuild->pn = strdup(pkg_name);
-	new_ebuild->pv = strdup(pkg_version);
+	new_ebuild->metadata_init = 0;
 	
-	if (rev_splt)
-		new_ebuild->pr = strdup(rev_splt + 1);
-	else
-		new_ebuild->pr = strdup("r0");
+	new_ebuild->category = atom_parsed->category;
+	new_ebuild->pn = atom_parsed->name;
+	new_ebuild->pv = atom_parsed->version->full_version;
+	new_ebuild->revision = atom_parsed->revision;
 	
+	asprintf(&new_ebuild->pr, "r%d", atom_parsed->revision);
 	asprintf(&new_ebuild->pvr, "%s-%s", new_ebuild->pv, new_ebuild->pr);
+	
 	new_ebuild->slot = NULL;
 	new_ebuild->eapi = NULL;
-	new_ebuild->version = atom_version_new(new_ebuild->pvr);
+	new_ebuild->version = atom_parsed->version;
 	
 	/* Cached in the database */
 	new_ebuild->depend = NULL;
@@ -318,14 +115,13 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	new_ebuild->older = NULL;
 	new_ebuild->newer = NULL;
 	
-	package_metadata_init(new_ebuild, atom_man);
-	
 	Ebuild* head;
 	if (!target->ebuilds)
 		target->ebuilds = new_ebuild;
 	else {
 		for (head = target->ebuilds;; head = head->older) {
-			if (atom_version_compare(head->version, new_ebuild->version) < 0) {
+			int cmp = atom_version_compare(head->version, new_ebuild->version);
+			if (cmp < 0 || (cmp == 0 && head->revision - new_ebuild->revision < 0) ) {
 				new_ebuild->newer = head->newer;
 				new_ebuild->older = head;
 				head->newer = new_ebuild;
@@ -341,8 +137,71 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 		}
 	}
 	
-	free(category);
-	free(atom);
-	
+	free(atom_parsed);
 	return new_ebuild;
+}
+
+#define ATOM_COMPARE_REVISION()\
+if (cmp_rev == 0) \
+	return 1; \
+else if (cmp_rev > 0 && atom->range & ATOM_VERSION_L) \
+	return 1; \
+else if (cmp_rev < 0 && atom->range & ATOM_VERSION_G) \
+	return 1;
+
+int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
+	int cmp = atom_version_compare(ebuild->version, atom->version);
+	int cmp_rev = ebuild->revision - atom->revision;
+	
+	if (cmp == 0 && atom->range & ATOM_VERSION_E) {
+		if (atom->range == ATOM_VERSION_E) {
+			if (cmp_rev == 0)
+				return 1;
+		}
+		else if (atom->range == ATOM_VERSION_REV)
+			return 1;
+		ATOM_COMPARE_REVISION()
+	}
+	
+	if (cmp < 0 && atom->range & ATOM_VERSION_L) {
+		return 1;
+	}
+	if (cmp > 0 && atom->range & ATOM_VERSION_G)
+		return 1;
+	
+	return 0;
+}
+
+Ebuild* atom_resolve_ebuild(Repository* repo, P_Atom* atom, arch_t target) {
+	Package* target_pkg = map_get(repo->packages, atom->key);
+	if (!target_pkg) {
+		plog_warn("Package '%s' not found", atom->key);
+		return NULL;
+	}
+	
+	Ebuild* current;
+	for (current = target_pkg->ebuilds; current; current = current->older) {
+		if (atom_match_ebuild(current, atom)) {
+			keyword_t accept_keyword = KEYWORD_STABLE;
+			if (!current->metadata_init)
+				package_metadata_init(current);
+			for (Keyword* keyword = target_pkg->keywords; keyword; keyword = keyword->next)
+				if (atom_match_ebuild(current, keyword->atom))
+					if (keyword->keywords[target] < accept_keyword)
+						accept_keyword = keyword->keywords[target];
+			if (current->keywords[target] >= accept_keyword)
+				return current;
+		}
+	}
+	
+	return NULL;
+}
+
+DependencyTree* package_resolve_dependencies(char* atom) {
+	
+	DependencyTree* out = malloc(sizeof(DependencyTree));
+	
+	
+	
+	return out;
 }

@@ -1,28 +1,6 @@
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
-# LANGUAGE
-#flex_target(FLEX_ATOM ${CMAKE_SOURCE_DIR}/hacksaw/language/atom_flex.l
-#        ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/atom.flex.c)
-#flex_target(FLEX_DEPEND ${CMAKE_SOURCE_DIR}/hacksaw/language/depend_flex.l
-#        ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/depend.flex.c)
-#bison_target(LANG_ATOM
-#        ${CMAKE_SOURCE_DIR}/hacksaw/language/atom_bison.y
-#        ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/atom.tab.c)
-#bison_target(LANG_DEPEND
-#        ${CMAKE_SOURCE_DIR}/hacksaw/language/depend_bison.y
-#        ${CMAKE_CURRENT_BINARY_DIR}/hacksaw/depend.tab.c)
-
-#add_flex_bison_dependency(FLEX_ATOM LANG_ATOM)
-#add_flex_bison_dependency(FLEX_DEPEND LANG_DEPEND)
-
-#set(language_BIN
-#        ${BISON_LANG_ATOM_OUTPUTS}
-#        ${BISON_LANG_DEPEND_OUTPUTS}
-#        ${FLEX_FLEX_DEPEND_OUTPUTS}
-#        ${FLEX_FLEX_ATOM_OUTPUTS}
-#        )
-
 set(hacksaw_SRC
         hacksaw/conf.c
         hacksaw/debug.c
@@ -35,6 +13,7 @@ set(hacksaw_SRC
         hacksaw/vector.c
         hacksaw/linked_vector.c
         hacksaw/util.c
+        hacksaw/getopt.c
         )
 
 set(hacksaw_HEADERS
@@ -49,5 +28,6 @@ set(hacksaw_HEADERS
         include/autogentoo/hacksaw/vector.h
         include/autogentoo/hacksaw/linked_vector.h
         include/autogentoo/hacksaw/util.h
+        include/autogentoo/hacksaw/getopt.h
         )
 

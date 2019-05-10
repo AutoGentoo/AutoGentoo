@@ -45,7 +45,7 @@ int portage_get_hash(sha_hash* target, char* path, const EVP_MD* algorithm) {
 	return portage_get_hash_fd(target, fd, algorithm);
 }
 
-Repository* repository_new (char* name, char* root, char* conf_dir) {
+Repository* repository_new(char* name, char* root, char* conf_dir) {
 	Repository* out = malloc(sizeof(Repository));
 	
 	out->packages = map_new(32768, 0.8);
@@ -60,9 +60,9 @@ Repository* repository_new (char* name, char* root, char* conf_dir) {
 	asprintf(&package_use_path, "%s/%s/package.use", root, conf_dir);
 	asprintf(&make_conf_path, "%s/%s/make.conf", root, conf_dir);
 	
-	portage_get_hash(&out->package_accept_keywords, package_accept_keywords_path, EVP_sha256());
-	portage_get_hash(&out->package_use, package_use_path, EVP_sha256());
-	portage_get_hash(&out->make_conf, make_conf_path, EVP_sha256());
+	portage_get_hash(&out->hash_accept_keywords, package_accept_keywords_path, EVP_sha256());
+	portage_get_hash(&out->hash_package_use, package_use_path, EVP_sha256());
+	portage_get_hash(&out->hash_make_conf, make_conf_path, EVP_sha256());
 	
 	free(package_accept_keywords_path);
 	free(package_use_path);

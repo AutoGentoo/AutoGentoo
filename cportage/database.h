@@ -11,7 +11,6 @@
 
 typedef struct __Database Database;
 
-
 typedef enum {
 	DATABASE_STOP,
 	DATABASE_DEPEND,

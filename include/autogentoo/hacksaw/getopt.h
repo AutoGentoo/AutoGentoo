@@ -5,8 +5,6 @@
 #ifndef AUTOGENTOO_GETOPT_H
 #define AUTOGENTOO_GETOPT_H
 
-#include <autogentoo/autogentoo.h>
-
 typedef struct _Opt Opt;
 
 typedef void (* AGOPTH)(Opt* op, char* arg);
@@ -26,7 +24,7 @@ struct _Opt {
 	opt_opts_t opt;
 };
 
-void opt_handle(Opt* opts, int argc, char** argv);
+char** opt_handle(Opt* opts, int argc, char** argv);
 
 Opt* find_opt(Opt* opts, char* arg);
 

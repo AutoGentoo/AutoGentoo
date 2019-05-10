@@ -25,6 +25,14 @@ Dependency* depend_parse (char* buffer) {
     return (Dependency*)yyout;
 }
 
+P_Atom* atom_parse (char* buffer) {
+    __yybuffer = strdup(buffer);
+    YY_BUFFER_STATE bs = yy_scan_string(buffer);
+    yy_switch_to_buffer(bs);
+    yyparse();
+    return (P_Atom*)yyout;
+}
+
 RequiredUse* required_use_parse (char* buffer) {
     __yybuffer = strdup(buffer);
     YY_BUFFER_STATE bs = yy_scan_string(buffer);

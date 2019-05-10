@@ -64,6 +64,7 @@ void yyerror(const char *message);
 
 program:    | depend_expr                       {yyout = (void*)$1;}
             | required_use_expr                 {yyout = (void*)$1;}
+            | atom                              {yyout = (void*)$1;}
             | END_OF_FILE
             ;
 

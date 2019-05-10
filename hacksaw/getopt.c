@@ -3,14 +3,23 @@
 //
 
 #include <string.h>
-#include <autogentoo/autogentoo.h>
 #include <stdlib.h>
+#include <autogentoo/hacksaw/log.h>
+#include "autogentoo/hacksaw/getopt.h"
 
-void opt_handle(Opt* opts, int argc, char** argv) {
+char** opt_handle(Opt* opts, int argc, char** argv) {
 	int i;
+	char** out = calloc(argc, sizeof(char*));
+	int out_i = 0;
+	
 	for (i = 0; i != argc; i++) {
 		if (argv[i] == NULL)
 			continue;
+		
+		if (argv[i][0] != '-') {
+			out[out_i++] = strdup(argv[i]);
+			continue;
+		}
 		
 		Opt* op = find_opt(opts, argv[i]);
 		if (op == NULL) {
@@ -28,10 +37,11 @@ void opt_handle(Opt* opts, int argc, char** argv) {
 		} else
 			op->handler(op, NULL);
 	}
+	
+	return out;
 }
 
 Opt* find_opt(Opt* opts, char* arg) {
-	
 	opt_opts_t t = get_type(arg);
 	if (t == OPT_ARG)
 		return NULL;

@@ -32,8 +32,6 @@ find_library(ARCHIVE archive)
 set(LOCALSTATEDIR /var)
 add_definitions(-DDBPATH="test")
 add_definitions(-DAUTOGENTOO_DEBUG)
-#add_definitions(-DAUTOGENTOO_DEBUG)
-
 
 add_library(autogentoo SHARED
         ${include_HEADERS}
@@ -64,6 +62,8 @@ set_target_properties(autogentoo-exec PROPERTIES OUTPUT_NAME autogentoo)
 add_executable(cportage-exec
         cportage/cemerge.c
         )
+
+set_target_properties(cportage-exec PROPERTIES OUTPUT_NAME emerge)
 
 target_link_libraries(cportage-exec
         cportage
@@ -116,8 +116,8 @@ ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
 
 SET(CMAKE_INSTALL_PREFIX /usr)
 
-INSTALL(TARGETS autogentoo-exec DESTINATION bin)
-INSTALL(TARGETS autogentoo hacksaw DESTINATION lib)
+INSTALL(TARGETS autogentoo-exec cportage-exec DESTINATION bin)
+INSTALL(TARGETS autogentoo hacksaw cportage DESTINATION lib)
 
 INSTALL_HEADERS_WITH_DIRECTORY(include_HEADERS)
 INSTALL_HEADERS_WITH_DIRECTORY(hacksaw_HEADERS)
