@@ -14,5 +14,17 @@
 #define DEFAULT_DISTDIR "/usr/portage/distfiles/"
 
 typedef unsigned char* sha_hash;
+typedef struct __Package Package;
+typedef struct __Ebuild Ebuild;
+typedef struct __RequiredUse RequiredUse;
+typedef struct __UseFlag UseFlag;
+typedef struct __Repository Repository;
+typedef struct __Emerge Emerge;
+typedef struct __Manifest Manifest;
+typedef struct __ManifestHash ManifestHash;
+typedef struct __PortageDependency PortageDependency;
+typedef struct __InstalledEbuild InstalledEbuild;
+typedef struct __InstalledPackage InstalledPackage;
+typedef struct __PortageDB PortageDB;
 
 #endif //AUTOGENTOO_CONSTANTS_H

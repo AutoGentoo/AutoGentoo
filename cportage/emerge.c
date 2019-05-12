@@ -9,6 +9,8 @@
 #include <share.h>
 #include <stdio.h>
 #include <errno.h>
+#include <stdlib.h>
+#include "portage.h"
 
 Emerge* emerge_new() {
 	Emerge* out = malloc(sizeof(Emerge));
@@ -26,6 +28,7 @@ Emerge* emerge_new() {
 }
 
 int emerge (Emerge* emerge) {
+	/*
 	char* package_accept_keywords_path;
 	char* package_use_path;
 	char* make_conf_path;
@@ -40,7 +43,7 @@ int emerge (Emerge* emerge) {
 	free(package_accept_keywords_path);
 	free(package_use_path);
 	free(make_conf_path);
-	
+	*/
 	emerge->repo->category_manifests = manifest_metadata_parse(emerge->repo->location);
 	if (!emerge->repo->category_manifests) {
 		return errno;

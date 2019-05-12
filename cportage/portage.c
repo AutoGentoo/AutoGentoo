@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <ctype.h>
+#include "emerge.h"
 
 int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm) {
 	FILE* hash = fdopen(fd, "r");
@@ -133,17 +134,19 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 		for(; *name && *name == ' '; name++);
 		for(; *value && *value == ' '; value++);
 		
-		size_t n = strlen(name);
-		for (; name[n] == ' ' && n >= 0; n--);
-		name[n] = 0;
+		size_t n = strlen(name) - 1;
+		for (; name[n] == ' ' && n >= 0; n--) {
+			name[n] = 0;
+		}
 		
-		n = strlen(value);
-		for (; (value[n] == ' ' || value[n] == '\n') && n >= 0; n--);
-		value[n] = 0;
+		n = strlen(value) - 1;
+		for (; (value[n] == ' ' || value[n] == '\n') && n >= 0; n--)
+			value[n] = 0;
 		
 		if (strcmp(current_name, "DEFAULT") == 0) {
 			if (strcmp(name, "main-repo") == 0)
 				emerge->default_repo = strdup(value);
+			free(line);
 			continue;
 		}
 		

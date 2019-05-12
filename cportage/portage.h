@@ -5,13 +5,10 @@
 #ifndef AUTOGENTOO_PORTAGE_H
 #define AUTOGENTOO_PORTAGE_H
 
-typedef struct __Repository Repository;
-
 #include <autogentoo/hacksaw/map.h>
 #include <openssl/evp.h>
 #include "constants.h"
 #include "manifest.h"
-#include "keywords.h"
 
 struct __Repository {
 	char* name;

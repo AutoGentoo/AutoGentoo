@@ -5,6 +5,7 @@
 #define _GNU_SOURCE
 
 #include "package.h"
+#include "portage.h"
 #include "portage_log.h"
 #include "manifest.h"
 #include <string.h>
@@ -13,6 +14,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <share.h>
+#include <autogentoo/hacksaw/map.h>
 
 void package_metadata_init(Ebuild* ebuild) {
 	int fd = openat(ebuild->atom_manifest->dir, ebuild->atom_manifest->path, O_RDONLY);
@@ -92,6 +94,7 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	new_ebuild->atom_manifest = atom_man;
 	
 	new_ebuild->metadata_init = 0;
+	new_ebuild->selected = 0;
 	
 	new_ebuild->category = atom_parsed->category;
 	new_ebuild->pn = atom_parsed->name;
@@ -172,7 +175,21 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 	return 0;
 }
 
-Ebuild* atom_resolve_ebuild(Repository* repo, P_Atom* atom, arch_t target) {
+Ebuild* atom_resolve_ebuild(Emerge* emerge, P_Atom* atom) {
+	Repository* repo = NULL;
+	for (Repository* current = emerge->repo; current; current = current->next) {
+		if (strcmp(atom->repository, current->name) == 0) {
+			repo = current;
+			break;
+		}
+	}
+	
+	if (!repo) {
+		errno = EINVAL;
+		plog_error("Repository not found %s", atom->repository);
+		return NULL;
+	}
+	
 	Package* target_pkg = map_get(repo->packages, atom->key);
 	if (!target_pkg) {
 		plog_warn("Package '%s' not found", atom->key);
@@ -187,9 +204,9 @@ Ebuild* atom_resolve_ebuild(Repository* repo, P_Atom* atom, arch_t target) {
 				package_metadata_init(current);
 			for (Keyword* keyword = target_pkg->keywords; keyword; keyword = keyword->next)
 				if (atom_match_ebuild(current, keyword->atom))
-					if (keyword->keywords[target] < accept_keyword)
-						accept_keyword = keyword->keywords[target];
-			if (current->keywords[target] >= accept_keyword)
+					if (keyword->keywords[emerge->target_arch] < accept_keyword)
+						accept_keyword = keyword->keywords[emerge->target_arch];
+			if (current->keywords[emerge->target_arch] >= accept_keyword)
 				return current;
 		}
 	}
@@ -197,19 +214,84 @@ Ebuild* atom_resolve_ebuild(Repository* repo, P_Atom* atom, arch_t target) {
 	return NULL;
 }
 
-DependencyTree* package_resolve_dependencies(Emerge* emerge, char* atom) {
-	P_Atom* res_atom = atom_parse(atom);
-	if (!res_atom) {
-		errno = EINVAL;
-		plog_error("Invalid atom: %s", atom);
-		return NULL;
-	}
-	
-	Repository* repo = emerge->repo;
-	
-	DependencyTree* out = malloc(sizeof(DependencyTree));
-	
-	
+PortageDependency* dependency_new(Ebuild* e, P_Atom* p) {
+	PortageDependency* out = malloc(sizeof(PortageDependency));
+	out->target = e;
+	out->selector = p;
 	
 	return out;
+}
+
+void dependency_add(DependencyTree* parent, Emerge* emerge, P_Atom* atom, depend_tree_t where) {
+	PortageDependency* temp;
+	Ebuild* e = atom_resolve_ebuild(emerge, atom);
+	if (!e) {
+		plog_warn("Atom %s could not be resolved to an ebuild");
+		return;
+	}
+	
+	if (e->selected)
+		return;
+	
+	temp = dependency_new(e, atom);
+	switch (where) {
+		case DEPEND_TREE_BDEPEND:
+			temp->next = parent->bdepend;
+			parent->bdepend = temp;
+			break;
+		case DEPEND_TREE_DEPEND:
+			temp->next = parent->depend;
+			parent->depend = temp;
+			break;
+		case DEPEND_TREE_RDEPEND:
+			temp->next = parent->rdepend;
+			parent->rdepend = temp;
+			break;
+		case DEPEND_TREE_PDEPEND:
+			temp->next = parent->pdepend;
+			parent->pdepend = temp;
+			break;
+		default:
+			break;
+	}
+	
+	if (e->bdepend)
+		dependency_resolve(parent, emerge, e, e->bdepend, DEPEND_TREE_BDEPEND);
+	if (e->depend)
+		dependency_resolve(parent, emerge, e, e->bdepend, DEPEND_TREE_DEPEND);
+	if (e->rdepend)
+		dependency_resolve(parent, emerge, e, e->bdepend, DEPEND_TREE_RDEPEND);
+	if (e->pdepend)
+		dependency_resolve(parent, emerge, e, e->bdepend, DEPEND_TREE_PDEPEND);
+}
+
+void dependency_resolve(DependencyTree* parent, Emerge* emerge, Ebuild* current_ebuild, Dependency* depends,
+                        depend_tree_t where) {
+	PortageDependency* temp;
+	Ebuild* e;
+	
+	if (depends->depends == HAS_DEPENDS) {
+		/*
+		 * USE_DISABLE, //!< !
+		 * USE_ENABLE, //!< ?
+		 * USE_LEAST_ONE, //!< ||
+		 */
+		
+		if (depends->selector == USE_DISABLE || depends->selector == USE_ENABLE) {
+			if (depends->selector == package_check_use(current_ebuild, depends->target)) {
+				for (Dependency* d = depends->selectors; d; d = d->next) {
+					if (d->selector == HAS_DEPENDS)
+						dependency_resolve(parent, emerge, current_ebuild, d, where);
+					else
+						dependency_add(parent, emerge, d->atom, where);
+				}
+			}
+		}
+		if (depends->selector == USE_LEAST_ONE) {
+		
+		}
+	}
+	else {
+		dependency_add(parent, emerge, depends->atom, where);
+	}
 }

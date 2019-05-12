@@ -11,11 +11,10 @@
 #include "portage_log.h"
 #include "manifest.h"
 #include "emerge.h"
+#include "database.h"
 #include <string.h>
 
-
-static Repository* repo_main;
-static Emerge* emerge_main;
+Emerge* emerge_main;
 
 void set_quiet(Opt* opt, char* arg) {
 	emerge_main->options |= EMERGE_QUIET;
@@ -65,12 +64,17 @@ void print_help_wrapper(Opt* op, char* arg) {
 }
 
 int main (int argc, char** argv) {
-	emerge_main = emerge_new();
+	
+	Emerge* __emerge_main = emerge_new();
+	emerge_main = __emerge_main;
 	//emerge_main->repo = repository_new();
 	
 	emerge_main->atoms = opt_handle(opt_handlers, argc, argv + 1);
-	emerge_main->repo = emerge_repos_conf(emerge_main);
+	emerge_main->repo = emerge_repos_conf(__emerge_main);
 	
 	OpenSSL_add_all_digests();
-	return emerge(emerge_main);
+	
+	PortageDB* portdb = portagedb_read(__emerge_main);
+	
+	return emerge(__emerge_main);
 }

@@ -5,11 +5,14 @@
 #ifndef AUTOGENTOO_REQUIRE_USE_H
 #define AUTOGENTOO_REQUIRE_USE_H
 
+#include "constants.h"
+#include "atom.h"
 
-typedef struct __RequiredUse RequiredUse;
-typedef struct __IUSE IUSE;
-
-#include "package.h"
+struct __UseFlag {
+	char* name;
+	use_select_t status; // Only USE_DISABLE and USE_ENABLE
+	UseFlag* next;
+};
 
 struct __RequiredUse {
 	char* target;
@@ -18,6 +21,7 @@ struct __RequiredUse {
 	RequiredUse* next;
 };
 
+use_select_t package_check_use(Ebuild* ebuild, char* useflag);
 RequiredUse* use_build_required_use(char* target, use_select_t option);
 
 #endif //AUTOGENTOO_REQUIRE_USE_H

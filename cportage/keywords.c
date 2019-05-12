@@ -10,6 +10,10 @@
 #include <errno.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <autogentoo/hacksaw/map.h>
+#include "portage.h"
+#include "directory.h"
+#include <unistd.h>
 
 arch_t get_arch(char* search) {
 	if (!search)
@@ -87,49 +91,18 @@ void emerge_parse_keywords(Emerge* emerge) {
 	char path[256];
 	sprintf(path, "%s/etc/portage/package.accept_keywords", emerge->root);
 	
-	struct stat st;
-	if (stat(path, &st) == -1) {
-		if (errno == ENOENT)
-			return;
-		plog_error("Failed to open %s", path);
-		return;
-	}
+	FPNode* files = open_directory(path);
+	FPNode* old;
 	
-	struct fp_node {
-		FILE* fp;
-		struct fp_node* next;
-	}* files = malloc(sizeof(struct fp_node));
-	
-	struct fp_node *current = files;
-	current->fp = NULL;
-	
-	if (!S_ISREG(st.st_mode)) {
-		int dir_fd = open(path, O_RDONLY);
-		
-		DIR *d;
-		struct dirent *dir;
-		d = opendir(path);
-		if (d) {
-			while ((dir = readdir(d)) != NULL) {
-				
-				int fd_temp = openat(dir_fd, dir->d_name, O_RDONLY);
-				if (fd_temp < 0)
-					continue;
-				current->fp = fdopen(fd_temp, "r");
-				current->next = malloc(sizeof(struct fp_node));
-				current->next->fp = NULL;
-				current = current->next;
-				current->next = NULL;
-			}
-			closedir(d);
+	for (FPNode* current = files; current->fp;) {
+		if (current->type == FP_NODE_DIR) {
+			close(current->dirfd);
+			old = current;
+			current = current->next;
+			free(old);
+			continue;
 		}
-	}
-	else {
-		files->fp = fopen(path, "r");
-		files->next = NULL;
-	}
-	
-	for (current = files; current->fp;) {
+		
 		Keyword* current_keyword = accept_keyword_parse(current->fp);
 		while (current_keyword) {
 			Package* target = map_get(emerge->repo->packages, current_keyword->atom->key);
@@ -143,9 +116,10 @@ void emerge_parse_keywords(Emerge* emerge) {
 			current_keyword = accept_keyword_parse(current->fp);
 		}
 		
-		struct fp_node* old = current;
+		fclose(current->fp);
+		
+		old = current;
 		current = current->next;
-		fclose(old->fp);
 		free(old);
 	}
 }

@@ -6,9 +6,7 @@
 #define AUTOGENTOO_MANIFEST_H
 
 #include <stdio.h>
-
-typedef struct __Manifest Manifest;
-typedef struct __ManifestHash ManifestHash;
+#include "constants.h"
 
 typedef enum {
 	MANIFEST_IGNORE,
@@ -22,7 +20,6 @@ struct __ManifestHash {
 	ManifestHash* next;
 };
 
-#include "portage.h"
 
 struct __Manifest {
 	sha_hash gz_hash; // SHA512

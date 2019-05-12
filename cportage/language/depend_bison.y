@@ -107,8 +107,8 @@ atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); $$->def = ATOM_NO_
             | IDENTIFIER USE_DEFAULT{$$ = atomflag_build($1); $$->def = $2;}
             ;
 
-atom_repo   : atom_slot_rebuild REPOSITORY {$$ = $1; $$->repository = $2;}
-            | atom_slot_rebuild            {$$ = $1; $$->repository = strdup("gentoo");}
+atom_repo   : atom_slot_rebuild REPOSITORY {$$ = $1; free($$->repository); $$->repository = $2;}
+            | atom_slot_rebuild            {$$ = $1;}
             ;
 
 atom_slot_rebuild:

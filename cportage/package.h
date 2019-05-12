@@ -5,15 +5,19 @@
 #ifndef AUTOGENTOO_PACKAGE_H
 #define AUTOGENTOO_PACKAGE_H
 
-typedef struct __Package Package;
-typedef struct __Ebuild Ebuild;
-
 #include <autogentoo/hacksaw/vector.h>
 #include <stdint.h>
 #include <autogentoo/hacksaw/string_vector.h>
 #include "constants.h"
 #include "atom.h"
 #include "keywords.h"
+
+typedef enum {
+	DEPEND_TREE_DEPEND,
+	DEPEND_TREE_BDEPEND,
+	DEPEND_TREE_RDEPEND,
+	DEPEND_TREE_PDEPEND,
+} depend_tree_t;
 
 struct __Package {
 	uint32_t hash;
@@ -28,6 +32,7 @@ struct __Package {
 
 #include "use.h"
 #include "manifest.h"
+#include "portage_log.h"
 
 /**
  * Version of a specfic package, this is what is built
@@ -51,7 +56,7 @@ struct __Ebuild {
 	Dependency* rdepend;
 	Dependency* pdepend; //!< Post install dependencies so no circular depends
 	
-	Vector* use; //!< Read iuse, then apply globals (make.conf), then package.use
+	UseFlag* use; //!< Read iuse, then apply globals (make.conf), then package.use
 	Vector* feature_restrict;
 	keyword_t keywords[ARCH_END];
 	
@@ -67,18 +72,25 @@ struct __Ebuild {
 	Manifest* category_manifest;
 	int metadata_init;
 	
+	int selected;
+	
 	Ebuild* older;
 	Ebuild* newer;
 };
 
 struct __DependencyTree {
-	DependencyTree* head;
-	DependencyTree* tail;
+	PortageDependency* bdepend;
+	PortageDependency* depend;
+	PortageDependency* rdepend;
+	PortageDependency* pdepend;
 	
-	DependencyTree* next;
-	DependencyTree* back;
+};
+
+struct __PortageDependency {
+	PortageDependency* next;
 	
-	Ebuild* depend;
+	Ebuild* target;
+	P_Atom* selector;
 };
 
 Dependency* dependency_build_atom(P_Atom* atom);
@@ -86,8 +98,10 @@ Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* 
 
 void package_metadata_init(Ebuild* ebuild);
 Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man);
-
-Ebuild* atom_resolve_ebuild(Repository* repo, P_Atom* atom, arch_t target);
-DependencyTree* package_resolve_dependencies(Emerge* emerge, char* atom);
+Ebuild* atom_resolve_ebuild(Emerge* emerge, P_Atom* atom);
+void dependency_resolve(DependencyTree* parent, Emerge* emerge, Ebuild* current_ebuild, Dependency* depends,
+                        depend_tree_t where);
+PortageDependency* dependency_new(Ebuild* e, P_Atom* p);
+void dependency_add(DependencyTree* parent, Emerge* emerge, P_Atom* atom, depend_tree_t where);
 
 #endif //AUTOGENTOO_PACKAGE_H

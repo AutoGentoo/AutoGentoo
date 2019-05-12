@@ -6,6 +6,7 @@
 
 #include "atom.h"
 #include "portage_log.h"
+#include "emerge.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -39,6 +40,7 @@ P_Atom* atom_new(char* input) {
 	
 	out->category = strdup(input);
 	out->name = strdup(cat_splt + 1);
+	out->repository = strdup(emerge_main->default_repo);
 	
 	asprintf(&out->key, "%s/%s", out->category, out->name);
 	
@@ -48,6 +50,7 @@ P_Atom* atom_new(char* input) {
 	out->sub_opts = ATOM_SLOT_IGNORE;
 	out->range = ATOM_VERSION_ALL;
 	out->blocks = ATOM_BLOCK_NONE;
+	out->next = NULL;
 	
 	return out;
 }

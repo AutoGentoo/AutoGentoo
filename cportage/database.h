@@ -9,38 +9,40 @@
 #include "portage.h"
 #include "package.h"
 
-typedef struct __Database Database;
-
-typedef enum {
-	DATABASE_STOP,
-	DATABASE_DEPEND,
-	DATABASE_EBUILD,
-} database_t;
-
-struct __Database {
-	FILE* target;
+struct __InstalledEbuild {
+	InstalledPackage* parent;
+	AtomVersion* version;
 	
-	Repository* repo;
+	char* repository;
+	
+	char* slot;
+	char* sub_slot;
+	atom_slot_t sub_opts;
+	
+	P_Atom* depend;
+	P_Atom* rdepend;
+	UseFlag* use;
+	
+	char* cflags;
+	char* cxxflags;
+	char* cbuild;
+	
+	InstalledEbuild* next;
 };
 
-int database_read_int(Database* db);
-char* database_read_str(Database* db);
-long database_read_long(Database* db);
+struct __InstalledPackage {
+	char* name;
+	char* category;
+	char* key;
+	
+	InstalledEbuild* installed;
+};
 
-void database_write_str(Database* db, char* str);
-void database_write_int(Database* db, int i);
-void database_write_long(Database* db, long l);
+struct __PortageDB {
+	char* path; // /var/db/pkg/
+	Map* installed; // KEY : category/name
+};
 
-Dependency* database_read_dependency(Database* db);
-void database_write_dependency(Database* db, Dependency* dp);
-
-Vector* database_read_vector(Database* db);
-void database_write_vector(Database* db, Vector* vec, char* template);
-
-Map* database_read_map(Database* db);
-void database_write_map(Database* db, Map* m);
-
-void database_read(Database* db);
-void database_write(Database* db);
+PortageDB* portagedb_read(Emerge* emerge);
 
 #endif //AUTOGENTOO_DATABASE_H

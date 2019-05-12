@@ -108,6 +108,8 @@ struct __P_Atom {
 	int revision;
 	
 	AtomFlag* useflags;
+	
+	P_Atom* next; // Only use if this a node
 };
 
 /**

@@ -5,10 +5,9 @@
 #ifndef AUTOGENTOO_EMERGE_H
 #define AUTOGENTOO_EMERGE_H
 
-typedef struct __Emerge Emerge;
-
 #include "atom.h"
-#include "portage.h"
+#include "constants.h"
+#include "cportage_defines.h"
 
 typedef enum {
 	EMERGE_NO_OPTS,
@@ -38,6 +37,8 @@ struct __Emerge {
 	sha_hash hash_package_use;
 	sha_hash hash_make_conf;
 };
+
+extern Emerge* emerge_main;
 
 Emerge* emerge_new();
 int emerge (Emerge* emg);
