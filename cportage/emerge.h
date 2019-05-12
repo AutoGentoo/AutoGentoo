@@ -5,9 +5,10 @@
 #ifndef AUTOGENTOO_EMERGE_H
 #define AUTOGENTOO_EMERGE_H
 
-#include "atom.h"
-
 typedef struct __Emerge Emerge;
+
+#include "atom.h"
+#include "portage.h"
 
 typedef enum {
 	EMERGE_NO_OPTS,
@@ -23,15 +24,19 @@ typedef enum {
 } emerge_opts_t;
 
 struct __Emerge {
+	char* default_repo;
 	Repository* repo;
-	char* atom; //!< Install argument
-	P_Atom* resolved_atom;
+	char** atoms; //!< Install arguments
 	char* root;
 	arch_t target_arch;
 	emerge_opts_t options;
 	
 	char* buildroot;
 	char* installroot;
+	
+	sha_hash hash_accept_keywords;
+	sha_hash hash_package_use;
+	sha_hash hash_make_conf;
 };
 
 Emerge* emerge_new();

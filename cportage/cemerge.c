@@ -47,10 +47,6 @@ void set_arch(Opt* opt, char* arg) {
 	}
 }
 
-void set_repodir(Opt* opt, char* args) {
-	emerge_main->repo->
-}
-
 void print_help_wrapper(Opt* op, char* arg);
 
 Opt opt_handlers[] = {
@@ -60,7 +56,6 @@ Opt opt_handlers[] = {
 		{'h', "help",    "Print the help message and exit", print_help_wrapper, OPT_SHORT | OPT_LONG},
 		{0,   "installroot", "Path to the root of install environment", set_installroot, OPT_LONG | OPT_ARG},
 		{0,   "target", "Target architecture", set_arch, OPT_LONG | OPT_ARG},
-		{0,   "repodir", "Directory to metadata of repository", set_arch, OPT_LONG | OPT_ARG},
 		{0, NULL, NULL, NULL, (opt_opts_t) 0}
 };
 
@@ -71,41 +66,11 @@ void print_help_wrapper(Opt* op, char* arg) {
 
 int main (int argc, char** argv) {
 	emerge_main = emerge_new();
-	emerge_main->repo = repository_new("gentoo", emerge_main->root, "etc/portage");
+	//emerge_main->repo = repository_new();
 	
-	char** emerge_atoms = opt_handle(opt_handlers, argc, argv + 1);
+	emerge_main->atoms = opt_handle(opt_handlers, argc, argv + 1);
+	emerge_main->repo = emerge_repos_conf(emerge_main);
 	
 	OpenSSL_add_all_digests();
-	sha_hash test_hash;
-	int md_len;
-	
-	PLOG_BENCHMARK(md_len = portage_get_hash(&test_hash, "/etc/portage/make.conf", EVP_sha256());, "PORTAGE_GET_HASH")
-	
-	Manifest* category_manifest;
-	PLOG_BENCHMARK({
-		category_manifest = manifest_metadata_parse("test");
-	}, "CATEGORY_MANIFEST")
-	
-	PLOG_BENCHMARK({
-		manifest_metadata_deep(category_manifest);
-	}, "ALL_MANIFEST")
-	
-	
-	Manifest* current_cat;
-	Manifest* current_pkg;
-	
-	PLOG_BENCHMARK({
-		for (current_cat = category_manifest; current_cat; current_cat = current_cat->next) {
-			for(current_pkg = current_cat->parsed; current_pkg; current_pkg = current_pkg->next) {
-				package_init(emerge_main->repo, current_cat, current_pkg);
-			}
-		}
-	}, "PKG_INIT")
-	
-	Package* gcc = (Package*)map_get(emerge_main->repo->packages, "sys-devel/gcc");
-	repository_parse_keywords(emerge_main->repo);
-	
-	Ebuild* gcc_resolve = atom_resolve_ebuild(emerge_main->repo, atom_parse("<=sys-devel/gcc-8.3.0"), emerge_main->target_arch);
-	printf("%s-r%d\n", gcc_resolve->version->full_version, gcc_resolve->revision);
-	return 0;
+	return emerge(emerge_main);
 }

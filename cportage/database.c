@@ -277,9 +277,9 @@ void database_read(Database* db) {
 	}
 	
 	db->repo->name = database_read_str(db);
-	db->repo->hash_make_conf = (unsigned char*)database_read_str(db);
-	db->repo->hash_accept_keywords = (unsigned char*)database_read_str(db);
-	db->repo->hash_package_use = (unsigned char*)database_read_str(db);
+	//db->repo->hash_make_conf = (unsigned char*)database_read_str(db);
+	//db->repo->hash_accept_keywords = (unsigned char*)database_read_str(db);
+	//db->repo->hash_package_use = (unsigned char*)database_read_str(db);
 	
 	db->repo->packages = database_read_map(db);
 }
@@ -290,8 +290,8 @@ void database_write(Database* db) {
 	db->target = fopen("autogentoo.db", "w+");
 	
 	database_write_str(db, db->repo->name);
-	database_write_str(db, (char*)db->repo->hash_make_conf);
-	database_write_str(db, (char*)db->repo->hash_accept_keywords);
-	database_write_str(db, (char*)db->repo->hash_package_use);
+	//database_write_str(db, (char*)db->repo->hash_make_conf);
+	//database_write_str(db, (char*)db->repo->hash_accept_keywords);
+	//database_write_str(db, (char*)db->repo->hash_package_use);
 	database_write_map(db, db->repo->packages);
 }

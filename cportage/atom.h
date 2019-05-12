@@ -93,6 +93,7 @@ struct __AtomFlag {
 struct __P_Atom {
 	char* category;
 	char* name;
+	char* repository; //!< Default is gentoo
 	
 	char* key;
 	
@@ -126,26 +127,12 @@ struct __Dependency {
 	Dependency* next;
 };
 
-#include "package.h"
-
-struct __DependencyTree {
-	DependencyTree* head;
-	DependencyTree* tail;
-	
-	DependencyTree* next;
-	DependencyTree* back;
-	
-	Ebuild* depend;
-};
 
 P_Atom* atom_new(char* input);
 AtomVersion* atom_version_new(char* version_str);
 void atomversion_free(AtomVersion* parent);
 void atom_free(P_Atom* ptr);
 void atomflag_free(AtomFlag* parent);
-
-Dependency* dependency_build_atom(P_Atom* atom);
-Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* selector);
 
 AtomFlag* atomflag_build(char* name);
 

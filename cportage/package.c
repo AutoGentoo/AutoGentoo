@@ -197,7 +197,15 @@ Ebuild* atom_resolve_ebuild(Repository* repo, P_Atom* atom, arch_t target) {
 	return NULL;
 }
 
-DependencyTree* package_resolve_dependencies(char* atom) {
+DependencyTree* package_resolve_dependencies(Emerge* emerge, char* atom) {
+	P_Atom* res_atom = atom_parse(atom);
+	if (!res_atom) {
+		errno = EINVAL;
+		plog_error("Invalid atom: %s", atom);
+		return NULL;
+	}
+	
+	Repository* repo = emerge->repo;
 	
 	DependencyTree* out = malloc(sizeof(DependencyTree));
 	

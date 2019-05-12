@@ -62,6 +62,7 @@ FILE* fread_archive(char* path, int dirfd, char* verify_sha) {
 	
 	int b_fd = openat(dirfd, buffer_file, O_RDWR | O_CREAT | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 	if (b_fd < 0) {
+		plog_error("Failed to open buffer file %s", buffer_file);
 		return NULL;
 	}
 	fp = fdopen(b_fd, "w+");

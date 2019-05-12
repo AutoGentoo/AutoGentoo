@@ -51,10 +51,12 @@ identifier      ({letter}|{digit}|_|\+|\*|\-)+
 atom            {identifier}\/{identifier}(\-{version})?
 slotname        ({letter}|{digit}|"_")({letter}|{digit}|"_"|"-"|"."|"+")*
 slot            [\:]({slotname}(\/{slotname})?)?
+repo            [\:][\:]{identifier}
 
 %%
 [\n]                    {yylineno++;}
 [ \t\r\\]+              ;
+{repo}                  {yylval.identifier = strdup(yytext + 2); return REPOSITORY;}
 {slot}                  {
                             char* name_splt = strchr(yytext + 1, '/');
                             if (name_splt)

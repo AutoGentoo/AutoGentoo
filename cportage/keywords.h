@@ -34,12 +34,12 @@ static struct __keyword_link_strct {
 		{ARCH_END, ""}
 };
 
-#include "portage.h"
+#include "emerge.h"
 
 arch_t get_arch(char* search);
 void keyword_parse(keyword_t* out, char* line);
 Keyword* accept_keyword_parse(FILE* fp);
 void keyword_free(Keyword* keyword);
-void repository_parse_keywords(Repository* repo);
+void emerge_parse_keywords(Emerge* emerge);
 
 #endif //AUTOGENTOO_KEYWORDS_H

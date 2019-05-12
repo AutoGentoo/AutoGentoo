@@ -7,6 +7,7 @@
 #include "atom.h"
 #include "portage_log.h"
 #include <string.h>
+#include <stdlib.h>
 
 P_Atom* atom_new(char* input) {
 	P_Atom* out = malloc(sizeof(P_Atom));

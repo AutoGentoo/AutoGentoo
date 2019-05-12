@@ -42,6 +42,7 @@ void yyerror(const char *message);
 }
 
 %token <identifier> IDENTIFIER
+%token <identifier> REPOSITORY
 %token <atom_type> ATOM
 %token END_OF_FILE
 %token <use_default> USE_DEFAULT;
@@ -52,6 +53,7 @@ void yyerror(const char *message);
 %type <atom_type> atom_block
 %type <atom_type> atom_slot_rebuild
 %type <atom_type> atom_slot
+%type <atom_type> atom_repo
 %type <atom_type> atom
 %type <atom_flag> atom_flags
 %type <atom_flag> atom_flag
@@ -88,8 +90,8 @@ use_expr: '!' IDENTIFIER        {$$.target = $2; $$.t = USE_DISABLE;}
         | IDENTIFIER            {$$.target = $1; $$.t = USE_ENABLE;}
         ;
 
-atom        : atom_slot_rebuild '[' atom_flags ']' {$$->useflags = $3;}
-            | atom_slot_rebuild
+atom        : atom_repo '[' atom_flags ']' {$$->useflags = $3;}
+            | atom_repo
             ;
 
 atom_flags  : '!' atom_flag '?'     {$$ = $2; $$->option = ATOM_USE_DISABLE_IF_OFF;}
@@ -103,11 +105,17 @@ atom_flags  : '!' atom_flag '?'     {$$ = $2; $$->option = ATOM_USE_DISABLE_IF_O
 
 atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); $$->def = ATOM_NO_DEFAULT;}
             | IDENTIFIER USE_DEFAULT{$$ = atomflag_build($1); $$->def = $2;}
+            ;
+
+atom_repo   : atom_slot_rebuild REPOSITORY {$$ = $1; $$->repository = $2;}
+            | atom_slot_rebuild            {$$ = $1; $$->repository = strdup("gentoo");}
+            ;
 
 atom_slot_rebuild:
               atom_slot '='         {$$ = $1; $$->sub_opts = ATOM_SLOT_REBUILD;}
             | atom_slot '*'         {$$ = $1; $$->sub_opts = ATOM_SLOT_IGNORE;}
             | atom_slot             {$$ = $1; $$->sub_opts = ATOM_SLOT_IGNORE;}
+            ;
 
 atom_slot   : atom_block SLOT           {
                                             $$ = $1;
@@ -116,6 +124,7 @@ atom_slot   : atom_block SLOT           {
                                                 $$->sub_slot = $2.sub_name;
                                         }
             | atom_block                {$$ = $1; $$->slot = NULL;}
+            ;
 
 atom_block  :      '!' atom_version     {$$ = $2; $$->blocks = ATOM_BLOCK_SOFT;}
             |  '!' '!' atom_version     {$$ = $3; $$->blocks = ATOM_BLOCK_HARD;}

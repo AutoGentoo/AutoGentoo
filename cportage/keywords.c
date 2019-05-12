@@ -83,9 +83,9 @@ Keyword* accept_keyword_parse(FILE* fp) {
 	return keyword;
 }
 
-void repository_parse_keywords(Repository* repo) {
+void emerge_parse_keywords(Emerge* emerge) {
 	char path[256];
-	sprintf(path, "%s/%s/package.accept_keywords", repo->root_path, repo->conf_dir);
+	sprintf(path, "%s/etc/portage/package.accept_keywords", emerge->root);
 	
 	struct stat st;
 	if (stat(path, &st) == -1) {
@@ -132,7 +132,7 @@ void repository_parse_keywords(Repository* repo) {
 	for (current = files; current->fp;) {
 		Keyword* current_keyword = accept_keyword_parse(current->fp);
 		while (current_keyword) {
-			Package* target = map_get(repo->packages, current_keyword->atom->key);
+			Package* target = map_get(emerge->repo->packages, current_keyword->atom->key);
 			if (!target) {
 				plog_warn("Package %s not found (package.accept_keywords)", current_keyword->atom->key);
 				keyword_free(current_keyword);

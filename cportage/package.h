@@ -71,15 +71,23 @@ struct __Ebuild {
 	Ebuild* newer;
 };
 
+struct __DependencyTree {
+	DependencyTree* head;
+	DependencyTree* tail;
+	
+	DependencyTree* next;
+	DependencyTree* back;
+	
+	Ebuild* depend;
+};
 
-#include "database.h"
-#include "manifest.h"
-
+Dependency* dependency_build_atom(P_Atom* atom);
+Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* selector);
 
 void package_metadata_init(Ebuild* ebuild);
 Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man);
 
 Ebuild* atom_resolve_ebuild(Repository* repo, P_Atom* atom, arch_t target);
-DependencyTree* package_resolve_dependencies(char* atom);
+DependencyTree* package_resolve_dependencies(Emerge* emerge, char* atom);
 
 #endif //AUTOGENTOO_PACKAGE_H
