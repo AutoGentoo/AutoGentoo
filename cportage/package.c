@@ -94,7 +94,7 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	new_ebuild->atom_manifest = atom_man;
 	
 	new_ebuild->metadata_init = 0;
-	new_ebuild->selected = 0;
+	new_ebuild->resolved = 0;
 	
 	new_ebuild->category = atom_parsed->category;
 	new_ebuild->pn = atom_parsed->name;
@@ -222,76 +222,74 @@ PortageDependency* dependency_new(Ebuild* e, P_Atom* p) {
 	return out;
 }
 
-void dependency_add(DependencyTree* parent, Emerge* emerge, P_Atom* atom, depend_tree_t where) {
-	PortageDependency* temp;
-	Ebuild* e = atom_resolve_ebuild(emerge, atom);
-	if (!e) {
-		plog_warn("Atom %s could not be resolved to an ebuild");
+void dependency_resolve_ebuild(Emerge* emerge, Ebuild* ebuild) {
+	if (ebuild->resolved)
 		return;
+	if (!ebuild->metadata_init)
+		package_metadata_init(ebuild);
+	if (ebuild->bdepend || ebuild->rdepend || ebuild->depend) {
+		if (emerge->build_opts == EMERGE_RUNSIDE)
+			ebuild->dependency_resolved = dependency_resolve(emerge, ebuild, ebuild->rdepend, NULL);
+		else if (emerge->build_opts == EMERGE_BUILDSIDE) {
+			ebuild->dependency_resolved = dependency_resolve(emerge, ebuild, ebuild->rdepend, NULL);
+			ebuild->dependency_resolved = dependency_resolve(emerge, ebuild, ebuild->depend, ebuild->dependency_resolved);
+			ebuild->dependency_resolved = dependency_resolve(emerge, ebuild, ebuild->bdepend, ebuild->dependency_resolved);
+		}
 	}
-	
-	if (e->selected)
-		return;
-	
-	temp = dependency_new(e, atom);
-	switch (where) {
-		case DEPEND_TREE_BDEPEND:
-			temp->next = parent->bdepend;
-			parent->bdepend = temp;
-			break;
-		case DEPEND_TREE_DEPEND:
-			temp->next = parent->depend;
-			parent->depend = temp;
-			break;
-		case DEPEND_TREE_RDEPEND:
-			temp->next = parent->rdepend;
-			parent->rdepend = temp;
-			break;
-		case DEPEND_TREE_PDEPEND:
-			temp->next = parent->pdepend;
-			parent->pdepend = temp;
-			break;
-		default:
-			break;
+	else
+		ebuild->dependency_resolved = NULL;
+	if (ebuild->pdepend && emerge->build_opts == EMERGE_BUILDSIDE) {
+		ebuild->pdependency_resolved = dependency_resolve(emerge, ebuild, ebuild->pdepend, NULL);
 	}
-	
-	if (e->bdepend)
-		dependency_resolve(parent, emerge, e, e->bdepend, DEPEND_TREE_BDEPEND);
-	if (e->depend)
-		dependency_resolve(parent, emerge, e, e->bdepend, DEPEND_TREE_DEPEND);
-	if (e->rdepend)
-		dependency_resolve(parent, emerge, e, e->bdepend, DEPEND_TREE_RDEPEND);
-	if (e->pdepend)
-		dependency_resolve(parent, emerge, e, e->bdepend, DEPEND_TREE_PDEPEND);
+	else
+		ebuild->pdependency_resolved = NULL;
 }
 
-void dependency_resolve(DependencyTree* parent, Emerge* emerge, Ebuild* current_ebuild, Dependency* depends,
-                        depend_tree_t where) {
-	PortageDependency* temp;
-	Ebuild* e;
+PortageDependency*
+dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends, PortageDependency* next) {
+	PortageDependency* last = next;
+	/*
+	 * USE_DISABLE, //!< !
+	 * USE_ENABLE, //!< ?
+	 * USE_LEAST_ONE, //!< ||
+	 */
 	
-	if (depends->depends == HAS_DEPENDS) {
-		/*
-		 * USE_DISABLE, //!< !
-		 * USE_ENABLE, //!< ?
-		 * USE_LEAST_ONE, //!< ||
-		 */
-		
-		if (depends->selector == USE_DISABLE || depends->selector == USE_ENABLE) {
-			if (depends->selector == package_check_use(current_ebuild, depends->target)) {
-				for (Dependency* d = depends->selectors; d; d = d->next) {
-					if (d->selector == HAS_DEPENDS)
-						dependency_resolve(parent, emerge, current_ebuild, d, where);
-					else
-						dependency_add(parent, emerge, d->atom, where);
+	PortageDependency** out_ptr = &last;
+	PortageDependency* current;
+	Ebuild* target;
+	for (Dependency* c_d = depends; c_d; c_d = c_d->next) {
+		if (c_d->depends == HAS_DEPENDS) {
+			if ((depends->selector == USE_DISABLE || depends->selector == USE_ENABLE)
+			     && depends->selector == package_check_use(current_ebuild, depends->target)) {
+				target = atom_resolve_ebuild(emerge, c_d->atom);
+				if (!target) {
+					plog_warn("Could not find package atom %s", c_d->atom->key);
+					continue;
 				}
+				
+				current = malloc(sizeof(PortageDependency));
+				current->next = *out_ptr;
+				(*out_ptr) = current;
+				
+				current->selector = c_d->atom;
+				current->target = target;
+			}
+			else if (depends->selector == USE_LEAST_ONE) {
+			
 			}
 		}
-		if (depends->selector == USE_LEAST_ONE) {
-		
+		else {
+			current = malloc(sizeof(PortageDependency));
+			current->next = *out_ptr;
+			(*out_ptr) = current;
+			
+			current->selector = c_d->atom;
+			current->target = atom_resolve_ebuild(emerge, current->selector);
+			if (!current->target) {
+				plog_warn("Could not find package atom %s", current->selector->key);
+			}
 		}
 	}
-	else {
-		dependency_add(parent, emerge, depends->atom, where);
-	}
+	
+	return *out_ptr;
 }

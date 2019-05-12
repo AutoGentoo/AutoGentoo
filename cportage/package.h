@@ -12,13 +12,6 @@
 #include "atom.h"
 #include "keywords.h"
 
-typedef enum {
-	DEPEND_TREE_DEPEND,
-	DEPEND_TREE_BDEPEND,
-	DEPEND_TREE_RDEPEND,
-	DEPEND_TREE_PDEPEND,
-} depend_tree_t;
-
 struct __Package {
 	uint32_t hash;
 	
@@ -33,6 +26,19 @@ struct __Package {
 #include "use.h"
 #include "manifest.h"
 #include "portage_log.h"
+
+/**
+ *              TOP
+ *             /   \
+ *           self  next
+ *         /          \
+ *    self->target    next->target
+ */
+struct __PortageDependency {
+	Ebuild* target;
+	P_Atom* selector;
+	PortageDependency* next;
+};
 
 /**
  * Version of a specfic package, this is what is built
@@ -54,7 +60,11 @@ struct __Ebuild {
 	Dependency* depend;
 	Dependency* bdepend;
 	Dependency* rdepend;
-	Dependency* pdepend; //!< Post install dependencies so no circular depends
+	Dependency* pdepend; //!< Must be installed after this package is
+	
+	PortageDependency* dependency_resolved;
+	PortageDependency* pdependency_resolved;
+	int resolved;
 	
 	UseFlag* use; //!< Read iuse, then apply globals (make.conf), then package.use
 	Vector* feature_restrict;
@@ -72,25 +82,8 @@ struct __Ebuild {
 	Manifest* category_manifest;
 	int metadata_init;
 	
-	int selected;
-	
 	Ebuild* older;
 	Ebuild* newer;
-};
-
-struct __DependencyTree {
-	PortageDependency* bdepend;
-	PortageDependency* depend;
-	PortageDependency* rdepend;
-	PortageDependency* pdepend;
-	
-};
-
-struct __PortageDependency {
-	PortageDependency* next;
-	
-	Ebuild* target;
-	P_Atom* selector;
 };
 
 Dependency* dependency_build_atom(P_Atom* atom);
@@ -99,9 +92,9 @@ Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* 
 void package_metadata_init(Ebuild* ebuild);
 Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man);
 Ebuild* atom_resolve_ebuild(Emerge* emerge, P_Atom* atom);
-void dependency_resolve(DependencyTree* parent, Emerge* emerge, Ebuild* current_ebuild, Dependency* depends,
-                        depend_tree_t where);
+PortageDependency*
+dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends, PortageDependency* next);
+void dependency_resolve_ebuild(Emerge* emerge, Ebuild* ebuild);
 PortageDependency* dependency_new(Ebuild* e, P_Atom* p);
-void dependency_add(DependencyTree* parent, Emerge* emerge, P_Atom* atom, depend_tree_t where);
 
 #endif //AUTOGENTOO_PACKAGE_H

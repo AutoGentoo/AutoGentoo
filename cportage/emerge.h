@@ -22,6 +22,11 @@ typedef enum {
 	EMERGE_INSTALLROOT = 1 << 8,
 } emerge_opts_t;
 
+typedef enum {
+	EMERGE_RUNSIDE,
+	EMERGE_BUILDSIDE
+} emerge_build_t;
+
 struct __Emerge {
 	char* default_repo;
 	Repository* repo;
@@ -29,6 +34,7 @@ struct __Emerge {
 	char* root;
 	arch_t target_arch;
 	emerge_opts_t options;
+	emerge_build_t build_opts;
 	
 	char* buildroot;
 	char* installroot;
