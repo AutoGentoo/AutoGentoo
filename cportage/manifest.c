@@ -43,21 +43,17 @@ ManifestHash* manifest_parse_hash (FILE* fp, int delim) {
 }
 
 /** Parse metadata from /usr/portage/metadata */
-Manifest* manifest_metadata_parse_fp(FILE* fp, char* dir_path) {
-	char* line;
+Vector* manifest_metadata_parse_fp(FILE* fp, char* dir_path) {
+	char* line = malloc(512);
 	size_t read_size = 0;
-	size_t n = 0;
+	size_t n = 512;
 	
-	Manifest* out = NULL;
-	Manifest* temp;
+	Vector* out = vector_new(sizeof(Manifest*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	
-	while ((read_size = getline(&line, &n, fp)) > 0) {
-		if (line[0] == '\n') {
-			free(line);
+	while ((read_size = getline(&line, &n, fp)) != -1) {
+		if (line[0] == '\n')
 			continue;
-		}
-		line[n - 1] = 0; // Delete newline
-		
+		line[read_size - 1] = 0; // Delete newline
 		char* type_buff = strtok(line, " ");
 		manifest_t __type = -1;
 		
@@ -71,28 +67,29 @@ Manifest* manifest_metadata_parse_fp(FILE* fp, char* dir_path) {
 		
 		if (__type == -1) {
 			plog_error("MANIFEST type %s not found", type_buff);
-			free(line);
 			return out;
 		}
 		
-		temp = malloc(sizeof(Manifest));
+		Manifest* temp = malloc(sizeof(Manifest));
 		temp->type = __type;
-		temp->next = out;
-		out = temp;
+		temp->parsed = NULL;
 		
-		out->filename = strdup(strtok(NULL, " "));
-		out->len = atoi(strtok(NULL, " "));
+		temp->filename = strdup(strtok(NULL, " "));
+		temp->len = atoi(strtok(NULL, " "));
 		
-		asprintf(&out->full_path, "%s/%s", dir_path, out->filename);
-		out->parent_dir = strdup(dir_path);
-		
-		free(line);
+		asprintf(&temp->full_path, "%s/%s", dir_path, temp->filename);
+		temp->parent_dir = strdup(temp->full_path);
+		*(strrchr(temp->parent_dir, '/')) = 0;
+		vector_add(out, &temp);
 	}
+	
+	free(line);
+	fclose(fp);
 	
 	return out;
 }
 
-Manifest* manifest_metadata_parse(char* path) {
+Vector* manifest_metadata_parse(char* path) {
 	char* manifest_path;
 	asprintf(&manifest_path, "%s/Manifest.gz", path);
 	FILE* fp = fread_archive(manifest_path);
@@ -100,36 +97,26 @@ Manifest* manifest_metadata_parse(char* path) {
 	if (!fp)
 		return NULL;
 	
-	Manifest* out = manifest_metadata_parse_fp(fp, path);
-	
-	return out;
+	return manifest_metadata_parse_fp(fp, path);
 }
 
-void manifest_metadata_deep(Manifest* mans) {
+void manifest_metadata_deep(Vector* mans) {
 	Manifest* current;
 	
 	FILE* fp;
-	for (current = mans; current; current = current->next) {
-		char* target_path = strdup(current->filename);
-		*strchr(target_path, '/') = 0;
-		int target_dir = open(current->full_path, O_RDONLY | O_CLOEXEC);
-		if (target_dir < 0) {
-			plog_error("Failed to open directory %s", target_path);
-			free(target_path);
-			return;
-		}
-		free(target_path);
+	for (int i = 0; i < mans->n; i++) {
+		current = *(Manifest**)vector_get(mans, i);
 		
 		fp = fread_archive(current->full_path);
 		if (!fp) {
 			plog_error("Failed to open file %s", current->full_path);
 			return;
 		}
-		current->parsed = manifest_metadata_parse_fp(fp, mans->parent_dir);
+		current->parsed = manifest_metadata_parse_fp(fp, current->parent_dir);
 	}
 }
 
-void manifest_free_prv(Manifest* ptr) {
+void manifest_free(Manifest* ptr) {
 	free(ptr->filename);
 	free(ptr->parent_dir);
 	free(ptr->full_path);
@@ -146,17 +133,4 @@ void manifest_free_prv(Manifest* ptr) {
 	}
 	*/
 	free(ptr);
-}
-
-void manifest_free(Manifest* ptr) {
-	if (!ptr)
-		return;
-	
-	Manifest* next = NULL;
-	Manifest* temp = ptr;
-	while (temp) {
-		next = temp->next;
-		manifest_free_prv(temp);
-		temp = next;
-	}
 }

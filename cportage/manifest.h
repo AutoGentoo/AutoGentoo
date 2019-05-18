@@ -6,6 +6,7 @@
 #define AUTOGENTOO_MANIFEST_H
 
 #include <stdio.h>
+#include <autogentoo/hacksaw/vector.h>
 #include "constants.h"
 
 typedef enum {
@@ -28,8 +29,7 @@ struct __Manifest {
 	manifest_t type;
 	size_t len;
 	
-	Manifest* parsed;
-	Manifest* next;
+	Vector* parsed;
 };
 
 struct __manifest_type_link_t {
@@ -37,9 +37,9 @@ struct __manifest_type_link_t {
 	char* type_str;
 };
 
-Manifest* manifest_metadata_parse_fp(FILE* fp, char* dir_path);
-Manifest* manifest_metadata_parse(char* path);
-void manifest_metadata_deep(Manifest* mans);
+Vector* manifest_metadata_parse_fp(FILE* fp, char* dir_path);
+Vector* manifest_metadata_parse(char* path);
+void manifest_metadata_deep(Vector* mans);
 void manifest_free(Manifest* ptr);
 
 #endif //AUTOGENTOO_MANIFEST_H

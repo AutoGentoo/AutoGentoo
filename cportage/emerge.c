@@ -57,9 +57,12 @@ int emerge (Emerge* emerge) {
 	
 	Manifest* current_cat;
 	Manifest* current_pkg;
-	for (current_cat = emerge->repo->category_manifests; current_cat; current_cat = current_cat->next) {
-		for(current_pkg = current_cat->parsed; current_pkg; current_pkg = current_pkg->next)
+	for (int i = 0; i < emerge->repo->category_manifests->n; i++) {
+		current_cat = *(Manifest**)vector_get(emerge->repo->category_manifests, i);
+		for (int j = 0; j < current_cat->parsed->n; j++) {
+			current_pkg = *(Manifest**)vector_get(current_cat->parsed, j);
 			package_init(emerge->repo, current_cat, current_pkg);
+		}
 	}
 	
 	emerge_parse_keywords(emerge);

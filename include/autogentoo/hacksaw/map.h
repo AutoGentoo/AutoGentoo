@@ -23,6 +23,7 @@ typedef void (*free_function) (void*);
 struct __Map {
 	MapItem** hash_table; // similar to Vector position are arbitrary
 	int n; // Only need if we need to resize the array
+	int overlaps; // Number of key overlaps
 	size_t size; // Current size of map
 	size_t realloc_at; // Target size to trigger a reallocation
 	double threshold; // Upper bound percent full

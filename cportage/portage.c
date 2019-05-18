@@ -51,7 +51,7 @@ int portage_get_hash(sha_hash* target, char* path, const EVP_MD* algorithm) {
 Repository* repository_new() {
 	Repository* out = malloc(sizeof(Repository));
 	
-	out->packages = map_new(32768, 0.8);
+	out->packages = map_new(65536, 0.8);
 	out->location = NULL;
 	
 	out->masters = NULL;
@@ -121,7 +121,6 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 				(*current)->name = current_name;
 				(*current)->next = NULL;
 			}
-			free(line);
 			continue;
 		}
 		
@@ -129,7 +128,6 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 		char* value = strtok(NULL, "\n");
 		
 		if (!name || !value) {
-			free(line);
 			continue;
 		}
 		
@@ -148,7 +146,6 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 		if (strcmp(current_name, "DEFAULT") == 0) {
 			if (strcmp(name, "main-repo") == 0)
 				emerge->default_repo = strdup(value);
-			free(line);
 			continue;
 		}
 		
@@ -200,16 +197,15 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 			else
 				(*current)->auto_sync = 0;
 		}
-		
-		free(line);
 	}
+	free(line);
 	
 	return parent;
 }
 
 void repository_free(Repository* repo) {
 	Repository* curr = repo;
-	Repository* next;
+	Repository* next = NULL;
 	
 	while (curr) {
 		next = curr->next;
@@ -219,9 +215,17 @@ void repository_free(Repository* repo) {
 		free(curr->sync_type);
 		free(curr->sync_uri);
 		
-		for (Manifest* man = curr->category_manifests; man; man = man->next)
-			manifest_free(man->parsed);
-		manifest_free(curr->category_manifests);
+		for (int i = 0; i < curr->category_manifests->n; i++) {
+			Manifest* cat_man = *(Manifest**)vector_get(curr->category_manifests, i);
+			for (int j = 0; j < cat_man->parsed->n; j++) {
+				Manifest* atom_man = *(Manifest**)vector_get(cat_man->parsed, j);
+				manifest_free(atom_man);
+			}
+			vector_free(cat_man->parsed);
+			manifest_free(cat_man);
+		}
+		vector_free(curr->category_manifests);
+		
 		map_free(curr->packages, (void (*) (void*))package_free);
 		
 		free(curr);

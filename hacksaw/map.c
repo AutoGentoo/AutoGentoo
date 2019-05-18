@@ -17,31 +17,32 @@ Map* map_new(size_t new_size, double threshold) {
 	
 	out->hash_table = calloc(new_size, sizeof(MapItem*));
 	out->n = 0;
+	out->overlaps = 0;
 	
 	return out;
 }
 
 void prv_map_realloc_item (Map* map, MapItem* list) {
-	if (list->next == NULL) {
-		prv_map_insert_item (map, list);
+	if (!list)
 		return;
-	}
 	
 	prv_map_realloc_item(map, list->next);
 	list->next = NULL;
+	prv_map_insert_item (map, list);
 }
 
 void map_realloc(Map* map, size_t size) {
 	size_t old_size = map->size;
+	MapItem** old_table = map->hash_table;
 	
-	map->hash_table = realloc(map->hash_table, size * sizeof (MapItem*));
+	map->hash_table = calloc(size, sizeof (MapItem*));
 	map->size = size;
-	memset(map->hash_table + old_size * sizeof (MapItem*), 0, (map->size - old_size) * sizeof (MapItem*)); // Only set the new data to NULL
 	
 	int i;
-	for (i = 0; i < map->size; i++)
-		if (map->hash_table[i] != NULL)
+	for (i = 0; i < old_size; i++)
+		if (old_table[i] != NULL)
 			prv_map_realloc_item (map, map->hash_table[i]);
+		
 }
 
 StringVector* map_all_keys(Map* map) {
@@ -99,16 +100,10 @@ uint32_t prv_map_insert_item (Map* map, MapItem* item) {
 	uint32_t hash = map_get_hash(item->key, n);
 	uint32_t offset = hash % map->size;
 	
-	MapItem** current_pos = &map->hash_table[offset];
-	
-	if ((*current_pos) == NULL)
-		*current_pos = item;
-	else {
-		while ((*current_pos)->next != NULL)
-			current_pos = &(*current_pos)->next;
-		(*current_pos)->next = item;
-	}
-	
+	if (map->hash_table[offset] != NULL)
+		map->overlaps++;
+	item->next = map->hash_table[offset];
+	map->hash_table[offset] = item;
 	map->n++;
 	
 	return hash;
@@ -185,12 +180,12 @@ uint32_t map_get_hash(const void *data, size_t nbytes) {
 	return h;
 }
 
-static int call = 0;
-
-void prv_map_free_bucket (MapItem* item, free_function __free) {
-	if (item->next)
-		prv_map_free_bucket(item->next, __free);
-	printf("prv_map_free_bucket %d (%s)\n", call++, item->key);
+void prv_map_free_bucket(Map* map, MapItem* item, free_function __free) {
+	if (!item)
+		return;
+	
+	map->n--;
+	prv_map_free_bucket(map, item->next, __free);
 	free(item->key);
 	if (__free)
 		__free (item->data);
@@ -198,10 +193,8 @@ void prv_map_free_bucket (MapItem* item, free_function __free) {
 }
 
 void map_free (Map* map, free_function __free) {
-	printf("map_free\n");
-	for (int i = 0; i < map->size; i++)
-		if (map->hash_table[i])
-			prv_map_free_bucket (map->hash_table[i], __free);
+	for (int i = 0; i < map->size && map->n > 0; i++)
+		prv_map_free_bucket(map, map->hash_table[i], __free);
 	free (map->hash_table);
 	free (map);
 }

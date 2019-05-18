@@ -35,7 +35,7 @@ struct __Repository {
 	
 	int auto_sync; // true
 	
-	Manifest* category_manifests;
+	Vector* category_manifests;
 	Map* packages;
 	
 	Repository* next;

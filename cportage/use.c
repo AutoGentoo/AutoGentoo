@@ -115,7 +115,6 @@ int ebuild_check_required_use(Ebuild* ebuild) {
 
 UseFlag* useflag_new(char* name, use_select_t status) {
 	UseFlag* out = malloc(sizeof(UseFlag));
-	out->next = NULL;
 	if (status == USE_NONE) {
 		if (*name == '+') {
 			status = USE_ENABLE;
@@ -125,6 +124,7 @@ UseFlag* useflag_new(char* name, use_select_t status) {
 			status = USE_DISABLE;
 	}
 	
+	out->next = NULL;
 	out->name = strdup(name);
 	out->status = status;
 	

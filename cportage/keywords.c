@@ -61,30 +61,35 @@ void keyword_parse(keyword_t* out, char* line) {
 	free(line);
 }
 
-Keyword* accept_keyword_parse(FILE* fp) {
+Keyword* accept_keyword_parse(FILE* fp, Keyword** last) {
 	char* line = NULL;
 	size_t n = 0;
-	if (getline(&line, &n, fp) <= 0)
-		return NULL;
+	size_t read_size = 0;
 	
-	if (line[0] == '#' || line[0] == '\n' || line[0] == 0) {
-		free(line);
-		return accept_keyword_parse(fp);
+	Keyword* out = NULL;
+	Keyword* temp = NULL;
+	
+	while ((read_size = getline(&line, &n, fp)) != -1) {
+		if (line[0] == '#' || line[0] == '\n' || line[0] == 0)
+			continue;
+		char* atom_splt = strchr(line, ' ');
+		*atom_splt = 0;
+		char* atom = strdup(line);
+		
+		temp = malloc(sizeof(Keyword));
+		keyword_parse(temp->keywords, atom_splt + 1);
+		temp->atom = atom_parse(atom);
+		free(atom);
+		
+		if (!out)
+			*last = temp;
+		
+		temp->next = out;
+		out = temp;
 	}
-	
-	
-	char* atom_splt = strchr(line, ' ');
-	*atom_splt = 0;
-	char* atom = strdup(line);
-	
-	Keyword* keyword = malloc(sizeof(Keyword));
-	
-	keyword_parse(keyword->keywords, atom_splt + 1);
-	keyword->atom = atom_parse(atom);
-	free(atom);
 	free(line);
-	keyword->next = NULL;
-	return keyword;
+	
+	return out;
 }
 
 void emerge_parse_keywords(Emerge* emerge) {
@@ -93,6 +98,9 @@ void emerge_parse_keywords(Emerge* emerge) {
 	
 	FPNode* files = open_directory(path);
 	FPNode* old;
+	
+	Keyword* parsed = NULL;
+	Keyword* temp = NULL;
 	
 	for (FPNode* current = files; current;) {
 		if (current->type == FP_NODE_DIR) {
@@ -106,19 +114,11 @@ void emerge_parse_keywords(Emerge* emerge) {
 		}
 		
 		FILE* fp = fopen(current->path, "r");
-		Keyword* current_keyword = accept_keyword_parse(fp);
-		while (current_keyword) {
-			Package* target = map_get(emerge->repo->packages, current_keyword->atom->key);
-			if (!target) {
-				plog_warn("Package %s not found (package.accept_keywords)", current_keyword->atom->key);
-				keyword_free(current_keyword);
-				return;
-			}
-			current_keyword->next = target->keywords;
-			target->keywords = current_keyword;
-			current_keyword = accept_keyword_parse(fp);
-		}
+		Keyword* last;
+		temp = accept_keyword_parse(fp, &last);
 		
+		last->next = parsed;
+		parsed = temp;
 		fclose(fp);
 		
 		old = current;
@@ -127,6 +127,21 @@ void emerge_parse_keywords(Emerge* emerge) {
 		free(old->path);
 		current = current->next;
 		free(old);
+	}
+	
+	Keyword* next;
+	Keyword* current = parsed;
+	while (current) {
+		next = current->next;
+		Package* target = map_get(emerge->repo->packages, current->atom->key);
+		if (!target) {
+			plog_warn("Package %s not found (package.accept_keywords)", current->atom->key);
+			keyword_free(current);
+			return;
+		}
+		current->next = target->keywords;
+		target->keywords = current;
+		current = next;
 	}
 }
 

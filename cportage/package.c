@@ -104,6 +104,7 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	asprintf(&new_ebuild->pr, "r%d", atom_parsed->revision);
 	
 	new_ebuild->slot = NULL;
+	new_ebuild->sub_slot = NULL;
 	new_ebuild->version = atom_parsed->version;
 	
 	/* Cached in the database */
@@ -111,6 +112,9 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	new_ebuild->bdepend = NULL;
 	new_ebuild->rdepend = NULL;
 	new_ebuild->pdepend = NULL;
+	
+	new_ebuild->required_use = NULL;
+	new_ebuild->src_uri = NULL;
 	
 	new_ebuild->dependency_resolved = NULL;
 	new_ebuild->pdependency_resolved = NULL;
@@ -131,6 +135,8 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 				head->newer = new_ebuild;
 				if (head == target->ebuilds)
 					target->ebuilds = new_ebuild;
+				else
+					new_ebuild->newer->older = new_ebuild;
 				break;
 			}
 			if (!head->older) {
@@ -141,6 +147,8 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 		}
 	}
 	
+	free(atom_parsed->key);
+	free(atom_parsed->repository);
 	free(atom_parsed);
 	return new_ebuild;
 }
@@ -292,7 +300,6 @@ dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends, 
 }
 
 void package_free(Package* ptr) {
-	printf("pacakge_free (%s)\n", ptr->key);
 	free(ptr->key);
 	free(ptr->name);
 	free(ptr->category);
@@ -301,15 +308,16 @@ void package_free(Package* ptr) {
 	Keyword* curr_key = ptr->keywords;
 	while (curr_key) {
 		next_key = curr_key->next;
-		atom_free(curr_key->atom);
-		free(curr_key);
+		keyword_free(curr_key);
 		curr_key = next_key;
 	}
 	
 	Ebuild* next_eb = NULL;
-	for (Ebuild* eb = ptr->ebuilds; eb; eb = next_eb) {
+	Ebuild* eb = ptr->ebuilds;
+	while (eb) {
 		next_eb = eb->older;
 		ebuild_free(eb);
+		eb = next_eb;
 	}
 	
 	free(ptr);
@@ -320,8 +328,11 @@ Ebuild* ebuild_free(Ebuild* ptr) {
 	free(ptr->pn);
 	free(ptr->pv);
 	free(ptr->pr);
-	free(ptr->slot);
-	free(ptr->sub_slot);
+	
+	if (ptr->slot)
+		free(ptr->slot);
+	if (ptr->sub_slot)
+		free(ptr->sub_slot);
 	
 	dependency_free(ptr->depend);
 	dependency_free(ptr->bdepend);
