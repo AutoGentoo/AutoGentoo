@@ -185,10 +185,12 @@ uint32_t map_get_hash(const void *data, size_t nbytes) {
 	return h;
 }
 
-void prv_map_free_bucket (Map* map, MapItem* item, free_function __free) {
+static int call = 0;
+
+void prv_map_free_bucket (MapItem* item, free_function __free) {
 	if (item->next)
-		prv_map_free_bucket(map, item->next, __free);
-	
+		prv_map_free_bucket(item->next, __free);
+	printf("prv_map_free_bucket %d (%s)\n", call++, item->key);
 	free(item->key);
 	if (__free)
 		__free (item->data);
@@ -196,9 +198,10 @@ void prv_map_free_bucket (Map* map, MapItem* item, free_function __free) {
 }
 
 void map_free (Map* map, free_function __free) {
+	printf("map_free\n");
 	for (int i = 0; i < map->size; i++)
 		if (map->hash_table[i])
-			prv_map_free_bucket (map, map->hash_table[i], __free);
+			prv_map_free_bucket (map->hash_table[i], __free);
 	free (map->hash_table);
 	free (map);
 }

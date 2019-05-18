@@ -74,7 +74,12 @@ int main (int argc, char** argv) {
 	
 	OpenSSL_add_all_digests();
 	
-	PortageDB* portdb = portagedb_read(__emerge_main);
+	//PortageDB* portdb = portagedb_read(__emerge_main);
 	
-	return emerge(__emerge_main);
+	int out = emerge(__emerge_main);
+	
+	repository_free(__emerge_main->repo);
+	//portagedb_free(portdb);
+	
+	return out;
 }

@@ -2,6 +2,8 @@
 // Created by atuser on 5/12/19.
 //
 
+#define _GNU_SOURCE
+
 #include "directory.h"
 #include <errno.h>
 #include "portage_log.h"
@@ -12,7 +14,7 @@
 #include <dirent.h>
 #include <string.h>
 
-FPNode* open_directory_stat(mode_t st_mode, int buf_fd, char* path) {
+FPNode* open_directory_stat(mode_t st_mode, int buf_fd, char* parent, char* path) {
 	FPNode* files = NULL;
 	FPNode* temp;
 	if (S_ISDIR(st_mode)) {
@@ -21,25 +23,22 @@ FPNode* open_directory_stat(mode_t st_mode, int buf_fd, char* path) {
 		d = fdopendir(buf_fd);
 		if (d) {
 			while ((dir = readdir(d)) != NULL) {
-				int fd_temp = openat(buf_fd, dir->d_name, O_RDONLY);
-				if (fd_temp < 0)
+				if (dir->d_name[0] == '.')
 					continue;
-				struct stat c_st;
-				fstat(fd_temp, &c_st);
-				
 				temp = malloc(sizeof(FPNode));
 				temp->filename = strdup(dir->d_name);
-				temp->fp = NULL;
-				temp->dirfd = -1;
+				temp->parent_dir = strdup(parent);
+				if (path)
+					asprintf(&temp->path, "%s/%s/%s", parent, path, dir->d_name);
+				else
+					asprintf(&temp->path, "%s/%s", parent, dir->d_name);
+				struct stat c_st;
+				stat(temp->path, &c_st);
 				
-				if (S_ISREG(c_st.st_mode)) {
-					temp->fp = fdopen(fd_temp, "r");
+				if (S_ISREG(c_st.st_mode))
 					temp->type = FP_NODE_FILE;
-				}
-				else if (S_ISDIR(c_st.st_mode)) {
-					temp->dirfd = fd_temp;
+				else if (S_ISDIR(c_st.st_mode))
 					temp->type = FP_NODE_DIR;
-				}
 				
 				temp->next = files;
 				files = temp;
@@ -49,9 +48,7 @@ FPNode* open_directory_stat(mode_t st_mode, int buf_fd, char* path) {
 	}
 	else if (S_ISREG(st_mode)) {
 		files = malloc(sizeof(FPNode));
-		files->fp = fdopen(buf_fd, "r");
-		files->dirfd = -1;
-		files->filename = strdup(path);
+		files->filename = strdup(parent);
 		files->type = FP_NODE_FILE;
 		files->next = NULL;
 	}
@@ -69,22 +66,21 @@ FPNode* open_directory(char* path) {
 	}
 	
 	int buf_fd = open(path, O_RDONLY);
-	
-	return open_directory_stat(st.st_mode, buf_fd, path);
+	return open_directory_stat(st.st_mode, buf_fd, path, NULL);
 }
 
-FPNode* open_directory_at(int parent_dir, char* path) {
+FPNode* open_directory_at(int parent_dir, char* parent_path, char* path) {
 	if (parent_dir < 0)
 		return open_directory(path);
 	
 	struct stat st;
 	if (fstatat(parent_dir, path, &st, 0) == -1) {
-		if (errno == ENOENT)
-			return NULL;
 		plog_error("Failed to open %s", path);
 		return NULL;
 	}
 	
 	int buf_fd = openat(parent_dir, path, O_RDONLY);
-	return open_directory_stat(st.st_mode, buf_fd, path);
+	FPNode* out = open_directory_stat(st.st_mode, buf_fd, parent_path, path);
+	close(buf_fd);
+	return out;
 }

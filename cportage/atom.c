@@ -130,6 +130,8 @@ void atomversion_free(AtomVersion* parent) {
 }
 
 void atomflag_free(AtomFlag* parent) {
+	if (!parent)
+		return;
 	AtomFlag* next;
 	for (next = parent->next; parent; parent = next)
 		free(parent->name);
@@ -141,6 +143,40 @@ void atom_free(P_Atom* ptr) {
 	
 	free(ptr->category);
 	free(ptr->name);
+	free(ptr);
+}
+
+void dependency_free(Dependency* ptr) {
+	if (!ptr)
+		return;
+	
+	Dependency* next = NULL;
+	Dependency* temp = ptr;
+	while (temp) {
+		next = temp->next;
+		if (ptr->depends == IS_ATOM)
+			atom_free(ptr->atom);
+		else
+			free(ptr->target);
+		free(ptr);
+		temp = next;
+	}
+	
+	temp = ptr->selectors;
+	while (temp) {
+		next = temp->next;
+		if (ptr->depends == IS_ATOM)
+			atom_free(ptr->atom);
+		else
+			free(ptr->target);
+		free(ptr);
+		temp = next;
+	}
+	
+	if (ptr->depends == IS_ATOM)
+		atom_free(ptr->atom);
+	else
+		free(ptr->target);
 	free(ptr);
 }
 

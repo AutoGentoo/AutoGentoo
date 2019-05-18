@@ -22,14 +22,12 @@ struct __ManifestHash {
 
 
 struct __Manifest {
-	sha_hash gz_hash; // SHA512
-	char* path;
+	char* full_path;
+	char* filename;
+	char* parent_dir;
 	manifest_t type;
 	size_t len;
 	
-	int dir; //!< Only head has this set
-	
-	ManifestHash* hashes;
 	Manifest* parsed;
 	Manifest* next;
 };
@@ -39,9 +37,9 @@ struct __manifest_type_link_t {
 	char* type_str;
 };
 
-Manifest* manifest_metadata_parse_fp(FILE* fp, int dir);
+Manifest* manifest_metadata_parse_fp(FILE* fp, char* dir_path);
 Manifest* manifest_metadata_parse(char* path);
 void manifest_metadata_deep(Manifest* mans);
-
+void manifest_free(Manifest* ptr);
 
 #endif //AUTOGENTOO_MANIFEST_H

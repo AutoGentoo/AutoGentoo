@@ -135,6 +135,7 @@ AtomVersion* atom_version_new(char* version_str);
 void atomversion_free(AtomVersion* parent);
 void atom_free(P_Atom* ptr);
 void atomflag_free(AtomFlag* parent);
+void dependency_free(Dependency* ptr);
 
 AtomFlag* atomflag_build(char* name);
 

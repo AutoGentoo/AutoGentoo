@@ -82,7 +82,6 @@ depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_bui
                 ;
 
 depend_expr_sel : use_expr '?'          {$$ = $1;}
-                | '!' use_expr '?'      {$$ = $2;}
                 | USESELECT             {$$.target = NULL; $$.t = $1;}
                 ;
 

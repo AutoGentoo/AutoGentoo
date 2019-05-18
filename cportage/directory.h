@@ -17,15 +17,15 @@ typedef enum {
 
 struct fp_node {
 	char* filename;
+	char* path;
+	char* parent_dir;
 	
 	fp_node_t type;
-	int dirfd; // null if normal file
-	FILE* fp; // null if directory
 	FPNode* next;
 };
 
-FPNode* open_directory_stat(mode_t st_mode, int buf_fd, char* path);
+FPNode* open_directory_stat(mode_t st_mode, int buf_fd, char* parent, char* path);
 FPNode* open_directory(char* path);
-FPNode* open_directory_at(int parent_dir, char* path);
+FPNode* open_directory_at(int parent_dir, char* parent_path, char* path);
 
 #endif //AUTOGENTOO_DIRECTORY_H

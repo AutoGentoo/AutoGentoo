@@ -23,5 +23,9 @@ struct __RequiredUse {
 
 use_select_t package_check_use(Ebuild* ebuild, char* useflag);
 RequiredUse* use_build_required_use(char* target, use_select_t option);
+int ebuild_check_required_use(Ebuild* ebuild);
+UseFlag* useflag_new(char* name, use_select_t status);
+void useflag_free(UseFlag* ptr);
+void requireduse_free(RequiredUse* ptr);
 
 #endif //AUTOGENTOO_REQUIRE_USE_H

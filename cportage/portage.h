@@ -44,9 +44,8 @@ struct __Repository {
 Repository* emerge_repos_conf(Emerge* emerge);
 
 Repository* repository_new();
-
 int portage_get_hash(sha_hash* target, char* path, const EVP_MD* algorithm);
 int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm);
-
+void repository_free(Repository* repo);
 
 #endif //AUTOGENTOO_PORTAGE_H

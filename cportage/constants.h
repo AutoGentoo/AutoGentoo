@@ -25,6 +25,7 @@ typedef struct __ManifestHash ManifestHash;
 typedef struct __PortageDependency PortageDependency;
 typedef struct __InstalledEbuild InstalledEbuild;
 typedef struct __InstalledPackage InstalledPackage;
+typedef struct __SelectedEbuild SelectedEbuild;
 typedef struct __PortageDB PortageDB;
 
 #endif //AUTOGENTOO_CONSTANTS_H

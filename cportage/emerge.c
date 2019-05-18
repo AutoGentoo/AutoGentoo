@@ -44,7 +44,11 @@ int emerge (Emerge* emerge) {
 	free(package_use_path);
 	free(make_conf_path);
 	*/
-	emerge->repo->category_manifests = manifest_metadata_parse(emerge->repo->location);
+	
+	char* metadata_path = NULL;
+	asprintf(&metadata_path, "%s/metadata/md5-cache", "portage_test");
+	emerge->repo->category_manifests = manifest_metadata_parse(metadata_path);
+	free(metadata_path);
 	if (!emerge->repo->category_manifests) {
 		return errno;
 	}

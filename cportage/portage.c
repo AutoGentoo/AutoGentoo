@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "emerge.h"
+#include "package.h"
 
 int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm) {
 	FILE* hash = fdopen(fd, "r");
@@ -57,15 +58,15 @@ Repository* repository_new() {
 	out->priority = -1000;
 	out->strict_misc_digests = 1;
 	out->sync_allow_hardlinks = 1;
-	out->sync_openpgp_key_path = "/usr/share/openpgp-keys/gentoo-release.asc";
+	out->sync_openpgp_key_path = strdup("/usr/share/openpgp-keys/gentoo-release.asc");
 	out->sync_openpgp_key_refresh_retry_count = 40;
 	out->sync_openpgp_key_refresh_retry_delay_exp_base = 2;
 	out->sync_openpgp_key_refresh_retry_delay_max = 60;
 	out->sync_openpgp_key_refresh_retry_delay_mult = 4;
 	out->sync_openpgp_key_refresh_retry_overall_timeout = 1200;
 	out->sync_rcu = 0;
-	out->sync_type = "rsync";
-	out->sync_uri = "rsync://rsync.gentoo.org/gentoo-portage";
+	out->sync_type = strdup("rsync");
+	out->sync_uri = strdup("rsync://rsync.gentoo.org/gentoo-portage");
 	out->sync_rsync_verify_max_age = 24;
 	out->sync_rsync_verify_jobs = 1;
 	
@@ -92,6 +93,7 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 	asprintf(&repos_conf_path, "%s/etc/portage/repos.conf", emerge->root);
 	
 	FILE* fp = fopen(repos_conf_path, "r");
+	free(repos_conf_path);
 	if (!fp) {
 		plog_error("Failed to open repos.conf");
 		return NULL;
@@ -203,4 +205,26 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 	}
 	
 	return parent;
+}
+
+void repository_free(Repository* repo) {
+	Repository* curr = repo;
+	Repository* next;
+	
+	while (curr) {
+		next = curr->next;
+		free(curr->name);
+		free(curr->location);
+		free(curr->sync_openpgp_key_path);
+		free(curr->sync_type);
+		free(curr->sync_uri);
+		
+		for (Manifest* man = curr->category_manifests; man; man = man->next)
+			manifest_free(man->parsed);
+		manifest_free(curr->category_manifests);
+		map_free(curr->packages, (void (*) (void*))package_free);
+		
+		free(curr);
+		curr = next;
+	}
 }

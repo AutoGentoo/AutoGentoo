@@ -7,6 +7,6 @@
 
 #include <stdio.h>
 
-FILE* fread_archive(char* path, int dirfd, char* verify_sha);
+FILE* fread_archive(char* path);
 
 #endif //AUTOGENTOO_COMPRESS_H

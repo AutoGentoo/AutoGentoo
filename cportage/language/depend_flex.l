@@ -18,7 +18,6 @@ int yyerror(char *s) {
 }
 
 Dependency* depend_parse (char* buffer) {
-    __yybuffer = strdup(buffer);
     YY_BUFFER_STATE bs = yy_scan_string(buffer);
     yy_switch_to_buffer(bs);
     yyparse();
@@ -26,7 +25,6 @@ Dependency* depend_parse (char* buffer) {
 }
 
 P_Atom* atom_parse (char* buffer) {
-    __yybuffer = strdup(buffer);
     YY_BUFFER_STATE bs = yy_scan_string(buffer);
     yy_switch_to_buffer(bs);
     yyparse();
@@ -34,7 +32,6 @@ P_Atom* atom_parse (char* buffer) {
 }
 
 RequiredUse* required_use_parse (char* buffer) {
-    __yybuffer = strdup(buffer);
     YY_BUFFER_STATE bs = yy_scan_string(buffer);
     yy_switch_to_buffer(bs);
     yyparse();

@@ -17,13 +17,12 @@
 #include <autogentoo/hacksaw/map.h>
 
 void package_metadata_init(Ebuild* ebuild) {
-	int fd = openat(ebuild->atom_manifest->dir, ebuild->atom_manifest->path, O_RDONLY);
-	if (fd < 0) {
-		plog_error("Failed to open %s", ebuild->atom_manifest->path);
+	FILE* fp = fopen(ebuild->atom_manifest->full_path, "r");
+	if (!fp) {
+		plog_error("Failed to open %s", ebuild->atom_manifest->full_path);
 		return;
 	}
 	
-	FILE* fp = fdopen(fd, "r");
 	
 	size_t name_size;
 	char* name = NULL;
@@ -51,8 +50,6 @@ void package_metadata_init(Ebuild* ebuild) {
 			ebuild->pdepend = depend_parse(value);
 		else if (strcmp(name, "BDEPEND") == 0)
 			ebuild->bdepend = depend_parse(value);
-		else if (strcmp(name, "EAPI") == 0)
-			ebuild->eapi = strdup(value);
 		else if (strcmp(name, "SLOT") == 0)
 			ebuild->slot = strdup(value);
 		else if (strcmp(name, "REQUIRED_USE") == 0)
@@ -67,9 +64,10 @@ void package_metadata_init(Ebuild* ebuild) {
 
 Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man) {
 	char* parsed_key;
-	char* pcat = strdup(category_man->path);
+	char* pcat = strdup(category_man->filename);
 	*strchr(pcat, '/') = 0;
-	asprintf(&parsed_key, "%s/%s", pcat, atom_man->path);
+	asprintf(&parsed_key, "%s/%s", pcat, atom_man->filename);
+	free(pcat);
 	
 	P_Atom* atom_parsed = atom_new(parsed_key);
 	if (atom_parsed == NULL)
@@ -82,6 +80,7 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 		new_package->key = strdup(atom_parsed->key);
 		new_package->category = strdup(atom_parsed->category);
 		new_package->name = strdup(atom_parsed->name);
+		new_package->keywords = NULL;
 		
 		new_package->ebuilds = NULL;
 		target = new_package;
@@ -92,20 +91,19 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	
 	new_ebuild->category_manifest = category_man;
 	new_ebuild->atom_manifest = atom_man;
+	new_ebuild->feature_restrict = NULL;
 	
 	new_ebuild->metadata_init = 0;
 	new_ebuild->resolved = 0;
 	
 	new_ebuild->category = atom_parsed->category;
 	new_ebuild->pn = atom_parsed->name;
-	new_ebuild->pv = atom_parsed->version->full_version;
+	new_ebuild->pv = strdup(atom_parsed->version->full_version);
 	new_ebuild->revision = atom_parsed->revision;
 	
 	asprintf(&new_ebuild->pr, "r%d", atom_parsed->revision);
-	asprintf(&new_ebuild->pvr, "%s-%s", new_ebuild->pv, new_ebuild->pr);
 	
 	new_ebuild->slot = NULL;
-	new_ebuild->eapi = NULL;
 	new_ebuild->version = atom_parsed->version;
 	
 	/* Cached in the database */
@@ -113,6 +111,9 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	new_ebuild->bdepend = NULL;
 	new_ebuild->rdepend = NULL;
 	new_ebuild->pdepend = NULL;
+	
+	new_ebuild->dependency_resolved = NULL;
+	new_ebuild->pdependency_resolved = NULL;
 	
 	new_ebuild->use = NULL;
 	new_ebuild->older = NULL;
@@ -144,14 +145,6 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	return new_ebuild;
 }
 
-#define ATOM_COMPARE_REVISION()\
-if (cmp_rev == 0) \
-	return 1; \
-else if (cmp_rev > 0 && atom->range & ATOM_VERSION_L) \
-	return 1; \
-else if (cmp_rev < 0 && atom->range & ATOM_VERSION_G) \
-	return 1;
-
 int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 	int cmp = atom_version_compare(ebuild->version, atom->version);
 	int cmp_rev = ebuild->revision - atom->revision;
@@ -163,7 +156,13 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 		}
 		else if (atom->range == ATOM_VERSION_REV)
 			return 1;
-		ATOM_COMPARE_REVISION()
+		
+		if (cmp_rev == 0)
+			return 1;
+		else if (cmp_rev > 0 && atom->range & ATOM_VERSION_L)
+			return 1; \
+		else if (cmp_rev < 0 && atom->range & ATOM_VERSION_G)
+			return 1;
 	}
 	
 	if (cmp < 0 && atom->range & ATOM_VERSION_L) {
@@ -227,6 +226,8 @@ void dependency_resolve_ebuild(Emerge* emerge, Ebuild* ebuild) {
 		return;
 	if (!ebuild->metadata_init)
 		package_metadata_init(ebuild);
+	if (!ebuild_check_required_use(ebuild))
+		exit(1);
 	if (ebuild->bdepend || ebuild->rdepend || ebuild->depend) {
 		if (emerge->build_opts == EMERGE_RUNSIDE)
 			ebuild->dependency_resolved = dependency_resolve(emerge, ebuild, ebuild->rdepend, NULL);
@@ -236,13 +237,9 @@ void dependency_resolve_ebuild(Emerge* emerge, Ebuild* ebuild) {
 			ebuild->dependency_resolved = dependency_resolve(emerge, ebuild, ebuild->bdepend, ebuild->dependency_resolved);
 		}
 	}
-	else
-		ebuild->dependency_resolved = NULL;
-	if (ebuild->pdepend && emerge->build_opts == EMERGE_BUILDSIDE) {
+	
+	if (ebuild->pdepend && emerge->build_opts == EMERGE_BUILDSIDE)
 		ebuild->pdependency_resolved = dependency_resolve(emerge, ebuild, ebuild->pdepend, NULL);
-	}
-	else
-		ebuild->pdependency_resolved = NULL;
 }
 
 PortageDependency*
@@ -292,4 +289,52 @@ dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends, 
 	}
 	
 	return *out_ptr;
+}
+
+void package_free(Package* ptr) {
+	printf("pacakge_free (%s)\n", ptr->key);
+	free(ptr->key);
+	free(ptr->name);
+	free(ptr->category);
+	
+	Keyword* next_key = NULL;
+	Keyword* curr_key = ptr->keywords;
+	while (curr_key) {
+		next_key = curr_key->next;
+		atom_free(curr_key->atom);
+		free(curr_key);
+		curr_key = next_key;
+	}
+	
+	Ebuild* next_eb = NULL;
+	for (Ebuild* eb = ptr->ebuilds; eb; eb = next_eb) {
+		next_eb = eb->older;
+		ebuild_free(eb);
+	}
+	
+	free(ptr);
+}
+
+Ebuild* ebuild_free(Ebuild* ptr) {
+	free(ptr->category);
+	free(ptr->pn);
+	free(ptr->pv);
+	free(ptr->pr);
+	free(ptr->slot);
+	free(ptr->sub_slot);
+	
+	dependency_free(ptr->depend);
+	dependency_free(ptr->bdepend);
+	dependency_free(ptr->rdepend);
+	dependency_free(ptr->pdepend);
+	
+	useflag_free(ptr->use);
+	if (ptr->feature_restrict)
+		vector_free(ptr->feature_restrict);
+	
+	requireduse_free(ptr->required_use);
+	dependency_free(ptr->src_uri);
+	
+	atomversion_free(ptr->version);
+	free(ptr);
 }

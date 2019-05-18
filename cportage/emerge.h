@@ -5,6 +5,7 @@
 #ifndef AUTOGENTOO_EMERGE_H
 #define AUTOGENTOO_EMERGE_H
 
+#include <autogentoo/hacksaw/map.h>
 #include "atom.h"
 #include "constants.h"
 #include "cportage_defines.h"
@@ -42,6 +43,9 @@ struct __Emerge {
 	sha_hash hash_accept_keywords;
 	sha_hash hash_package_use;
 	sha_hash hash_make_conf;
+	
+	Map* installed;
+	Map* selected;
 };
 
 extern Emerge* emerge_main;

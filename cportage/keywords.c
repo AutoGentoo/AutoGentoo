@@ -94,16 +94,19 @@ void emerge_parse_keywords(Emerge* emerge) {
 	FPNode* files = open_directory(path);
 	FPNode* old;
 	
-	for (FPNode* current = files; current->fp;) {
+	for (FPNode* current = files; current;) {
 		if (current->type == FP_NODE_DIR) {
-			close(current->dirfd);
 			old = current;
+			free(old->filename);
+			free(old->parent_dir);
+			free(old->path);
 			current = current->next;
 			free(old);
 			continue;
 		}
 		
-		Keyword* current_keyword = accept_keyword_parse(current->fp);
+		FILE* fp = fopen(current->path, "r");
+		Keyword* current_keyword = accept_keyword_parse(fp);
 		while (current_keyword) {
 			Package* target = map_get(emerge->repo->packages, current_keyword->atom->key);
 			if (!target) {
@@ -113,12 +116,15 @@ void emerge_parse_keywords(Emerge* emerge) {
 			}
 			current_keyword->next = target->keywords;
 			target->keywords = current_keyword;
-			current_keyword = accept_keyword_parse(current->fp);
+			current_keyword = accept_keyword_parse(fp);
 		}
 		
-		fclose(current->fp);
+		fclose(fp);
 		
 		old = current;
+		free(old->filename);
+		free(old->parent_dir);
+		free(old->path);
 		current = current->next;
 		free(old);
 	}

@@ -48,13 +48,9 @@ struct __Ebuild {
 	char* pn;
 	char* pv;
 	char* pr;
-	char* slot;
-	char* eapi;
 	
-	/* Uninitalized until we emerge it */
-	char* p;
-	char* pvr;
-	char* pf;
+	char* slot;
+	char* sub_slot;
 	
 	/* Cached in the database */
 	Dependency* depend;
@@ -96,5 +92,7 @@ PortageDependency*
 dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends, PortageDependency* next);
 void dependency_resolve_ebuild(Emerge* emerge, Ebuild* ebuild);
 PortageDependency* dependency_new(Ebuild* e, P_Atom* p);
+void package_free(Package* ptr);
+Ebuild* ebuild_free(Ebuild* ptr);
 
 #endif //AUTOGENTOO_PACKAGE_H
