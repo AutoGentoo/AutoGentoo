@@ -120,10 +120,9 @@ atom_slot_rebuild:
 atom_slot   : atom_block SLOT           {
                                             $$ = $1;
                                             $$->slot = $2.name;
-                                            if ($2.sub_name)
-                                                $$->sub_slot = $2.sub_name;
+                                            $$->sub_slot = $2.sub_name;
                                         }
-            | atom_block                {$$ = $1; $$->slot = NULL;}
+            | atom_block                {$$ = $1; $$->slot = NULL; $$->sub_slot = NULL;}
             ;
 
 atom_block  :      '!' atom_version     {$$ = $2; $$->blocks = ATOM_BLOCK_SOFT;}
