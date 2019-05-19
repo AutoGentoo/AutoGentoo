@@ -283,7 +283,10 @@ PortageDB* portagedb_read(Emerge* emerge) {
 		free(old);
 	}
 	
-	backtrack_resolve(out);
+	if (EMERGE_USE_BINHOST & emerge->build_opts)
+		backtrack_resolve(out, EBUILD_REBUILD_RDEPEND);
+	else
+		backtrack_resolve(out, EBUILD_REBUILD_RDEPEND | EBUILD_REBUILD_DEPEND);
 	
 	return out;
 }
@@ -313,12 +316,16 @@ void backtrack_new(PortageDB* db, InstalledEbuild* rebuild, P_Atom* atom, rebuil
 	vector_add(db->backtracking, &backtrack);
 }
 
-void backtrack_resolve(PortageDB* db) {
+void backtrack_resolve(PortageDB* db, rebuild_t types) {
 	for (int i = 0; i < db->backtracking->n; i++) {
 		RebuildEbuild* backtrack = *(RebuildEbuild**)vector_get(db->backtracking, i);
+		if (!(backtrack->type & types))
+			continue;
+		
 		InstalledPackage* package = map_get(db->installed, backtrack->selector->key);
 		if (!package) {
 			plog_warn("Invalid backtracking request for package %s (%s)", backtrack->rebuild->parent->key, backtrack->selector->key);
+			plog_warn("Is %s a binary package?", backtrack->rebuild->parent->key);
 			continue;
 		}
 		
@@ -327,9 +334,10 @@ void backtrack_resolve(PortageDB* db) {
 			if (backtrack->selector->slot && strcmp(curr->slot, backtrack->selector->slot) != 0)
 				continue;
 			backtrack->old_slot = curr;
+			
 			if (backtrack->type == EBUILD_REBUILD_DEPEND)
 				vector_add(curr->rebuild_depend, &backtrack);
-			else if (backtrack->type == EBUILD_REBUILD_RDEPEND)
+			if (backtrack->type == EBUILD_REBUILD_RDEPEND)
 				vector_add(curr->rebuild_rdepend, &backtrack);
 		}
 	}

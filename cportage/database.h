@@ -26,8 +26,8 @@ struct __SelectedEbuild {
 };
 
 typedef enum {
-	EBUILD_REBUILD_DEPEND, //!< Part of DEPEND set
-	EBUILD_REBUILD_RDEPEND //!< Part of RDEPEND set
+	EBUILD_REBUILD_DEPEND = 0x1, //!< Part of DEPEND set
+	EBUILD_REBUILD_RDEPEND = 0x2 //!< Part of RDEPEND set
 } rebuild_t;
 
 struct __RebuildEbuild {
@@ -89,6 +89,6 @@ void installedebuild_free(InstalledEbuild* ebuild);
 void installedpackage_free(InstalledPackage* pkg);
 void backtrack_search(PortageDB* db, InstalledEbuild* parent, Dependency* deptree, rebuild_t type);
 void backtrack_new(PortageDB* db, InstalledEbuild* rebuild, P_Atom* atom, rebuild_t type);
-void backtrack_resolve(PortageDB* db);
+void backtrack_resolve(PortageDB* db, rebuild_t types);
 
 #endif //AUTOGENTOO_DATABASE_H
