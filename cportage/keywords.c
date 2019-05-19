@@ -94,7 +94,7 @@ Keyword* accept_keyword_parse(FILE* fp, Keyword** last) {
 
 void emerge_parse_keywords(Emerge* emerge) {
 	char path[256];
-	sprintf(path, "%s/etc/portage/package.accept_keywords", emerge->root);
+	sprintf(path, "%setc/portage/package.accept_keywords", emerge->root);
 	
 	FPNode* files = open_directory(path);
 	FPNode* old;
@@ -114,6 +114,12 @@ void emerge_parse_keywords(Emerge* emerge) {
 		}
 		
 		FILE* fp = fopen(current->path, "r");
+		if (!fp) {
+			plog_error("Failed to open %s", current->path);
+			fpnode_free(current);
+			return;
+		}
+		
 		Keyword* last;
 		temp = accept_keyword_parse(fp, &last);
 		

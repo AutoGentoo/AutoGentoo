@@ -27,5 +27,6 @@ struct fp_node {
 FPNode* open_directory_stat(mode_t st_mode, int buf_fd, char* parent, char* path);
 FPNode* open_directory(char* path);
 FPNode* open_directory_at(int parent_dir, char* parent_path, char* path);
+void fpnode_free(FPNode* ptr);
 
 #endif //AUTOGENTOO_DIRECTORY_H

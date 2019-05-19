@@ -25,7 +25,7 @@ add_library(hacksaw STATIC
         ${hacksaw_SRC}
         )
 
-set_target_properties(hacksaw PROPERTIES COMPILE_FLAGS "-fPIC")
+set_target_properties(hacksaw PROPERTIES COMPILE_FLAGS "-fPIC -g")
 
 find_library(ARCHIVE archive)
 

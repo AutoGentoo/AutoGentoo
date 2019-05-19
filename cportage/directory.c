@@ -48,7 +48,24 @@ FPNode* open_directory_stat(mode_t st_mode, int buf_fd, char* parent, char* path
 	}
 	else if (S_ISREG(st_mode)) {
 		files = malloc(sizeof(FPNode));
-		files->filename = strdup(parent);
+		
+		if (path)
+			asprintf(&files->path, "%s/%s", parent, path);
+		else
+			asprintf(&files->path, "%s", parent);
+		
+		char* name_splt = strrchr(files->path, '/');
+		if (!name_splt) {
+			files->filename = strdup(files->path);
+			files->parent_dir = strdup("");
+		}
+		else {
+			files->filename = strdup(name_splt + 1);
+			*name_splt = 0;
+			files->parent_dir = strdup(files->path);
+			*name_splt = '/';
+		}
+		
 		files->type = FP_NODE_FILE;
 		files->next = NULL;
 	}
@@ -83,4 +100,16 @@ FPNode* open_directory_at(int parent_dir, char* parent_path, char* path) {
 	FPNode* out = open_directory_stat(st.st_mode, buf_fd, parent_path, path);
 	close(buf_fd);
 	return out;
+}
+
+void fpnode_free(FPNode* ptr) {
+	FPNode* next;
+	while (ptr) {
+		next = ptr->next;
+		free(ptr->path);
+		free(ptr->filename);
+		free(ptr->parent_dir);
+		free(ptr);
+		ptr = next;
+	}
 }
