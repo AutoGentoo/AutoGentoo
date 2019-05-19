@@ -174,16 +174,20 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 		free(buf_str);
 	}
 	
-	//char* iuse_temp = portagedb_ebuild_read(ebuild, pkg, "IUSE_EFFECTIVE");
 	char* use_temp = portagedb_ebuild_read(pkg, "USE");
 	if (use_temp) {
-		char* use_tok = strtok(use_temp, " \n");
-		UseFlag* use = ebuild->use = useflag_new(use_tok, USE_ENABLE);
-		for (use_tok = strtok(NULL, " \n"); use_tok; use_tok = strtok(NULL, " \n")) {
-			use->next = useflag_new(use_tok, USE_DISABLE);
-			use = use->next;
+		ebuild->use = NULL;
+		UseFlag* last = NULL;
+		UseFlag* use;
+		
+		for (char* use_tok = strtok(use_temp, " \n"); use_tok; use_tok = strtok(NULL, " \n")) {
+			use = useflag_new(use_tok, USE_ENABLE);
+			if (!ebuild->use)
+				ebuild->use = use;
+			else
+				last->next = use;
+			last = use;
 		}
-		use->next = NULL;
 		free(use_temp);
 	}
 	else
