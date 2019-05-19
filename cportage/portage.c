@@ -53,6 +53,7 @@ Repository* repository_new() {
 	
 	out->packages = map_new(65536, 0.8);
 	out->location = NULL;
+	out->next = NULL;
 	
 	out->masters = NULL;
 	out->priority = -1000;

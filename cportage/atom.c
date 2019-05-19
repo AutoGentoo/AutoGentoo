@@ -186,18 +186,15 @@ void dependency_free(Dependency* ptr) {
 	if (!ptr)
 		return;
 	
-	if (ptr->selectors)
-		dependency_free(ptr->selectors);
-	
 	Dependency* next = NULL;
 	Dependency* temp = ptr;
 	while (temp) {
 		next = temp->next;
 		if (temp->depends == IS_ATOM)
 			atom_free(temp->atom);
-		else if (temp->target)
+		if (temp->target)
 			free(temp->target);
-		
+		dependency_free(temp->selectors);
 		free(temp);
 		temp = next;
 	}

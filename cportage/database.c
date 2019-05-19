@@ -69,6 +69,19 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	
 	ebuild->parent = target;
 	ebuild->version = atom->version;
+	
+	atomflag_free(atom->useflags);
+	free(atom->key);
+	
+	if (atom->slot)
+		free(atom->slot);
+	if (atom->sub_slot)
+		free(atom->sub_slot);
+	free(atom->repository);
+	free(atom->category);
+	free(atom->name);
+	free(atom);
+	
 	ebuild->slot = NULL;
 	ebuild->sub_slot = NULL;
 	
@@ -97,24 +110,15 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	ebuild->depend = NULL;
 	ebuild->rdepend = NULL;
 	
-	struct {
-		char* prop;
-		Dependency** atom;
-	} depend_expr[] = {
-			{"DEPEND", &ebuild->depend},
-			{"RDEPEND", &ebuild->rdepend},
-			{NULL, NULL}
-	};
+	char* buf_str = portagedb_ebuild_read(pkg, "DEPEND");
+	if (buf_str) {
+		ebuild->depend = depend_parse(buf_str);
+		free(buf_str);
+	}
 	
-	for (int i = 0; depend_expr[i].prop; i++) {
-		char* buf_str = portagedb_ebuild_read(pkg, depend_expr[i].prop);
-		if (!buf_str)
-			continue;
-		if (buf_str[0] == '\n') {
-			free(buf_str);
-			continue;
-		}
-		*(depend_expr[i].atom) = depend_parse(buf_str);
+	buf_str = portagedb_ebuild_read(pkg, "RDEPEND");
+	if (buf_str) {
+		ebuild->rdepend = depend_parse(buf_str);
 		free(buf_str);
 	}
 	

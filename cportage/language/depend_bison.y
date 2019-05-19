@@ -64,9 +64,10 @@ void yyerror(const char *message);
 
 %%
 
-program:    | depend_expr                       {yyout = (void*)$1;}
+program:                                        {yyout = NULL;}
+            | depend_expr                       {yyout = (void*)$1;}
             | required_use_expr                 {yyout = (void*)$1;}
-            | END_OF_FILE
+            | END_OF_FILE                       {yyout = NULL;}
             ;
 
 required_use_expr   : depend_expr_sel '(' required_use_expr ')' {$$ = use_build_required_use($1.target, $1.t); $$->depend = $3;}
@@ -75,7 +76,7 @@ required_use_expr   : depend_expr_sel '(' required_use_expr ')' {$$ = use_build_
                     | '(' required_use_expr ')'                 {$$ = $2;}
                     ;
 
-depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_build_use($p.target, $p.t, $c);}
+depend_expr  :    depend_expr_sel[p] depend_expr[c]         {$$ = dependency_build_use($p.target, $p.t, $c);}
                 | '(' depend_expr[c] ')'                    {$$ = $c;}
                 | atom                                      {$$ = dependency_build_atom($1);}
                 | depend_expr depend_expr                   {$$ = $1; $1->next = $2;}

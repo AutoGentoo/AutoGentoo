@@ -28,7 +28,9 @@ P_Atom* atom_parse (char* buffer) {
     YY_BUFFER_STATE bs = yy_scan_string(buffer);
     yy_switch_to_buffer(bs);
     yyparse();
-    return ((Dependency*)yyout)->atom;
+    P_Atom* atom_out = ((Dependency*)yyout)->atom;
+    free((void*)yyout);
+    return atom_out;
 }
 
 RequiredUse* required_use_parse (char* buffer) {
