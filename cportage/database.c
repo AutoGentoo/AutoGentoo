@@ -42,8 +42,6 @@ char* portagedb_ebuild_read(FPNode* pkg, char* property) {
 	return out;
 }
 
-static int ebuild_alloc = 0;
-
 void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	char* atom_key;
 	asprintf(&atom_key, "%s/%s", cat->filename, pkg->filename);
@@ -68,7 +66,6 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	}
 	
 	InstalledEbuild* ebuild = malloc(sizeof(InstalledEbuild));
-	printf("\r%d", ++ebuild_alloc);
 	
 	ebuild->parent = target;
 	ebuild->version = atom->version;
@@ -80,7 +77,7 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 		char* tok1 = strtok(slot_temp, "/\n");
 		if (tok1) {
 			ebuild->slot = strdup(tok1);
-			char* tok2 = strtok(slot_temp, "/\n");
+			char* tok2 = strtok(NULL, "/\n");
 			if (tok2)
 				ebuild->sub_slot = strdup(tok2);
 		}
@@ -139,12 +136,20 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	if (!target->installed)
 		target->installed = ebuild;
 	else {
+		if (strcmp(ebuild->slot, "4.14.78") == 0) {
+			char* d = NULL;
+		}
+		
 		for (InstalledEbuild* head = target->installed;; head = head->older_slot) {
 			int slot_cmp = strcmp(head->slot, ebuild->slot);
 			int sub_slot_cmp = 0;
-			if (!head->sub_slot && head->sub_slot != ebuild->sub_slot)
-				plog_warn("%s-%s has subslot but %s does not", head->parent->key, head->version->full_version, ebuild->parent->key, ebuild->version->full_version);
-			else
+			if ((!head->sub_slot || !ebuild->sub_slot) && head->sub_slot != ebuild->sub_slot)
+				plog_warn("%s-%s has subslot but %s-%s does not",
+						head->parent->key,
+						head->version->full_version,
+						ebuild->parent->key,
+						ebuild->version->full_version);
+			else if (head->sub_slot)
 				sub_slot_cmp = strcmp(head->sub_slot, ebuild->sub_slot);
 			
 			if (slot_cmp < 0 || (slot_cmp == 0 && sub_slot_cmp < 0)) {
@@ -153,6 +158,8 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 				head->newer_slot = ebuild;
 				if (head == target->installed)
 					target->installed = ebuild;
+				else
+					ebuild->newer_slot->older_slot = ebuild;
 				break;
 			}
 			if (!head->older_slot) {
@@ -178,6 +185,8 @@ PortageDB* portagedb_read(Emerge* emerge) {
 	FPNode* old;
 	
 	out->installed = map_new(4196, 0.8);
+	int ebuild_n = 0;
+	
 	FPNode* categories = open_directory_stat(__S_IFDIR, db_dir, out->path, NULL);
 	close(db_dir);
 	for (FPNode* cat = categories; cat;) {
@@ -196,6 +205,7 @@ PortageDB* portagedb_read(Emerge* emerge) {
 		close(cat_dirfd);
 		for (FPNode* pkg = pkgs; pkg;) {
 			portagedb_add_ebuild(out, cat, pkg);
+			ebuild_n++;
 			free(pkg->path);
 			free(pkg->filename);
 			free(pkg->parent_dir);
@@ -212,7 +222,6 @@ PortageDB* portagedb_read(Emerge* emerge) {
 		cat = cat->next;
 		free(old);
 	}
-	printf(" alloced\n");
 	return out;
 }
 
