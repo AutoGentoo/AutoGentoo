@@ -143,13 +143,12 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 		for (InstalledEbuild* head = target->installed;; head = head->older_slot) {
 			int slot_cmp = strcmp(head->slot, ebuild->slot);
 			int sub_slot_cmp = 0;
-			if ((!head->sub_slot || !ebuild->sub_slot) && head->sub_slot != ebuild->sub_slot)
-				plog_warn("%s-%s has subslot but %s-%s does not",
-						head->parent->key,
-						head->version->full_version,
-						ebuild->parent->key,
-						ebuild->version->full_version);
-			else if (head->sub_slot)
+			
+			if (head->sub_slot && !ebuild->sub_slot)
+				sub_slot_cmp = 1;
+			else if (!head->sub_slot && ebuild->sub_slot)
+				sub_slot_cmp = -1;
+			else if (head->sub_slot && ebuild->sub_slot)
 				sub_slot_cmp = strcmp(head->sub_slot, ebuild->sub_slot);
 			
 			if (slot_cmp < 0 || (slot_cmp == 0 && sub_slot_cmp < 0)) {
@@ -230,7 +229,6 @@ void portagedb_free(PortageDB* db) {
 	free(db->path);
 	map_free(db->installed, (void (*) (void*))installedpackage_free);
 	free(db);
-	printf(" freed\n");
 }
 
 void installedpackage_free(InstalledPackage* pkg) {
@@ -251,7 +249,6 @@ void installedpackage_free(InstalledPackage* pkg) {
 static int ebuild_freed = 0;
 
 void installedebuild_free(InstalledEbuild* ebuild) {
-	printf("\r%d", ++ebuild_freed);
 	dependency_free(ebuild->depend);
 	dependency_free(ebuild->rdepend);
 	atomversion_free(ebuild->version);
