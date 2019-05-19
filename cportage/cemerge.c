@@ -64,22 +64,20 @@ void print_help_wrapper(Opt* op, char* arg) {
 }
 
 int main (int argc, char** argv) {
-	
 	Emerge* __emerge_main = emerge_new();
 	emerge_main = __emerge_main;
-	//emerge_main->repo = repository_new();
 	
 	emerge_main->atoms = opt_handle(opt_handlers, argc, argv + 1);
 	emerge_main->repo = emerge_repos_conf(__emerge_main);
 	
 	OpenSSL_add_all_digests();
 	
-	//PortageDB* portdb = portagedb_read(__emerge_main);
+	PortageDB* portdb = portagedb_read(__emerge_main);
 	
 	int out = emerge(__emerge_main);
 	
 	repository_free(__emerge_main->repo);
-	//portagedb_free(portdb);
+	portagedb_free(portdb);
 	
 	return out;
 }

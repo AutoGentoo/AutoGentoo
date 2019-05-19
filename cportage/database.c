@@ -42,6 +42,8 @@ char* portagedb_ebuild_read(FPNode* pkg, char* property) {
 	return out;
 }
 
+static int ebuild_alloc = 0;
+
 void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	char* atom_key;
 	asprintf(&atom_key, "%s/%s", cat->filename, pkg->filename);
@@ -66,6 +68,8 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	}
 	
 	InstalledEbuild* ebuild = malloc(sizeof(InstalledEbuild));
+	printf("\r%d", ++ebuild_alloc);
+	
 	ebuild->parent = target;
 	ebuild->version = atom->version;
 	ebuild->slot = NULL;
@@ -208,7 +212,7 @@ PortageDB* portagedb_read(Emerge* emerge) {
 		cat = cat->next;
 		free(old);
 	}
-	
+	printf(" alloced\n");
 	return out;
 }
 
@@ -217,28 +221,31 @@ void portagedb_free(PortageDB* db) {
 	free(db->path);
 	map_free(db->installed, (void (*) (void*))installedpackage_free);
 	free(db);
+	printf(" freed\n");
 }
 
 void installedpackage_free(InstalledPackage* pkg) {
+	InstalledEbuild* next = NULL;
+	InstalledEbuild* eb = pkg->installed;
+	while(eb) {
+		next = eb->older_slot;
+		installedebuild_free(eb);
+		eb = next;
+	}
 	free(pkg->key);
 	free(pkg->name);
 	free(pkg->category);
 	
-	InstalledEbuild* next = NULL;
-	for (InstalledEbuild* eb = pkg->installed; eb; eb = next) {
-		next = eb->newer_slot;
-		installedebuild_free(eb);
-	}
-	
 	free(pkg);
 }
 
+static int ebuild_freed = 0;
+
 void installedebuild_free(InstalledEbuild* ebuild) {
-	UseFlag* use;
-	
+	printf("\r%d", ++ebuild_freed);
+	dependency_free(ebuild->depend);
+	dependency_free(ebuild->rdepend);
 	atomversion_free(ebuild->version);
-	if (ebuild->repository)
-		free(ebuild->repository);
 	if (ebuild->slot)
 		free(ebuild->slot);
 	if (ebuild->sub_slot)
@@ -250,8 +257,6 @@ void installedebuild_free(InstalledEbuild* ebuild) {
 	if (ebuild->cbuild)
 		free(ebuild->cbuild);
 	
-	dependency_free(ebuild->depend);
-	dependency_free(ebuild->rdepend);
 	useflag_free(ebuild->use);
 	
 	free(ebuild);

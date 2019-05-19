@@ -184,16 +184,16 @@ void prv_map_free_bucket(Map* map, MapItem* item, free_function __free) {
 	if (!item)
 		return;
 	
-	map->n--;
 	prv_map_free_bucket(map, item->next, __free);
 	free(item->key);
 	if (__free)
 		__free (item->data);
 	free(item);
+	//map->n--;
 }
 
 void map_free (Map* map, free_function __free) {
-	for (int i = 0; i < map->size && map->n > 0; i++)
+	for (int i = 0; i < map->size; i++)
 		prv_map_free_bucket(map, map->hash_table[i], __free);
 	free (map->hash_table);
 	free (map);

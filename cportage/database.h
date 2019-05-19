@@ -29,8 +29,6 @@ struct __InstalledEbuild {
 	InstalledPackage* parent;
 	AtomVersion* version;
 	
-	char* repository;
-	
 	char* slot;
 	char* sub_slot;
 	

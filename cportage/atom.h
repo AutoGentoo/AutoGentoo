@@ -69,8 +69,7 @@ typedef enum {
 	ATOM_PREFIX_PRE,
 	ATOM_PREFIX_RC,
 	ATOM_PREFIX_NONE,
-	ATOM_PREFIX_P,
-	ATOM_REVISION
+	ATOM_PREFIX_P
 } atom_version_pre_t;
 
 struct __AtomVersion {
@@ -108,8 +107,6 @@ struct __P_Atom {
 	int revision;
 	
 	AtomFlag* useflags;
-	
-	P_Atom* next; // Only use if this a node
 };
 
 /**

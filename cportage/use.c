@@ -132,11 +132,14 @@ UseFlag* useflag_new(char* name, use_select_t status) {
 }
 
 void useflag_free(UseFlag* ptr) {
-	if (!ptr)
-		return;
-	useflag_free(ptr);
-	free(ptr->name);
-	free(ptr);
+	UseFlag* next = NULL;
+	UseFlag* curr = ptr;
+	while (curr) {
+		next = curr->next;
+		free(curr->name);
+		free(curr);
+		curr = next;
+	}
 }
 
 void requireduse_free(RequiredUse* ptr) {

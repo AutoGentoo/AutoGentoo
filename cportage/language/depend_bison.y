@@ -66,7 +66,6 @@ void yyerror(const char *message);
 
 program:    | depend_expr                       {yyout = (void*)$1;}
             | required_use_expr                 {yyout = (void*)$1;}
-            | atom                              {yyout = (void*)$1;}
             | END_OF_FILE
             ;
 
@@ -74,6 +73,7 @@ required_use_expr   : depend_expr_sel '(' required_use_expr ')' {$$ = use_build_
                     | required_use_expr required_use_expr       {$$ = $1; $$->next = $2;}
                     | use_expr                                  {$$ = use_build_required_use($1.target, $1.t);}
                     | '(' required_use_expr ')'                 {$$ = $2;}
+                    ;
 
 depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_build_use($p.target, $p.t, $c);}
                 | '(' depend_expr[c] ')'                    {$$ = $c;}
@@ -90,7 +90,7 @@ use_expr: '!' IDENTIFIER        {$$.target = $2; $$.t = USE_DISABLE;}
         ;
 
 atom        : atom_repo '[' atom_flags ']' {$$->useflags = $3;}
-            | atom_repo
+            | atom_repo                    {$$->useflags = NULL;}
             ;
 
 atom_flags  : '!' atom_flag '?'     {$$ = $2; $$->option = ATOM_USE_DISABLE_IF_OFF;}
@@ -102,8 +102,8 @@ atom_flags  : '!' atom_flag '?'     {$$ = $2; $$->option = ATOM_USE_DISABLE_IF_O
             | atom_flags ',' atom_flags {$$ = $1; $$->next = $3;}
             ;
 
-atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); $$->def = ATOM_NO_DEFAULT;}
-            | IDENTIFIER USE_DEFAULT{$$ = atomflag_build($1); $$->def = $2;}
+atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); $$->def = ATOM_NO_DEFAULT; $$->next = NULL;}
+            | IDENTIFIER USE_DEFAULT{$$ = atomflag_build($1); $$->def = $2; $$->next = NULL;}
             ;
 
 atom_repo   : atom_slot_rebuild REPOSITORY {$$ = $1; free($$->repository); $$->repository = $2;}
@@ -130,12 +130,12 @@ atom_block  :      '!' atom_version     {$$ = $2; $$->blocks = ATOM_BLOCK_SOFT;}
             |          atom_version     {$$ = $1; $$->blocks = ATOM_BLOCK_NONE;}
             ;
 
-atom_version   :     '=' ATOM           {$$ = $2; $$->range = ATOM_VERSION_E;}
+atom_version   : '>' '=' ATOM           {$$ = $3; $$->range = ATOM_VERSION_GE;}
+               | '<' '=' ATOM           {$$ = $3; $$->range = ATOM_VERSION_LE;}
+               |     '=' ATOM           {$$ = $2; $$->range = ATOM_VERSION_E;}
                |     '>' ATOM           {$$ = $2; $$->range = ATOM_VERSION_G;}
                |     '~' ATOM           {$$ = $2; $$->range = ATOM_VERSION_REV;}
                |     '<' ATOM           {$$ = $2; $$->range = ATOM_VERSION_L;}
-               | '>' '=' ATOM           {$$ = $3; $$->range = ATOM_VERSION_GE;}
-               | '<' '=' ATOM           {$$ = $3; $$->range = ATOM_VERSION_LE;}
                |         ATOM           {$$ = $1; $$->range = ATOM_VERSION_ALL;}
                ;
 %%

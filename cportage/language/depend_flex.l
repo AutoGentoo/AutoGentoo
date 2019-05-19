@@ -28,7 +28,7 @@ P_Atom* atom_parse (char* buffer) {
     YY_BUFFER_STATE bs = yy_scan_string(buffer);
     yy_switch_to_buffer(bs);
     yyparse();
-    return (P_Atom*)yyout;
+    return ((Dependency*)yyout)->atom;
 }
 
 RequiredUse* required_use_parse (char* buffer) {
@@ -76,11 +76,11 @@ repo            [\:][\:]{identifier}
 "^^"                    {yylval.use_select = USE_EXACT_ONE; return USESELECT;}
 "(+)"                   {yylval.use_default = ATOM_DEFAULT_ON; return USE_DEFAULT;}
 "(-)"                   {yylval.use_default = ATOM_DEFAULT_OFF; return USE_DEFAULT;}
-[-]                     {return '-';}
-[<]                     {return '<';}
-[>]                     {return '>';}
-[=]                     {return '=';}
-[!]                     {return '!';}
+"-"                     {return '-';}
+"<"                     {return '<';}
+">"                     {return '>';}
+"="                     {return '=';}
+"!"                     {return '!';}
 [\[]                    {return '[';}
 [\]]                    {return ']';}
 [\?]                    {return '?';}
@@ -98,7 +98,7 @@ repo            [\:][\:]{identifier}
 [\*]                    {return '*';}
 
 {identifier}            {
-                            yylval.identifier = strdup (yytext);
+                            yylval.identifier = yytext;
                             return (IDENTIFIER);
                         }
 
