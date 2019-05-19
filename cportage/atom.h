@@ -133,9 +133,12 @@ void atomversion_free(AtomVersion* parent);
 void atom_free(P_Atom* ptr);
 void atomflag_free(AtomFlag* parent);
 void dependency_free(Dependency* ptr);
-
 AtomFlag* atomflag_build(char* name);
 
 int atom_version_compare(AtomVersion* first, AtomVersion* second);
+
+AtomVersion* version_dup(AtomVersion* ver);
+AtomFlag* atomflag_dup(AtomFlag* use);
+P_Atom* atom_dup(P_Atom* atom);
 
 #endif //AUTOGENTOO_ATOM_H

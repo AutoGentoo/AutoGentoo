@@ -10,6 +10,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include "use.h"
 
 P_Atom* atom_new(char* input) {
 	P_Atom* out = malloc(sizeof(P_Atom));
@@ -270,4 +271,83 @@ int atom_version_compare(AtomVersion* first, AtomVersion* second) {
 	}
 	
 	return 0;
+}
+
+AtomVersion* version_dup(AtomVersion* ver) {
+	if (!ver)
+		return NULL;
+	
+	AtomVersion* out = NULL;
+	AtomVersion* last = NULL;
+	AtomVersion* temp = NULL;
+	
+	AtomVersion* curr;
+	
+	for (curr = ver; curr; curr = curr->next) {
+		temp = malloc(sizeof(AtomVersion));
+		if (curr->full_version)
+			temp->full_version = strdup(curr->full_version);
+		else
+			temp->full_version = NULL;
+		temp->prefix = curr->prefix;
+		temp->v = strdup(curr->v);
+		
+		if (!out)
+			out = temp;
+		else
+			last->next = temp;
+		last = temp;
+	}
+	last->next = NULL;
+	
+	return out;
+}
+
+AtomFlag* atomflag_dup(AtomFlag* use) {
+	if (!use)
+		return NULL;
+	
+	AtomFlag* out = NULL;
+	AtomFlag* last = NULL;
+	AtomFlag* temp = NULL;
+	
+	AtomFlag* curr;
+	
+	for (curr = use; curr; curr = curr->next) {
+		temp = malloc(sizeof(UseFlag));
+		temp->name = strdup(curr->name);
+		temp->def = curr->def;
+		temp->option = curr->option;
+		
+		if (!out)
+			out = temp;
+		else
+			last->next = temp;
+		last = temp;
+	}
+	last->next = NULL;
+	
+	return out;
+}
+
+P_Atom* atom_dup(P_Atom* atom) {
+	P_Atom* out = malloc(sizeof(P_Atom));
+	out->version = version_dup(atom->version);
+	out->useflags = atomflag_dup(atom->useflags);
+	
+	if (atom->slot)
+		out->slot = strdup(atom->slot);
+	if (atom->sub_slot)
+		out->sub_slot = strdup(atom->sub_slot);
+	
+	out->key = strdup(atom->key);
+	out->name = strdup(atom->name);
+	out->category = strdup(atom->category);
+	out->repository = strdup(atom->repository);
+	out->blocks = atom->blocks;
+	out->revision = atom->revision;
+	out->range = atom->range;
+	out->sub_opts = atom->sub_opts;
+	
+	return out;
 }

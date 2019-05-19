@@ -154,8 +154,23 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 }
 
 int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
-	int cmp = atom_version_compare(ebuild->version, atom->version);
-	int cmp_rev = ebuild->revision - atom->revision;
+	int cmp_slot = 0;
+	int cmp_slot_sub = 0;
+	
+	if (ebuild->slot && atom->slot)
+		cmp_slot = strcmp(ebuild->slot, atom->slot);
+	if (ebuild->sub_slot && atom->sub_slot)
+		cmp_slot_sub = strcmp(ebuild->sub_slot, atom->sub_slot);
+	
+	if (cmp_slot != 0 || cmp_slot_sub != 0)
+		return 0;
+	
+	int cmp = 0;
+	int cmp_rev = 0;
+	if (atom->version) {
+		cmp = atom_version_compare(ebuild->version, atom->version);
+		cmp_rev = ebuild->revision - atom->revision;
+	}
 	
 	if (cmp == 0 && atom->range & ATOM_VERSION_E) {
 		if (atom->range == ATOM_VERSION_E) {
@@ -168,7 +183,7 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 		if (cmp_rev == 0)
 			return 1;
 		else if (cmp_rev > 0 && atom->range & ATOM_VERSION_L)
-			return 1; \
+			return 1;
 		else if (cmp_rev < 0 && atom->range & ATOM_VERSION_G)
 			return 1;
 	}

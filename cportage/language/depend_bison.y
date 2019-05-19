@@ -36,6 +36,7 @@ void yyerror(const char *message);
     struct {
         char* name;
         char* sub_name;
+        atom_slot_t sub_opts;
     } slot;
 
     AtomFlag* atom_flag;
@@ -51,7 +52,6 @@ void yyerror(const char *message);
 
 %type <atom_type> atom_version
 %type <atom_type> atom_block
-%type <atom_type> atom_slot_rebuild
 %type <atom_type> atom_slot
 %type <atom_type> atom_repo
 %type <atom_type> atom
@@ -107,22 +107,17 @@ atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); $$->def = ATOM_NO_
             | IDENTIFIER USE_DEFAULT{$$ = atomflag_build($1); $$->def = $2; $$->next = NULL;}
             ;
 
-atom_repo   : atom_slot_rebuild REPOSITORY {$$ = $1; free($$->repository); $$->repository = $2;}
-            | atom_slot_rebuild            {$$ = $1;}
+atom_repo   : atom_slot REPOSITORY {$$ = $1; free($$->repository); $$->repository = $2;}
+            | atom_slot            {$$ = $1;}
             ;
 
-atom_slot_rebuild:
-              atom_slot '='         {$$ = $1; $$->sub_opts = ATOM_SLOT_REBUILD;}
-            | atom_slot '*'         {$$ = $1; $$->sub_opts = ATOM_SLOT_IGNORE;}
-            | atom_slot             {$$ = $1; $$->sub_opts = ATOM_SLOT_IGNORE;}
-            ;
-
-atom_slot   : atom_block SLOT           {
-                                            $$ = $1;
-                                            $$->slot = $2.name;
-                                            $$->sub_slot = $2.sub_name;
-                                        }
-            | atom_block                {$$ = $1; $$->slot = NULL; $$->sub_slot = NULL;}
+atom_slot   : atom_block                {$$ = $1; $$->slot = NULL; $$->sub_slot = NULL; $$->sub_opts = ATOM_SLOT_IGNORE;}
+            | atom_block SLOT           {
+                                             $$ = $1;
+                                             $$->slot = $2.name;
+                                             $$->sub_slot = $2.sub_name;
+                                             $$->sub_opts = $2.sub_opts;
+                                         }
             ;
 
 atom_block  :      '!' atom_version     {$$ = $2; $$->blocks = ATOM_BLOCK_SOFT;}

@@ -7,10 +7,7 @@
 
 int error = 0;
 
-static char* __yybuffer;
-
 int yyerror(char *s) {
-    fprintf(stderr, "%s\n", __yybuffer);
     fprintf(stderr, "%s in line %d near '%s'\n", s, yylineno, yytext);
     error = 1;
     exit(1);
@@ -49,7 +46,7 @@ version         {digit}+("."{digit}+)*{letter}?({version_suf}{digit}*)*("-r"{dig
 identifier      ({letter}|{digit}|_|\+|\*|\-)+
 atom            {identifier}\/{identifier}(\-{version})?
 slotname        ({letter}|{digit}|"_")({letter}|{digit}|"_"|"-"|"."|"+")*
-slot            [\:]({slotname}(\/{slotname})?)?
+slot            [\:]({slotname}(\/{slotname})?)?[\*|\=]?
 repo            [\:][\:]{identifier}
 
 %%
@@ -57,6 +54,17 @@ repo            [\:][\:]{identifier}
 [ \t\r\\]+              ;
 {repo}                  {yylval.identifier = strdup(yytext + 2); return REPOSITORY;}
 {slot}                  {
+                            size_t len = strlen(yytext);
+                            yylval.slot.sub_opts = ATOM_SLOT_IGNORE;
+                            if (yytext[len - 1] == '*') {
+                                yylval.slot.sub_opts = ATOM_SLOT_IGNORE;
+                                yytext[len - 1] == 0;
+                            }
+                            else if (yytext[len - 1] == '=') {
+                                yylval.slot.sub_opts = ATOM_SLOT_REBUILD;
+                                yytext[len - 1] == 0;
+                            }
+
                             char* name_splt = strchr(yytext + 1, '/');
                             if (name_splt)
                                 *name_splt = 0;
