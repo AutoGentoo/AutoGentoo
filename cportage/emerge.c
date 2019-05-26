@@ -66,6 +66,7 @@ int emerge (Emerge* emerge) {
 	}
 	
 	emerge_parse_keywords(emerge);
+	emerge_parse_useflags(emerge);
 	
 	for (char** atom = emerge->atoms; *atom; atom++) {
 	

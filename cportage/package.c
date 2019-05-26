@@ -82,6 +82,7 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 		new_package->category = strdup(atom_parsed->category);
 		new_package->name = strdup(atom_parsed->name);
 		new_package->keywords = NULL;
+		new_package->useflags = NULL;
 		
 		new_package->ebuilds = NULL;
 		target = new_package;
@@ -155,7 +156,6 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 }
 
 
-
 void package_free(Package* ptr) {
 	free(ptr->key);
 	free(ptr->name);
@@ -180,7 +180,7 @@ void package_free(Package* ptr) {
 	free(ptr);
 }
 
-Ebuild* ebuild_free(Ebuild* ptr) {
+void ebuild_free(Ebuild* ptr) {
 	free(ptr->category);
 	free(ptr->pn);
 	free(ptr->pv);

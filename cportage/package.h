@@ -20,6 +20,7 @@ struct __Package {
 	char* name;
 	
 	Keyword* keywords;
+	PackageUse* useflags;
 	Ebuild* ebuilds;
 };
 
@@ -77,6 +78,6 @@ void package_metadata_init(Ebuild* ebuild);
 Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man);
 
 void package_free(Package* ptr);
-Ebuild* ebuild_free(Ebuild* ptr);
+void ebuild_free(Ebuild* ptr);
 
 #endif //AUTOGENTOO_PACKAGE_H

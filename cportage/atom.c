@@ -64,6 +64,8 @@ P_Atom* atom_new(char* input) {
 	out->sub_opts = ATOM_SLOT_IGNORE;
 	out->range = ATOM_VERSION_ALL;
 	out->blocks = ATOM_BLOCK_NONE;
+	out->parent = NULL;
+	out->repo_selected = ATOM_REPO_ALL;
 	free(input);
 	
 	return out;
@@ -184,9 +186,6 @@ void atom_free(P_Atom* ptr) {
 }
 
 void dependency_free(Dependency* ptr) {
-	if (!ptr)
-		return;
-	
 	Dependency* next = NULL;
 	Dependency* temp = ptr;
 	while (temp) {
@@ -209,6 +208,8 @@ Dependency* dependency_build_atom(P_Atom* atom) {
 	out->depends = IS_ATOM;
 	out->selector = USE_NONE;
 	out->selectors = NULL;
+	out->atom->parent = out;
+	out->parent = NULL;
 	
 	return out;
 }
@@ -224,6 +225,7 @@ Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* 
 	out->depends = HAS_DEPENDS;
 	out->selector = type;
 	out->selectors = selector;
+	out->parent = NULL;
 	
 	return out;
 }
@@ -231,6 +233,9 @@ Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* 
 AtomFlag* atomflag_build(char* name) {
 	AtomFlag* out = malloc(sizeof(AtomFlag));
 	out->name = strdup(name);
+	out->option = 0;
+	out->def = 0;
+	out->next = NULL;
 	
 	return out;
 }
@@ -348,6 +353,8 @@ P_Atom* atom_dup(P_Atom* atom) {
 	out->revision = atom->revision;
 	out->range = atom->range;
 	out->sub_opts = atom->sub_opts;
+	out->repo_selected = atom->repo_selected;
+	out->parent = atom->parent;
 	
 	return out;
 }

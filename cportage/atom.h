@@ -5,6 +5,8 @@
 #ifndef AUTOGENTOO_ATOM_H
 #define AUTOGENTOO_ATOM_H
 
+#include "constants.h"
+
 typedef struct __P_Atom P_Atom;
 typedef struct __AtomVersion AtomVersion;
 typedef struct __AtomFlag AtomFlag;
@@ -72,6 +74,11 @@ typedef enum {
 	ATOM_PREFIX_P
 } atom_version_pre_t;
 
+typedef enum {
+	ATOM_REPO_ALL,
+	ATOM_REPO_DEFINED
+} atom_repo_t;
+
 struct __AtomVersion {
 	char* full_version; //!< Only set on the first one
 	char* v; //!< If there is a prefix, only include the integer part, if none 0
@@ -93,6 +100,7 @@ struct __P_Atom {
 	char* category;
 	char* name;
 	char* repository; //!< Default is gentoo
+	atom_repo_t repo_selected;
 	
 	char* key;
 	
@@ -107,12 +115,14 @@ struct __P_Atom {
 	int revision;
 	
 	AtomFlag* useflags;
+	Dependency* parent;
 };
 
 /**
  * target? ( selector selector selector ) next_target? ( ... ) depend
  */
 struct __Dependency {
+	Ebuild* parent;
 	P_Atom* atom; // NULL if it has depends
 	char* target; // NULL if has atom
 	

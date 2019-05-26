@@ -17,7 +17,8 @@ typedef enum {
 	PORTAGE_DOWNGRADE = 1 << 4 | PORTAGE_UPDATE,
 	PORTAGE_REPLACE = PORTAGE_INSTALL| 1 << 5,
 	PORTAGE_REBIULD = PORTAGE_REPLACE | 1 << 6,
-	PORTAGE_BLOCK = 1 << 7
+	PORTAGE_USE_FLAG = 1 << 7 | PORTAGE_REBIULD,
+	PORTAGE_BLOCK = 1 << 8
 } dependency_t;
 
 /**
@@ -38,6 +39,6 @@ Ebuild* atom_resolve_ebuild(Emerge* emerge, P_Atom* atom);
 void dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends);
 void dependency_resolve_ebuild(Emerge* emerge, Ebuild* ebuild);
 PortageDependency* dependency_new(Ebuild* e, P_Atom* p, InstalledEbuild* old, dependency_t option);
-PortageDependency* dependency_check_selected(Emerge* emerge, Ebuild* potential, dependency_t* options);
+PortageDependency* dependency_check_selected(Emerge* emerge, Ebuild* potential, P_Atom* atom, dependency_t* options);
 
 #endif //AUTOGENTOO_DEPENDENCY_H

@@ -155,23 +155,24 @@ void dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depe
 						continue;
 					
 					dependency_t options = 0;
-					PortageDependency* check_selected = dependency_check_selected(emerge, check_resolved, &options);
+					PortageDependency* check_selected = dependency_check_selected(emerge, check_resolved, NULL,
+					                                                              &options);
 					
 					if (!check_selected)
 						continue;
-					
-					
 				}
 			}
 			else
 				portage_die("Illegal operator %s in a dependency expression", current->target);
 		}
-		// ATOM
-		
+		else {
+			// ATOM
+			
+		}
 	}
 }
 
-PortageDependency* dependency_check_selected(Emerge* emerge, Ebuild* potential, dependency_t* options) {
+PortageDependency* dependency_check_selected(Emerge* emerge, Ebuild* potential, P_Atom* atom, dependency_t* options) {
 	for (int i = 0; i < emerge->selected->n; i++) {
 		PortageDependency* check = *(PortageDependency**)vector_get(emerge->selected, i);
 		if (strcmp(potential->parent->key, check->target->parent->key) != 0)

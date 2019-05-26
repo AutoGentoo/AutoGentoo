@@ -110,8 +110,8 @@ atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); $$->def = ATOM_NO_
             | IDENTIFIER USE_DEFAULT{$$ = atomflag_build($1); $$->def = $2; $$->next = NULL;}
             ;
 
-atom_repo   : atom_slot REPOSITORY {$$ = $1; free($$->repository); $$->repository = $2;}
-            | atom_slot            {$$ = $1;}
+atom_repo   : atom_slot REPOSITORY {$$ = $1; free($$->repository); $$->repository = $2; $$->repo_selected = ATOM_REPO_DEFINED;}
+            | atom_slot            {$$ = $1; $$->repo_selected = ATOM_REPO_ALL;}
             ;
 
 atom_slot   : atom_block                {$$ = $1; $$->slot = NULL; $$->sub_slot = NULL; $$->sub_opts = ATOM_SLOT_IGNORE;}

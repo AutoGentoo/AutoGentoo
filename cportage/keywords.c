@@ -72,6 +72,7 @@ Keyword* accept_keyword_parse(FILE* fp, Keyword** last) {
 	while ((read_size = getline(&line, &n, fp)) != -1) {
 		if (line[0] == '#' || line[0] == '\n' || line[0] == 0)
 			continue;
+		line[read_size - 1] = 0;
 		char* atom_splt = strchr(line, ' ');
 		*atom_splt = 0;
 		char* atom = strdup(line);
@@ -120,7 +121,7 @@ void emerge_parse_keywords(Emerge* emerge) {
 			return;
 		}
 		
-		Keyword* last;
+		Keyword* last = NULL;
 		temp = accept_keyword_parse(fp, &last);
 		
 		last->next = parsed;
@@ -137,16 +138,32 @@ void emerge_parse_keywords(Emerge* emerge) {
 	
 	Keyword* next;
 	Keyword* current = parsed;
+	Keyword* new;
 	while (current) {
 		next = current->next;
-		Package* target = map_get(emerge->repo->packages, current->atom->key);
-		if (!target) {
-			plog_warn("Package %s not found (package.accept_keywords)", current->atom->key);
-			keyword_free(current);
-			return;
+		
+		for (Repository* repo = emerge->repo; repo; repo = repo->next) {
+			if (current->atom->repo_selected == ATOM_REPO_DEFINED
+			    && strcmp(current->atom->repository, repo->name) != 0)
+				continue;
+			
+			Package* target = map_get(repo->packages, current->atom->key);
+			
+			if (!target) {
+				plog_warn("Package %s not found (package.accept_keywords)", current->atom->key);
+				continue;
+			}
+			
+			new = malloc(sizeof(Keyword));
+			new->next = target->keywords;
+			new->atom = atom_dup(current->atom);
+			memcpy(new->keywords, current->keywords, sizeof(keyword_t) * ARCH_END);
+			
+			new->next = target->keywords;
+			target->keywords = new;
 		}
-		current->next = target->keywords;
-		target->keywords = current;
+		
+		keyword_free(current);
 		current = next;
 	}
 }
