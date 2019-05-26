@@ -28,22 +28,10 @@ struct __Package {
 #include "portage_log.h"
 
 /**
- *              TOP
- *             /   \
- *           self  next
- *         /          \
- *    self->target    next->target
- */
-struct __PortageDependency {
-	Ebuild* target;
-	P_Atom* selector;
-	PortageDependency* next;
-};
-
-/**
  * Version of a specfic package, this is what is built
  */
 struct __Ebuild {
+	Package* parent;
 	char* category;
 	char* pn;
 	char* pv;
@@ -87,11 +75,7 @@ Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* 
 
 void package_metadata_init(Ebuild* ebuild);
 Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man);
-Ebuild* atom_resolve_ebuild(Emerge* emerge, P_Atom* atom);
-PortageDependency*
-dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends, PortageDependency* next);
-void dependency_resolve_ebuild(Emerge* emerge, Ebuild* ebuild);
-PortageDependency* dependency_new(Ebuild* e, P_Atom* p);
+
 void package_free(Package* ptr);
 Ebuild* ebuild_free(Ebuild* ptr);
 

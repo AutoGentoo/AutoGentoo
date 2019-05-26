@@ -81,9 +81,9 @@ repo            [\:][\:]{identifier}
 
                             return SLOT;
                         }
-"??"                    {yylval.use_select = USE_MOST_ONE; return USESELECT;}
-"||"                    {yylval.use_select = USE_LEAST_ONE; return USESELECT;}
-"^^"                    {yylval.use_select = USE_EXACT_ONE; return USESELECT;}
+"??"                    {yylval.use_select.target = strdup(yytext); yylval.use_select.val = USE_MOST_ONE; return USESELECT;}
+"||"                    {yylval.use_select.target = strdup(yytext); yylval.use_select.val = USE_LEAST_ONE; return USESELECT;}
+"^^"                    {yylval.use_select.target = strdup(yytext); yylval.use_select.val = USE_EXACT_ONE; return USESELECT;}
 "(+)"                   {yylval.use_default = ATOM_DEFAULT_ON; return USE_DEFAULT;}
 "(-)"                   {yylval.use_default = ATOM_DEFAULT_OFF; return USE_DEFAULT;}
 "-"                     {return '-';}

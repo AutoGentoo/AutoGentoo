@@ -109,6 +109,8 @@ set(src_CPORTAGE
         cportage/emerge.h
         cportage/directory.c
         cportage/directory.h
+        cportage/dependency.c
+        cportage/dependency.h
         cportage/cportage_defines.h
         )
 

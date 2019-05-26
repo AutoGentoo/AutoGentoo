@@ -90,5 +90,6 @@ void installedpackage_free(InstalledPackage* pkg);
 void backtrack_search(PortageDB* db, InstalledEbuild* parent, Dependency* deptree, rebuild_t type);
 void backtrack_new(PortageDB* db, InstalledEbuild* rebuild, P_Atom* atom, rebuild_t type);
 void backtrack_resolve(PortageDB* db, rebuild_t types);
+int ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* installed_ebuild);
 
 #endif //AUTOGENTOO_DATABASE_H

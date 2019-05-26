@@ -44,8 +44,8 @@ struct __Emerge {
 	sha_hash hash_package_use;
 	sha_hash hash_make_conf;
 	
-	Map* installed;
-	Map* selected;
+	PortageDB* database;
+	Vector* selected;
 };
 
 extern Emerge* emerge_main;

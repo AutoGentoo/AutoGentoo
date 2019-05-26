@@ -24,4 +24,6 @@ void plog_warn(char* fmt, ...);
 	plog_info("BENCHMARK %s (%lf)", name, cpu_time_used); \
 }
 
+void portage_die(char* fmt, ...);
+
 #endif //AUTOGENTOO_PORTAGE_LOG_H

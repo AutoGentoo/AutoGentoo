@@ -14,6 +14,33 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+int ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* installed_ebuild) {
+	int cmp_slot = 0;
+	int cmp_slot_sub = 0;
+	int cmp = 0;
+	int cmp_rev = 0;
+	
+	if (ebuild->slot && installed_ebuild->slot)
+		cmp_slot = strcmp(ebuild->slot, installed_ebuild->slot);
+	if (cmp_slot != 0)
+		return cmp_slot;
+	
+	if (ebuild->sub_slot && installed_ebuild->sub_slot)
+		cmp_slot_sub = strcmp(ebuild->sub_slot, installed_ebuild->sub_slot);
+	if (cmp_slot_sub != 0)
+		return cmp_slot_sub;
+	
+	cmp = atom_version_compare(ebuild->version, installed_ebuild->version);
+	cmp_rev = ebuild->revision - installed_ebuild->revision;
+	
+	if (cmp != 0)
+		return cmp;
+	if (cmp_rev != 0)
+		return cmp_rev;
+	
+	return 0;
+}
+
 InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom) {
 	InstalledPackage* db_pkg = map_get(db->installed, atom->key);
 	if (!db_pkg)
@@ -246,6 +273,7 @@ PortageDB* portagedb_read(Emerge* emerge) {
 	out->installed = map_new(4196, 0.8);
 	out->backtracking = vector_new(sizeof(RebuildEbuild*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	int ebuild_n = 0;
+	emerge->database = out;
 	
 	FPNode* categories = open_directory_stat(__S_IFDIR, db_dir, out->path, NULL);
 	close(db_dir);

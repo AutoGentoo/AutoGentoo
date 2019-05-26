@@ -26,7 +26,10 @@ void yyerror(const char *message);
     Dependency* depend_type;
     atom_use_default use_default;
     RequiredUse* use_type;
-    use_select_t use_select;
+    struct {
+        use_select_t val;
+        char* target;
+     } use_select;
 
     struct {
         char* target;
@@ -83,7 +86,7 @@ depend_expr  :    depend_expr_sel[p] depend_expr[c]         {$$ = dependency_bui
                 ;
 
 depend_expr_sel : use_expr '?'          {$$ = $1;}
-                | USESELECT             {$$.target = NULL; $$.t = $1;}
+                | USESELECT             {$$.target = $1.target; $$.t = $1.val;}
                 ;
 
 use_expr: '!' IDENTIFIER        {$$.target = $2; $$.t = USE_DISABLE;}
