@@ -46,6 +46,9 @@ struct __Emerge {
 	
 	PortageDB* database;
 	Vector* selected;
+	
+	Suggestion* use_suggestions;
+	Suggestion* keyword_suggestions;
 };
 
 extern Emerge* emerge_main;

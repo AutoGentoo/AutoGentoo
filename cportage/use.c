@@ -10,12 +10,34 @@
 #include "package.h"
 #include "directory.h"
 #include "portage.h"
+#include "dependency.h"
 #include <stdlib.h>
 #include <share.h>
 #include <string.h>
-#include<ctype.h>
+#include <ctype.h>
 
-use_select_t package_check_use(Ebuild* ebuild, char* useflag) {
+/**
+ * Set the useflag of ebiuld to new_val
+ * @param ebuild ebuild to look in
+ * @param useflag useflag to look for
+ * @param new_val value to set to
+ * @return the old value of the useflag
+ */
+use_select_t ebuild_set_use(Ebuild* ebuild, char* useflag, use_select_t new_val) {
+	UseFlag* current;
+	for (current = ebuild->use; current; current = current->next) {
+		if (strcmp(current->name, useflag) == 0) {
+			use_select_t old = current->status;
+			current->status = new_val;
+			return old;
+		}
+	}
+	
+	plog_warn("Flag %s not found for ebuild %s-%s", useflag, ebuild->parent->key, ebuild->version->full_version);
+	return -1;
+}
+
+use_select_t ebuild_check_use(Ebuild* ebuild, char* useflag) {
 	UseFlag* current;
 	for (current = ebuild->use; current; current = current->next) {
 		if (strcmp(current->name, useflag) == 0)
@@ -77,10 +99,10 @@ char* use_expr_str(RequiredUse* expr) {
 int use_check_expr(Ebuild* ebuild, RequiredUse* expr) {
 	if (expr->option == USE_ENABLE || expr->option == USE_DISABLE) {
 		if (expr->depend) {
-			if (package_check_use(ebuild, expr->target) != expr->option)
+			if (ebuild_check_use(ebuild, expr->target) != expr->option)
 				return use_check_expr(ebuild, expr->depend);
 		} else {
-			if (expr->option == package_check_use(ebuild, expr->target))
+			if (expr->option == ebuild_check_use(ebuild, expr->target))
 				return 1;
 			return 0;
 		}
@@ -194,7 +216,7 @@ AtomFlag* dependency_useflag(Ebuild* resolved, AtomFlag* new_flags, AtomFlag* ol
 		if (!current) {
 			// Use flag from two not found in one
 			// Add this flag
-			use_select_t ebuild_setting = package_check_use(resolved, to_check->name);
+			use_select_t ebuild_setting = ebuild_check_use(resolved, to_check->name);
 			if (ebuild_setting == -1) {
 				if (to_check->def == ATOM_DEFAULT_OFF)
 					ebuild_setting = USE_DISABLE;
@@ -343,7 +365,6 @@ void emerge_parse_useflags(Emerge* emerge) {
 	
 	PackageUse* next;
 	PackageUse* current = parsed;
-	PackageUse* new;
 	while (current) {
 		next = current->next;
 		
@@ -359,21 +380,11 @@ void emerge_parse_useflags(Emerge* emerge) {
 				continue;
 			}
 			
-			new = malloc(sizeof(PackageUse));
-			new->next = target->useflags;
-			new->atom = atom_dup(current->atom);
-			new->flags = NULL;
-			
-			for (UseFlag* flag = current->flags; flag; flag = flag->next) {
-				UseFlag* dupped_flag = malloc(sizeof(UseFlag));
-				dupped_flag->name = strdup(flag->name);
-				dupped_flag->status = flag->status;
-				dupped_flag->next = new->flags;
-				new->flags = dupped_flag;
+			for (Ebuild* current_ebuild = target->ebuilds; current_ebuild; current_ebuild = current_ebuild->older) {
+				if (atom_match_ebuild(current_ebuild, current->atom) == 0)
+					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next)
+						ebuild_set_use(current_ebuild, current_flag->name, current_flag->status);
 			}
-			
-			new->next = target->useflags;
-			target->useflags = new;
 		}
 		
 		useflag_free(current->flags);

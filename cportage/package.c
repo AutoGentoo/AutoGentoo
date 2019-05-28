@@ -24,7 +24,6 @@ void package_metadata_init(Ebuild* ebuild) {
 		return;
 	}
 	
-	
 	size_t name_size;
 	char* name = NULL;
 	

@@ -75,9 +75,8 @@ int main (int argc, char** argv) {
 	emerge_main->atoms = opt_handle(opt_handlers, argc, argv + 1);
 	emerge_main->repo = emerge_repos_conf(__emerge_main);
 	
-	if (!emerge_main->default_repo) {
+	if (!emerge_main->default_repo)
 		return 1;
-	}
 	
 	OpenSSL_add_all_digests();
 	

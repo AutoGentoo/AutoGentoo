@@ -24,6 +24,9 @@ Emerge* emerge_new() {
 	out->options = 0;
 	out->repo = NULL;
 	
+	out->use_suggestions = NULL;
+	out->keyword_suggestions = NULL;
+	
 	return out;
 }
 

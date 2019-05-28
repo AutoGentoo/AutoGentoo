@@ -122,7 +122,8 @@ struct __P_Atom {
  * target? ( selector selector selector ) next_target? ( ... ) depend
  */
 struct __Dependency {
-	Ebuild* parent;
+	Ebuild* parent_ebuild;
+	Dependency* parent;
 	P_Atom* atom; // NULL if it has depends
 	char* target; // NULL if has atom
 	
@@ -150,5 +151,6 @@ int atom_version_compare(AtomVersion* first, AtomVersion* second);
 AtomVersion* version_dup(AtomVersion* ver);
 AtomFlag* atomflag_dup(AtomFlag* use);
 P_Atom* atom_dup(P_Atom* atom);
+char* atom_get_str(P_Atom* atom);
 
 #endif //AUTOGENTOO_ATOM_H

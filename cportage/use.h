@@ -27,7 +27,8 @@ struct __RequiredUse {
 	RequiredUse* next;
 };
 
-use_select_t package_check_use(Ebuild* ebuild, char* useflag);
+use_select_t ebuild_set_use(Ebuild* ebuild, char* useflag, use_select_t new_val);
+use_select_t ebuild_check_use(Ebuild* ebuild, char* useflag);
 RequiredUse* use_build_required_use(char* target, use_select_t option);
 int ebuild_check_required_use(Ebuild* ebuild);
 UseFlag* useflag_new(char* name, use_select_t status);

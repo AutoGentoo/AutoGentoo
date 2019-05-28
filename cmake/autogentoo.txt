@@ -111,6 +111,8 @@ set(src_CPORTAGE
         cportage/directory.h
         cportage/dependency.c
         cportage/dependency.h
+        cportage/suggestion.c
+        cportage/suggestion.h
         cportage/cportage_defines.h
         )
 

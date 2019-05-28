@@ -29,5 +29,6 @@ typedef struct __InstalledPackage InstalledPackage;
 typedef struct __SelectedEbuild SelectedEbuild;
 typedef struct __RebuildEbuild RebuildEbuild;
 typedef struct __PortageDB PortageDB;
+typedef struct __Suggestion Suggestion;
 
 #endif //AUTOGENTOO_CONSTANTS_H

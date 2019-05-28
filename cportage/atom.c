@@ -358,3 +358,37 @@ P_Atom* atom_dup(P_Atom* atom) {
 	
 	return out;
 }
+
+void prv_get_prefix(char* out, atom_version_t range) {
+	out[0] = 0;
+	out[1] = 0;
+	out[2] = 0;
+	
+	if (range == ATOM_VERSION_ALL)
+		;
+	else if (range == ATOM_VERSION_REV)
+		out[0] = '~';
+	else if (range == ATOM_VERSION_E)
+		out[0] = '=';
+	else if (range & ATOM_VERSION_G)
+		out[0] = '>';
+	else if (range & ATOM_VERSION_L)
+		out[0] = '<';
+	
+	if (range == ATOM_VERSION_GE || range == ATOM_VERSION_LE)
+		out[1] = '=';
+}
+
+char* atom_get_str(P_Atom* atom) {
+	char* out;
+	char prefix[3];
+	prv_get_prefix(prefix, atom->range);
+	
+	if (atom->range != ATOM_VERSION_ALL)
+		asprintf(&out, "%s%s-%s", prefix, atom->key, atom->version->full_version);
+	else
+		asprintf(&out, "%s", atom->key);
+	
+	free(prefix);
+	return out;
+}
