@@ -21,13 +21,11 @@ typedef enum {
 	PORTAGE_BLOCK = 1 << 8
 } dependency_t;
 
-/**
- *              TOP
- *             /   \
- *           self  next
- *         /          \
- *    self->target    next->target
- */
+typedef enum {
+	PORTAGE_DEPEND_STATUS_NOT_ADDED,
+	PORTAGE_DEPEND_STATUS_ADDED
+} portage_depend_st_t;
+
 struct __PortageDependency {
 	Dependency* selected_by;
 	
@@ -36,13 +34,16 @@ struct __PortageDependency {
 	UseFlag* flags;
 	P_Atom* selector;
 	dependency_t option;
+	
+	portage_depend_st_t status;
 };
 
 int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom);
 Ebuild* atom_resolve_ebuild(Emerge* emerge, P_Atom* atom);
-void dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends);
+PortageDependency* dependency_resolve_single(Emerge* emerge, Ebuild* current_ebuild, Dependency* depend, int try_keyword);
 void dependency_resolve_ebuild(Emerge* emerge, Ebuild* ebuild);
 PortageDependency* dependency_new(Dependency* parent, Ebuild* e, P_Atom* p, InstalledEbuild* old, dependency_t option);
-PortageDependency* dependency_check_selected(Emerge* emerge, Ebuild* potential, dependency_t* options);
+PortageDependency* dependency_get_selected(Emerge* emerge, P_Atom* search);
+PortageDependency* dependency_set_selected(Emerge* emerge, Ebuild* potential, P_Atom* potential_atom);
 
 #endif //AUTOGENTOO_DEPENDENCY_H

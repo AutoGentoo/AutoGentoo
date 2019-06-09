@@ -119,15 +119,15 @@ void dependency_resolve_ebuild(Emerge* emerge, Ebuild* ebuild) {
 		exit(1);
 	
 	if (emerge->build_opts == EMERGE_RUNSIDE) {
-		dependency_resolve(emerge, ebuild, ebuild->rdepend);
+		dependency_resolve_single(emerge, ebuild, ebuild->rdepend, 0);
 		
 		/* IM NOT REALLY SURE ABOUT THIS */
-		dependency_resolve(emerge, ebuild, ebuild->pdepend);
+		dependency_resolve_single(emerge, ebuild, ebuild->pdepend, 0);
 	} else if (emerge->build_opts == EMERGE_BUILDSIDE) {
-		dependency_resolve(emerge, ebuild, ebuild->bdepend);
-		dependency_resolve(emerge, ebuild, ebuild->rdepend);
-		dependency_resolve(emerge, ebuild, ebuild->depend);
-		dependency_resolve(emerge, ebuild, ebuild->pdepend);
+		dependency_resolve_single(emerge, ebuild, ebuild->bdepend, 0);
+		dependency_resolve_single(emerge, ebuild, ebuild->rdepend, 0);
+		dependency_resolve_single(emerge, ebuild, ebuild->depend, 0);
+		dependency_resolve_single(emerge, ebuild, ebuild->pdepend, 0);
 	}
 	
 	ebuild->resolved = 1;
@@ -145,8 +145,7 @@ void dependency_useflag_simplify(Ebuild* parent, Ebuild* resolved, P_Atom* atom)
 		if (curr->option == ATOM_USE_ENABLE) {
 			ebuild_set_use(resolved, curr->name, USE_ENABLE);
 			continue;
-		}
-		else if (curr->option == ATOM_USE_DISABLE) {
+		} else if (curr->option == ATOM_USE_DISABLE) {
 			ebuild_set_use(resolved, curr->name, USE_DISABLE);
 			continue;
 		}
@@ -154,7 +153,8 @@ void dependency_useflag_simplify(Ebuild* parent, Ebuild* resolved, P_Atom* atom)
 		use_select_t value = ebuild_check_use(parent, curr->name);
 		if (value == -1) {
 			if (curr->def == ATOM_NO_DEFAULT)
-				portage_die("Ebuild %s-%s has no use flag %s and no default is defined", parent->parent->key, parent->version->full_version, curr->name);
+				portage_die("Ebuild %s-%s has no use flag %s and no default is defined", parent->parent->key,
+				            parent->version->full_version, curr->name);
 			else if (curr->def == ATOM_DEFAULT_ON)
 				value = USE_ENABLE;
 			else if (curr->def == ATOM_DEFAULT_OFF)
@@ -173,9 +173,10 @@ void dependency_useflag_simplify(Ebuild* parent, Ebuild* resolved, P_Atom* atom)
 }
 
 PortageDependency*
-dependency_select_atom(Emerge* emerge, Ebuild* parent, Ebuild* resolved, InstalledEbuild* installed, Dependency* dep,
-                       PortageDependency* selected, int try_keyword) {
+dependency_select_atom(Emerge* emerge, Ebuild* parent, Dependency* dep, int try_keyword) {
 	Package* package = atom_resolve_package(emerge, dep->atom);
+	InstalledEbuild* installed = portagedb_resolve_installed(emerge->database, dep->atom);
+	Ebuild* resolved = atom_resolve_ebuild(emerge, dep->atom);
 	
 	if (!resolved && try_keyword == 1) {
 		/* Try again with unstable selected */
@@ -191,160 +192,134 @@ dependency_select_atom(Emerge* emerge, Ebuild* parent, Ebuild* resolved, Install
 			/* It works with the unstable flag */
 			/* Raise the suggestion and continue */
 			emerge_suggestion_keyword(emerge, resolved, dep->atom);
-		}
-		else
+		} else
 			return NULL;
-	}
-	else if (!resolved)
+	} else if (!resolved)
 		return NULL;
 	
-	if (!selected)
-		selected = dependency_check_selected(emerge, resolved, NULL);
+	// Check if this atom is already selected, if so, set it to desired version
+	PortageDependency* selected = dependency_set_selected(emerge, resolved, dep->atom);
+	if (selected)
+		return selected;
 	
 	PortageDependency* out = NULL;
 	
-	if (!installed) {
-		out = dependency_new(NULL, resolved, dep->atom, NULL, PORTAGE_NEW);
-		vector_add(emerge->selected, &dep);
-		return out;
+	dependency_t option = -1;
+	
+	if (!installed)
+		option = PORTAGE_NEW;
+	else {
+		int update = ebuild_installedebuild_cmp(resolved, installed);
+		if (update == 0)
+			option = PORTAGE_REBUILD;
+		else if (update > 0)
+			option = PORTAGE_UPDATE;
+		else if (update < 0)
+			option = PORTAGE_DOWNGRADE;
 	}
 	
-	dependency_t option = -1;
-	int update = ebuild_installedebuild_cmp(resolved, installed);
-	if (update == 0)
-		option = PORTAGE_REBUILD;
-	else if (update > 0)
-		option = PORTAGE_UPDATE;
-	else if (update < 0)
-		option = PORTAGE_DOWNGRADE;
+	out = dependency_new(dep, resolved, dep->atom, installed, option);
 	
 	return out;
 }
 
 PortageDependency* dependency_select_one(Emerge* emerge, Ebuild* current_ebuild, Dependency* from) {
-	P_Atom* resolved_atom = NULL;
-	Ebuild* resolved = NULL;
-	InstalledEbuild* installed = NULL;
+	Dependency* current;
 	
-	/* Won't be null if already selected */
 	PortageDependency* selected = NULL;
 	
-	Dependency* check = NULL;
+	/* Search for stable one first */
+	for (current = from; current && !selected; current = current->next)
+		selected = dependency_resolve_single(emerge, current_ebuild, current, 0);
 	
-	/* Search the array for the first one that hits */
-	for (check = from; check; check = check->next) {
-		if (check->depends != IS_ATOM)
-			portage_die("Invalid any of many expression in package %s-%s", current_ebuild->parent->key,
-			            current_ebuild->version);
+	for (; current; current = current->next) {
+		InstalledEbuild* installed = portagedb_resolve_installed(emerge->database, current->atom);
+		selected = dependency_get_selected(emerge, current->atom);
 		
-		InstalledEbuild* check_installed = portagedb_resolve_installed(emerge->database, check->atom);
-		Ebuild* check_resolved = atom_resolve_ebuild(emerge, check->atom);
-		
-		if (!check_resolved)
+		if (installed) {
+			if (!selected)
+				;
+			else
+				return selected;
+		}
+	}
+}
+
+Vector* dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends, int try_keyword) {
+	Vector* out = vector_new(sizeof(PortageDependency*), VECTOR_ORDERED | VECTOR_REMOVE);
+	for (Dependency* current = depends; current; current = current->next) {
+		PortageDependency* found = dependency_resolve_single(emerge, )
+	}
+}
+
+inline PortageDependency* dependency_resolve_single(Emerge* emerge, Ebuild* current_ebuild, Dependency* depend, int try_keyword) {
+	if (depend->depends == HAS_DEPENDS) {
+		// Check if we are looking for a use flag
+		if ((depend->selector == USE_DISABLE || depend->selector == USE_ENABLE)) {
+			if (depend->selector == ebuild_check_use(current_ebuild, depend->target)) {
+				dependency_resolve(emerge, current_ebuild, depend->selectors, try_keyword);
+				
+			}
+			return NULL;
+		}
+		else if (depend->selector == USE_LEAST_ONE) {
+			return dependency_select_one(emerge, current_ebuild, depend);
+		}
+		else
+			portage_die("Illegal operator %s in a dependency expression", depend->target);
+	}
+	
+	//ATOM
+	return dependency_select_atom(emerge, current_ebuild, depend, try_keyword);
+}
+
+PortageDependency* dependency_get_selected(Emerge* emerge, P_Atom* search) {
+	for (int i = 0; i < emerge->selected->n; i++) {
+		PortageDependency* check = *(PortageDependency**) vector_get(emerge->selected, i);
+		if (strcmp(search->key, check->target->parent->key) != 0)
 			continue;
 		
-		resolved = check_resolved;
-		resolved_atom = check->atom;
+		if (search->slot && strcmp(search->slot, check->target->slot) != 0) { // Different slot
+			if (search->sub_slot && check->target->sub_slot && strcmp(search->slot, check->target->slot) != 0)
+				continue;
+			else if (search->sub_slot || check->target->sub_slot)
+				;
+			else
+				continue;
+		}
 		
-		if (check_installed)
-			installed = check_installed;
-		
-		selected = dependency_check_selected(emerge, check_resolved, NULL);
-		
-		
-		if (installed || selected)
-			break;
+		if (atom_match_ebuild(check->target, search))
+			return check;
 	}
 	
-	/* Go through the rest of the array to make sure no other package is selected or installed */
-	for (; check; check = check->next) {
-		Ebuild* check_resolved = atom_resolve_ebuild(emerge, check->atom);
-		InstalledEbuild* check_installed = portagedb_resolve_installed(emerge->database, check->atom);
-		
-		dependency_t options = 0;
-		PortageDependency* check_seleted = dependency_check_selected(emerge, check_resolved, &options);
-		
-		if (check_seleted || check_installed) {
-			plog_warn("|| (%s-%s %s-%s) in ebuild %s-%s selected multiple packages", check->atom->key, check->atom->version->full_version, resolved->parent->key, resolved->version->full_version);
-			portage_die("%s-%s cannot be installed on the same system as %s-%s", check->atom->key, check->atom->version->full_version, resolved->parent->key, resolved->version->full_version);
-		}
-	}
-	
-	if (installed) {
-		if (!dependency_select_atom(emerge, current_ebuild, resolved, installed, from, NULL, 1))
-			portage_die("Failed select a package update for %s-%s", resolved->parent->key, resolved->version->full_version);
-	}
-	else {
-		PortageDependency* new_dep = NULL;
-		for (Dependency* possible_install = current->selectors; possible_install; possible_install = possible_install->next) {
-			Ebuild* check_resolved = atom_resolve_ebuild(emerge, possible_install->atom);
-			if ((new_dep = dependency_select_atom(emerge, current_ebuild, check_resolved, NULL, possible_install, NULL,
-			                                      0)))
-				break; // Select the first one that works
-		}
-		
-		if (!new_dep) {
-			/* Try again by with unstable keywords this time */
-			for (Dependency* possible_install = current->selectors; possible_install; possible_install = possible_install->next) {
-				if ((new_dep = dependency_select_atom(emerge, current_ebuild, NULL, NULL, possible_install, NULL, 1)))
-					break; // Select the first one that works
-			}
-		}
-		
-		if (!new_dep)
-			portage_die ("Could not find unmasked package in || statement (%s-%s)", current_ebuild->parent->key, current_ebuild->version->full_version);
-	}
+	return NULL;
 }
 
-void dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends) {
-	Dependency* current;
-	for (current = depends; current; current = current->next) {
-		if (current->depends == HAS_DEPENDS) {
-			if ((current->selector == USE_DISABLE || current->selector == USE_ENABLE)
-			    && current->selector == ebuild_check_use(current_ebuild, current->target)) {
-				dependency_resolve(emerge, current_ebuild, current->selectors);
-			} else if (current->selector == USE_LEAST_ONE) {
-			
-			} else
-				portage_die("Illegal operator %s in a dependency expression", current->target);
-		} else {
-			// ATOM
-			InstalledEbuild* installed = portagedb_resolve_installed(emerge->database, current->atom);
-			Ebuild* resolved = atom_resolve_ebuild(emerge, current->atom);
-			
-			if (!dependency_select_atom(emerge, current_ebuild, resolved, installed, current, NULL, 1))
-				portage_die("All packages to resolve %s have been masked", atom_get_str(current->atom));
-		}
-	}
-}
-
-PortageDependency* dependency_check_selected(Emerge* emerge, Ebuild* potential, dependency_t* options) {
+PortageDependency*
+dependency_set_selected(Emerge* emerge, Ebuild* potential, P_Atom* potential_atom) {
 	for (int i = 0; i < emerge->selected->n; i++) {
 		PortageDependency* check = *(PortageDependency**) vector_get(emerge->selected, i);
 		if (strcmp(potential->parent->key, check->target->parent->key) != 0)
 			continue;
 		
-		if (strcmp(potential->slot, check->target->slot) != 0) {// Different slot
-			if (options)
-				*options = PORTAGE_SLOT;
-			return NULL;
-		}
+		if (strcmp(potential->slot, check->target->slot) != 0) // Different slot
+			continue;
 		
 		if (PORTAGE_INSTALL & check->option) {
-			int ver_cmp = atom_version_compare(check->target->version, potential->version);
-			if (options) {
-				if (ver_cmp == 0)
-					*options = PORTAGE_REPLACE; //!< Already selected
-				else if (ver_cmp < 0)
-					*options = PORTAGE_UPDATE;
-				else if (ver_cmp > 0)
-					*options = PORTAGE_DOWNGRADE;
+			if (atom_match_ebuild(check->target, potential_atom))
+				return check;
+			
+			if (atom_match_ebuild(potential, check->selector)) {
+				check->target = potential;
+				return check;
 			}
-			return check;
 		}
+		char* temp_str = atom_get_str(potential_atom);
+		plog_warn("%s-%s does not match atom %s", check->target->parent->key, check->target->version->full_version, temp_str);
+		free(temp_str);
 	}
 	
-	if (options)
-		*options = 0;
 	return NULL; //!< Package was not selected
 }
+
+void dependency_remove(Emerge* emerge, PortageDependency* depend)
