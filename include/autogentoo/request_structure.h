@@ -16,6 +16,7 @@ typedef enum {
 	STRCT_EMERGE,
 	STRCT_ISSUE_TOK,
 	STRCT_JOB_SELECT,
+	STRCT_HOST_META, /* Get information about a potential host */
 	
 	STRCT_MAX
 } request_structure_t;
@@ -57,6 +58,13 @@ struct __struct_Issue_token {
 	char* user_id;
 	char* target_host;
 	token_access_t permission;
+} __attribute__((packed));
+
+struct __struct_Host_meta {
+	char* arch;
+	
+	int systemd;
+
 } __attribute__((packed));
 
 struct __Raw {

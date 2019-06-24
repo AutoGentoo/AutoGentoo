@@ -45,3 +45,4 @@ venv/*
 src/test/*
 src/temp_api/*
 /doc/*
+build-debug/*

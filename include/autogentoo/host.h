@@ -15,6 +15,7 @@ typedef struct __Host Host;
 #include "response.h"
 #include "server.h"
 #include "kernel.h"
+#include "host_environment.h"
 
 #define AUTOGETNOO_HOST_ID_LENGTH 15
 
@@ -50,24 +51,13 @@ struct __Host {
 	char* profile; //!< Portage profile, see possible values with eselect profile list
 	char* hostname; //!< Hostname of the host (shows up in the graphical client)
 	char* arch; //!<  The portage-arch (eg. amd64)
+	
+	char* abi;
+	
 	chroot_t chroot_status; //!< Is the chroot ready?
 	host_env_t environment_status; //!< Is the environment ready to compile
 	
-	/*
-	char* cflags; //!< The gcc passed to C programs, try -march=native :)
-	char* cxxflags; //!< The gcc passed only to CXX programs
-	char* chost; //!< The system chost (should not be changed after it is set)
-	char* use; //!< use flags
-	StringVector* extra; //!< A list of extra entries to go into make.conf
-	
-	char* portage_tmpdir; //!< build dir
-	char* portdir; //!< ebuild portage tree
-	char* distdir; //!< distfiles
-	char* pkgdir; //!< path to binaries
-	char* port_logdir; //!< logs
-	*/
-	
-	SmallMap* make_conf;
+	HostEnvironment* environment;
 	Vector* kernel;
 };
 
@@ -113,8 +103,6 @@ void host_free(Host* host);
  */
 void host_init_extras(Host* target);
 
-/**
- *
- */
+int host_write_make_conf(Host* host);
 
 #endif

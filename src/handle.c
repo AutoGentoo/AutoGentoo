@@ -34,6 +34,7 @@ RequestLink requests[] = {
 		{REQ_SRV_REFRESH,     {.ag_fh=SRV_REFRESH}},
 		{REQ_AUTH_REGISTER,   {.ag_fh=AUTH_REGISTER}},
 		{REQ_JOB_STREAM,      {.ag_fh=JOB_STREAM}},
+		{REQ_META_STAGE3,     {.ag_fh=META_STAGE3}},
 };
 
 RequestNameLink request_names[] = {
@@ -50,6 +51,7 @@ RequestNameLink request_names[] = {
 		{REQ_SRV_REFRESH,     "SRV_REFRESH"},
 		{REQ_AUTH_REGISTER,   "AUTH_REGISTER"},
 		{REQ_JOB_STREAM,      "JOB_STREAM"},
+		{REQ_META_STAGE3,     "META_STAGE3"}
 };
 
 char* str_request(request_t type) {
@@ -124,7 +126,7 @@ void HOST_EDIT(Response* res, Request* request) {
 	struct __struct_Host_edit host_edit = request->structures[2].host_edit;
 
 	if (host_edit.request_type == 1) {
-		free(small_map_delete(host->make_conf, host_edit.make_conf_var));
+		 free(small_map_delete(host->make_conf, host_edit.make_conf_var));
 		small_map_insert(host->make_conf, host_edit.make_conf_var, strdup(host_edit.make_conf_val));
 	}
 	else if (host_edit.request_type == 2) {
@@ -262,8 +264,6 @@ void SRV_REFRESH(Response* res, Request* request) {
 		dynamic_binary_array_next(res->content);
 	}
 	dynamic_binary_array_end(res->content);
-
-
 }
 
 void AUTH_ISSUE_TOK(Response* res, Request* request) {
@@ -455,4 +455,9 @@ void JOB_STREAM(Response* res, Request* request) {
 	inotify_rm_watch(iwatch, watch_d);
 	close(iwatch);
 	close(log_fd);
+}
+
+void META_STAGE3(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_JOB_SELECT});
+	
 }

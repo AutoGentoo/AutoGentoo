@@ -81,5 +81,6 @@ void AUTH_ISSUE_TOK(Response* res, Request* request);
 void AUTH_REFRESH_TOK(Response* res, Request* request);
 void AUTH_REGISTER(Response* res, Request* request);
 void JOB_STREAM(Response* res, Request* request);
+void META_STAGE3(Response* res, Request* req);
 
 #endif

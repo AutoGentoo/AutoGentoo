@@ -248,8 +248,11 @@ PortageDependency* dependency_select_one(Emerge* emerge, Ebuild* current_ebuild,
 Vector* dependency_resolve(Emerge* emerge, Ebuild* current_ebuild, Dependency* depends, int try_keyword) {
 	Vector* out = vector_new(sizeof(PortageDependency*), VECTOR_ORDERED | VECTOR_REMOVE);
 	for (Dependency* current = depends; current; current = current->next) {
-		PortageDependency* found = dependency_resolve_single(emerge, )
+		PortageDependency* found = dependency_resolve_single(emerge, current_ebuild, current, try_keyword);
+		
 	}
+	
+	return out;
 }
 
 inline PortageDependency* dependency_resolve_single(Emerge* emerge, Ebuild* current_ebuild, Dependency* depend, int try_keyword) {
@@ -322,4 +325,4 @@ dependency_set_selected(Emerge* emerge, Ebuild* potential, P_Atom* potential_ato
 	return NULL; //!< Package was not selected
 }
 
-void dependency_remove(Emerge* emerge, PortageDependency* depend)
+void dependency_remove(Emerge* emerge, PortageDependency* depend);

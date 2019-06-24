@@ -6,7 +6,6 @@
 #include <openssl/ssl.h>
 
 Opt opt_handlers[] = {
-		{'s', "server",  "Start the autogentoo server (instead of client)", set_is_server,      OPT_SHORT | OPT_LONG},
 		{'r', "root",    "Set the root directory of the server",            set_location,       OPT_SHORT | OPT_LONG |
 		                                                                                        OPT_ARG},
 		{'h', "help",    "Print the help message and exit",                 print_help_wrapper, OPT_SHORT | OPT_LONG},
@@ -29,7 +28,6 @@ static char* location = NULL;
 static char port[5] = AUTOGENTOO_PORT;
 static server_t server_opts;
 static int logfile_fd = -1;
-static char is_server = 0;
 static char* client_opts = NULL;
 
 static char* cert_file = NULL;
@@ -65,10 +63,6 @@ void set_is_encrypted (Opt* op, char* c) {
 		lerror("Could not initialize ssl library");
 		exit(1);
 	}
-}
-
-void set_is_server(Opt* op, char* c) {
-	is_server = 1;
 }
 
 void set_target(Opt* op, char* target) {
@@ -120,35 +114,27 @@ int main(int argc, char** argv) {
 	free(location);
 	location = resolved_location;
 	
-	if (is_server) {
-		Server* main_server = read_server(location, port, server_opts);
-		free(location);
-		main_server->keep_alive = 1;
-		
-		if (main_server->opts & ENCRYPT) {
-			main_server->rsa_child = server_encrypt_new(main_server, AUTOGENTOO_PORT_ENCRYPT, cert_file, rsa_file, enc_server_options);
-			if (!main_server->rsa_child) {
-				server_free(main_server);
-				lerror("Failed to initialize server");
-				exit(1);
-			}
+	Server* main_server = read_server(location, port, server_opts);
+	free(location);
+	main_server->keep_alive = 1;
+	
+	if (main_server->opts & ENCRYPT) {
+		main_server->rsa_child = server_encrypt_new(main_server, AUTOGENTOO_PORT_ENCRYPT, cert_file, rsa_file, enc_server_options);
+		if (!main_server->rsa_child) {
+			server_free(main_server);
+			lerror("Failed to initialize server");
+			exit(1);
 		}
-		
-		if (main_server->opts & ENCRYPT)
-			pthread_create(
-					&main_server->rsa_child->pid,
-					NULL,
-					(void* (*)(void*))server_encrypt_start,
-					main_server->rsa_child);
-		server_start(main_server);
 	}
-	else {
-		free(location);
-		char* cmd;
-		asprintf(&cmd, "python " AUTOGENTOO_CLIENT " %s", client_opts);
-		system(cmd);
-		free(cmd);
-	}
+	
+	if (main_server->opts & ENCRYPT)
+		pthread_create(
+				&main_server->rsa_child->pid,
+				NULL,
+				(void* (*)(void*))server_encrypt_start,
+				main_server->rsa_child);
+	
+	server_start(main_server);
 	
 	/* Exit sequence */
 	if (logfile_fd != -1)
