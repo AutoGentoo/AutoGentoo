@@ -38,22 +38,23 @@ Host* host_new(Server* server, char* id) {
 	out->id = id; // Dont need to dup, never accessed elsewhere
 	out->chroot_status = CHR_NOT_MOUNTED;
 	out->environment_status = HOST_ENV_VOID;
+	out->environment = malloc(sizeof(HostEnvironment));
 	
 	out->arch = NULL;
 	out->hostname = NULL;
 	out->profile = NULL;
 	
-	out->environment->make_conf.cflags = strdup("-O2 -pipe");
-	out->environment->make_conf.cxxflags = strdup("${CFLAGS}");
-	out->environment->make_conf.use = strdup("");
-	out->environment->make_conf.portage_tmpdir = strdup("/autogentoo/tmp");
-	out->environment->make_conf.portdir = strdup("/usr/portage");
-	out->environment->make_conf.distdir = strdup("/usr/portage/distfiles");
-	out->environment->make_conf.pkgdir = strdup("/autogentoo/pkg");
-	out->environment->make_conf.portage_logdir = strdup("/autogentoo/log");
-	out->environment->make_conf.lc_messages = strdup("C");
+	out->environment->cflags = strdup("-O2 -pipe");
+	out->environment->cxxflags = strdup("${CFLAGS}");
+	out->environment->use = strdup("");
+	out->environment->portage_tmpdir = strdup("/autogentoo/tmp");
+	out->environment->portdir = strdup("/usr/portage");
+	out->environment->distdir = strdup("/usr/portage/distfiles");
+	out->environment->pkgdir = strdup("/autogentoo/pkg");
+	out->environment->portage_logdir = strdup("/autogentoo/log");
+	out->environment->lc_messages = strdup("C");
 	
-	out->environment->make_conf.extra = small_map_new(5);
+	out->environment->extra = small_map_new(5);
 	
 	out->kernel = NULL;
 	
@@ -125,33 +126,33 @@ int host_write_make_conf(Host* host) {
 	
 	fwrite_line(makef, "# CFLAGS, CXXFLAGS are passed to the compile to make binary optimizations");
 	fwrite_line(makef, "# Warning: Never use -march=native, use the expanded form");
-	fwrite_line(makef, "CFLAGS=\"%s\"", host->environment->make_conf.cflags);
-	fwrite_line(makef, "CXXFLAGS=\"%s\"", host->environment->make_conf.cxxflags);
+	fwrite_line(makef, "CFLAGS=\"%s\"", host->environment->cflags);
+	fwrite_line(makef, "CXXFLAGS=\"%s\"", host->environment->cxxflags);
 	
 	fwrite_line(makef, "");
-	fwrite_line(makef, "USE=\"%s\"", host->environment->make_conf.use);
+	fwrite_line(makef, "USE=\"%s\"", host->environment->use);
 	fwrite_line(makef, "");
 	
-	for (int i = 0; i < host->environment->make_conf.extra->n; i++) {
-		SmallMap_key* current_key = *(SmallMap_key**)vector_get(host->environment->make_conf.extra, i);
+	for (int i = 0; i < host->environment->extra->n; i++) {
+		SmallMap_key* current_key = *(SmallMap_key**)vector_get(host->environment->extra, i);
 		fwrite_line(makef, "%s=\"%s\"", current_key->key, current_key->data_ptr);
 	}
 	
 	fwrite_line(makef, "");
 	fwrite_line(makef, "# Portage directory settings");
 	fwrite_line(makef, "# These settings should not be changed");
-	fwrite_line(makef, "PORTDIR=\"%s\"", host->environment->make_conf.portdir);
-	fwrite_line(makef, "PORTAGE_LOGDIR=\"%s\"", host->environment->make_conf.portage_logdir);
-	fwrite_line(makef, "DISTDIR=\"%s\"", host->environment->make_conf.distdir);
-	fwrite_line(makef, "PORTAGE_TMPDIR=\"%s\"", host->environment->make_conf.portage_tmpdir);
-	fwrite_line(makef, "PKGDIR=\"%s\"", host->environment->make_conf.pkgdir);
+	fwrite_line(makef, "PORTDIR=\"%s\"", host->environment->portdir);
+	fwrite_line(makef, "PORTAGE_LOGDIR=\"%s\"", host->environment->portage_logdir);
+	fwrite_line(makef, "DISTDIR=\"%s\"", host->environment->distdir);
+	fwrite_line(makef, "PORTAGE_TMPDIR=\"%s\"", host->environment->portage_tmpdir);
+	fwrite_line(makef, "PKGDIR=\"%s\"", host->environment->pkgdir);
 	
 	fwrite_line(makef, "");
 	fwrite_line(makef, "# This sets the language of build output to English.");
 	fwrite_line(makef, "# Please keep this setting intact when reporting bugs.");
-	fwrite_line(makef, "LC_MESSAGES=\"%s\"", host->environment->make_conf.lc_messages);
+	fwrite_line(makef, "LC_MESSAGES=\"%s\"", host->environment->lc_messages);
 	
-	fwrite_line(1, "");
+	fwrite_line(makef, "");
 	
 	fflush(makef);
 	fclose(makef);

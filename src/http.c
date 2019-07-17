@@ -88,9 +88,7 @@ FILE* http_handle_path(Server* parent, HttpRequest* req, long* size) {
 		}
 		
 		Host* target = server_get_host(parent, host_id);
-		char* pkgdir = small_map_get(target->make_conf, "PKGDIR");
-		
-		asprintf(&path, "%s/%s/%s/%s", parent->location, target->id, pkgdir, file);
+		asprintf(&path, "%s/%s/%s/%s", parent->location, target->id, target->environment->pkgdir, file);
 	}
 	else
 		asprintf(&path, "%s/%s", parent->location, req->path);

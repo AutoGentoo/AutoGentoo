@@ -124,13 +124,25 @@ size_t write_host_fp(Host* host, FILE* fp) {
 	size += write_string(host->profile, fp);
 	size += write_string(host->arch, fp);
 	
-	size += write_int((int)host->make_conf->n, fp);
+	size += write_string(host->environment->cflags, fp);
+	size += write_string(host->environment->cxxflags, fp);
+	size += write_string(host->environment->distdir, fp);
+	size += write_string(host->environment->lc_messages, fp);
+	size += write_string(host->environment->pkgdir, fp);
+	size += write_string(host->environment->portage_logdir, fp);
+	size += write_string(host->environment->portage_tmpdir, fp);
+	size += write_string(host->environment->portdir, fp);
+	size += write_string(host->environment->use, fp);
+	
+	size += write_int((int)host->environment->extra->n, fp);
 	
 	int i;
-	for (i = 0; i != host->make_conf->n; i++) {
-		size += write_string((*(SmallMap_key**)vector_get(host->make_conf, i))->key, fp);
-		size += write_string((*(SmallMap_key**)vector_get(host->make_conf, i))->data_ptr, fp);
+	for (i = 0; i != host->environment->extra->n; i++) {
+		SmallMap_key* current_key = (*(SmallMap_key**)vector_get(host->environment->extra, i));
+		size += write_string(current_key->key, fp);
+		size += write_string(current_key->data_ptr, fp);
 	}
+	
 	
 	if (host->kernel) {
 		for (i = 0; i != host->kernel->n; i++) {
@@ -223,15 +235,28 @@ Host* read_host(FILE* fp) {
 	out->profile = read_string(fp);
 	out->arch = read_string(fp);
 	
-	out->make_conf = small_map_new(20);
+	out->environment = malloc(sizeof(HostEnvironment));
+	
+	out->environment->extra = small_map_new(20);
 	int n, i;
 	n = read_int(fp);
 	char* temp_name, *temp_val;
 	
+	out->environment->cflags = read_string(fp);
+	out->environment->cxxflags = read_string(fp);
+	out->environment->distdir = read_string(fp);
+	out->environment->lc_messages = read_string(fp);
+	out->environment->pkgdir = read_string(fp);
+	out->environment->portage_logdir = read_string(fp);
+	out->environment->portage_tmpdir = read_string(fp);
+	out->environment->portdir = read_string(fp);
+	out->environment->use = read_string(fp);
+	
+	
 	for (i = 0; i != n; i++) {
 		temp_name = read_string(fp);
 		temp_val = read_string(fp);
-		small_map_insert(out->make_conf, temp_name, temp_val);
+		small_map_insert(out->environment->extra, temp_name, temp_val);
 		
 		/* Dont free temp_val, we never dup it */
 		free(temp_name);
@@ -288,8 +313,10 @@ char* read_string(FILE* fp) {
 	
 	char* out = malloc(len + 1);
 	
-	if (!out)
+	if (!out) {
+		lerror("Failed to allocate memory with size %d", len + 1);
 		exit(1);
+	}
 	
 	fread(out, 1, len, fp);
 	out[len] = 0;

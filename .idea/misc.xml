@@ -4,6 +4,7 @@
   <component name="CidrRootsConfiguration">
     <excludeRoots>
       <file path="$PROJECT_DIR$/autom4te.cache" />
+      <file path="$PROJECT_DIR$/doc" />
       <file path="$PROJECT_DIR$/include/autogentoo/hacksaw/deprecated" />
       <file path="$PROJECT_DIR$/m4" />
       <file path="$PROJECT_DIR$/src/.deps" />

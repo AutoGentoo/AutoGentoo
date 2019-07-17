@@ -32,7 +32,7 @@ struct __struct_Host_new {
 };
 
 struct __struct_Host_edit {
-	int request_type; /* 1: make.conf, 2: general */
+	int request_type;
 	char* make_conf_var; /* Must be listed in allowed vars */
 	char* make_conf_val;
 };

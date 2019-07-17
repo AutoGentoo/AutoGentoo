@@ -124,30 +124,8 @@ void HOST_EDIT(Response* res, Request* request) {
 
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
 	struct __struct_Host_edit host_edit = request->structures[2].host_edit;
-
-	if (host_edit.request_type == 1) {
-		 free(small_map_delete(host->make_conf, host_edit.make_conf_var));
-		small_map_insert(host->make_conf, host_edit.make_conf_var, strdup(host_edit.make_conf_val));
-	}
-	else if (host_edit.request_type == 2) {
-		if (strcmp(host_edit.make_conf_var, "profile") == 0) {
-			if (host->profile)
-				free(host->profile);
-			host->profile = strdup(host_edit.make_conf_val);
-		}
-		else if (strcmp(host_edit.make_conf_var, "hostname") == 0) {
-			if (host->hostname)
-				free(host->hostname);
-			host->hostname = strdup(host_edit.make_conf_val);
-		}
-		else if (strcmp(host_edit.make_conf_var, "arch") == 0) {
-			if (host->arch)
-				free(host->arch);
-			host->arch = strdup(host_edit.make_conf_val);
-		}
-		else
-			HANDLE_RETURN(BAD_REQUEST);
-	}
+	
+	HANDLE_RETURN(INTERNAL_ERROR);
 }
 
 void HOST_DEL(Response* res, Request* request) {
@@ -253,14 +231,14 @@ void SRV_REFRESH(Response* res, Request* request) {
 		dynamic_binary_add(res->content, 's', current->arch);
 		dynamic_binary_add(res->content, 'i', &current->environment_status);
 
-		dynamic_binary_array_start(res->content);
+		/*dynamic_binary_array_start(res->content);
 		for (int j = 0; j < current->make_conf->n; j++) {
 			SmallMap_key* variable = *(SmallMap_key**)vector_get(current->make_conf, j);
 			dynamic_binary_add(res->content, 's', variable->key);
 			dynamic_binary_add(res->content, 's', (char*)variable->data_ptr);
 			dynamic_binary_array_next(res->content);
 		}
-		dynamic_binary_array_end(res->content);
+		dynamic_binary_array_end(res->content);*/
 		dynamic_binary_array_next(res->content);
 	}
 	dynamic_binary_array_end(res->content);

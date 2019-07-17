@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 project(AutoGentoo)
 
-include(cmake/hacksaw.txt)
+find_package(BISON REQUIRED)
+find_package(FLEX REQUIRED)
+
 include(cmake/autogentoo-build.txt)
 include(cmake/autogentoo.txt)
 include (${CMAKE_ROOT}/Modules/FindPythonLibs.cmake)
@@ -10,6 +12,7 @@ include (${CMAKE_ROOT}/Modules/FindPythonInterp.cmake)
 find_package(PythonLibs)
 
 include_directories(include)
+include_directories(/usr/include/autogentoo)
 include_directories(cportage/language)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PYTHON_INCLUDE_DIR})
@@ -19,13 +22,6 @@ include_directories(${PYTHON_INCLUDE_DIR})
 SET(CMAKE_C_COMPILER gcc)
 
 execute_process(COMMAND bash -c "mkdir -p {cportage,http}")
-
-add_library(hacksaw STATIC
-        ${hacksaw_HEADERS}
-        ${hacksaw_SRC}
-        )
-
-set_target_properties(hacksaw PROPERTIES COMPILE_FLAGS "-fPIC -g")
 
 find_library(ARCHIVE archive)
 
@@ -117,7 +113,6 @@ ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
 SET(CMAKE_INSTALL_PREFIX /usr)
 
 INSTALL(TARGETS autogentoo-exec cportage-exec DESTINATION bin)
-INSTALL(TARGETS autogentoo hacksaw cportage DESTINATION lib)
+INSTALL(TARGETS autogentoo cportage DESTINATION lib)
 
 INSTALL_HEADERS_WITH_DIRECTORY(include_HEADERS)
-INSTALL_HEADERS_WITH_DIRECTORY(hacksaw_HEADERS)
