@@ -197,14 +197,32 @@ void HOST_MNTCHROOT(Response* res, Request* request) {
 void SRV_INFO(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({});
 
+	char* distro = "Unknown";
+	
+	FILE* os_fp = fopen("/etc/os-release", "r");
+	if (os_fp) {
+		ssize_t nread = 0;
+		size_t len = 0;
+		char* line = NULL;
+		
+		while ((nread = getline(&line, &len, os_fp)) != -1)
+			if (strncmp(line, "NAME=", 5) == 0) {
+				distro = strndup(line + 5, nread - 6);
+				break;
+			}
+		
+		if (line)
+			free(line);
+	}
+	
 	struct utsname uname_pointer;
 	uname(&uname_pointer);
 	char* sys_info[][2] = {
-			{"System name", uname_pointer.sysname},
-			{"Nodename", uname_pointer.nodename},
-			{"Release", uname_pointer.release},
-			{"Version", uname_pointer.version},
-			{"Machine", uname_pointer.machine},
+			{"OS Name", uname_pointer.sysname},
+			{"Hostname", uname_pointer.nodename},
+			{"Kernel", uname_pointer.release},
+			{"Arch", uname_pointer.machine},
+			{"Distro", distro}
 	};
 
 	dynamic_binary_array_start(res->content);
@@ -214,6 +232,8 @@ void SRV_INFO(Response* res, Request* request) {
 		dynamic_binary_array_next(res->content);
 	}
 	dynamic_binary_array_end(res->content);
+	
+	free(distro);
 }
 
 void SRV_REFRESH(Response* res, Request* request) {
