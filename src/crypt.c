@@ -203,3 +203,31 @@ int x509_generate_write(EncryptServer* parent) {
 	
 	return 0;
 }
+
+char* fread_sha256 (FILE* fp) {
+	long pos = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	
+	SHA256_CTX sha256;
+	SHA256_Init(&sha256);
+	
+	int buff;
+	size_t bytes_read = 0;
+	
+	while ((bytes_read = fread(&buff, sizeof(int), 1, fp)) > 0)
+		SHA256_Update(&sha256, &buff, bytes_read);
+	
+	unsigned char out_buf[SHA256_DIGEST_LENGTH];
+	SHA256_Final(out_buf, &sha256);
+	
+	char* out = malloc(SHA256_DIGEST_LENGTH * 2 + 1);
+	for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+		sprintf(&out[i * 2], "%02x", out_buf[i]);
+	
+	out[SHA256_DIGEST_LENGTH * 2] = 0;
+	
+	fseek(fp, pos, SEEK_SET);
+	
+	return out;
+
+}

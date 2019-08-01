@@ -4,10 +4,7 @@
 #include <netinet/in.h>
 #include <autogentoo/user.h>
 #include <errno.h>
-
-inline size_t rsa_write_void(size_t len, FILE* fp) {
-	return 0;
-}
+#include <autogentoo/host_environment.h>
 
 void* read_void(size_t len, FILE* fp) {
 	void* out = malloc (len);
@@ -235,9 +232,7 @@ Host* read_host(FILE* fp) {
 	out->profile = read_string(fp);
 	out->arch = read_string(fp);
 	
-	out->environment = malloc(sizeof(HostEnvironment));
-	
-	out->environment->extra = small_map_new(20);
+	out->environment = host_environment_new(out);
 	int n, i;
 	n = read_int(fp);
 	char* temp_name, *temp_val;

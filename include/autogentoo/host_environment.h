@@ -16,12 +16,6 @@ typedef enum {
 	USE_DISABLE
 } portage_env_t;
 
-typedef enum {
-	HOST_ENVIRON_CFLAGS,
-	HOST_ENVIRON_CXXCFLAGS,
-	HOST_ENVIRON_USE
-} host_environ_t;
-
 #include "host.h"
 
 struct __HostEnvironment {
@@ -45,6 +39,12 @@ struct __HostEnvironment {
 	Vector* package_accept_keywords;
 	StringVector* package_mask;
 	Vector* package_env;
+	
+	char* make_conf_sha;
+	char* package_use_sha;
+	char* package_accept_keywords_sha;
+	char* package_mask_sha;
+	char* package_env_sha;
 };
 
 struct __PortageEntry {
@@ -54,5 +54,10 @@ struct __PortageEntry {
 	char* atom;
 	portage_env_t status;
 };
+
+HostEnvironment* host_environment_new(Host* parent);
+int host_environment_write(Host* target);
+void host_environment_backup(Host* target);
+void host_environment_write_make_conf(Host* target);
 
 #endif //AUTOGENTOO_HOST_ENVIRONMENT_H

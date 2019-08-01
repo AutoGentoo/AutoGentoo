@@ -8,7 +8,11 @@
       <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact" />
       <secret-storage>master_key</secret-storage>
       <user-name>postgres</user-name>
-      <introspection-schemas>autogentoo:</introspection-schemas>
+      <schema-mapping>
+        <introspection-scope>
+          <node kind="database" qname="autogentoo" />
+        </introspection-scope>
+      </schema-mapping>
     </data-source>
   </component>
 </project>

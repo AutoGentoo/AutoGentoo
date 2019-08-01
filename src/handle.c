@@ -125,6 +125,7 @@ void HOST_EDIT(Response* res, Request* request) {
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
 	struct __struct_Host_edit host_edit = request->structures[2].host_edit;
 	
+	
 	HANDLE_RETURN(INTERNAL_ERROR);
 }
 

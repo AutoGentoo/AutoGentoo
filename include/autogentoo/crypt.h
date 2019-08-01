@@ -43,4 +43,6 @@ int certificate_sign(X509* cert, RSA* rsa);
 void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair);
 int x509_generate_write(EncryptServer* parent);
 
+char* fread_sha256 (FILE* fp);
+
 #endif //AUTOGENTOO_CRYPT_H

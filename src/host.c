@@ -67,7 +67,7 @@ void host_init_extras(Host* target) {
 	target->kernel = vector_new(sizeof(Kernel*), VECTOR_UNORDERED | VECTOR_REMOVE);
 }
 
-char* host_path(Host* host, char* sub) {
+char* host_path(Host* host, char* sub, ...) {
 	char buf[PATH_MAX];
 	char* dest_temp = realpath(host->parent->location, buf);
 	if (dest_temp == NULL) {
@@ -76,8 +76,18 @@ char* host_path(Host* host, char* sub) {
 		return NULL;
 	}
 	
-	char* out;
-	asprintf(&out, "%s/%s/%s", dest_temp, host->id, sub);
+	char* out = malloc(256);
+	out[0] = 0;
+	
+	sprintf(out, "%s/%s/", dest_temp, host->id);
+	
+	va_list args;
+	va_start(args, sub);
+	
+	vsprintf(out + strlen(out), sub, args);
+	
+	va_end(args);
+	
 	return out;
 }
 
