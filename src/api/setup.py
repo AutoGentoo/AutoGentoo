@@ -23,7 +23,7 @@ extensions = [
 Options.language_level = "3"
 
 setup(
-	name="${PACKAGE_NAME}",
+	name="${PROJECT_NAME}",
 	version="2.01",
 	package_dir={'': '${CMAKE_CURRENT_SOURCE_DIR}'},
 	ext_modules=cythonize(extensions, compiler_directives={'language_level': "3"}, gdb_debug=True),

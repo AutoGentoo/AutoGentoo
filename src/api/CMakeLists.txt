@@ -1,3 +1,5 @@
+project(autogentoo_api)
+
 find_program(PYTHON "python")
 
 if (PYTHON)

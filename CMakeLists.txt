@@ -19,13 +19,8 @@ include_directories(${PYTHON_INCLUDE_DIR})
 
 #find_package (Python3 COMPONENTS Interpreter Development)
 
-SET(CMAKE_C_COMPILER gcc)
-
 execute_process(COMMAND bash -c "mkdir -p {cportage,http}")
 
-find_library(ARCHIVE archive)
-
-set(LOCALSTATEDIR /var)
 add_definitions(-DDBPATH="test")
 add_definitions(-DAUTOGENTOO_DEBUG)
 
@@ -64,7 +59,7 @@ add_executable(cportage-exec
         cportage/cemerge.c
         )
 
-set_target_properties(cportage-exec PROPERTIES OUTPUT_NAME emerge)
+set_target_properties(cportage-exec PROPERTIES OUTPUT_NAME autogentoo-emerge)
 
 target_link_libraries(cportage-exec
         cportage
@@ -120,6 +115,7 @@ ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
 SET(CMAKE_INSTALL_PREFIX /usr)
 
 INSTALL(TARGETS autogentoo-exec cportage-exec DESTINATION bin)
-INSTALL(TARGETS autogentoo cportage DESTINATION lib)
+INSTALL(TARGETS autogentoo cportage hacksaw DESTINATION lib)
 
 INSTALL_HEADERS_WITH_DIRECTORY(include_HEADERS)
+INSTALL_HEADERS_WITH_DIRECTORY(hacksaw_HEADERS)
