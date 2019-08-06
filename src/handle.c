@@ -155,32 +155,38 @@ void HOST_EMERGE(Response* res, Request* request) {
 		HANDLE_RETURN(FORBIDDEN);
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
 	
-	WorkerRequest* strct_worker_request = malloc(sizeof(WorkerRequest));
-	strct_worker_request->chroot = 0;
-	strct_worker_request->script = strdup("/usr/bin/emerge");
-	strct_worker_request->host = host;
 	
-	StringVector* worker_args = string_vector_new();
-	string_vector_add(worker_args, "-v");
+	WorkerRequest* strct_worker_request = malloc(sizeof(WorkerRequest));
+	strct_worker_request->command_name = "emerge";
+	
+	DynamicBinary* db = dynamic_binary_new(DB_ENDIAN_INPUT_NETWORK);
+	
+	dynamic_binary_add(db, 's', request->structures[1].host_select.hostname);
+	dynamic_binary_array_start(db);
 	
 	char* token = strtok(request->structures[2].emerge.emerge, " ");
 	while(token) {
-		string_vector_add(worker_args, token);
+		dynamic_binary_add(db, 's', token);
 		token = strtok(NULL, " ");
 	}
-	string_vector_add(worker_args, NULL);
+	dynamic_binary_array_end(db);
 	
-	strct_worker_request->arguments = worker_args->ptr;
-	strct_worker_request->argument_n = worker_args->n - 1; // Ignore NULL at end
+	strct_worker_request->bytes = db->ptr;
+	strct_worker_request->n = db->used_size;
+	strct_worker_request->template = db->template;
 	
-	free(worker_args);
-	
-	char* job_name = worker_request(request->parent->job_handler, strct_worker_request);
+	char* job_name;
+	int worker_res = worker_handler_request(request->parent->job_handler, strct_worker_request, &job_name);
 	
 	if (!job_name)
 		HANDLE_RETURN(INTERNAL_ERROR);
 	
 	dynamic_binary_add(res->content, 's', job_name);
+	
+	dynamic_binary_free(db);
+	free(strct_worker_request);
+	
+	HANDLE_RETURN(get_res(worker_res));
 }
 
 void HOST_MNTCHROOT(Response* res, Request* request) {
@@ -350,17 +356,21 @@ void JOB_STREAM(Response* res, Request* request) {
 	}
 	
 	/* Check if worker is running */
-	pthread_mutex_lock(&request->parent->job_handler->worker_mutex);
 	char* job_id = request->structures[2].job_select.job_name;
-	Worker* worker;
-	for (worker = request->parent->job_handler->worker_head; worker; worker = worker->next)
-		if (strcmp(job_id, worker->id) == 0)
-			break;
-	pthread_mutex_unlock(&request->parent->job_handler->worker_mutex);
+	
 	char* filename;
 	asprintf(&filename, "log/%s-%s.log", host->id, job_id);
+	size_t filename_len = strlen(filename);
+	
+	char* lock_file = malloc(filename_len + 5);
+	sprintf(lock_file, "%s.lck", filename);
+	
+	int running = 0;
 	
 	struct stat log_stat;
+	if (stat(lock_file, &log_stat) == 0) /* Successful lock file stat() */
+		running = 1;
+	
 	if (stat(filename, &log_stat) != 0) {
 		lerror("Failed to open %s", filename);
 		lerror("Error [%d] %s", errno, strerror(errno));
@@ -379,6 +389,7 @@ void JOB_STREAM(Response* res, Request* request) {
 	
 	START_STREAM()
 	
+	/* Dump the existing content of the file to SSL */
 	int c;
 	ssize_t log_read_size;
 	if (request->conn->communication_type == COM_RSA) {
@@ -393,7 +404,7 @@ void JOB_STREAM(Response* res, Request* request) {
 		HANDLE_RETURN_HTTP(UPGRADE_REQUIRED);
 	
 	/* Job is done. exit now */
-	if (!worker || pthread_mutex_trylock(&worker->running) != EBUSY) {
+	if (!running) {
 		close(log_fd);
 		HANDLE_RETURN_HTTP(OK);
 	}
@@ -405,8 +416,9 @@ void JOB_STREAM(Response* res, Request* request) {
 		return;
 	}
 	
-	int watch_d = inotify_add_watch(iwatch, filename, IN_MODIFY | IN_CLOSE_WRITE);
-	if (watch_d < 0) {
+	int watch_d = inotify_add_watch(iwatch, filename, IN_MODIFY);
+	int watch_d2 = inotify_add_watch(iwatch, lock_file, IN_DELETE_SELF);
+	if (watch_d < 0 || watch_d2 < 0) {
 		lerror("inotify_add_watch()");
 		close(log_fd);
 		close(iwatch);
@@ -422,7 +434,7 @@ void JOB_STREAM(Response* res, Request* request) {
 	ssize_t read_size;
 	
 	int keep_reading = 1;
-	for (;keep_reading;) {
+	while (keep_reading) {
 		read_size = read(iwatch, evbuff, sizeof(struct inotify_event));
 		if (read_size <= 0)
 			break;
@@ -430,10 +442,8 @@ void JOB_STREAM(Response* res, Request* request) {
 		for ( p = evbuff; p < evbuff + read_size; ) {
 			event = (struct inotify_event*) p;
 			
-			if (event->mask & IN_CLOSE_WRITE) {
-				if (pthread_mutex_trylock(&worker->running) != EBUSY)
-					keep_reading = 0;
-			}
+			if (event->mask & IN_DELETE_SELF)
+				keep_reading = 0;
 			
 			if (event->mask & IN_MODIFY) {
 				while ((log_read_size = read(log_fd, &c, sizeof(c))) == sizeof(c)) {
@@ -443,9 +453,6 @@ void JOB_STREAM(Response* res, Request* request) {
 					}
 				}
 			}
-			
-			if (pthread_mutex_trylock(&worker->running) != EBUSY)
-				keep_reading = 0;
 			
 			p += sizeof(struct inotify_event) + event->len;
 		}

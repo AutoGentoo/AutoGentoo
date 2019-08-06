@@ -2,13 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
-#include <netdb.h>
 #include <autogentoo/autogentoo.h>
 #include <fcntl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <string.h>
-#include <autogentoo/api/ssl_wrap.h>
 #include <sys/un.h>
 #include "autogentoo/worker.h"
 #include <sys/types.h>

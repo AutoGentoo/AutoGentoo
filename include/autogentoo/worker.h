@@ -8,60 +8,47 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#define WORKER_SOCK "/tmp/autogentoo_worker.sock"
-#define WORKER_SOCK_LCK "/tmp/autogentoo_worker.sock.lock"
-#define WORKER_RECV_CHUNK_SIZE 32
-
-#define WORKER_REQUEST_TEMPLATE "issia(s)"
+#define WORKER_FIFO_REQUEST "/tmp/autogentoo_worker.req"
+#define WORKER_FIFO_RESPONSE "/tmp/autogentoo_worker.res"
 
 typedef struct __WorkerHandler WorkerHandler;
-typedef struct __Worker Worker;
 typedef struct __WorkerRequest WorkerRequest;
-typedef struct __WorkerWaitor WorkerWaitor;
 
 #include "host.h"
 
 struct __WorkerRequest {
-	Worker* parent;
+	char* command_name;
+	char* template;
 	
-	Host* host;
-	char* script;
-	int chroot;
-	
-	int argument_n;
-	char** arguments;
-};
-
-/* Worker never needs to do a search because its saved to a file */
-struct __Worker {
-	WorkerHandler* parent;
-	Worker* next;
-	Worker* back;
-	
-	WorkerRequest* request;
-	pthread_mutex_t running;
-	
-	char* parent_directory;
-	
-	int exit_code;
-	
-	char* id;
-	pthread_t pid;
-	pid_t forked_pid;
+	size_t n;
+	void* bytes;
 };
 
 struct __WorkerHandler {
-	Worker* worker_head;
-	pthread_mutex_t worker_mutex;
+	pthread_t pid;
+	
+	pthread_mutex_t sig_lck;
+	pthread_cond_t sig;
+	
+	int read_fifo;
+	int write_fifo;
+	
+	pthread_mutex_t write_lck;
+	pthread_mutex_t read_lck;
+	
+	pthread_mutex_t request_lck;
+	pthread_mutex_t lck;
+	
+	WorkerRequest* request;
+	
+	int keep_alive;
 };
 
 WorkerHandler* worker_handler_new();
-void worker_start(Worker* worker);
-void worker_free(Worker* worker);
-void worker_handler_free(WorkerHandler* worker_handler);
-
-char* worker_register();
-
-char* worker_request(WorkerHandler* worker_handler, WorkerRequest* request);
+int worker_handler_start(WorkerHandler* wh);
+int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** command_id);
+void worker_handler_loop(WorkerHandler* wh);
+char* worker_register(char* command_name);
+void worker_handler_free(WorkerHandler* wh);
 
 #endif //AUTOGENTOO_WORKER_H

@@ -8,15 +8,9 @@
 typedef struct __HostEnvironment HostEnvironment;
 typedef struct __PortageEntry PortageEntry;
 
-typedef enum {
-	ACCEPT_KEYWORD_STABLE,
-	ACCEPT_KEYWORD_UNSTABLE,
-	
-	USE_ENABLE,
-	USE_DISABLE
-} portage_env_t;
-
 #include "host.h"
+
+
 
 struct __HostEnvironment {
 	Host* parent;
@@ -48,16 +42,25 @@ struct __HostEnvironment {
 };
 
 struct __PortageEntry {
-	char** comments;
-	int n;
-	
 	char* atom;
-	portage_env_t status;
+	
+	int flags_n;
+	char** flags;
 };
 
 HostEnvironment* host_environment_new(Host* parent);
 int host_environment_write(Host* target);
 void host_environment_backup(Host* target);
 void host_environment_write_make_conf(Host* target);
+
+
+/**
+ * MAY NOT NEED
+ * Checks if host_path/etc/portage/[filename] is a directory and shrinks it to one file
+ * @param target host to look in
+ * @param filename [package.use, package.accept_keywords] etc.
+ * @return 0: no action needed, 1: error, 2: ignore hash (regen needed)
+ */
+//int host_environment_convert_portagedir(Host* target, char* filename);
 
 #endif //AUTOGENTOO_HOST_ENVIRONMENT_H

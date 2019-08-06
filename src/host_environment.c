@@ -18,9 +18,9 @@ HostEnvironment* host_environment_new(Host* parent) {
 	out->extra = small_map_new(5);
 	out->lc_messages = NULL;
 	
-	out->package_accept_keywords = vector_new(sizeof(void*), VECTOR_REMOVE | VECTOR_ORDERED);
-	out->package_env = vector_new(sizeof(void*), VECTOR_REMOVE | VECTOR_ORDERED);
-	out->package_use = vector_new(sizeof(void*), VECTOR_REMOVE | VECTOR_ORDERED);
+	out->package_accept_keywords = vector_new(sizeof(PortageEntry*), VECTOR_REMOVE | VECTOR_ORDERED);
+	out->package_env = vector_new(sizeof(PortageEntry*), VECTOR_REMOVE | VECTOR_ORDERED);
+	out->package_use = vector_new(sizeof(PortageEntry*), VECTOR_REMOVE | VECTOR_ORDERED);
 	out->package_mask = string_vector_new();
 	
 	out->pkgdir = NULL;
@@ -74,11 +74,11 @@ void host_environment_backup(Host* target) {
 			size_t bytes_read = 0;
 			
 			char* backup_path = NULL;
-			asprintf(&backup_path, "%s.%d.backup", filepath, time(NULL));
+			asprintf(&backup_path, "%s.%ld.backup", filepath, time(NULL));
 			FILE* backup = fopen(backup_path, "w+");
 			
 			while ((bytes_read = fread(&b, sizeof(int), 1, fp)) > 0)
-				fwrite(&b, sizeof(int), 1, backup);
+				fwrite(&b, bytes_read, 1, backup);
 			
 			lwarning("Hash for %s (%s) did not match", sha_checks[i].rel_filepath, target->id);
 			lwarning("Backed up old file to %s", backup_path);
@@ -137,7 +137,7 @@ void host_environment_write_make_conf(Host* target) {
 	
 	for (int i = 0; i < (int)target->environment->extra->n; i++) {
 		SmallMap_key* c_key = *(SmallMap_key**)vector_get(target->environment->extra, i);
-		LINEWRITE("%s=\"%s\"", c_key->key, c_key->data_ptr)
+		LINEWRITE("%s=\"%s\"", c_key->key, (char*)c_key->data_ptr)
 	}
 	
 	LINEWRITE("")
@@ -165,3 +165,95 @@ void host_environment_write_make_conf(Host* target) {
 	free(filepath);
 }
 
+/*
+int host_environment_convert_portagedir(Host* target, char* filename) {
+	char* dirpath = host_path(target, "/etc/portage/%s", filename);
+	struct stat buf;
+	
+	if (stat(dirpath, &buf) == -1) {
+		lwarning("File %s does not exist");
+		free(dirpath);
+		return 0;
+	}
+	
+	if ((buf.st_mode & S_IFMT) == S_IFDIR) {
+		struct dirent *de;  // Pointer for directory entry
+		DIR* dr = opendir(dirpath);
+		
+		if (!dr) {
+			lerror("Failed to open directory: %s", dirpath);
+			return 1;
+		}
+		
+		char* buf_path = host_path(target, "/etc/portage/%s.%d.temp", filename, time(NULL));
+		FILE* fp = fopen(buf_path, "w+");
+		
+		while ((de = readdir(dr)) != NULL) {
+			char* cpfile = NULL;
+			asprintf(&cpfile, "%s/%s", dirpath, de->d_name);
+			
+			FILE* cpfp = fopen(cpfile, "rb");
+			
+			LINEWRITE("# FILE: %s", cpfile)
+			int cpbuf;
+			size_t bytes_read = 0;
+			
+			while ((bytes_read = fread(&cpbuf, sizeof(int), 1, cpfp)) > 0)
+				fwrite(&cpbuf, bytes_read, 1, fp);
+			
+			LINEWRITE("# End of file %s", cpfile)
+			LINEWRITE("")
+			
+			fclose(cpfp);
+			free(cpfile);
+		}
+		
+		closedir(dr);
+		
+		char* remove_command = NULL;
+		asprintf(&remove_command, "rm -rf %s", dirpath);
+		
+		linfo("Removing directory %s", dirpath);
+		int res = system(dirpath);
+		if (res != 0) {
+			lerror("Failed to remove directory: %s", dirpath);
+			lerror("Error [%d]: %s", res, strerror(res));
+			free(dirpath);
+			free(remove_command);
+			free(buf_path);
+			fclose(fp);
+			return 1;
+		}
+		
+		FILE* fp_out = fopen(dirpath, "w+");
+		fclose(fp);
+		fp = fopen(buf_path, "rb");
+		
+		int cpbuf;
+		size_t bytes_read = 0;
+		
+		while ((bytes_read = fread(&cpbuf, sizeof(int), 1, fp)) > 0)
+			fwrite(&cpbuf, bytes_read, 1, fp_out);
+		
+		fclose(fp);
+		fclose(fp_out);
+		
+		// Remove the temp file
+		remove(buf_path);
+		
+		free(buf_path);
+		free(remove_command);
+		free(dirpath);
+	}
+	
+	free(dirpath);
+	return 0;
+}
+*/
+
+void host_environment_write_conf(Host* target, Vector* content, char* file) {
+	
+	
+	char* filepath = host_path(target, "/etc/portage/%s", file);
+	FILE* fp = fopen(filepath, "w+");
+}

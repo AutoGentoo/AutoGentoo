@@ -5,8 +5,6 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <arpa/inet.h>
-#include <netdb.h>
-#include <fcntl.h>
 #include <autogentoo/autogentoo.h>
 #include <autogentoo/crypt.h>
 #include <string.h>
