@@ -6,13 +6,13 @@ find_package(FLEX REQUIRED)
 
 include(cmake/autogentoo-build.txt)
 include(cmake/autogentoo.txt)
+include(cmake/hacksaw.txt)
 include (${CMAKE_ROOT}/Modules/FindPythonLibs.cmake)
 include (${CMAKE_ROOT}/Modules/FindPythonInterp.cmake)
 
 find_package(PythonLibs)
 
 include_directories(include)
-include_directories(/usr/include/autogentoo)
 include_directories(cportage/language)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PYTHON_INCLUDE_DIR})
@@ -42,6 +42,11 @@ add_library(cportage SHARED
         ${language_BIN}
         ${language_PARSER}
         ${language_SOURCES}
+        )
+
+add_library(hacksaw SHARED
+        ${hacksaw_HEADERS}
+        ${hacksaw_SRC}
         )
 
 target_link_libraries(autogentoo hacksaw)
@@ -94,6 +99,8 @@ target_link_libraries(
         pthread
         m
 )
+
+add_subdirectory(src/api/)
 
 target_link_libraries(
         autogentoo-aabs
