@@ -126,6 +126,8 @@ class Job:
 			
 			rm(logfile + ".lck")
 			
+			logfp.close()
+			
 			exit(ret)
 		
 		return 0
