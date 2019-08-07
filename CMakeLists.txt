@@ -96,6 +96,7 @@ target_link_libraries(
 )
 
 add_subdirectory(src/api/)
+add_dependencies(autogentoo-exec autogentoo_api)
 
 target_link_libraries(
         autogentoo-aabs

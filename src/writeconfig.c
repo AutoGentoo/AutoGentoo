@@ -5,6 +5,7 @@
 #include <autogentoo/user.h>
 #include <errno.h>
 #include <autogentoo/host_environment.h>
+#include <autogentoo/writeconfig.h>
 
 void* read_void(size_t len, FILE* fp) {
 	void* out = malloc (len);
@@ -175,21 +176,13 @@ Server* read_server(char* location, char* port, server_t opts) {
 	
 	//size_t len = (size_t)read_int(fp);
 	
-	int current = 0;
-	int __break = 0;
+	int current = read_int(fp);
 	while (current != AUTOGENTOO_FILE_END) {
-		current = read_int(fp);
-		if (__break)
-			break;
-		
 		switch (current) {
 			case AUTOGENTOO_HOST:
 				host_temp = read_host(fp);
 				host_temp->parent = out;
 				vector_add(out->hosts, &host_temp);
-				break;
-			case AUTOGENTOO_FILE_END:
-				__break = 1;
 				break;
 			case AUTOGENTOO_SERVER_TOKEN:
 				out->autogentoo_org_token = read_string(fp);
@@ -200,9 +193,10 @@ Server* read_server(char* location, char* port, server_t opts) {
 				break;
 			default:
 				lerror("Could not understand autogentoo data type: 0x%x", current);
-				__break = 1;
-				break;
+				exit(1);
 		}
+		
+		current = read_int(fp);
 	}
 	
 	fclose(fp);

@@ -84,9 +84,35 @@ void worker_handler_loop(WorkerHandler* wh) {
 		pthread_mutex_unlock(&wh->lck);
 		
 		/* Write the request to the write_fifo */
-		write(wh->write_fifo, command_id, strlen(command_id) + 1);
-		write(wh->write_fifo, req->template, strlen(req->template) + 1);
-		write(wh->write_fifo, req->bytes, req->n);
+		int command = 0;
+		write(wh->write_fifo, &command, sizeof(int));
+		
+		int len = (int)strlen(command_id);
+		write(wh->write_fifo, &len, sizeof(int));
+		write(wh->write_fifo, command_id, len);
+		
+		len = (int)strlen(req->command_name);
+		write(wh->write_fifo, &len, sizeof(int));
+		write(wh->write_fifo, req->command_name, len);
+		
+		if (!req->host_id) {
+			len = 0;
+			write(wh->write_fifo, &len, sizeof(int));
+		}
+		else {
+			len = (int)strlen(req->host_id);
+			write(wh->write_fifo, &len, sizeof(int));
+			write(wh->write_fifo, req->host_id, len);
+		}
+		
+		len = req->n;
+		write(wh->write_fifo, &len, sizeof(int));
+		
+		for (int i = 0; i < req->n; i++) {
+			len = (int)strlen(req->args[i]);
+			write(wh->write_fifo, &len, sizeof(int));
+			write(wh->write_fifo, req->args[i], len);
+		}
 		
 		free(command_id);
 		
@@ -109,14 +135,14 @@ int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** com
 	
 	/* Read from the worker process */
 	pthread_mutex_lock(&wh->read_lck);
-	int res = 0;
-	read(wh->read_fifo, &res, sizeof(int));
-	
 	int read_len = 0;
 	read(wh->read_fifo, &read_len, sizeof(int));
 	
 	*command_id = malloc(read_len);
 	read(wh->read_fifo, *command_id, read_len);
+	
+	int res = 0;
+	read(wh->read_fifo, &res, sizeof(int));
 	
 	pthread_mutex_unlock(&wh->read_lck);
 	
@@ -151,6 +177,14 @@ void worker_handler_free(WorkerHandler* wh) {
 	
 	pthread_cond_signal(&wh->sig);
 	pthread_join(wh->pid, NULL);
+	
+	pthread_mutex_lock(&wh->write_lck);
+	
+	int command = 1;
+	write(wh->write_fifo, &command, sizeof(int));
+	
+	pthread_mutex_unlock(&wh->write_lck);
+	
 	
 	pthread_mutex_destroy(&wh->sig_lck);
 	pthread_mutex_destroy(&wh->write_lck);

@@ -18,10 +18,10 @@ typedef struct __WorkerRequest WorkerRequest;
 
 struct __WorkerRequest {
 	char* command_name;
-	char* template;
+	char* host_id;
 	
-	size_t n;
-	void* bytes;
+	int n;
+	char** args;
 };
 
 struct __WorkerHandler {

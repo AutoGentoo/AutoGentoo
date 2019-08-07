@@ -123,18 +123,17 @@ ssize_t write_int_fd(int fd, int i);
  * Write an integer to file
  * @param src the integer to write
  * @param fp the file to write to
- *
-inline size_t write_int (int src, FILE* fp);
+ */
+size_t write_int (int src, FILE* fp);
 
-**
+/**
  * Read an integer from file
  * @param fp the file to read from
  * @return the integer that has been read
- *
-inline int read_int (FILE* fp);
-
-inline void* read_void(size_t len, FILE* fp);
-inline size_t write_void(void* ptr, size_t len, FILE* fp);
-
  */
+int read_int (FILE* fp);
+
+void* read_void(size_t len, FILE* fp);
+size_t write_void(void* ptr, size_t len, FILE* fp);
+
 #endif

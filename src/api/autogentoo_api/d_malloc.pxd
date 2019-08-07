@@ -1,4 +1,9 @@
 from .dynamic_binary cimport *
+from libc.stdio cimport FILE
+
+cdef extern from "<autogentoo/writeconfig.h>":
+	char* read_string (FILE* fp);
+	int read_int(FILE* fp)
 
 cdef AUTOGENTOO_FILE_END = 0xffffffff
 
@@ -33,3 +38,12 @@ cdef class Binary:
 	cdef str get_array_template(self, template_start)
 	cpdef read_template (self, char* template, top=*)
 	cpdef void print_raw (self, align=*)
+
+cdef class BinaryFileReader:
+	cdef str file
+	cdef FILE* fp
+	
+	cpdef str read_string(self)
+	cpdef int read_int(self)
+	cdef str get_array_template(self, template_start)
+	cpdef read_template(self, str template)

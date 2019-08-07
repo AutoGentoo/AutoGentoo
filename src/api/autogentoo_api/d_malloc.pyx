@@ -1,7 +1,7 @@
-from libc.stdio cimport printf, fflush, stdout
+from libc.stdio cimport *
 from libc.string cimport strlen, strdup, memcpy
 from libc.stdlib cimport free
-from .d_malloc cimport DynamicBuffer
+from .d_malloc cimport *
 from .dynamic_binary cimport *
 from .vector cimport CVector
 
@@ -257,3 +257,54 @@ cdef class Binary:
 	def __dealloc__(self):
 		if self.buffer is None:
 			free(self.ptr)
+
+cdef class BinaryFileReader:
+	def __init__(self, file: str):
+		self.file = file
+		self.fp = fopen(self.file.encode("utf-8"), "r")
+	
+	cpdef str read_string(self):
+		cdef char* temp = read_string(self.fp)
+		return temp.decode("utf-8")
+	
+	cpdef int read_int(self):
+		cdef int i = read_int(self.fp)
+		return int(i)
+	
+	cdef str get_array_template(self, template_start):
+		end = 0
+		level = 0
+		for i in range(len(template_start)):
+			if template_start[i] == '(':
+				level += 1
+			elif template_start[i] == ')':
+				level -= 1
+			if level == 0:
+				end = i
+				break
+		return template_start[1:end]
+	
+	cpdef read_template(self, template: str):
+		out = []
+		
+		i = 0
+		while i < len(template):
+			if template[i] == "i":
+				out.append (self.read_int())
+			elif template[i] == "s":
+				out.append (self.read_string())
+			elif template[i] == "a":
+				i += 1 # skip over the open paren
+				array_len = self.read_int()
+				array_template = self.get_array_template(template[i:])
+				temp_arr = []
+				for j in range (array_len):
+					temp_arr.append(self.read_template(array_template))
+				out.append(temp_arr)
+				i += len(array_template)
+			i += 1
+		
+		return out
+	
+	def __dealloc__(self):
+		fclose(self.fp)

@@ -159,21 +159,18 @@ void HOST_EMERGE(Response* res, Request* request) {
 	WorkerRequest* strct_worker_request = malloc(sizeof(WorkerRequest));
 	strct_worker_request->command_name = "emerge";
 	
-	DynamicBinary* db = dynamic_binary_new(DB_ENDIAN_INPUT_NETWORK);
-	
-	dynamic_binary_add(db, 's', request->structures[1].host_select.hostname);
-	dynamic_binary_array_start(db);
+	StringVector* worker_args = string_vector_new();
+	string_vector_add(worker_args, "-v");
 	
 	char* token = strtok(request->structures[2].emerge.emerge, " ");
 	while(token) {
-		dynamic_binary_add(db, 's', token);
+		string_vector_add(worker_args, token);
 		token = strtok(NULL, " ");
 	}
-	dynamic_binary_array_end(db);
+	string_vector_add(worker_args, NULL);
 	
-	strct_worker_request->bytes = db->ptr;
-	strct_worker_request->n = db->used_size;
-	strct_worker_request->template = db->template;
+	strct_worker_request->args = worker_args->ptr;
+	strct_worker_request->n = (int)worker_args->n - 1; // Ignore NULL at end
 	
 	char* job_name;
 	int worker_res = worker_handler_request(request->parent->job_handler, strct_worker_request, &job_name);
@@ -183,7 +180,6 @@ void HOST_EMERGE(Response* res, Request* request) {
 	
 	dynamic_binary_add(res->content, 's', job_name);
 	
-	dynamic_binary_free(db);
 	free(strct_worker_request);
 	
 	HANDLE_RETURN(get_res(worker_res));
