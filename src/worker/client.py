@@ -13,7 +13,7 @@ class Server:
 		self.path = path
 		self.file = "%s/.autogentoo.config" % self.path
 		
-		self.reader = BinaryFileReader(self.file)
+		self.reader = None
 		
 		self.hosts = []
 		self.keys = {}
@@ -32,24 +32,28 @@ class Server:
 		self.keys[token.auth_token] = token
 	
 	def read(self):
+		self.reader = BinaryFileReader(self.file)
+		self.keys = {}
+		self.hosts = []
+		
+		self.sudo_token = None
+		self.autogentoo_org_token = None
+		
 		current = self.reader.read_int() & 0xffffffff
 		while current != AUTOGENTOO_FILE_END:
 			if current == AUTOGENTOO_HOST:
-				print("host")
 				self.read_host()
 			elif current == AUTOGENTOO_SERVER_TOKEN:
-				print(" server token")
 				self.autogentoo_org_token = self.reader.read_string()
 			elif current == AUTOGENTOO_SUDO_TOKEN:
-				print("sudo")
 				self.sudo_token = self.reader.read_string()
 			elif current == AUTOGENTOO_ACCESS_TOKEN:
-				print("token")
 				self.read_token()
 			else:
-				raise IOError("Invalid data type 0x%s" % hex(current))
+				raise IOError("Invalid data type %s" % hex(current))
 			
 			current = self.reader.read_int() & 0xffffffff
+		self.reader = None
 	
 	def get_host(self, host_id):
 		if host_id is None:
@@ -88,7 +92,6 @@ class Host:
 	
 	def read(self):
 		__tuple = self.reader.read_template("siissssssssssssi")
-		print (__tuple)
 		(
 			self.id,
 			self.status,
@@ -114,7 +117,7 @@ class Host:
 			key = self.reader.read_string()
 			self.extra[key] = self.reader.read_string()
 		
-		if self.reader.read_int() != AUTOGENTOO_HOST_END:
+		if self.reader.read_int() & 0xffffffff != AUTOGENTOO_HOST_END:
 			raise IOError("Expected end of host")
 	
 	def get_path(self):

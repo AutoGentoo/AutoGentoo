@@ -147,6 +147,7 @@ cdef class Request:
 
 	cpdef list recv(self, raw=False):
 		cdef Binary res_bin = self.sock.recv()
+		res_bin.print_raw()
 		
 		self.code = res_bin.read_int()
 		self.message = res_bin.read_string()

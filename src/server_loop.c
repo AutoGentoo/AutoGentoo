@@ -56,7 +56,8 @@ void server_start (Server* server) {
 	server->pool_handler = pool_handler_new(32);
 #endif
 	
-	server->job_handler = worker_handler_new();
+	server->job_handler = worker_handler_new(server);
+	worker_handler_start(server->job_handler);
 	
 	AccessToken org_creation_token;
 	org_creation_token.host_id = NULL;

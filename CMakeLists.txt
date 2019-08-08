@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(AutoGentoo)
 
+SET(CMAKE_INSTALL_PREFIX /usr)
+
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
@@ -21,6 +23,8 @@ include_directories(${PYTHON_INCLUDE_DIR})
 
 execute_process(COMMAND bash -c "mkdir -p {cportage,http}")
 
+#add_definitions(-DAUTOGENTOO_WORKER_DIR="${CMAKE_INSTALL_PREFIX}/share/autogentoo")
+add_definitions(-DAUTOGENTOO_WORKER_DIR="${CMAKE_SOURCE_DIR}/src/worker")
 add_definitions(-DDBPATH="test")
 add_definitions(-DAUTOGENTOO_DEBUG)
 
@@ -110,13 +114,24 @@ MACRO(INSTALL_HEADERS_WITH_DIRECTORY HEADER_LIST)
                 STRING(REGEX MATCH "(.*)[/]" DIR ${HEADER})
                 INSTALL(FILES ${HEADER} DESTINATION ${DIR})
         ENDFOREACH(HEADER)
-
 ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
-
-SET(CMAKE_INSTALL_PREFIX /usr)
 
 INSTALL(TARGETS autogentoo-exec cportage-exec DESTINATION bin)
 INSTALL(TARGETS autogentoo cportage hacksaw DESTINATION lib)
+
+SET(PYTHON_WORKER
+        src/worker/cli.py
+        src/worker/client.py
+        src/worker/worker.py
+        src/worker/script.py
+        )
+SET(WORKER_SCRIPTS
+        src/worker/scripts/stage3.py
+        )
+
+
+INSTALL(PROGRAMS ${PYTHON_WORKER} DESTINATION share/autogentoo/)
+INSTALL(PROGRAMS ${WORKER_SCRIPTS} DESTINATION share/autogentoo/scripts/)
 
 INSTALL_HEADERS_WITH_DIRECTORY(include_HEADERS)
 INSTALL_HEADERS_WITH_DIRECTORY(hacksaw_HEADERS)

@@ -141,6 +141,19 @@ int main(int argc, char** argv) {
 				(void* (*)(void*))server_encrypt_start,
 				main_server->rsa_child);
 	
+	pid_t cli_pid = 0;
+	
+	if (start_cli) {
+		cli_pid = fork();
+		if (cli_pid == 0) {
+			char* cli_path = AUTOGENTOO_WORKER_DIR "/cli.py";
+			char* const cli_argv[] = {cli_path, main_server->location, NULL};
+			int res = execv(cli_path, cli_argv);
+			lerror("Failed to start command line");
+			lerror("Error [%d] %s", res, strerror(res));
+		}
+	}
+	
 	server_start(main_server);
 	
 	/* Exit sequence */

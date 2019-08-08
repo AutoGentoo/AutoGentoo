@@ -138,7 +138,7 @@ size_t write_host_fp(Host* host, FILE* fp) {
 	size += write_int((int)host->environment->extra->n, fp);
 	
 	int i;
-	for (i = 0; i != host->environment->extra->n; i++) {
+	for (i = 0; i < host->environment->extra->n; i++) {
 		SmallMap_key* current_key = (*(SmallMap_key**)vector_get(host->environment->extra, i));
 		size += write_string(current_key->key, fp);
 		size += write_string(current_key->data_ptr, fp);

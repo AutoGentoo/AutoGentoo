@@ -25,8 +25,6 @@ void server_kill (Server* server) {
 		close(server->rsa_child->socket);
 		pthread_join(server->rsa_child->pid, NULL);
 		
-		worker_handler_free(server->job_handler);
-		
 		server_encrypt_free(server->rsa_child);
 		linfo("encrypt server exited");
 	}

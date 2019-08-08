@@ -8,6 +8,10 @@
 #include <stdio.h>
 #include <pthread.h>
 
+#ifndef AUTOGENTOO_WORKER_DIR
+#define AUTOGENTOO_WORKER_DIR "/usr/share/autogentoo/"
+#endif
+
 #define WORKER_FIFO_REQUEST "/tmp/autogentoo_worker.req"
 #define WORKER_FIFO_RESPONSE "/tmp/autogentoo_worker.res"
 
@@ -25,7 +29,9 @@ struct __WorkerRequest {
 };
 
 struct __WorkerHandler {
+	Server* parent;
 	pthread_t pid;
+	pid_t worker_pid;
 	
 	pthread_mutex_t sig_lck;
 	pthread_cond_t sig;
@@ -44,7 +50,7 @@ struct __WorkerHandler {
 	int keep_alive;
 };
 
-WorkerHandler* worker_handler_new();
+WorkerHandler* worker_handler_new(Server* parent);
 int worker_handler_start(WorkerHandler* wh);
 int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** command_id);
 void worker_handler_loop(WorkerHandler* wh);

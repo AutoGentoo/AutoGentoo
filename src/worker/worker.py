@@ -1,10 +1,13 @@
+#! /usr/bin/env python
+
 import os
 import struct
 import sys
 import _thread
-from .client import *
+from client import *
 import importlib
-from .script import mkdir, touch, rm
+import traceback
+from script import mkdir, touch, rm, cd, logfp
 
 WORKER_FIFO_REQUEST = "/tmp/autogentoo_worker.req"
 WORKER_FIFO_RESPONSE = "/tmp/autogentoo_worker.res"
@@ -125,14 +128,22 @@ class Job:
 		
 		self.pid = os.fork()
 		if self.pid == 0:
+			working_dir = os.getcwd()
+			
+			global logfp
 			logfp = open(logfile, "a+")
 			sys.stdout = logfp
 			sys.stderr = logfp
 			
 			# Run the script
 			importlib.reload(self.module)
-			ret = self.module.script(self.host, self.args)
 			
+			try:
+				ret = self.module.script(self.host, self.args)
+			except Exception:
+				traceback.print_exc()
+			
+			cd(working_dir)
 			rm(logfile + ".lck")
 			
 			logfp.close()
@@ -143,7 +154,6 @@ class Job:
 
 
 def main(argv):
-	print("Starting worker from conf file %s" % argv[1])
 	
 	server = Server(argv[1])
 	server.read()
@@ -153,7 +163,6 @@ def main(argv):
 	try:
 		worker.start()
 	except KeyboardInterrupt:
-		print("Closing worker and ending all jobs")
 		worker.close()
 
 
