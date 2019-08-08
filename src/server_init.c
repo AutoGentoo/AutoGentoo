@@ -49,6 +49,7 @@ Server* server_new (char* location, char* port, server_t opts) {
 	out->hosts = vector_new(sizeof(Host*), VECTOR_REMOVE | VECTOR_UNORDERED);
 	out->location = strdup(location);
 	out->autogentoo_org_token = NULL;
+	out->sudo_token = NULL;
 	
 	chdir(out->location);
 	out->opts = opts;

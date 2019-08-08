@@ -94,6 +94,9 @@ size_t write_server_fp(Server* server, FILE* fp) {
 	size += write_int(AUTOGENTOO_SERVER_TOKEN, fp);
 	size += write_string(server->autogentoo_org_token, fp);
 	
+	size += write_int(AUTOGENTOO_SUDO_TOKEN, fp);
+	size += write_string(server->sudo_token, fp);
+	
 	size += write_int(AUTOGENTOO_FILE_END, fp);
 	
 	return size;
@@ -191,6 +194,9 @@ Server* read_server(char* location, char* port, server_t opts) {
 				token_temp = read_access_token(fp);
 				map_insert(out->auth_tokens, token_temp->auth_token, token_temp);
 				break;
+			case AUTOGENTOO_SUDO_TOKEN:
+				out->sudo_token = read_string(fp);
+				break;
 			default:
 				lerror("Could not understand autogentoo data type: 0x%x", current);
 				exit(1);
@@ -227,9 +233,7 @@ Host* read_host(FILE* fp) {
 	out->arch = read_string(fp);
 	
 	out->environment = host_environment_new(out);
-	int n, i;
-	n = read_int(fp);
-	char* temp_name, *temp_val;
+	
 	
 	out->environment->cflags = read_string(fp);
 	out->environment->cxxflags = read_string(fp);
@@ -241,6 +245,9 @@ Host* read_host(FILE* fp) {
 	out->environment->portdir = read_string(fp);
 	out->environment->use = read_string(fp);
 	
+	int n, i;
+	n = read_int(fp);
+	char* temp_name, *temp_val;
 	
 	for (i = 0; i != n; i++) {
 		temp_name = read_string(fp);
@@ -265,10 +272,6 @@ Host* read_host(FILE* fp) {
 				new_kernel->version = read_string(fp);
 				vector_add(out->kernel, new_kernel);
 				break;
-			case AUTOGENTOO_ACCESS_TOKEN:
-				new_token.user_id = read_string(fp);
-				new_token.auth_token = read_void(AUTOGENTOO_TOKEN_LENGTH, fp);
-				new_token.access_level = read_int(fp);
 			case AUTOGENTOO_HOST_END:
 				break;
 			default:

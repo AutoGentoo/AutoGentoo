@@ -5,18 +5,20 @@ AUTOGENTOO_HOST = 0xfffffff0
 AUTOGENTOO_SERVER_TOKEN = 0xfffff000
 AUTOGENTOO_HOST_END = 0xaaaaaaaa
 AUTOGENTOO_FILE_END = 0xffffffff
+AUTOGENTOO_SUDO_TOKEN = 0xcccccccc
 
 
 class Server:
 	def __init__(self, path):
 		self.path = path
-		file = "%s/.autogentoo.config"
+		self.file = "%s/.autogentoo.config" % self.path
 		
-		self.reader = BinaryFileReader(file)
+		self.reader = BinaryFileReader(self.file)
 		
 		self.hosts = []
 		self.keys = {}
 		
+		self.sudo_token = None
 		self.autogentoo_org_token = None
 	
 	def read_host(self):
@@ -30,18 +32,24 @@ class Server:
 		self.keys[token.auth_token] = token
 	
 	def read(self):
-		current = self.reader.read_int()
+		current = self.reader.read_int() & 0xffffffff
 		while current != AUTOGENTOO_FILE_END:
 			if current == AUTOGENTOO_HOST:
+				print("host")
 				self.read_host()
 			elif current == AUTOGENTOO_SERVER_TOKEN:
+				print(" server token")
 				self.autogentoo_org_token = self.reader.read_string()
+			elif current == AUTOGENTOO_SUDO_TOKEN:
+				print("sudo")
+				self.sudo_token = self.reader.read_string()
 			elif current == AUTOGENTOO_ACCESS_TOKEN:
+				print("token")
 				self.read_token()
 			else:
-				raise IOError("Invalid data type 0x%x" % current)
+				raise IOError("Invalid data type 0x%s" % hex(current))
 			
-			current = self.reader.read_int()
+			current = self.reader.read_int() & 0xffffffff
 	
 	def get_host(self, host_id):
 		if host_id is None:
@@ -79,6 +87,8 @@ class Host:
 		self.extra = {}
 	
 	def read(self):
+		__tuple = self.reader.read_template("siissssssssssssi")
+		print (__tuple)
 		(
 			self.id,
 			self.status,
@@ -98,7 +108,7 @@ class Host:
 			self.portdir,
 			self.use,
 			extra_n
-		) = self.reader.read_template("siisssssssssi")
+		) = __tuple
 		
 		for i in range(extra_n):
 			key = self.reader.read_string()

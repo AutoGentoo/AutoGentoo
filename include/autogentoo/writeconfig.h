@@ -17,6 +17,7 @@ typedef enum {
 	// Host entries for autogentoo extensions
 	AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb,
 	AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd,
+	AUTOGENTOO_SUDO_TOKEN = 0xcccccccc,
 	AUTOGENTOO_SERVER_TOKEN = 0xfffff000
 } AutoGentoo_WriteConfig;
 

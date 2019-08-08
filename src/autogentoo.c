@@ -21,6 +21,7 @@ Opt opt_handlers[] = {
 		{0,   "sign",    "sign the rsa key with the certificate",           set_encrypt_opts,   OPT_LONG},
 		{0,   "gencert", "generate new certicaite and self sign",           set_encrypt_opts,   OPT_LONG},
 		{0,   "genrsa",  "generate new rsa and sign with cert",             set_encrypt_opts,   OPT_LONG},
+		{0,   "cmdline", "start the CLI",                                   set_cli,            OPT_LONG},
 		{0, NULL, NULL, NULL, (opt_opts_t) 0 }
 };
 
@@ -33,6 +34,12 @@ static char* client_opts = NULL;
 static char* cert_file = NULL;
 static char* rsa_file = NULL;
 static enc_server_t enc_server_options = ENC_READ_CERT | ENC_READ_RSA;
+
+static int start_cli = 0;
+
+void set_cli(Opt* op, char* arg) {
+	start_cli = 1;
+}
 
 void set_encrypt_opts (Opt* op, char* arg) {
 	if (strcmp(op->_long, "cert") == 0) {
@@ -140,5 +147,4 @@ int main(int argc, char** argv) {
 	if (logfile_fd != -1)
 		close(logfile_fd);
 	return 0;
-	
 }

@@ -67,6 +67,8 @@ void pipe_to_log(Opt* op, char* logfile);
 
 void set_target(Opt* op, char* target);
 
+void set_cli(Opt* op, char* arg);
+
 //int main(int argc, char** argv);
 
 #endif

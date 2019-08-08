@@ -265,7 +265,13 @@ cdef class BinaryFileReader:
 	
 	cpdef str read_string(self):
 		cdef char* temp = read_string(self.fp)
-		return temp.decode("utf-8")
+		if temp == NULL:
+			return None
+
+		out = temp.decode("utf-8")
+		free(temp)
+
+		return out
 	
 	cpdef int read_int(self):
 		cdef int i = read_int(self.fp)

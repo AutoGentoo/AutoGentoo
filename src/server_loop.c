@@ -13,6 +13,8 @@
 #include <sys/socket.h>
 #include "autogentoo/worker.h"
 
+int prv_random_string(char* out, size_t len);
+
 Connection* accept_conn (void* server, int fd, com_t type) {
 	if (fd < 3) {
 		lwarning("accept() error");
@@ -50,7 +52,6 @@ void server_start (Server* server) {
 	
 	addrlen = sizeof(clientaddr);
 	server->keep_alive = 1;
-	//server->thandler = thread_handler_new(32);
 #ifndef AUTOGENTOO_NO_THREADS
 	server->pool_handler = pool_handler_new(32);
 #endif
@@ -72,6 +73,11 @@ void server_start (Server* server) {
 		linfo ("Your token is:");
 		linfo ("%s", server->autogentoo_org_token);
 		linfo ("Copy this into the interface on autogentoo.org to register this server.");
+	}
+	
+	if (!server->sudo_token) {
+		server->sudo_token = malloc(AUTOGENTOO_TOKEN_LENGTH + 1);
+		prv_random_string(server->sudo_token, AUTOGENTOO_TOKEN_LENGTH);
 	}
 	
 	write_server(server);

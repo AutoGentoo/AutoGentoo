@@ -100,6 +100,7 @@ struct __Server {
 	
 	/* Authentication */
 	char* autogentoo_org_token; //!< Just a dup of the key
+	char* sudo_token;
 	
 	Map* auth_tokens;
 };

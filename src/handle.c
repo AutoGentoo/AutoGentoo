@@ -34,7 +34,7 @@ RequestLink requests[] = {
 		{REQ_SRV_REFRESH,     {.ag_fh=SRV_REFRESH}},
 		{REQ_AUTH_REGISTER,   {.ag_fh=AUTH_REGISTER}},
 		{REQ_JOB_STREAM,      {.ag_fh=JOB_STREAM}},
-		{REQ_META_STAGE3,     {.ag_fh=META_STAGE3}},
+		{REQ_HOST_STAGE3,     {.ag_fh=HOST_STAGE3}},
 };
 
 RequestNameLink request_names[] = {
@@ -51,7 +51,7 @@ RequestNameLink request_names[] = {
 		{REQ_SRV_REFRESH,     "SRV_REFRESH"},
 		{REQ_AUTH_REGISTER,   "AUTH_REGISTER"},
 		{REQ_JOB_STREAM,      "JOB_STREAM"},
-		{REQ_META_STAGE3,     "META_STAGE3"}
+		{REQ_HOST_STAGE3,     "META_STAGE3"}
 };
 
 char* str_request(request_t type) {
@@ -216,6 +216,8 @@ void SRV_INFO(Response* res, Request* request) {
 		
 		if (line)
 			free(line);
+		
+		fclose(os_fp);
 	}
 	
 	struct utsname uname_pointer;
@@ -295,8 +297,8 @@ void AUTH_REFRESH_TOK(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE});
 
 	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
-	//if (!tok)
-	//	HANDLE_RETURN(FORBIDDEN);
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
 
 	StringVector* token_keys = map_all_keys(request->parent->auth_tokens);
 
@@ -320,7 +322,6 @@ void AUTH_REFRESH_TOK(Response* res, Request* request) {
 
 void AUTH_REGISTER(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_ISSUE_TOK});
-	AccessToken auth_tok;
 	AccessToken creat_tok;
 
 	AccessToken* tok = authorize (request, TOKEN_SERVER_AUTOGENTOO_ORG, AUTH_TOKEN_SERVER);
@@ -345,10 +346,10 @@ void JOB_STREAM(Response* res, Request* request) {
 	AccessToken* tok = authorize (request, TOKEN_HOST_READ, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN_HTTP(FORBIDDEN);
-	Host* host = server_get_host(request->parent, request->structures[1].host_select.hostname); \
-	if (!host) { \
-		token_free(map_remove(request->parent->auth_tokens, request->structures[0].auth.token)); \
-		HANDLE_RETURN_HTTP(NOT_FOUND);\
+	Host* host = server_get_host(request->parent, request->structures[1].host_select.hostname);
+	if (!host) {
+		token_free(map_remove(request->parent->auth_tokens, request->structures[0].auth.token));
+		HANDLE_RETURN_HTTP(NOT_FOUND);
 	}
 	
 	/* Check if worker is running */
@@ -459,7 +460,25 @@ void JOB_STREAM(Response* res, Request* request) {
 	close(log_fd);
 }
 
-void META_STAGE3(Response* res, Request* request) {
+void HOST_STAGE3(Response* res, Request* request) {
 	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_JOB_SELECT});
+	AccessToken* tok = authorize (request, TOKEN_HOST_WRITE, AUTH_TOKEN_HOST);
+	if (!tok)
+		HANDLE_RETURN(FORBIDDEN);
 	
+	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
+	
+	WorkerRequest worker_req;
+	worker_req.command_name = "stage3";
+	worker_req.host_id = host->id;
+	
+	worker_req.n = 1;
+	worker_req.args = &request->structures[2].job_select.job_name;
+	
+	char* job_name = NULL;
+	int worker_res = worker_handler_request(request->parent->job_handler, &worker_req, &job_name);
+	
+	dynamic_binary_add(res->content, 's', job_name);
+	
+	HANDLE_RETURN(get_res(worker_res));
 }

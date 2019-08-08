@@ -34,6 +34,7 @@ cdef extern from "<autogentoo/request.h>":
 			REQ_AUTH_REFRESH_TOK,
 			REQ_AUTH_REGISTER,
 			REQ_JOB_STREAM,
+			REQ_HOST_STAGE3,
 			
 			REQ_MAX
 

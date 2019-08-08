@@ -29,7 +29,7 @@ class Worker:
 		self.response_fifo = open(WORKER_FIFO_RESPONSE, "wb")
 		
 		self.pid = os.getpid()
-		self.running_jobs = {}
+		self.jobs = []
 		self.keep_alive = True
 		
 		self.read_lck = _thread.allocate_lock()
@@ -60,6 +60,8 @@ class Worker:
 			self.read_lck.release()
 			
 			new_job = Job(self.server, self.server.get_host(host_id), job_name, command_name, argv)
+			new_job.run()
+			self.jobs.append(new_job)
 			
 			self.write_lck.acquire()
 			self.write_str(job_name)
@@ -88,6 +90,13 @@ class Worker:
 	def write_str(self, string):
 		self.write_int(len(string))
 		self.response_fifo.write(string.encode('utf-8'))
+	
+	def close(self):
+		self.request_fifo.close()
+		self.response_fifo.close()
+		
+		for job in self.jobs:
+			job.join()
 
 
 class Job:
@@ -101,14 +110,14 @@ class Job:
 		try:
 			self.module = importlib.import_module("scripts.%s" % self.command_name)
 		except ModuleNotFoundError:
-			self.res = 1
+			self.res = 400
 			return
 		
-		self.res = 0
+		self.res = 200
 		self.pid = 0
 	
 	def join(self):
-		os.waitpid(self.pid)
+		os.waitpid(self.pid, 0)
 	
 	def run(self):
 		logfile = "logs/%s.log" % self.job_name
@@ -140,7 +149,12 @@ def main(argv):
 	server.read()
 	
 	worker = Worker(server)
-	worker.start()
+	
+	try:
+		worker.start()
+	except KeyboardInterrupt:
+		print("Closing worker and ending all jobs")
+		worker.close()
 
 
 if __name__ == "__main__":
