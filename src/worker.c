@@ -50,11 +50,6 @@ int worker_handler_start(WorkerHandler* wh) {
 	
 	/* Start the worker daemon */
 	
-	/* Open as read/write so open doesn't hang */
-	/* Opening a O_WRONLY with O_NONBLOCK causes ENXIO */
-	wh->write_fifo = open(WORKER_FIFO_REQUEST, O_RDWR);
-	wh->read_fifo = open(WORKER_FIFO_RESPONSE, O_RDONLY|O_NONBLOCK);
-	
 	wh->worker_pid = fork();
 	if (wh->worker_pid == 0) {
 		char* path = AUTOGENTOO_WORKER_DIR "/worker.py";
@@ -63,6 +58,12 @@ int worker_handler_start(WorkerHandler* wh) {
 		lerror("Failed to start worker");
 		lerror("Error [%d] %s", res, strerror(res));
 		exit(1);
+	}
+	else {
+		/* Open as read/write so open doesn't hang */
+		/* Opening a O_WRONLY with O_NONBLOCK causes ENXIO */
+		wh->write_fifo = open(WORKER_FIFO_REQUEST, O_WRONLY);
+		wh->read_fifo = open(WORKER_FIFO_RESPONSE, O_RDONLY);
 	}
 	
 	pthread_create(&wh->pid, NULL, (void* (*) (void*))worker_handler_loop, wh);

@@ -46,11 +46,12 @@ class Cli:
 		readline.set_completer(rlcompleter.Completer(self.completion).complete)
 
 	def cli(self):
+		time.sleep(0.1)
 		while True:
 			self.server.read()
 			self.update_completion()
 			try:
-				line = input("autogentoo > ").replace("\n", "")
+				line = input("autogentoo > ").replace("\n", "").strip()
 				if not len(line):
 					continue
 			except KeyboardInterrupt:
