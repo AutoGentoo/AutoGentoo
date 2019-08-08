@@ -89,10 +89,12 @@ class Worker:
 	
 	def write_int(self, i):
 		self.response_fifo.write(i.to_bytes(4, sys.byteorder))
+		self.response_fifo.flush()
 	
 	def write_str(self, string):
 		self.write_int(len(string))
 		self.response_fifo.write(string.encode('utf-8'))
+		self.response_fifo.flush()
 	
 	def close(self):
 		self.request_fifo.close()
