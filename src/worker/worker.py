@@ -58,7 +58,7 @@ class Worker:
 			argc = self.read_int()
 			argv = []
 			for i in range(argc):
-				argv.append(self.read_str())
+				argv.append(eval(self.read_str()))
 			
 			self.read_lck.release()
 			
@@ -141,9 +141,10 @@ class Job:
 			importlib.reload(self.module)
 			
 			try:
-				ret = self.module.script(self.host, self.args)
+				ret = self.module.script(self.job_name, self.host, self.args)
 			except Exception:
 				traceback.print_exc()
+				ret = 1
 			
 			cd(working_dir)
 			rm(logfile + ".lck")

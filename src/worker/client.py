@@ -120,8 +120,8 @@ class Host:
 		if self.reader.read_int() & 0xffffffff != AUTOGENTOO_HOST_END:
 			raise IOError("Expected end of host")
 	
-	def get_path(self):
-		return "%s/%s" % (self.parent.path, self.id)
+	def get_path(self, sub=""):
+		return "%s/%s/%s" % (self.parent.path, self.id, sub)
 
 
 class Token:

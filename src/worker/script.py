@@ -120,3 +120,7 @@ def stat(path):
 
 def ln(file, link_name):
 	s("ln -s %s %s" % (file, link_name))
+
+
+def chroot(host):
+	os.chroot(host.get_path())

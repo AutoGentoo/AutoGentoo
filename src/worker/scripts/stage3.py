@@ -18,7 +18,7 @@ from script import *
 from client import Host
 
 
-def script(host: Host, args=None):
+def script(job_name: str, host: Host, args=None):
 	if host is None:
 		raise RuntimeError("Host must be specified for stage3.py")
 	
