@@ -1,8 +1,9 @@
 #ifndef __AUTOGENTOO_HANDLE_H__
 #define __AUTOGENTOO_HANDLE_H__
 
-#include "request.h"
-#include "endian_convert.h"
+#include <autogentoo/request.h>
+#include <autogentoo/endian_convert.h>
+#include "http.h"
 
 #define HANDLE_RETURN(ret) ({ \
 res->code = ((ret)); \

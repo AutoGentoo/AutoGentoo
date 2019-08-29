@@ -48,7 +48,7 @@ class PortageEntry:
 		temp_flag = PortageEntry.flag_parse(flag_str)
 		
 		for f in self.flags:
-			if f.name == flag_name:
+			if f.name == flag_str:
 				f.status = temp_flag
 				return
 		self.flags.append(temp_flag)

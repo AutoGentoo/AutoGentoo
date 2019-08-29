@@ -2,8 +2,8 @@
 // Created by atuser on 4/7/18.
 //
 
-#ifndef AUTOGENTOO_REQUEST_STRUCTURE_H
-#define AUTOGENTOO_REQUEST_STRUCTURE_H
+#ifndef __AUTOGENTOO_REQUEST_STRUCTURE_H
+#define __AUTOGENTOO_REQUEST_STRUCTURE_H
 
 #include <stdio.h>
 
@@ -23,7 +23,6 @@ typedef enum {
 
 typedef union __RequestData RequestData;
 
-#include "user.h"
 
 struct __struct_Host_new {
 	char* arch;
@@ -57,7 +56,7 @@ struct __struct_Job {
 struct __struct_Issue_token {
 	char* user_id;
 	char* target_host;
-	token_access_t permission;
+	int permission;
 } __attribute__((packed));
 
 struct __struct_Host_meta {

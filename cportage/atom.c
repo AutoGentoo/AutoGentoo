@@ -388,7 +388,6 @@ char* atom_get_str(P_Atom* atom) {
 		asprintf(&out, "%s%s-%s", prefix, atom->key, atom->version->full_version);
 	else
 		asprintf(&out, "%s", atom->key);
-	
-	free(prefix);
+
 	return out;
 }

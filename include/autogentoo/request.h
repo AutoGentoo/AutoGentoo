@@ -5,9 +5,15 @@
 #ifndef AUTOGENTOO_REQUEST_H
 #define AUTOGENTOO_REQUEST_H
 
-#include <autogentoo/api/dynamic_binary.h>
+#include <stdio.h>
 
 typedef struct __Request Request;
+
+/**
+ * Links a string to a request handler
+ */
+typedef struct __RequestLink RequestLink;
+typedef struct __RequestNameLink RequestNameLink;
 
 typedef enum {
 	PROT_AUTOGENTOO = 0, // guarentees first byte is 0 (cant be HTTP)
@@ -62,7 +68,6 @@ typedef enum {
  * @param the index to start reading the request at
  */
 typedef void (* HTTP_FH)(Connection* conn, HttpRequest* req);
-typedef struct __Response Response;
 typedef void (* AUTOGENTOO_FH) (Response* res, Request* request);
 
 typedef union __FunctionHandler FunctionHandler;
@@ -70,12 +75,6 @@ typedef union __FunctionHandler FunctionHandler;
 union __FunctionHandler {
 	AUTOGENTOO_FH ag_fh;
 	HTTP_FH http_fh;
-};
-
-struct __Response {
-	DynamicBinary* content;
-	response_t code;
-	int sent_response;
 };
 
 struct __Request {
@@ -96,12 +95,6 @@ struct __Request {
 	RequestData* structures;
 	request_structure_t* types;
 };
-
-/**
- * Links a string to a request handler
- */
-typedef struct __RequestLink RequestLink;
-typedef struct __RequestNameLink RequestNameLink;
 
 /**
  * Links a string to a request handler

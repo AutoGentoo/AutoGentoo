@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "autogentoo.h"
+#include <hacksaw/vector.h>
 
 typedef struct __Endian Endian;
 typedef struct __EndianNode EndianNode;

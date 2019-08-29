@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <autogentoo/request_structure.h>
 #include <netinet/in.h>
+#include <hacksaw/vector.h>
+#include <hacksaw/log.h>
 
 size_t prv_safe_strdup (char** dest, char* original, void* end_ptr) {
 	char* i = original;

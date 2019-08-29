@@ -137,11 +137,12 @@ void worker_handler_loop(WorkerHandler* wh) {
 	}
 }
 
-int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** command_id) {
+int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** job_id) {
 	pthread_mutex_lock(&wh->lck);
 	wh->request = request;
 	pthread_mutex_unlock(&wh->lck);
-	
+
+	/* Signal the C worker loop to send our request over */
 	pthread_cond_signal(&wh->sig);
 	pthread_mutex_lock(&wh->request_lck); /* Wait for the write lock to activate */
 	pthread_mutex_lock(&wh->write_lck); /* Wait for request to be sent */
@@ -155,8 +156,8 @@ int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** com
 	int read_len = 0;
 	read(wh->read_fifo, &read_len, sizeof(int));
 	
-	*command_id = malloc(read_len);
-	read(wh->read_fifo, *command_id, read_len);
+	*job_id = malloc(read_len);
+	read(wh->read_fifo, *job_id, read_len);
 	
 	int res = 0;
 	read(wh->read_fifo, &res, sizeof(int));

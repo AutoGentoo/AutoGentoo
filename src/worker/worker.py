@@ -1,13 +1,11 @@
 #! /usr/bin/env python
 
-import os
 import struct
 import sys
 import _thread
 from client import *
 import importlib
-import traceback
-from script import mkdir, touch, rm, cd, logfp
+from script import *
 
 WORKER_FIFO_REQUEST = "/tmp/autogentoo_worker.req"
 WORKER_FIFO_RESPONSE = "/tmp/autogentoo_worker.res"
@@ -157,7 +155,6 @@ class Job:
 
 
 def main(argv):
-	
 	server = Server(argv[1])
 	server.read()
 	

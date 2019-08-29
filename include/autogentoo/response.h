@@ -2,6 +2,7 @@
 #define __AUTOGENTOO_RESPONSE_H__
 
 #include <stdio.h>
+#include <autogentoo/api/dynamic_binary.h>
 
 typedef enum {
 	HTTP_OK = 200,
@@ -28,6 +29,13 @@ typedef struct {
 	size_t len;
 } response_t;
 
+typedef struct __Response Response;
+
+struct __Response {
+    DynamicBinary* content;
+    response_t code;
+    int sent_response;
+};
 
 #define RESPONSE_SENT (response_t) {0, "", 0}
 #define OK (response_t) {HTTP_OK, "Ok", 2}

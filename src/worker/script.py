@@ -41,7 +41,6 @@ def download(url, file_name):
 def extract(filename: str, output_dir):
 	if os.getuid() != 0:
 		raise PermissionError("Cannot create /dev if not root!")
-		return 1
 	
 	if not os.path.exists(output_dir):
 		mkdir(output_dir)
@@ -120,7 +119,3 @@ def stat(path):
 
 def ln(file, link_name):
 	s("ln -s %s %s" % (file, link_name))
-
-
-def chroot(host):
-	os.chroot(host.get_path())

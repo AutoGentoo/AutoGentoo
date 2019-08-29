@@ -7,6 +7,8 @@
 
 #include <autogentoo/request.h>
 #include "request_generate.h"
+#include <openssl/ssl.h>
+#include <openssl/x509.h>
 
 typedef struct __SSocket SSocket;
 

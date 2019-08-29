@@ -52,7 +52,19 @@ struct __WorkerHandler {
 
 WorkerHandler* worker_handler_new(Server* parent);
 int worker_handler_start(WorkerHandler* wh);
-int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** command_id);
+
+/**
+ * Main entry point into the python worker environment
+ * This will send interupt to wh->sig and pull the request
+ * across the pipe to the worker side
+ *
+ * @param wh the handle with pipe/locks initialized
+ * @param request request to send over
+ * @param job_id pointer to NULL, after this returns, the job_name will be stored (needs to be freed)
+ * @return integer representing handling status of request. 0 is good, anything else is bad
+ */
+int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** job_id);
+
 void worker_handler_loop(WorkerHandler* wh);
 char* worker_register(char* command_name);
 void worker_handler_free(WorkerHandler* wh);

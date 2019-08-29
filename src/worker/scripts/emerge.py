@@ -24,6 +24,7 @@ def script(job_name: str, host: Host, args: str):
 	
 	print("[INFO] Emerge log in %s" % lfile)
 	
+	global logfp
 	logfp = open(lfile, "w+")
 	subprocess.run(["emerge", "--autounmask-continue", "--buildpkg", "--usepkg", *args], stdout=logfp, stderr=logfp)
 	
