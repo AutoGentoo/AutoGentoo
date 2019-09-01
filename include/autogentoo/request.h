@@ -92,7 +92,7 @@ struct __Request {
 	Vector* structures_parent;
 	Vector* types_parent;
 	
-	RequestData* structures;
+	RequestData** structures;
 	request_structure_t* types;
 };
 

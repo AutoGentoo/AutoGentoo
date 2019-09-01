@@ -95,14 +95,14 @@ void HOST_NEW(Response* res, Request* request) {
 
 	/* Create the host */
 	Host* target = host_new(request->parent, host_id_new());
-	target->arch = strdup(request->structures[1].host_new.arch);
-	target->hostname = strdup(request->structures[1].host_new.hostname);
-	target->profile = strdup(request->structures[1].host_new.profile);
+	target->arch = strdup(request->structures[1]->host_new.arch);
+	target->hostname = strdup(request->structures[1]->host_new.hostname);
+	target->profile = strdup(request->structures[1]->host_new.profile);
 
 	AccessToken creat_tok;
 	creat_tok.access_level = TOKEN_HOST_MOD;
 	creat_tok.host_id = target->id;
-	creat_tok.user_id = request->structures[0].auth.user_id;
+	creat_tok.user_id = request->structures[0]->auth.user_id;
 
 	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
 	if (!issued)
@@ -123,7 +123,7 @@ void HOST_EDIT(Response* res, Request* request) {
 		HANDLE_RETURN(FORBIDDEN);
 
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
-	struct __struct_Host_edit host_edit = request->structures[2].host_edit;
+	struct __struct_Host_edit host_edit = request->structures[2]->host_edit;
 	
 	
 	HANDLE_RETURN(INTERNAL_ERROR);
@@ -162,7 +162,7 @@ void HOST_EMERGE(Response* res, Request* request) {
 	StringVector* worker_args = string_vector_new();
 	string_vector_add(worker_args, "-v");
 	
-	char* token = strtok(request->structures[2].emerge.emerge, " ");
+	char* token = strtok(request->structures[2]->emerge.emerge, " ");
 	while(token) {
 		string_vector_add(worker_args, token);
 		token = strtok(NULL, " ");
@@ -274,13 +274,13 @@ void AUTH_ISSUE_TOK(Response* res, Request* request) {
 	AccessToken auth_tok;
 	AccessToken creat_tok;
 
-	auth_tok.host_id = request->structures[1].host_select.hostname;
-	auth_tok.auth_token = request->structures[0].auth.token;
-	auth_tok.user_id = request->structures[0].auth.user_id;
+	auth_tok.host_id = request->structures[1]->host_select.hostname;
+	auth_tok.auth_token = request->structures[0]->auth.token;
+	auth_tok.user_id = request->structures[0]->auth.user_id;
 
-	creat_tok.user_id = request->structures[2].issue_tok.user_id;
-	creat_tok.host_id = request->structures[2].issue_tok.target_host;
-	creat_tok.access_level = request->structures[2].issue_tok.permission;
+	creat_tok.user_id = request->structures[2]->issue_tok.user_id;
+	creat_tok.host_id = request->structures[2]->issue_tok.target_host;
+	creat_tok.access_level = request->structures[2]->issue_tok.permission;
 
 	AccessToken* issued = autogentoo_issue(request->parent, &auth_tok, &creat_tok);
 	if (!issued)
@@ -328,7 +328,7 @@ void AUTH_REGISTER(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
-	creat_tok.user_id = request->structures[1].issue_tok.user_id;
+	creat_tok.user_id = request->structures[1]->issue_tok.user_id;
 	creat_tok.host_id = NULL;
 	creat_tok.access_level = TOKEN_SERVER_WRITE;
 	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
@@ -346,14 +346,14 @@ void JOB_STREAM(Response* res, Request* request) {
 	AccessToken* tok = authorize (request, TOKEN_HOST_READ, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN_HTTP(FORBIDDEN);
-	Host* host = server_get_host(request->parent, request->structures[1].host_select.hostname);
+	Host* host = server_get_host(request->parent, request->structures[1]->host_select.hostname);
 	if (!host) {
-		token_free(map_remove(request->parent->auth_tokens, request->structures[0].auth.token));
+		token_free(map_remove(request->parent->auth_tokens, request->structures[0]->auth.token));
 		HANDLE_RETURN_HTTP(NOT_FOUND);
 	}
 	
 	/* Check if worker is running */
-	char* job_id = request->structures[2].job_select.job_name;
+	char* job_id = request->structures[2]->job_select.job_name;
 	
 	char* filename;
 	asprintf(&filename, "log/%s-%s.log", host->id, job_id);
@@ -473,7 +473,7 @@ void HOST_STAGE3(Response* res, Request* request) {
 	worker_req.host_id = host->id;
 	
 	worker_req.n = 1;
-	worker_req.args = &request->structures[2].job_select.job_name;
+	worker_req.args = &request->structures[2]->job_select.job_name;
 	
 	char* job_name = NULL;
 	int worker_res = worker_handler_request(request->parent->job_handler, &worker_req, &job_name);

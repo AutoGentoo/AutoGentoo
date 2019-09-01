@@ -20,7 +20,7 @@ Queue* queue_new (queue_t type, char* template, ...) {
 	va_list args;
 	va_start (args, template);
 	
-	out->args = malloc (get_item_size (template));
+	//out->args = malloc (get_item_size (template));
 	size_t offset = 0;
 	/*
 	for (char* i = template; *i; i++) {

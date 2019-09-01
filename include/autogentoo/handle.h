@@ -24,9 +24,9 @@ return; \
 })
 
 #define HANDLE_GET_HOST(name) \
-Host* host = server_get_host(request->parent, request->structures[1].host_select.hostname); \
+Host* host = server_get_host(request->parent, request->structures[1]->host_select.hostname); \
 if (!host) { \
-	token_free(map_remove(request->parent->auth_tokens, request->structures[0].auth.token)); \
+	token_free(map_remove(request->parent->auth_tokens, request->structures[0]->auth.token)); \
 	HANDLE_RETURN(NOT_FOUND);\
 }
 

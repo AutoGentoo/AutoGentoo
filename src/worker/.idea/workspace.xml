@@ -2,19 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c3c7d066-649f-4691-b7dc-2dc4586c4764" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../.idea/AutoGentoo.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/AutoGentoo.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../include/autogentoo/api/ssl_wrap.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../include/autogentoo/api/ssl_wrap.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../include/autogentoo/endian_convert.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../include/autogentoo/endian_convert.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../include/autogentoo/handle.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../include/autogentoo/handle.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../include/autogentoo/request.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../include/autogentoo/request.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../include/autogentoo/request_structure.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../include/autogentoo/request_structure.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../include/autogentoo/response.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../include/autogentoo/response.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../include/autogentoo/worker.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../include/autogentoo/worker.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.autogentoo_history" beforeDir="false" afterPath="$PROJECT_DIR$/.autogentoo_history" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/script.py" beforeDir="false" afterPath="$PROJECT_DIR$/script.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/emerge.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/emerge.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/package_etc.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/package_etc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker.py" beforeDir="false" afterPath="$PROJECT_DIR$/worker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,7 +13,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scripts/emerge.py">
           <provider selected="true" editor-type-id="text-editor">
             <state>
@@ -36,17 +25,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../../../CSCI141/p_turtle/hexes.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1063" />
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/worker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="27">
+            <state>
               <caret line="1" selection-start-line="1" selection-end-line="1" />
               <folding>
                 <element signature="e#24#37#0" expanded="true" />
@@ -58,7 +40,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cli.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="398">
+            <state>
               <caret line="23" column="8" selection-start-line="23" selection-start-column="8" selection-end-line="23" selection-end-column="8" />
               <folding>
                 <element signature="e#24#49#0" expanded="true" />
@@ -70,7 +52,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/package_etc.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1034">
+            <state>
               <caret line="123" column="21" selection-start-line="123" selection-start-column="21" selection-end-line="123" selection-end-column="21" />
             </state>
           </provider>
@@ -79,7 +61,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/stage3.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="486">
+            <state>
               <caret line="18" selection-start-line="18" selection-end-line="18" />
               <folding>
                 <element signature="e#361#381#0" expanded="true" />
@@ -91,7 +73,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/script.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="297">
+            <state>
               <caret line="11" column="9" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -141,7 +123,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -158,15 +139,17 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../CSCI141/p_turtle/hexes.py" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="Errors" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -192,16 +175,18 @@
       <updated>1566941787454</updated>
       <workItem from="1566941788693" duration="462000" />
       <workItem from="1566944848497" duration="2572000" />
+      <workItem from="1567186490900" duration="11000" />
+      <workItem from="1567186525824" duration="45000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3034000" />
+    <option name="totallyTimeSpent" value="3090000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-2" y="14" width="2564" height="1428" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15412329" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15692554" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -238,6 +223,7 @@
     <entry file="file://$PROJECT_DIR$/client.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/../../../CSCI141/p_turtle/hexes.py" />
     <entry file="file://$PROJECT_DIR$/scripts/emerge.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -248,46 +234,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/stage3.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="486">
-          <caret line="18" selection-start-line="18" selection-end-line="18" />
-          <folding>
-            <element signature="e#361#381#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cli.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="398">
-          <caret line="23" column="8" selection-start-line="23" selection-start-column="8" selection-end-line="23" selection-end-column="8" />
-          <folding>
-            <element signature="e#24#49#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/script.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="297">
-          <caret line="11" column="9" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/package_etc.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1034">
-          <caret line="123" column="21" selection-start-line="123" selection-start-column="21" selection-end-line="123" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/worker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27">
+        <state>
           <caret line="1" selection-start-line="1" selection-end-line="1" />
           <folding>
             <element signature="e#24#37#0" expanded="true" />
@@ -295,9 +244,41 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../CSCI141/p_turtle/hexes.py">
+    <entry file="file://$PROJECT_DIR$/cli.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1063" />
+        <state>
+          <caret line="23" column="8" selection-start-line="23" selection-start-column="8" selection-end-line="23" selection-end-column="8" />
+          <folding>
+            <element signature="e#24#49#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/package_etc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret line="123" column="21" selection-start-line="123" selection-start-column="21" selection-end-line="123" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/stage3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret line="18" selection-start-line="18" selection-end-line="18" />
+          <folding>
+            <element signature="e#361#381#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret line="11" column="9" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
       </provider>
     </entry>
   </component>

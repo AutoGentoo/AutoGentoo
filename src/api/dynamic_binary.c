@@ -120,12 +120,8 @@ dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {
 			*(int*)data = ntohl(*(uint32_t*)data);
 	}
 	else if (type == 's') {
-		if (data == NULL) {
-			data_size = 1;
-			data = calloc (data_size, 1);
-		}
-		else
-			data_size = strlen((char*)data) + 1; // Add the NULL byte
+		data_size = strlen((char*)data);
+		dynamic_binary_add(db, 'i', &data_size);
 	}
 	else if (type == 'v') {
 		lerror("Use dynamic_binary_add_binary() instead of dynamic_binary_add()");

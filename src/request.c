@@ -5,7 +5,6 @@
 #include <autogentoo/request.h>
 #include <string.h>
 #include <unitypes.h>
-#include <netinet/in.h>
 #include <autogentoo/handle.h>
 #include <autogentoo/http.h>
 
@@ -67,7 +66,7 @@ Request* request_handle (Connection* conn) {
 		out->directive = DIR_CONNECTION_STREAM;
 	}
 	
-	out->structures_parent = vector_new (sizeof (RequestData), VECTOR_REMOVE | VECTOR_ORDERED);
+	out->structures_parent = vector_new (sizeof (RequestData*), VECTOR_REMOVE | VECTOR_ORDERED);
 	out->types_parent = vector_new (sizeof (request_structure_t), VECTOR_REMOVE | VECTOR_ORDERED);
 	out->structures = out->structures_parent->ptr;
 	out->types = out->types_parent->ptr;
@@ -75,18 +74,18 @@ Request* request_handle (Connection* conn) {
 	request_structure_t current;
 	AUTOGENTOO_READ_INT_ERROR(current, AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR)
 	
-	long d = 0;
 	while (current != STRCT_END) {
 		if (current >= STRCT_MAX)
 			AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR
 		
 		vector_add(out->types_parent, &current);
-		vector_add(out->structures_parent, &d);
+		
+		size_t len = 0;
+		RequestData* rs = request_structure_read(current_request, request_structure_linkage[current - 1], &len);
+		
+		vector_add(out->structures_parent, &rs);
 		out->struct_c++;
-		int len = parse_request_structure (
-				(RequestData*)vector_get(out->structures_parent, out->struct_c - 1),
-				request_structure_linkage[current - 1],
-				current_request, end);
+		
 		if (len == -1)
 			AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR
 		current_request += len;
@@ -136,8 +135,7 @@ void request_free (Request* req) {
 		return free (req);
 	
 	for (int i = 0; i != req->struct_c; i++)
-		free_request_structure(&req->structures[i],
-							   request_structure_linkage[req->types[i] - 1], NULL);
+		request_structure_free(req->structures[i], request_structure_linkage[req->types[i] - 1]);
 	
 	vector_free (req->structures_parent);
 	vector_free (req->types_parent);

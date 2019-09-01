@@ -7,12 +7,14 @@
 #include <autogentoo/endian_convert.h>
 #include <stdlib.h>
 #include <hacksaw/log.h>
-#include <autogentoo/request_structure.h>
 
 int rs_read_int(void** src) {
-	int i = **(uint32_t**)src;
-	*src += sizeof(int);
-	return ntohl(i);
+	uint32_t len = 0;
+	memcpy(*src, &len, sizeof(len));
+	
+	*src += sizeof(len);
+	
+	return ntohl(len);
 }
 
 char* rs_read_string(void** src) {

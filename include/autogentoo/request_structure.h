@@ -91,8 +91,9 @@ union __RequestData {
 	struct __struct_Job job_select;
 };
 
-int parse_request_structure(RequestData* out, char* template, void* data, void* end_ptr);
-void free_request_structure (RequestData* to_free, char* template, void* end_ptr);
-size_t get_item_size(char* template);
+char* request_structure_template_parse(char* c_template, size_t* skip);
+size_t request_structure_get_size(char* template);
+void* request_structure_read(void* src, char* template, size_t* skip);
+void request_structure_free(void* rs, char* template);
 
 #endif //AUTOGENTOO_REQUEST_STRUCTURE_H

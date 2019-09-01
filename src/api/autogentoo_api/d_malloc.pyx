@@ -28,6 +28,7 @@ cdef class DynamicBuffer:
 		self.append_item ("i", &k)
 
 	cdef void append_item (self, str _type, void* data):
+		print("appending %s (d_malloc:32)" % _type)
 		dynamic_binary_add(self.parent, _type.encode("utf-8")[0], data)
 
 	cpdef append(self, py_template, array):
