@@ -97,6 +97,8 @@ void host_free(Host* host) {
 	free(host->profile);
 	free(host->arch);
 	
+	host_environment_free(host->environment);
+	
 	if (host->kernel != NULL) {
 		int i;
 		for (i = 0; i != host->kernel->n; i++)

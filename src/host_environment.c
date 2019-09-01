@@ -257,3 +257,47 @@ void host_environment_write_conf(Host* target, Vector* content, char* file) {
 	char* filepath = host_path(target, "/etc/portage/%s", file);
 	FILE* fp = fopen(filepath, "w+");
 }
+
+void host_environment_free(HostEnvironment* ptr) {
+	if (ptr->cflags)
+		free(ptr->cflags);
+	
+	if (ptr->cxxflags)
+		free(ptr->cxxflags);
+	if (ptr->distdir)
+		free(ptr->distdir);
+	
+	small_map_free(ptr->extra, 1);
+	
+	if (ptr->lc_messages)
+		free(ptr->lc_messages);
+	
+	vector_free(ptr->package_accept_keywords);
+	vector_free(ptr->package_env);
+	vector_free(ptr->package_use);
+	string_vector_free(ptr->package_mask);
+	
+	if (ptr->pkgdir)
+		free(ptr->pkgdir);
+	if (ptr->portage_logdir)
+		free(ptr->portage_logdir);
+	if (ptr->portage_tmpdir)
+		free(ptr->portage_tmpdir);
+	if (ptr->portdir)
+		free(ptr->portdir);
+	if (ptr->use)
+		free(ptr->use);
+	
+	if (ptr->make_conf_sha)
+		free(ptr->make_conf_sha);
+	if (ptr->package_accept_keywords_sha)
+		free(ptr->package_accept_keywords_sha);
+	if (ptr->package_env_sha)
+		free(ptr->package_env_sha);
+	if (ptr->package_use_sha)
+		free(ptr->package_use_sha);
+	if (ptr->package_mask_sha)
+		free(ptr->package_mask_sha);
+	
+	free(ptr);
+}

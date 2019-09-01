@@ -104,7 +104,8 @@ void pipe_to_log(Opt* op, char* logfile) {
 }
 
 int main(int argc, char** argv) {
-	opt_handle(opt_handlers, argc, argv + 1);
+	char** opts = opt_handle(opt_handlers, argc, argv + 1);
+	free(opts);
 	if (!location)
 		location = strdup(".");
 	if (!client_opts)

@@ -52,6 +52,7 @@ HostEnvironment* host_environment_new(Host* parent);
 int host_environment_write(Host* target);
 void host_environment_backup(Host* target);
 void host_environment_write_make_conf(Host* target);
+void host_environment_free(HostEnvironment* ptr);
 
 
 /**
