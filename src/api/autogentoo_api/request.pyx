@@ -116,7 +116,7 @@ cdef class Socket:
 		if raw:
 			return PyByteArray_FromStringAndSize(<char*>response_ptr, response_size)
 		
-		cdef Binary res_bin = Binary(None)
+		cdef Binary res_bin = Binary(None, is_network=False)
 		res_bin.set_ptr(response_ptr, response_size)
 		return res_bin
 	
@@ -157,20 +157,20 @@ cdef class Request:
 
 		return res_bin.read_template(template.encode('utf-8'))
 
-cpdef host_new(str arch, str profile, str hostname):
+def host_new(arch, profile, hostname):
 	return RequestStruct(struct_type=STRCT_HOST_NEW, args=(arch, profile, hostname))
 # request_type 1: make_conf 2: general
-cpdef host_edit(int request_type, str make_conf_var, str make_conf_val):
+def host_edit(request_type, make_conf_var, make_conf_val):
 	return RequestStruct(struct_type=STRCT_HOST_EDIT, args=(request_type, make_conf_var))
-cpdef host_select(str hostname):
+def host_select(hostname):
 	return RequestStruct(struct_type=STRCT_HOST_SELECT, args=[hostname])
-cpdef authorize(str user_id, str token):
+def authorize(user_id, token):
 	return RequestStruct(struct_type=STRCT_AUTHORIZE, args=(user_id, token))
-cpdef host_emerge(str emerge_str):
+def host_emerge(emerge_str):
 	return RequestStruct(struct_type=STRCT_EMERGE, args=[emerge_str])
-cpdef issue_token(str user_id, str target_host, token_access_t access_level):
+def issue_token(user_id, target_host, token_access_t access_level):
 	return RequestStruct(struct_type=STRCT_ISSUE_TOK, args=(user_id, target_host, access_level))
-cpdef job_select(str job_id):
+def job_select(job_id):
 	return RequestStruct(struct_type=STRCT_JOB_SELECT, args=[job_id])
 
 cdef class Client:
@@ -188,6 +188,9 @@ cdef class Client:
 
 		req.send()
 		content = req.recv()
+		
+		print(content)
+		
 		res = Response(code=req.code, message=req.message, content=content)
 
 		return res

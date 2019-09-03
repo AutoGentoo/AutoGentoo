@@ -7,7 +7,6 @@
 #include <string.h>
 #include <autogentoo/hacksaw/hacksaw.h>
 #include <autogentoo/endian_convert.h>
-#include <autogentoo/hacksaw/debug.h>
 
 DynamicBinary* dynamic_binary_new(dynamic_binary_endian_t endian) {
 	DynamicBinary* out = malloc(sizeof(DynamicBinary));
@@ -28,6 +27,9 @@ DynamicBinary* dynamic_binary_new(dynamic_binary_endian_t endian) {
 }
 
 void* prv_dynamic_binary_add_item(DynamicBinary* db, size_t size, void* data_ptr) {
+	if (!size)
+		return db->ptr;
+	
 	if (db->used_size + size >= db->ptr_size) {
 		db->ptr_size *= 2;
 		db->ptr = realloc(db->ptr, db->ptr_size);
@@ -120,7 +122,9 @@ dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {
 			*(int*)data = ntohl(*(uint32_t*)data);
 	}
 	else if (type == 's') {
-		data_size = strlen((char*)data);
+		if (data)
+			data_size = strlen((char*)data);
+		
 		dynamic_binary_add(db, 'i', &data_size);
 	}
 	else if (type == 'v') {

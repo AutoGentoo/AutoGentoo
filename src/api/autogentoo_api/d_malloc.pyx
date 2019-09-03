@@ -1,5 +1,5 @@
 from libc.stdio cimport *
-from libc.string cimport strlen, strdup, memcpy
+from libc.string cimport strlen, strdup, strndup, memcpy
 from libc.stdlib cimport free
 from .d_malloc cimport *
 from .dynamic_binary cimport *
@@ -154,8 +154,13 @@ cdef class Binary:
 	cpdef str read_string (self):
 		if not self.inside():
 			raise MemoryError("Reading past edge of memory")
-		cdef char* out = <char*>(<void*>self.ptr + self.pos)
-		self.pos += strlen (out) + 1
+		
+		cdef int length = self.read_int()
+		if length == 0:
+			return ""
+		
+		cdef char* out = strndup(<char*>(<void*>self.ptr + self.pos), length)
+		self.pos += length
 		return out.decode("utf-8")
 
 	cpdef int read_int (self):

@@ -43,7 +43,7 @@ class Worker:
 			self.read_lck.acquire()
 			
 			command_enum = self.read_int()
-			if command_enum == 1:
+			if command_enum == 1 or command_enum == -1:
 				self.read_lck.release()
 				# Kill this service
 				self.keep_alive = False
@@ -71,9 +71,13 @@ class Worker:
 		
 		self.request_fifo.close()
 		self.response_fifo.close()
-	
+
 	def read_int(self):
-		return struct.unpack('i', self.request_fifo.read(4))[0]
+		buf = self.request_fifo.read(4)
+		if len(buf) != 4:
+			return -1
+
+		return struct.unpack('i', )[0]
 	
 	def read_str(self):
 		length = self.read_int()
