@@ -29,7 +29,6 @@ set(src_SOURCES
         src/worker.c
         src/host_environment.c
         src/cli.c
-        src/transfer_protocol.c
         )
 
 set(include_HEADERS
@@ -62,7 +61,6 @@ set(include_HEADERS
         include/autogentoo/worker.h
         include/autogentoo/host_environment.h
         include/autogentoo/cli.h
-        include/autogentoo/transfer_protocol.h
         )
 
 set(test_SOURCES

@@ -1,11 +1,11 @@
 from dynamic_binary import *
 import socket
 import collections
-import ssl
-from typing import List
+from OpenSSL import SSL
+from typing import List, Union, Tuple
 
 
-Address = collections.namedtuple("Address", ("ip", "port"))
+Address = collections.namedtuple("Address", "ip port")
 RequestStruct = collections.namedtuple('RequestStruct', 'struct_type args')
 
 
@@ -14,35 +14,53 @@ class Client:
 		self.address = adr
 		self.ssl = _ssl
 		
-		self.context = ssl.create_default_context()
-		
 		self.socket = socket.socket(socket.AF_INET)
-		self.conn = None
+		self.context = SSL.Context(SSL.SSLv23_METHOD)
 	
 	def connect(self):
 		if self.ssl:
-			self.conn = self.context.wrap_socket(self.socket, server_hostname=self.address.ip)
-		else:
-			self.conn = self.socket
+			self.socket = SSL.Connection(self.context, self.socket)
 		
-		self.conn.connect(tuple(self.address))
+		self.socket.connect(tuple(self.address))
+		
+		if self.ssl:
+			self.socket.do_handshake()
+	
+	def close(self):
+		self.socket.close()
 	
 	def send(self, data: DynamicBinary):
-		self.conn.sendall(data.data)
+		self.socket.sendall(data.data)
 	
-	def recv(self) -> DynamicBinary:
+	def recv(self, maxsize=-1) -> DynamicBinary:
+		if maxsize != -1:
+			buf = self.socket.recv(maxsize)
+			outptr = DynamicBinary()
+			outptr.data = buf
+			
+			return outptr
+		
 		bufsize = 128
-		buf = self.socket.recv(bufsize)
+		buf = bytearray(bufsize)
+		view = memoryview(buf)
 		
-		out = buf
+		outdata = b""
 		
-		while len(buf) == bufsize:
-			buf = self.socket.recv(bufsize)
-			out += buf
+		nbytes = self.socket.recv_into(view, bufsize)
+		
+		while nbytes > 0:
+			outdata += view[:nbytes]
+			
+			try:
+				nbytes = self.socket.recv_into(view, bufsize)
+			except SSL.SysCallError:
+				break
+			except BrokenPipeError:
+				break
+			
 		
 		outptr = DynamicBinary()
-		outptr.data = out
-		
+		outptr.data = outdata
 		return outptr
 
 
@@ -99,6 +117,7 @@ class Request:
 	}
 	
 	request_structure_linkage = (
+		"",
 		"sss",  # /* Host new */
 		"s",  # /* Host select */
 		"iss",  # /* Host edit */
@@ -137,7 +156,7 @@ class Request:
 	def job_select(job_id: str) -> RequestStruct:
 		return RequestStruct(struct_type=Request.STRCT_JOB_SELECT, args=(job_id,))
 	
-	def __init__(self, adr: Address, request: int, structs: List[RequestStruct], _ssl=True):
+	def __init__(self, adr: Address, request: int, structs: Union[List[RequestStruct], Tuple[RequestStruct]], _ssl=True):
 		self.address = adr
 		self.ssl = _ssl
 		
@@ -171,6 +190,9 @@ class Request:
 	
 	def recv(self):
 		outdata = self.client.recv()
+		print(outdata)
+		
+		self.client.close()
 		
 		self.code = outdata.read_int()
 		self.message = outdata.read_string()
@@ -178,6 +200,8 @@ class Request:
 		template = outdata.read_string()
 		
 		if template is None:
-			return []
+			return None, -1, "Connection Error"
 		
 		self.content = outdata.read_template(template)
+		
+		return self.content, self.code, self.message

@@ -32,13 +32,13 @@ class DynamicBinary:
 	
 	def read_string(self):
 		length = self.read_int()
-		return struct.unpack("!%ds" % length, self.read(length))[0].encode("utf-8")
+		return struct.unpack("!%ds" % length, self.read(length))[0].decode("utf-8")
 	
 	def write_int(self, i):
 		self.write(struct.pack("!I", i))
 	
-	def write_string(self, s):
-		self.write(struct.pack("!I%ds" % len(s), len(s), s))
+	def write_string(self, s: str):
+		self.write(struct.pack("!I%ds" % len(s), len(s), s.encode("utf-8")))
 	
 	@staticmethod
 	def get_subtemplate(template, i):
@@ -50,11 +50,12 @@ class DynamicBinary:
 		
 		paren_level = 1
 		
-		while paren_level:
+		while paren_level > 0:
 			if buf_template[buf_pos] == "(":
 				paren_level += 1
 			elif buf_template[buf_pos] == ")":
 				paren_level -= 1
+			buf_pos += 1
 		
 		return buf_template[0:buf_pos - 1]
 	
@@ -95,9 +96,34 @@ class DynamicBinary:
 				i += 1
 				sub_template = self.get_subtemplate(template, i)
 				
-				self.write_template(obj[obj_i], sub_template)
+				iter_num = len(obj[obj_i])
+				
+				self.write_int(iter_num)
+				
+				for j in obj[obj_i]:
+					self.write_template(j, sub_template)
 				
 				i += len(sub_template)
 			
 			i += 1
 			obj_i += 1
+		
+		self.template += template
+	
+	def __str__(self):
+		align = 12
+		to_print = ""
+		
+		view = memoryview(self.data)
+		
+		for i in range(int(len(self.data) / align)):
+			for byte in view[:align]:
+				to_print += format(byte, "02x") + " "
+			
+			to_print += "\n"
+			view = view[align:]
+		
+		for byte in view:
+			to_print += format(byte, "02x") + " "
+		
+		return to_print

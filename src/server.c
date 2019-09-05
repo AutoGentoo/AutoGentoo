@@ -130,14 +130,19 @@ void server_respond(Connection* conn, int worker_index) {
 		if (!res.sent_response) {
 			/* Send the response */
 			/* Response code */
-			int code_big_endian = htonl(res.code.code);
+			int big_endian = htonl(res.code.code);
 			
 			size_t write_size = 0;
-			write_size += connection_write(conn, &code_big_endian, sizeof(int))
-			write_size += connection_write(conn, res.code.message, res.code.len + 1)
+			write_size += connection_write(conn, &big_endian, sizeof(int));
+			
+			big_endian = htonl(res.code.len);
+			write_size += connection_write(conn, &big_endian, sizeof(int));
+			write_size += connection_write(conn, res.code.message, res.code.len)
 			
 			/* Response content */
-			write_size += connection_write(conn, res.content->template, res.content->template_used_size + 1)
+			big_endian = htonl(res.content->template_used_size);
+			write_size += connection_write(conn, &big_endian, sizeof(int));
+			write_size += connection_write(conn, res.content->template, res.content->template_used_size)
 			write_size += connection_write(conn, res.content->ptr, res.content->used_size)
 		}
 	}

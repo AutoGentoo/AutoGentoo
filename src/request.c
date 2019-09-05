@@ -49,7 +49,7 @@ Request* request_handle (Connection* conn) {
 	void* current_request = out->body;
 	
 	/* If our first byte is a NULL byte, protocol == PROT_AUTOGENTOO */
-	if (*(char*)current_request != 0) {
+	if (((char*)current_request)[0] != 0) {
 		out->protocol = PROT_HTTP;
 		return out;
 	}

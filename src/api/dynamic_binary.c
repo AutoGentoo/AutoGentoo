@@ -125,7 +125,15 @@ dynamic_bin_t dynamic_binary_add(DynamicBinary* db, char type, void* data) {
 		if (data)
 			data_size = strlen((char*)data);
 		
-		dynamic_binary_add(db, 'i', &data_size);
+		void* int_data = malloc(sizeof(int));
+		*(int*)int_data = data_size;
+		if (db->endian & DB_ENDIAN_TARGET_NETWORK && !(db->endian & DB_ENDIAN_INPUT_NETWORK))
+			*(int*)int_data = htonl(*(uint32_t*)int_data);
+		else if (!(db->endian & DB_ENDIAN_TARGET_NETWORK) && db->endian & DB_ENDIAN_INPUT_NETWORK)
+			*(int*)int_data = ntohl(*(uint32_t*)int_data);
+		
+		prv_dynamic_binary_add_item(db, sizeof(int), int_data);
+		free(int_data);
 	}
 	else if (type == 'v') {
 		lerror("Use dynamic_binary_add_binary() instead of dynamic_binary_add()");

@@ -113,7 +113,8 @@ conn->communication_type == COM_RSA ? \
 
 #ifndef connection_write
 #define connection_write(conn, src, size) \
-conn->communication_type == COM_RSA ? SSL_write(conn->encrypted_connection, src, (int)size) : write (conn->fd, src, size);
+conn->communication_type == COM_RSA ? \
+	SSL_write(conn->encrypted_connection, src, (int)size) : write (conn->fd, src, size);
 #endif
 
 struct __EncryptServer {
