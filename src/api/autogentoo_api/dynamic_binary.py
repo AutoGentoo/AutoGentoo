@@ -112,18 +112,18 @@ class DynamicBinary:
 	
 	def __str__(self):
 		align = 12
-		to_print = ""
+		outstr = ""
 		
 		view = memoryview(self.data)
 		
 		for i in range(int(len(self.data) / align)):
 			for byte in view[:align]:
-				to_print += format(byte, "02x") + " "
+				outstr += format(byte, "02x") + " "
 			
-			to_print += "\n"
+			outstr += "\n"
 			view = view[align:]
 		
 		for byte in view:
-			to_print += format(byte, "02x") + " "
+			outstr += format(byte, "02x") + " "
 		
-		return to_print
+		return outstr

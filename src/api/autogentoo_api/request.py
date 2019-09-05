@@ -57,7 +57,6 @@ class Client:
 				break
 			except BrokenPipeError:
 				break
-			
 		
 		outptr = DynamicBinary()
 		outptr.data = outdata
@@ -101,7 +100,7 @@ class Request:
 		STRCT_MAX
 	) = range(9)
 	
-	request_args = {
+	ARGS = {
 		REQ_HOST_NEW: (STRCT_AUTHORIZE, STRCT_HOST_NEW),
 		REQ_HOST_EDIT: (STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_HOST_EDIT),
 		REQ_HOST_DEL: (STRCT_AUTHORIZE, STRCT_HOST_SELECT),
@@ -116,7 +115,7 @@ class Request:
 		REQ_HOST_STAGE3: (STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_JOB_SELECT)
 	}
 	
-	request_structure_linkage = (
+	LINKAGE = (
 		"",
 		"sss",  # /* Host new */
 		"s",  # /* Host select */
@@ -164,8 +163,8 @@ class Request:
 		self.structs = structs
 		
 		for i, st in enumerate(self.structs):
-			if st.struct_type != self.request_args[self.request][i]:
-				raise TypeError("Invalid argument expected '%d' got '%d'" % (self.request_args[self.request][i], st.struct_type))
+			if st.struct_type != Request.ARGS[self.request][i]:
+				raise TypeError("Invalid argument expected '%d' got '%d'" % (Request.ARGS[self.request][i], st.struct_type))
 		
 		self.data = DynamicBinary(read_only=False)
 		
@@ -174,7 +173,7 @@ class Request:
 		
 		for st in self.structs:
 			self.data.write_int(st.struct_type)
-			self.data.write_template(st.args, self.request_structure_linkage[st.struct_type])
+			self.data.write_template(st.args, Request.LINKAGE[st.struct_type])
 		
 		self.data.write_int(self.STRCT_END)
 		
@@ -190,7 +189,6 @@ class Request:
 	
 	def recv(self):
 		outdata = self.client.recv()
-		print(outdata)
 		
 		self.client.close()
 		

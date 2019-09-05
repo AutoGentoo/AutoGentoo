@@ -2,23 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f77f1f87-28ef-4d9e-9b42-bd978f38ca6a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/stream.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../.idea/dataSources/1e8fbf73-8f2d-480f-88dc-dd311f2d3adc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../.idea/dataSources/1e8fbf73-8f2d-480f-88dc-dd311f2d3adc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../cmake/autogentoo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../../cmake/autogentoo.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/d_malloc.pxd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/d_malloc.pyx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dynamic_binary.pxd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dynamic_binary.py" beforeDir="false" afterPath="$PROJECT_DIR$/dynamic_binary.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dynamic_binary.pyx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/request.pxd" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/request.py" beforeDir="false" afterPath="$PROJECT_DIR$/request.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/request.pyx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stream.pxd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stream.pyx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vector.pxd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vector.pyx" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,11 +12,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/request.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="245">
-              <caret line="204" selection-start-line="204" selection-end-line="204" />
+            <state relative-caret-position="224">
+              <caret line="59" column="8" selection-start-line="59" selection-start-column="8" selection-end-line="59" selection-end-column="8" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
               </folding>
@@ -58,10 +42,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dynamic_binary.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
+            <state relative-caret-position="1832">
               <caret line="76" selection-start-line="76" selection-end-line="76" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
@@ -117,8 +101,8 @@
         <option value="$PROJECT_DIR$/request.pyx" />
         <option value="$PROJECT_DIR$/stream.py" />
         <option value="$PROJECT_DIR$/test.py" />
-        <option value="$PROJECT_DIR$/request.py" />
         <option value="$PROJECT_DIR$/dynamic_binary.py" />
+        <option value="$PROJECT_DIR$/request.py" />
       </list>
     </option>
   </component>
@@ -223,15 +207,16 @@
       <workItem from="1567372768060" duration="2233000" />
       <workItem from="1567451673897" duration="1803000" />
       <workItem from="1567454768838" duration="10477000" />
-      <workItem from="1567697599294" duration="6502000" />
+      <workItem from="1567697599294" duration="6680000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="26366000" />
+    <option name="totallyTimeSpent" value="26544000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="36" width="1922" height="1045" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13129689" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -239,7 +224,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.3211517" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.39977852" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39977852" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -348,16 +333,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/request.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="204" selection-start-line="204" selection-end-line="204" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="395">
@@ -367,10 +342,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dynamic_binary.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
+        <state relative-caret-position="1832">
           <caret line="76" selection-start-line="76" selection-end-line="76" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/request.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="59" column="8" selection-start-line="59" selection-start-column="8" selection-end-line="59" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
