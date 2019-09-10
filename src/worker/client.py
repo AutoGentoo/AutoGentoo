@@ -1,4 +1,4 @@
-from autogentoo_api.d_malloc import BinaryFileReader
+from autogentoo_api.dynamic_binary import DynamicBinary
 
 AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd
 AUTOGENTOO_HOST = 0xfffffff0
@@ -8,12 +8,26 @@ AUTOGENTOO_FILE_END = 0xffffffff
 AUTOGENTOO_SUDO_TOKEN = 0xcccccccc
 
 
+class FileReader(DynamicBinary):
+	def __init__(self, path):
+		super(FileReader, self).__init__()
+
+		self.path = path
+		self.file = None
+		self.data = b""
+
+	def read_data(self):
+		self.file = open(self.path, "rb")
+		self.data = self.file.read()
+		self.file.close()
+
+
 class Server:
 	def __init__(self, path):
 		self.path = path
 		self.file = "%s/.autogentoo.config" % self.path
-		
-		self.reader = None
+
+		self.reader = FileReader(self.file)
 		
 		self.hosts = []
 		self.keys = {}
@@ -32,7 +46,8 @@ class Server:
 		self.keys[token.auth_token] = token
 	
 	def read(self):
-		self.reader = BinaryFileReader(self.file)
+		self.reader.read_data()
+
 		self.keys = {}
 		self.hosts = []
 		
@@ -53,7 +68,6 @@ class Server:
 				raise IOError("Invalid data type %s" % hex(current))
 			
 			current = self.reader.read_int() & 0xffffffff
-		self.reader = None
 	
 	def get_host(self, host_id):
 		if host_id is None:
@@ -66,7 +80,7 @@ class Server:
 
 
 class Host:
-	def __init__(self, reader, parent):
+	def __init__(self, reader: FileReader, parent):
 		self.reader = reader
 		self.parent = parent
 		

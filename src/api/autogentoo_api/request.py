@@ -1,4 +1,4 @@
-from dynamic_binary import *
+from .dynamic_binary import *
 import socket
 import collections
 from OpenSSL import SSL
@@ -7,6 +7,7 @@ from typing import List, Union, Tuple
 
 Address = collections.namedtuple("Address", "ip port")
 RequestStruct = collections.namedtuple('RequestStruct', 'struct_type args')
+Response = collections.namedtuple('Response', 'content code message')
 
 
 class Client:
@@ -187,7 +188,7 @@ class Request:
 		self.client.connect()
 		self.client.send(self.data)
 	
-	def recv(self):
+	def recv(self) -> Response:
 		outdata = self.client.recv()
 		
 		self.client.close()
@@ -202,4 +203,4 @@ class Request:
 		
 		self.content = outdata.read_template(template)
 		
-		return self.content, self.code, self.message
+		return Response(self.content, self.code, self.message)

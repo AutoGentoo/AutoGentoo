@@ -1,11 +1,11 @@
-from request import Address, Request
+from .request import Address, Request
 
 
 class Stream(Request):
 	def __init__(self, adr: Address, args: list):
 		super(Stream).__init__(adr, Request.REQ_JOB_STREAM, args, _ssl=True)
 	
-	def recv(self, chunksize=32):
+	def recv(self, chunksize=32) -> bytearray:
 		buffer = bytearray(chunksize)
 		
 		nbytes = self.client.socket.recv_into(buffer, chunksize)

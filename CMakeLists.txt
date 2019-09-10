@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.8)
-project(AutoGentoo)
+cmake_minimum_required(VERSION 3.8)
+project(AutoGentoo VERSION "2.1.0")
 
 SET(CMAKE_INSTALL_PREFIX /usr)
 
@@ -9,17 +9,10 @@ find_package(FLEX REQUIRED)
 include(cmake/autogentoo-build.txt)
 include(cmake/autogentoo.txt)
 include(cmake/hacksaw.txt)
-include (${CMAKE_ROOT}/Modules/FindPythonLibs.cmake)
-include (${CMAKE_ROOT}/Modules/FindPythonInterp.cmake)
-
-find_package(PythonLibs)
 
 include_directories(include)
 include_directories(cportage/language)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${PYTHON_INCLUDE_DIR})
-
-#find_package (Python3 COMPONENTS Interpreter Development)
 
 execute_process(COMMAND bash -c "mkdir -p {cportage,http}")
 
@@ -57,7 +50,9 @@ add_executable(autogentoo-exec
         src/autogentoo.c
         )
 
+add_subdirectory("src/api/")
 set_target_properties(autogentoo-exec PROPERTIES OUTPUT_NAME autogentoo)
+add_dependencies(autogentoo-exec autogentoo_api)
 
 add_executable(cportage-exec
         cportage/cemerge.c
@@ -102,7 +97,7 @@ target_link_libraries(
 target_link_libraries(
         autogentoo-aabs
         autogentoo
-        ${ARCHIVE}
+        archive
         ssl
         )
 

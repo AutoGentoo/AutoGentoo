@@ -1,5 +1,5 @@
 import struct
-from typing import Union
+from typing import Union, List
 
 
 class DynamicBinary:
@@ -27,21 +27,21 @@ class DynamicBinary:
 		
 		return outdata
 	
-	def read_int(self):
+	def read_int(self) -> int:
 		return struct.unpack("!I", self.read(4))[0]
 	
-	def read_string(self):
+	def read_string(self) -> str:
 		length = self.read_int()
 		return struct.unpack("!%ds" % length, self.read(length))[0].decode("utf-8")
 	
-	def write_int(self, i):
+	def write_int(self, i) -> None:
 		self.write(struct.pack("!I", i))
 	
-	def write_string(self, s: str):
+	def write_string(self, s: str) -> None:
 		self.write(struct.pack("!I%ds" % len(s), len(s), s.encode("utf-8")))
 	
 	@staticmethod
-	def get_subtemplate(template, i):
+	def get_subtemplate(template, i) -> str:
 		if template[i] != "(":
 			ValueError("Template not at correct position expected '(' got '%s'" % template[i])
 		
@@ -59,7 +59,7 @@ class DynamicBinary:
 		
 		return buf_template[0:buf_pos - 1]
 	
-	def read_template(self, template):
+	def read_template(self, template) -> List[Union[int, str, List]]:
 		out = []
 		
 		i = 0
@@ -83,7 +83,7 @@ class DynamicBinary:
 		
 		return out
 	
-	def write_template(self, obj: Union[tuple, list], template: str):
+	def write_template(self, obj: Union[tuple, list], template: str) -> None:
 		i = 0
 		obj_i = 0
 		
