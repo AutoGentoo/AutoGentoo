@@ -15,7 +15,7 @@ import subprocess
 
 
 def script(job_name: str, host: Host, args: str):
-	print("[INFO] Starting Emerge for host" % host.id)
+	print("[INFO] Starting Emerge for host %s" % host.id)
 	print("[DEBUG] chroot %s" % host.get_path())
 	chroot(host)
 	

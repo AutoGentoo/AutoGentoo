@@ -158,6 +158,7 @@ void HOST_EMERGE(Response* res, Request* request) {
 	
 	WorkerRequest* strct_worker_request = malloc(sizeof(WorkerRequest));
 	strct_worker_request->command_name = "emerge";
+	strct_worker_request->host_id = host->id;
 	
 	StringVector* worker_args = string_vector_new();
 	string_vector_add(worker_args, "-v");
@@ -356,7 +357,7 @@ void JOB_STREAM(Response* res, Request* request) {
 	char* job_id = request->structures[2]->job_select.job_name;
 	
 	char* filename;
-	asprintf(&filename, "log/%s-%s.log", host->id, job_id);
+	asprintf(&filename, "logs/%s-%s.log", host->id, job_id);
 	size_t filename_len = strlen(filename);
 	
 	char* lock_file = malloc(filename_len + 5);

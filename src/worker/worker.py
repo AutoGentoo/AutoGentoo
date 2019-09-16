@@ -56,7 +56,7 @@ class Worker:
 			argc = self.read_int()
 			argv = []
 			for i in range(argc):
-				argv.append(eval(self.read_str()))
+				argv.append(self.read_str())
 			
 			self.read_lck.release()
 			
@@ -77,7 +77,7 @@ class Worker:
 		if len(buf) != 4:
 			return -1
 
-		return struct.unpack('i', )[0]
+		return struct.unpack('i', buf)[0]
 	
 	def read_str(self):
 		length = self.read_int()
@@ -127,7 +127,7 @@ class Job:
 		os.waitpid(self.pid, 0)
 	
 	def run(self):
-		logfile = "logs/%s.log" % self.job_name
+		logfile = "logs/%s-%s.log" % (self.host.id, self.job_name)
 		touch(logfile + ".lck")
 		
 		self.pid = os.fork()
