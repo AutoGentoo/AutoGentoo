@@ -21,7 +21,7 @@ Opt opt_handlers[] = {
 		{0,   "sign",    "sign the rsa key with the certificate",           set_encrypt_opts,   OPT_LONG},
 		{0,   "gencert", "generate new certicaite and self sign",           set_encrypt_opts,   OPT_LONG},
 		{0,   "genrsa",  "generate new rsa and sign with cert",             set_encrypt_opts,   OPT_LONG},
-		{0,   "cmdline", "start the CLI",                                   set_cli,            OPT_LONG},
+		{'s', "shell", "start the CLI (shell)",                             set_cli,            OPT_SHORT | OPT_LONG},
 		{0, NULL, NULL, NULL, (opt_opts_t) 0 }
 };
 
@@ -144,11 +144,15 @@ int main(int argc, char** argv) {
 	
 	pid_t cli_pid = 0;
 	
+	char parent_pid[16];
+	sprintf(parent_pid, "%d", getpid());
+	
 	if (start_cli) {
 		cli_pid = fork();
 		if (cli_pid == 0) {
 			char* cli_path = AUTOGENTOO_WORKER_DIR "/cli.py";
-			char* const cli_argv[] = {cli_path, main_server->location, NULL};
+			
+			char* const cli_argv[] = {cli_path, main_server->location, parent_pid, NULL};
 			int res = execv(cli_path, cli_argv);
 			lerror("Failed to start command line");
 			lerror("Error [%d] %s", res, strerror(res));

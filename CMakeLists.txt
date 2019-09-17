@@ -116,7 +116,6 @@ SET(PYTHON_WORKER
         src/worker/client.py
         src/worker/worker.py
         src/worker/script.py
-        src/worker/semaphore.py
         )
 SET(WORKER_SCRIPTS
         src/worker/scripts/emerge.py

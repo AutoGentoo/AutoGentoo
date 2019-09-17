@@ -28,6 +28,11 @@ class DynamicBinary:
 		outdata = self.data[self.pos:self.pos + size]
 		self.pos += size
 		
+		if len(outdata) < size:
+			print(self.pos)
+			print(outdata)
+			raise IOError("Failed to read %d bytes from data" % size)
+		
 		return outdata
 	
 	def read_int(self) -> int:
@@ -175,26 +180,49 @@ class FileReader(DynamicBinary):
 		self.data = b""
 		
 		self.config_lck = _thread.allocate_lock()
-		signal.signal(signal.SIGUSR1, self.toggle_lock)
+		self.ack_lck = _thread.allocate_lock()
+		signal.signal(signal.SIGUSR1, self.handle_toggle)
+		signal.signal(signal.SIGUSR2, self.handle_ack)
 	
-	def toggle_lock(self):
+	def handle_ack(self, signum, stack):
+		self.ack_lck.release()
+	
+	def handle_toggle(self, signum, stack):
 		if self.config_lck.locked():
 			self.config_lck.release()
 		else:
-			self.config_lck.aquire()
+			self.config_lck.acquire()
 	
 	def read_data(self):
 		self.file = open(self.path, "rb")
 		self.data = self.file.read()
+		self.pos = 0
 		self.file.close()
 	
-	def start_write(self):
-		self.config_lck.aquire()
+	def toggle_server_lock(self):
+		self.ack_lck.acquire()
 		os.kill(self.parent_pid, signal.SIGUSR1)
 		
+		# WAIT FOR SIGUSR2
+		
+		self.ack_lck.acquire()
+		self.ack_lck.release()
+	
+	def start_write(self):
+		self.data = b""
+		self.pos = 0
+		
+		self.config_lck.acquire()
+		self.toggle_server_lock()
+		
 	def stop_write(self):
+		self.file = open(self.path, "wb+")
+		self.file.write(self.data)
+		self.file.flush()
+		self.file.close()
+		
 		self.config_lck.release()
-		os.kill(self.parent_pid, signal.SIGUSR1)
+		self.toggle_server_lock()
 
 
 class BinaryObject:

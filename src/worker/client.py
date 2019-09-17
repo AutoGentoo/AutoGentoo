@@ -72,15 +72,6 @@ class Server(BinaryObject):
 		self.reader.start_write()
 		super().write()
 		self.reader.end_write()
-	
-	def get_host(self, host_id):
-		if host_id is None:
-			return None
-		
-		for host in self.hosts:
-			if host.id == host_id:
-				return host
-		return None
 
 
 class Host(BinaryObject):

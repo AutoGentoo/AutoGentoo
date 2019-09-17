@@ -21,9 +21,10 @@ atexit.register(readline.write_history_file, histfile)
 
 
 class Cli:
-	def __init__(self, path):
+	def __init__(self, path, server_pid):
 		self.path = path
-		self.server = Server(self.path)
+		self.server_pid = server_pid
+		self.server = Server(self.path, server_pid)
 		self.commands = {
 			"stage3": ("host_id", "args"),
 			"mkhost": ("arch", "profile", "hostname"),
@@ -40,15 +41,20 @@ class Cli:
 		self.pp = pprint.PrettyPrinter(indent=1)
 
 	def update_completion(self):
-		for host in self.server.hosts:
-			self.completion[host.id] = host
+		for host_id in self.server.hosts:
+			self.completion[host_id] = self.server.hosts[host_id]
 		
 		readline.set_completer(rlcompleter.Completer(self.completion).complete)
 
 	def cli(self):
 		time.sleep(0.1)
 		while True:
-			self.server.read()
+			try:
+				self.server.read()
+			except IOError:
+				traceback.print_exc(file=sys.stdout)
+				print("Failed to read config")
+			
 			self.update_completion()
 			try:
 				line = input("autogentoo > ").replace("\n", "").strip()
@@ -80,48 +86,30 @@ class Cli:
 		
 		return eval("self.%s(*args)" % cmd_name)
 	
-	@staticmethod
-	def send_request(request_str, args):
-		client = Client(Address("localhost", 9491))
-		stat = "OK"
-		
-		try:
-			response = client.request(request_str, args)
-		except ConnectionError:
-			stat = "CON"
-			response = None
-			
-			return None, None, stat
-		else:
-			if response.code == 200:
-				stat = "OK"
-			elif response.code != 403:
-				if response.code < 500:
-					stat = "CLT"
-				else:
-					stat = "ERR"
-			
-			time.sleep(0.5)
-			return response.code, response.content, stat
-	
 	def stage3(self, host_id, args=""):
-		code, content, status = self.send_request("REQ_HOST_STAGE3", [
-			authorize("cli", self.server.sudo_token),
-			host_select(host_id),
-			job_select(args)
+		req = Request(Address("localhost", 9491), Request.REQ_HOST_STAGE3, [
+			Request.authorize("cli", self.server.sudo_token),
+			Request.host_select(host_id),
+			Request.job_select(args)
 		])
 		
-		print(content)
+		req.send()
+		res = req.recv()
+		
+		print(res.content)
 	
 	def mkhost(self, arch, profile, hostname):
-		code, content, status = self.send_request("REQ_HOST_NEW", [
-			authorize("cli", self.server.sudo_token),
-			host_new(arch, profile, hostname)
+		req = Request(Address("localhost", 9491), Request.REQ_HOST_NEW, [
+			Request.authorize("cli", self.server.sudo_token),
+			Request.host_new(arch, profile, hostname)
 		])
+		
+		req.send()
+		req.recv()
 	
 	def ls(self):
-		for host in self.server.hosts:
-			print("id: %s" % host.id)
+		for host_id, host in self.server.hosts.items():
+			print("id: %s" % host_id)
 			print("path: %s" % host.get_path())
 			print("arch %s" % host.arch)
 			print("profile %s" % host.profile)
@@ -133,12 +121,13 @@ class Cli:
 	def help(self):
 		self.pp.pprint(self.commands)
 	
-	def q(self):
+	@staticmethod
+	def q():
 		exit(0)
 
 
 def main(args):
-	cli = Cli(args[1])
+	cli = Cli(args[1], args[2])
 	cli.cli()
 
 
