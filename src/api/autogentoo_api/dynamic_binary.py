@@ -184,10 +184,10 @@ class FileReader(DynamicBinary):
 		signal.signal(signal.SIGUSR1, self.handle_toggle)
 		signal.signal(signal.SIGUSR2, self.handle_ack)
 	
-	def handle_ack(self, signum, stack):
+	def handle_ack(self, _signum, _stack):
 		self.ack_lck.release()
 	
-	def handle_toggle(self, signum, stack):
+	def handle_toggle(self, _signum, _stack):
 		if self.config_lck.locked():
 			self.config_lck.release()
 		else:
