@@ -58,7 +58,7 @@ Server* server_new (char* location, char* port, server_t opts) {
 	out->port = strdup(port);
 	out->auth_tokens = map_new(128, 0.8);
 	
-	out->config_semaphore = sem_open("/tmp/autogentoo.config.semaphore", O_CREAT, 0777, 1);
+	pthread_mutex_init(&out->config_mutex, NULL);
 	
 	return out;
 }

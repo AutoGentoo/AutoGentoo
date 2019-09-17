@@ -1,4 +1,4 @@
-from autogentoo_api.dynamic_binary import DynamicBinary
+from autogentoo_api.dynamic_binary import FileReader, BinaryObject
 
 AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd
 AUTOGENTOO_HOST = 0xfffffff0
@@ -8,37 +8,26 @@ AUTOGENTOO_FILE_END = 0xffffffff
 AUTOGENTOO_SUDO_TOKEN = 0xcccccccc
 
 
-class FileReader(DynamicBinary):
-	def __init__(self, path):
-		super(FileReader, self).__init__()
-
+class Server(BinaryObject):
+	def __init__(self, path, parent_pid):
 		self.path = path
-		self.file = None
-		self.data = b""
-
-	def read_data(self):
-		self.file = open(self.path, "rb")
-		self.data = self.file.read()
-		self.file.close()
-
-
-class Server:
-	def __init__(self, path):
-		self.path = path
+		self.parent_pid = parent_pid
 		self.file = "%s/.autogentoo.config" % self.path
-
-		self.reader = FileReader(self.file)
 		
-		self.hosts = []
+		reader = FileReader(self.file, parent_pid)
+		
+		super(Server, self).__init__(reader, "")
+		
+		self.hosts = {}
 		self.keys = {}
 		
 		self.sudo_token = None
 		self.autogentoo_org_token = None
-	
+
 	def read_host(self):
 		host = Host(self.reader, self)
 		host.read()
-		self.hosts.append(host)
+		self.hosts[host.id] = host
 	
 	def read_token(self):
 		token = Token(self.reader)
@@ -49,7 +38,7 @@ class Server:
 		self.reader.read_data()
 
 		self.keys = {}
-		self.hosts = []
+		self.hosts = {}
 		
 		self.sudo_token = None
 		self.autogentoo_org_token = None
@@ -69,6 +58,21 @@ class Server:
 			
 			current = self.reader.read_int() & 0xffffffff
 	
+	def write(self):
+		self.data = (
+			*list(self.hosts.values()),
+			*list(self.keys.values()),
+			AUTOGENTOO_SERVER_TOKEN,
+			self.autogentoo_org_token,
+			AUTOGENTOO_SUDO_TOKEN,
+			self.sudo_token,
+			AUTOGENTOO_FILE_END
+		)
+		
+		self.reader.start_write()
+		super().write()
+		self.reader.end_write()
+	
 	def get_host(self, host_id):
 		if host_id is None:
 			return None
@@ -79,12 +83,13 @@ class Server:
 		return None
 
 
-class Host:
+class Host(BinaryObject):
 	def __init__(self, reader: FileReader, parent):
-		self.reader = reader
+		super(Host, self).__init__(reader, "siissssssssssssi")
+
 		self.parent = parent
 		
-		self.id = None
+		self.id = ""
 		self.status = -1
 		self.env_status = -1
 		
@@ -105,7 +110,6 @@ class Host:
 		self.extra = {}
 	
 	def read(self):
-		__tuple = self.reader.read_template("siissssssssssssi")
 		(
 			self.id,
 			self.status,
@@ -125,7 +129,7 @@ class Host:
 			self.portdir,
 			self.use,
 			extra_n
-		) = __tuple
+		) = super().read()
 		
 		for i in range(extra_n):
 			key = self.reader.read_string()
@@ -134,12 +138,39 @@ class Host:
 		if self.reader.read_int() & 0xffffffff != AUTOGENTOO_HOST_END:
 			raise IOError("Expected end of host")
 	
+	def write(self):
+		self.data = (
+			AUTOGENTOO_HOST,
+			self.id,
+			self.status,
+			self.env_status,
+			
+			self.hostname,
+			self.profile,
+			self.arch,
+			
+			self.cflags,
+			self.cxxflags,
+			self.distdir,
+			self.lc_messages,
+			self.pkgdir,
+			self.portage_logdir,
+			self.portage_tmpdir,
+			self.portdir,
+			self.use,
+			self.extra,
+			AUTOGENTOO_HOST_END
+		)
+		
+		super().write()
+	
 	def get_path(self, sub=""):
 		return "%s/%s/%s" % (self.parent.path, self.id, sub)
 
 
-class Token:
+class Token(BinaryObject):
 	def __init__(self, reader):
+		super(Token, self).__init__(reader, "sssi")
 		self.reader = reader
 		
 		self.auth_token = ""
@@ -153,4 +184,15 @@ class Token:
 			self.user_id,
 			self.host_id,
 			self.access_level
-		) = self.reader.read_template("sssi")
+		) = super().read()
+	
+	def write(self):
+		self.data = (
+			AUTOGENTOO_ACCESS_TOKEN,
+			self.auth_token,
+			self.user_id,
+			self.host_id,
+			self.access_level
+		)
+		
+		super().write()

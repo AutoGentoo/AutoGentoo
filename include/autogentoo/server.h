@@ -105,7 +105,7 @@ struct __Server {
 	
 	Map* auth_tokens;
 	
-	sem_t* config_semaphore;
+	pthread_mutex_t config_mutex;
 };
 
 #ifndef connection_read

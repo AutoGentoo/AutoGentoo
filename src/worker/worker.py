@@ -35,7 +35,6 @@ class Worker:
 		
 		self.read_lck = _thread.allocate_lock()
 		self.write_lck = _thread.allocate_lock()
-		self.config_lck = 
 	
 	def start(self):
 		mkdir("logs")
@@ -160,7 +159,7 @@ class Job:
 
 
 def main(argv):
-	server = Server(argv[1])
+	server = Server(argv[1], int(argv[2]))
 	server.read()
 	
 	worker = Worker(server)

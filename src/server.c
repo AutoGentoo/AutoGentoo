@@ -11,7 +11,6 @@
 #include "autogentoo/worker.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <semaphore.h>
 
 Server* srv = NULL;
 
@@ -134,15 +133,15 @@ void server_respond(Connection* conn, int worker_index) {
 			int big_endian = htonl(res.code.code);
 			
 			size_t write_size = 0;
-			write_size += connection_write(conn, &big_endian, sizeof(int));
+			write_size += connection_write(conn, &big_endian, sizeof(int))
 			
 			big_endian = htonl(res.code.len);
-			write_size += connection_write(conn, &big_endian, sizeof(int));
+			write_size += connection_write(conn, &big_endian, sizeof(int))
 			write_size += connection_write(conn, res.code.message, res.code.len)
 			
 			/* Response content */
 			big_endian = htonl(res.content->template_used_size);
-			write_size += connection_write(conn, &big_endian, sizeof(int));
+			write_size += connection_write(conn, &big_endian, sizeof(int))
 			write_size += connection_write(conn, res.content->template, res.content->template_used_size)
 			write_size += connection_write(conn, res.content->ptr, res.content->used_size)
 		}
@@ -225,7 +224,7 @@ void server_free (Server* server) {
 	
 	free(server->port);
 	
-	sem_close(server->config_semaphore);
+	pthread_mutex_destroy(&server->config_mutex);
 	
 	free(server);
 }

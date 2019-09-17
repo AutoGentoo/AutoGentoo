@@ -1,5 +1,8 @@
 import struct
-from typing import Union, List
+from typing import Union, List, Tuple
+import _thread
+import signal
+import os
 
 
 class DynamicBinary:
@@ -34,12 +37,45 @@ class DynamicBinary:
 		length = self.read_int()
 		return struct.unpack("!%ds" % length, self.read(length))[0].decode("utf-8")
 	
-	def write_int(self, i) -> None:
+	def write_int(self, i, add_template=True) -> None:
+		if add_template:
+			self.template += "i"
 		self.write(struct.pack("!I", i))
 	
 	def write_string(self, s: str) -> None:
+		self.template += "s"
 		self.write(struct.pack("!I%ds" % len(s), len(s), s.encode("utf-8")))
-	
+
+	def write_list(self, lst: Union[List, Tuple]):
+		for item in lst:
+			if type(item) == str:
+				self.write_string(item)
+			elif type(item) == int:
+				self.write_int(item)
+			elif type(item) == dict:
+				self.write_int(len(item), False)
+				self.template += 'a(ss)'
+				temp = self.template
+				self.template = ""
+				
+				for key in item:
+					self.write_string(key)
+					self.write_string(item[key])
+				
+				self.template = temp
+			elif type(item) in (tuple, list):
+				self.write_int(len(item), False)
+				self.template += 'a('
+				temp = self.template
+				self.template = ""
+				for sub in item:
+					self.write_list(sub)
+				
+				temp += self.template[:len(item[0])]
+				self.template = temp + ")"
+			elif issubclass(type(item), BinaryObject):
+				item.write()
+
 	@staticmethod
 	def get_subtemplate(template, i) -> str:
 		if template[i] != "(":
@@ -127,3 +163,48 @@ class DynamicBinary:
 			outstr += format(byte, "02x") + " "
 		
 		return outstr
+
+
+class FileReader(DynamicBinary):
+	def __init__(self, path, parent_pid):
+		super(FileReader, self).__init__()
+		
+		self.parent_pid = parent_pid
+		self.path = path
+		self.file = None
+		self.data = b""
+		
+		self.config_lck = _thread.allocate_lock()
+		signal.signal(signal.SIGUSR1, self.toggle_lock)
+	
+	def toggle_lock(self):
+		if self.config_lck.locked():
+			self.config_lck.release()
+		else:
+			self.config_lck.aquire()
+	
+	def read_data(self):
+		self.file = open(self.path, "rb")
+		self.data = self.file.read()
+		self.file.close()
+	
+	def start_write(self):
+		self.config_lck.aquire()
+		os.kill(self.parent_pid, signal.SIGUSR1)
+		
+	def stop_write(self):
+		self.config_lck.release()
+		os.kill(self.parent_pid, signal.SIGUSR1)
+
+
+class BinaryObject:
+	def __init__(self, reader: FileReader, template: str):
+		self.reader = reader
+		self.data = ()
+		self.template = template
+	
+	def read(self):
+		return self.reader.read_template(self.template)
+	
+	def write(self):
+		self.reader.write_list(self.data)

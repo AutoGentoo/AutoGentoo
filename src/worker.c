@@ -50,10 +50,14 @@ int worker_handler_start(WorkerHandler* wh) {
 	
 	/* Start the worker daemon */
 	
+	char pid_str[16];
+	sprintf(pid_str, "%d", getpid());
+	
 	wh->worker_pid = fork();
 	if (wh->worker_pid == 0) {
 		char* path = AUTOGENTOO_WORKER_DIR "/worker.py";
-		char* const argv[] = {path, wh->parent->location, NULL};
+		char* const argv[] = {path, wh->parent->location, pid_str, NULL};
+		
 		int res = execv(path, argv);
 		lerror("Failed to start worker");
 		lerror("Error [%d] %s", res, strerror(res));

@@ -6,13 +6,19 @@
 #include <autogentoo/writeconfig.h>
 #include <errno.h>
 
+void handle_sigusr1(int sig) {
+	if (pthread_mutex_trylock(&srv->config_mutex) == EBUSY)
+		pthread_mutex_unlock(&srv->config_mutex);
+	else
+		pthread_mutex_lock(&srv->config_mutex);
+}
+
 void handle_sigint (int sig) {
 	srv->keep_alive = 0;
 	server_kill (srv);
 }
 
 void kill_encrypt_server(int sig) {
-	int ret = 0;
 	server_kill(srv);
 	exit(0);
 }
