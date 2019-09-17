@@ -8,7 +8,9 @@
 #include <autogentoo/autogentoo.h>
 #include <autogentoo/crypt.h>
 #include <string.h>
+#include <semaphore.h>
 #include "autogentoo/worker.h"
+#include <fcntl.h>
 
 int server_init(short port) {
 	int listenfd = -1;
@@ -55,6 +57,8 @@ Server* server_new (char* location, char* port, server_t opts) {
 	out->opts = opts;
 	out->port = strdup(port);
 	out->auth_tokens = map_new(128, 0.8);
+	
+	out->config_semaphore = sem_open("/tmp/autogentoo.config.semaphore", O_CREAT, 0777, 1);
 	
 	return out;
 }

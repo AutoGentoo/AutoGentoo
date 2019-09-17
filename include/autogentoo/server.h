@@ -6,6 +6,7 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <autogentoo/pool.h>
+#include <semaphore.h>
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -103,6 +104,8 @@ struct __Server {
 	char* sudo_token;
 	
 	Map* auth_tokens;
+	
+	sem_t* config_semaphore;
 };
 
 #ifndef connection_read

@@ -11,6 +11,7 @@
 #include "autogentoo/worker.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <semaphore.h>
 
 Server* srv = NULL;
 
@@ -223,6 +224,9 @@ void server_free (Server* server) {
 	free(server->sudo_token);
 	
 	free(server->port);
+	
+	sem_close(server->config_semaphore);
+	
 	free(server);
 }
 

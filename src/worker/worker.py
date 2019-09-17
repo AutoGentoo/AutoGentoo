@@ -35,6 +35,7 @@ class Worker:
 		
 		self.read_lck = _thread.allocate_lock()
 		self.write_lck = _thread.allocate_lock()
+		self.config_lck = 
 	
 	def start(self):
 		mkdir("logs")

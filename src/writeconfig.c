@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <autogentoo/host_environment.h>
 #include <autogentoo/writeconfig.h>
+#include <semaphore.h>
 
 void* read_void(size_t len, FILE* fp) {
 	void* out = malloc (len);
@@ -46,6 +47,8 @@ size_t write_server(Server* server) {
 	char* config_file = malloc(strlen(server->location) + strlen(config_file_name) + 2);
 	sprintf(config_file, "%s/%s", server->location, config_file_name);
 	
+	sem_wait(server->config_semaphore);
+	
 	FILE* to_write = fopen(config_file, "wb+");
 	if (to_write == NULL) {
 		lerror("Failed to open '%s' for writing-----------", config_file);
@@ -64,7 +67,7 @@ size_t write_server(Server* server) {
 	size_t size = write_server_fp(server, to_write);
 	fclose(to_write);
 	
-	AccessToken* test = map_get(server->auth_tokens, server->autogentoo_org_token);
+	sem_post(server->config_semaphore);
 	
 	return size;
 }
