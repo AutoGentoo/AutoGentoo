@@ -11,7 +11,6 @@ print = functools.partial(print, flush=True)
 cp = copy2
 mv = move
 rm = os.remove
-cd = os.chdir
 rmdir = os.rmdir
 logfp = None
 
@@ -19,6 +18,12 @@ logfp = None
 def s(cmd):
 	out = subprocess.run(cmd, shell=True, stdout=logfp, stderr=logfp)
 	return out.returncode
+
+
+def cd(path: str, host=None):
+	if host is not None:
+		path = host.get_path() + path
+	os.chdir(path)
 
 
 def mkdir(path):
@@ -46,12 +51,10 @@ def extract(filename: str, output_dir):
 		mkdir(output_dir)
 	
 	print("Extracting %s to %s ..." % (filename, output_dir), end="")
-	if filename.endswith(".tar") or filename.endswith(".gz") or filename.endswith(".xz"):
+	if filename.endswith(".tar") or filename.endswith(".gz") or filename.endswith(".xz") or filename.endswith(".bz2"):
 		out = s("tar -xf %s -C %s" % (filename, output_dir))
 	elif filename.endswith(".zip"):
 		out = s("unzip %s -d %s" % (filename, output_dir))
-	elif filename.endswith(".bz2"):
-		out = s("bzip2 -d %s" % filename)
 	else:
 		print("Invalid filetype %s" % filename[filename.rfind("."):])
 		out = 1
@@ -66,7 +69,7 @@ def extract(filename: str, output_dir):
 
 
 def chroot(host):
-	cd(host.get_path())
+	cd(host, "/")
 	os.chroot(".")
 
 
@@ -119,3 +122,7 @@ def stat(path):
 
 def ln(file, link_name):
 	s("ln -s %s %s" % (file, link_name))
+
+
+def rmrf(path):
+	s("rm -rf %s" % path)

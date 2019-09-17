@@ -17,3 +17,8 @@ Steps:
 
 from script import *
 from client import Host
+
+def script(_job_name: str, host: Host, args=None):
+	
+	
+	pass

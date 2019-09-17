@@ -112,7 +112,7 @@ class PortageFile:
 		self.fp.close()
 
 
-def script(job_name: str, host: Host, file_name: str, content: str):
+def script(_job_name: str, host: Host, file_name: str, content: str):
 	cd(host.get_path())
 	
 	fn = "etc/portage/%s" % file_name

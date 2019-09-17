@@ -99,7 +99,7 @@ void worker_handler_loop(WorkerHandler* wh) {
 		pthread_mutex_unlock(&wh->request_lck);
 		
 		WorkerRequest* req = wh->request;
-		char* command_id = worker_register(req->command_name);
+		char* command_id = worker_register(req->host_id, req->command_name);
 		wh->request = NULL;
 		
 		pthread_mutex_unlock(&wh->lck);
@@ -173,21 +173,25 @@ int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** job
 
 int prv_random_string(char* out, size_t len);
 
-char* worker_register(char* command_name) {
+char* worker_register(char* host_id, char* command_name) {
 	time_t rawtime;
 	struct tm *info;
 	
 	size_t len = strlen(command_name);
 	
-	char* out = malloc(24 + len + 1);
+	char* out = malloc(24 + len + 1 + 16);
 	
 	time( &rawtime );
 	info = localtime( &rawtime );
 	
-	strftime(out, 32, "%Y-%m-%d-%H-%M-%S-", info);
-	prv_random_string(out + 20, 4);
-	strcpy(out + 24, command_name);
-	out[24 + len] = 0;
+	size_t host_id_len = strlen(host_id);
+	
+	strcpy(out, host_id);
+	
+	strftime(out + host_id_len, 32, "%Y-%m-%d-%H-%M-%S-", info);
+	prv_random_string(out + host_id_len + 20, 4);
+	strcpy(out + host_id_len + 24, command_name);
+	out[host_id_len + 24 + len] = 0;
 	
 	return out;
 }

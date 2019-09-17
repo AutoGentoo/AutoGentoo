@@ -14,18 +14,18 @@ from client import Host
 import subprocess
 
 
-def script(job_name: str, host: Host, args: str):
+def script(_job_name: str, host: Host, args: str):
 	print("[INFO] Starting Emerge for host %s" % host.id)
 	print("[DEBUG] chroot %s" % host.get_path())
 	chroot(host)
 	
 	print("[DEBUG] emerge --autounmask-continue --buildpkg --usepkg %s" % args)
-	lfile = "emerge_logs/%s-%s.log" % (host.id, job_name)
+	lfile = "emerge_logs/%s-%s.log" % (host.id, _job_name)
 	
 	print("[INFO] Emerge log in %s" % lfile)
 	
 	global logfp
-	logfp = open(lfile, "w+")
+	logfp = open(lfile, "a+")
 	subprocess.run(["emerge", "--autounmask-continue", "--buildpkg", "--usepkg", *args], stdout=logfp, stderr=logfp)
 	
 	print("[INFO] Job finished")

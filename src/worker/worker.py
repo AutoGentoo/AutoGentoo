@@ -23,7 +23,7 @@ class Worker:
 	
 	keep_alive = True
 	
-	def __init__(self, server):
+	def __init__(self, server: Server):
 		self.server = server
 		
 		self.request_fifo = open(WORKER_FIFO_REQUEST, "rb")
@@ -60,7 +60,7 @@ class Worker:
 			
 			self.read_lck.release()
 			
-			new_job = Job(self.server, self.server.get_host(host_id), job_name, command_name, argv)
+			new_job = Job(self.server, self.server.hosts[host_id], job_name, command_name, argv)
 			new_job.run()
 			self.jobs.append(new_job)
 			
@@ -107,7 +107,7 @@ class Worker:
 
 
 class Job:
-	def __init__(self, server, host, job_name, command_name, args):
+	def __init__(self, server: Server, host: Host, job_name: str, command_name: str, args):
 		self.server = server
 		self.host = host
 		self.job_name = job_name
@@ -127,7 +127,7 @@ class Job:
 		os.waitpid(self.pid, 0)
 	
 	def run(self):
-		logfile = "logs/%s-%s.log" % (self.host.id, self.job_name)
+		logfile = "logs/%s.log" % self.job_name
 		touch(logfile + ".lck")
 		
 		self.pid = os.fork()

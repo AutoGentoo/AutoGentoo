@@ -66,7 +66,7 @@ int worker_handler_start(WorkerHandler* wh);
 int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** job_id);
 
 void worker_handler_loop(WorkerHandler* wh);
-char* worker_register(char* command_name);
+char* worker_register(char* host_id, char* command_name);
 void worker_handler_free(WorkerHandler* wh);
 
 #endif //AUTOGENTOO_WORKER_H

@@ -18,13 +18,13 @@ from script import *
 from client import Host
 
 
-def script(job_name: str, host: Host, args=None):
+def script(_job_name: str, host: Host, args=None):
 	if host is None:
 		raise RuntimeError("Host must be specified for stage3.py")
 	
 	# Make the host path and cd to it
 	mkdir(host.get_path())
-	cd(host.get_path())
+	cd("", host)
 	
 	mirror = "http://mirrors.rit.edu/gentoo"
 	url_pre = "%s/releases/%s/autobuilds" % (mirror, host.arch)
@@ -82,12 +82,16 @@ def script(job_name: str, host: Host, args=None):
 	mkdir("autogentoo/pkg")
 	
 	print("Preparing /etc/portage/")
-	rmdir("etc/portage/package.use")
+	rmrf("etc/portage/package.use")
 	touch("etc/portage/package.use")
 	touch("etc/portage/package.env")
 	touch("etc/portage/package.accept_keywords")
 	
 	print("Settings make.profile")
-	cd("etc/portage/")
+	cd("etc/portage/", host)
 	rm("make.profile")
-	ln("/usr/portage/profiles/%s" % host.profile, "make.profile")
+	ln("usr/portage/profiles/%s" % host.profile, "make.profile")
+	
+	cd("/", host)
+	
+	touch(".stage3")
