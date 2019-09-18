@@ -225,3 +225,31 @@ void worker_handler_free(WorkerHandler* wh) {
 	
 	free(wh);
 }
+
+void worker_toggle(Server* server) {
+	if (pthread_mutex_trylock(&srv->config_mutex) == EBUSY)
+		pthread_mutex_unlock(&srv->config_mutex);
+	else
+		pthread_mutex_lock(&srv->config_mutex);
+	
+	kill(srv->job_handler->worker_pid, SIGUSR2);
+}
+
+void worker_lock(Server* server) {
+	pthread_mutex_lock(&server->config_mutex);
+	kill(srv->job_handler->worker_pid, SIGUSR1);
+	pthread_mutex_lock(&server->ack_mutex);
+	
+	/* Wait for SIGUSR2 */
+	
+	pthread_mutex_lock(&server->ack_mutex);
+	pthread_mutex_unlock(&server->ack_mutex);
+}
+
+void worker_unlock(Server* server) {
+
+}
+
+void worker_ack(Server* server) {
+	pthread_mutex_unlock(&server->ack_mutex);
+}

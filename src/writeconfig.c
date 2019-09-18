@@ -48,7 +48,13 @@ size_t write_server(Server* server) {
 	sprintf(config_file, "%s/%s", server->location, config_file_name);
 	
 	pthread_mutex_lock(&server->config_mutex);
+	pthread_mutex_lock(&server->ack_mutex);
 	kill(server->job_handler->worker_pid, SIGUSR1);
+	/* Wait for SIGUSR2 */
+	
+	pthread_mutex_lock(&server->ack_mutex);
+	pthread_mutex_unlock(&server->ack_mutex);
+	
 	
 	FILE* to_write = fopen(config_file, "wb+");
 	if (to_write == NULL) {

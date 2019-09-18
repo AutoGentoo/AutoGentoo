@@ -6,7 +6,6 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <autogentoo/pool.h>
-#include <semaphore.h>
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -106,6 +105,7 @@ struct __Server {
 	Map* auth_tokens;
 	
 	pthread_mutex_t config_mutex;
+	pthread_mutex_t ack_mutex;
 };
 
 #ifndef connection_read

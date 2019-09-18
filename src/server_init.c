@@ -59,6 +59,7 @@ Server* server_new (char* location, char* port, server_t opts) {
 	out->auth_tokens = map_new(128, 0.8);
 	
 	pthread_mutex_init(&out->config_mutex, NULL);
+	pthread_mutex_init(&out->ack_mutex, NULL);
 	
 	return out;
 }

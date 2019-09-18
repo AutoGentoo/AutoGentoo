@@ -7,16 +7,11 @@
 #include <errno.h>
 
 void handle_sigusr1(int sig) {
-	if (pthread_mutex_trylock(&srv->config_mutex) == EBUSY)
-		pthread_mutex_unlock(&srv->config_mutex);
-	else
-		pthread_mutex_lock(&srv->config_mutex);
-	
-	kill(srv->job_handler->worker_pid, SIGUSR2);
+
 }
 
 void handle_sigusr2(int sig) {
-
+	pthread_mutex_unlock(&srv->ack_mutex);
 }
 
 void handle_sigint (int sig) {

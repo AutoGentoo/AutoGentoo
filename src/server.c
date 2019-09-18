@@ -225,6 +225,7 @@ void server_free (Server* server) {
 	free(server->port);
 	
 	pthread_mutex_destroy(&server->config_mutex);
+	pthread_mutex_destroy(&server->ack_mutex);
 	
 	free(server);
 }
