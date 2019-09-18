@@ -31,8 +31,7 @@ struct __struct_Host_new {
 };
 
 struct __struct_Host_edit {
-	int request_type;
-	char* make_conf_var; /* Must be listed in allowed vars */
+	int request_type; // 0
 	char* make_conf_val;
 };
 
@@ -74,7 +73,7 @@ struct __Raw {
 static char* request_structure_linkage[] = {
 	"sss", /* Host new */
 	"s", /* Host select */
-	"iss", /* Host edit */
+	"is", /* Host edit */
 	"ss", /* Host authorize */
 	"s", /* Emerge arguments */
 	"ssi", /* Issue Token */

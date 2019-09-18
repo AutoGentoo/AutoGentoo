@@ -16,9 +16,10 @@ Steps:
 """
 
 from script import *
+from .emerge import script as emerge
 from client import Host
 
 def script(_job_name: str, host: Host, args=None):
-	
+	emerge()
 	
 	pass
