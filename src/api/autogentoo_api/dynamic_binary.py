@@ -192,6 +192,8 @@ class FileReader(DynamicBinary):
 			self.config_lck.release()
 		else:
 			self.config_lck.acquire()
+		
+		os.kill(self.parent_pid, signal.SIGUSR2)
 	
 	def read_data(self):
 		self.file = open(self.path, "rb")

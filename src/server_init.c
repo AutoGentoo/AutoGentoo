@@ -8,7 +8,6 @@
 #include <autogentoo/autogentoo.h>
 #include <autogentoo/crypt.h>
 #include <string.h>
-#include <semaphore.h>
 #include "autogentoo/worker.h"
 #include <fcntl.h>
 

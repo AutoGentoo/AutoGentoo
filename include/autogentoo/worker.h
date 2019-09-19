@@ -69,4 +69,10 @@ void worker_handler_loop(WorkerHandler* wh);
 char* worker_register(char* host_id, char* command_name);
 void worker_handler_free(WorkerHandler* wh);
 
+/* Signal handlers */
+void worker_toggle(Server* server);
+void worker_lock(Server* server);
+void worker_unlock(Server* server);
+void worker_ack(Server* server);
+
 #endif //AUTOGENTOO_WORKER_H

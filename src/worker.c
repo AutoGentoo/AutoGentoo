@@ -238,16 +238,24 @@ void worker_toggle(Server* server) {
 void worker_lock(Server* server) {
 	pthread_mutex_lock(&server->config_mutex);
 	kill(srv->job_handler->worker_pid, SIGUSR1);
-	pthread_mutex_lock(&server->ack_mutex);
-	
-	/* Wait for SIGUSR2 */
 	
 	pthread_mutex_lock(&server->ack_mutex);
+	
+	if (server->keep_alive) /* Wait for SIGUSR2 */
+		pthread_mutex_lock(&server->ack_mutex);
+	
 	pthread_mutex_unlock(&server->ack_mutex);
 }
 
 void worker_unlock(Server* server) {
-
+	pthread_mutex_unlock(&server->config_mutex);
+	kill(srv->job_handler->worker_pid, SIGUSR1);
+	pthread_mutex_lock(&server->ack_mutex);
+	
+	if (server->keep_alive) /* Wait for SIGUSR2 */
+		pthread_mutex_lock(&server->ack_mutex);
+	
+	pthread_mutex_unlock(&server->ack_mutex);
 }
 
 void worker_ack(Server* server) {

@@ -49,6 +49,8 @@ void server_start (Server* server) {
 	server->pid = getpid();
 	srv = server;
 	signal (SIGINT, handle_sigint);
+	signal (SIGUSR1, handle_sigusr1);
+	signal (SIGUSR2, handle_sigusr2);
 	
 	addrlen = sizeof(clientaddr);
 	server->keep_alive = 1;
@@ -103,9 +105,7 @@ void server_encrypt_start(EncryptServer* server) {
 	struct sockaddr_in clientaddr;
 	socklen_t addrlen;
 	
-	
 	server->socket = server_init(9491);
-	signal (SIGINT, kill_encrypt_server);
 	
 	linfo("Encrypted server started on port %s", server->port);
 	

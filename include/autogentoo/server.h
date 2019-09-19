@@ -250,9 +250,9 @@ void server_encrypt_free (EncryptServer* server);
 
 void server_kill(Server* server);
 
-void kill_encrypt_server(int sig);
-
 void handle_sigint (int sig);
+void handle_sigusr1(int sig);
+void handle_sigusr2(int sig);
 
 char* server_get_path (Server* parent, char* path);
 

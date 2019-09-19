@@ -4,23 +4,18 @@
 
 #include <autogentoo/server.h>
 #include <autogentoo/writeconfig.h>
-#include <errno.h>
 
 void handle_sigusr1(int sig) {
-
+	worker_toggle(srv);
 }
 
 void handle_sigusr2(int sig) {
-	pthread_mutex_unlock(&srv->ack_mutex);
+	worker_ack(srv);
 }
 
 void handle_sigint (int sig) {
 	srv->keep_alive = 0;
 	server_kill (srv);
-}
-
-void kill_encrypt_server(int sig) {
-	server_kill(srv);
 	exit(0);
 }
 

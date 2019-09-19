@@ -47,14 +47,7 @@ size_t write_server(Server* server) {
 	char* config_file = malloc(strlen(server->location) + strlen(config_file_name) + 2);
 	sprintf(config_file, "%s/%s", server->location, config_file_name);
 	
-	pthread_mutex_lock(&server->config_mutex);
-	pthread_mutex_lock(&server->ack_mutex);
-	kill(server->job_handler->worker_pid, SIGUSR1);
-	/* Wait for SIGUSR2 */
-	
-	pthread_mutex_lock(&server->ack_mutex);
-	pthread_mutex_unlock(&server->ack_mutex);
-	
+	worker_lock(server);
 	
 	FILE* to_write = fopen(config_file, "wb+");
 	if (to_write == NULL) {
@@ -74,8 +67,7 @@ size_t write_server(Server* server) {
 	size_t size = write_server_fp(server, to_write);
 	fclose(to_write);
 	
-	pthread_mutex_unlock(&server->config_mutex);
-	kill(server->job_handler->worker_pid, SIGUSR1);
+	worker_unlock(server);
 	
 	return size;
 }
