@@ -16,7 +16,6 @@ void handle_sigusr2(int sig) {
 void handle_sigint (int sig) {
 	srv->keep_alive = 0;
 	server_kill (srv);
-	exit(0);
 }
 
 void server_kill (Server* server) {

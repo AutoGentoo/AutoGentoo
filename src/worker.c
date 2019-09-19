@@ -197,20 +197,10 @@ char* worker_register(char* host_id, char* command_name) {
 }
 
 void worker_handler_free(WorkerHandler* wh) {
-	linfo("Exiting WorkerHandler with worker_handler_free()");
-	
 	wh->keep_alive = 0;
 	
 	pthread_cond_signal(&wh->sig);
 	pthread_join(wh->pid, NULL);
-	
-	pthread_mutex_lock(&wh->write_lck);
-	
-	int command = 1;
-	write(wh->write_fifo, &command, sizeof(int));
-	
-	pthread_mutex_unlock(&wh->write_lck);
-	
 	
 	pthread_mutex_destroy(&wh->sig_lck);
 	pthread_mutex_destroy(&wh->write_lck);
@@ -224,6 +214,8 @@ void worker_handler_free(WorkerHandler* wh) {
 	close(wh->write_fifo);
 	
 	free(wh);
+	
+	linfo("Exited WorkerHandler with worker_handler_free()");
 }
 
 void worker_toggle(Server* server) {
