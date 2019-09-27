@@ -10,7 +10,6 @@
 #include "log.h"
 #include "map.h"
 #include "small_map.h"
-#include "hacksaw_string.h"
 #include "string_vector.h"
 #include "vector.h"
 #include "linked_vector.h"

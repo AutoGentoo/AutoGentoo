@@ -47,7 +47,7 @@ typedef enum {
 	ATOM_VERSION_E = 0x1,
 	ATOM_VERSION_L = 0x2, //!< <app-misc/foo-1.23	A version strictly before 1.23 is required.
 	ATOM_VERSION_G = 0x4, //!< >app-misc/foo-1.23	A version strictly later than 1.23 is required.
-	ATOM_VERSION_REV = 0x8,  //!< ~app-misc/foo-1.23	Version 1.23 (or any 1.23-r*) is required.
+	ATOM_VERSION_REV = ATOM_VERSION_E | 0x8,  //!< ~app-misc/foo-1.23	Version 1.23 (or any 1.23-r*) is required.
 	
 	ATOM_VERSION_ALL = ATOM_VERSION_E | ATOM_VERSION_L | ATOM_VERSION_G,//!< app-misc/foo-1.23		Any version
 	ATOM_VERSION_GE = ATOM_VERSION_E | ATOM_VERSION_G, //!< >=app-misc/foo-1.23	Version 1.23 or later is required.
@@ -135,6 +135,13 @@ struct __Dependency {
 	
 	// Next target
 	Dependency* next;
+	
+	/** Next selector dependency
+	 Every PortageDependecy can have multiple Dependecy selectors
+	 This will be a per-portagedependecy linked list
+	 */
+	
+	Dependency* portage_depend_next;
 };
 
 

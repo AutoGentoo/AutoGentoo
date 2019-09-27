@@ -13,6 +13,7 @@
 #include "keywords.h"
 
 struct __Package {
+	Repository* parent;
 	uint32_t hash;
 	
 	char* key; // category/name

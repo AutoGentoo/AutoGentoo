@@ -5,6 +5,7 @@
 #ifndef AUTOGENTOO_DEPENDENCY_H
 #define AUTOGENTOO_DEPENDENCY_H
 
+#include <autogentoo/hacksaw/vector.h>
 #include "constants.h"
 #include "atom.h"
 
@@ -21,29 +22,49 @@ typedef enum {
 	PORTAGE_BLOCK = 1 << 8
 } dependency_t;
 
-typedef enum {
-	PORTAGE_DEPEND_STATUS_NOT_ADDED,
-	PORTAGE_DEPEND_STATUS_ADDED
-} portage_depend_st_t;
-
-struct __PortageDependency {
+struct __SelectedEbuild {
+	/* Next and depends not relevant */
 	Dependency* selected_by;
+	Ebuild* ebuild;
 	
-	Ebuild* target;
-	InstalledEbuild* old;
-	UseFlag* flags;
-	P_Atom* selector;
-	dependency_t option;
-	
-	portage_depend_st_t status;
+	dependency_t action;
+	Vector* requested_use_flags;
 };
 
-int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom);
-Ebuild* atom_resolve_ebuild(Emerge* emerge, P_Atom* atom);
-PortageDependency* dependency_resolve_single(Emerge* emerge, Ebuild* current_ebuild, Dependency* depend, int try_keyword);
-void dependency_resolve_ebuild(Emerge* emerge, Ebuild* ebuild);
-PortageDependency* dependency_new(Dependency* parent, Ebuild* e, P_Atom* p, InstalledEbuild* old, dependency_t option);
-PortageDependency* dependency_get_selected(Emerge* emerge, P_Atom* search);
-PortageDependency* dependency_set_selected(Emerge* emerge, Ebuild* potential, P_Atom* potential_atom);
+struct __PortageDependency {
+	/* Linked by selected_by->portage_depend_next */
+	Dependency* selected_by;
+	Ebuild* ebuild;
+	
+	/* Two ebuild from the same ebuild may be installed on different slots */
+	char* slot;
+	char* sub_slot;
+	
+};
+
+/**
+ * Resolve a list of potential ebuilds for depend
+ * Generate the following structure:
+ *
+ *           |----- pkg1: [ebuilds] ---|
+ * Dep tree  |----- pkg2: [ebuilds]    |----- Merge and find newest -> layer 2
+ *           |----- pkg1: [ebuilds] ---|
+ * @param parent the emerge environment
+ * @param depend expression to look at
+ */
+void pd_layer_resolve(Emerge* parent, Dependency* depend, Ebuild* target);
+
+/**
+ * Do the actually dependency tree with useflag checks etc...
+ * @param parent build environment
+ * @param depend selecting depend expression (linked by portage_depend_next)
+ * @param target ebuild resolved in layer 1
+ */
+void pd_layer_2(Emerge* parent, Dependency* depend, Ebuild* target);
+
+/* Helpers */
+Package* atom_resolve_package(Emerge* emerge, P_Atom* atom);
+int pd_slot_cmp(char* slot_1, char* sub_slot_1, char* slot_2, char* sub_slot_2);
+PortageDependency* pd_find_atm(Emerge* parent, P_Atom* atom);
 
 #endif //AUTOGENTOO_DEPENDENCY_H

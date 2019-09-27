@@ -24,7 +24,7 @@ RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
 		{REQ_HEAD,            {.http_fh=HEAD}},
 		{REQ_HOST_NEW,        {.ag_fh=HOST_NEW}},
-		{REQ_HOST_EDIT,       {.ag_fh=HOST_EDIT}},
+		{REQ_MAKE_CONF,       {.ag_fh=HOST_MAKE_CONF}},
 		{REQ_HOST_DEL,        {.ag_fh=HOST_DEL}},
 		{REQ_HOST_EMERGE,     {.ag_fh=HOST_EMERGE}},
 		{REQ_HOST_MNTCHROOT,  {.ag_fh=HOST_MNTCHROOT}},
@@ -41,7 +41,7 @@ RequestNameLink request_names[] = {
 		{REQ_GET,             "GET"},
 		{REQ_HEAD,            "HEAD"},
 		{REQ_HOST_NEW,        "HOST_NEW"},
-		{REQ_HOST_EDIT,       "HOST_EDIT"},
+		{REQ_MAKE_CONF,       "MAKE_CONF"},
 		{REQ_HOST_DEL,        "HOST_DEL"},
 		{REQ_HOST_EMERGE,     "HOST_EMERGE"},
 		{REQ_HOST_MNTCHROOT,  "HOST_MNTCHROOT"},
@@ -116,15 +116,34 @@ void HOST_NEW(Response* res, Request* request) {
 	dynamic_binary_add(res->content, 'i', &issued->access_level);
 }
 
-void HOST_EDIT(Response* res, Request* request) {
-	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_HOST_EDIT});
+void string_overwrite(char** target, char* to_copy, int dup) {
+	if (*target)
+		free(*target);
+	
+	if (dup)
+		*target = strdup(to_copy);
+	else
+		*target = to_copy;
+}
+
+void HOST_MAKE_CONF(Response* res, Request* request) {
+	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT, STRCT_HOST_MAKE_CONF});
 	AccessToken* tok = authorize (request, TOKEN_HOST_WRITE, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
 	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
-	struct __struct_Host_edit host_edit = request->structures[2]->host_edit;
+	struct __struct_Host_make_conf make_conf = request->structures[2]->make_conf;
 	
+	if (strcmp(make_conf.key, "CFLAGS") == 0)
+		string_overwrite(&host->environment->cflags, make_conf.value, 1);
+	else if (strcmp(make_conf.key, "CXXFLAGS") == 0)
+		string_overwrite(&host->environment->cxxflags, make_conf.value, 1);
+	else if (strcmp(make_conf.key, "USE") == 0)
+		string_overwrite(&host->environment->use, make_conf.value, 1);
+	else {
+		// HOLD FOR NOW
+	}
 	
 	HANDLE_RETURN(INTERNAL_ERROR);
 }

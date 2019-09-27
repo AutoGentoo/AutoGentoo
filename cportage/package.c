@@ -77,6 +77,7 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	Package* target = map_get(repo->packages, atom_parsed->key);
 	if (!target) {
 		Package* new_package = malloc(sizeof(Package));
+		new_package->parent = repo;
 		new_package->key = strdup(atom_parsed->key);
 		new_package->category = strdup(atom_parsed->category);
 		new_package->name = strdup(atom_parsed->name);

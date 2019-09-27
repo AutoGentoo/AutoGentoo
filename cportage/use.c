@@ -381,9 +381,11 @@ void emerge_parse_useflags(Emerge* emerge) {
 			}
 			
 			for (Ebuild* current_ebuild = target->ebuilds; current_ebuild; current_ebuild = current_ebuild->older) {
+				/*
 				if (atom_match_ebuild(current_ebuild, current->atom) == 0)
 					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next)
 						ebuild_set_use(current_ebuild, current_flag->name, current_flag->status);
+				*/
 			}
 		}
 		

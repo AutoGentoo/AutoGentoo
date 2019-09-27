@@ -26,6 +26,24 @@ def script(_job_name: str, host: Host, args=None):
 	mkdir(host.get_path())
 	cd("", host)
 	
+	print("Initializing autogentoo directories")
+	mkdir("autogentoo")
+	mkdir("autogentoo/log")
+	mkdir("autogentoo/tmp")
+	mkdir("autogentoo/pkg")
+	
+	"""
+	print("Creating library file structure")
+	mkdir("lib64")
+	ln("lib64", "lib")
+	
+	mkdir("usr")
+	cd("usr")
+	mkdir("lib64")
+	ln("lib64", "lib")
+	cd("/")
+	"""
+	
 	mirror = "http://mirrors.rit.edu/gentoo"
 	url_pre = "%s/releases/%s/autobuilds" % (mirror, host.arch)
 	
@@ -74,12 +92,6 @@ def script(_job_name: str, host: Host, args=None):
 	
 	if extract(filename, ".") != 0:
 		raise RuntimeError("Failed to extract stage3")
-	
-	print("Initializing autogentoo directories")
-	mkdir("autogentoo")
-	mkdir("autogentoo/log")
-	mkdir("autogentoo/tmp")
-	mkdir("autogentoo/pkg")
 	
 	print("Preparing /etc/portage/")
 	rmrf("etc/portage/package.use")

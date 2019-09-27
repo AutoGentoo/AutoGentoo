@@ -17,12 +17,6 @@ from client import Host
 import sys
 
 
-def generate_make_conf(host: Host):
-	content = """# make.conf
-	
-	
-	"""
-
 def script(_job_name: str, host: Host, file_name: str, content: str):
 	cd(host.get_path())
 	

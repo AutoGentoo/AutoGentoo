@@ -123,6 +123,7 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 				
 				if (strcmp(current_name, "DEFAULT") != 0) {
 					next_repo = repository_new();
+					next_repo->parent = emerge;
 					if (parent)
 						current_repo->next = next_repo;
 					else

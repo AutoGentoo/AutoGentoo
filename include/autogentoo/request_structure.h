@@ -17,6 +17,7 @@ typedef enum {
 	STRCT_ISSUE_TOK,
 	STRCT_JOB_SELECT,
 	STRCT_HOST_META, /* Get information about a potential host */
+	STRCT_HOST_MAKE_CONF,
 	
 	STRCT_MAX
 } request_structure_t;
@@ -33,6 +34,11 @@ struct __struct_Host_new {
 struct __struct_Host_edit {
 	int request_type; // 0
 	char* make_conf_val;
+};
+
+struct __struct_Host_make_conf {
+	char* key;
+	char* value;
 };
 
 struct __struct_Host_select {
@@ -88,6 +94,7 @@ union __RequestData {
 	struct __struct_Issue_token issue_tok;
 	struct __struct_Emerge emerge;
 	struct __struct_Job job_select;
+	struct __struct_Host_make_conf make_conf;
 };
 
 char* request_structure_template_parse(char* c_template, size_t* skip);

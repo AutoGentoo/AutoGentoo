@@ -226,6 +226,7 @@ Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* 
 	out->selector = type;
 	out->selectors = selector;
 	out->parent = NULL;
+	out->portage_depend_next = NULL;
 	
 	return out;
 }

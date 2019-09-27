@@ -71,7 +71,7 @@ void HEAD(Connection* conn, HttpRequest* req);
  * PROT_AUTOGENTOO
  */
 void HOST_NEW(Response* res, Request* request);
-void HOST_EDIT(Response* res, Request* request);
+void HOST_MAKE_CONF(Response* res, Request* request);
 void HOST_DEL(Response* res, Request* request);
 void HOST_EMERGE(Response* res, Request* request);
 void HOST_MNTCHROOT(Response* res, Request* request);

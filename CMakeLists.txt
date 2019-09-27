@@ -3,6 +3,8 @@ project(AutoGentoo VERSION "2.1.0")
 
 SET(CMAKE_INSTALL_PREFIX /usr)
 
+SET( CMAKE_EXPORT_COMPILE_COMMANDS ON )
+
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
@@ -11,6 +13,7 @@ include(cmake/autogentoo.txt)
 include(cmake/hacksaw.txt)
 
 include_directories(include)
+include_directories(include/autogentoo)
 include_directories(cportage/language)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -20,6 +23,27 @@ execute_process(COMMAND bash -c "mkdir -p {cportage,http}")
 add_definitions(-DAUTOGENTOO_WORKER_DIR="${CMAKE_SOURCE_DIR}/src/worker")
 add_definitions(-DDBPATH="test")
 add_definitions(-DAUTOGENTOO_DEBUG)
+
+# PYTHON EXTENSION LIBS
+
+find_package(PythonInterp 3.6 REQUIRED)
+find_package(PythonLibs 3.6 REQUIRED)
+
+add_library(cportage_api SHARED
+        cportage/cportage_api.c
+        cportage/cportage_api.h
+        )
+
+set_target_properties(
+        cportage_api
+        PROPERTIES
+        PREFIX ""
+        OUTPUT_NAME "cportage_api"
+        LINKER_LANGUAGE C
+)
+
+# END PYTHON EXTENSION LIBS
+
 
 add_library(autogentoo SHARED
         ${include_HEADERS}
@@ -130,3 +154,11 @@ INSTALL(PROGRAMS ${WORKER_SCRIPTS} DESTINATION share/autogentoo/scripts/)
 
 INSTALL_HEADERS_WITH_DIRECTORY(include_HEADERS)
 INSTALL_HEADERS_WITH_DIRECTORY(hacksaw_HEADERS)
+
+IF( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json" )
+  EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
+    ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
+  )
+ENDIF()
+

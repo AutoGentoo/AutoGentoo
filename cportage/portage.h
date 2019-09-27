@@ -11,6 +11,7 @@
 #include "manifest.h"
 
 struct __Repository {
+	Emerge* parent;
 	char* name;
 	char* location; //!< Root of repository (/usr/portage)
 	

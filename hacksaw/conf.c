@@ -5,7 +5,6 @@
 #define _GNU_SOURCE
 #include "hacksaw/hacksaw.h"
 #include <string.h>
-#include "hacksaw/hacksaw_string.h"
 #include <stdlib.h>
 
 Conf* conf_new(char* path) {
