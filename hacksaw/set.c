@@ -82,3 +82,36 @@ Set* set_intersect(Set* s1, Set* s2) {
 	
 	return out;
 }
+
+Set* set_collapse(Set* to_collapse, void* (*merge_func)(void*, void*)) {
+	Set* out_set = set_new(to_collapse->cmp_func);
+	Set* has_read = set_new(to_collapse->cmp_func);
+	
+	for (int i = 0; i < to_collapse->parent->n; i++) {
+		void* el_1 = set_get(to_collapse, i);
+		if (set_inside(has_read, el_1) != -1)
+			continue;
+		
+		for (int j = i + 1; j < to_collapse->parent->n; j++) {
+			void* el_2 = set_get(to_collapse, j);
+			
+			if (set_inside(has_read, el_2) != -1)
+				continue;
+			
+			void* out_el = merge_func(el_1, el_2);
+			if (out_el) {
+				set_add(has_read, el_2);
+				set_add(out_set, out_el);
+			}
+		}
+	}
+	
+	set_free(has_read);
+	
+	return out_set;
+}
+
+void set_free(Set* ptr) {
+	vector_free(ptr->parent);
+	free(ptr);
+}
