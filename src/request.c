@@ -133,8 +133,10 @@ void request_free (Request* req) {
 	if (req->protocol == PROT_HTTP)
 		return free (req);
 	
-	for (int i = 0; i != req->struct_c; i++)
+	for (int i = 0; i != req->struct_c; i++) {
 		request_structure_free(req->structures[i]->data, request_structure_linkage[(request_structure_t)req->structures[i]->type - 1]);
+		free(req->structures[i]);
+	}
 	
 	vector_free (req->structures_parent);
 	free (req);
