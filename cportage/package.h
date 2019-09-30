@@ -48,10 +48,6 @@ struct __Ebuild {
 	Dependency* rdepend;
 	Dependency* pdepend; //!< Must be installed after this package is
 	
-	PortageDependency* dependency_resolved;
-	PortageDependency* pdependency_resolved;
-	int resolved;
-	
 	UseFlag* use; //!< Read iuse, then apply globals (make.conf), then package.use
 	Vector* feature_restrict;
 	keyword_t keywords[ARCH_END];

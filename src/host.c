@@ -64,7 +64,7 @@ Host* host_new(Server* server, char* id) {
 }
 
 void host_init_extras(Host* target) {
-	target->kernel = vector_new(sizeof(Kernel*), VECTOR_UNORDERED | VECTOR_REMOVE);
+	target->kernel = vector_new(VECTOR_UNORDERED | VECTOR_REMOVE);
 }
 
 char* host_path(Host* host, char* sub, ...) {
@@ -102,7 +102,7 @@ void host_free(Host* host) {
 	if (host->kernel != NULL) {
 		int i;
 		for (i = 0; i != host->kernel->n; i++)
-			kernel_free(*(Kernel**) vector_get(host->kernel, i));
+			kernel_free((Kernel*) vector_get(host->kernel, i));
 		vector_free(host->kernel);
 	}
 	
@@ -146,7 +146,7 @@ int host_write_make_conf(Host* host) {
 	fwrite_line(makef, "");
 	
 	for (int i = 0; i < host->environment->extra->n; i++) {
-		SmallMap_key* current_key = *(SmallMap_key**)vector_get(host->environment->extra, i);
+		SmallMap_key* current_key = (SmallMap_key*)vector_get(host->environment->extra, i);
 		fwrite_line(makef, "%s=\"%s\"", current_key->key, current_key->data_ptr);
 	}
 	

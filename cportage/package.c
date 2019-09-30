@@ -10,9 +10,7 @@
 #include "manifest.h"
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <stdio.h>
-#include <fcntl.h>
 #include <share.h>
 #include <autogentoo/hacksaw/map.h>
 #include "database.h"
@@ -96,7 +94,6 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	new_ebuild->feature_restrict = NULL;
 	
 	new_ebuild->metadata_init = 0;
-	new_ebuild->resolved = 0;
 	
 	new_ebuild->category = atom_parsed->category;
 	new_ebuild->pn = atom_parsed->name;
@@ -117,9 +114,6 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	
 	new_ebuild->required_use = NULL;
 	new_ebuild->src_uri = NULL;
-	
-	new_ebuild->dependency_resolved = NULL;
-	new_ebuild->pdependency_resolved = NULL;
 	
 	new_ebuild->use = NULL;
 	new_ebuild->older = NULL;

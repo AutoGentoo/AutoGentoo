@@ -18,9 +18,9 @@ HostEnvironment* host_environment_new(Host* parent) {
 	out->extra = small_map_new(5);
 	out->lc_messages = NULL;
 	
-	out->package_accept_keywords = vector_new(sizeof(PortageEntry*), VECTOR_REMOVE | VECTOR_ORDERED);
-	out->package_env = vector_new(sizeof(PortageEntry*), VECTOR_REMOVE | VECTOR_ORDERED);
-	out->package_use = vector_new(sizeof(PortageEntry*), VECTOR_REMOVE | VECTOR_ORDERED);
+	out->package_accept_keywords = vector_new(VECTOR_REMOVE | VECTOR_ORDERED);
+	out->package_env = vector_new(VECTOR_REMOVE | VECTOR_ORDERED);
+	out->package_use = vector_new(VECTOR_REMOVE | VECTOR_ORDERED);
 	out->package_mask = string_vector_new();
 	
 	out->pkgdir = NULL;
@@ -136,7 +136,7 @@ void host_environment_write_make_conf(Host* target) {
 	LINEWRITE("# The following entries were appended by the user")
 	
 	for (int i = 0; i < (int)target->environment->extra->n; i++) {
-		SmallMap_key* c_key = *(SmallMap_key**)vector_get(target->environment->extra, i);
+		SmallMap_key* c_key = (SmallMap_key*)vector_get(target->environment->extra, i);
 		LINEWRITE("%s=\"%s\"", c_key->key, (char*)c_key->data_ptr)
 	}
 	

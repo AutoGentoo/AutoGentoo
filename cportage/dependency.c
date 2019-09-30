@@ -7,7 +7,6 @@
 #include "portage.h"
 #include "database.h"
 #include "suggestion.h"
-#include <stdlib.h>
 #include <string.h>
 #include <autogentoo/hacksaw/hacksaw.h>
 #include <autogentoo/hacksaw/set.h>
@@ -37,6 +36,7 @@ int pd_slot_cmp(char* slot_1, char* sub_slot_1, char* slot_2, char* sub_slot_2) 
 	return 0;
 }
 
+/*
 PortageDependency* pd_find_atm(Emerge* parent, P_Atom* atom) {
 	for (int i = 0; i < parent->selected->n; i++) {
 		PortageDependency* current = *(PortageDependency**)vector_get(parent->selected, i);
@@ -44,7 +44,7 @@ PortageDependency* pd_find_atm(Emerge* parent, P_Atom* atom) {
 		if (strcmp(current->ebuild->parent->key, atom->key) == 0) {
 			int slot_cmp = pd_slot_cmp(current->slot, current->sub_slot, atom->slot, atom->sub_slot);
 			
-			/* Slots don't match */
+			* Slots don't match *
 			if (slot_cmp < 0)
 				continue;
 			
@@ -64,14 +64,15 @@ PortageDependency* pd_find_atm(Emerge* parent, P_Atom* atom) {
 	
 	return NULL;
 }
+*/
 
-void __pd_layer_resolve__(Emerge* parent, Dependency* depend, Ebuild* target, SmallMap* pkg_to_ebuild_set) {
+void __pd_layer_resolve__(Emerge* parent, Dependency* depend, Ebuild* target, Vector* ebuild_set) {
 	for (Dependency* current_depend = depend; current_depend; current_depend = current_depend->next) {
 		if (current_depend->depends == HAS_DEPENDS) {
 			/* Do logical evaluation for use flags */
 			if ((depend->selector == USE_DISABLE || depend->selector == USE_ENABLE)) {
 				if (depend->selector == ebuild_check_use(target, depend->target))
-					__pd_layer_resolve__(parent, current_depend->selectors, target, pkg_to_ebuild_set);
+					__pd_layer_resolve__(parent, current_depend->selectors, target, ebuild_set);
 			}
 			else if (depend->selector == USE_LEAST_ONE) {
 			
@@ -81,23 +82,17 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, Ebuild* target, Sm
 			continue;
 		}
 		
-		Set* ebuild_set = small_map_get(pkg_to_ebuild_set, current_depend->atom->key);
 		
-		if (!ebuild_set) {
-			ebuild_set = set_new(NULL); /* NULL just compares points */
-			small_map_insert(pkg_to_ebuild_set, current_depend->atom->key, ebuild_set);
-		}
-		
-		/* Resolve the ebuild */
+		/* Resolve the ebuild */ /*
 		Package* pkg = atom_resolve_package(parent, current_depend->atom);
-		Ebuild* resolved = NULL;
-		set_add(ebuild_set, resolved);
+		Ebuild* resolved = package_resolve_ebuild(pkg, current_depend->atom);
+		set_add(ebuild_set, resolved); */
 	}
 }
 
 void pd_layer_resolve(Emerge* parent, Dependency* depend, Ebuild* target) {
-	SmallMap* pkg_to_ebuild_set = small_map_new(32);
-	__pd_layer_resolve__(parent, depend, target, pkg_to_ebuild_set)
+	Vector* ebuild_set = small_map_new(32);
+	__pd_layer_resolve__(parent, depend, target, ebuild_set);
 }
 
 Package* atom_resolve_package(Emerge* emerge, P_Atom* atom) {
@@ -172,7 +167,7 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 	return 0;
 }
 
-Ebuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
+SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 	Ebuild* current;
 	for (current = pkg->ebuilds; current; current = current->older) {
 		if (atom_match_ebuild(current, atom)) {
@@ -184,8 +179,21 @@ Ebuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 				if (atom_match_ebuild(current, keyword->atom))
 					if (keyword->keywords[pkg->parent->parent->target_arch] < accept_keyword)
 						accept_keyword = keyword->keywords[pkg->parent->parent->target_arch];
-			if (current->keywords[pkg->parent->parent->target_arch] >= accept_keyword)
-				return current;
+			if (current->keywords[pkg->parent->parent->target_arch] >= accept_keyword) {
+				SelectedEbuild* out = malloc(sizeof(SelectedEbuild));
+				out->ebuild = current;
+				out->installed = portagedb_resolve_installed(pkg->parent->parent->database, atom);
+				
+				if (!out->installed)
+					return out;
+				
+				int cmp = ebuild_installedebuild_cmp(out->ebuild, out->installed);
+				if (cmp > 0)
+					out->action = PORTAGE_UPDATE;
+				
+				
+				return out;
+			}
 		}
 	}
 	

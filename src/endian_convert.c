@@ -44,7 +44,7 @@ uint64_t ntohll(uint64_t network) {
 
 Endian* endian_new(void* src) {
 	Endian* out = malloc(sizeof(Endian));
-	out->nodes = vector_new(sizeof(EndianNode*), VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->nodes = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
 	
 	return out;
 }
@@ -54,13 +54,13 @@ void endian_add_handler(Endian* target, size_t offset, endian_convert_t type) {
 	handler->type = type;
 	handler->offset = offset;
 	
-	vector_add(target->nodes, &handler);
+	vector_add(target->nodes, handler);
 }
 
 void endian_to_network(Endian* target, void* dest) {
 	int i;
 	for (i = 0; i != target->nodes->n; i++) {
-		EndianNode* node = *vector_get(target->nodes, i);
+		EndianNode* node = vector_get(target->nodes, i);
 		
 		uint16_t _s;
 		uint32_t _i;
@@ -87,7 +87,7 @@ void endian_to_network(Endian* target, void* dest) {
 void endian_to_host(Endian* target, void* dest) {
 	int i;
 	for (i = 0; i != target->nodes->n; i++) {
-		EndianNode* node = *vector_get(target->nodes, i);
+		EndianNode* node = vector_get(target->nodes, i);
 		
 		uint16_t _s;
 		uint32_t _i;

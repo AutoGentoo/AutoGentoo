@@ -9,7 +9,7 @@
 ClientRequest* client_request_init(request_t type) {
 	ClientRequest* out = malloc (sizeof(ClientRequest));
 	out->request_type = type;
-	out->arguments = vector_new(sizeof(ClientRequestArgument), VECTOR_ORDERED | VECTOR_REMOVE);
+	out->arguments = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
 	out->size = 0;
 	out->ptr = NULL;
 	
@@ -24,8 +24,13 @@ int client_request_add_structure(ClientRequest* req, request_structure_t struct_
 	if (dynamic_binary_add_quick(dyn, template, content) != DYNAMIC_BIN_OK)
 		return -2;
 	
-	ClientRequestArgument req_arg = {struct_type, dyn->used_size, dynamic_binary_free(dyn)};
-	vector_add(req->arguments, &req_arg);
+	ClientRequestArgument* req_arg = malloc(sizeof(ClientRequestArgument));
+	
+	req_arg->struct_type = struct_type;
+	req_arg->size = dyn->used_size;
+	req_arg->ptr = dynamic_binary_free(dyn);
+	
+	vector_add(req->arguments, req_arg);
 	
 	return 0;
 }
@@ -74,6 +79,7 @@ void client_request_free(ClientRequest* req) {
 	for (int i = 0; i < req->arguments->n; i++) {
 		ClientRequestArgument* arg = (ClientRequestArgument*)vector_get(req->arguments, i);
 		free(arg->ptr);
+		free(arg);
 	}
 	
 	vector_free(req->arguments);

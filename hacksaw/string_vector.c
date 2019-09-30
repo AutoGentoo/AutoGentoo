@@ -8,7 +8,7 @@
 #include "hacksaw/string_vector.h"
 
 StringVector* string_vector_new() {
-	return vector_new(sizeof(char*), VECTOR_ORDERED | VECTOR_REMOVE);
+	return vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
 }
 
 void string_vector_add(StringVector* vec, char* string) {
@@ -39,7 +39,10 @@ void string_vector_set(StringVector* vec, char* string, int index) {
 	while (vec->s >= index)
 		vector_allocate(vec);
 	
-	*(char**)vector_get (vec, index) = string;
+	if (vector_get(vec, index))
+		free(vector_get(vec, index));
+	
+	vec->ptr[index] = string;
 }
 
 void string_vector_remove(StringVector* vec, int index) {
@@ -68,5 +71,5 @@ void string_vector_free(StringVector* vec) {
 }
 
 char* string_vector_get(StringVector* vec, int index) {
-	return *(char**) vector_get(vec, index);
+	return (char*)vector_get(vec, index);
 }

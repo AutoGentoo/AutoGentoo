@@ -20,7 +20,6 @@ int prv_read_int (void** data, void* end, int* out) {
 #define AUTOGENTOO_REQUEST_HANDLE_ERROR {free(out); return NULL;}
 #define AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR {\
 vector_free (out->structures_parent); \
-vector_free (out->types_parent); \
 AUTOGENTOO_REQUEST_HANDLE_ERROR}
 
 #define AUTOGENTOO_READ_INT(destination) {\
@@ -66,10 +65,8 @@ Request* request_handle (Connection* conn) {
 		out->directive = DIR_CONNECTION_STREAM;
 	}
 	
-	out->structures_parent = vector_new (sizeof (RequestData*), VECTOR_REMOVE | VECTOR_ORDERED);
-	out->types_parent = vector_new (sizeof (request_structure_t), VECTOR_REMOVE | VECTOR_ORDERED);
-	out->structures = out->structures_parent->ptr;
-	out->types = out->types_parent->ptr;
+	out->structures_parent = vector_new (VECTOR_REMOVE | VECTOR_ORDERED);
+	out->structures = (RequestStructure**)out->structures_parent->ptr;
 	
 	request_structure_t current;
 	AUTOGENTOO_READ_INT_ERROR(current, AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR)
@@ -78,12 +75,14 @@ Request* request_handle (Connection* conn) {
 		if (current >= STRCT_MAX)
 			AUTOGENTOO_REQUEST_HANDLE_VECTOR_ERROR
 		
-		vector_add(out->types_parent, &current);
-		
 		size_t len = 0;
-		RequestData* rs = request_structure_read(current_request, request_structure_linkage[current - 1], &len);
+		RequestData* rd = request_structure_read(current_request, request_structure_linkage[current - 1], &len);
 		
-		vector_add(out->structures_parent, &rs);
+		RequestStructure* rs = malloc(sizeof(RequestStructure));
+		rs->data = rd;
+		rs->type = current;
+		
+		vector_add(out->structures_parent, rs);
 		out->struct_c++;
 		
 		if (len == -1)
@@ -135,9 +134,8 @@ void request_free (Request* req) {
 		return free (req);
 	
 	for (int i = 0; i != req->struct_c; i++)
-		request_structure_free(req->structures[i], request_structure_linkage[req->types[i] - 1]);
+		request_structure_free(req->structures[i]->data, request_structure_linkage[(request_structure_t)req->structures[i]->type - 1]);
 	
 	vector_free (req->structures_parent);
-	vector_free (req->types_parent);
 	free (req);
 }

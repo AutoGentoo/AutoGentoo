@@ -77,7 +77,7 @@ int prv_check_data_structs (Request* req, const int* to_check, int count) {
 		return 1;
 
 	for (int i = 0; i < count; i++)
-		if (req->types[i] != to_check[i])
+		if (req->structures[i]->type != to_check[i])
 			return 1;
 
 	return 0;
@@ -95,20 +95,20 @@ void HOST_NEW(Response* res, Request* request) {
 
 	/* Create the host */
 	Host* target = host_new(request->parent, host_id_new());
-	target->arch = strdup(request->structures[1]->host_new.arch);
-	target->hostname = strdup(request->structures[1]->host_new.hostname);
-	target->profile = strdup(request->structures[1]->host_new.profile);
+	target->arch = strdup(request->structures[1]->data->host_new.arch);
+	target->hostname = strdup(request->structures[1]->data->host_new.hostname);
+	target->profile = strdup(request->structures[1]->data->host_new.profile);
 
 	AccessToken creat_tok;
 	creat_tok.access_level = TOKEN_HOST_MOD;
 	creat_tok.host_id = target->id;
-	creat_tok.user_id = request->structures[0]->auth.user_id;
+	creat_tok.user_id = request->structures[0]->data->auth.user_id;
 
 	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
 	if (!issued)
 		HANDLE_RETURN(NOT_FOUND);
 
-	vector_add(request->parent->hosts, &target);
+	vector_add(request->parent->hosts, target);
 
 	dynamic_binary_add(res->content, 's', issued->user_id);
 	dynamic_binary_add(res->content, 's', issued->host_id);
@@ -132,8 +132,8 @@ void HOST_MAKE_CONF(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
-	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
-	struct __struct_Host_make_conf make_conf = request->structures[2]->make_conf;
+	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
+	struct __struct_Host_make_conf make_conf = request->structures[2]->data->make_conf;
 	
 	if (strcmp(make_conf.key, "CFLAGS") == 0)
 		string_overwrite(&host->environment->cflags, make_conf.value, 1);
@@ -154,11 +154,11 @@ void HOST_DEL(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
-	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
+	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
 
 	/* Remove the host */
 	for (int i = 0; i < request->parent->hosts->n; i++)
-		if (*(Host**)vector_get(request->parent->hosts, i) == host) {
+		if ((Host*)vector_get(request->parent->hosts, i) == host) {
 			vector_remove(request->parent->hosts, i);
 			break;
 		}
@@ -172,7 +172,7 @@ void HOST_EMERGE(Response* res, Request* request) {
 	AccessToken* tok = authorize (request, TOKEN_HOST_EMERGE, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
-	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
+	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
 	
 	
 	WorkerRequest* strct_worker_request = malloc(sizeof(WorkerRequest));
@@ -182,14 +182,14 @@ void HOST_EMERGE(Response* res, Request* request) {
 	StringVector* worker_args = string_vector_new();
 	string_vector_add(worker_args, "-v");
 	
-	char* token = strtok(request->structures[2]->emerge.emerge, " ");
+	char* token = strtok(request->structures[2]->data->emerge.emerge, " ");
 	while(token) {
 		string_vector_add(worker_args, token);
 		token = strtok(NULL, " ");
 	}
 	string_vector_add(worker_args, NULL);
 	
-	strct_worker_request->args = worker_args->ptr;
+	strct_worker_request->args = (char**)worker_args->ptr;
 	strct_worker_request->n = (int)worker_args->n - 1; // Ignore NULL at end
 	
 	char* job_name;
@@ -211,7 +211,7 @@ void HOST_MNTCHROOT(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
-	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
+	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
 
 	response_t ret = chroot_mount(host);
 	HANDLE_RETURN(ret);
@@ -269,7 +269,7 @@ void SRV_REFRESH(Response* res, Request* request) {
 
 	dynamic_binary_array_start(res->content);
 	for (int i = 0; i < request->parent->hosts->n; i++) {
-		Host* current = *(Host**)vector_get(request->parent->hosts, i);
+		Host* current = (Host*)vector_get(request->parent->hosts, i);
 		dynamic_binary_add(res->content, 's', current->id);
 		dynamic_binary_add(res->content, 's', current->hostname);
 		dynamic_binary_add(res->content, 's', current->profile);
@@ -294,13 +294,13 @@ void AUTH_ISSUE_TOK(Response* res, Request* request) {
 	AccessToken auth_tok;
 	AccessToken creat_tok;
 
-	auth_tok.host_id = request->structures[1]->host_select.hostname;
-	auth_tok.auth_token = request->structures[0]->auth.token;
-	auth_tok.user_id = request->structures[0]->auth.user_id;
+	auth_tok.host_id = request->structures[1]->data->host_select.hostname;
+	auth_tok.auth_token = request->structures[0]->data->auth.token;
+	auth_tok.user_id = request->structures[0]->data->auth.user_id;
 
-	creat_tok.user_id = request->structures[2]->issue_tok.user_id;
-	creat_tok.host_id = request->structures[2]->issue_tok.target_host;
-	creat_tok.access_level = request->structures[2]->issue_tok.permission;
+	creat_tok.user_id = request->structures[2]->data->issue_tok.user_id;
+	creat_tok.host_id = request->structures[2]->data->issue_tok.target_host;
+	creat_tok.access_level = request->structures[2]->data->issue_tok.permission;
 
 	AccessToken* issued = autogentoo_issue(request->parent, &auth_tok, &creat_tok);
 	if (!issued)
@@ -348,7 +348,7 @@ void AUTH_REGISTER(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 
-	creat_tok.user_id = request->structures[1]->issue_tok.user_id;
+	creat_tok.user_id = request->structures[1]->data->issue_tok.user_id;
 	creat_tok.host_id = NULL;
 	creat_tok.access_level = TOKEN_SERVER_WRITE;
 	AccessToken* issued = auth_issue_token(request->parent, &creat_tok);
@@ -366,14 +366,14 @@ void JOB_STREAM(Response* res, Request* request) {
 	AccessToken* tok = authorize (request, TOKEN_HOST_READ, AUTH_TOKEN_HOST);
 	if (!tok)
 		HANDLE_RETURN_HTTP(FORBIDDEN);
-	Host* host = server_get_host(request->parent, request->structures[1]->host_select.hostname);
+	Host* host = server_get_host(request->parent, request->structures[1]->data->host_select.hostname);
 	if (!host) {
-		token_free(map_remove(request->parent->auth_tokens, request->structures[0]->auth.token));
+		token_free(map_remove(request->parent->auth_tokens, request->structures[0]->data->auth.token));
 		HANDLE_RETURN_HTTP(NOT_FOUND);
 	}
 	
 	/* Check if worker is running */
-	char* job_id = request->structures[2]->job_select.job_name;
+	char* job_id = request->structures[2]->data->job_select.job_name;
 	
 	char* filename;
 	asprintf(&filename, "logs/%s-%s.log", host->id, job_id);
@@ -486,14 +486,14 @@ void HOST_STAGE3(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 	
-	HANDLE_GET_HOST(request->structures[1].host_select.hostname)
+	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
 	
 	WorkerRequest worker_req;
 	worker_req.command_name = "stage3";
 	worker_req.host_id = host->id;
 	
 	worker_req.n = 1;
-	worker_req.args = &request->structures[2]->job_select.job_name;
+	worker_req.args = &request->structures[2]->data->job_select.job_name;
 	
 	char* job_name = NULL;
 	int worker_res = worker_handler_request(request->parent->job_handler, &worker_req, &job_name);

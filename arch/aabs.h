@@ -77,7 +77,7 @@ struct __aabs_file_t {
 
 struct __aabs_filelist_t {
 	size_t count;
-	aabs_file_t* files;
+	aabs_file_t** files;
 };
 
 #include "db.h"

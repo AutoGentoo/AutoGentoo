@@ -9,14 +9,14 @@
 
 Set* set_new(element_cmp cmp_func) {
 	Set* out = malloc(sizeof(Set));
-	out->parent = vector_new(sizeof(void*), VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->parent = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
 	out->cmp_func = cmp_func;
 	
 	return out;
 }
 
 void* set_get(Set* s, int i) {
-	return *(void**)vector_get(s->parent, i);
+	return vector_get(s->parent, i);
 }
 
 int set_inside(Set* s, void* item) {
@@ -34,7 +34,7 @@ void set_add(Set* set, void* element) {
 	int index = set_inside(set, element);
 	
 	if (index == -1)
-		vector_add(set->parent, &element);
+		vector_add(set->parent, element);
 }
 
 Set* set_dup(Set* s) {

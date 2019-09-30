@@ -48,7 +48,7 @@ Vector* manifest_metadata_parse_fp(FILE* fp, char* dir_path) {
 	size_t read_size = 0;
 	size_t n = 512;
 	
-	Vector* out = vector_new(sizeof(Manifest*), VECTOR_REMOVE | VECTOR_UNORDERED);
+	Vector* out = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
 	
 	while ((read_size = getline(&line, &n, fp)) != -1) {
 		if (line[0] == '\n')
@@ -80,7 +80,7 @@ Vector* manifest_metadata_parse_fp(FILE* fp, char* dir_path) {
 		asprintf(&temp->full_path, "%s/%s", dir_path, temp->filename);
 		temp->parent_dir = strdup(temp->full_path);
 		*(strrchr(temp->parent_dir, '/')) = 0;
-		vector_add(out, &temp);
+		vector_add(out, temp);
 	}
 	
 	free(line);
@@ -105,7 +105,7 @@ void manifest_metadata_deep(Vector* mans) {
 	
 	FILE* fp;
 	for (int i = 0; i < mans->n; i++) {
-		current = *(Manifest**)vector_get(mans, i);
+		current = (Manifest*)vector_get(mans, i);
 		
 		fp = fread_archive(current->full_path);
 		if (!fp) {

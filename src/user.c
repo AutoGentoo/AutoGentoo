@@ -32,15 +32,15 @@ int prv_random_string(char* out, size_t len) {
 
 AccessToken* authorize(Request* request, token_access_t access_level, auth_t type) {
 	AccessToken req_tok;
-	req_tok.user_id = request->structures[0]->auth.user_id;
-	req_tok.auth_token = request->structures[0]->auth.token;
+	req_tok.user_id = request->structures[0]->data->auth.user_id;
+	req_tok.auth_token = request->structures[0]->data->auth.token;
 	req_tok.access_level = access_level;
 	
 	if (strcmp(request->parent->sudo_token, req_tok.auth_token) == 0)
 		return map_get(request->parent->auth_tokens, request->parent->autogentoo_org_token);
 	
 	if (type == AUTH_TOKEN_HOST)
-		req_tok.host_id = request->structures[1]->host_select.hostname;
+		req_tok.host_id = request->structures[1]->data->host_select.hostname;
 	else
 		req_tok.host_id = NULL;
 	

@@ -77,7 +77,7 @@ size_t write_server_fp(Server* server, FILE* fp) {
 	
 	int i;
 	for (i = 0; i != server->hosts->n; i++) {
-		size += write_host_fp(*(Host**) vector_get(server->hosts, i), fp);
+		size += write_host_fp((Host*) vector_get(server->hosts, i), fp);
 	}
 	
 	StringVector* token_keys = map_all_keys(server->auth_tokens);
@@ -142,7 +142,7 @@ size_t write_host_fp(Host* host, FILE* fp) {
 	
 	int i;
 	for (i = 0; i < host->environment->extra->n; i++) {
-		SmallMap_key* current_key = (*(SmallMap_key**)vector_get(host->environment->extra, i));
+		SmallMap_key* current_key = ((SmallMap_key*)vector_get(host->environment->extra, i));
 		size += write_string(current_key->key, fp);
 		size += write_string(current_key->data_ptr, fp);
 	}
@@ -152,7 +152,7 @@ size_t write_host_fp(Host* host, FILE* fp) {
 		for (i = 0; i != host->kernel->n; i++) {
 			size += write_int(AUTOGENTOO_HOST_KERNEL, fp);
 			
-			Kernel* current_kernel = *(Kernel**)vector_get(host->kernel, i);
+			Kernel* current_kernel = (Kernel*)vector_get(host->kernel, i);
 			size += write_string(current_kernel->kernel_target, fp);
 			size += write_string(current_kernel->version, fp);
 		}
@@ -188,7 +188,7 @@ Server* read_server(char* location, char* port, server_t opts) {
 			case AUTOGENTOO_HOST:
 				host_temp = read_host(fp);
 				host_temp->parent = out;
-				vector_add(out->hosts, &host_temp);
+				vector_add(out->hosts, host_temp);
 				break;
 			case AUTOGENTOO_SERVER_TOKEN:
 				out->autogentoo_org_token = read_string(fp);

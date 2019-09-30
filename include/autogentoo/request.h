@@ -90,10 +90,8 @@ struct __Request {
 	
 	int struct_c;
 	Vector* structures_parent;
-	Vector* types_parent;
 	
-	RequestData** structures;
-	request_structure_t* types;
+	RequestStructure** structures;
 };
 
 /**

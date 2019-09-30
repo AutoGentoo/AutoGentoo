@@ -47,7 +47,7 @@ int server_init(short port) {
 Server* server_new (char* location, char* port, server_t opts) {
 	Server* out = malloc(sizeof(Server));
 	
-	out->hosts = vector_new(sizeof(Host*), VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->hosts = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
 	out->location = strdup(location);
 	out->autogentoo_org_token = NULL;
 	out->sudo_token = NULL;

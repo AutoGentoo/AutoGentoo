@@ -23,7 +23,12 @@ typedef enum {
 } request_structure_t;
 
 typedef union __RequestData RequestData;
+typedef struct __RequestStructure RequestStructure;
 
+struct __RequestStructure {
+	request_structure_t type;
+	RequestData* data;
+};
 
 struct __struct_Host_new {
 	char* arch;

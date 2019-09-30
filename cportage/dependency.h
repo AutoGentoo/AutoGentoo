@@ -25,6 +25,7 @@ typedef enum {
 struct __SelectedEbuild {
 	/* Next and depends not relevant */
 	Dependency* selected_by;
+	InstalledEbuild* installed;
 	Ebuild* ebuild;
 	
 	dependency_t action;
@@ -65,6 +66,6 @@ void pd_layer_2(Emerge* parent, Dependency* depend, Ebuild* target);
 /* Helpers */
 Package* atom_resolve_package(Emerge* emerge, P_Atom* atom);
 int pd_slot_cmp(char* slot_1, char* sub_slot_1, char* slot_2, char* sub_slot_2);
-PortageDependency* pd_find_atm(Emerge* parent, P_Atom* atom);
+SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom);
 
 #endif //AUTOGENTOO_DEPENDENCY_H

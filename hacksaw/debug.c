@@ -22,7 +22,7 @@ void print_bin(void* ptr, int n, size_t size) {
 }
 
 void print_vec(Vector* vec) {
-	print_bin(vec->ptr, (int)vec->n, vec->size);
+	print_bin(vec->ptr, (int)vec->n, sizeof(void*));
 	fflush(stdout);
 }
 

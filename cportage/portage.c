@@ -84,7 +84,7 @@ char** strsplt(char* to_split, size_t* n) {
 	StringVector* sv_out = string_vector_new();
 	string_vector_split(sv_out, to_split, " ");
 	
-	char** out = sv_out->ptr;
+	char** out = (char**)sv_out->ptr;
 	*n = sv_out->n;
 	
 	return out;
@@ -258,9 +258,9 @@ void repository_free(Repository* repo) {
 		
 		if (curr->category_manifests) {
 			for (i = 0; i < curr->category_manifests->n; i++) {
-				Manifest* cat_man = *(Manifest**)vector_get(curr->category_manifests, i);
+				Manifest* cat_man = (Manifest*)vector_get(curr->category_manifests, i);
 				for (int j = 0; j < cat_man->parsed->n; j++) {
-					Manifest* atom_man = *(Manifest**)vector_get(cat_man->parsed, j);
+					Manifest* atom_man = (Manifest*)vector_get(cat_man->parsed, j);
 					manifest_free(atom_man);
 				}
 				vector_free(cat_man->parsed);

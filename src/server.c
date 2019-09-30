@@ -166,7 +166,7 @@ void server_respond(Connection* conn, int worker_index) {
 Host* server_get_host(Server* server, char* id) {
 	int i;
 	for (i = 0; i != server->hosts->n; i++) {
-		Host* current_host = *(Host**) vector_get(server->hosts, i);
+		Host* current_host = (Host*) vector_get(server->hosts, i);
 		if (strcmp(id, current_host->id) == 0)
 			return current_host;
 	}
@@ -213,7 +213,7 @@ void server_free (Server* server) {
 	
 	int i;
 	for (i = 0; i != server->hosts->n; i++)
-		host_free(*(Host**) vector_get(server->hosts, i));
+		host_free((Host*) vector_get(server->hosts, i));
 	
 	vector_free(server->hosts);
 	map_free(server->auth_tokens, (void (*)(void*))token_free);

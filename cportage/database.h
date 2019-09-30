@@ -9,20 +9,11 @@
 #include "portage.h"
 #include "package.h"
 #include "directory.h"
+#include "dependency.h"
 
 struct __DependQuery {
 	InstalledEbuild* selector;
 	char* depend_atom;
-};
-
-struct __SelectedEbuild {
-	Ebuild* target; //!< Package marked for installation
-	
-	SelectedEbuild* selected_parent;
-	InstalledEbuild* installed_parent;
-	Dependency* selected_by;
-	
-	int emerge_index; //!< We don't need all consecutive int as long at its ordered
 };
 
 typedef enum {
@@ -90,6 +81,6 @@ void installedpackage_free(InstalledPackage* pkg);
 void backtrack_search(PortageDB* db, InstalledEbuild* parent, Dependency* deptree, rebuild_t type);
 void backtrack_new(PortageDB* db, InstalledEbuild* rebuild, P_Atom* atom, rebuild_t type);
 void backtrack_resolve(PortageDB* db, rebuild_t types);
-int ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* installed_ebuild);
+dependency_t ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* installed_ebuild);
 
 #endif //AUTOGENTOO_DATABASE_H

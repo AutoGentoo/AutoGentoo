@@ -51,20 +51,20 @@ void* aabs_read_archive(aabs_filelist_t* dest, struct archive** ar, char* file_p
 	}
 	
 	/* Use the vector api and then copy it over */
-	Vector* temp = vector_new(sizeof(aabs_file_t), VECTOR_REMOVE | VECTOR_UNORDERED);
+	Vector* temp = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
 	
 	/* Expecting a lot of files */
 	
 	while (archive_read_next_header(*ar, &entry) == ARCHIVE_OK) {
-		aabs_file_t t;
-		t.name = strdup(archive_entry_pathname(entry));
-		t.mode = archive_entry_filetype(entry);
-		t.size = archive_entry_size(entry);
-		vector_add(temp, &t);
+		aabs_file_t* t = malloc(sizeof(aabs_file_t));
+		t->name = strdup(archive_entry_pathname(entry));
+		t->mode = archive_entry_filetype(entry);
+		t->size = archive_entry_size(entry);
+		vector_add(temp, t);
 	}
 	
 	dest->count = temp->n;
-	dest->files = temp->ptr;
+	dest->files = (aabs_file_t**)temp->ptr;
 	free(temp);
 	
 	if (close) {
@@ -73,6 +73,8 @@ void* aabs_read_archive(aabs_filelist_t* dest, struct archive** ar, char* file_p
 		if (r != ARCHIVE_OK)
 			exit(1);
 	}
+	
+	return dest;
 }
 
 aabs_time_t _aabs_parsedate(const char* line) {
