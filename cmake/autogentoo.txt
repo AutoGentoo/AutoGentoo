@@ -5,7 +5,6 @@ set(src_SOURCES
         src/kernel.c
         src/response.c
         src/server.c
-        src/stage.c
         src/writeconfig.c
         src/endian_convert.c
         src/thread.c
@@ -42,7 +41,6 @@ set(include_HEADERS
         include/autogentoo/response.h
         include/autogentoo/request.h
         include/autogentoo/server.h
-        include/autogentoo/stage.h
         include/autogentoo/writeconfig.h
         include/autogentoo/endian_convert.h
         include/autogentoo/thread.h

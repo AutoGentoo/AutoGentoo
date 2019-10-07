@@ -26,7 +26,10 @@ def cd(path: str, host=None):
 	os.chdir(path)
 
 
-def mkdir(path):
+def mkdir(path, host=None):
+	if host is not None and len(path) and path[0] == "/":
+		path = host.get_path() + path
+	
 	return os.makedirs(path, exist_ok=True)
 
 

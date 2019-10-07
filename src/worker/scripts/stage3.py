@@ -28,21 +28,10 @@ def script(_job_name: str, host: Host, args=None):
 	
 	print("Initializing autogentoo directories")
 	mkdir("autogentoo")
-	mkdir("autogentoo/log")
-	mkdir("autogentoo/tmp")
-	mkdir("autogentoo/pkg")
-	
-	"""
-	print("Creating library file structure")
-	mkdir("lib64")
-	ln("lib64", "lib")
-	
-	mkdir("usr")
-	cd("usr")
-	mkdir("lib64")
-	ln("lib64", "lib")
-	cd("/")
-	"""
+	mkdir(host.portage_logdir, host)
+	mkdir(host.portage_tmpdir, host)
+	mkdir(host.pkgdir, host)
+	mkdir(host.portdir, host)
 	
 	mirror = "http://mirrors.rit.edu/gentoo"
 	url_pre = "%s/releases/%s/autobuilds" % (mirror, host.arch)
@@ -102,7 +91,7 @@ def script(_job_name: str, host: Host, args=None):
 	print("Settings make.profile")
 	cd("etc/portage/", host)
 	rm("make.profile")
-	ln("usr/portage/profiles/%s" % host.profile, "make.profile")
+	ln("autogentoo/portage/profiles/%s" % host.profile, "make.profile")
 	
 	cd("/", host)
 	

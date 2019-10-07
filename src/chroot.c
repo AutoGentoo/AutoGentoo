@@ -39,7 +39,7 @@ enum {
 
 response_t chroot_mount(Host* host) {
 	ChrootMount to_mount[] = {
-			{"/usr/portage", "usr/portage", NULL, MS_BIND},
+			{"/usr/portage", host->environment->portdir, NULL, MS_BIND},
 			{"/dev",         "dev",         NULL, MS_BIND | MS_REC},
 			{"/sys",         "sys",         NULL, MS_BIND | MS_REC},
 			{"/proc",        "proc", "proc",      MS_MGC_VAL}

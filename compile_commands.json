@@ -36,11 +36,6 @@
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dautogentoo_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/autogentoo.dir/src/stage.c.o   -c /home/atuser/git/AutoGentoo/src/stage.c",
-  "file": "/home/atuser/git/AutoGentoo/src/stage.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
   "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dautogentoo_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/autogentoo.dir/src/writeconfig.c.o   -c /home/atuser/git/AutoGentoo/src/writeconfig.c",
   "file": "/home/atuser/git/AutoGentoo/src/writeconfig.c"
 },
@@ -303,6 +298,11 @@
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
   "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/getopt.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/getopt.c",
   "file": "/home/atuser/git/AutoGentoo/hacksaw/getopt.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/set.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/set.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/set.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
