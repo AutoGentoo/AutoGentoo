@@ -1,8 +1,6 @@
 import struct
 from typing import Union, List, Tuple
-import _thread
-import signal
-import os
+import fcntl
 
 
 class DynamicBinary:
@@ -178,53 +176,17 @@ class FileReader(DynamicBinary):
 		self.path = path
 		self.file = None
 		self.data = b""
-		
-		self.config_lck = _thread.allocate_lock()
-		self.ack_lck = _thread.allocate_lock()
-		signal.signal(signal.SIGUSR1, self.handle_toggle)
-		signal.signal(signal.SIGUSR2, self.handle_ack)
-	
-	def handle_ack(self, _signum, _stack):
-		self.ack_lck.release()
-	
-	def handle_toggle(self, _signum, _stack):
-		if self.config_lck.locked():
-			self.config_lck.release()
-		else:
-			self.config_lck.acquire()
-		
-		os.kill(self.parent_pid, signal.SIGUSR2)
 	
 	def read_data(self):
 		self.file = open(self.path, "rb")
+		fcntl.flock(self.file.fileno(), fcntl.LOCK_EX)
+		
 		self.data = self.file.read()
 		self.pos = 0
+		
+		fcntl.flock(self.file.fileno(), fcntl.LOCK_UN)
 		self.file.close()
-	
-	def toggle_server_lock(self):
-		self.ack_lck.acquire()
-		os.kill(self.parent_pid, signal.SIGUSR1)
-		
-		# WAIT FOR SIGUSR2
-		
-		self.ack_lck.acquire()
-		self.ack_lck.release()
-	
-	def start_write(self):
-		self.data = b""
-		self.pos = 0
-		
-		self.config_lck.acquire()
-		self.toggle_server_lock()
-		
-	def stop_write(self):
-		self.file = open(self.path, "wb+")
-		self.file.write(self.data)
-		self.file.flush()
-		self.file.close()
-		
-		self.config_lck.release()
-		self.toggle_server_lock()
+		print(len(self.data))
 
 
 class BinaryObject:

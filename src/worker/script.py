@@ -72,8 +72,15 @@ def extract(filename: str, output_dir):
 
 
 def chroot(host):
-	cd(host, "/")
-	os.chroot(".")
+	cd("/", host=host)
+	
+	try:
+		os.chroot(".")
+	except PermissionError:
+		print("[ERROR], server needs to be root!")
+		return 1
+	
+	return 0
 
 
 def touch(filepath):

@@ -91,7 +91,7 @@ def script(_job_name: str, host: Host, args=None):
 	print("Settings make.profile")
 	cd("etc/portage/", host)
 	rm("make.profile")
-	ln("autogentoo/portage/profiles/%s" % host.profile, "make.profile")
+	ln("%s/profiles/%s" % (host.portdir, host.profile), "make.profile")
 	
 	cd("/", host)
 	

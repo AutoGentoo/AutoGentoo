@@ -376,7 +376,7 @@ void JOB_STREAM(Response* res, Request* request) {
 	char* job_id = request->structures[2]->data->job_select.job_name;
 	
 	char* filename;
-	asprintf(&filename, "logs/%s-%s.log", host->id, job_id);
+	asprintf(&filename, "logs/%s.log", job_id);
 	size_t filename_len = strlen(filename);
 	
 	char* lock_file = malloc(filename_len + 5);

@@ -5,13 +5,6 @@
 #include <autogentoo/server.h>
 #include <autogentoo/writeconfig.h>
 
-void handle_sigusr1(int sig) {
-	worker_toggle(srv);
-}
-
-void handle_sigusr2(int sig) {
-	worker_ack(srv);
-}
 
 void handle_sigint (int sig) {
 	srv->keep_alive = 0;

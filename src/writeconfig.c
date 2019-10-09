@@ -47,9 +47,10 @@ size_t write_server(Server* server) {
 	char* config_file = malloc(strlen(server->location) + strlen(config_file_name) + 2);
 	sprintf(config_file, "%s/%s", server->location, config_file_name);
 	
-	worker_lock(server);
 	
 	FILE* to_write = fopen(config_file, "wb+");
+	worker_lock(fileno(to_write));
+	
 	if (to_write == NULL) {
 		lerror("Failed to open '%s' for writing-----------", config_file);
 		lerror("Error [%d] %s", errno, strerror(errno));
@@ -65,9 +66,11 @@ size_t write_server(Server* server) {
 	free(config_file);
 	
 	size_t size = write_server_fp(server, to_write);
+	
+	
+	worker_unlock(fileno(to_write));
 	fclose(to_write);
 	
-	worker_unlock(server);
 	
 	return size;
 }

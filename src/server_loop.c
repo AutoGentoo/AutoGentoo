@@ -49,17 +49,12 @@ void server_start (Server* server) {
 	server->pid = getpid();
 	srv = server;
 	signal (SIGINT, handle_sigint);
-	signal (SIGUSR1, handle_sigusr1);
-	signal (SIGUSR2, handle_sigusr2);
 	
 	addrlen = sizeof(clientaddr);
 	server->keep_alive = 1;
 #ifndef AUTOGENTOO_NO_THREADS
 	server->pool_handler = pool_handler_new(32);
 #endif
-	
-	server->job_handler = worker_handler_new(server);
-	worker_handler_start(server->job_handler);
 	
 	AccessToken org_creation_token;
 	org_creation_token.host_id = NULL;
@@ -84,6 +79,9 @@ void server_start (Server* server) {
 	}
 	
 	write_server(server);
+	
+	server->job_handler = worker_handler_new(server);
+	worker_handler_start(server->job_handler);
 	
 	while (server->keep_alive) { // Main accept loop
 		int temp_fd = accept4(server->socket, (struct sockaddr*) &clientaddr, &addrlen, SOCK_CLOEXEC);

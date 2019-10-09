@@ -9,7 +9,6 @@
 #include <autogentoo/crypt.h>
 #include <string.h>
 #include "autogentoo/worker.h"
-#include <fcntl.h>
 
 int server_init(short port) {
 	int listenfd = -1;
@@ -59,6 +58,7 @@ Server* server_new (char* location, char* port, server_t opts) {
 	
 	pthread_mutex_init(&out->config_mutex, NULL);
 	pthread_mutex_init(&out->ack_mutex, NULL);
+	pthread_mutex_init(&out->worker_ready, NULL);
 	
 	return out;
 }

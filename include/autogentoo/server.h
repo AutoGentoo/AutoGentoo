@@ -106,6 +106,7 @@ struct __Server {
 	
 	pthread_mutex_t config_mutex;
 	pthread_mutex_t ack_mutex;
+	pthread_mutex_t worker_ready;
 };
 
 #ifndef connection_read
@@ -251,8 +252,6 @@ void server_encrypt_free (EncryptServer* server);
 void server_kill(Server* server);
 
 void handle_sigint (int sig);
-void handle_sigusr1(int sig);
-void handle_sigusr2(int sig);
 
 char* server_get_path (Server* parent, char* path);
 

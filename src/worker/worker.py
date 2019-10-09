@@ -7,6 +7,7 @@ from client import *
 import importlib
 from script import *
 
+logfp = None
 WORKER_FIFO_REQUEST = "/tmp/autogentoo_worker.req"
 WORKER_FIFO_RESPONSE = "/tmp/autogentoo_worker.res"
 
@@ -40,6 +41,7 @@ class Worker:
 		mkdir("logs")
 		
 		while self.keep_alive:
+			self.server.read()
 			self.read_lck.acquire()
 			
 			command_enum = self.read_int()
@@ -130,30 +132,37 @@ class Job:
 		logfile = "logs/%s.log" % self.job_name
 		touch(logfile + ".lck")
 		
+		# Fork this process to give a response
 		self.pid = os.fork()
 		if self.pid == 0:
 			working_dir = os.getcwd()
 			
-			global logfp
-			logfp = open(logfile, "a+")
-			sys.stdout = logfp
-			sys.stderr = logfp
-			
 			# Run the script
 			importlib.reload(self.module)
 			
-			try:
-				ret = self.module.script(self.job_name, self.host, self.args)
-			except Exception:
-				traceback.print_exc()
-				ret = 1
-			
-			cd(working_dir)
-			rm(logfile + ".lck")
-			
-			logfp.close()
-			
-			exit(ret)
+			script_pid = os.fork()
+			if script_pid == 0:
+				global logfp
+				logfp = open(logfile, "a+")
+				sys.stdout = logfp
+				sys.stderr = logfp
+				
+				try:
+					ret = self.module.script(self.job_name, self.host, self.args)
+				except Exception:
+					traceback.print_exc()
+					ret = 1
+				
+				logfp.close()
+				
+				exit(ret)
+			else:
+				pid, status = os.waitpid(script_pid, 0)
+				
+				cd(working_dir)
+				rm(logfile + ".lck")
+				
+				exit(status)
 		
 		return 0
 

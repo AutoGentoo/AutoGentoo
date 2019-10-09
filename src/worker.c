@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <string.h>
 #include <fcntl.h>
+#include <sys/file.h>
 
 WorkerHandler* worker_handler_new(Server* parent) {
 	WorkerHandler* out = malloc(sizeof(WorkerHandler));
@@ -34,6 +35,8 @@ WorkerHandler* worker_handler_new(Server* parent) {
 }
 
 int worker_handler_start(WorkerHandler* wh) {
+	pthread_mutex_lock(&wh->parent->worker_ready);
+	
 	if (mkfifo(WORKER_FIFO_REQUEST, 0600) == -1) {
 		if (errno != EEXIST) {
 			lerror("Failed to init req_fifo: %s", strerror(errno));
@@ -71,6 +74,8 @@ int worker_handler_start(WorkerHandler* wh) {
 	}
 	
 	pthread_create(&wh->pid, NULL, (void* (*) (void*))worker_handler_loop, wh);
+	pthread_mutex_lock(&wh->parent->worker_ready);
+	pthread_mutex_unlock(&wh->parent->worker_ready);
 	
 	return 0;
 }
@@ -218,38 +223,10 @@ void worker_handler_free(WorkerHandler* wh) {
 	linfo("Exited WorkerHandler with worker_handler_free()");
 }
 
-void worker_toggle(Server* server) {
-	if (pthread_mutex_trylock(&srv->config_mutex) == EBUSY)
-		pthread_mutex_unlock(&srv->config_mutex);
-	else
-		pthread_mutex_lock(&srv->config_mutex);
-	
-	kill(srv->job_handler->worker_pid, SIGUSR2);
+void worker_lock(int fd) {
+	flock(fd, LOCK_EX);
 }
 
-void worker_lock(Server* server) {
-	pthread_mutex_lock(&server->config_mutex);
-	kill(srv->job_handler->worker_pid, SIGUSR1);
-	
-	pthread_mutex_lock(&server->ack_mutex);
-	
-	if (server->keep_alive) /* Wait for SIGUSR2 */
-		pthread_mutex_lock(&server->ack_mutex);
-	
-	pthread_mutex_unlock(&server->ack_mutex);
-}
-
-void worker_unlock(Server* server) {
-	pthread_mutex_unlock(&server->config_mutex);
-	kill(srv->job_handler->worker_pid, SIGUSR1);
-	pthread_mutex_lock(&server->ack_mutex);
-	
-	if (server->keep_alive) /* Wait for SIGUSR2 */
-		pthread_mutex_lock(&server->ack_mutex);
-	
-	pthread_mutex_unlock(&server->ack_mutex);
-}
-
-void worker_ack(Server* server) {
-	pthread_mutex_unlock(&server->ack_mutex);
+void worker_unlock(int fd) {
+	flock(fd, LOCK_UN);
 }
