@@ -66,32 +66,125 @@ PortageDependency* pd_find_atm(Emerge* parent, P_Atom* atom) {
 }
 */
 
-void __pd_layer_resolve__(Emerge* parent, Dependency* depend, Ebuild* target, Vector* ebuild_set) {
+SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild, Dependency* dep) {
+	Package* pkg = atom_resolve_package(emerge, dep->atom);
+	if (!pkg)
+		return NULL;
+	
+	SelectedEbuild* out = package_resolve_ebuild(pkg, dep->atom);
+	if (!out) {
+		char* atom_str = atom_get_str(dep->atom);
+		plog_error("All ebuilds matching %s have been masked", atom_str);
+		free(atom_str);
+		return NULL;
+	}
+	
+	out->selected_by = dep;
+	out->useflags = NULL;
+	
+	for (UseFlag* current_use = out->ebuild->use; current_use; current_use = current_use->next) {
+		UseFlag* new_flag = malloc(sizeof(UseFlag));
+		
+		new_flag->next = out->useflags;
+		new_flag->name = strdup(current_use->name);
+		new_flag->status = current_use->status;
+		
+		out->useflags = new_flag;
+	}
+	
+	for (AtomFlag* current_use = dep->atom->useflags; current_use; current_use = current_use->next) {
+		/*
+		ATOM_USE_DISABLE, //!< atom[-bar]
+		ATOM_USE_ENABLE, //!< atom[bar]
+		ATOM_USE_ENABLE_IF_ON, //!< atom[bar?]
+		ATOM_USE_DISABLE_IF_OFF, //!< atom[!bar?]
+		ATOM_USE_EQUAL, //!< atom[bar=]
+		ATOM_USE_OPPOSITE //!< atom[!bar=]
+		
+		ATOM_NO_DEFAULT, //!< use
+		ATOM_DEFAULT_ON, //!< use(+)
+		ATOM_DEFAULT_OFF, //!< use(-)
+		
+		 */
+		
+		if (current_use->def == ATOM_NO_DEFAULT) {
+			if (current_use->def == ATOM_USE_ENABLE)
+				s_ebuild_set_use(out, current_use->name, USE_ENABLE);
+			else if (current_use->def == ATOM_USE_DISABLE)
+				s_ebuild_set_use(out, current_use->name, USE_DISABLE);
+			else if (current_use->def == ATOM_USE_ENABLE_IF_ON) {
+				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
+				if (parent_flag && parent_flag->status == USE_ENABLE)
+					s_ebuild_set_use(out, current_use->name, USE_ENABLE);
+			}
+			else if (current_use->def == ATOM_USE_DISABLE_IF_OFF) {
+				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
+				if (parent_flag && parent_flag->status == USE_DISABLE)
+					s_ebuild_set_use(out, current_use->name, USE_DISABLE);
+			}
+			else if (current_use->def == ATOM_USE_EQUAL) {
+				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
+				s_ebuild_set_use(out, current_use->name, parent_flag->status);
+			}
+			else if (current_use->def == ATOM_USE_OPPOSITE) {
+				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
+				s_ebuild_set_use(out, current_use->name, parent_flag->status == USE_ENABLE ? USE_DISABLE : USE_ENABLE);
+			}
+		}
+		else {
+			UseFlag* flag = s_ebuild_get_use(out, current_use->name);
+			if (flag) {
+				if (current_use->option == ATOM_USE_ENABLE)
+					flag->status = USE_ENABLE;
+				else if (current_use->option == ATOM_USE_DISABLE)
+					flag->status = USE_DISABLE;
+			}
+			else { /* Flag not found, use the default value and add it to the ebuild */
+				flag = malloc(sizeof(UseFlag));
+				flag->name = strdup(current_use->name);
+				flag->status = current_use->def == ATOM_DEFAULT_ON ? USE_ENABLE : USE_DISABLE;
+				flag->next = out->useflags;
+				out->useflags = flag;
+			}
+		}
+	}
+	
+	if (!ebuild_check_required_use(out))
+		exit(1);
+	
+	return out;
+}
+
+void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* target, Vector* ebuild_set) {
 	for (Dependency* current_depend = depend; current_depend; current_depend = current_depend->next) {
 		if (current_depend->depends == HAS_DEPENDS) {
 			/* Do logical evaluation for use flags */
 			if ((depend->selector == USE_DISABLE || depend->selector == USE_ENABLE)) {
-				if (depend->selector == ebuild_check_use(target, depend->target))
+				UseFlag* u = s_ebuild_get_use(target, depend->target);
+				if (u && u->status == depend->selector)
 					__pd_layer_resolve__(parent, current_depend->selectors, target, ebuild_set);
 			}
 			else if (depend->selector == USE_LEAST_ONE) {
-			
+				for (Dependency* least_one_iter = depend->selectors; least_one_iter; least_one_iter = least_one_iter->next) {
+				
+				}
 			}
 			else
 				portage_die("Illegal operator %s in a dependency expression", depend->target);
 			continue;
 		}
 		
+		SelectedEbuild* se = pd_resolve_single(parent, target, current_depend);
+		if (!se)
+			exit(1);
 		
-		/* Resolve the ebuild */ /*
-		Package* pkg = atom_resolve_package(parent, current_depend->atom);
-		Ebuild* resolved = package_resolve_ebuild(pkg, current_depend->atom);
-		set_add(ebuild_set, resolved); */
+		__pd_layer_resolve__(parent, current_depend, se, ebuild_set);
+		vector_add(ebuild_set, se);
 	}
 }
 
-void pd_layer_resolve(Emerge* parent, Dependency* depend, Ebuild* target) {
-	Vector* ebuild_set = small_map_new(32);
+void pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild *target) {
+	SmallMap* ebuild_set = small_map_new(32);
 	__pd_layer_resolve__(parent, depend, target, ebuild_set);
 }
 
@@ -190,7 +283,6 @@ SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 				int cmp = ebuild_installedebuild_cmp(out->ebuild, out->installed);
 				if (cmp > 0)
 					out->action = PORTAGE_UPDATE;
-				
 				
 				return out;
 			}

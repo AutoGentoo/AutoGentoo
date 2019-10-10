@@ -2,7 +2,6 @@
 // Created by atuser on 4/23/19.
 //
 
-#include "portage_log.h"
 #include <time.h>
 #include <stdarg.h>
 #include <errno.h>

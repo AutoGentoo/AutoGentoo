@@ -24,27 +24,6 @@ add_definitions(-DAUTOGENTOO_WORKER_DIR="${CMAKE_SOURCE_DIR}/src/worker")
 add_definitions(-DDBPATH="test")
 add_definitions(-DAUTOGENTOO_DEBUG)
 
-# PYTHON EXTENSION LIBS
-
-find_package(PythonInterp 3.6 REQUIRED)
-find_package(PythonLibs 3.6 REQUIRED)
-
-add_library(cportage_api SHARED
-        cportage/cportage_api.c
-        cportage/cportage_api.h
-        )
-
-set_target_properties(
-        cportage_api
-        PROPERTIES
-        PREFIX ""
-        OUTPUT_NAME "cportage_api"
-        LINKER_LANGUAGE C
-)
-
-# END PYTHON EXTENSION LIBS
-
-
 add_library(autogentoo SHARED
         ${include_HEADERS}
         ${src_SOURCES}

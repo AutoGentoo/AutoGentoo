@@ -13,7 +13,6 @@
 #include "dependency.h"
 #include <stdlib.h>
 #include <share.h>
-#include <string.h>
 #include <ctype.h>
 
 /**
@@ -37,14 +36,39 @@ use_select_t ebuild_set_use(Ebuild* ebuild, char* useflag, use_select_t new_val)
 	return -1;
 }
 
-use_select_t ebuild_check_use(Ebuild* ebuild, char* useflag) {
-	UseFlag* current;
-	for (current = ebuild->use; current; current = current->next) {
-		if (strcmp(current->name, useflag) == 0)
-			return current->status;
+use_select_t s_ebuild_set_use(SelectedEbuild* ebuild, char* useflag, use_select_t new_val) {
+	UseFlag* target = s_ebuild_get_use(ebuild, useflag);
+	if (!target) {
+		plog_warn("Flag %s not found for ebuild %s-%s", useflag, ebuild->ebuild->parent->key, ebuild->ebuild->version->full_version);
+		return -1;
 	}
 	
-	return -1;
+	use_select_t out = target->status;
+	target->status = new_val;
+	
+	UseFlag* new_explicit = malloc(sizeof(UseFlag));
+	new_explicit->status = new_val;
+	new_explicit->name = strdup(target->name);
+	new_explicit->next = ebuild->explicit_flags;
+	ebuild->explicit_flags = new_explicit->next;
+	
+	return out;
+}
+
+UseFlag* s_ebuild_get_use(SelectedEbuild *ebuild, char* useflag) {
+	for (UseFlag* current = ebuild->useflags; current; current = current->next)
+		if (strcmp(current->name, useflag) == 0)
+			return current;
+	
+	return NULL;
+}
+
+use_select_t ebuild_check_use(Ebuild *ebuild, char* useflag) {
+	for (UseFlag* current = ebuild->use; current; current = current->next)
+		if (strcmp(current->name, useflag) == 0)
+			return current->status;
+	
+	return USE_NONE;
 }
 
 RequiredUse* use_build_required_use(char* target, use_select_t option) {
@@ -96,13 +120,18 @@ char* use_expr_str(RequiredUse* expr) {
 	return out;
 }
 
-int use_check_expr(Ebuild* ebuild, RequiredUse* expr) {
+int use_check_expr(SelectedEbuild *ebuild, RequiredUse* expr) {
 	if (expr->option == USE_ENABLE || expr->option == USE_DISABLE) {
+		UseFlag* u = s_ebuild_get_use(ebuild, expr->target);
+		use_select_t status = USE_NONE;
+		if (u)
+			status = u->status;
+		
 		if (expr->depend) {
-			if (ebuild_check_use(ebuild, expr->target) != expr->option)
+			if (status != expr->option)
 				return use_check_expr(ebuild, expr->depend);
 		} else {
-			if (expr->option == ebuild_check_use(ebuild, expr->target))
+			if (expr->option == status)
 				return 1;
 			return 0;
 		}
@@ -124,10 +153,10 @@ int use_check_expr(Ebuild* ebuild, RequiredUse* expr) {
 	return 0;
 }
 
-int ebuild_check_required_use(Ebuild* ebuild) {
-	if (!ebuild->required_use)
+int ebuild_check_required_use(SelectedEbuild *ebuild) {
+	if (!ebuild->ebuild->required_use)
 		return 1;
-	for (RequiredUse* expr = ebuild->required_use; expr; expr = expr->next) {
+	for (RequiredUse* expr = ebuild->ebuild->required_use; expr; expr = expr->next) {
 		if (use_check_expr(ebuild, expr) == 0) {
 			char* expr_fail = use_expr_str(expr);
 			plog_warn("Required use not met");

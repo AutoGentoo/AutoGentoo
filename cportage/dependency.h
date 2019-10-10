@@ -6,6 +6,7 @@
 #define AUTOGENTOO_DEPENDENCY_H
 
 #include <autogentoo/hacksaw/vector.h>
+#include <autogentoo/hacksaw/hacksaw.h>
 #include "constants.h"
 #include "atom.h"
 
@@ -29,18 +30,9 @@ struct __SelectedEbuild {
 	Ebuild* ebuild;
 	
 	dependency_t action;
-	Vector* requested_use_flags;
-};
-
-struct __PortageDependency {
-	/* Linked by selected_by->portage_depend_next */
-	Dependency* selected_by;
-	Ebuild* ebuild;
 	
-	/* Two ebuild from the same ebuild may be installed on different slots */
-	char* slot;
-	char* sub_slot;
-	
+	UseFlag* useflags;
+	UseFlag* explicit_flags;
 };
 
 /**
@@ -53,7 +45,7 @@ struct __PortageDependency {
  * @param parent the emerge environment
  * @param depend expression to look at
  */
-void pd_layer_resolve(Emerge* parent, Dependency* depend, Ebuild* target);
+void pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild *target);
 
 /**
  * Do the actually dependency tree with useflag checks etc...

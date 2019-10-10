@@ -116,8 +116,6 @@ set(src_CPORTAGE
         cportage/suggestion.c
         cportage/suggestion.h
         cportage/cportage_defines.h
-        cportage/cportage_api.c
-        cportage/cportage_api.h
         )
 
 set(language_SOURCES
