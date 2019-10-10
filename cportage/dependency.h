@@ -45,7 +45,7 @@ struct __SelectedEbuild {
  * @param parent the emerge environment
  * @param depend expression to look at
  */
-void pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild *target);
+Vector * pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild *target);
 
 /**
  * Do the actually dependency tree with useflag checks etc...
@@ -59,5 +59,6 @@ void pd_layer_2(Emerge* parent, Dependency* depend, Ebuild* target);
 Package* atom_resolve_package(Emerge* emerge, P_Atom* atom);
 int pd_slot_cmp(char* slot_1, char* sub_slot_1, char* slot_2, char* sub_slot_2);
 SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom);
+void selected_ebuild_free(SelectedEbuild* se);
 
 #endif //AUTOGENTOO_DEPENDENCY_H

@@ -66,18 +66,20 @@ PortageDependency* pd_find_atm(Emerge* parent, P_Atom* atom) {
 }
 */
 
-SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild, Dependency* dep) {
+SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild, Dependency* dep, Vector* selected) {
 	Package* pkg = atom_resolve_package(emerge, dep->atom);
 	if (!pkg)
-		return NULL;
+		exit(1);
 	
 	SelectedEbuild* out = package_resolve_ebuild(pkg, dep->atom);
 	if (!out) {
 		char* atom_str = atom_get_str(dep->atom);
 		plog_error("All ebuilds matching %s have been masked", atom_str);
 		free(atom_str);
-		return NULL;
+		exit(1);
 	}
+	
+	package_metadata_init(out->ebuild);
 	
 	out->selected_by = dep;
 	out->useflags = NULL;
@@ -152,7 +154,62 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	if (!ebuild_check_required_use(out))
 		exit(1);
 	
-	return out;
+	/* Check if slot is already selected */
+	SelectedEbuild* prev_sel = NULL;
+	for (int i = 0; i < selected->n; i++) {
+		SelectedEbuild* current = vector_get(selected, i);
+		
+		if (current->ebuild->parent != out->ebuild->parent)
+			continue;
+		
+		/* Short circuit if the same ebuild */
+		if (current->ebuild == out->ebuild) {
+			prev_sel = current;
+			break;
+		}
+		
+		if (strcmp(current->ebuild->slot, out->ebuild->slot) == 0) {
+			prev_sel = current;
+			break;
+		}
+	}
+	
+	/* Not selected yet, good to go! */
+	if (!prev_sel)
+		return out;
+	
+	UseFlag* sel_explicit_key = NULL;
+	UseFlag* out_explicit_key = NULL;
+	for (sel_explicit_key = prev_sel->explicit_flags; sel_explicit_key; sel_explicit_key = sel_explicit_key->next) {
+		for (out_explicit_key = out->explicit_flags; out_explicit_key; out_explicit_key = out_explicit_key->next) {
+			if (strcmp(sel_explicit_key->name, out_explicit_key->name) == 0 && sel_explicit_key->status != out_explicit_key->status)
+				break;
+		}
+		
+		if (out_explicit_key) /* Error */
+			break;
+	}
+	
+	if (sel_explicit_key) /* Error */ {
+		plog_error("Selected packages could not resolve use conflict");
+		
+		char* atom_1 = atom_get_str(prev_sel->selected_by->atom);
+		char* atom_2 = atom_get_str(out->selected_by->atom);
+		plog_error("%s wants %c%s", atom_1, sel_explicit_key->status == USE_ENABLE ? '+' : '-', sel_explicit_key->name);
+		plog_error("%s wants %c%s", atom_2, out_explicit_key->status == USE_ENABLE ? '+' : '-', out_explicit_key->name);
+		
+		free(atom_1);
+		free(atom_2);
+		
+		exit(1);
+	}
+	
+	for (UseFlag* use = out->explicit_flags; use; use = use->next)
+		s_ebuild_set_use(prev_sel, use->name, use->status);
+	
+	selected_ebuild_free(out);
+	
+	return NULL;
 }
 
 void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* target, Vector* ebuild_set) {
@@ -174,18 +231,26 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 			continue;
 		}
 		
-		SelectedEbuild* se = pd_resolve_single(parent, target, current_depend);
-		if (!se)
-			exit(1);
+		SelectedEbuild* se = pd_resolve_single(parent, target, current_depend, ebuild_set);
 		
-		__pd_layer_resolve__(parent, current_depend, se, ebuild_set);
+		/* Could be dangerous because use flags could change dependencies */
+		if (!se) /* Already resolved */
+			continue;
+		
 		vector_add(ebuild_set, se);
+		
+		__pd_layer_resolve__(parent, se->ebuild->bdepend, se, ebuild_set);
+		__pd_layer_resolve__(parent, se->ebuild->depend, se, ebuild_set);
+		__pd_layer_resolve__(parent, se->ebuild->rdepend, se, ebuild_set);
+		__pd_layer_resolve__(parent, se->ebuild->pdepend, se, ebuild_set);
 	}
 }
 
-void pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild *target) {
-	SmallMap* ebuild_set = small_map_new(32);
+Vector * pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild *target) {
+	Vector* ebuild_set = vector_new(VECTOR_ORDERED | VECTOR_KEEP);
 	__pd_layer_resolve__(parent, depend, target, ebuild_set);
+	
+	return ebuild_set;
 }
 
 Package* atom_resolve_package(Emerge* emerge, P_Atom* atom) {
@@ -290,4 +355,11 @@ SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 	}
 	
 	return NULL;
+}
+
+void selected_ebuild_free(SelectedEbuild* se) {
+	useflag_free(se->useflags);
+	useflag_free(se->explicit_flags);
+	
+	free(se);
 }

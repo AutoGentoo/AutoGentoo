@@ -84,18 +84,19 @@ add_executable(autogentoo-aabs
         ${arch_HEADERS}
         )
 
-add_executable(autogentoo-test
-        ${test_SOURCES}
-        )
 
-target_link_libraries(
-        autogentoo-test
-        cmocka
-        autogentoo
-        ssl
-        pthread
-        m
-)
+#add_executable(autogentoo-test
+#        ${test_SOURCES}
+#        )
+
+#target_link_libraries(
+#        autogentoo-test
+#        cmocka
+#        autogentoo
+#        ssl
+#        pthread
+#        m
+#)
 
 target_link_libraries(
         autogentoo-aabs

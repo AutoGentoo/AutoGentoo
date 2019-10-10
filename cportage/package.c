@@ -54,6 +54,10 @@ void package_metadata_init(Ebuild* ebuild) {
 			ebuild->required_use = required_use_parse(value);
 		else if (strcmp(name, "KEYWORDS") == 0)
 			keyword_parse(ebuild->keywords, value);
+		else if (strcmp(name, "IUSE") == 0) {
+			UseFlag* new = malloc(sizeof(UseFlag));
+			new->
+		}
 	}
 	
 	ebuild->metadata_init = 1;

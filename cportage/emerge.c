@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include "portage.h"
+#include "dependency.h"
 
 Emerge* emerge_new() {
 	Emerge* out = malloc(sizeof(Emerge));
@@ -71,8 +72,24 @@ int emerge (Emerge* emerge) {
 	emerge_parse_keywords(emerge);
 	emerge_parse_useflags(emerge);
 	
-	for (char** atom = emerge->atoms; *atom; atom++) {
+	char* dep_expr_buff = NULL;
+	size_t dep_expr_size = 0;
+	for (int i = 0; emerge->atoms[i]; i++)
+		dep_expr_size += strlen(emerge->atoms[i]) + 1;
 	
+	dep_expr_buff = malloc(dep_expr_size);
+	dep_expr_buff[0] = 0;
+	
+	for (int i = 0; emerge->atoms[i]; i++)
+		strcat(dep_expr_buff, emerge->atoms[i]);
+	
+	Dependency* dep = depend_parse(dep_expr_buff);
+	
+	Vector* selected = pd_layer_resolve(emerge, dep, NULL);
+	
+	for (int i = 0; i < selected->n; i++) {
+		SelectedEbuild* eb = vector_get(selected, i);
+		plog_info("PACKAGE %s/%s", eb->ebuild->category, eb->ebuild->pn, eb->ebuild->version->full_version);
 	}
 	
 	return 0;
