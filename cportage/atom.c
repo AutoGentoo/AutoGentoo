@@ -245,7 +245,6 @@ int atom_version_compare(AtomVersion* first, AtomVersion* second) {
 	AtomVersion* cf = first;
 	AtomVersion* cs = second;
 	
-	int cmp_temp;
 	for (; cf && cs; cf = cf->next, cs = cs->next) {
 		char* scf = cf->v;
 		char* scs = cs->v;
@@ -268,7 +267,11 @@ int atom_version_compare(AtomVersion* first, AtomVersion* second) {
 			scs[scs_l - 1] = 0;
 		}
 		
-		int cmp = strcmp(scf, scs);
+		char* temp;
+		int cmp_1 = (int)strtol(scf, &temp, 10);
+		int cmp_2 = (int)strtol(scs, &temp, 10);
+		
+		int cmp = cmp_1 - cmp_2;
 		int cmp_suf = scf_suf - scs_suf;
 		if (cmp != 0)
 			return cmp;

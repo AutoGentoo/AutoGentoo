@@ -16,6 +16,9 @@
 #include "database.h"
 
 void package_metadata_init(Ebuild* ebuild) {
+	if (ebuild->metadata_init)
+		return;
+	
 	FILE* fp = fopen(ebuild->atom_manifest->full_path, "r");
 	if (!fp) {
 		plog_error("Failed to open %s", ebuild->atom_manifest->full_path);
@@ -48,16 +51,20 @@ void package_metadata_init(Ebuild* ebuild) {
 			ebuild->pdepend = depend_parse(value);
 		else if (strcmp(name, "BDEPEND") == 0)
 			ebuild->bdepend = depend_parse(value);
-		else if (strcmp(name, "SLOT") == 0)
-			ebuild->slot = strdup(value);
+		else if (strcmp(name, "SLOT") == 0) {
+			char* tok = strtok(value, "/");
+			ebuild->slot = strdup(tok);
+			
+			tok = strtok(NULL, "/");
+			if (tok)
+				ebuild->sub_slot = strdup(tok);
+		}
 		else if (strcmp(name, "REQUIRED_USE") == 0)
 			ebuild->required_use = required_use_parse(value);
 		else if (strcmp(name, "KEYWORDS") == 0)
 			keyword_parse(ebuild->keywords, value);
-		else if (strcmp(name, "IUSE") == 0) {
-			UseFlag* new = malloc(sizeof(UseFlag));
-			new->
-		}
+		else if (strcmp(name, "IUSE") == 0)
+			ebuild->use = useflag_iuse_parse(value);
 	}
 	
 	ebuild->metadata_init = 1;

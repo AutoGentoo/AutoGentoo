@@ -108,7 +108,7 @@ repo            [\:][\:]{identifier}
 [\*]                    {return '*';}
 
 {identifier}            {
-                            yylval.identifier = yytext;
+                            yylval.identifier = strdup(yytext);
                             return (IDENTIFIER);
                         }
 

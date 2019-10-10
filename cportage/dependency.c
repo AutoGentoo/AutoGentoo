@@ -73,9 +73,13 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	
 	SelectedEbuild* out = package_resolve_ebuild(pkg, dep->atom);
 	if (!out) {
+		errno = 0;
 		char* atom_str = atom_get_str(dep->atom);
 		plog_error("All ebuilds matching %s have been masked", atom_str);
+		if (parent_ebuild)
+			plog_error("Required by %s-%s", parent_ebuild->ebuild->parent->key, parent_ebuild->ebuild->pv);
 		free(atom_str);
+		
 		exit(1);
 	}
 	
@@ -155,24 +159,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		exit(1);
 	
 	/* Check if slot is already selected */
-	SelectedEbuild* prev_sel = NULL;
-	for (int i = 0; i < selected->n; i++) {
-		SelectedEbuild* current = vector_get(selected, i);
-		
-		if (current->ebuild->parent != out->ebuild->parent)
-			continue;
-		
-		/* Short circuit if the same ebuild */
-		if (current->ebuild == out->ebuild) {
-			prev_sel = current;
-			break;
-		}
-		
-		if (strcmp(current->ebuild->slot, out->ebuild->slot) == 0) {
-			prev_sel = current;
-			break;
-		}
-	}
+	SelectedEbuild* prev_sel = pd_check_selected(selected, out);
 	
 	/* Not selected yet, good to go! */
 	if (!prev_sel)
@@ -212,22 +199,57 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	return NULL;
 }
 
-void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* target, Vector* ebuild_set) {
+void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* target, Vector* ebuild_set, Vector* blocked_set) {
 	for (Dependency* current_depend = depend; current_depend; current_depend = current_depend->next) {
 		if (current_depend->depends == HAS_DEPENDS) {
 			/* Do logical evaluation for use flags */
-			if ((depend->selector == USE_DISABLE || depend->selector == USE_ENABLE)) {
-				UseFlag* u = s_ebuild_get_use(target, depend->target);
-				if (u && u->status == depend->selector)
-					__pd_layer_resolve__(parent, current_depend->selectors, target, ebuild_set);
+			if ((current_depend->selector == USE_DISABLE || current_depend->selector == USE_ENABLE)) {
+				UseFlag* u = s_ebuild_get_use(target, current_depend->target);
+				if (u && u->status == current_depend->selector)
+					__pd_layer_resolve__(parent, current_depend->selectors, target, ebuild_set, blocked_set);
 			}
-			else if (depend->selector == USE_LEAST_ONE) {
-				for (Dependency* least_one_iter = depend->selectors; least_one_iter; least_one_iter = least_one_iter->next) {
+			else if (current_depend->selector == USE_LEAST_ONE) {
+				for (Dependency* least_one_iter = current_depend->selectors; least_one_iter; least_one_iter = least_one_iter->next) {
 				
 				}
 			}
 			else
-				portage_die("Illegal operator %s in a dependency expression", depend->target);
+				portage_die("Illegal operator %s in a dependency expression", current_depend->target);
+			continue;
+		}
+		
+		
+		if (current_depend->atom->blocks != ATOM_BLOCK_NONE) {
+			Package* resolved_package = atom_resolve_package(parent, current_depend->atom);
+			if (!resolved_package)
+				continue;
+			
+			for (int i = 0; i < ebuild_set->n; i++) {
+				SelectedEbuild* current_se = vector_get(ebuild_set, i);
+				if (resolved_package != current_se->ebuild->parent)
+					continue;
+				
+				if (atom_match_ebuild(current_se->ebuild, current_depend->atom)) {
+					char* blocker = atom_get_str(target->selected_by->atom);
+					char* blocked_pkg = atom_get_str(current_se->selected_by->atom);
+					
+					if (current_depend->atom->blocks == ATOM_BLOCK_SOFT) {
+						plog_info("%s may not be installed at the same time as %s", blocked_pkg, blocker);
+						plog_info("Install %s first then rerun", blocked_pkg);
+						plog_info("emerge --oneshot %s", blocked_pkg);
+						
+					}
+					else if (current_depend->atom->blocks == ATOM_BLOCK_HARD)
+						portage_die("%s may not be installed with %s installed", blocked_pkg, blocker);
+					
+					free(blocked_pkg);
+					free(blocker);
+					exit(1);
+				}
+			}
+			
+			
+			/* Check for installed package for hard blockers */
 			continue;
 		}
 		
@@ -239,16 +261,17 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 		
 		vector_add(ebuild_set, se);
 		
-		__pd_layer_resolve__(parent, se->ebuild->bdepend, se, ebuild_set);
-		__pd_layer_resolve__(parent, se->ebuild->depend, se, ebuild_set);
-		__pd_layer_resolve__(parent, se->ebuild->rdepend, se, ebuild_set);
-		__pd_layer_resolve__(parent, se->ebuild->pdepend, se, ebuild_set);
+		__pd_layer_resolve__(parent, se->ebuild->bdepend, se, ebuild_set, blocked_set);
+		__pd_layer_resolve__(parent, se->ebuild->depend, se, ebuild_set, blocked_set);
+		__pd_layer_resolve__(parent, se->ebuild->rdepend, se, ebuild_set, blocked_set);
+		__pd_layer_resolve__(parent, se->ebuild->pdepend, se, ebuild_set, blocked_set);
 	}
 }
 
 Vector * pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild *target) {
 	Vector* ebuild_set = vector_new(VECTOR_ORDERED | VECTOR_KEEP);
-	__pd_layer_resolve__(parent, depend, target, ebuild_set);
+	Vector* blocked_set = vector_new(VECTOR_ORDERED | VECTOR_KEEP);
+	__pd_layer_resolve__(parent, depend, target, ebuild_set, blocked_set);
 	
 	return ebuild_set;
 }
@@ -311,9 +334,6 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 		return 1;
 	}
 	
-	if (pd_compare_range(cmp, atom->range))
-		return 1;
-	
 	if (cmp == 0 && atom->range & ATOM_VERSION_E) {
 		if (atom->range == ATOM_VERSION_E) {
 			if (cmp_rev == 0)
@@ -322,12 +342,16 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 			return 1;
 	}
 	
+	if (pd_compare_range(cmp, atom->range))
+		return 1;
+	
 	return 0;
 }
 
 SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 	Ebuild* current;
 	for (current = pkg->ebuilds; current; current = current->older) {
+		package_metadata_init(current);
 		if (atom_match_ebuild(current, atom)) {
 			keyword_t accept_keyword = KEYWORD_STABLE;
 			if (!current->metadata_init)
@@ -339,6 +363,8 @@ SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 						accept_keyword = keyword->keywords[pkg->parent->parent->target_arch];
 			if (current->keywords[pkg->parent->parent->target_arch] >= accept_keyword) {
 				SelectedEbuild* out = malloc(sizeof(SelectedEbuild));
+				out->useflags = NULL;
+				out->explicit_flags = NULL;
 				out->ebuild = current;
 				out->installed = portagedb_resolve_installed(pkg->parent->parent->database, atom);
 				
@@ -351,6 +377,26 @@ SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 				
 				return out;
 			}
+		}
+	}
+	
+	return NULL;
+}
+
+SelectedEbuild* pd_check_selected(Vector* selected, SelectedEbuild* se) {
+	for (int i = 0; i < selected->n; i++) {
+		SelectedEbuild* current = vector_get(selected, i);
+		
+		if (current->ebuild->parent != se->ebuild->parent)
+			continue;
+		
+		/* Short circuit if the same ebuild */
+		if (current->ebuild == se->ebuild) {
+			return current;
+		}
+		
+		if (strcmp(current->ebuild->slot, se->ebuild->slot) == 0) {
+			return current;
 		}
 	}
 	

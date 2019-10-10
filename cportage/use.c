@@ -89,9 +89,9 @@ static char* use_select_prefix[] = {
 		"", //None
 		"!",
 		"",
-		"||",
-		"^^",
-		"??"
+		"",
+		"",
+		""
 };
 
 static char* use_select_suffix[] = {
@@ -128,13 +128,12 @@ int use_check_expr(SelectedEbuild *ebuild, RequiredUse* expr) {
 			status = u->status;
 		
 		if (expr->depend) {
-			if (status != expr->option)
+			if (status == expr->option)
 				return use_check_expr(ebuild, expr->depend);
-		} else {
-			if (expr->option == status)
-				return 1;
-			return 0;
+			return 1;
 		}
+		else
+			return expr->option == status;
 	}
 	
 	int num_true = 0;
@@ -159,7 +158,7 @@ int ebuild_check_required_use(SelectedEbuild *ebuild) {
 	for (RequiredUse* expr = ebuild->ebuild->required_use; expr; expr = expr->next) {
 		if (use_check_expr(ebuild, expr) == 0) {
 			char* expr_fail = use_expr_str(expr);
-			plog_warn("Required use not met");
+			plog_warn("Required use not met for ebuild %s-%s", ebuild->ebuild->parent->key, ebuild->ebuild->pv);
 			plog_warn(expr_fail);
 			free(expr_fail);
 			return 0;
@@ -189,6 +188,35 @@ UseFlag* useflag_new(char* name, use_select_t status) {
 	out->status = status;
 	
 	return out;
+}
+
+UseFlag* useflag_iuse_parse(char* metadata) {
+	char* token = strtok(metadata, " ");
+	UseFlag* current = NULL;
+	UseFlag* next = NULL;
+	
+	while (token) {
+		current = malloc(sizeof(UseFlag));
+		current->next = next;
+		
+		if (token[0] == '+') {
+			current->status = USE_ENABLE;
+			current->name = strdup(token + 1);
+		}
+		else if (token[0] == '-') {
+			current->status = USE_DISABLE;
+			current->name = strdup(token + 1);
+		}
+		else {
+			current->status = USE_DISABLE;
+			current->name = strdup(token);
+		}
+		
+		next = current;
+		token = strtok(NULL, " ");
+	}
+	
+	return current;
 }
 
 void useflag_free(UseFlag* ptr) {
@@ -410,11 +438,9 @@ void emerge_parse_useflags(Emerge* emerge) {
 			}
 			
 			for (Ebuild* current_ebuild = target->ebuilds; current_ebuild; current_ebuild = current_ebuild->older) {
-				/*
 				if (atom_match_ebuild(current_ebuild, current->atom) == 0)
 					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next)
 						ebuild_set_use(current_ebuild, current_flag->name, current_flag->status);
-				*/
 			}
 		}
 		

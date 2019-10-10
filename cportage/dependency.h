@@ -61,4 +61,6 @@ int pd_slot_cmp(char* slot_1, char* sub_slot_1, char* slot_2, char* sub_slot_2);
 SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom);
 void selected_ebuild_free(SelectedEbuild* se);
 
+SelectedEbuild* pd_check_selected(Vector* selected, SelectedEbuild* check);
+
 #endif //AUTOGENTOO_DEPENDENCY_H
