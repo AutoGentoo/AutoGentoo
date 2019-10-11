@@ -79,7 +79,7 @@ required_use_expr   : depend_expr_sel '(' required_use_expr ')' {$$ = use_build_
                     | '(' required_use_expr ')'                 {$$ = $2;}
                     ;
 
-depend_expr  :    depend_expr_sel[p] depend_expr[c]         {$$ = dependency_build_use($p.target, $p.t, $c);}
+depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_build_use($p.target, $p.t, $c);}
                 | '(' depend_expr[c] ')'                    {$$ = $c;}
                 | atom                                      {$$ = dependency_build_atom($1);}
                 | depend_expr depend_expr                   {$$ = $1; $1->next = $2;}

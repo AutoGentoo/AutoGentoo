@@ -256,11 +256,17 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 						}
 					}
 					
-					if (!use_match)
+					int slot_match = 1;
+					if (current_depend->atom->slot && strcmp(current_depend->atom->slot, current_se->ebuild->slot) != 0)
+						slot_match = 0;
+					else if (current_depend->atom->sub_slot && strcmp(current_depend->atom->sub_slot, current_se->ebuild->sub_slot) != 0)
+						slot_match = 0;
+					
+					if (!use_match || !slot_match)
 						continue;
 					
 					char* blocker = atom_get_str(target->selected_by->atom);
-					char* blocked_pkg = atom_get_str(current_se->selected_by->atom);
+					char* blocked_pkg = current_se->ebuild->ebuild_key;
 					if (current_depend->atom->blocks == ATOM_BLOCK_SOFT) {
 						plog_info("%s may not be installed at the same time as %s", blocked_pkg, blocker);
 						plog_info("Install %s first then rerun", blocked_pkg);
@@ -270,7 +276,6 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 					else if (current_depend->atom->blocks == ATOM_BLOCK_HARD)
 						portage_die("%s may not be installed with %s installed", blocked_pkg, blocker);
 					
-					free(blocked_pkg);
 					free(blocker);
 					exit(1);
 				}
