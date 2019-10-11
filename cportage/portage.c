@@ -11,7 +11,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <ctype.h>
 #include "emerge.h"
 #include "package.h"
 #include "directory.h"
@@ -113,10 +112,9 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 			return NULL;
 		}
 		
-		ssize_t read = 0;
 		size_t s;
 		char* line = NULL;
-		while ((read = getline(&line, &s, fp)) > 0) {
+		while (getline(&line, &s, fp) > 0) {
 			if (line[0] == '[') {
 				(*strchr(line, ']')) = 0;
 				char* current_name = strdup(line + 1);
@@ -131,6 +129,9 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 					
 					current_repo = next_repo;
 					current_repo->name = current_name;
+					
+					if (emerge->default_repo && strcmp(emerge->default_repo, current_name) == 0)
+						emerge->default_repo_ptr = current_repo;
 				}
 				else
 					free(current_name);
@@ -174,28 +175,28 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 				current_repo->location = strdup(value);
 			}
 			else if (strcmp(name, "priority") == 0)
-				current_repo->priority = atoi(value);
+				current_repo->priority = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "strict-misc-digests") == 0)
-				current_repo->strict_misc_digests = atoi(value);
+				current_repo->strict_misc_digests = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "sync-allow-hardlinks") == 0)
-				current_repo->sync_allow_hardlinks = atoi(value);
+				current_repo->sync_allow_hardlinks = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "sync-openpgp-key-path") == 0) {
 				if (current_repo->sync_openpgp_key_path)
 					free(current_repo->sync_openpgp_key_path);
 				current_repo->sync_openpgp_key_path = strdup(value);
 			}
 			else if (strcmp(name, "sync-openpgp-key-refresh-retry-count") == 0)
-				current_repo->sync_openpgp_key_refresh_retry_count = atoi(value);
+				current_repo->sync_openpgp_key_refresh_retry_count = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "sync-openpgp-key-refresh-retry-delay-exp-base") == 0)
-				current_repo->sync_openpgp_key_refresh_retry_delay_exp_base = atoi(value);
+				current_repo->sync_openpgp_key_refresh_retry_delay_exp_base = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "sync-openpgp-key-refresh-retry-delay-max") == 0)
-				current_repo->sync_openpgp_key_refresh_retry_delay_max = atoi(value);
+				current_repo->sync_openpgp_key_refresh_retry_delay_max = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "sync-openpgp-key-refresh-retry-delay-mult") == 0)
-				current_repo->sync_openpgp_key_refresh_retry_delay_mult = atoi(value);
+				current_repo->sync_openpgp_key_refresh_retry_delay_mult = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "sync-openpgp-key-refresh-retry-overall-timeout") == 0)
-				current_repo->sync_openpgp_key_refresh_retry_overall_timeout = atoi(value);
+				current_repo->sync_openpgp_key_refresh_retry_overall_timeout = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "sync-rcu") == 0)
-				current_repo->sync_rcu = atoi(value);
+				current_repo->sync_rcu = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "sync-type") == 0) {
 				if (current_repo->sync_type)
 					free(current_repo->sync_type);
@@ -207,16 +208,16 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 				current_repo->sync_uri = strdup(value);
 			}
 			else if (strcmp(name, "sync-rsync-verify-max-age") == 0)
-				current_repo->sync_rsync_verify_max_age = atoi(value);
+				current_repo->sync_rsync_verify_max_age = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "sync-rsync-verify-jobs") == 0)
-				current_repo->sync_rsync_verify_jobs = atoi(value);
+				current_repo->sync_rsync_verify_jobs = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "sync-rsync-extra-opts") == 0) {
 				n = 0;
 				current_repo->sync_rsync_extra_opts= strsplt(value, &n);
 				current_repo->sync_rsync_extra_opts[n] = NULL;
 			}
 			else if (strcmp(name, "sync-rsync-verify-metamanifest") == 0)
-				current_repo->sync_rsync_verify_metamanifest = atoi(value);
+				current_repo->sync_rsync_verify_metamanifest = (int)strtol(value, NULL, 10);
 			else if (strcmp(name, "auto_sync") == 0) {
 				if (strcmp(value, "true") == 0 || strcmp(value, "yes") == 0)
 					current_repo->auto_sync = 1;

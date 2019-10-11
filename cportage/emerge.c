@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "portage.h"
 #include "dependency.h"
+#include "globals.h"
 
 Emerge* emerge_new() {
 	Emerge* out = malloc(sizeof(Emerge));
@@ -24,6 +25,8 @@ Emerge* emerge_new() {
 	out->root = strdup("/");
 	out->options = 0;
 	out->repo = NULL;
+	out->default_repo_ptr = NULL;
+	out->default_repo = NULL;
 	
 	out->use_suggestions = NULL;
 	out->keyword_suggestions = NULL;
@@ -68,6 +71,10 @@ int emerge (Emerge* emerge) {
 			package_init(emerge->repo, current_cat, current_pkg);
 		}
 	}
+	/* Do this before package.use because globals need to be applied to packages on metadata_init()  */
+	emerge->use_expand = use_expand_new(emerge->default_repo_ptr);
+	emerge->make_conf = make_conf_new(emerge);
+	emerge->global_use = make_conf_use(emerge);
 	
 	emerge_parse_keywords(emerge);
 	emerge_parse_useflags(emerge);
@@ -84,7 +91,6 @@ int emerge (Emerge* emerge) {
 		strcat(dep_expr_buff, emerge->atoms[i]);
 	
 	Dependency* dep = depend_parse(dep_expr_buff);
-	
 	Vector* selected = pd_layer_resolve(emerge, dep, NULL);
 	
 	for (int i = 0; i < selected->n; i++) {

@@ -208,7 +208,7 @@ UseFlag* useflag_new(char* name, use_select_t status) {
 	return out;
 }
 
-UseFlag* useflag_iuse_parse(char* metadata) {
+UseFlag* useflag_iuse_parse(Emerge* em, char* metadata) {
 	char* token = strtok(metadata, " ");
 	UseFlag* current = NULL;
 	UseFlag* next = NULL;
@@ -228,6 +228,13 @@ UseFlag* useflag_iuse_parse(char* metadata) {
 		else {
 			current->status = USE_DISABLE;
 			current->name = strdup(token);
+		}
+		
+		/* Set profile use (maybe?) */
+		/* Set globals */
+		for (UseFlag* current_global = em->global_use; current_global; current_global = current_global->next) {
+			if (strcmp(current_global->name, current->name) == 0)
+				current->status = current_global->status;
 		}
 		
 		next = current;
@@ -252,27 +259,13 @@ void requireduse_free(RequiredUse* ptr) {
 	if (!ptr)
 		return;
 	
-	RequiredUse* next = NULL;
-	RequiredUse* temp = ptr;
-	while (temp) {
-		next = temp->next;
-		if (ptr->target)
-			free(ptr->target);
-		free(ptr);
-		temp = next;
-	}
+	if (ptr->depend)
+		requireduse_free(ptr->depend);
 	
-	temp = ptr->depend;
-	while (temp) {
-		next = temp->next;
-		if (ptr->target)
-			free(ptr->target);
-		free(ptr);
-		temp = next;
-	}
+	if (ptr->next)
+		requireduse_free(ptr->next);
 	
-	if (ptr->target)
-		free(ptr->target);
+	free(ptr->target);
 	free(ptr);
 }
 
@@ -458,7 +451,6 @@ void emerge_parse_useflags(Emerge* emerge) {
 			for (Ebuild* current_ebuild = target->ebuilds; current_ebuild; current_ebuild = current_ebuild->older) {
 				if (atom_match_ebuild(current_ebuild, current->atom)) {
 					package_metadata_init(current_ebuild);
-					printf("%s-%s\n", current_ebuild->parent->key, current_ebuild->pv);
 					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next)
 						ebuild_set_use(current_ebuild, current_flag->name, current_flag->status);
 				}

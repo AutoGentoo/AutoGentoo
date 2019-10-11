@@ -30,6 +30,7 @@ typedef enum {
 
 struct __Emerge {
 	char* default_repo;
+	Repository* default_repo_ptr;
 	Repository* repo;
 	char** atoms; //!< Install arguments
 	char* root;
@@ -46,6 +47,10 @@ struct __Emerge {
 	
 	PortageDB* database;
 	Vector* selected;
+	
+	Map* use_expand;
+	Map* make_conf;
+	UseFlag* global_use;
 	
 	Suggestion* use_suggestions;
 	Suggestion* keyword_suggestions;

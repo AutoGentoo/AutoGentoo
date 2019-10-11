@@ -64,7 +64,7 @@ void package_metadata_init(Ebuild* ebuild) {
 		else if (strcmp(name, "KEYWORDS") == 0)
 			keyword_parse(ebuild->keywords, value);
 		else if (strcmp(name, "IUSE") == 0)
-			ebuild->use = useflag_iuse_parse(value);
+			ebuild->use = useflag_iuse_parse(ebuild->parent->parent->parent, value);
 	}
 	
 	ebuild->metadata_init = 1;

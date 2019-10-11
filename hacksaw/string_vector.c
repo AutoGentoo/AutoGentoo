@@ -12,27 +12,11 @@ StringVector* string_vector_new() {
 }
 
 void string_vector_add(StringVector* vec, char* string) {
-	if (vec->s >= (vec->n + 1))
-		vector_allocate(vec);
-	if (!string)
-		((char**) vec->ptr)[vec->n] = NULL;
-	else
-		((char**) vec->ptr)[vec->n] = strdup(string);
-	vec->n++;
+	vector_add(vec, strdup(string));
 }
 
 void string_vector_insert(StringVector* vec, char* string, int index) {
-	if (vec->s >= (vec->n + 1))
-		vector_allocate(vec);
-	
-	if (vec->opts & VECTOR_ORDERED)
-		memcpy (((char**) vec->ptr)[index + 1], ((char**) vec->ptr)[index], sizeof (char*) * (vec->n - index));
-	else
-		((char**) vec->ptr)[vec->n] = ((char**) vec->ptr)[index];
-	
-	
-	((char**) vec->ptr)[index] = strdup(string);
-	vec->n++;
+	vector_insert(vec, strdup(string), index);
 }
 
 void string_vector_set(StringVector* vec, char* string, int index) {

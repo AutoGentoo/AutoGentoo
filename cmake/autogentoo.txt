@@ -116,6 +116,8 @@ set(src_CPORTAGE
         cportage/suggestion.c
         cportage/suggestion.h
         cportage/cportage_defines.h
+        cportage/globals.c
+        cportage/globals.h
         )
 
 set(language_SOURCES
@@ -125,6 +127,8 @@ set(language_SOURCES
 set(language_PARSER
         cportage/language/depend_bison.y
         cportage/language/depend_flex.l
+        cportage/language/make_conf.y
+        cportage/language/make_conf.l
         )
 
 flex_target(FLEX_DEPEND ${CMAKE_SOURCE_DIR}/cportage/language/depend_flex.l
@@ -133,9 +137,18 @@ bison_target(LANG_DEPEND
         ${CMAKE_SOURCE_DIR}/cportage/language/depend_bison.y
         ${CMAKE_CURRENT_BINARY_DIR}/cportage/depend.tab.c)
 
+flex_target(FLEX_MAKE_CONF ${CMAKE_SOURCE_DIR}/cportage/language/make_conf_flex.l
+        ${CMAKE_CURRENT_BINARY_DIR}/cportage/make_conf.flex.c)
+bison_target(LANG_MAKE_CONF
+        ${CMAKE_SOURCE_DIR}/cportage/language/make_conf_bison.y
+        ${CMAKE_CURRENT_BINARY_DIR}/cportage/make_conf.tab.c)
+
 add_flex_bison_dependency(FLEX_DEPEND LANG_DEPEND)
+add_flex_bison_dependency(FLEX_MAKE_CONF LANG_MAKE_CONF)
 
 set(language_BIN
         ${BISON_LANG_DEPEND_OUTPUTS}
         ${FLEX_FLEX_DEPEND_OUTPUTS}
+        ${BISON_LANG_MAKE_CONF_OUTPUTS}
+        ${FLEX_FLEX_MAKE_CONF_OUTPUTS}
         )

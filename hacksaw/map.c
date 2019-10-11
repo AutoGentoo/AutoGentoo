@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "hacksaw/hacksaw.h"
@@ -135,7 +134,7 @@ uint32_t map_get_hash(const void *data, size_t nbytes) {
 	const uint32_t c1 = 0xcc9e2d51;
 	const uint32_t c2 = 0x1b873593;
 	
-	const int nblocks = nbytes / 4;
+	const int nblocks = (int)(nbytes / 4);
 	const uint32_t *blocks = (const uint32_t *) (data);
 	const uint8_t *tail = (const uint8_t *) (data + (nblocks * 4));
 	
