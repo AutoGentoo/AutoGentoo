@@ -42,6 +42,8 @@ struct __Ebuild {
 	char* slot;
 	char* sub_slot;
 	
+	char* ebuild_key;
+	
 	/* Cached in the database */
 	Dependency* depend;
 	Dependency* bdepend;

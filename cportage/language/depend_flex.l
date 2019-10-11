@@ -58,11 +58,11 @@ repo            [\:][\:]{identifier}
                             yylval.slot.sub_opts = ATOM_SLOT_IGNORE;
                             if (yytext[len - 1] == '*') {
                                 yylval.slot.sub_opts = ATOM_SLOT_IGNORE;
-                                yytext[len - 1] == 0;
+                                yytext[--len] = 0;
                             }
                             else if (yytext[len - 1] == '=') {
                                 yylval.slot.sub_opts = ATOM_SLOT_REBUILD;
-                                yytext[len - 1] == 0;
+                                yytext[--len] = 0;
                             }
 
                             char* name_splt = strchr(yytext + 1, '/');

@@ -176,7 +176,7 @@ int ebuild_check_required_use(SelectedEbuild *ebuild) {
 	for (RequiredUse* expr = ebuild->ebuild->required_use; expr; expr = expr->next) {
 		if (use_check_expr(ebuild, expr) == 0) {
 			char* expr_fail = use_expr_str(expr);
-			plog_warn("Required use not met for ebuild %s-%s", ebuild->ebuild->parent->key, ebuild->ebuild->pv);
+			plog_warn("Required use not met for ebuild %s", ebuild->ebuild->ebuild_key);
 			plog_warn(expr_fail);
 			free(expr_fail);
 			return 0;

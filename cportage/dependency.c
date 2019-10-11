@@ -77,9 +77,9 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		char* atom_str = atom_get_str(dep->atom);
 		plog_error("All ebuilds matching %s have been masked", atom_str);
 		if (parent_ebuild)
-			plog_error("Required by %s-%s", parent_ebuild->ebuild->parent->key, parent_ebuild->ebuild->pv);
-		free(atom_str);
+			plog_error("Required by %s", parent_ebuild->ebuild->ebuild_key);
 		
+		free(atom_str);
 		exit(1);
 	}
 	
@@ -230,9 +230,37 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 					continue;
 				
 				if (atom_match_ebuild(current_se->ebuild, current_depend->atom)) {
+					int use_match = 1;
+					for (AtomFlag* af = current_depend->atom->useflags; af; af = af->next) {
+						use_select_t use_value = USE_DISABLE;
+						if (af->def == ATOM_DEFAULT_ON)
+							use_value = USE_ENABLE;
+						else if (af->def == ATOM_DEFAULT_OFF)
+							use_value = USE_DISABLE;
+						
+						UseFlag* use = s_ebuild_get_use(current_se, af->name);
+						if (use)
+							use_value = use->status;
+						
+						if (af->option == ATOM_USE_ENABLE && use_value != USE_ENABLE) {
+							use_match = 0;
+							break;
+						}
+						else if (af->option == ATOM_USE_DISABLE && use_value != USE_DISABLE) {
+							use_match = 0;
+							break;
+						}
+						else {
+							plog_warn("Blocker uses something ebuild conditional");
+							plog_warn("If this ever comes up ima be pissed");
+						}
+					}
+					
+					if (!use_match)
+						continue;
+					
 					char* blocker = atom_get_str(target->selected_by->atom);
 					char* blocked_pkg = atom_get_str(current_se->selected_by->atom);
-					
 					if (current_depend->atom->blocks == ATOM_BLOCK_SOFT) {
 						plog_info("%s may not be installed at the same time as %s", blocked_pkg, blocker);
 						plog_info("Install %s first then rerun", blocked_pkg);
@@ -316,6 +344,12 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 		slot_cmp = strcmp(ebuild->slot, atom->slot);
 		if(atom->sub_slot)
 			sub_slot_cmp = strcmp(ebuild->sub_slot, atom->sub_slot);
+		
+		/* Only compare the slots */
+		if (!pd_compare_range(slot_cmp, atom->range))
+			return 0;
+		if (!pd_compare_range(sub_slot_cmp, atom->range))
+			return 0;
 	}
 	
 	int cmp = 0;
@@ -324,11 +358,6 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 		cmp = atom_version_compare(ebuild->version, atom->version);
 		cmp_rev = ebuild->revision - atom->revision;
 	} else {
-		/* Only compare the slots */
-		if (!pd_compare_range(slot_cmp, atom->range))
-			return 0;
-		if (!pd_compare_range(sub_slot_cmp, atom->range))
-			return 0;
 		return 1;
 	}
 	

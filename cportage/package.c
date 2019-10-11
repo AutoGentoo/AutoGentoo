@@ -81,7 +81,6 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	P_Atom* atom_parsed = atom_new(parsed_key);
 	if (atom_parsed == NULL)
 		return NULL;
-	free(parsed_key);
 	
 	Package* target = map_get(repo->packages, atom_parsed->key);
 	if (!target) {
@@ -103,6 +102,7 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	new_ebuild->category_manifest = category_man;
 	new_ebuild->atom_manifest = atom_man;
 	new_ebuild->feature_restrict = NULL;
+	new_ebuild->ebuild_key = parsed_key;
 	
 	new_ebuild->metadata_init = 0;
 	
@@ -190,6 +190,7 @@ void ebuild_free(Ebuild* ptr) {
 	free(ptr->pn);
 	free(ptr->pv);
 	free(ptr->pr);
+	free(ptr->ebuild_key);
 	
 	if (ptr->slot)
 		free(ptr->slot);

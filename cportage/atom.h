@@ -160,7 +160,6 @@ AtomFlag* atomflag_dup(AtomFlag* use);
 P_Atom* atom_dup(P_Atom* atom);
 char* atom_get_str(P_Atom* atom);
 
-
 /* Defined in dependency.c */
 int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom);
 
