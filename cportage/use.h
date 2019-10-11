@@ -34,7 +34,7 @@ use_select_t ebuild_check_use(Ebuild *ebuild, char* useflag);
 RequiredUse* use_build_required_use(char* target, use_select_t option);
 int ebuild_check_required_use(SelectedEbuild *ebuild);
 UseFlag* useflag_new(char* name, use_select_t status);
-UseFlag* useflag_iuse_parse(char* metadata);
+UseFlag * useflag_iuse_parse(char *metadata);
 void useflag_free(UseFlag* ptr);
 void requireduse_free(RequiredUse* ptr);
 AtomFlag* dependency_useflag(Ebuild* resolved, AtomFlag* new_flags, AtomFlag* old_flags);

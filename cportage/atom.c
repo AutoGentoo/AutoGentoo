@@ -233,8 +233,14 @@ Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* 
 
 AtomFlag* atomflag_build(char* name) {
 	AtomFlag* out = malloc(sizeof(AtomFlag));
+	out->option = ATOM_USE_ENABLE;
+	
+	if (name[0] == '-') {
+		out->option = ATOM_USE_DISABLE;
+		name++;
+	}
+	
 	out->name = strdup(name);
-	out->option = 0;
 	out->def = 0;
 	out->next = NULL;
 	

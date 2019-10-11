@@ -101,8 +101,7 @@ atom_flags  : '!' atom_flag '?'     {$$ = $2; $$->option = ATOM_USE_DISABLE_IF_O
             | '!' atom_flag '='     {$$ = $2; $$->option = ATOM_USE_OPPOSITE;}
             | atom_flag '?'         {$$ = $1; $$->option = ATOM_USE_ENABLE_IF_ON;}
             | atom_flag '='         {$$ = $1; $$->option = ATOM_USE_EQUAL;}
-            | atom_flag             {$$ = $1; $$->option = ATOM_USE_ENABLE;}
-            | '-' atom_flag         {$$ = $2; $$->option = ATOM_USE_DISABLE;}
+            | atom_flag             {$$ = $1;}
             | atom_flags ',' atom_flags {$$ = $1; $$->next = $3;}
             ;
 

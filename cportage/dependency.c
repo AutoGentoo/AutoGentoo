@@ -69,7 +69,7 @@ PortageDependency* pd_find_atm(Emerge* parent, P_Atom* atom) {
 SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild, Dependency* dep, Vector* selected) {
 	Package* pkg = atom_resolve_package(emerge, dep->atom);
 	if (!pkg)
-		exit(1);
+		portage_die("Package '%s' not found", dep->atom->key);
 	
 	SelectedEbuild* out = package_resolve_ebuild(pkg, dep->atom);
 	if (!out) {
@@ -114,25 +114,25 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		 */
 		
 		if (current_use->def == ATOM_NO_DEFAULT) {
-			if (current_use->def == ATOM_USE_ENABLE)
+			if (current_use->option == ATOM_USE_ENABLE)
 				s_ebuild_set_use(out, current_use->name, USE_ENABLE);
-			else if (current_use->def == ATOM_USE_DISABLE)
+			else if (current_use->option == ATOM_USE_DISABLE)
 				s_ebuild_set_use(out, current_use->name, USE_DISABLE);
-			else if (current_use->def == ATOM_USE_ENABLE_IF_ON) {
+			else if (current_use->option == ATOM_USE_ENABLE_IF_ON) {
 				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
 				if (parent_flag && parent_flag->status == USE_ENABLE)
 					s_ebuild_set_use(out, current_use->name, USE_ENABLE);
 			}
-			else if (current_use->def == ATOM_USE_DISABLE_IF_OFF) {
+			else if (current_use->option == ATOM_USE_DISABLE_IF_OFF) {
 				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
 				if (parent_flag && parent_flag->status == USE_DISABLE)
 					s_ebuild_set_use(out, current_use->name, USE_DISABLE);
 			}
-			else if (current_use->def == ATOM_USE_EQUAL) {
+			else if (current_use->option == ATOM_USE_EQUAL) {
 				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
 				s_ebuild_set_use(out, current_use->name, parent_flag->status);
 			}
-			else if (current_use->def == ATOM_USE_OPPOSITE) {
+			else if (current_use->option == ATOM_USE_OPPOSITE) {
 				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
 				s_ebuild_set_use(out, current_use->name, parent_flag->status == USE_ENABLE ? USE_DISABLE : USE_ENABLE);
 			}
@@ -292,8 +292,6 @@ Package* atom_resolve_package(Emerge* emerge, P_Atom* atom) {
 	}
 	
 	Package* target_pkg = map_get(repo->packages, atom->key);
-	if (!target_pkg)
-		portage_die("Package '%s' not found", atom->key);
 	
 	return target_pkg;
 }
@@ -336,8 +334,7 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 	
 	if (cmp == 0 && atom->range & ATOM_VERSION_E) {
 		if (atom->range == ATOM_VERSION_E) {
-			if (cmp_rev == 0)
-				return 1;
+			return cmp_rev == 0;
 		} else if (atom->range == ATOM_VERSION_REV)
 			return 1;
 	}

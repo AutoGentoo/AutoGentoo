@@ -106,7 +106,25 @@ static char* use_select_suffix[] = {
 char* use_expr_str(RequiredUse* expr) {
 	char* out;
 	if (expr->depend) {
-		char* depend_str = use_expr_str(expr->depend);
+		StringVector* ls = string_vector_new();
+		size_t size = 0;
+		for (RequiredUse* deps = expr->depend; deps; deps = deps->next) {
+			char* to_free = use_expr_str(deps);
+			string_vector_add(ls, to_free);
+			size += strlen(to_free) + 1;
+			free(to_free);
+		}
+		
+		char* depend_str = malloc(size + 1);
+		depend_str[0] = 0;
+		
+		for (int i = 0; i < ls->n; i++) {
+			strcat(depend_str, string_vector_get(ls, i));
+			strcat(depend_str, " ");
+		}
+		
+		string_vector_free(ls);
+		
 		asprintf(&out, "%s%s%s ( %s )",
 		         use_select_prefix[expr->option],
 		         expr->target,
@@ -438,9 +456,12 @@ void emerge_parse_useflags(Emerge* emerge) {
 			}
 			
 			for (Ebuild* current_ebuild = target->ebuilds; current_ebuild; current_ebuild = current_ebuild->older) {
-				if (atom_match_ebuild(current_ebuild, current->atom) == 0)
+				if (atom_match_ebuild(current_ebuild, current->atom)) {
+					package_metadata_init(current_ebuild);
+					printf("%s-%s\n", current_ebuild->parent->key, current_ebuild->pv);
 					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next)
 						ebuild_set_use(current_ebuild, current_flag->name, current_flag->status);
+				}
 			}
 		}
 		
