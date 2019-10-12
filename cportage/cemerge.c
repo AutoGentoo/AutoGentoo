@@ -50,6 +50,10 @@ void usepkg(Opt* op, char* arg) {
 	emerge_main->build_opts |= EMERGE_USE_BINHOST;
 }
 
+void verbose(Opt* op, char* arg) {
+	emerge_main->options |= EMERGE_VERBOSE;
+}
+
 void print_help_wrapper(Opt* op, char* arg);
 
 Opt opt_handlers[] = {
@@ -58,6 +62,7 @@ Opt opt_handlers[] = {
 		{0,   "buildroot", "Path to the root of build environment", set_buildroot, OPT_LONG | OPT_ARG},
 		{'h', "help",    "Print the help message and exit", print_help_wrapper, OPT_SHORT | OPT_LONG},
 		{'k', "usepkg",  "Use a package from the binhost", usepkg, OPT_SHORT | OPT_LONG},
+		{'v', "verbose",  "be verbose when printing dependencies", verbose, OPT_SHORT | OPT_LONG},
 		{0,   "installroot", "Path to the root of install environment", set_installroot, OPT_LONG | OPT_ARG},
 		{0,   "target", "Target architecture", set_arch, OPT_LONG | OPT_ARG},
 		{0, NULL, NULL, NULL, (opt_opts_t) 0}

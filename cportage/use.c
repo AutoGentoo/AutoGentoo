@@ -37,7 +37,7 @@ use_select_t ebuild_set_use(Ebuild* ebuild, char* useflag, use_select_t new_val)
 }
 
 use_select_t s_ebuild_set_use(SelectedEbuild* ebuild, char* useflag, use_select_t new_val) {
-	UseFlag* target = s_ebuild_get_use(ebuild, useflag);
+	UseFlag* target = get_use(ebuild->useflags, useflag);
 	if (!target) {
 		plog_warn("Flag %s not found for ebuild %s-%s", useflag, ebuild->ebuild->parent->key, ebuild->ebuild->version->full_version);
 		return -1;
@@ -55,20 +55,12 @@ use_select_t s_ebuild_set_use(SelectedEbuild* ebuild, char* useflag, use_select_
 	return out;
 }
 
-UseFlag* s_ebuild_get_use(SelectedEbuild *ebuild, char* useflag) {
-	for (UseFlag* current = ebuild->useflags; current; current = current->next)
+UseFlag* get_use(UseFlag* useflags, char* useflag) {
+	for (UseFlag* current = useflags; current; current = current->next)
 		if (strcmp(current->name, useflag) == 0)
 			return current;
 	
 	return NULL;
-}
-
-use_select_t ebuild_check_use(Ebuild *ebuild, char* useflag) {
-	for (UseFlag* current = ebuild->use; current; current = current->next)
-		if (strcmp(current->name, useflag) == 0)
-			return current->status;
-	
-	return USE_NONE;
 }
 
 RequiredUse* use_build_required_use(char* target, use_select_t option) {
@@ -140,7 +132,7 @@ char* use_expr_str(RequiredUse* expr) {
 
 int use_check_expr(SelectedEbuild *ebuild, RequiredUse* expr) {
 	if (expr->option == USE_ENABLE || expr->option == USE_DISABLE) {
-		UseFlag* u = s_ebuild_get_use(ebuild, expr->target);
+		UseFlag* u = get_use(ebuild->useflags, expr->target);
 		use_select_t status = USE_NONE;
 		if (u)
 			status = u->status;
@@ -282,7 +274,8 @@ AtomFlag* dependency_useflag(Ebuild* resolved, AtomFlag* new_flags, AtomFlag* ol
 		if (!current) {
 			// Use flag from two not found in one
 			// Add this flag
-			use_select_t ebuild_setting = ebuild_check_use(resolved, to_check->name);
+			UseFlag* ebuild_use = get_use(resolved->use, to_check->name);
+			use_select_t ebuild_setting = ebuild_use != NULL ? ebuild_use->status : USE_NONE;
 			if (ebuild_setting == -1) {
 				if (to_check->def == ATOM_DEFAULT_OFF)
 					ebuild_setting = USE_DISABLE;

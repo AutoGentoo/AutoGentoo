@@ -14,8 +14,7 @@
 #include <string.h>
 
 FILE* fread_archive(char* path) {
-	char* buffer_file;
-	asprintf(&buffer_file, "%s.cportage.decomp", path);
+	char* buffer_file = "/tmp/cportage.decomp";
 	FILE* fp;
 	
 	struct archive* a = archive_read_new();
@@ -49,7 +48,6 @@ FILE* fread_archive(char* path) {
 	}
 	
 	fp = fopen(buffer_file, "w+");
-	free(buffer_file);
 	if (!fp) {
 		plog_error("Failed to open buffer file %s", buffer_file);
 		archive_read_close(a);

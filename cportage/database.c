@@ -143,7 +143,7 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 		target->name = strdup(atom->name);
 		target->category = strdup(atom->category);
 		
-		target->hash = map_insert(db->installed, target->key, target);
+		map_insert(db->installed, target->key, target);
 	}
 	
 	InstalledEbuild* ebuild = malloc(sizeof(InstalledEbuild));

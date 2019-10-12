@@ -119,33 +119,28 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 			else if (current_use->option == ATOM_USE_DISABLE)
 				s_ebuild_set_use(out, current_use->name, USE_DISABLE);
 			else if (current_use->option == ATOM_USE_ENABLE_IF_ON) {
-				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
+				UseFlag* parent_flag = get_use(parent_ebuild->useflags, current_use->name);
 				if (parent_flag && parent_flag->status == USE_ENABLE)
 					s_ebuild_set_use(out, current_use->name, USE_ENABLE);
-			}
-			else if (current_use->option == ATOM_USE_DISABLE_IF_OFF) {
-				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
+			} else if (current_use->option == ATOM_USE_DISABLE_IF_OFF) {
+				UseFlag* parent_flag = get_use(parent_ebuild->useflags, current_use->name);
 				if (parent_flag && parent_flag->status == USE_DISABLE)
 					s_ebuild_set_use(out, current_use->name, USE_DISABLE);
-			}
-			else if (current_use->option == ATOM_USE_EQUAL) {
-				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
+			} else if (current_use->option == ATOM_USE_EQUAL) {
+				UseFlag* parent_flag = get_use(parent_ebuild->useflags, current_use->name);
 				s_ebuild_set_use(out, current_use->name, parent_flag->status);
-			}
-			else if (current_use->option == ATOM_USE_OPPOSITE) {
-				UseFlag* parent_flag = s_ebuild_get_use(parent_ebuild, current_use->name);
+			} else if (current_use->option == ATOM_USE_OPPOSITE) {
+				UseFlag* parent_flag = get_use(parent_ebuild->useflags, current_use->name);
 				s_ebuild_set_use(out, current_use->name, parent_flag->status == USE_ENABLE ? USE_DISABLE : USE_ENABLE);
 			}
-		}
-		else {
-			UseFlag* flag = s_ebuild_get_use(out, current_use->name);
+		} else {
+			UseFlag* flag = get_use(out->useflags, current_use->name);
 			if (flag) {
 				if (current_use->option == ATOM_USE_ENABLE)
 					flag->status = USE_ENABLE;
 				else if (current_use->option == ATOM_USE_DISABLE)
 					flag->status = USE_DISABLE;
-			}
-			else { /* Flag not found, use the default value and add it to the ebuild */
+			} else { /* Flag not found, use the default value and add it to the ebuild */
 				flag = malloc(sizeof(UseFlag));
 				flag->name = strdup(current_use->name);
 				flag->status = current_use->def == ATOM_DEFAULT_ON ? USE_ENABLE : USE_DISABLE;
@@ -159,17 +154,26 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		printf("Seleted by: \n");
 		
 		for (SelectedEbuild* selected_by = parent_ebuild; selected_by; selected_by = selected_by->parent_ebuild)
-			selected_ebuild_print(selected_by);
+			selected_ebuild_print(NULL, selected_by);
 		
 		if (out->use_change) {
 			printf("Use flags change by following dependencies");
 			for (int i = 0; i < out->use_change->n; i++)
-				selected_ebuild_print(vector_get(out->use_change, i));
+				selected_ebuild_print(NULL, vector_get(out->use_change, i));
 		}
 		
 		exit(1);
 	}
 	
+	if (out->installed && out->action == PORTAGE_REPLACE) {
+		for (UseFlag* use = out->useflags; use; use = use->next) {
+			UseFlag* ebuild_use_status = get_use(out->installed->use, use->name);
+			if (ebuild_use_status && ebuild_use_status->status != use->status) {
+				out->action = PORTAGE_USE_FLAG;
+				break;
+			}
+		}
+	}
 	
 	/* Check if slot is already selected */
 	SelectedEbuild* prev_sel = pd_check_selected(selected, out);
@@ -184,7 +188,8 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	UseFlag* out_explicit_key = NULL;
 	for (sel_explicit_key = prev_sel->explicit_flags; sel_explicit_key; sel_explicit_key = sel_explicit_key->next) {
 		for (out_explicit_key = out->explicit_flags; out_explicit_key; out_explicit_key = out_explicit_key->next) {
-			if (strcmp(sel_explicit_key->name, out_explicit_key->name) == 0 && sel_explicit_key->status != out_explicit_key->status)
+			if (strcmp(sel_explicit_key->name, out_explicit_key->name) == 0 &&
+			    sel_explicit_key->status != out_explicit_key->status)
 				break;
 		}
 		
@@ -215,24 +220,26 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		vector_add(prev_sel->use_change, out);
 	}
 	
+	if (out->action == PORTAGE_USE_FLAG)
+		prev_sel->action = PORTAGE_USE_FLAG;
+	
 	return NULL;
 }
 
-void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* target, Vector* ebuild_set, Vector* blocked_set) {
+void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* target, Vector* ebuild_set,
+                          Vector* blocked_set, Vector* dependency_order) {
 	for (Dependency* current_depend = depend; current_depend; current_depend = current_depend->next) {
 		if (current_depend->depends == HAS_DEPENDS) {
 			/* Do logical evaluation for use flags */
 			if ((current_depend->selector == USE_DISABLE || current_depend->selector == USE_ENABLE)) {
-				UseFlag* u = s_ebuild_get_use(target, current_depend->target);
+				UseFlag* u = get_use(target->useflags, current_depend->target);
 				if (u && u->status == current_depend->selector)
-					__pd_layer_resolve__(parent, current_depend->selectors, target, ebuild_set, blocked_set);
-			}
-			else if (current_depend->selector == USE_LEAST_ONE) {
+					__pd_layer_resolve__(parent, current_depend->selectors, target, ebuild_set, blocked_set, dependency_order);
+			} else if (current_depend->selector == USE_LEAST_ONE) {
 				for (Dependency* least_one_iter = current_depend->selectors; least_one_iter; least_one_iter = least_one_iter->next) {
 				
 				}
-			}
-			else
+			} else
 				portage_die("Illegal operator %s in a dependency expression", current_depend->target);
 			continue;
 		}
@@ -257,19 +264,17 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 						else if (af->def == ATOM_DEFAULT_OFF)
 							use_value = USE_DISABLE;
 						
-						UseFlag* use = s_ebuild_get_use(current_se, af->name);
+						UseFlag* use = get_use(current_se->useflags, af->name);
 						if (use)
 							use_value = use->status;
 						
 						if (af->option == ATOM_USE_ENABLE && use_value != USE_ENABLE) {
 							use_match = 0;
 							break;
-						}
-						else if (af->option == ATOM_USE_DISABLE && use_value != USE_DISABLE) {
+						} else if (af->option == ATOM_USE_DISABLE && use_value != USE_DISABLE) {
 							use_match = 0;
 							break;
-						}
-						else {
+						} else {
 							plog_warn("Blocker uses something ebuild conditional");
 							plog_warn("If this ever comes up ima be pissed");
 						}
@@ -278,7 +283,8 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 					int slot_match = 1;
 					if (current_depend->atom->slot && strcmp(current_depend->atom->slot, current_se->ebuild->slot) != 0)
 						slot_match = 0;
-					else if (current_depend->atom->sub_slot && strcmp(current_depend->atom->sub_slot, current_se->ebuild->sub_slot) != 0)
+					else if (current_depend->atom->sub_slot &&
+					         strcmp(current_depend->atom->sub_slot, current_se->ebuild->sub_slot) != 0)
 						slot_match = 0;
 					
 					if (!use_match || !slot_match)
@@ -291,12 +297,13 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 						plog_info("Install %s first then rerun", blocked_pkg);
 						plog_info("emerge --oneshot %s", blocked_pkg);
 						
-					}
-					else if (current_depend->atom->blocks == ATOM_BLOCK_HARD)
+					} else if (current_depend->atom->blocks == ATOM_BLOCK_HARD)
 						portage_die("%s may not be installed with %s installed", blocked_pkg, blocker);
 					
 					free(blocker);
-					exit(1);
+					
+					current_se->action = PORTAGE_BLOCK;
+					vector_add(blocked_set, current_se);
 				}
 			}
 			
@@ -313,19 +320,30 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 		
 		vector_add(ebuild_set, se);
 		
-		__pd_layer_resolve__(parent, se->ebuild->bdepend, se, ebuild_set, blocked_set);
-		__pd_layer_resolve__(parent, se->ebuild->depend, se, ebuild_set, blocked_set);
-		__pd_layer_resolve__(parent, se->ebuild->rdepend, se, ebuild_set, blocked_set);
-		__pd_layer_resolve__(parent, se->ebuild->pdepend, se, ebuild_set, blocked_set);
+		__pd_layer_resolve__(parent, se->ebuild->bdepend, se, ebuild_set, blocked_set, dependency_order);
+		__pd_layer_resolve__(parent, se->ebuild->depend, se, ebuild_set, blocked_set, dependency_order);
+		__pd_layer_resolve__(parent, se->ebuild->rdepend, se, ebuild_set, blocked_set, dependency_order);
+		__pd_layer_resolve__(parent, se->ebuild->pdepend, se, ebuild_set, blocked_set, dependency_order);
+		
+		vector_add(dependency_order, se);
 	}
 }
 
-Vector * pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild *target) {
+Vector* pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild* target) {
 	Vector* ebuild_set = vector_new(VECTOR_ORDERED | VECTOR_KEEP);
 	Vector* blocked_set = vector_new(VECTOR_ORDERED | VECTOR_KEEP);
-	__pd_layer_resolve__(parent, depend, target, ebuild_set, blocked_set);
+	Vector* dep_order = vector_new(VECTOR_ORDERED | VECTOR_KEEP);
 	
-	return ebuild_set;
+	__pd_layer_resolve__(parent, depend, target, ebuild_set, blocked_set, dep_order);
+	vector_free(ebuild_set);
+	
+	for (int i = 0; i < blocked_set->n; i++) {
+		vector_add(dep_order, vector_get(blocked_set, i));
+	}
+	
+	vector_free(blocked_set);
+	
+	return dep_order;
 }
 
 Package* atom_resolve_package(Emerge* emerge, P_Atom* atom) {
@@ -366,7 +384,7 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 		slot_cmp = 0;
 	else {
 		slot_cmp = strcmp(ebuild->slot, atom->slot);
-		if(atom->sub_slot)
+		if (atom->sub_slot)
 			sub_slot_cmp = strcmp(ebuild->sub_slot, atom->sub_slot);
 		
 		/* Only compare the slots */
@@ -469,7 +487,7 @@ void selected_ebuild_free(SelectedEbuild* se) {
 	free(se);
 }
 
-void selected_ebuild_print(SelectedEbuild* se) {
+void selected_ebuild_print(Emerge* em, SelectedEbuild* se) {
 	if (se->action == PORTAGE_NEW)
 		printf("NEW     ");
 	else if (se->action == PORTAGE_DOWNGRADE)
@@ -478,17 +496,35 @@ void selected_ebuild_print(SelectedEbuild* se) {
 		printf("REBUILD ");
 	else if (se->action == PORTAGE_USE_FLAG)
 		printf("CNG USE ");
-	else
-		printf("OTHER   ");
-	
-	printf("%s [ ", se->ebuild->ebuild_key);
-	for (UseFlag* use = se->useflags; use; use = use->next) {
-		if (use->status == USE_ENABLE)
-			printf("\033[1;31m");
-		else
-			printf("\033[1;34m-");
-		printf("%s\033[0m ", use->name);
+	else if (se->action == PORTAGE_UPDATE)
+		printf("UPDATE  ");
+	else if (se->action == PORTAGE_REPLACE)
+		printf("REPLACE ");
+	else {
+		printf("OTHER %d ", se->action);
 	}
 	
-	printf("]\n");
+	printf("%s", se->ebuild->ebuild_key);
+	
+	printf(" ");
+	for (UseFlag* use = se->useflags; use; use = use->next) {
+		UseFlag* ebuild_use = NULL;
+		use_select_t ebuild_use_status = USE_NONE;
+		
+		if (se->installed)
+			ebuild_use = get_use(se->installed->use, use->name);
+		
+		if (ebuild_use)
+			ebuild_use_status = ebuild_use->status;
+		
+		if ((ebuild_use_status != use->status && se->installed) || em->options & EMERGE_VERBOSE) {
+			if (use->status == USE_ENABLE)
+				printf("\033[1;31m");
+			else
+				printf("\033[1;34m-");
+			printf("%s%s\033[0m ", use->name, ebuild_use_status != use->status ? "*": "");
+		}
+	}
+	
+	printf("\n");
 }

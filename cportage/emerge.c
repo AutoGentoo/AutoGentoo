@@ -53,7 +53,7 @@ int emerge (Emerge* emerge) {
 	*/
 	
 	char* metadata_path = NULL;
-	asprintf(&metadata_path, "%s/metadata/md5-cache", "portage_test");
+	asprintf(&metadata_path, "%s/metadata/md5-cache", emerge->default_repo_ptr->location);
 	emerge->repo->category_manifests = manifest_metadata_parse(metadata_path);
 	free(metadata_path);
 	if (!emerge->repo->category_manifests) {
@@ -95,7 +95,8 @@ int emerge (Emerge* emerge) {
 	
 	for (int i = 0; i < selected->n; i++) {
 		SelectedEbuild* eb = vector_get(selected, i);
-		selected_ebuild_print(eb);
+		printf("(%d) ", i);
+		selected_ebuild_print(emerge, eb);
 	}
 	
 	return 0;
