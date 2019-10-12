@@ -12,13 +12,26 @@ int asprintf(char **strp, const char *fmt, ...);
 int yyerror(char *s) {
     fprintf(stderr, "%s in line %d near '%s'\n", s, yylineno, yytext);
     error = 1;
-    exit(1);
+    yyout = NULL;
     return error;
 }
 
 Dependency* depend_parse (char* buffer) {
     char* depend_expr_str = NULL;
     asprintf(&depend_expr_str, "DEPEND_EXPR_AUTOGENTOO %s", buffer);
+
+    YY_BUFFER_STATE bs = yy_scan_string(depend_expr_str);
+    yy_switch_to_buffer(bs);
+    yyparse();
+
+    free(depend_expr_str);
+
+    return (Dependency*)yyout;
+}
+
+Dependency* cmdline_parse (char* buffer) {
+    char* depend_expr_str = NULL;
+    asprintf(&depend_expr_str, "COMMAND_LINE_AUTOGENTOO %s", buffer);
 
     YY_BUFFER_STATE bs = yy_scan_string(depend_expr_str);
     yy_switch_to_buffer(bs);
@@ -71,6 +84,7 @@ repo            [\:][\:]{identifier}
 %%
 DEPEND_EXPR_AUTOGENTOO  {return DEPEND;}
 RUSE_EXPR_AUTOGENTOO    {return REQUIRED_USE;}
+COMMAND_LINE_AUTOGENTOO {return COMMAND_LINE;}
 [\n]                    {yylineno++;}
 [ \t\r\\]+              ;
 {repo}                  {yylval.identifier = strdup(yytext + 2); return REPOSITORY;}
@@ -130,7 +144,7 @@ RUSE_EXPR_AUTOGENTOO    {return REQUIRED_USE;}
 
 {identifier}            {
                             yylval.identifier = strdup(yytext);
-                            return (IDENTIFIER);
+                            return IDENTIFIER;
                         }
 
 

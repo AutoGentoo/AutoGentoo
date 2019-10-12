@@ -12,6 +12,15 @@
 #include <stdlib.h>
 #include "use.h"
 
+P_Atom* cmdline_atom_new(char* name) {
+	char* cmd_temp = NULL;
+	asprintf(&cmd_temp, "SEARCH/%s", name);
+	P_Atom* out = atom_new(cmd_temp);
+	free(cmd_temp);
+	
+	return out;
+}
+
 P_Atom* atom_new(char* input) {
 	P_Atom* out = malloc(sizeof(P_Atom));
 	input = strdup(input);

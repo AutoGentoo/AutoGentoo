@@ -54,6 +54,7 @@ void yyerror(const char *message);
 %token <use_select> USESELECT
 %token DEPEND
 %token REQUIRED_USE
+%token COMMAND_LINE
 
 %type <atom_type> atom_version
 %type <atom_type> atom_block
@@ -66,12 +67,15 @@ void yyerror(const char *message);
 %type <use_type> required_use_expr
 %type <depend_expr_select> depend_expr_sel
 %type <depend_expr_select> use_expr
+%type <depend_type> command_line
+%type <atom_type> command_atom
 
 %%
 
 program:                                        {yyout = NULL;}
             | DEPEND depend_expr                {yyout = (void*)$2;}
             | REQUIRED_USE required_use_expr    {yyout = (void*)$2;}
+            | COMMAND_LINE command_line         {yyout = $2;}
             | END_OF_FILE                       {yyout = NULL;}
             ;
 
@@ -137,4 +141,19 @@ atom_version   : '>' '=' ATOM           {$$ = $3; $$->range = ATOM_VERSION_GE;}
                |     '<' ATOM           {$$ = $2; $$->range = ATOM_VERSION_L;}
                |         ATOM           {$$ = $1; $$->range = ATOM_VERSION_ALL;}
                ;
+
+command_atom   : atom_repo              {$$ = $1;}
+               | '>' '=' IDENTIFIER     {$$ = cmdline_atom_new($3); $$->range = ATOM_VERSION_GE;}
+               | '<' '=' IDENTIFIER     {$$ = cmdline_atom_new($3); $$->range = ATOM_VERSION_LE;}
+               |     '=' IDENTIFIER     {$$ = cmdline_atom_new($2); $$->range = ATOM_VERSION_E;}
+               |     '>' IDENTIFIER     {$$ = cmdline_atom_new($2); $$->range = ATOM_VERSION_G;}
+               |     '~' IDENTIFIER     {$$ = cmdline_atom_new($2); $$->range = ATOM_VERSION_REV;}
+               |     '<' IDENTIFIER     {$$ = cmdline_atom_new($2); $$->range = ATOM_VERSION_L;}
+               |         IDENTIFIER     {$$ = cmdline_atom_new($1); $$->range = ATOM_VERSION_ALL;}
+               ;
+
+command_line   : command_atom                   {$$ = dependency_build_atom($1);}
+               | command_atom '[' atom_flags ']' {$1->useflags = $3; $$ = dependency_build_atom($1);}
+               ;
+
 %%

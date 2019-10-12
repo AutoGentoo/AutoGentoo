@@ -37,7 +37,8 @@ void plog_error(char* fmt, ...) {
 	va_start(ap, fmt);
 	vprintf(fmt, ap);
 	printf("\n");
-	printf("[cportage - %s] ERROR -- %s (%d)\n", log_time_buffer, strerror(buff_error), buff_error);
+	if (errno != 0)
+		printf("[cportage - %s] ERROR -- %s (%d)\n", log_time_buffer, strerror(buff_error), buff_error);
 }
 
 void plog_warn(char* fmt, ...) {

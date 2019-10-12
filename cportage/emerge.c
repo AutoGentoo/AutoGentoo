@@ -90,12 +90,45 @@ int emerge (Emerge* emerge) {
 	for (int i = 0; emerge->atoms[i]; i++)
 		strcat(dep_expr_buff, emerge->atoms[i]);
 	
-	Dependency* dep = depend_parse(dep_expr_buff);
-	for (Dependency* check_dep = dep; check_dep; check_dep = check_dep->next) {
-		if (check_dep->depends != IS_ATOM) {
-			printf("%s\n", check_dep->target);
-			dependency_free(dep);
-			return 1;
+	printf("---------\n");
+	
+	Dependency* dep = cmdline_parse(dep_expr_buff);
+	if (!dep)
+		portage_die("Failed to parse arguments");
+	
+	for (Dependency* expand_dep = dep; expand_dep; expand_dep = expand_dep->next) {
+		if (expand_dep->atom && strcmp(expand_dep->atom->category, "SEARCH") == 0) {
+			StringVector* valid_categories = string_vector_new();
+			for (int i = 0; i < emerge->repo->category_manifests->n; i++) {
+				Manifest* current_cat_search = vector_get(emerge->repo->category_manifests, i);
+				
+				char* cat_splt = strchr(current_cat_search->filename, '/');
+				*cat_splt = 0;
+				
+				free(expand_dep->atom->key);
+				asprintf(&expand_dep->atom->key, "%s/%s", current_cat_search->filename, expand_dep->atom->name);
+				
+				Package* try_package = atom_resolve_package(emerge, expand_dep->atom);
+				if (try_package)
+					string_vector_add(valid_categories, expand_dep->atom->key);
+				
+				*cat_splt = '/';
+			}
+			
+			if (valid_categories->n == 0)
+				portage_die("Could not resolve package name %s", expand_dep->atom->name);
+			else if (valid_categories->n > 1) {
+				errno = 0;
+				plog_error("Ambigious name %s", expand_dep->atom->name);
+				printf("Found the following packages:\n");
+				for (int i = 0; i < valid_categories->n; i++)
+					printf("  -  %s\n", string_vector_get(valid_categories, i));
+				portage_die("Pass the full package qualifier");
+			}
+			else
+				expand_dep->atom->key = string_vector_get(valid_categories, 0);
+			
+			vector_free(valid_categories);
 		}
 	}
 	

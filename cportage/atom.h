@@ -145,6 +145,7 @@ struct __Dependency {
 };
 
 
+P_Atom* cmdline_atom_new(char* name);
 P_Atom* atom_new(char* input);
 AtomVersion* atom_version_new(char* version_str);
 void atomversion_free(AtomVersion* parent);

@@ -6,12 +6,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <archive.h>
 #include "manifest.h"
 #include "portage_log.h"
 #include "compress.h"
 #include <string.h>
-#include <fcntl.h>
 
 static struct __manifest_type_link_t manifest_type_links[] = {
 		{MANIFEST_IGNORE, "IGNORE"},
@@ -75,7 +73,7 @@ Vector* manifest_metadata_parse_fp(FILE* fp, char* dir_path) {
 		temp->parsed = NULL;
 		
 		temp->filename = strdup(strtok(NULL, " "));
-		temp->len = atoi(strtok(NULL, " "));
+		temp->len = strtol(strtok(NULL, " "), NULL, 10);
 		
 		asprintf(&temp->full_path, "%s/%s", dir_path, temp->filename);
 		temp->parent_dir = strdup(temp->full_path);
