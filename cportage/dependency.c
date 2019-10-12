@@ -526,5 +526,11 @@ void selected_ebuild_print(Emerge* em, SelectedEbuild* se) {
 		}
 	}
 	
+	if (se->installed) {
+		printf(" %s", se->installed->version->full_version);
+		if (se->installed->revision != 0)
+			printf("-r%d", se->installed->revision);
+	}
+	
 	printf("\n");
 }

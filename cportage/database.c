@@ -215,7 +215,7 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 		UseFlag* use;
 		
 		for (char* use_tok = strtok(iuse_read, " \n"); use_tok; use_tok = strtok(NULL, " \n")) {
-			use = useflag_new(use_tok, USE_NONE);
+			use = useflag_new(use_tok, USE_DISABLE);
 			if (!ebuild->use)
 				ebuild->use = use;
 			else
@@ -225,7 +225,7 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 		free(iuse_read);
 	}
 	
-	char* use_temp = portagedb_ebuild_read(pkg, "PKGUSE");
+	char* use_temp = portagedb_ebuild_read(pkg, "USE");
 	if (use_temp) {
 		for (char* use_tok = strtok(use_temp, " \n"); use_tok; use_tok = strtok(NULL, " \n")) {
 			UseFlag* useflag_temp = useflag_new(use_tok, USE_ENABLE);

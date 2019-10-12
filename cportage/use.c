@@ -180,16 +180,14 @@ int ebuild_check_required_use(SelectedEbuild *ebuild) {
 
 UseFlag* useflag_new(char* name, use_select_t status) {
 	UseFlag* out = malloc(sizeof(UseFlag));
-	if (status == USE_NONE) {
-		if (*name == '+') {
-			status = USE_ENABLE;
-			name++;
-		}
-		else if (*name == '-') {
-			status = USE_DISABLE;
-			name++;
-		} else
-			status = USE_ENABLE;
+	
+	if (*name == '+') {
+		status = USE_ENABLE;
+		name++;
+	}
+	else if (*name == '-') {
+		status = USE_DISABLE;
+		name++;
 	}
 	
 	out->next = NULL;
@@ -355,7 +353,7 @@ PackageUse* useflag_parse(FILE* fp, PackageUse** last) {
 				
 				asprintf(&curr_flag, "%s%s", curr_flag, use_expand_flag);
 				
-				UseFlag* new_flag = useflag_new(curr_flag, USE_NONE);
+				UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE);
 				new_flag->next = temp->flags;
 				temp->flags = new_flag;
 				
@@ -363,7 +361,7 @@ PackageUse* useflag_parse(FILE* fp, PackageUse** last) {
 				continue;
 			}
 			
-			UseFlag* new_flag = useflag_new(curr_flag, USE_NONE);
+			UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE);
 			new_flag->next = temp->flags;
 			temp->flags = new_flag;
 		}
