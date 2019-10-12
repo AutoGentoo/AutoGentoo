@@ -127,8 +127,8 @@ set(language_SOURCES
 set(language_PARSER
         cportage/language/depend_bison.y
         cportage/language/depend_flex.l
-        cportage/language/make_conf.y
-        cportage/language/make_conf.l
+        cportage/language/make_conf_bison.y
+        cportage/language/make_conf_flex.l
         )
 
 flex_target(FLEX_DEPEND ${CMAKE_SOURCE_DIR}/cportage/language/depend_flex.l

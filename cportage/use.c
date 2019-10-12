@@ -231,10 +231,9 @@ UseFlag* useflag_iuse_parse(Emerge* em, char* metadata) {
 		
 		/* Set profile use (maybe?) */
 		/* Set globals */
-		for (UseFlag* current_global = em->global_use; current_global; current_global = current_global->next) {
-			if (strcmp(current_global->name, current->name) == 0)
-				current->status = current_global->status;
-		}
+		use_select_t* ptr = map_get(em->global_use, current->name);
+		if (ptr)
+			current->status = *ptr;
 		
 		next = current;
 		token = strtok(NULL, " ");

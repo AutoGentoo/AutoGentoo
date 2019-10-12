@@ -83,10 +83,10 @@ Map* make_conf_new(Emerge *em) {
 	return out;
 }
 
-UseFlag* make_conf_use(Emerge* em) {
-	UseFlag* out = NULL;
-	
+Map * make_conf_use(Emerge* em) {
 	StringVector* keys = map_all_keys(em->use_expand);
+	Map* out = map_new(256, 0.8);
+	
 	
 	/* USE_EXPAND */
 	for (int i = 0; i < keys->n; i++) {
@@ -100,36 +100,33 @@ UseFlag* make_conf_use(Emerge* em) {
 		value = strdup(value);
 		
 		for (char* tok = strtok(value, " "); tok; tok = strtok(NULL, " ")) {
-			UseFlag* temp = malloc(sizeof(UseFlag));
-			temp->next = out;
-			out = temp;
+			use_select_t* status = malloc(sizeof(use_select_t));
+			char* name = NULL;
+			*status = USE_ENABLE;
 			
 			if (tok[0] == '-') {
-				out->status = USE_DISABLE;
-				asprintf(&out->name, "%s_%s", key, tok + 1);
+				*status = USE_DISABLE;
+				asprintf(&name, "%s_%s", key, tok + 1);
 			}
-			else {
-				out->status = USE_ENABLE;
-				asprintf(&out->name, "%s_%s", key, tok);
-			}
+			else
+				asprintf(&name, "%s_%s", key, tok);
+			free(map_insert(out, name, status));
+			free(name);
 		}
 	}
 	
 	char* use_str = map_get(em->make_conf, "USE");
 	if (use_str) {
 		for (char* tok = strtok(use_str, " "); tok; tok = strtok(NULL, " ")) {
-			UseFlag* temp = malloc(sizeof(UseFlag));
-			temp->next = out;
-			out = temp;
+			use_select_t* status = malloc(sizeof(use_select_t));
+			*status = USE_ENABLE;
 			
 			if (tok[0] == '-') {
-				out->status = USE_DISABLE;
-				out->name = strdup(tok + 1);
+				*status = USE_DISABLE;
+				tok++;
 			}
-			else {
-				out->status = USE_ENABLE;
-				out->name = strdup(tok);
-			}
+			
+			free(map_insert(out, tok, status));
 		}
 	}
 	

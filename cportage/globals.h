@@ -29,6 +29,6 @@ struct __UseExpand {
 
 Map* use_expand_new(Repository* repo);
 Map* make_conf_new(Emerge *em);
-UseFlag* make_conf_use(Emerge* em);
+Map * make_conf_use(Emerge* em);
 
 #endif //AUTOGENTOO_GLOBALS_H

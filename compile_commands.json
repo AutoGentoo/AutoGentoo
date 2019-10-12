@@ -76,6 +76,26 @@
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/cportage.dir/cportage/depend.tab.c.o   -c /home/atuser/git/AutoGentoo/cmake-build-debug/cportage/depend.tab.c",
+  "file": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage/depend.tab.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/cportage.dir/cportage/depend.flex.c.o   -c /home/atuser/git/AutoGentoo/cmake-build-debug/cportage/depend.flex.c",
+  "file": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage/depend.flex.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/cportage.dir/cportage/make_conf.tab.c.o   -c /home/atuser/git/AutoGentoo/cmake-build-debug/cportage/make_conf.tab.c",
+  "file": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage/make_conf.tab.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/cportage.dir/cportage/make_conf.flex.c.o   -c /home/atuser/git/AutoGentoo/cmake-build-debug/cportage/make_conf.flex.c",
+  "file": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage/make_conf.flex.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
   "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dautogentoo_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/autogentoo.dir/src/chroot.c.o   -c /home/atuser/git/AutoGentoo/src/chroot.c",
   "file": "/home/atuser/git/AutoGentoo/src/chroot.c"
 },

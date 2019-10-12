@@ -3,7 +3,7 @@
 #include "hacksaw/hacksaw.h"
 #include <stdint.h>
 
-uint32_t prv_map_insert_item (Map* map, MapItem* item);
+void * prv_map_insert_item (Map* map, MapItem* item);
 void prv_map_realloc_item (Map* map, MapItem* list);
 
 
@@ -36,12 +36,15 @@ void map_realloc(Map* map, size_t size) {
 	
 	map->hash_table = calloc(size, sizeof (MapItem*));
 	map->size = size;
+	map->realloc_at = map->size * map->threshold;
+	map->n = 0;
 	
 	int i;
 	for (i = 0; i < old_size; i++)
 		if (old_table[i] != NULL)
-			prv_map_realloc_item (map, map->hash_table[i]);
-		
+			prv_map_realloc_item (map, old_table[i]);
+	
+	free(old_table);
 }
 
 StringVector* map_all_keys(Map* map) {
@@ -94,21 +97,34 @@ void* map_remove(Map* map, char* key) {
 	return NULL;
 }
 
-uint32_t prv_map_insert_item (Map* map, MapItem* item) {
+void * prv_map_insert_item (Map* map, MapItem* item) {
 	size_t n = strlen(item->key);
 	uint32_t hash = map_get_hash(item->key, n);
 	uint32_t offset = hash % map->size;
 	
 	if (map->hash_table[offset] != NULL)
 		map->overlaps++;
+	
+	for (MapItem* iter = map->hash_table[offset]; iter; iter = iter->next) {
+		if (strcmp(iter->key, item->key) == 0) {
+			void* out = iter->data;
+			
+			iter->data = item->data;
+			free(item->key);
+			free(item);
+			
+			return out;
+		}
+	}
+	
 	item->next = map->hash_table[offset];
 	map->hash_table[offset] = item;
 	map->n++;
 	
-	return hash;
+	return NULL;
 }
 
-uint32_t map_insert(Map* map, char* key, void* data) {
+void* map_insert(Map* map, char* key, void* data) {
 	if (map->n + 1 >= map->realloc_at)
 		map_realloc(map, map->size * 2);
 	

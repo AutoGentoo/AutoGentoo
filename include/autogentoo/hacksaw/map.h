@@ -50,7 +50,7 @@ void* map_get(Map* map, char* key);
  * @param data Pointer to data that will be copied
  * @return returns the hash generated from the key
  */
-uint32_t map_insert(Map* map, char* key, void* data);
+void * map_insert(Map* map, char* key, void* data);
 
 /**
  * Create a new map with array size new_size

@@ -50,7 +50,7 @@ struct __Emerge {
 	
 	Map* use_expand;
 	Map* make_conf;
-	UseFlag* global_use;
+	Map* global_use;
 	
 	Suggestion* use_suggestions;
 	Suggestion* keyword_suggestions;
