@@ -91,7 +91,15 @@ int emerge (Emerge* emerge) {
 		strcat(dep_expr_buff, emerge->atoms[i]);
 	
 	Dependency* dep = depend_parse(dep_expr_buff);
-	Vector* selected = pd_layer_resolve(emerge, dep, NULL);
+	for (Dependency* check_dep = dep; check_dep; check_dep = check_dep->next) {
+		if (check_dep->depends != IS_ATOM) {
+			printf("%s\n", check_dep->target);
+			dependency_free(dep);
+			return 1;
+		}
+	}
+	
+	Vector* selected = pd_layer_resolve(emerge, dep);
 	
 	for (int i = 0; i < selected->n; i++) {
 		SelectedEbuild* eb = vector_get(selected, i);

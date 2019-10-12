@@ -52,6 +52,8 @@ void yyerror(const char *message);
 %token <use_default> USE_DEFAULT;
 %token <slot> SLOT
 %token <use_select> USESELECT
+%token DEPEND
+%token REQUIRED_USE
 
 %type <atom_type> atom_version
 %type <atom_type> atom_block
@@ -68,8 +70,8 @@ void yyerror(const char *message);
 %%
 
 program:                                        {yyout = NULL;}
-            | depend_expr                       {yyout = (void*)$1;}
-            | required_use_expr                 {yyout = (void*)$1;}
+            | DEPEND depend_expr                {yyout = (void*)$2;}
+            | REQUIRED_USE required_use_expr    {yyout = (void*)$2;}
             | END_OF_FILE                       {yyout = NULL;}
             ;
 

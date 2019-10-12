@@ -1,11 +1,13 @@
 %{
 #define _GNU_SOURCE
-#include "depend.tab.h"
 #include <stdio.h>
 #include <share.h>
 #include <string.h>
+#include "depend.tab.h"
 
 int error = 0;
+
+int asprintf(char **strp, const char *fmt, ...);
 
 int yyerror(char *s) {
     fprintf(stderr, "%s in line %d near '%s'\n", s, yylineno, yytext);
@@ -15,25 +17,42 @@ int yyerror(char *s) {
 }
 
 Dependency* depend_parse (char* buffer) {
-    YY_BUFFER_STATE bs = yy_scan_string(buffer);
+    char* depend_expr_str = NULL;
+    asprintf(&depend_expr_str, "DEPEND_EXPR_AUTOGENTOO %s", buffer);
+
+    YY_BUFFER_STATE bs = yy_scan_string(depend_expr_str);
     yy_switch_to_buffer(bs);
     yyparse();
+
+    free(depend_expr_str);
+
     return (Dependency*)yyout;
 }
 
 P_Atom* atom_parse (char* buffer) {
-    YY_BUFFER_STATE bs = yy_scan_string(buffer);
+    char* depend_expr_str = NULL;
+    asprintf(&depend_expr_str, "DEPEND_EXPR_AUTOGENTOO %s", buffer);
+
+    YY_BUFFER_STATE bs = yy_scan_string(depend_expr_str);
     yy_switch_to_buffer(bs);
     yyparse();
+
+    free(depend_expr_str);
+
     P_Atom* atom_out = ((Dependency*)yyout)->atom;
     free((void*)yyout);
     return atom_out;
 }
 
 RequiredUse* required_use_parse (char* buffer) {
-    YY_BUFFER_STATE bs = yy_scan_string(buffer);
+    char* depend_expr_str = NULL;
+    asprintf(&depend_expr_str, "RUSE_EXPR_AUTOGENTOO %s", buffer);
+
+    YY_BUFFER_STATE bs = yy_scan_string(depend_expr_str);
     yy_switch_to_buffer(bs);
     yyparse();
+
+    free(depend_expr_str);
     return (RequiredUse*)yyout;
 }
 
@@ -50,6 +69,8 @@ slot            [\:]({slotname}(\/{slotname})?)?[\*|\=]?
 repo            [\:][\:]{identifier}
 
 %%
+DEPEND_EXPR_AUTOGENTOO  {return DEPEND;}
+RUSE_EXPR_AUTOGENTOO    {return REQUIRED_USE;}
 [\n]                    {yylineno++;}
 [ \t\r\\]+              ;
 {repo}                  {yylval.identifier = strdup(yytext + 2); return REPOSITORY;}

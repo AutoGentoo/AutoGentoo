@@ -329,12 +329,12 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 	}
 }
 
-Vector* pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild* target) {
+Vector* pd_layer_resolve(Emerge* parent, Dependency* depend) {
 	Vector* ebuild_set = vector_new(VECTOR_ORDERED | VECTOR_KEEP);
 	Vector* blocked_set = vector_new(VECTOR_ORDERED | VECTOR_KEEP);
 	Vector* dep_order = vector_new(VECTOR_ORDERED | VECTOR_KEEP);
 	
-	__pd_layer_resolve__(parent, depend, target, ebuild_set, blocked_set, dep_order);
+	__pd_layer_resolve__(parent, depend, NULL, ebuild_set, blocked_set, dep_order);
 	vector_free(ebuild_set);
 	
 	for (int i = 0; i < blocked_set->n; i++) {

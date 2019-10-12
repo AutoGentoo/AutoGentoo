@@ -48,7 +48,7 @@ struct __SelectedEbuild {
  * @param parent the emerge environment
  * @param depend expression to look at
  */
-Vector * pd_layer_resolve(Emerge* parent, Dependency* depend, SelectedEbuild *target);
+Vector* pd_layer_resolve(Emerge* parent, Dependency* depend);
 
 /**
  * Do the actually dependency tree with useflag checks etc...
