@@ -95,7 +95,7 @@ int emerge (Emerge* emerge) {
 	
 	for (int i = 0; i < selected->n; i++) {
 		SelectedEbuild* eb = vector_get(selected, i);
-		plog_info("PACKAGE %s/%s", eb->ebuild->category, eb->ebuild->pn, eb->ebuild->version->full_version);
+		selected_ebuild_print(eb);
 	}
 	
 	return 0;

@@ -197,8 +197,7 @@ UseFlag* useflag_new(char* name, use_select_t status) {
 			status = USE_DISABLE;
 			name++;
 		} else
-			status = USE_DISABLE;
-		
+			status = USE_ENABLE;
 	}
 	
 	out->next = NULL;
@@ -364,7 +363,7 @@ PackageUse* useflag_parse(FILE* fp, PackageUse** last) {
 				
 				asprintf(&curr_flag, "%s%s", curr_flag, use_expand_flag);
 				
-				UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE);
+				UseFlag* new_flag = useflag_new(curr_flag, USE_NONE);
 				new_flag->next = temp->flags;
 				temp->flags = new_flag;
 				
@@ -372,7 +371,7 @@ PackageUse* useflag_parse(FILE* fp, PackageUse** last) {
 				continue;
 			}
 			
-			UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE);
+			UseFlag* new_flag = useflag_new(curr_flag, USE_NONE);
 			new_flag->next = temp->flags;
 			temp->flags = new_flag;
 		}

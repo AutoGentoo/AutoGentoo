@@ -155,15 +155,30 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		}
 	}
 	
-	if (!ebuild_check_required_use(out))
+	if (!ebuild_check_required_use(out)) {
+		printf("Seleted by: \n");
+		
+		for (SelectedEbuild* selected_by = parent_ebuild; selected_by; selected_by = selected_by->parent_ebuild)
+			selected_ebuild_print(selected_by);
+		
+		if (out->use_change) {
+			printf("Use flags change by following dependencies");
+			for (int i = 0; i < out->use_change->n; i++)
+				selected_ebuild_print(vector_get(out->use_change, i));
+		}
+		
 		exit(1);
+	}
+	
 	
 	/* Check if slot is already selected */
 	SelectedEbuild* prev_sel = pd_check_selected(selected, out);
 	
 	/* Not selected yet, good to go! */
-	if (!prev_sel)
+	if (!prev_sel) {
+		out->parent_ebuild = parent_ebuild;
 		return out;
+	}
 	
 	UseFlag* sel_explicit_key = NULL;
 	UseFlag* out_explicit_key = NULL;
@@ -194,7 +209,11 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	for (UseFlag* use = out->explicit_flags; use; use = use->next)
 		s_ebuild_set_use(prev_sel, use->name, use->status);
 	
-	selected_ebuild_free(out);
+	if (out->explicit_flags) {
+		if (!prev_sel->use_change)
+			prev_sel->use_change = vector_new(VECTOR_UNORDERED | VECTOR_REMOVE);
+		vector_add(prev_sel->use_change, out);
+	}
 	
 	return NULL;
 }
@@ -396,8 +415,13 @@ SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 				SelectedEbuild* out = malloc(sizeof(SelectedEbuild));
 				out->useflags = NULL;
 				out->explicit_flags = NULL;
+				out->parent_ebuild = NULL;
+				out->selected_by = NULL;
+				out->use_change = NULL;
 				out->ebuild = current;
 				out->installed = portagedb_resolve_installed(pkg->parent->parent->database, atom);
+				
+				out->action = PORTAGE_NEW;
 				
 				if (!out->installed)
 					return out;
@@ -405,6 +429,10 @@ SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 				int cmp = ebuild_installedebuild_cmp(out->ebuild, out->installed);
 				if (cmp > 0)
 					out->action = PORTAGE_UPDATE;
+				else if (cmp == 0)
+					out->action = PORTAGE_REPLACE;
+				else if (cmp < 0)
+					out->action = PORTAGE_DOWNGRADE;
 				
 				return out;
 			}
@@ -439,4 +467,28 @@ void selected_ebuild_free(SelectedEbuild* se) {
 	useflag_free(se->explicit_flags);
 	
 	free(se);
+}
+
+void selected_ebuild_print(SelectedEbuild* se) {
+	if (se->action == PORTAGE_NEW)
+		printf("NEW     ");
+	else if (se->action == PORTAGE_DOWNGRADE)
+		printf("DOWN    ");
+	else if (se->action == PORTAGE_REBUILD)
+		printf("REBUILD ");
+	else if (se->action == PORTAGE_USE_FLAG)
+		printf("CNG USE ");
+	else
+		printf("OTHER   ");
+	
+	printf("%s [ ", se->ebuild->ebuild_key);
+	for (UseFlag* use = se->useflags; use; use = use->next) {
+		if (use->status == USE_ENABLE)
+			printf("\033[1;31m");
+		else
+			printf("\033[1;34m-");
+		printf("%s\033[0m ", use->name);
+	}
+	
+	printf("]\n");
 }

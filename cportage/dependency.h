@@ -25,6 +25,9 @@ typedef enum {
 
 struct __SelectedEbuild {
 	/* Next and depends not relevant */
+	SelectedEbuild* parent_ebuild;
+	Vector* use_change;
+	
 	Dependency* selected_by;
 	InstalledEbuild* installed;
 	Ebuild* ebuild;
@@ -62,5 +65,6 @@ SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom);
 void selected_ebuild_free(SelectedEbuild* se);
 
 SelectedEbuild* pd_check_selected(Vector* selected, SelectedEbuild* check);
+void selected_ebuild_print(SelectedEbuild* se);
 
 #endif //AUTOGENTOO_DEPENDENCY_H
