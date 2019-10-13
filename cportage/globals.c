@@ -113,10 +113,13 @@ Map * make_conf_use(Emerge* em) {
 			free(map_insert(out, name, status));
 			free(name);
 		}
+		free(value);
+		free(key);
 	}
 	
 	char* use_str = map_get(em->make_conf, "USE");
 	if (use_str) {
+		use_str = strdup(use_str);
 		for (char* tok = strtok(use_str, " "); tok; tok = strtok(NULL, " ")) {
 			use_select_t* status = malloc(sizeof(use_select_t));
 			*status = USE_ENABLE;
@@ -128,6 +131,7 @@ Map * make_conf_use(Emerge* em) {
 			
 			free(map_insert(out, tok, status));
 		}
+		free(use_str);
 	}
 	
 	return out;

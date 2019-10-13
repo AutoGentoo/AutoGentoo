@@ -39,7 +39,7 @@ use_select_t ebuild_set_use(Ebuild* ebuild, char* useflag, use_select_t new_val)
 use_select_t s_ebuild_set_use(SelectedEbuild* ebuild, char* useflag, use_select_t new_val) {
 	UseFlag* target = get_use(ebuild->useflags, useflag);
 	if (!target) {
-		plog_warn("Flag %s not found for ebuild %s-%s", useflag, ebuild->ebuild->parent->key, ebuild->ebuild->version->full_version);
+		plog_warn("Flag %s not found for ebuild %s", useflag, ebuild->ebuild->ebuild_key);
 		return -1;
 	}
 	

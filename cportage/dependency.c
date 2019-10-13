@@ -33,7 +33,9 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	
 	out->selected_by = dep;
 	out->useflags = NULL;
+	out->parent_ebuild = parent_ebuild;
 	
+	/* Build the use flags from the ebuild */
 	for (UseFlag* current_use = out->ebuild->use; current_use; current_use = current_use->next) {
 		UseFlag* new_flag = malloc(sizeof(UseFlag));
 		
@@ -44,6 +46,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		out->useflags = new_flag;
 	}
 	
+	/* Apply the explicit flags */
 	for (AtomFlag* current_use = dep->atom->useflags; current_use; current_use = current_use->next) {
 		/*
 		ATOM_USE_DISABLE, //!< atom[-bar]
@@ -58,42 +61,62 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		ATOM_DEFAULT_OFF, //!< use(-)
 		
 		 */
-		
-		if (current_use->def == ATOM_NO_DEFAULT) {
+		UseFlag* parent_flag = NULL;
+		if (parent_ebuild)
+			parent_flag = get_use(parent_ebuild->useflags, current_use->name);
+		UseFlag* flag = get_use(out->useflags, current_use->name);
+		if (!flag && current_use->def != ATOM_NO_DEFAULT) {
+			use_select_t def_status = current_use->def == ATOM_DEFAULT_ON ? USE_ENABLE : USE_DISABLE;
+			use_select_t resolved_status = def_status;
+			
 			if (current_use->option == ATOM_USE_ENABLE)
-				s_ebuild_set_use(out, current_use->name, USE_ENABLE);
+				resolved_status = USE_ENABLE;
 			else if (current_use->option == ATOM_USE_DISABLE)
-				s_ebuild_set_use(out, current_use->name, USE_DISABLE);
+				resolved_status = USE_DISABLE;
 			else if (current_use->option == ATOM_USE_ENABLE_IF_ON) {
-				UseFlag* parent_flag = get_use(parent_ebuild->useflags, current_use->name);
 				if (parent_flag && parent_flag->status == USE_ENABLE)
-					s_ebuild_set_use(out, current_use->name, USE_ENABLE);
+					resolved_status = USE_ENABLE;
 			} else if (current_use->option == ATOM_USE_DISABLE_IF_OFF) {
-				UseFlag* parent_flag = get_use(parent_ebuild->useflags, current_use->name);
 				if (parent_flag && parent_flag->status == USE_DISABLE)
-					s_ebuild_set_use(out, current_use->name, USE_DISABLE);
-			} else if (current_use->option == ATOM_USE_EQUAL) {
-				UseFlag* parent_flag = get_use(parent_ebuild->useflags, current_use->name);
-				s_ebuild_set_use(out, current_use->name, parent_flag->status);
-			} else if (current_use->option == ATOM_USE_OPPOSITE) {
-				UseFlag* parent_flag = get_use(parent_ebuild->useflags, current_use->name);
-				s_ebuild_set_use(out, current_use->name, parent_flag->status == USE_ENABLE ? USE_DISABLE : USE_ENABLE);
-			}
-		} else {
-			UseFlag* flag = get_use(out->useflags, current_use->name);
-			if (flag) {
-				if (current_use->option == ATOM_USE_ENABLE)
-					flag->status = USE_ENABLE;
-				else if (current_use->option == ATOM_USE_DISABLE)
-					flag->status = USE_DISABLE;
-			} else { /* Flag not found, use the default value and add it to the ebuild */
-				flag = malloc(sizeof(UseFlag));
-				flag->name = strdup(current_use->name);
-				flag->status = current_use->def == ATOM_DEFAULT_ON ? USE_ENABLE : USE_DISABLE;
-				flag->next = out->useflags;
-				out->useflags = flag;
+					resolved_status = USE_DISABLE;
+			} else if (current_use->option == ATOM_USE_EQUAL)
+				resolved_status = parent_flag->status;
+			else if (current_use->option == ATOM_USE_OPPOSITE)
+				resolved_status = parent_flag->status == USE_ENABLE ? USE_DISABLE : USE_ENABLE;
+			
+			if (def_status != resolved_status) {
+				errno = 0;
+				char* atom_str = atom_get_str(dep->atom);
+				plog_error("Default use for %s did not match %s", current_use->name, atom_str);
+				
+				exit(1);
 			}
 		}
+		else if (!flag)
+			continue;
+		else {
+			if (current_use->option == ATOM_USE_ENABLE)
+				flag->status = USE_ENABLE;
+			else if (current_use->option == ATOM_USE_DISABLE)
+				flag->status = USE_DISABLE;
+			else if (current_use->option == ATOM_USE_ENABLE_IF_ON) {
+				if (parent_flag && parent_flag->status == USE_ENABLE)
+					flag->status = USE_ENABLE;
+			} else if (current_use->option == ATOM_USE_DISABLE_IF_OFF) {
+				if (parent_flag && parent_flag->status == USE_DISABLE)
+					flag->status = USE_DISABLE;
+			} else if (current_use->option == ATOM_USE_EQUAL)
+				flag->status = parent_flag->status;
+			else if (current_use->option == ATOM_USE_OPPOSITE)
+				flag->status = parent_flag->status == USE_ENABLE ? USE_DISABLE : USE_ENABLE;
+		}
+		
+		if (flag) {
+			UseFlag* ex_dup = useflag_new(flag->name, flag->status);
+			ex_dup->next = out->explicit_flags;
+			out->explicit_flags = ex_dup;
+		}
+		
 	}
 	
 	if (!ebuild_check_required_use(out)) {
@@ -126,7 +149,6 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	
 	/* Not selected yet, good to go! */
 	if (!prev_sel) {
-		out->parent_ebuild = parent_ebuild;
 		return out;
 	}
 	
@@ -144,12 +166,13 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	}
 	
 	if (sel_explicit_key) /* Error */ {
+		errno = 0;
 		plog_error("Selected packages could not resolve use conflict");
 		
 		char* atom_1 = atom_get_str(prev_sel->selected_by->atom);
 		char* atom_2 = atom_get_str(out->selected_by->atom);
-		plog_error("%s wants %c%s", atom_1, sel_explicit_key->status == USE_ENABLE ? '+' : '-', sel_explicit_key->name);
-		plog_error("%s wants %c%s", atom_2, out_explicit_key->status == USE_ENABLE ? '+' : '-', out_explicit_key->name);
+		plog_error("%s DEP = %s wants %c%s", prev_sel->parent_ebuild->ebuild->ebuild_key, atom_1, sel_explicit_key->status == USE_ENABLE ? '+' : '-', sel_explicit_key->name);
+		plog_error("%s DEP = %s wants %c%s", out->parent_ebuild->ebuild->ebuild_key, atom_2, out_explicit_key->status == USE_ENABLE ? '+' : '-', out_explicit_key->name);
 		
 		free(atom_1);
 		free(atom_2);
@@ -157,8 +180,13 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		exit(1);
 	}
 	
-	for (UseFlag* use = out->explicit_flags; use; use = use->next)
-		s_ebuild_set_use(prev_sel, use->name, use->status);
+	for (UseFlag* use = out->explicit_flags; use; use = use->next) {
+		UseFlag* search_prev = get_use(prev_sel->useflags, use->name);
+		if (!search_prev) {
+			continue;
+		}
+		search_prev->status = use->status;
+	}
 	
 	if (out->explicit_flags) {
 		if (!prev_sel->use_change)
@@ -383,7 +411,7 @@ SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 				out->selected_by = NULL;
 				out->use_change = NULL;
 				out->ebuild = current;
-				out->installed = portagedb_resolve_installed(pkg->parent->parent->database, atom);
+				out->installed = portagedb_resolve_installed(pkg->parent->parent->database, atom, current->slot);
 				
 				out->action = PORTAGE_NEW;
 				
@@ -434,23 +462,40 @@ void selected_ebuild_free(SelectedEbuild* se) {
 }
 
 void selected_ebuild_print(Emerge* em, SelectedEbuild* se) {
-	if (se->action == PORTAGE_NEW)
-		printf("NEW     ");
-	else if (se->action == PORTAGE_DOWNGRADE)
-		printf("DOWN    ");
-	else if (se->action == PORTAGE_REBUILD)
-		printf("REBUILD ");
-	else if (se->action == PORTAGE_USE_FLAG)
-		printf("CNG USE ");
-	else if (se->action == PORTAGE_UPDATE)
-		printf("UPDATE  ");
-	else if (se->action == PORTAGE_REPLACE)
-		printf("REPLACE ");
-	else {
-		printf("OTHER %d ", se->action);
-	}
+	printf("[ ");
+	if (se->action & PORTAGE_NEW)
+		printf("N");
+	else
+		printf(" ");
 	
-	printf("%s", se->ebuild->ebuild_key);
+	if (se->action & PORTAGE_SLOT)
+		printf("S");
+	else
+		printf(" ");
+	
+	if (se->action & PORTAGE_REPLACE)
+		printf("R");
+	else
+		printf(" ");
+	
+	if (se->action & PORTAGE_UPDATE)
+		printf("U");
+	else if (se->action & PORTAGE_DOWNGRADE)
+		printf("D");
+	else
+		printf(" ");
+	
+	if (se->action & PORTAGE_USE_FLAG)
+		printf("F");
+	else
+		printf(" ");
+	
+	if (se->action & PORTAGE_BLOCK)
+		printf("B");
+	else
+		printf(" ");
+	
+	printf(" ] %s", se->ebuild->ebuild_key);
 	
 	printf(" ");
 	for (UseFlag* use = se->useflags; use; use = use->next) {

@@ -48,7 +48,7 @@ dependency_t ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* install
 	
 }
 
-InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom) {
+InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom, char* target_slot) {
 	InstalledPackage* db_pkg = map_get(db->installed, atom->key);
 	if (!db_pkg)
 		return NULL;
@@ -56,14 +56,11 @@ InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom) {
 	InstalledEbuild* ebuild;
 	for (ebuild = db_pkg->installed; ebuild; ebuild = ebuild->older_slot) {
 		int cmp_slot = 0;
-		int cmp_slot_sub = 0;
 		
-		if (ebuild->slot && atom->slot)
-			cmp_slot = strcmp(ebuild->slot, atom->slot);
-		if (ebuild->sub_slot && atom->sub_slot)
-			cmp_slot_sub = strcmp(ebuild->sub_slot, atom->sub_slot);
+		if (ebuild->slot && target_slot)
+			cmp_slot = strcmp(ebuild->slot, target_slot);
 		
-		if (cmp_slot != 0 || cmp_slot_sub != 0)
+		if (cmp_slot != 0)
 			continue;
 		
 		int cmp = 0;
@@ -83,9 +80,9 @@ InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom) {
 			
 			if (cmp_rev == 0)
 				break;
-			else if (cmp_rev > 0 && atom->range & ATOM_VERSION_L)
+			else if (cmp_rev > 0 && atom->range & ATOM_VERSION_G)
 				break;
-			else if (cmp_rev < 0 && atom->range & ATOM_VERSION_G)
+			else if (cmp_rev < 0 && atom->range & ATOM_VERSION_L)
 				break;
 		}
 		

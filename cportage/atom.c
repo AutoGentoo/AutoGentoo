@@ -450,7 +450,7 @@ char* atom_get_str(P_Atom* atom) {
 	char prefix[3];
 	prv_get_prefix(prefix, atom->range);
 	
-	char flags[256];
+	char flags[1024];
 	flags[0] = 0;
 	for (AtomFlag* af = atom->useflags; af; af = af->next) {
 		/*

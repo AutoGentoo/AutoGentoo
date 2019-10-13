@@ -33,6 +33,10 @@ void package_metadata_init(Ebuild* ebuild) {
 	
 	size_t n = 0;
 	
+	if (strcmp(ebuild->ebuild_key, "dev-python/pygobject-3.32.1") == 0) {
+	
+	}
+	
 	while(!feof(fp)) {
 		name_size = getdelim(&name, &n, '=', fp);
 		value_size = getdelim(&value, &n, '\n', fp);

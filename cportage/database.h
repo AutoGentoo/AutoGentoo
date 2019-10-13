@@ -72,7 +72,7 @@ struct __PortageDB {
 	Vector* backtracking; //!< Array of rebuild requests
 };
 
-InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom);
+InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom, char* target_slot);
 void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg);
 PortageDB* portagedb_read(Emerge* emerge);
 void portagedb_free(PortageDB* db);
