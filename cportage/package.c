@@ -25,6 +25,9 @@ void package_metadata_init(Ebuild* ebuild) {
 		return;
 	}
 	
+	for (int i = 0; i < ARCH_END; i++)
+		ebuild->keywords[i] = KEYWORD_NONE;
+	
 	size_t name_size;
 	char* name = NULL;
 	
@@ -32,10 +35,6 @@ void package_metadata_init(Ebuild* ebuild) {
 	char* value = NULL;
 	
 	size_t n = 0;
-	
-	if (strcmp(ebuild->ebuild_key, "dev-python/pygobject-3.32.1") == 0) {
-	
-	}
 	
 	while(!feof(fp)) {
 		name_size = getdelim(&name, &n, '=', fp);

@@ -399,10 +399,13 @@ SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 			if (!current->metadata_init)
 				package_metadata_init(current);
 			
-			for (Keyword* keyword = pkg->keywords; keyword; keyword = keyword->next)
+			/* Apply package.accept_keywords */
+			for (Keyword* keyword = pkg->keywords; keyword; keyword = keyword->next) {
 				if (atom_match_ebuild(current, keyword->atom))
 					if (keyword->keywords[pkg->parent->parent->target_arch] < accept_keyword)
 						accept_keyword = keyword->keywords[pkg->parent->parent->target_arch];
+			}
+			
 			if (current->keywords[pkg->parent->parent->target_arch] >= accept_keyword) {
 				SelectedEbuild* out = malloc(sizeof(SelectedEbuild));
 				out->useflags = NULL;

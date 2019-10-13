@@ -25,9 +25,6 @@ arch_t get_arch(char* search) {
 }
 
 void keyword_parse(keyword_t* out, char* line) {
-	for (int i = 0; i < ARCH_END; i++)
-		out[i] = KEYWORD_STABLE;
-	
 	line = strdup(line);
 	
 	char* tok;
