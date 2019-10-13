@@ -12,60 +12,6 @@
 #include <autogentoo/hacksaw/set.h>
 #include <errno.h>
 
-int pd_slot_cmp(char* slot_1, char* sub_slot_1, char* slot_2, char* sub_slot_2) {
-	if (!slot_1 && !slot_2)
-		return 0;
-	else if (slot_1 && !slot_2)
-		return 1;
-	else if (!slot_1)
-		return 2;
-	
-	if (strcmp(slot_1, slot_2) != 0)
-		return -1;
-	
-	if (!sub_slot_1 && !sub_slot_2)
-		return 0;
-	else if (sub_slot_1 && !sub_slot_2)
-		return 1;
-	else if (!sub_slot_1)
-		return 2;
-	
-	if (strcmp(sub_slot_1, sub_slot_2) != 0)
-		return -2;
-	
-	return 0;
-}
-
-/*
-PortageDependency* pd_find_atm(Emerge* parent, P_Atom* atom) {
-	for (int i = 0; i < parent->selected->n; i++) {
-		PortageDependency* current = *(PortageDependency**)vector_get(parent->selected, i);
-		
-		if (strcmp(current->ebuild->parent->key, atom->key) == 0) {
-			int slot_cmp = pd_slot_cmp(current->slot, current->sub_slot, atom->slot, atom->sub_slot);
-			
-			* Slots don't match *
-			if (slot_cmp < 0)
-				continue;
-			
-			if (slot_cmp == 2) {
-				if (current->slot)
-					free(current->slot);
-				if (current->sub_slot)
-					free(current->sub_slot);
-				
-				current->slot = strdup(atom->slot);
-				current->sub_slot = strdup(atom->sub_slot);
-			}
-			
-			return current;
-		}
-	}
-	
-	return NULL;
-}
-*/
-
 SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild, Dependency* dep, Vector* selected) {
 	Package* pkg = atom_resolve_package(emerge, dep->atom);
 	if (!pkg)
@@ -154,12 +100,12 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		printf("Seleted by: \n");
 		
 		for (SelectedEbuild* selected_by = parent_ebuild; selected_by; selected_by = selected_by->parent_ebuild)
-			selected_ebuild_print(NULL, selected_by);
+			selected_ebuild_print(emerge, selected_by);
 		
 		if (out->use_change) {
 			printf("Use flags change by following dependencies");
 			for (int i = 0; i < out->use_change->n; i++)
-				selected_ebuild_print(NULL, vector_get(out->use_change, i));
+				selected_ebuild_print(emerge, vector_get(out->use_change, i));
 		}
 		
 		exit(1);
@@ -348,7 +294,7 @@ Vector* pd_layer_resolve(Emerge* parent, Dependency* depend) {
 
 Package* atom_resolve_package(Emerge* emerge, P_Atom* atom) {
 	Repository* repo = NULL;
-	for (Repository* current = emerge->repo; current; current = current->next) {
+	for (Repository* current = emerge->repos; current; current = current->next) {
 		if (strcmp(atom->repository, current->name) == 0) {
 			repo = current;
 			break;
@@ -384,7 +330,7 @@ int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom) {
 		slot_cmp = 0;
 	else {
 		slot_cmp = strcmp(ebuild->slot, atom->slot);
-		if (atom->sub_slot)
+		if (ebuild->sub_slot && atom->sub_slot)
 			sub_slot_cmp = strcmp(ebuild->sub_slot, atom->sub_slot);
 		
 		/* Only compare the slots */

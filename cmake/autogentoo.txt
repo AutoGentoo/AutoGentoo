@@ -118,6 +118,8 @@ set(src_CPORTAGE
         cportage/cportage_defines.h
         cportage/globals.c
         cportage/globals.h
+        cportage/profile.c
+        cportage/profile.h
         )
 
 set(language_SOURCES

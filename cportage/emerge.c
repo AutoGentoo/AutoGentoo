@@ -24,8 +24,8 @@ Emerge* emerge_new() {
 	out->installroot = strdup("/");
 	out->root = strdup("/");
 	out->options = 0;
-	out->repo = NULL;
-	out->default_repo_ptr = NULL;
+	out->repos = NULL;
+	out->default_repo_name = NULL;
 	out->default_repo = NULL;
 	
 	out->use_suggestions = NULL;
@@ -53,26 +53,26 @@ int emerge (Emerge* emerge) {
 	*/
 	
 	char* metadata_path = NULL;
-	asprintf(&metadata_path, "%s/metadata/md5-cache", emerge->default_repo_ptr->location);
-	emerge->repo->category_manifests = manifest_metadata_parse(metadata_path);
+	asprintf(&metadata_path, "%s/metadata/md5-cache", emerge->default_repo->location);
+	emerge->default_repo->category_manifests = manifest_metadata_parse(metadata_path);
 	free(metadata_path);
-	if (!emerge->repo->category_manifests) {
+	if (!emerge->default_repo->category_manifests) {
 		return errno;
 	}
 	
-	manifest_metadata_deep(emerge->repo->category_manifests);
+	manifest_metadata_deep(emerge->default_repo->category_manifests);
 	
 	Manifest* current_cat;
 	Manifest* current_pkg;
-	for (int i = 0; i < emerge->repo->category_manifests->n; i++) {
-		current_cat = (Manifest*)vector_get(emerge->repo->category_manifests, i);
+	for (int i = 0; i < emerge->default_repo->category_manifests->n; i++) {
+		current_cat = (Manifest*)vector_get(emerge->default_repo->category_manifests, i);
 		for (int j = 0; j < current_cat->parsed->n; j++) {
 			current_pkg = (Manifest*)vector_get(current_cat->parsed, j);
-			package_init(emerge->repo, current_cat, current_pkg);
+			package_init(emerge->default_repo, current_cat, current_pkg);
 		}
 	}
 	/* Do this before package.use because globals need to be applied to packages on metadata_init()  */
-	emerge->use_expand = use_expand_new(emerge->default_repo_ptr);
+	emerge->use_expand = use_expand_new(emerge->default_repo);
 	emerge->make_conf = make_conf_new(emerge);
 	emerge->global_use = make_conf_use(emerge);
 	
@@ -99,8 +99,8 @@ int emerge (Emerge* emerge) {
 	for (Dependency* expand_dep = dep; expand_dep; expand_dep = expand_dep->next) {
 		if (expand_dep->atom && strcmp(expand_dep->atom->category, "SEARCH") == 0) {
 			StringVector* valid_categories = string_vector_new();
-			for (int i = 0; i < emerge->repo->category_manifests->n; i++) {
-				Manifest* current_cat_search = vector_get(emerge->repo->category_manifests, i);
+			for (int i = 0; i < emerge->default_repo->category_manifests->n; i++) {
+				Manifest* current_cat_search = vector_get(emerge->default_repo->category_manifests, i);
 				
 				char* cat_splt = strchr(current_cat_search->filename, '/');
 				*cat_splt = 0;

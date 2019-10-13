@@ -142,7 +142,7 @@ void emerge_parse_keywords(Emerge* emerge) {
 	while (current) {
 		next = current->next;
 		
-		for (Repository* repo = emerge->repo; repo; repo = repo->next) {
+		for (Repository* repo = emerge->repos; repo; repo = repo->next) {
 			if (current->atom->repo_selected == ATOM_REPO_DEFINED
 			    && strcmp(current->atom->repository, repo->name) != 0)
 				continue;
@@ -150,7 +150,6 @@ void emerge_parse_keywords(Emerge* emerge) {
 			Package* target = map_get(repo->packages, current->atom->key);
 			
 			if (!target) {
-				plog_warn("Package %s not found (package.accept_keywords)", current->atom->key);
 				continue;
 			}
 			

@@ -15,7 +15,6 @@ Map* map_new(size_t new_size, double threshold) {
 	out->realloc_at = (size_t)(threshold * new_size);
 	
 	out->hash_table = calloc(new_size, sizeof(MapItem*));
-	out->n = 0;
 	out->overlaps = 0;
 	
 	return out;
@@ -37,7 +36,6 @@ void map_realloc(Map* map, size_t size) {
 	map->hash_table = calloc(size, sizeof (MapItem*));
 	map->size = size;
 	map->realloc_at = map->size * map->threshold;
-	map->n = 0;
 	
 	int i;
 	for (i = 0; i < old_size; i++)

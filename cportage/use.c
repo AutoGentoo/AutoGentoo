@@ -425,21 +425,19 @@ void emerge_parse_useflags(Emerge* emerge) {
 	while (current) {
 		next = current->next;
 		
-		for (Repository* repo = emerge->repo; repo; repo = repo->next) {
+		for (Repository* repo = emerge->repos; repo; repo = repo->next) {
 			if (current->atom->repo_selected == ATOM_REPO_DEFINED
 			    && strcmp(current->atom->repository, repo->name) != 0)
 				continue;
 			
 			Package* target = map_get(repo->packages, current->atom->key);
 			
-			if (!target) {
-				plog_warn("Package %s not found (package.accept_keywords)", current->atom->key);
+			if (!target)
 				continue;
-			}
 			
 			for (Ebuild* current_ebuild = target->ebuilds; current_ebuild; current_ebuild = current_ebuild->older) {
+				package_metadata_init(current_ebuild);
 				if (atom_match_ebuild(current_ebuild, current->atom)) {
-					package_metadata_init(current_ebuild);
 					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next)
 						ebuild_set_use(current_ebuild, current_flag->name, current_flag->status);
 				}

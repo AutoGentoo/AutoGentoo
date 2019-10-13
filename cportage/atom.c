@@ -63,7 +63,7 @@ P_Atom* atom_new(char* input) {
 	
 	out->category = strdup(input);
 	out->name = strdup(cat_splt + 1);
-	out->repository = strdup(emerge_main->default_repo);
+	out->repository = strdup(emerge_main->default_repo_name);
 	
 	asprintf(&out->key, "%s/%s", out->category, out->name);
 	
@@ -98,8 +98,6 @@ AtomVersion* atom_version_new(char* input) {
 	AtomVersion* current_node = NULL;
 	AtomVersion* next_node = NULL;
 	
-	char* saveptr;
-	
 	char* buf = version_str;
 	char* buf_splt = strpbrk(buf, "._-");
 	while (1) {
@@ -112,8 +110,9 @@ AtomVersion* atom_version_new(char* input) {
 			prefix_len = 0;
 			prefix_splt = buf;
 		}
-		else
+		else {
 			prefix_len = prefix_splt - buf;
+		}
 		
 		atom_version_pre_t prefix = -1;
 		
@@ -270,29 +269,77 @@ int atom_version_compare(AtomVersion* first, AtomVersion* second) {
 		size_t scf_l = strlen(scf);
 		size_t scs_l = strlen(scs);
 		
+		int star_skip = 0;
+		if (scf[scf_l - 1] == '*') {
+			star_skip = 1;
+			scf_l--;
+		}
+		else if (scs[scs_l - 1] == '*') {
+			star_skip = 1;
+			scs_l--;
+		}
+		
 		char scf_suf = 0;
 		char scs_suf = 0;
 		
-		if (scf[scf_l - 1] > '9') {
-			scf_suf = scf[scf_l - 1];
-			scf[scf_l - 1] = 0;
-		}
-		if (scs[scs_l - 1] > '9') {
-			scs_suf = scs[scs_l - 1];
-			scs[scs_l - 1] = 0;
-		}
+		/* 12.5.4 > 12.5b */
+		if (cs->next && scf[scf_l - 1] > '9')
+			return -1;
+		if (cf->next && scs[scs_l - 1] > '9')
+			return 1;
 		
-		char* temp;
-		int cmp_1 = (int)strtol(scf, &temp, 10);
-		int cmp_2 = (int)strtol(scs, &temp, 10);
+		if (scf[scf_l - 1] > '9')
+			scf_suf = scf[scf_l - 1];
+		if (scs[scs_l - 1] > '9')
+			scs_suf = scs[scs_l - 1];
+		
+		int cmp_1;
+		int cmp_2;
+		
+		if ((scf[0] != '0' || scf_l == 1) && (scs[0] != '0' || scs_l == 1)) {
+			cmp_1 = (int)strtol(scf, NULL, 10);
+			cmp_2 = (int)strtol(scs, NULL, 10);
+		}
+		else {
+			int maxlength = scf_l > scs_l ? (int)scf_l : (int)scs_l;
+			
+			char* r1 = malloc(maxlength + 1);
+			char* r2 = malloc(maxlength + 1);
+			r1[maxlength] = 0;
+			r2[maxlength] = 0;
+			
+			strncpy(r1, scf, scf_l);
+			strncpy(r2, scs, scs_l);
+			
+			for (int i1 = scf_l; i1 < maxlength; i1++)
+				r1[i1] = '0';
+			for (int i2 = scs_l; i2 < maxlength; i2++)
+				r2[i2] = '0';
+			
+			cmp_1 = (int)strtol(r1, NULL, 10);
+			cmp_2 = (int)strtol(r2, NULL, 10);
+			
+			free(r1);
+			free(r2);
+		}
 		
 		int cmp = cmp_1 - cmp_2;
 		int cmp_suf = scf_suf - scs_suf;
 		if (cmp != 0)
 			return cmp;
+		
+		if (star_skip)
+			return 0;
+		
 		if (cmp_suf != 0)
 			return cmp_suf;
+		
 	}
+	
+	if (cf)
+		return 1;
+	if (cs)
+		return -1;
 	
 	return 0;
 }
@@ -403,10 +450,49 @@ char* atom_get_str(P_Atom* atom) {
 	char prefix[3];
 	prv_get_prefix(prefix, atom->range);
 	
-	if (atom->range != ATOM_VERSION_ALL)
-		asprintf(&out, "%s%s-%s", prefix, atom->key, atom->version->full_version);
-	else
-		asprintf(&out, "%s", atom->key);
+	char flags[256];
+	flags[0] = 0;
+	for (AtomFlag* af = atom->useflags; af; af = af->next) {
+		/*
+		ATOM_USE_DISABLE, //!< atom[-bar]
+		ATOM_USE_ENABLE, //!< atom[bar]
+		ATOM_USE_ENABLE_IF_ON, //!< atom[bar?]
+		ATOM_USE_DISABLE_IF_OFF, //!< atom[!bar?]
+		ATOM_USE_EQUAL, //!< atom[bar=]
+		ATOM_USE_OPPOSITE //!< atom[!bar=]
+		 */
+		
+		if (af->option == ATOM_USE_DISABLE)
+			strcat(flags, "-");
+		else if (af->option == ATOM_USE_DISABLE_IF_OFF)
+			strcat(flags, "!");
+		
+		strcat(flags, af->name);
+		
+		if (af->option == ATOM_USE_ENABLE_IF_ON)
+			strcat(flags, "?");
+		else if (af->option == ATOM_USE_DISABLE_IF_OFF)
+			strcat(flags, "?");
+		else if (af->option == ATOM_USE_EQUAL)
+			strcat(flags, "=");
+		else if (af->option == ATOM_USE_EQUAL)
+			strcat(flags, "=");
+		
+		strcat(flags, " ");
+	}
+	
+	if (!flags[0]) {
+		if (atom->range != ATOM_VERSION_ALL)
+			asprintf(&out, "%s%s-%s", prefix, atom->key, atom->version->full_version);
+		else
+			asprintf(&out, "%s", atom->key);
+	}
+	else {
+		if (atom->range != ATOM_VERSION_ALL)
+			asprintf(&out, "%s%s-%s [ %s]", prefix, atom->key, atom->version->full_version, flags);
+		else
+			asprintf(&out, "%s [ %s]", atom->key, flags);
+	}
 
 	return out;
 }

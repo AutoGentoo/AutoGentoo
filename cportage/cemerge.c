@@ -13,6 +13,7 @@
 #include "emerge.h"
 #include "database.h"
 #include <string.h>
+#include <errno.h>
 
 Emerge* emerge_main;
 
@@ -24,11 +25,11 @@ void set_deep(Opt* opt, char* arg) {
 	emerge_main->options |= EMERGE_DEEP;
 }
 
-void set_buildroot(Opt* opt, char* arg) {
+void set_root(Opt* opt, char* arg) {
 	emerge_main->options |= EMERGE_BUILDROOT;
-	if (emerge_main->buildroot)
-		free(emerge_main->buildroot);
-	emerge_main->buildroot = strdup(arg);
+	if (emerge_main->root)
+		free(emerge_main->root);
+	emerge_main->root = strdup(arg);
 }
 
 void set_installroot(Opt* opt, char* arg) {
@@ -59,7 +60,7 @@ void print_help_wrapper(Opt* op, char* arg);
 Opt opt_handlers[] = {
 		{'q', "quiet",  "Don't print the build logs during emerge", set_quiet, OPT_SHORT | OPT_LONG},
 		{'D', "deep",   "Keep searching for dependencies even if package already installed", set_deep, OPT_SHORT | OPT_LONG},
-		{0,   "buildroot", "Path to the root of build environment", set_buildroot, OPT_LONG | OPT_ARG},
+		{0,   "root", "Path to the root of build environment", set_root, OPT_LONG | OPT_ARG},
 		{'h', "help",    "Print the help message and exit", print_help_wrapper, OPT_SHORT | OPT_LONG},
 		{'k', "usepkg",  "Use a package from the binhost", usepkg, OPT_SHORT | OPT_LONG},
 		{'v', "verbose",  "be verbose when printing dependencies", verbose, OPT_SHORT | OPT_LONG},
@@ -74,14 +75,21 @@ void print_help_wrapper(Opt* op, char* arg) {
 }
 
 int main (int argc, char** argv) {
+	AtomVersion* v1 = atom_version_new("1.1.0*");
+	AtomVersion* v2 = atom_version_new("1.1.0l");
+	printf("%d\n", atom_version_compare(v1, v2));
+	
 	Emerge* __emerge_main = emerge_new();
 	emerge_main = __emerge_main;
 	
 	emerge_main->atoms = opt_handle(opt_handlers, argc, argv + 1);
-	emerge_main->repo = emerge_repos_conf(__emerge_main);
+	emerge_main->repos = emerge_repos_conf(__emerge_main);
 	
-	if (!emerge_main->default_repo)
+	if (!emerge_main->default_repo) {
+		errno = 0;
+		plog_error("Could not initialize repostiories");
 		return 1;
+	}
 	
 	OpenSSL_add_all_digests();
 	
@@ -89,7 +97,7 @@ int main (int argc, char** argv) {
 	
 	int out = emerge(__emerge_main);
 	
-	repository_free(__emerge_main->repo);
+	repository_free(__emerge_main->repos);
 	portagedb_free(portdb);
 	
 	return out;

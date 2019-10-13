@@ -30,9 +30,11 @@ typedef enum {
 } emerge_build_t;
 
 struct __Emerge {
-	char* default_repo;
-	Repository* default_repo_ptr;
-	Repository* repo;
+	Repository* repos;
+	
+	char* default_repo_name;
+	Repository* default_repo;
+	
 	char** atoms; //!< Install arguments
 	char* root;
 	arch_t target_arch;

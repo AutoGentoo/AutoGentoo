@@ -12,6 +12,7 @@
 
 %code requires {
   #include "share.h"
+  #include "../globals.h"
   #include <stdlib.h>
   #include <string.h>
 }
@@ -54,8 +55,13 @@ program:                                        {mcout = NULL;}
             ;
 
 make_conf: entry                             {$$ = map_new(64, 0.8); map_insert($$, $1.key, $1.value);}
-         | make_conf entry                   {$$ = $1; map_insert($$, $2.key, $2.value);}
+         | make_conf entry                   {
+                                                $$ = $1;
+                                                make_conf_add($$, $2.key, $2.value);
+                                             }
+         ;
 
-entry:   IDENTIFIER EQUALS IDENTIFIER              {$$.key = $1; $$.value = $3;}
+entry:     IDENTIFIER EQUALS IDENTIFIER      {$$.key = $1; $$.value = $3;}
+         ;
 
 %%

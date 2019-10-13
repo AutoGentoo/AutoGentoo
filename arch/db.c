@@ -230,7 +230,7 @@ void aabs_db_read(aabs_db_t* db) {
 			fclose(fp);
 			free(buffer);
 			
-			curr_pkg->name_hash = map_insert(db->packages, curr_pkg->name, &curr_pkg);
+			map_insert(db->packages, curr_pkg->name, &curr_pkg);
 		} else if (strcmp(file_name, "files") == 0) {
 			size_t current_size = (size_t) archive_entry_size(entry);
 			char* buffer = malloc(current_size + 4);
@@ -249,7 +249,7 @@ void aabs_db_read(aabs_db_t* db) {
 				if (READ_NEXT () == 0)
 					break;
 				string_vector_add(curr_pkg->files, line);
-			};
+			}
 			
 			/* Just in case we reach end of file */
 			READ_NEXT_NO_BREAK();
@@ -259,7 +259,7 @@ void aabs_db_read(aabs_db_t* db) {
 					if (READ_NEXT () == 0)
 						break;
 					string_vector_add(curr_pkg->backup, line);
-				};
+				}
 			}
 			
 			fclose(fp);

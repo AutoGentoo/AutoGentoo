@@ -93,9 +93,7 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 	char* repos_conf_path = NULL;
 	asprintf(&repos_conf_path, "%s/etc/portage/repos.conf", emerge->root);
 	
-	Repository* parent = NULL;
 	Repository* current_repo = NULL;
-	Repository* next_repo = NULL;
 	
 	FPNode* repos_conf = open_directory(repos_conf_path);
 	free(repos_conf_path);
@@ -120,18 +118,15 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 				char* current_name = strdup(line + 1);
 				
 				if (strcmp(current_name, "DEFAULT") != 0) {
-					next_repo = repository_new();
-					next_repo->parent = emerge;
-					if (parent)
-						current_repo->next = next_repo;
-					else
-						parent = next_repo;
+					Repository* new_repo = repository_new();
+					new_repo->next = current_repo;
+					new_repo->parent = emerge;
+					new_repo->name = current_name;
 					
-					current_repo = next_repo;
-					current_repo->name = current_name;
+					if (strcmp(emerge->default_repo_name, current_name) == 0)
+						emerge->default_repo = new_repo;
 					
-					if (emerge->default_repo && strcmp(emerge->default_repo, current_name) == 0)
-						emerge->default_repo_ptr = current_repo;
+					current_repo = new_repo;
 				}
 				else
 					free(current_name);
@@ -142,9 +137,8 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 			char* name = strtok(line, "=");
 			char* value = strtok(NULL, "\n");
 			
-			if (!name || !value) {
+			if (!name || !value)
 				continue;
-			}
 			
 			for(; *name && *name == ' '; name++);
 			for(; *value && *value == ' '; value++);
@@ -158,11 +152,13 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 			for (; (value[n] == ' ' || value[n] == '\n') && n >= 0; n--)
 				value[n] = 0;
 			
-			if (!current_repo) {
-				if (strcmp(name, "main-repo") == 0)
-					emerge->default_repo = strdup(value);
+			if (strcmp(name, "main-repo") == 0) {
+				emerge->default_repo_name = strdup(value);
 				continue;
 			}
+			
+			if (!current_repo)
+				continue;
 			
 			if (strcmp(name, "masters") == 0) {
 				n = 0;
@@ -230,7 +226,7 @@ Repository* emerge_repos_conf(Emerge* emerge) {
 	
 	fpnode_free(repos_conf);
 	
-	return parent;
+	return current_repo;
 }
 
 void repository_free(Repository* repo) {
