@@ -89,8 +89,10 @@ int emerge (Emerge* emerge) {
 	dep_expr_buff = malloc(dep_expr_size);
 	dep_expr_buff[0] = 0;
 	
-	for (int i = 0; emerge->atoms[i]; i++)
+	for (int i = 0; emerge->atoms[i]; i++) {
 		strcat(dep_expr_buff, emerge->atoms[i]);
+		strcat(dep_expr_buff, " ");
+	}
 	
 	printf("---------\n");
 	

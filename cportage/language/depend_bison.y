@@ -152,8 +152,9 @@ command_atom   : atom_repo              {$$ = $1;}
                |         IDENTIFIER     {$$ = cmdline_atom_new($1); $$->range = ATOM_VERSION_ALL;}
                ;
 
-command_line   : command_atom                   {$$ = dependency_build_atom($1);}
+command_line   : command_atom                    {$$ = dependency_build_atom($1);}
                | command_atom '[' atom_flags ']' {$1->useflags = $3; $$ = dependency_build_atom($1);}
+               | command_line command_line       {$$ = $1; $$->next = $2;}
                ;
 
 %%
