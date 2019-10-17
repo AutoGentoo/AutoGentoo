@@ -10,11 +10,15 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <tgmath.h>
 #include "portage.h"
 #include "dependency.h"
 #include "globals.h"
-#include <math.h>
+
+int number_len(int num) {
+	char out[32];
+	sprintf(out, "%d", num);
+	return (int)strlen(out);
+}
 
 Emerge* emerge_new() {
 	Emerge* out = malloc(sizeof(Emerge));
@@ -138,7 +142,7 @@ int emerge (Emerge* emerge) {
 	
 	Vector* selected = pd_layer_resolve(emerge, dep);
 	
-	int max_width = (int)(log10(selected->n)) + 1;
+	int max_width = number_len(selected->n);
 	for (int i = 0; i < selected->n; i++) {
 		SelectedEbuild* eb = vector_get(selected, i);
 		printf("(%*d) ", max_width, i + 1);

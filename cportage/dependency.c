@@ -510,6 +510,8 @@ void selected_ebuild_print(Emerge* em, SelectedEbuild* se) {
 		
 		if (ebuild_use)
 			ebuild_use_status = ebuild_use->status;
+		else
+			continue;
 		
 		if ((ebuild_use_status != use->status && se->installed) || em->options & EMERGE_VERBOSE) {
 			if (use->status == USE_ENABLE)

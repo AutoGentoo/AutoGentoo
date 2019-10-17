@@ -6,20 +6,68 @@
 #define AUTOGENTOO_PROFILE_H
 
 #include <autogentoo/hacksaw/vector.h>
+#include <autogentoo/hacksaw/map.h>
 #include "constants.h"
 
 typedef struct __Profile Profile;
 
+/**
+ * Directly from 'man portage'
+ *  /etc/portage/make.profile/ or /etc/make.profile/
+              site-specific overrides go in /etc/portage/profile/
+      deprecated
+      eapi
+      make.defaults
+      packages
+      packages.build
+      package.accept_keywords
+      package.bashrc
+      package.keywords
+      package.mask
+      package.provided
+      package.unmask
+      package.use
+      package.use.force
+      package.use.mask
+      package.use.stable.force
+      package.use.stable.mask
+      parent
+      profile.bashrc
+      soname.provided
+      use.force
+      use.mask
+      use.stable.mask
+      use.stable.force
+      virtuals
+ */
+
 struct __Profile {
-	Vector* system_set;
+	/* make.defaults also passed into make.conf */
+	Map* make_defaults;
 	
-	Vector* use_mask;
+	/* The system set */
+	Vector* packages;
+	
+	/* Used for stage1 and stage2, We can do this now yay!! */
+	Vector* package_build;
+	
+	/* package.keywords overrided by non-deprecated package.accept_keywords */
+	/* accept keywords overrided by /etc/portage/package.accept_keywords */
+	Vector* package_accept_keywords;
+	
+	/* Sourced after profile.bashrc, inside the bashrc directory in profile */
+	Vector* package_bashrc;
+	
+	/* Package mask */
+	/* Mark an ebuild as masked */
 	Vector* package_mask;
 	
-	UseFlag* globals;
+	/* Create a fake install folder in db */
+	Vector* package_provided;
 	
-	Vector* use_force;
-	Vector* package_use_force; // precedence over use_force
+	/*  */
+	/* overrided by /etc/portage/package.use */
+	PackageUse* package_use;
 };
 
 void profile_parse(Profile* update, char* current_path, char* path);

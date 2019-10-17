@@ -6,14 +6,9 @@
 #include "keywords.h"
 #include "portage_log.h"
 #include <string.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <dirent.h>
-#include <fcntl.h>
 #include <autogentoo/hacksaw/map.h>
 #include "portage.h"
 #include "directory.h"
-#include <unistd.h>
 
 arch_t get_arch(char* search) {
 	if (!search)
