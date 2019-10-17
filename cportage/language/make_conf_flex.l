@@ -12,10 +12,10 @@ int mcerror(char *s) {
     exit(1);
 }
 
-Map* mc_parse (FILE* fp) {
+void mc_parse (FILE* fp, Map* out) {
     mcin = fp;
+    mcout = out;
     mcparse();
-    return (Map*)mcout;
 }
 
 %}

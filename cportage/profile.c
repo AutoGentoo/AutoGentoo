@@ -8,10 +8,12 @@
 #include "use.h"
 #include "directory.h"
 #include "portage_log.h"
+#include "globals.h"
 #include <linux/limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <share.h>
 
 void profile_parse(Profile* update, char* current_path, char* path) {
 	/* Parse the parents first */
@@ -50,8 +52,14 @@ void profile_parse(Profile* update, char* current_path, char* path) {
 		if (current_file->type != FP_NODE_FILE)
 			continue; /* Skip all subdirectories */
 		
-		if (strcmp(current_file->filename, "make.defaults") == 0) {
+		FILE* fp = fopen(current_file->path, "r");
+		if (!fp) {
+			plog_error("Failed to open profile file: %s", current_file->path);
+			continue;
+		}
 		
+		if (strcmp(current_file->filename, "make.defaults") == 0) {
+			mc_parse(fp, update->make_defaults);
 		}
 	}
 }

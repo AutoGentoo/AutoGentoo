@@ -16,6 +16,7 @@ Map* map_new(size_t new_size, double threshold) {
 	
 	out->hash_table = calloc(new_size, sizeof(MapItem*));
 	out->overlaps = 0;
+	out->n = 0;
 	
 	return out;
 }

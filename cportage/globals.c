@@ -76,7 +76,8 @@ Map* make_conf_new(Emerge *em) {
 	asprintf(&filename, "%s/etc/portage/make.conf", em->root);
 	
 	FILE* fp = fopen(filename, "r");
-	Map* out = mc_parse(fp);
+	Map* out = map_new(256, 0.8);
+	mc_parse(fp, out);
 	
 	fclose(fp);
 	

@@ -67,6 +67,7 @@ int emerge (Emerge* emerge) {
 	}
 	
 	manifest_metadata_deep(emerge->default_repo->category_manifests);
+	remove("/tmp/cportage.decomp");
 	
 	Manifest* current_cat;
 	Manifest* current_pkg;

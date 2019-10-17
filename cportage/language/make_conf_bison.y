@@ -46,22 +46,13 @@
 %token END_OF_FILE
 
 %type <entry> entry
-%type <map> make_conf
 
 %%
 
-program:                                        {mcout = NULL;}
-            | make_conf                         {mcout = $1;}
-            ;
+program:    entry                             {make_conf_add(mcout, $1.key, $1.value);}
+           | program entry                    {make_conf_add(mcout, $2.key, $2.value);}
+           ;
 
-make_conf: entry                             {$$ = map_new(64, 0.8); map_insert($$, $1.key, $1.value);}
-         | make_conf entry                   {
-                                                $$ = $1;
-                                                make_conf_add($$, $2.key, $2.value);
-                                             }
-         ;
-
-entry:     IDENTIFIER EQUALS IDENTIFIER      {$$.key = $1; $$.value = $3;}
-         ;
+entry:     IDENTIFIER EQUALS IDENTIFIER      {$$.key = $1; $$.value = $3;};
 
 %%
