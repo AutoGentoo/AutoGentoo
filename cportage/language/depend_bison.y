@@ -79,13 +79,13 @@ program:                                        {yyout = NULL;}
             | END_OF_FILE                       {yyout = NULL;}
             ;
 
-required_use_expr   : depend_expr_sel '(' required_use_expr ')' {$$ = use_build_required_use($1.target, $1.t); $$->depend = $3;}
+required_use_expr   : depend_expr_sel '(' required_use_expr ')' {$$ = use_build_required_use($1.target, $1.t); free($1.target); $$->depend = $3;}
                     | required_use_expr required_use_expr       {$$ = $1; $$->next = $2;}
                     | use_expr                                  {$$ = use_build_required_use($1.target, $1.t);}
                     | '(' required_use_expr ')'                 {$$ = $2;}
                     ;
 
-depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_build_use($p.target, $p.t, $c);}
+depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_build_use($p.target, $p.t, $c); free($p.target);}
                 | '(' depend_expr[c] ')'                    {$$ = $c;}
                 | atom                                      {$$ = dependency_build_atom($1);}
                 | depend_expr depend_expr                   {$$ = $1; $1->next = $2;}
@@ -111,8 +111,8 @@ atom_flags  : '!' atom_flag '?'     {$$ = $2; $$->option = ATOM_USE_DISABLE_IF_O
             | atom_flags ',' atom_flags {$$ = $1; $$->next = $3;}
             ;
 
-atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); $$->def = ATOM_NO_DEFAULT; $$->next = NULL;}
-            | IDENTIFIER USE_DEFAULT{$$ = atomflag_build($1); $$->def = $2; $$->next = NULL;}
+atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); free($1); $$->def = ATOM_NO_DEFAULT; $$->next = NULL;}
+            | IDENTIFIER USE_DEFAULT{$$ = atomflag_build($1); free($1); $$->def = $2; $$->next = NULL;}
             ;
 
 atom_repo   : atom_slot REPOSITORY {$$ = $1; free($$->repository); $$->repository = $2; $$->repo_selected = ATOM_REPO_DEFINED;}

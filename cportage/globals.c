@@ -32,37 +32,10 @@ Map* use_expand_new(Repository* repo) {
 	
 	for (FPNode* dir = use_expand_dir; dir; dir = dir->next) {
 		char* dot_split = strchr(dir->filename, '.');
-		char* key_name = strndup(dir->filename, dot_split - dir->filename);
+		char* key_name = strupr(strndup(dir->filename, dot_split - dir->filename));
 		
-		UseExpand* el = malloc(sizeof(UseExpand));
-		el->parent = repo;
-		el->variable_name = strupr(key_name);
-		el->possible_values = vector_new(VECTOR_UNORDERED | VECTOR_REMOVE);
-		
-		map_insert(out, el->variable_name, el);
-		
-		FILE* fp = fopen(dir->path, "r");
-		char* line = NULL;
-		size_t line_size = 0;
-		while (getline(&line, &line_size, fp) > 0) {
-			if (line[0] == '#')
-				continue;
-			char* name_tok = strtok(line, " - ");
-			if (!name_tok)
-				continue;
-			char* desc_tok = strtok(NULL, "\n");
-			if (!desc_tok)
-				continue;
-			
-			UseExpandEntry* entry = malloc(sizeof(UseExpandEntry));
-			entry->flag_name = strdup(name_tok);
-			entry->description = strdup(desc_tok + 2);
-			
-			vector_add(el->possible_values, entry);
-		}
-		
-		free(line);
-		fclose(fp);
+		map_insert(out, key_name, NULL); // Just create a set
+		free(key_name);
 	}
 	
 	fpnode_free(use_expand_dir);

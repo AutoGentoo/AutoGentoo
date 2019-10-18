@@ -46,14 +46,26 @@ void package_metadata_init(Ebuild* ebuild) {
 		name[name_size - 1] = 0;
 		value[value_size - 1] = 0;
 		
-		if (strcmp(name, "DEPEND") == 0)
+		if (strcmp(name, "DEPEND") == 0) {
+			if (ebuild->depend)
+				portage_die("DEPEND already allocated for %s", ebuild->ebuild_key);
 			ebuild->depend = depend_parse(value);
-		else if (strcmp(name, "RDEPEND") == 0)
+		}
+		else if (strcmp(name, "RDEPEND") == 0) {
+			if (ebuild->rdepend)
+				portage_die("RDEPEND already allocated for %s", ebuild->ebuild_key);
 			ebuild->rdepend = depend_parse(value);
-		else if (strcmp(name, "PDEPEND") == 0)
+		}
+		else if (strcmp(name, "PDEPEND") == 0) {
+			if (ebuild->pdepend)
+				portage_die("PDEPEND already allocated for %s", ebuild->ebuild_key);
 			ebuild->pdepend = depend_parse(value);
-		else if (strcmp(name, "BDEPEND") == 0)
+		}
+		else if (strcmp(name, "BDEPEND") == 0) {
+			if (ebuild->bdepend)
+				portage_die("BDEPEND already allocated for %s", ebuild->ebuild_key);
 			ebuild->bdepend = depend_parse(value);
+		}
 		else if (strcmp(name, "SLOT") == 0) {
 			char* tok = strtok(value, "/");
 			ebuild->slot = strdup(tok);
@@ -69,6 +81,9 @@ void package_metadata_init(Ebuild* ebuild) {
 		else if (strcmp(name, "IUSE") == 0)
 			ebuild->use = useflag_iuse_parse(ebuild->parent->parent->parent, value);
 	}
+	
+	free(value);
+	free(name);
 	
 	ebuild->metadata_init = 1;
 	fclose(fp);

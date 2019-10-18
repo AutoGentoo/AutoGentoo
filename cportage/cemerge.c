@@ -75,10 +75,6 @@ void print_help_wrapper(Opt* op, char* arg) {
 }
 
 int main (int argc, char** argv) {
-	AtomVersion* v1 = atom_version_new("1.1.0*");
-	AtomVersion* v2 = atom_version_new("1.1.0l");
-	printf("%d\n", atom_version_compare(v1, v2));
-	
 	Emerge* __emerge_main = emerge_new();
 	emerge_main = __emerge_main;
 	
@@ -97,8 +93,8 @@ int main (int argc, char** argv) {
 	
 	int out = emerge(__emerge_main);
 	
-	repository_free(__emerge_main->repos);
 	portagedb_free(portdb);
+	emerge_free(__emerge_main);
 	
 	return out;
 }

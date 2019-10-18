@@ -123,7 +123,6 @@ struct __P_Atom {
  */
 struct __Dependency {
 	Ebuild* parent_ebuild;
-	Dependency* parent;
 	P_Atom* atom; // NULL if it has depends
 	char* target; // NULL if has atom
 	
@@ -135,13 +134,6 @@ struct __Dependency {
 	
 	// Next target
 	Dependency* next;
-	
-	/** Next selector dependency
-	 Every PortageDependecy can have multiple Dependecy selectors
-	 This will be a per-portagedependecy linked list
-	 */
-	
-	Dependency* portage_depend_next;
 };
 
 

@@ -192,10 +192,13 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		if (!prev_sel->use_change)
 			prev_sel->use_change = vector_new(VECTOR_UNORDERED | VECTOR_REMOVE);
 		vector_add(prev_sel->use_change, out);
+		
+		if (out->action == PORTAGE_USE_FLAG)
+			prev_sel->action = PORTAGE_USE_FLAG;
 	}
-	
-	if (out->action == PORTAGE_USE_FLAG)
-		prev_sel->action = PORTAGE_USE_FLAG;
+	else {
+		selected_ebuild_free(out);
+	}
 	
 	return NULL;
 }
@@ -309,13 +312,13 @@ Vector* pd_layer_resolve(Emerge* parent, Dependency* depend) {
 	Vector* dep_order = vector_new(VECTOR_ORDERED | VECTOR_KEEP);
 	
 	__pd_layer_resolve__(parent, depend, NULL, ebuild_set, blocked_set, dep_order);
-	vector_free(ebuild_set);
 	
 	for (int i = 0; i < blocked_set->n; i++) {
 		vector_add(dep_order, vector_get(blocked_set, i));
 	}
 	
 	vector_free(blocked_set);
+	vector_free(ebuild_set);
 	
 	return dep_order;
 }
@@ -461,6 +464,13 @@ void selected_ebuild_free(SelectedEbuild* se) {
 	useflag_free(se->useflags);
 	useflag_free(se->explicit_flags);
 	
+	if (se->use_change) {
+		for (int i = 0; i < se->use_change->n; i++) {
+			selected_ebuild_free(vector_get(se->use_change, i));
+		}
+		vector_free(se->use_change);
+	}
+	
 	free(se);
 }
 
@@ -510,7 +520,7 @@ void selected_ebuild_print(Emerge* em, SelectedEbuild* se) {
 		
 		if (ebuild_use)
 			ebuild_use_status = ebuild_use->status;
-		else
+		else if (!(em->options & EMERGE_VERBOSE))
 			continue;
 		
 		if ((ebuild_use_status != use->status && se->installed) || em->options & EMERGE_VERBOSE) {
@@ -518,7 +528,7 @@ void selected_ebuild_print(Emerge* em, SelectedEbuild* se) {
 				printf("\033[1;31m");
 			else
 				printf("\033[1;34m-");
-			printf("%s%s\033[0m ", use->name, ebuild_use_status != use->status ? "*": "");
+			printf("%s%s\033[0m ", use->name, ebuild_use_status != use->status && ebuild_use ? "*": "");
 		}
 	}
 	

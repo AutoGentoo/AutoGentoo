@@ -17,6 +17,7 @@ P_Atom* cmdline_atom_new(char* name) {
 	asprintf(&cmd_temp, "SEARCH/%s", name);
 	P_Atom* out = atom_new(cmd_temp);
 	free(cmd_temp);
+	free(name);
 	
 	return out;
 }
@@ -50,7 +51,7 @@ P_Atom* atom_new(char* input) {
 		if (second_dash && isdigit(second_dash[1])) {
 			*second_dash = 0;
 			ver_splt = second_dash;
-			out->revision = atoi(last_dash+2);
+			out->revision = (int)strtol(last_dash+2, NULL, 10);
 		}
 		else
 			*last_dash = '-';
@@ -187,6 +188,7 @@ void atom_free(P_Atom* ptr) {
 		free(ptr->slot);
 	if (ptr->sub_slot)
 		free(ptr->sub_slot);
+	
 	free(ptr->repository);
 	free(ptr->category);
 	free(ptr->name);
@@ -198,12 +200,13 @@ void dependency_free(Dependency* ptr) {
 	Dependency* temp = ptr;
 	while (temp) {
 		next = temp->next;
-		if (temp->depends == IS_ATOM)
+		if (temp->atom)
 			atom_free(temp->atom);
 		if (temp->target)
 			free(temp->target);
 		dependency_free(temp->selectors);
 		free(temp);
+		
 		temp = next;
 	}
 }
@@ -217,7 +220,6 @@ Dependency* dependency_build_atom(P_Atom* atom) {
 	out->selector = USE_NONE;
 	out->selectors = NULL;
 	out->atom->parent = out;
-	out->parent = NULL;
 	
 	return out;
 }
@@ -233,8 +235,6 @@ Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* 
 	out->depends = HAS_DEPENDS;
 	out->selector = type;
 	out->selectors = selector;
-	out->parent = NULL;
-	out->portage_depend_next = NULL;
 	
 	return out;
 }
@@ -264,7 +264,7 @@ int atom_version_compare(AtomVersion* first, AtomVersion* second) {
 		char* scs = cs->v;
 		
 		if (cf->prefix != cs->prefix)
-			return cf->prefix - cs->prefix;
+			return (int)(cf->prefix - cs->prefix);
 		
 		size_t scf_l = strlen(scf);
 		size_t scs_l = strlen(scs);

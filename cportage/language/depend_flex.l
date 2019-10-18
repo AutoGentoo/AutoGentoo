@@ -25,6 +25,7 @@ Dependency* depend_parse (char* buffer) {
     yyparse();
 
     free(depend_expr_str);
+    yy_delete_buffer(bs);
 
     return (Dependency*)yyout;
 }
@@ -38,6 +39,7 @@ Dependency* cmdline_parse (char* buffer) {
     yyparse();
 
     free(depend_expr_str);
+    yy_delete_buffer(bs);
 
     return (Dependency*)yyout;
 }
@@ -51,6 +53,7 @@ P_Atom* atom_parse (char* buffer) {
     yyparse();
 
     free(depend_expr_str);
+    yy_delete_buffer(bs);
 
     P_Atom* atom_out = ((Dependency*)yyout)->atom;
     free((void*)yyout);
@@ -66,6 +69,7 @@ RequiredUse* required_use_parse (char* buffer) {
     yyparse();
 
     free(depend_expr_str);
+    yy_delete_buffer(bs);
     return (RequiredUse*)yyout;
 }
 

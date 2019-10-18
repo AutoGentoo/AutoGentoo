@@ -63,5 +63,6 @@ extern Emerge* emerge_main;
 
 Emerge* emerge_new();
 int emerge (Emerge* emg);
+void emerge_free(Emerge* em);
 
 #endif //AUTOGENTOO_EMERGE_H

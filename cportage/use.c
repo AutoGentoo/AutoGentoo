@@ -257,60 +257,6 @@ void requireduse_free(RequiredUse* ptr) {
 	free(ptr);
 }
 
-AtomFlag* dependency_useflag(Ebuild* resolved, AtomFlag* new_flags, AtomFlag* old_flags) {
-	AtomFlag* parent = atomflag_dup(old_flags);
-	AtomFlag* start = parent;
-	
-	for (AtomFlag* to_check = new_flags; to_check; to_check = to_check->next) {
-		AtomFlag* current = NULL;
-		for (AtomFlag* subcheck = start; subcheck; subcheck = subcheck->next) {
-			if (strcmp(to_check->name, subcheck->name) != 0)
-				continue;
-			current = subcheck;
-			break;
-		}
-		if (!current) {
-			// Use flag from two not found in one
-			// Add this flag
-			UseFlag* ebuild_use = get_use(resolved->use, to_check->name);
-			use_select_t ebuild_setting = ebuild_use != NULL ? ebuild_use->status : USE_NONE;
-			if (ebuild_setting == -1) {
-				if (to_check->def == ATOM_DEFAULT_OFF)
-					ebuild_setting = USE_DISABLE;
-				else if (to_check->def == ATOM_DEFAULT_ON)
-					ebuild_setting = USE_ENABLE;
-				else
-					portage_die("Ebuild %s-%s does not have %s flag set and no default was defined",
-							resolved->parent->key, resolved->version->full_version,
-							to_check->name);
-			}
-			else {
-				/* Doesn't make a difference */
-				if (ebuild_setting == USE_DISABLE && to_check->option == ATOM_USE_DISABLE)
-					continue;
-				else if (ebuild_setting == USE_ENABLE && to_check->option == ATOM_USE_ENABLE)
-					continue;
-			}
-			
-			AtomFlag* toadd = malloc(sizeof(AtomFlag));
-			toadd->name = strdup(to_check->name);
-			toadd->next = parent;
-			toadd->option = to_check->option;
-			toadd->def = to_check->def;
-			parent = toadd;
-			continue;
-		}
-		
-		// Use flag from two was found in one, compare them
-		if (current->option > ATOM_USE_ENABLE)
-			portage_die("P_ATOM option must be simplified before added to dependency tree");
-		
-		if (current->option != to_check->option) {
-		
-		}
-	}
-}
-
 char* strlwr(char* str) {
 	unsigned char* p = (unsigned char*)str;
 	while (*p) {

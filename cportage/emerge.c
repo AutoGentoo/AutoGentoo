@@ -104,6 +104,7 @@ int emerge (Emerge* emerge) {
 	Dependency* dep = cmdline_parse(dep_expr_buff);
 	if (!dep)
 		portage_die("Failed to parse arguments");
+	free(dep_expr_buff);
 	
 	for (Dependency* expand_dep = dep; expand_dep; expand_dep = expand_dep->next) {
 		if (expand_dep->atom && strcmp(expand_dep->atom->category, "SEARCH") == 0) {
@@ -142,14 +143,34 @@ int emerge (Emerge* emerge) {
 	}
 	
 	Vector* selected = pd_layer_resolve(emerge, dep);
-	
+	/*
 	int max_width = number_len(selected->n);
 	for (int i = 0; i < selected->n; i++) {
 		SelectedEbuild* eb = vector_get(selected, i);
 		printf("(%*d) ", max_width, i + 1);
 		
 		selected_ebuild_print(emerge, eb);
+	}*/
+	
+	for (int i = 0; i < selected->n; i++) {
+		selected_ebuild_free(vector_get(selected, i));
 	}
 	
+	vector_free(selected);
+	
 	return 0;
+}
+
+void emerge_free(Emerge* em) {
+	map_free(em->make_conf, free);
+	map_free(em->global_use, free);
+	map_free(em->use_expand, NULL);
+	
+	free(em->buildroot);
+	free(em->installroot);
+	free(em->root);
+	
+	repository_free(em->repos);
+	
+	free(em);
 }
