@@ -82,21 +82,13 @@ void emerge_parse_keywords(Emerge* emerge) {
 	sprintf(path, "%setc/portage/package.accept_keywords", emerge->root);
 	
 	FPNode* files = open_directory(path);
-	FPNode* old;
 	
 	/* REMOVE WHEN PROFILE IS READY */
 	Vector* keywords = vector_new(VECTOR_REMOVE | VECTOR_ORDERED);
 	
 	for (FPNode* current = files; current; current = current->next) {
-		if (current->type == FP_NODE_DIR) {
-			old = current;
-			free(old->filename);
-			free(old->parent_dir);
-			free(old->path);
-			current = current->next;
-			free(old);
+		if (current->type == FP_NODE_DIR)
 			continue;
-		}
 		
 		FILE* fp = fopen(current->path, "r");
 		if (!fp) {
@@ -108,6 +100,8 @@ void emerge_parse_keywords(Emerge* emerge) {
 		accept_keyword_parse(fp, keywords);
 		fclose(fp);
 	}
+	
+	fpnode_free(files);
 	
 	for (int i = 0; i < keywords->n; i++) {
 		Keyword* current = vector_get(keywords, i);

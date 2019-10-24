@@ -267,13 +267,10 @@ char* strlwr(char* str) {
 	return str;
 }
 
-PackageUse* useflag_parse(FILE* fp, PackageUse** last) {
+void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required) {
 	char* line = NULL;
 	size_t n = 0;
 	size_t read_size = 0;
-	
-	PackageUse* out = NULL;
-	PackageUse* temp = NULL;
 	
 	while ((read_size = getline(&line, &n, fp)) != -1) {
 		if (line[0] == '#' || line[0] == '\n' || line[0] == 0)
@@ -283,8 +280,9 @@ PackageUse* useflag_parse(FILE* fp, PackageUse** last) {
 		*atom_splt = 0;
 		char* atom = strdup(line);
 		
-		temp = malloc(sizeof(PackageUse));
+		PackageUse* temp = malloc(sizeof(PackageUse));
 		temp->atom = atom_parse(atom);
+		temp->keyword_required = keyword_required;
 		temp->flags = NULL;
 		free(atom);
 		
@@ -312,15 +310,10 @@ PackageUse* useflag_parse(FILE* fp, PackageUse** last) {
 			temp->flags = new_flag;
 		}
 		
-		if (!out)
-			*last = temp;
-		
-		temp->next = out;
-		out = temp;
+		vector_add(useflags, temp);
 	}
-	free(line);
 	
-	return out;
+	free(line);
 }
 
 void emerge_parse_useflags(Emerge* emerge) {
@@ -328,21 +321,13 @@ void emerge_parse_useflags(Emerge* emerge) {
 	sprintf(path, "%setc/portage/package.use", emerge->root);
 	
 	FPNode* files = open_directory(path);
-	FPNode* old;
 	
-	PackageUse* parsed = NULL;
-	PackageUse* temp = NULL;
+	/* USE THE PROFILE VECTOR WHEN READY */
+	Vector* useflags = vector_new(VECTOR_REMOVE | VECTOR_ORDERED);
 	
-	for (FPNode* current = files; current;) {
-		if (current->type == FP_NODE_DIR) {
-			old = current;
-			free(old->filename);
-			free(old->parent_dir);
-			free(old->path);
-			current = current->next;
-			free(old);
+	for (FPNode* current = files; current; current = current->next) {
+		if (current->type == FP_NODE_DIR)
 			continue;
-		}
 		
 		FILE* fp = fopen(current->path, "r");
 		if (!fp) {
@@ -351,25 +336,14 @@ void emerge_parse_useflags(Emerge* emerge) {
 			return;
 		}
 		
-		PackageUse* last = NULL;
-		temp = useflag_parse(fp, &last);
-		
-		last->next = parsed;
-		parsed = temp;
+		useflag_parse(fp, useflags, KEYWORD_UNSTABLE);
 		fclose(fp);
-		
-		old = current;
-		free(old->filename);
-		free(old->parent_dir);
-		free(old->path);
-		current = current->next;
-		free(old);
 	}
 	
-	PackageUse* next;
-	PackageUse* current = parsed;
-	while (current) {
-		next = current->next;
+	fpnode_free(files);
+	
+	for (int i = 0; i < useflags->n; i++) {
+		PackageUse* current = vector_get(useflags, i);
 		
 		for (Repository* repo = emerge->repos; repo; repo = repo->next) {
 			if (current->atom->repo_selected == ATOM_REPO_DEFINED
@@ -384,15 +358,12 @@ void emerge_parse_useflags(Emerge* emerge) {
 			for (Ebuild* current_ebuild = target->ebuilds; current_ebuild; current_ebuild = current_ebuild->older) {
 				package_metadata_init(current_ebuild);
 				if (atom_match_ebuild(current_ebuild, current->atom)) {
-					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next)
-						ebuild_set_use(current_ebuild, current_flag->name, current_flag->status);
+					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next) {
+						if (current_ebuild->keywords[emerge->target_arch] >= current->keyword_required)
+							ebuild_set_use(current_ebuild, current_flag->name, current_flag->status);
+					}
 				}
 			}
 		}
-		
-		useflag_free(current->flags);
-		atom_free(current->atom);
-		free(current);
-		current = next;
 	}
 }
