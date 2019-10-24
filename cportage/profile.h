@@ -8,8 +8,24 @@
 #include <autogentoo/hacksaw/vector.h>
 #include <autogentoo/hacksaw/map.h>
 #include "constants.h"
+#include "atom.h"
 
 typedef struct __Profile Profile;
+
+typedef struct __PackageMask PackageMask;
+
+typedef enum {
+	PACKAGE_MASK,
+	PACKAGE_UNMASK
+} mask_t;
+
+struct __PackageMask {
+	P_Atom* atom;
+	mask_t mask;
+	
+	PackageMask* next;
+	PackageMask** last;
+};
 
 /**
  * Directly from 'man portage'
@@ -40,13 +56,15 @@ typedef struct __Profile Profile;
       use.stable.force
       virtuals
  */
-
 struct __Profile {
 	/* make.defaults also passed into make.conf */
 	Map* make_defaults;
 	
 	/* The system set */
 	Vector* packages;
+	
+	/* The system set */
+	Vector* profile_packages;
 	
 	/* Used for stage1 and stage2, We can do this now yay!! */
 	Vector* package_build;
@@ -60,7 +78,7 @@ struct __Profile {
 	
 	/* Package mask */
 	/* Mark an ebuild as masked */
-	Vector* package_mask;
+	PackageMask* package_mask;
 	
 	/* Create a fake install folder in db */
 	Vector* package_provided;
