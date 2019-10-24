@@ -28,8 +28,8 @@ struct __UseExpand {
 };
 
 Map* use_expand_new(Repository* repo);
-Map* make_conf_new(Emerge *em);
-Map* make_conf_use(Emerge* em);
+void make_conf_parse(Emerge *em);
+void make_conf_use(Emerge* em);
 void make_conf_add(Map* make_conf, char* key, char* value);
 
 #endif //AUTOGENTOO_GLOBALS_H

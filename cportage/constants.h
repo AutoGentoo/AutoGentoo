@@ -29,5 +29,6 @@ typedef struct __SelectedEbuild SelectedEbuild;
 typedef struct __RebuildEbuild RebuildEbuild;
 typedef struct __PortageDB PortageDB;
 typedef struct __Suggestion Suggestion;
+typedef struct __Keyword Keyword;
 
 #endif //AUTOGENTOO_CONSTANTS_H

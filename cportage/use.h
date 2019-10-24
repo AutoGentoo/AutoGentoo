@@ -5,6 +5,7 @@
 #ifndef AUTOGENTOO_REQUIRE_USE_H
 #define AUTOGENTOO_REQUIRE_USE_H
 
+#include <autogentoo/hacksaw/vector.h>
 #include "constants.h"
 #include "atom.h"
 #include "cportage_defines.h"
@@ -40,6 +41,8 @@ UseFlag * useflag_iuse_parse(Emerge* em, char *metadata);
 void useflag_free(UseFlag* ptr);
 void requireduse_free(RequiredUse* ptr);
 AtomFlag* dependency_useflag(Ebuild* resolved, AtomFlag* new_flags, AtomFlag* old_flags);
+
+void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required, use_priority_t priority);
 void emerge_parse_useflags(Emerge* emerge);
 
 #endif //AUTOGENTOO_REQUIRE_USE_H

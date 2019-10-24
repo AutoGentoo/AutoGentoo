@@ -32,7 +32,6 @@ use_select_t ebuild_set_use(Ebuild* ebuild, char* useflag, use_select_t new_val)
 		}
 	}
 	
-	plog_warn("Flag %s not found for ebuild %s-%s", useflag, ebuild->parent->key, ebuild->version->full_version);
 	return -1;
 }
 
@@ -227,7 +226,7 @@ UseFlag* useflag_iuse_parse(Emerge* em, char* metadata) {
 		
 		/* Set profile use (maybe?) */
 		/* Set globals */
-		use_select_t* ptr = map_get(em->global_use, current->name);
+		use_select_t* ptr = map_get(em->profile->use, current->name);
 		if (ptr)
 			current->status = *ptr;
 		
@@ -273,7 +272,7 @@ char* strlwr(char* str) {
 	return str;
 }
 
-void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required) {
+void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required, use_priority_t priority) {
 	char* line = NULL;
 	size_t n = 0;
 	size_t read_size = 0;
@@ -303,7 +302,7 @@ void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required) {
 				
 				asprintf(&curr_flag, "%s%s", curr_flag, use_expand_flag);
 				
-				UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE, PRIORITY_NORMAL);
+				UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE, priority);
 				new_flag->next = temp->flags;
 				temp->flags = new_flag;
 				
@@ -311,7 +310,7 @@ void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required) {
 				continue;
 			}
 			
-			UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE, PRIORITY_NORMAL);
+			UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE, priority);
 			new_flag->next = temp->flags;
 			temp->flags = new_flag;
 		}
@@ -329,7 +328,6 @@ void emerge_parse_useflags(Emerge* emerge) {
 	FPNode* files = open_directory(path);
 	
 	/* USE THE PROFILE VECTOR WHEN READY */
-	Vector* useflags = vector_new(VECTOR_REMOVE | VECTOR_ORDERED);
 	
 	for (FPNode* current = files; current; current = current->next) {
 		if (current->type == FP_NODE_DIR)
@@ -342,14 +340,14 @@ void emerge_parse_useflags(Emerge* emerge) {
 			return;
 		}
 		
-		useflag_parse(fp, useflags, KEYWORD_UNSTABLE);
+		useflag_parse(fp, emerge->profile->package_use, KEYWORD_UNSTABLE, PRIORITY_NORMAL);
 		fclose(fp);
 	}
 	
 	fpnode_free(files);
 	
-	for (int i = 0; i < useflags->n; i++) {
-		PackageUse* current = vector_get(useflags, i);
+	for (int i = 0; i < emerge->profile->package_use->n; i++) {
+		PackageUse* current = vector_get(emerge->profile->package_use, i);
 		
 		for (Repository* repo = emerge->repos; repo; repo = repo->next) {
 			if (current->atom->repo_selected == ATOM_REPO_DEFINED

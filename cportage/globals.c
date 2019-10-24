@@ -5,7 +5,6 @@
 #define _GNU_SOURCE
 
 #include <stdio.h>
-#include "globals.h"
 #include "directory.h"
 #include "portage.h"
 #include "emerge.h"
@@ -44,28 +43,22 @@ Map* use_expand_new(Repository* repo) {
 }
 
 
-Map* make_conf_new(Emerge *em) {
+void make_conf_parse(Emerge *em) {
 	char* filename = NULL;
 	asprintf(&filename, "%s/etc/portage/make.conf", em->root);
 	
 	FILE* fp = fopen(filename, "r");
-	Map* out = map_new(256, 0.8);
-	mc_parse(fp, out);
-	
+	mc_parse(fp, em->profile->make_conf);
 	fclose(fp);
-	
-	return out;
 }
 
-Map * make_conf_use(Emerge* em) {
+void make_conf_use(Emerge* em) {
 	StringVector* keys = map_all_keys(em->use_expand);
-	Map* out = map_new(256, 0.8);
-	
 	
 	/* USE_EXPAND */
 	for (int i = 0; i < keys->n; i++) {
 		char* key = string_vector_get(keys, i);
-		char* value = map_get(em->make_conf, key);
+		char* value = map_get(em->profile->make_conf, key);
 		
 		if (!value)
 			continue;
@@ -84,14 +77,14 @@ Map * make_conf_use(Emerge* em) {
 			}
 			else
 				asprintf(&name, "%s_%s", key, tok);
-			free(map_insert(out, name, status));
+			free(map_insert(em->profile->use, name, status));
 			free(name);
 		}
 		free(value);
 		free(key);
 	}
 	
-	char* use_str = map_get(em->make_conf, "USE");
+	char* use_str = map_get(em->profile->make_conf, "USE");
 	if (use_str) {
 		use_str = strdup(use_str);
 		for (char* tok = strtok(use_str, " "); tok; tok = strtok(NULL, " ")) {
@@ -103,75 +96,81 @@ Map * make_conf_use(Emerge* em) {
 				tok++;
 			}
 			
-			free(map_insert(out, tok, status));
+			free(map_insert(em->profile->use, tok, status));
 		}
 		free(use_str);
 	}
-	
-	return out;
 }
 
-char* prv_str_replace(char *orig, char *rep, char *with) {
-	char* result; // the return string
-	char* ins;    // the next insert point
-	char* tmp;    // varies
-	size_t len_rep;  // length of rep (the string to remove)
-	size_t len_with; // length of with (the string to replace rep with)
-	size_t len_front; // distance between rep and end of last rep
-	int count;    // number of replacements
+char* prv_str_replace(char* s, char* oldW, char* newW) {
+	char *result;
+	int i, cnt = 0;
+	int newWlen = strlen(newW);
+	int oldWlen = strlen(oldW);
 	
-	// sanity checks and initialization
-	if (!orig || !rep)
-		return NULL;
-	len_rep = strlen(rep);
-	if (len_rep == 0)
-		return NULL; // empty rep causes infinite loop during count
-	if (!with)
-		with = "";
-	len_with = strlen(with);
-	
-	// count the number of replacements needed
-	ins = orig;
-	for (count = 0; (tmp = strstr(ins, rep)); ++count) {
-		ins = tmp + len_rep;
+	// Counting the number of times old word
+	// occur in the string
+	for (i = 0; s[i] != '\0'; i++)
+	{
+		if (strstr(&s[i], oldW) == &s[i])
+		{
+			cnt++;
+			
+			// Jumping to index after the old word.
+			i += oldWlen - 1;
+		}
 	}
 	
-	tmp = result = malloc(strlen(orig) + (len_with - len_rep) * count + 1);
+	// Making new string of enough length
+	result = (char *)malloc(i + cnt * (newWlen - oldWlen) + 1);
 	
-	if (!result)
-		return NULL;
-	
-	// first time through the loop, all the variable are set correctly
-	// from here on,
-	//    tmp points to the end of the result string
-	//    ins points to the next occurrence of rep in orig
-	//    orig points to the remainder of orig after "end of rep"
-	while (count--) {
-		ins = strstr(orig, rep);
-		len_front = ins - orig;
-		tmp = strncpy(tmp, orig, len_front) + len_front;
-		tmp = strcpy(tmp, with) + len_with;
-		orig += len_front + len_rep; // move to next "end of rep"
+	i = 0;
+	while (*s)
+	{
+		// compare the substring with the result
+		if (strstr(s, oldW) == s)
+		{
+			strcpy(&result[i], newW);
+			i += newWlen;
+			s += oldWlen;
+		}
+		else
+			result[i++] = *s++;
 	}
-	strcpy(tmp, orig);
+	
+	result[i] = '\0';
 	return result;
 }
 
-void make_conf_add(Map* make_conf, char* key, char* value) {
+void make_conf_add(Map* make_conf, char* key, char* value, int is_profile) {
+	int is_incremental = 0;
+	if (strcmp(key, "USE") == 0 || strcmp(key, "ACCEPT_KEYWORDS") == 0 || strncmp(key, "CONFIG_PROTECT", 14) == 0)
+		is_incremental = 1;
+	
 	char* old_value = map_get(make_conf, key);
 	
+	char* replace_key = NULL;
+	char* new_value = NULL;
+	asprintf(&replace_key, "${%s}", key);
+	
 	if (!old_value) {
-		map_insert(make_conf, key, value);
+		new_value = prv_str_replace(value, replace_key, "");
+		map_insert(make_conf, key, new_value);
+		free(value);
+		free(replace_key);
 		return;
 	}
 	
-	char* replace_key = NULL;
-	asprintf(&replace_key, "${%s}", key);
-	char* new_value = prv_str_replace(value, replace_key, old_value);
-	
-	printf("%s = %s\n", key, new_value);
+	if (is_incremental) {
+		char* incremental_buffer = NULL;
+		asprintf(&incremental_buffer, "%s %s", old_value, value);
+		new_value = prv_str_replace(incremental_buffer, replace_key, "");
+		free(incremental_buffer);
+	}
+	else
+		new_value = prv_str_replace(value, replace_key, "");
 	
 	free(replace_key);
-	
+	free(value);
 	free(map_insert(make_conf, key, new_value));
 }

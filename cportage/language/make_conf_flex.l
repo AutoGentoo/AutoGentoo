@@ -8,7 +8,7 @@
 #include <string.h>
 
 int mcerror(char *s) {
-    fprintf(stderr, "%s in line %d near '%s'\n", s, mclineno, mctext);
+    fprintf(stderr, "MAKECONF ERROR %s in line %d near '%s'\n", s, mclineno, mctext);
     exit(1);
 }
 
