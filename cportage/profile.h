@@ -9,6 +9,7 @@
 #include <autogentoo/hacksaw/map.h>
 #include "constants.h"
 #include "atom.h"
+#include "keywords.h"
 
 typedef struct __Profile Profile;
 
@@ -70,7 +71,7 @@ struct __Profile {
 	Vector* package_build;
 	
 	/* package.keywords overrided by non-deprecated package.accept_keywords */
-	/* accept keywords overrided by /etc/portage/package.accept_keywords */
+	/* above keywords overrided by /etc/portage/package.accept_keywords */
 	Vector* package_accept_keywords;
 	
 	/* Sourced after profile.bashrc, inside the bashrc directory in profile */

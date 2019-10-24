@@ -408,8 +408,13 @@ P_Atom* atom_dup(P_Atom* atom) {
 	
 	if (atom->slot)
 		out->slot = strdup(atom->slot);
+	else
+		out->slot = NULL;
+	
 	if (atom->sub_slot)
 		out->sub_slot = strdup(atom->sub_slot);
+	else
+		out->sub_slot = NULL;
 	
 	out->key = strdup(atom->key);
 	out->name = strdup(atom->name);

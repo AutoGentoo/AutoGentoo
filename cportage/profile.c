@@ -96,6 +96,10 @@ void profile_package_unmask(Profile* update, FILE* fp) {
 	profile_package_mask_meta(update, fp, PACKAGE_UNMASK);
 }
 
+void profile_package_keywords(Profile* update, FILE* fp) {
+	accept_keyword_parse(fp, update->package_accept_keywords);
+}
+
 void profile_open(Profile* profile, int profile_dir, char* filename, void (*func)(Profile*, FILE*)) {
 	int fd = openat(profile_dir, filename, O_RDONLY);
 	if (fd < 0)
@@ -142,4 +146,6 @@ void profile_parse(Profile* update, char* current_path, char* path) {
 	profile_open(update, prof_dir, "packages", profile_packages);
 	profile_open(update, prof_dir, "package.mask", profile_package_mask);
 	profile_open(update, prof_dir, "package.unmask", profile_package_unmask);
+	profile_open(update, prof_dir, "package.keywords", profile_package_keywords); // DEPRACATED
+	profile_open(update, prof_dir, "package.accept_keywords", profile_package_keywords);
 }

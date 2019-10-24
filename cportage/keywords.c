@@ -53,13 +53,10 @@ void keyword_parse(keyword_t* out, char* line) {
 	free(line);
 }
 
-Keyword* accept_keyword_parse(FILE* fp, Keyword** last) {
+void accept_keyword_parse(FILE* fp, Vector* keywords) {
 	char* line = NULL;
 	size_t n = 0;
 	size_t read_size = 0;
-	
-	Keyword* out = NULL;
-	Keyword* temp = NULL;
 	
 	while ((read_size = getline(&line, &n, fp)) != -1) {
 		if (line[0] == '#' || line[0] == '\n' || line[0] == 0)
@@ -69,20 +66,15 @@ Keyword* accept_keyword_parse(FILE* fp, Keyword** last) {
 		*atom_splt = 0;
 		char* atom = strdup(line);
 		
-		temp = malloc(sizeof(Keyword));
-		keyword_parse(temp->keywords, atom_splt + 1);
-		temp->atom = atom_parse(atom);
+		Keyword* new_keyword = malloc(sizeof(Keyword));
+		keyword_parse(new_keyword->keywords, atom_splt + 1);
+		new_keyword->atom = atom_parse(atom);
 		free(atom);
 		
-		if (!out)
-			*last = temp;
-		
-		temp->next = out;
-		out = temp;
+		vector_add(keywords, new_keyword);
 	}
-	free(line);
 	
-	return out;
+	free(line);
 }
 
 void emerge_parse_keywords(Emerge* emerge) {
@@ -92,10 +84,10 @@ void emerge_parse_keywords(Emerge* emerge) {
 	FPNode* files = open_directory(path);
 	FPNode* old;
 	
-	Keyword* parsed = NULL;
-	Keyword* temp = NULL;
+	/* REMOVE WHEN PROFILE IS READY */
+	Vector* keywords = vector_new(VECTOR_REMOVE | VECTOR_ORDERED);
 	
-	for (FPNode* current = files; current;) {
+	for (FPNode* current = files; current; current = current->next) {
 		if (current->type == FP_NODE_DIR) {
 			old = current;
 			free(old->filename);
@@ -113,26 +105,12 @@ void emerge_parse_keywords(Emerge* emerge) {
 			return;
 		}
 		
-		Keyword* last = NULL;
-		temp = accept_keyword_parse(fp, &last);
-		
-		last->next = parsed;
-		parsed = temp;
+		accept_keyword_parse(fp, keywords);
 		fclose(fp);
-		
-		old = current;
-		free(old->filename);
-		free(old->parent_dir);
-		free(old->path);
-		current = current->next;
-		free(old);
 	}
 	
-	Keyword* next;
-	Keyword* current = parsed;
-	Keyword* new;
-	while (current) {
-		next = current->next;
+	for (int i = 0; i < keywords->n; i++) {
+		Keyword* current = vector_get(keywords, i);
 		
 		for (Repository* repo = emerge->repos; repo; repo = repo->next) {
 			if (current->atom->repo_selected == ATOM_REPO_DEFINED
@@ -145,7 +123,7 @@ void emerge_parse_keywords(Emerge* emerge) {
 				continue;
 			}
 			
-			new = malloc(sizeof(Keyword));
+			Keyword* new = malloc(sizeof(Keyword));
 			new->next = target->keywords;
 			new->atom = atom_dup(current->atom);
 			memcpy(new->keywords, current->keywords, sizeof(keyword_t) * ARCH_END);
@@ -153,10 +131,12 @@ void emerge_parse_keywords(Emerge* emerge) {
 			new->next = target->keywords;
 			target->keywords = new;
 		}
-		
-		keyword_free(current);
-		current = next;
 	}
+	
+	for (int i = 0; i < keywords->n; i++)
+		keyword_free(vector_get(keywords, i));
+	
+	vector_free(keywords);
 }
 
 void keyword_free(Keyword* keyword) {

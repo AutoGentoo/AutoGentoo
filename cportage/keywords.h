@@ -38,7 +38,7 @@ static struct __keyword_link_strct {
 
 arch_t get_arch(char* search);
 void keyword_parse(keyword_t* out, char* line);
-Keyword* accept_keyword_parse(FILE* fp, Keyword** last);
+void accept_keyword_parse(FILE* fp, Vector* keywords);
 void keyword_free(Keyword* keyword);
 void emerge_parse_keywords(Emerge* emerge);
 
