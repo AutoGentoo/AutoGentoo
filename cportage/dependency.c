@@ -26,7 +26,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 			plog_error("Required by %s", parent_ebuild->ebuild->ebuild_key);
 		
 		free(atom_str);
-		exit(1);
+		portage_die("Masked package");
 	}
 	
 	package_metadata_init(out->ebuild);
@@ -85,16 +85,14 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 				resolved_status = parent_flag->status == USE_ENABLE ? USE_DISABLE : USE_ENABLE;
 			
 			if (def_status != resolved_status) {
-				errno = 0;
 				char* atom_str = atom_get_str(dep->atom);
-				plog_error("Default use for %s did not match %s", current_use->name, atom_str);
-				
-				exit(1);
+				portage_die("Default use for %s did not match %s", current_use->name, atom_str);
 			}
 		}
 		else if (!flag)
 			continue;
 		else {
+			use_select_t old_status = flag->status;
 			if (current_use->option == ATOM_USE_ENABLE)
 				flag->status = USE_ENABLE;
 			else if (current_use->option == ATOM_USE_DISABLE)
@@ -109,10 +107,14 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 				flag->status = parent_flag->status;
 			else if (current_use->option == ATOM_USE_OPPOSITE)
 				flag->status = parent_flag->status == USE_ENABLE ? USE_DISABLE : USE_ENABLE;
+			
+			/* Error if flag was forced */
+			if (flag->priority == PRIORITY_FORCE && old_status != flag->status)
+				portage_die("Explicit flag %s in %s overriden by profile forced flag", flag->name, out->ebuild->ebuild_key);
 		}
 		
 		if (flag) {
-			UseFlag* ex_dup = useflag_new(flag->name, flag->status);
+			UseFlag* ex_dup = useflag_new(flag->name, flag->status, PRIORITY_NORMAL);
 			ex_dup->next = out->explicit_flags;
 			out->explicit_flags = ex_dup;
 		}
@@ -131,7 +133,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 				selected_ebuild_print(emerge, vector_get(out->use_change, i));
 		}
 		
-		exit(1);
+		portage_die("Invalid required use");
 	}
 	
 	if (out->installed && out->action == PORTAGE_REPLACE) {
@@ -177,7 +179,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		free(atom_1);
 		free(atom_2);
 		
-		exit(1);
+		portage_die("Dependency use conflict");
 	}
 	
 	for (UseFlag* use = out->explicit_flags; use; use = use->next) {
@@ -210,8 +212,11 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 			/* Do logical evaluation for use flags */
 			if ((current_depend->selector == USE_DISABLE || current_depend->selector == USE_ENABLE)) {
 				UseFlag* u = get_use(target->useflags, current_depend->target);
-				if (u && u->status == current_depend->selector)
+				if (u && u->status == current_depend->selector) {
+					plog_enter_stack("%c%s ?", current_depend->selector == USE_ENABLE ? ' ' : '!', current_depend->target);
 					__pd_layer_resolve__(parent, current_depend->selectors, target, ebuild_set, blocked_set, dependency_order);
+					plog_exit_stack();
+				}
 			} else if (current_depend->selector == USE_LEAST_ONE) {
 				for (Dependency* least_one_iter = current_depend->selectors; least_one_iter; least_one_iter = least_one_iter->next) {
 				
@@ -289,7 +294,10 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 			continue;
 		}
 		
+		char* atom_stack_str = atom_get_str(current_depend->atom);
+		plog_enter_stack("resolve %s", atom_stack_str);
 		SelectedEbuild* se = pd_resolve_single(parent, target, current_depend, ebuild_set);
+		plog_exit_stack();
 		
 		/* Could be dangerous because use flags could change dependencies */
 		if (!se) /* Already resolved */
@@ -297,10 +305,24 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 		
 		vector_add(ebuild_set, se);
 		
+		
+		plog_enter_stack("bdepend %s", atom_stack_str);
 		__pd_layer_resolve__(parent, se->ebuild->bdepend, se, ebuild_set, blocked_set, dependency_order);
+		plog_exit_stack();
+		
+		plog_enter_stack("depend %s", atom_stack_str);
 		__pd_layer_resolve__(parent, se->ebuild->depend, se, ebuild_set, blocked_set, dependency_order);
+		plog_exit_stack();
+		
+		plog_enter_stack("rdepend %s", atom_stack_str);
 		__pd_layer_resolve__(parent, se->ebuild->rdepend, se, ebuild_set, blocked_set, dependency_order);
+		plog_exit_stack();
+		
+		plog_enter_stack("pdepend %s", atom_stack_str);
 		__pd_layer_resolve__(parent, se->ebuild->pdepend, se, ebuild_set, blocked_set, dependency_order);
+		plog_exit_stack();
+		
+		free(atom_stack_str);
 		
 		vector_add(dependency_order, se);
 	}

@@ -10,6 +10,10 @@
 
 #define LOG_TARGET stdout;
 
+void plog_init();
+void plog_enter_stack(char* stack_name, ...);
+void plog_exit_stack();
+
 void plog_info(char* fmt, ...);
 void plog_error(char* fmt, ...);
 void plog_warn(char* fmt, ...);

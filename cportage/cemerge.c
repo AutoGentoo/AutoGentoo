@@ -75,6 +75,8 @@ void print_help_wrapper(Opt* op, char* arg) {
 }
 
 int main (int argc, char** argv) {
+	plog_init();
+	plog_enter_stack("main");
 	Emerge* __emerge_main = emerge_new();
 	emerge_main = __emerge_main;
 	
@@ -96,5 +98,6 @@ int main (int argc, char** argv) {
 	portagedb_free(portdb);
 	emerge_free(__emerge_main);
 	
+	plog_exit_stack();
 	return out;
 }

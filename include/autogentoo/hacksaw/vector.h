@@ -21,7 +21,7 @@ enum __vector_opts {
 
 struct __Vector {
 	void** ptr; // Location where elements are stored
-	size_t n; // Number of filled places
+	int n; // Number of filled places
 	size_t s; // Max number of elements (increments by HACKSAW_VECTOR_INCREMENT)
 	
 	vector_opts opts;

@@ -36,11 +36,15 @@ use_select_t ebuild_set_use(Ebuild* ebuild, char* useflag, use_select_t new_val)
 	return -1;
 }
 
-use_select_t s_ebuild_set_use(SelectedEbuild* ebuild, char* useflag, use_select_t new_val) {
+use_select_t s_ebuild_set_use(SelectedEbuild* ebuild, char* useflag, use_select_t new_val, use_priority_t priority) {
 	UseFlag* target = get_use(ebuild->useflags, useflag);
 	if (!target) {
 		plog_warn("Flag %s not found for ebuild %s", useflag, ebuild->ebuild->ebuild_key);
 		return -1;
+	}
+	
+	if (target->priority > priority && target->status != new_val) {
+		portage_die("Explicit flag %s in %s overriden by profile forced flag", useflag, ebuild->ebuild->ebuild_key);
 	}
 	
 	use_select_t out = target->status;
@@ -178,7 +182,7 @@ int ebuild_check_required_use(SelectedEbuild *ebuild) {
 	return 1;
 }
 
-UseFlag* useflag_new(char* name, use_select_t status) {
+UseFlag* useflag_new(char* name, use_select_t status, use_priority_t priority) {
 	UseFlag* out = malloc(sizeof(UseFlag));
 	
 	if (*name == '+') {
@@ -193,6 +197,7 @@ UseFlag* useflag_new(char* name, use_select_t status) {
 	out->next = NULL;
 	out->name = strdup(name);
 	out->status = status;
+	out->priority = priority;
 	
 	return out;
 }
@@ -205,6 +210,7 @@ UseFlag* useflag_iuse_parse(Emerge* em, char* metadata) {
 	while (token) {
 		current = malloc(sizeof(UseFlag));
 		current->next = next;
+		current->priority = PRIORITY_NORMAL; // iuse has the lowest
 		
 		if (token[0] == '+') {
 			current->status = USE_ENABLE;
@@ -297,7 +303,7 @@ void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required) {
 				
 				asprintf(&curr_flag, "%s%s", curr_flag, use_expand_flag);
 				
-				UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE);
+				UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE, PRIORITY_NORMAL);
 				new_flag->next = temp->flags;
 				temp->flags = new_flag;
 				
@@ -305,7 +311,7 @@ void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required) {
 				continue;
 			}
 			
-			UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE);
+			UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE, PRIORITY_NORMAL);
 			new_flag->next = temp->flags;
 			temp->flags = new_flag;
 		}

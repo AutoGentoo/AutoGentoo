@@ -212,7 +212,7 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 		UseFlag* use;
 		
 		for (char* use_tok = strtok(iuse_read, " \n"); use_tok; use_tok = strtok(NULL, " \n")) {
-			use = useflag_new(use_tok, USE_DISABLE);
+			use = useflag_new(use_tok, USE_DISABLE, PRIORITY_NORMAL);
 			if (!ebuild->use)
 				ebuild->use = use;
 			else

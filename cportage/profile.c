@@ -143,9 +143,15 @@ void profile_parse(Profile* update, char* current_path, char* path) {
 		portage_die ("Failed to read profile at %s", fullpath);
 	
 	profile_open(update, prof_dir, "make.defaults", profile_make_defaults);
+	
 	profile_open(update, prof_dir, "packages", profile_packages);
+	profile_open(update, prof_dir, "packages.build", profile_packages_build);
+	
 	profile_open(update, prof_dir, "package.mask", profile_package_mask);
 	profile_open(update, prof_dir, "package.unmask", profile_package_unmask);
+	
 	profile_open(update, prof_dir, "package.keywords", profile_package_keywords); // DEPRACATED
 	profile_open(update, prof_dir, "package.accept_keywords", profile_package_keywords);
+	
+	profile_open(update, prof_dir, "package.use", profile_package_keywords);
 }

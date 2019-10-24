@@ -23,6 +23,11 @@ typedef enum {
 } use_select_t;
 
 typedef enum {
+	PRIORITY_NORMAL, // set by the selected profile or package.use
+	PRIORITY_FORCE // set by profile in package.use.force
+} use_priority_t;
+
+typedef enum {
 	IS_ATOM,
 	HAS_DEPENDS,
 } depend_t;

@@ -14,7 +14,7 @@ int mcerror(char *s) {
 
 void mc_parse (FILE* fp, Map* out) {
     mcin = fp;
-    mcout = out;
+    mcout = (void*)out;
     mcparse();
 }
 
