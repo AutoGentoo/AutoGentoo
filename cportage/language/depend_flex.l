@@ -6,17 +6,20 @@
 #include "depend.tab.h"
 
 int error = 0;
+#include <signal.h>
 
 int asprintf(char **strp, const char *fmt, ...);
 
 int yyerror(char *s) {
-    fprintf(stderr, "%s in line %d near '%s'\n", s, yylineno, yytext);
+    fprintf(stderr, "DEPEND ERROR %s in line %d near '%s'\n", s, yylineno, yytext);
     error = 1;
     yyout = NULL;
+    raise(SIGSEGV);
     return error;
 }
 
 Dependency* depend_parse (char* buffer) {
+    yylineno = 0;
     char* depend_expr_str = NULL;
     asprintf(&depend_expr_str, "DEPEND_EXPR_AUTOGENTOO %s", buffer);
 
@@ -31,6 +34,7 @@ Dependency* depend_parse (char* buffer) {
 }
 
 Dependency* cmdline_parse (char* buffer) {
+    yylineno = 0;
     char* depend_expr_str = NULL;
     asprintf(&depend_expr_str, "COMMAND_LINE_AUTOGENTOO %s", buffer);
 
@@ -45,6 +49,7 @@ Dependency* cmdline_parse (char* buffer) {
 }
 
 P_Atom* atom_parse (char* buffer) {
+    yylineno = 0;
     char* depend_expr_str = NULL;
     asprintf(&depend_expr_str, "DEPEND_EXPR_AUTOGENTOO %s", buffer);
 
@@ -55,12 +60,15 @@ P_Atom* atom_parse (char* buffer) {
     free(depend_expr_str);
     yy_delete_buffer(bs);
 
+    if (!yyout)
+        return NULL;
     P_Atom* atom_out = ((Dependency*)yyout)->atom;
     free((void*)yyout);
     return atom_out;
 }
 
 RequiredUse* required_use_parse (char* buffer) {
+    yylineno = 0;
     char* depend_expr_str = NULL;
     asprintf(&depend_expr_str, "RUSE_EXPR_AUTOGENTOO %s", buffer);
 

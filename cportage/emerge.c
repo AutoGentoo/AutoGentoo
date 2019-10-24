@@ -13,6 +13,7 @@
 #include "portage.h"
 #include "dependency.h"
 #include "globals.h"
+#include <unistd.h>
 
 int number_len(int num) {
 	char out[32];
@@ -36,6 +37,7 @@ Emerge* emerge_new() {
 	
 	out->use_suggestions = NULL;
 	out->keyword_suggestions = NULL;
+	
 	
 	return out;
 }
@@ -78,10 +80,23 @@ int emerge (Emerge* emerge) {
 			package_init(emerge->default_repo, current_cat, current_pkg);
 		}
 	}
+	
+	/* Initialize the profile */
+	emerge->profile = profile_new();
+	
+	char profile_realpath[1024];
+	size_t profile_len = 0;
+	if ((profile_len = readlink("/etc/portage/make.profile", profile_realpath, sizeof(profile_realpath)-1)) == -1) {
+		portage_die("Failed to read make.profile link");
+	}
+	
+	profile_realpath[profile_len] = 0;
+	profile_parse(emerge->profile, "", profile_realpath);
+	
 	/* Do this before package.use because globals need to be applied to packages on metadata_init()  */
 	emerge->use_expand = use_expand_new(emerge->default_repo);
-	emerge->make_conf = make_conf_new(emerge);
-	emerge->global_use = make_conf_use(emerge);
+	make_conf_parse(emerge);
+	make_conf_use(emerge);
 	
 	emerge_parse_keywords(emerge);
 	emerge_parse_useflags(emerge);
@@ -162,8 +177,6 @@ int emerge (Emerge* emerge) {
 }
 
 void emerge_free(Emerge* em) {
-	map_free(em->make_conf, free);
-	map_free(em->global_use, free);
 	map_free(em->use_expand, NULL);
 	
 	free(em->buildroot);

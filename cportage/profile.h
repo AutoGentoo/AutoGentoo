@@ -5,15 +5,12 @@
 #ifndef AUTOGENTOO_PROFILE_H
 #define AUTOGENTOO_PROFILE_H
 
+typedef struct __Profile Profile;
+typedef struct __PackageMask PackageMask;
+
 #include <autogentoo/hacksaw/vector.h>
 #include <autogentoo/hacksaw/map.h>
-#include "constants.h"
 #include "atom.h"
-#include "keywords.h"
-
-typedef struct __Profile Profile;
-
-typedef struct __PackageMask PackageMask;
 
 typedef enum {
 	PACKAGE_MASK,
@@ -59,7 +56,7 @@ struct __PackageMask {
  */
 struct __Profile {
 	/* make.defaults also passed into make.conf */
-	Map* make_defaults;
+	Map* make_conf;
 	
 	/* The system set */
 	Vector* packages;
@@ -79,16 +76,19 @@ struct __Profile {
 	
 	/* Package mask */
 	/* Mark an ebuild as masked */
-	PackageMask* package_mask;
+	Vector* package_mask;
 	
 	/* Create a fake install folder in db */
 	Vector* package_provided;
 	
 	/*  */
 	/* overrided by /etc/portage/package.use */
-	PackageUse* package_use;
+	Vector* package_use;
+	
+	Map* use;
 };
 
+Profile* profile_new();
 void profile_parse(Profile* update, char* current_path, char* path);
 void profile_free(Profile* ptr);
 

@@ -9,6 +9,7 @@
 #include "atom.h"
 #include "constants.h"
 #include "cportage_defines.h"
+#include "profile.h"
 
 typedef enum {
 	EMERGE_NO_OPTS,
@@ -52,8 +53,7 @@ struct __Emerge {
 	Vector* selected;
 	
 	Map* use_expand;
-	Map* make_conf;
-	Map* global_use;
+	Profile* profile;
 	
 	Suggestion* use_suggestions;
 	Suggestion* keyword_suggestions;

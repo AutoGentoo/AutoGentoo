@@ -87,9 +87,5 @@ void portage_die(char* fmt, ...) {
 	for (int i = portage_call_stack->n - 1; i >= 0; i--) {
 		fprintf(target, "%s\n", string_vector_get(portage_call_stack, i));
 	}
-	
-	string_vector_free(portage_call_stack);
-	
-	fflush(target);
 	exit(1);
 }

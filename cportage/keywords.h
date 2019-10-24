@@ -7,9 +7,6 @@
 
 #include <stdio.h>
 #include "cportage_defines.h"
-
-typedef struct __Keyword Keyword;
-
 #include "atom.h"
 
 struct __Keyword {
