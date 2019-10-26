@@ -37,32 +37,22 @@ struct __SelectedEbuild {
 };
 
 /**
- * Resolve a list of potential ebuilds for depend
- * Generate the following structure:
- *
- *           |----- pkg1: [ebuilds] ---|
- * Dep tree  |----- pkg2: [ebuilds]    |----- Merge and find newest -> layer 2
- *           |----- pkg1: [ebuilds] ---|
+ * Resolve a top-level depedency, generated a vector of selected ebuild,
+ * All blockers are added to the end
  * @param parent the emerge environment
  * @param depend expression to look at
  */
 Vector* pd_layer_resolve(Emerge* parent, Dependency* depend);
 
-/**
- * Do the actually dependency tree with useflag checks etc...
- * @param parent build environment
- * @param depend selecting depend expression (linked by portage_depend_next)
- * @param target ebuild resolved in layer 1
- */
-void pd_layer_2(Emerge* parent, Dependency* depend, Ebuild* target);
 
 /* Helpers */
 Package* atom_resolve_package(Emerge* emerge, P_Atom* atom);
 int pd_slot_cmp(char* slot_1, char* sub_slot_1, char* slot_2, char* sub_slot_2);
 SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom);
-void selected_ebuild_free(SelectedEbuild* se);
-
 SelectedEbuild* pd_check_selected(Vector* selected, SelectedEbuild* check);
+
+/* Util */
 void selected_ebuild_print(Emerge *em, SelectedEbuild *se);
+void selected_ebuild_free(SelectedEbuild* se);
 
 #endif //AUTOGENTOO_DEPENDENCY_H

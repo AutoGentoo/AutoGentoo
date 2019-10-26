@@ -84,8 +84,8 @@ void portage_die(char* fmt, ...) {
 	va_end (args);
 	fprintf(target, ANSI_RESET "\n");
 	fprintf(target, ANSI_BOLD ANSI_RED " * " ANSI_COLOR "PORTAGE CALL STACK:\n");
-	for (int i = portage_call_stack->n - 1; i >= 0; i--) {
-		fprintf(target, "%s\n", string_vector_get(portage_call_stack, i));
+	for (int i = 0; i < portage_call_stack->n; i++) {
+		fprintf(target, "%*c%s\n", i*2, ' ', string_vector_get(portage_call_stack, i));
 	}
 	exit(1);
 }

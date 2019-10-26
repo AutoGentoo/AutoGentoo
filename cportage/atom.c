@@ -385,7 +385,7 @@ AtomFlag* atomflag_dup(AtomFlag* use) {
 	AtomFlag* curr;
 	
 	for (curr = use; curr; curr = curr->next) {
-		temp = malloc(sizeof(UseFlag));
+		temp = malloc(sizeof(AtomFlag));
 		temp->name = strdup(curr->name);
 		temp->def = curr->def;
 		temp->option = curr->option;
@@ -473,6 +473,10 @@ char* atom_get_str(P_Atom* atom) {
 			strcat(flags, "!");
 		
 		strcat(flags, af->name);
+		if (af->def == ATOM_DEFAULT_ON)
+			strcat(flags, "(+)");
+		else if (af->def == ATOM_DEFAULT_OFF)
+			strcat(flags, "(-)");
 		
 		if (af->option == ATOM_USE_ENABLE_IF_ON)
 			strcat(flags, "?");

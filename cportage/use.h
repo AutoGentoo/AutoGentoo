@@ -22,6 +22,10 @@ struct __UseFlag {
 	use_select_t status; // Only USE_DISABLE and USE_ENABLE
 	use_priority_t priority;
 	UseFlag* next;
+	
+	/* DANGER ZONE DO NOT ACCESS */
+	/* Only use this when we need use backtracking */
+	SelectedEbuild* parent;
 };
 
 struct __RequiredUse {

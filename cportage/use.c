@@ -49,9 +49,7 @@ use_select_t s_ebuild_set_use(SelectedEbuild* ebuild, char* useflag, use_select_
 	use_select_t out = target->status;
 	target->status = new_val;
 	
-	UseFlag* new_explicit = malloc(sizeof(UseFlag));
-	new_explicit->status = new_val;
-	new_explicit->name = strdup(target->name);
+	UseFlag* new_explicit = useflag_new(target->name, new_val, PRIORITY_NORMAL);
 	new_explicit->next = ebuild->explicit_flags;
 	ebuild->explicit_flags = new_explicit->next;
 	
@@ -197,32 +195,17 @@ UseFlag* useflag_new(char* name, use_select_t status, use_priority_t priority) {
 	out->name = strdup(name);
 	out->status = status;
 	out->priority = priority;
+	out->parent = NULL;
 	
 	return out;
 }
 
 UseFlag* useflag_iuse_parse(Emerge* em, char* metadata) {
-	char* token = strtok(metadata, " ");
 	UseFlag* current = NULL;
 	UseFlag* next = NULL;
 	
-	while (token) {
-		current = malloc(sizeof(UseFlag));
-		current->next = next;
-		current->priority = PRIORITY_NORMAL; // iuse has the lowest
-		
-		if (token[0] == '+') {
-			current->status = USE_ENABLE;
-			current->name = strdup(token + 1);
-		}
-		else if (token[0] == '-') {
-			current->status = USE_DISABLE;
-			current->name = strdup(token + 1);
-		}
-		else {
-			current->status = USE_DISABLE;
-			current->name = strdup(token);
-		}
+	for (char* token = strtok(metadata, " "); token; token = strtok(NULL, " ")) {
+		current = useflag_new(token, USE_DISABLE, PRIORITY_NORMAL);
 		
 		/* Set profile use (maybe?) */
 		/* Set globals */
@@ -230,8 +213,8 @@ UseFlag* useflag_iuse_parse(Emerge* em, char* metadata) {
 		if (ptr)
 			current->status = *ptr;
 		
+		current->next = next;
 		next = current;
-		token = strtok(NULL, " ");
 	}
 	
 	return current;
@@ -297,12 +280,16 @@ void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required, use_p
 				char* use_expand_flag = strtok(NULL, " ");
 				if (!use_expand_flag)
 					portage_die("Expected USE_EXPAND flag for %s (package.use)", curr_flag);
+				
+				UseFlag* new_flag = useflag_new(use_expand_flag, USE_ENABLE, priority);
 				curr_flag[len - 1] = '_';
 				curr_flag = strlwr(curr_flag);
 				
-				asprintf(&curr_flag, "%s%s", curr_flag, use_expand_flag);
+				char* new_name = NULL;
+				asprintf(&new_name, "%s%s", curr_flag, use_expand_flag);
+				free(new_flag->name);
+				new_flag->name = new_name;
 				
-				UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE, priority);
 				new_flag->next = temp->flags;
 				temp->flags = new_flag;
 				

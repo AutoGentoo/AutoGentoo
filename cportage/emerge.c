@@ -158,14 +158,14 @@ int emerge (Emerge* emerge) {
 	}
 	
 	Vector* selected = pd_layer_resolve(emerge, dep);
-	/*
+	
 	int max_width = number_len(selected->n);
 	for (int i = 0; i < selected->n; i++) {
 		SelectedEbuild* eb = vector_get(selected, i);
 		printf("(%*d) ", max_width, i + 1);
 		
 		selected_ebuild_print(emerge, eb);
-	}*/
+	}
 	
 	for (int i = 0; i < selected->n; i++) {
 		selected_ebuild_free(vector_get(selected, i));

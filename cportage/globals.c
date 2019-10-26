@@ -105,8 +105,8 @@ void make_conf_use(Emerge* em) {
 char* prv_str_replace(char* s, char* oldW, char* newW) {
 	char *result;
 	int i, cnt = 0;
-	int newWlen = strlen(newW);
-	int oldWlen = strlen(oldW);
+	int newWlen = (int)strlen(newW);
+	int oldWlen = (int)strlen(oldW);
 	
 	// Counting the number of times old word
 	// occur in the string
@@ -144,7 +144,10 @@ char* prv_str_replace(char* s, char* oldW, char* newW) {
 
 void make_conf_add(Map* make_conf, char* key, char* value, int is_profile) {
 	int is_incremental = 0;
-	if (strcmp(key, "USE") == 0 || strcmp(key, "ACCEPT_KEYWORDS") == 0 || strncmp(key, "CONFIG_PROTECT", 14) == 0)
+	if (strcmp(key, "USE") == 0
+		|| strcmp(key, "ACCEPT_KEYWORDS") == 0
+		|| strncmp(key, "CONFIG_PROTECT", 14) == 0
+		)
 		is_incremental = 1;
 	
 	char* old_value = map_get(make_conf, key);

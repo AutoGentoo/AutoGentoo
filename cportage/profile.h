@@ -86,9 +86,13 @@ struct __Profile {
 	Vector* package_use;
 	
 	Map* use;
+	
+	/* Only use for use defaults */
+	Map* implicit_use;
 };
 
 Profile* profile_new();
+void profile_implicit_use(Profile* update);
 void profile_parse(Profile* update, char* current_path, char* path);
 void profile_free(Profile* ptr);
 

@@ -37,12 +37,9 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	
 	/* Build the use flags from the ebuild */
 	for (UseFlag* current_use = out->ebuild->use; current_use; current_use = current_use->next) {
-		UseFlag* new_flag = malloc(sizeof(UseFlag));
+		UseFlag* new_flag = useflag_new(current_use->name, current_use->status, current_use->priority);
 		
 		new_flag->next = out->useflags;
-		new_flag->name = strdup(current_use->name);
-		new_flag->status = current_use->status;
-		
 		out->useflags = new_flag;
 	}
 	
@@ -136,6 +133,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		portage_die("Invalid required use");
 	}
 	
+	/* Check if the selected ebuild has different use flags from the installed */
 	if (out->installed && out->action == PORTAGE_REPLACE) {
 		for (UseFlag* use = out->useflags; use; use = use->next) {
 			UseFlag* ebuild_use_status = get_use(out->installed->use, use->name);
@@ -154,6 +152,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		return out;
 	}
 	
+	/* Check if the explicit flags from previous and current selections match */
 	UseFlag* sel_explicit_key = NULL;
 	UseFlag* out_explicit_key = NULL;
 	for (sel_explicit_key = prev_sel->explicit_flags; sel_explicit_key; sel_explicit_key = sel_explicit_key->next) {
@@ -182,6 +181,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		portage_die("Dependency use conflict");
 	}
 	
+	/* Since there are no errors, just set all the previous package flags out's status */
 	for (UseFlag* use = out->explicit_flags; use; use = use->next) {
 		UseFlag* search_prev = get_use(prev_sel->useflags, use->name);
 		if (!search_prev) {
@@ -213,7 +213,7 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 			if ((current_depend->selector == USE_DISABLE || current_depend->selector == USE_ENABLE)) {
 				UseFlag* u = get_use(target->useflags, current_depend->target);
 				if (u && u->status == current_depend->selector) {
-					plog_enter_stack("%c%s ?", current_depend->selector == USE_ENABLE ? ' ' : '!', current_depend->target);
+					plog_enter_stack("%c%s?", current_depend->selector == USE_ENABLE ?  : '!', current_depend->target);
 					__pd_layer_resolve__(parent, current_depend->selectors, target, ebuild_set, blocked_set, dependency_order);
 					plog_exit_stack();
 				}
@@ -225,7 +225,6 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 				portage_die("Illegal operator %s in a dependency expression", current_depend->target);
 			continue;
 		}
-		
 		
 		if (current_depend->atom->blocks != ATOM_BLOCK_NONE) {
 			Package* resolved_package = atom_resolve_package(parent, current_depend->atom);
