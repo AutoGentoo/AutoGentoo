@@ -161,6 +161,13 @@ int emerge (Emerge* emerge) {
 	
 	/* The resolution failed, try again with these suggestion settings */
 	while (emerge->use_suggestions) {
+		if (current) {
+			Suggestion* current_end;
+			for (current_end = current; current->next; current = current->next);
+			current_end->next = emerge->use_suggestions;
+			emerge->use_suggestions = current;
+		}
+		
 		emerge_apply_suggestions(emerge); // Updates package.use
 		emerge_apply_package_use(emerge); // Updates IUSE in ebuilds
 		
@@ -168,6 +175,11 @@ int emerge (Emerge* emerge) {
 		emerge->use_suggestions = NULL;
 		
 		selected = pd_layer_resolve(emerge, dep);    // Resolve again
+	}
+	
+	for (Suggestion* cs = current; cs; cs = cs->next) {
+		printf("# Needed by %s\n", cs->required_by);
+		printf("%s\n\n", cs->line_addition);
 	}
 	
 	int max_width = number_len(selected->n);

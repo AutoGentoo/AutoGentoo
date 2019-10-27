@@ -35,6 +35,7 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 	
 	Suggestion* out = NULL;
 	char* atom_str = atom_get_str(conflict_prev->reason->selected_by->atom);
+	*(strchr(atom_str, ' ')) = 0;
 	
 	for (UseReason* current_reason = conflict_prev->reason; current_reason; current_reason = current_reason->next) {
 		/**

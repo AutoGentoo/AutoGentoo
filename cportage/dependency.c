@@ -316,24 +316,25 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 		
 		vector_add(ebuild_set, se);
 		
-		
-		plog_enter_stack("bdepend %s", atom_stack_str);
-		__pd_layer_resolve__(parent, se->ebuild->bdepend, se, ebuild_set, blocked_set, dependency_order);
-		plog_exit_stack();
-		
-		plog_enter_stack("depend %s", atom_stack_str);
-		__pd_layer_resolve__(parent, se->ebuild->depend, se, ebuild_set, blocked_set, dependency_order);
-		plog_exit_stack();
-		
-		plog_enter_stack("rdepend %s", atom_stack_str);
-		__pd_layer_resolve__(parent, se->ebuild->rdepend, se, ebuild_set, blocked_set, dependency_order);
-		plog_exit_stack();
-		
-		plog_enter_stack("pdepend %s", atom_stack_str);
-		__pd_layer_resolve__(parent, se->ebuild->pdepend, se, ebuild_set, blocked_set, dependency_order);
-		plog_exit_stack();
-		
-		free(atom_stack_str);
+		if (se->action != PORTAGE_REPLACE || parent->options & EMERGE_DEEP) {
+			plog_enter_stack("bdepend %s", atom_stack_str);
+			__pd_layer_resolve__(parent, se->ebuild->bdepend, se, ebuild_set, blocked_set, dependency_order);
+			plog_exit_stack();
+			
+			plog_enter_stack("depend %s", atom_stack_str);
+			__pd_layer_resolve__(parent, se->ebuild->depend, se, ebuild_set, blocked_set, dependency_order);
+			plog_exit_stack();
+			
+			plog_enter_stack("rdepend %s", atom_stack_str);
+			__pd_layer_resolve__(parent, se->ebuild->rdepend, se, ebuild_set, blocked_set, dependency_order);
+			plog_exit_stack();
+			
+			plog_enter_stack("pdepend %s", atom_stack_str);
+			__pd_layer_resolve__(parent, se->ebuild->pdepend, se, ebuild_set, blocked_set, dependency_order);
+			plog_exit_stack();
+			
+			free(atom_stack_str);
+		}
 		
 		vector_add(dependency_order, se);
 	}
