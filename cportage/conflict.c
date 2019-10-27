@@ -17,12 +17,8 @@ inline void conflict_use_check(UseFlag* use1, UseFlag* use2, UseFlag** conflict1
 	for (sel_explicit_key = use1; sel_explicit_key; sel_explicit_key = sel_explicit_key->next) {
 		for (out_explicit_key = use2; out_explicit_key; out_explicit_key = out_explicit_key->next) {
 			if (strcmp(sel_explicit_key->name, out_explicit_key->name) == 0 &&
-			    sel_explicit_key->status != out_explicit_key->status) {
-				/* There was an error in requested useflags */
-				/* We need to generate a list of suggested edits */
-				//Suggestion* use_s = suggestion_new();
+			    sel_explicit_key->status != out_explicit_key->status)
 				break;
-			}
 		}
 		
 		if (out_explicit_key) /* Error */

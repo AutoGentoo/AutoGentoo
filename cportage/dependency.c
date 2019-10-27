@@ -163,10 +163,10 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	conflict_use_check(prev_sel->explicit_flags, out->explicit_flags, &prev_conflict, &curr_conflict);
 	
 	/* Atempt to resolve the conflict by backtracking the previous package use flags */
-	if (curr_conflict) {
-		Suggestion* suggestion = conflict_use_resolve(prev_conflict, curr_conflict->status);
+	if (prev_conflict) {
+		Suggestion* suggestion = conflict_use_resolve(curr_conflict, prev_conflict->status);
 		if (!suggestion)
-			suggestion = conflict_use_resolve(curr_conflict, prev_conflict->status);
+			suggestion = conflict_use_resolve(prev_conflict, curr_conflict->status);
 		
 		if (!suggestion) {
 			errno = 0;
