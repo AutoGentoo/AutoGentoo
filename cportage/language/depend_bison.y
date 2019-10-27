@@ -27,13 +27,13 @@ void yyerror(const char *message);
     atom_use_default use_default;
     RequiredUse* use_type;
     struct {
-        use_select_t val;
+        use_t val;
         char* target;
      } use_select;
 
     struct {
         char* target;
-        use_select_t t;
+        use_t t;
     } depend_expr_select;
 
     struct {
@@ -85,7 +85,7 @@ required_use_expr   : depend_expr_sel '(' required_use_expr ')' {$$ = use_build_
                     | '(' required_use_expr ')'                 {$$ = $2;}
                     ;
 
-depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_build_use($p.target, $p.t, $c); free($p.target);}
+depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_build_use($p.target, $p.t, $c); free($p.target); $c->parent = $$;}
                 | '(' depend_expr[c] ')'                    {$$ = $c;}
                 | atom                                      {$$ = dependency_build_atom($1);}
                 | depend_expr depend_expr                   {$$ = $1; $1->next = $2;}

@@ -224,7 +224,7 @@ Dependency* dependency_build_atom(P_Atom* atom) {
 	return out;
 }
 
-Dependency* dependency_build_use(char* use_flag, use_select_t type, Dependency* selector) {
+Dependency* dependency_build_use(char* use_flag, use_t type, Dependency* selector) {
 	Dependency* out = malloc(sizeof(Dependency));
 	out->atom = NULL;
 	if (use_flag)

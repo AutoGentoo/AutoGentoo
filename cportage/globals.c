@@ -67,7 +67,7 @@ void make_conf_use(Emerge* em) {
 		value = strdup(value);
 		
 		for (char* tok = strtok(value, " "); tok; tok = strtok(NULL, " ")) {
-			use_select_t* status = malloc(sizeof(use_select_t));
+			use_t* status = malloc(sizeof(use_t));
 			char* name = NULL;
 			*status = USE_ENABLE;
 			
@@ -88,7 +88,7 @@ void make_conf_use(Emerge* em) {
 	if (use_str) {
 		use_str = strdup(use_str);
 		for (char* tok = strtok(use_str, " "); tok; tok = strtok(NULL, " ")) {
-			use_select_t* status = malloc(sizeof(use_select_t));
+			use_t* status = malloc(sizeof(use_t));
 			*status = USE_ENABLE;
 			
 			if (tok[0] == '-') {

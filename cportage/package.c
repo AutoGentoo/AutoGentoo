@@ -79,7 +79,7 @@ void package_metadata_init(Ebuild* ebuild) {
 		else if (strcmp(name, "KEYWORDS") == 0)
 			keyword_parse(ebuild->keywords, value);
 		else if (strcmp(name, "IUSE") == 0)
-			ebuild->use = useflag_iuse_parse(ebuild->parent->parent->parent, value);
+			ebuild->use = use_iuse_parse(ebuild->parent->parent->parent, value);
 	}
 	
 	free(value);
@@ -220,7 +220,7 @@ void ebuild_free(Ebuild* ptr) {
 	dependency_free(ptr->rdepend);
 	dependency_free(ptr->pdepend);
 	
-	useflag_free(ptr->use);
+	use_free(ptr->use);
 	if (ptr->feature_restrict)
 		vector_free(ptr->feature_restrict);
 	

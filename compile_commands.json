@@ -76,6 +76,11 @@
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/cportage.dir/cportage/profile.c.o   -c /home/atuser/git/AutoGentoo/cportage/profile.c",
+  "file": "/home/atuser/git/AutoGentoo/cportage/profile.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
   "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/cportage.dir/cportage/depend.tab.c.o   -c /home/atuser/git/AutoGentoo/cmake-build-debug/cportage/depend.tab.c",
   "file": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage/depend.tab.c"
 },

@@ -212,7 +212,7 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 		UseFlag* use;
 		
 		for (char* use_tok = strtok(iuse_read, " \n"); use_tok; use_tok = strtok(NULL, " \n")) {
-			use = useflag_new(use_tok, USE_DISABLE, PRIORITY_NORMAL);
+			use = use_new(use_tok, USE_DISABLE, PRIORITY_NORMAL);
 			if (!ebuild->use)
 				ebuild->use = use;
 			else
@@ -225,7 +225,7 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	char* use_temp = portagedb_ebuild_read(pkg, "USE");
 	if (use_temp) {
 		for (char* use_tok = strtok(use_temp, " \n"); use_tok; use_tok = strtok(NULL, " \n")) {
-			UseFlag* target_use = get_use(ebuild->use, use_tok);
+			UseFlag* target_use = use_get(ebuild->use, use_tok);
 			if (!target_use) {
 				/* Inside implicit IUSE */
 				continue;
@@ -433,7 +433,7 @@ void installedebuild_free(InstalledEbuild* ebuild) {
 	if (ebuild->cbuild)
 		free(ebuild->cbuild);
 	
-	useflag_free(ebuild->use);
+	use_free(ebuild->use);
 	vector_free(ebuild->rebuild_depend);
 	vector_free(ebuild->rebuild_rdepend);
 	

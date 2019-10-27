@@ -7,6 +7,7 @@
 #include "portage.h"
 #include "database.h"
 #include "suggestion.h"
+#include "conflict.h"
 #include <string.h>
 #include <autogentoo/hacksaw/hacksaw.h>
 #include <autogentoo/hacksaw/set.h>
@@ -37,7 +38,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	
 	/* Build the use flags from the ebuild */
 	for (UseFlag* current_use = out->ebuild->use; current_use; current_use = current_use->next) {
-		UseFlag* new_flag = useflag_new(current_use->name, current_use->status, current_use->priority);
+		UseFlag* new_flag = use_new(current_use->name, current_use->status, current_use->priority);
 		
 		new_flag->next = out->useflags;
 		out->useflags = new_flag;
@@ -60,11 +61,11 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		 */
 		UseFlag* parent_flag = NULL;
 		if (parent_ebuild)
-			parent_flag = get_use(parent_ebuild->useflags, current_use->name);
-		UseFlag* flag = get_use(out->useflags, current_use->name);
+			parent_flag = use_get(parent_ebuild->useflags, current_use->name);
+		UseFlag* flag = use_get(out->useflags, current_use->name);
 		if (!flag && current_use->def != ATOM_NO_DEFAULT) {
-			use_select_t def_status = current_use->def == ATOM_DEFAULT_ON ? USE_ENABLE : USE_DISABLE;
-			use_select_t resolved_status = def_status;
+			use_t def_status = current_use->def == ATOM_DEFAULT_ON ? USE_ENABLE : USE_DISABLE;
+			use_t resolved_status = def_status;
 			
 			if (current_use->option == ATOM_USE_ENABLE)
 				resolved_status = USE_ENABLE;
@@ -89,7 +90,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		else if (!flag)
 			continue;
 		else {
-			use_select_t old_status = flag->status;
+			use_t old_status = flag->status;
 			if (current_use->option == ATOM_USE_ENABLE)
 				flag->status = USE_ENABLE;
 			else if (current_use->option == ATOM_USE_DISABLE)
@@ -111,7 +112,11 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		}
 		
 		if (flag) {
-			UseFlag* ex_dup = useflag_new(flag->name, flag->status, PRIORITY_NORMAL);
+			UseFlag* ex_dup = use_new(flag->name, flag->status, PRIORITY_NORMAL);
+			UseReason* reason = use_reason_new(parent_ebuild, current_use, dep);
+			reason->next = ex_dup->reason;
+			ex_dup->reason = reason;
+			
 			ex_dup->next = out->explicit_flags;
 			out->explicit_flags = ex_dup;
 		}
@@ -136,7 +141,7 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	/* Check if the selected ebuild has different use flags from the installed */
 	if (out->installed && out->action == PORTAGE_REPLACE) {
 		for (UseFlag* use = out->useflags; use; use = use->next) {
-			UseFlag* ebuild_use_status = get_use(out->installed->use, use->name);
+			UseFlag* ebuild_use_status = use_get(out->installed->use, use->name);
 			if (ebuild_use_status && ebuild_use_status->status != use->status) {
 				out->action = PORTAGE_USE_FLAG;
 				break;
@@ -152,38 +157,43 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 		return out;
 	}
 	
-	/* Check if the explicit flags from previous and current selections match */
-	UseFlag* sel_explicit_key = NULL;
-	UseFlag* out_explicit_key = NULL;
-	for (sel_explicit_key = prev_sel->explicit_flags; sel_explicit_key; sel_explicit_key = sel_explicit_key->next) {
-		for (out_explicit_key = out->explicit_flags; out_explicit_key; out_explicit_key = out_explicit_key->next) {
-			if (strcmp(sel_explicit_key->name, out_explicit_key->name) == 0 &&
-			    sel_explicit_key->status != out_explicit_key->status)
-				break;
-		}
-		
-		if (out_explicit_key) /* Error */
-			break;
-	}
 	
-	if (sel_explicit_key) /* Error */ {
-		errno = 0;
-		plog_error("Selected packages could not resolve use conflict");
+	UseFlag* prev_conflict;
+	UseFlag* curr_conflict;
+	conflict_use_check(prev_sel->explicit_flags, out->explicit_flags, &prev_conflict, &curr_conflict);
+	
+	/* Atempt to resolve the conflict by backtracking the previous package use flags */
+	if (curr_conflict) {
+		Suggestion* suggestion = conflict_use_resolve(prev_conflict, curr_conflict->status);
+		if (!suggestion)
+			suggestion = conflict_use_resolve(curr_conflict, prev_conflict->status);
 		
-		char* atom_1 = atom_get_str(prev_sel->selected_by->atom);
-		char* atom_2 = atom_get_str(out->selected_by->atom);
-		plog_error("%s DEP = %s wants %c%s", prev_sel->parent_ebuild->ebuild->ebuild_key, atom_1, sel_explicit_key->status == USE_ENABLE ? '+' : '-', sel_explicit_key->name);
-		plog_error("%s DEP = %s wants %c%s", out->parent_ebuild->ebuild->ebuild_key, atom_2, out_explicit_key->status == USE_ENABLE ? '+' : '-', out_explicit_key->name);
-		
-		free(atom_1);
-		free(atom_2);
-		
-		portage_die("Dependency use conflict");
+		if (!suggestion) {
+			errno = 0;
+			plog_error("Selected packages could not resolve use conflict");
+			
+			char* atom_1 = atom_get_str(prev_sel->selected_by->atom);
+			char* atom_2 = atom_get_str(out->selected_by->atom);
+			plog_error("%s DEP = %s wants %c%s", prev_sel->parent_ebuild->ebuild->ebuild_key, atom_1, prev_conflict->status == USE_ENABLE ? '+' : '-', prev_conflict->name);
+			plog_error("%s DEP = %s wants %c%s", out->parent_ebuild->ebuild->ebuild_key, atom_2, curr_conflict->status == USE_ENABLE ? '+' : '-', curr_conflict->name);
+			
+			free(atom_1);
+			free(atom_2);
+			
+			portage_die("Dependency use conflict");
+		}
+		else {
+			suggestion->next = emerge->use_suggestions;
+			emerge->use_suggestions = suggestion;
+			
+			selected_ebuild_free(out);
+			return NULL;
+		}
 	}
 	
 	/* Since there are no errors, just set all the previous package flags out's status */
 	for (UseFlag* use = out->explicit_flags; use; use = use->next) {
-		UseFlag* search_prev = get_use(prev_sel->useflags, use->name);
+		UseFlag* search_prev = use_get(prev_sel->useflags, use->name);
 		if (!search_prev) {
 			continue;
 		}
@@ -211,7 +221,7 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 		if (current_depend->depends == HAS_DEPENDS) {
 			/* Do logical evaluation for use flags */
 			if ((current_depend->selector == USE_DISABLE || current_depend->selector == USE_ENABLE)) {
-				UseFlag* u = get_use(target->useflags, current_depend->target);
+				UseFlag* u = use_get(target->useflags, current_depend->target);
 				if (u && u->status == current_depend->selector) {
 					plog_enter_stack("%c%s?", current_depend->selector == USE_ENABLE ?  : '!', current_depend->target);
 					__pd_layer_resolve__(parent, current_depend->selectors, target, ebuild_set, blocked_set, dependency_order);
@@ -239,13 +249,13 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 				if (atom_match_ebuild(current_se->ebuild, current_depend->atom)) {
 					int use_match = 1;
 					for (AtomFlag* af = current_depend->atom->useflags; af; af = af->next) {
-						use_select_t use_value = USE_DISABLE;
+						use_t use_value = USE_DISABLE;
 						if (af->def == ATOM_DEFAULT_ON)
 							use_value = USE_ENABLE;
 						else if (af->def == ATOM_DEFAULT_OFF)
 							use_value = USE_DISABLE;
 						
-						UseFlag* use = get_use(current_se->useflags, af->name);
+						UseFlag* use = use_get(current_se->useflags, af->name);
 						if (use)
 							use_value = use->status;
 						
@@ -299,8 +309,10 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 		plog_exit_stack();
 		
 		/* Could be dangerous because use flags could change dependencies */
-		if (!se) /* Already resolved */
+		if (!se && !parent->use_suggestions) /* Already resolved */
 			continue;
+		else if (!se)
+			return;
 		
 		vector_add(ebuild_set, se);
 		
@@ -482,8 +494,8 @@ SelectedEbuild* pd_check_selected(Vector* selected, SelectedEbuild* se) {
 }
 
 void selected_ebuild_free(SelectedEbuild* se) {
-	useflag_free(se->useflags);
-	useflag_free(se->explicit_flags);
+	use_free(se->useflags);
+	use_free(se->explicit_flags);
 	
 	if (se->use_change) {
 		for (int i = 0; i < se->use_change->n; i++) {
@@ -534,10 +546,10 @@ void selected_ebuild_print(Emerge* em, SelectedEbuild* se) {
 	printf(" ");
 	for (UseFlag* use = se->useflags; use; use = use->next) {
 		UseFlag* ebuild_use = NULL;
-		use_select_t ebuild_use_status = USE_NONE;
+		use_t ebuild_use_status = USE_NONE;
 		
 		if (se->installed)
-			ebuild_use = get_use(se->installed->use, use->name);
+			ebuild_use = use_get(se->installed->use, use->name);
 		
 		if (ebuild_use)
 			ebuild_use_status = ebuild_use->status;

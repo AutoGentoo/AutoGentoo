@@ -120,6 +120,8 @@ set(src_CPORTAGE
         cportage/globals.h
         cportage/profile.c
         cportage/profile.h
+        cportage/conflict.c
+        cportage/conflict.h
         )
 
 set(language_SOURCES

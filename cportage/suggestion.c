@@ -5,32 +5,44 @@
 #define _GNU_SOURCE
 
 #include "suggestion.h"
-#include "keywords.h"
-#include "package.h"
+#include "cportage_defines.h"
+#include "emerge.h"
+#include "use.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 
-void emerge_suggestion_keyword(Emerge* emerge, Ebuild* required_by, P_Atom* selector) {
-	Suggestion* new_sugg = malloc(sizeof(Suggestion));
+Suggestion* suggestion_new(char* required_by, char* line, ...) {
+	Suggestion* out = malloc(sizeof(Suggestion));
 	
-	char* arch_str = NULL;
+	out->next = NULL;
+	out->line_addition = NULL;
+	out->required_by = strdup(required_by);
 	
-	for (int i = 0; i < ARCH_END; i++) {
-		if (emerge->target_arch == keyword_links[i].l)
-			arch_str = strdup(keyword_links[i].str);
+	va_list args;
+	va_start (args, line);
+	vasprintf(&out->line_addition, line, args);
+	va_end(args);
+	
+	return out;
+}
+
+FILE* suggestion_read(Suggestion* s) {
+	FILE* out = tmpfile();
+	
+	for (Suggestion* c = s; c; c = c->next) {
+		fwrite(c->line_addition, strlen(c->line_addition), 1, out);
+		fwrite("\n", 1, 1, out);
 	}
 	
-	char* atom = atom_get_str(selector);
-	asprintf(&new_sugg->line_addition, "%s ~%s", atom, arch_str);
-	
-	new_sugg->portage_file = strdup("package.keywords");
-	asprintf(&new_sugg->required_by, "# Required by %s-%s", required_by->parent->key, required_by->version->full_version);
-	
-	new_sugg->next = emerge->keyword_suggestions;
-	emerge->keyword_suggestions = new_sugg;
-	
-	free(atom);
-	free(arch_str);
+	fseek(out, 0, SEEK_SET);
+	return out;
+}
+
+void emerge_apply_suggestions(Emerge* em) {
+	FILE* to_apply = suggestion_read(em->use_suggestions);
+	useflag_parse(to_apply, em->profile->package_use, KEYWORD_UNSTABLE, PRIORITY_NORMAL);
+	fclose(to_apply);
 }

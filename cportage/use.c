@@ -15,56 +15,30 @@
 #include <share.h>
 #include <ctype.h>
 
-/**
- * Set the useflag of ebiuld to new_val
- * @param ebuild ebuild to look in
- * @param useflag useflag to look for
- * @param new_val value to set to
- * @return the old value of the useflag
- */
-use_select_t ebuild_set_use(Ebuild* ebuild, char* useflag, use_select_t new_val) {
-	UseFlag* current;
-	for (current = ebuild->use; current; current = current->next) {
-		if (strcmp(current->name, useflag) == 0) {
-			use_select_t old = current->status;
-			current->status = new_val;
-			return old;
-		}
-	}
-	
-	return -1;
-}
-
-use_select_t s_ebuild_set_use(SelectedEbuild* ebuild, char* useflag, use_select_t new_val, use_priority_t priority) {
-	UseFlag* target = get_use(ebuild->useflags, useflag);
-	if (!target) {
-		plog_warn("Flag %s not found for ebuild %s", useflag, ebuild->ebuild->ebuild_key);
+use_t use_set(UseFlag* head, char* use_search, use_t new_val, use_priority_t priority) {
+	UseFlag* target = use_get(head, use_search);
+	if (!target)
 		return -1;
-	}
 	
 	if (target->priority > priority && target->status != new_val) {
-		portage_die("Explicit flag %s in %s overriden by profile forced flag", useflag, ebuild->ebuild->ebuild_key);
+		portage_die("Explicit flag %s overriden by profile forced flag", use_search);
 	}
 	
-	use_select_t out = target->status;
+	use_t out = target->status;
 	target->status = new_val;
-	
-	UseFlag* new_explicit = useflag_new(target->name, new_val, PRIORITY_NORMAL);
-	new_explicit->next = ebuild->explicit_flags;
-	ebuild->explicit_flags = new_explicit->next;
 	
 	return out;
 }
 
-UseFlag* get_use(UseFlag* useflags, char* useflag) {
-	for (UseFlag* current = useflags; current; current = current->next)
+UseFlag* use_get(UseFlag* head, char* useflag) {
+	for (UseFlag* current = head; current; current = current->next)
 		if (strcmp(current->name, useflag) == 0)
 			return current;
 	
 	return NULL;
 }
 
-RequiredUse* use_build_required_use(char* target, use_select_t option) {
+RequiredUse* use_build_required_use(char* target, use_t option) {
 	RequiredUse* out = malloc(sizeof(RequiredUse));
 	
 	if (target)
@@ -133,8 +107,8 @@ char* use_expr_str(RequiredUse* expr) {
 
 int use_check_expr(SelectedEbuild *ebuild, RequiredUse* expr) {
 	if (expr->option == USE_ENABLE || expr->option == USE_DISABLE) {
-		UseFlag* u = get_use(ebuild->useflags, expr->target);
-		use_select_t status = USE_NONE;
+		UseFlag* u = use_get(ebuild->useflags, expr->target);
+		use_t status = USE_NONE;
 		if (u)
 			status = u->status;
 		
@@ -179,7 +153,17 @@ int ebuild_check_required_use(SelectedEbuild *ebuild) {
 	return 1;
 }
 
-UseFlag* useflag_new(char* name, use_select_t status, use_priority_t priority) {
+UseReason* use_reason_new(SelectedEbuild* parent, AtomFlag* flag, Dependency* selected_by) {
+	UseReason* reason = malloc(sizeof(UseReason));
+	reason->parent_ebuild = parent;
+	reason->flag = flag;
+	reason->selected_by = selected_by;
+	reason->next = NULL;
+	
+	return reason;
+}
+
+UseFlag* use_new(char* name, use_t status, use_priority_t priority) {
 	UseFlag* out = malloc(sizeof(UseFlag));
 	
 	if (*name == '+') {
@@ -195,21 +179,21 @@ UseFlag* useflag_new(char* name, use_select_t status, use_priority_t priority) {
 	out->name = strdup(name);
 	out->status = status;
 	out->priority = priority;
-	out->parent = NULL;
+	out->reason = NULL;
 	
 	return out;
 }
 
-UseFlag* useflag_iuse_parse(Emerge* em, char* metadata) {
+UseFlag* use_iuse_parse(Emerge* em, char* metadata) {
 	UseFlag* current = NULL;
 	UseFlag* next = NULL;
 	
 	for (char* token = strtok(metadata, " "); token; token = strtok(NULL, " ")) {
-		current = useflag_new(token, USE_DISABLE, PRIORITY_NORMAL);
+		current = use_new(token, USE_DISABLE, PRIORITY_NORMAL);
 		
 		/* Set profile use (maybe?) */
 		/* Set globals */
-		use_select_t* ptr = map_get(em->profile->use, current->name);
+		use_t* ptr = map_get(em->profile->use, current->name);
 		if (ptr)
 			current->status = *ptr;
 		
@@ -220,7 +204,7 @@ UseFlag* useflag_iuse_parse(Emerge* em, char* metadata) {
 	return current;
 }
 
-void useflag_free(UseFlag* ptr) {
+void use_free(UseFlag* ptr) {
 	UseFlag* next = NULL;
 	UseFlag* curr = ptr;
 	while (curr) {
@@ -281,7 +265,7 @@ void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required, use_p
 				if (!use_expand_flag)
 					portage_die("Expected USE_EXPAND flag for %s (package.use)", curr_flag);
 				
-				UseFlag* new_flag = useflag_new(use_expand_flag, USE_ENABLE, priority);
+				UseFlag* new_flag = use_new(use_expand_flag, USE_ENABLE, priority);
 				curr_flag[len - 1] = '_';
 				curr_flag = strlwr(curr_flag);
 				
@@ -297,7 +281,7 @@ void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required, use_p
 				continue;
 			}
 			
-			UseFlag* new_flag = useflag_new(curr_flag, USE_ENABLE, priority);
+			UseFlag* new_flag = use_new(curr_flag, USE_ENABLE, priority);
 			new_flag->next = temp->flags;
 			temp->flags = new_flag;
 		}
@@ -332,7 +316,10 @@ void emerge_parse_useflags(Emerge* emerge) {
 	}
 	
 	fpnode_free(files);
-	
+	emerge_apply_package_use(emerge);
+}
+
+void emerge_apply_package_use(Emerge* emerge) {
 	for (int i = 0; i < emerge->profile->package_use->n; i++) {
 		PackageUse* current = vector_get(emerge->profile->package_use, i);
 		
@@ -351,7 +338,7 @@ void emerge_parse_useflags(Emerge* emerge) {
 				if (atom_match_ebuild(current_ebuild, current->atom)) {
 					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next) {
 						if (current_ebuild->keywords[emerge->target_arch] >= current->keyword_required)
-							ebuild_set_use(current_ebuild, current_flag->name, current_flag->status);
+							use_set(current_ebuild->use, current_flag->name, current_flag->status, PRIORITY_NORMAL);
 					}
 				}
 			}

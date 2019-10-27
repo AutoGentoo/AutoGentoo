@@ -6,15 +6,11 @@
 
 #include <archive.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <fcntl.h>
-#include "compress.h"
 #include "portage_log.h"
-#include "portage.h"
 #include <string.h>
 
 FILE* fread_archive(char* path) {
-	char* buffer_file = "/tmp/cportage.decomp";
 	FILE* fp;
 	
 	struct archive* a = archive_read_new();
@@ -27,7 +23,6 @@ FILE* fread_archive(char* path) {
 	if (fd == -1) {
 		plog_error("Failed to open file %s for reading", path);
 		archive_free(a);
-		free(buffer_file);
 		return NULL;
 	}
 	
@@ -35,7 +30,6 @@ FILE* fread_archive(char* path) {
 		plog_warn("Failed to open archive %s for reading", path);
 		plog_warn("libarchive -- %s", archive_error_string(a));
 		archive_read_free(a);
-		free(buffer_file);
 		return NULL;
 	}
 	
@@ -43,13 +37,12 @@ FILE* fread_archive(char* path) {
 		plog_error("Failed to read header from %s", path);
 		archive_read_close(a);
 		archive_read_free(a);
-		free(buffer_file);
 		return NULL;
 	}
 	
-	fp = fopen(buffer_file, "w+");
+	fp = tmpfile();
 	if (!fp) {
-		plog_error("Failed to open buffer file %s", buffer_file);
+		plog_error("Failed to open tmpfile()");
 		archive_read_close(a);
 		archive_read_free(a);
 		return NULL;

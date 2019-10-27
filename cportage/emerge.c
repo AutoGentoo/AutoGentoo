@@ -13,6 +13,7 @@
 #include "portage.h"
 #include "dependency.h"
 #include "globals.h"
+#include "suggestion.h"
 #include <unistd.h>
 
 int number_len(int num) {
@@ -36,7 +37,6 @@ Emerge* emerge_new() {
 	out->default_repo = NULL;
 	
 	out->use_suggestions = NULL;
-	out->keyword_suggestions = NULL;
 	
 	
 	return out;
@@ -69,7 +69,6 @@ int emerge (Emerge* emerge) {
 	}
 	
 	manifest_metadata_deep(emerge->default_repo->category_manifests);
-	remove("/tmp/cportage.decomp");
 	
 	Manifest* current_cat;
 	Manifest* current_pkg;
@@ -158,6 +157,20 @@ int emerge (Emerge* emerge) {
 	}
 	
 	Vector* selected = pd_layer_resolve(emerge, dep);
+	Suggestion* current = NULL;
+	
+	/* The resolution failed, try again with these suggestion settings */
+	int i = 0;
+	while (emerge->use_suggestions) {
+		emerge_apply_suggestions(emerge); // Updates package.use
+		emerge_apply_package_use(emerge); // Updates IUSE in ebuilds
+		
+		current = emerge->use_suggestions;
+		emerge->use_suggestions = NULL;
+		printf("%d\n", ++i);
+		
+		pd_layer_resolve(emerge, dep);    // Resolve again
+	}
 	
 	int max_width = number_len(selected->n);
 	for (int i = 0; i < selected->n; i++) {

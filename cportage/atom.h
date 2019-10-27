@@ -20,7 +20,7 @@ typedef enum {
 	USE_LEAST_ONE, //!< ||
 	USE_EXACT_ONE, //!< ^^
 	USE_MOST_ONE, //!< ??
-} use_select_t;
+} use_t;
 
 typedef enum {
 	PRIORITY_NORMAL, // set by the selected profile or package.use
@@ -127,11 +127,11 @@ struct __P_Atom {
  * target? ( selector selector selector ) next_target? ( ... ) depend
  */
 struct __Dependency {
-	Ebuild* parent_ebuild;
+	Dependency* parent;
 	P_Atom* atom; // NULL if it has depends
 	char* target; // NULL if has atom
 	
-	use_select_t selector;
+	use_t selector;
 	depend_t depends;
 	
 	// Selector list

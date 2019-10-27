@@ -17,36 +17,82 @@ struct __PackageUse {
 	PackageUse* next;
 };
 
+struct __UseReason {
+	SelectedEbuild* parent_ebuild;
+	AtomFlag* flag;
+	Dependency* selected_by;
+	
+	UseReason* next;
+};
+
 struct __UseFlag {
 	char* name;
-	use_select_t status; // Only USE_DISABLE and USE_ENABLE
+	use_t status; // Only USE_DISABLE and USE_ENABLE
 	use_priority_t priority;
 	UseFlag* next;
 	
 	/* DANGER ZONE DO NOT ACCESS */
 	/* Only use this when we need use backtracking */
-	SelectedEbuild* parent;
+	UseReason* reason;
 };
 
 struct __RequiredUse {
 	char* target;
-	use_select_t option;
+	use_t option;
 	RequiredUse* depend;
 	RequiredUse* next;
 };
 
-use_select_t ebuild_set_use(Ebuild* ebuild, char* useflag, use_select_t new_val);
-use_select_t s_ebuild_set_use(SelectedEbuild* ebuild, char* useflag, use_select_t new_val, use_priority_t priority);
-UseFlag* get_use(UseFlag* useflags, char* useflag);
-RequiredUse* use_build_required_use(char* target, use_select_t option);
+/**
+ * Generate a new useflag with these settings
+ * @param name name of the new flag
+ * @param status USE_ENABLE or USE_DISABLE
+ * @param priority set the write level
+ * @return the new flag
+ */
+UseFlag* use_new(char* name, use_t status, use_priority_t priority);
+
+/**
+ * Parse the iuse from the repo metadata cache
+ * @param em parent instance
+ * @param metadata the IUSE line in the repo metadata
+ * @return the new flag
+ */
+UseFlag* use_iuse_parse(Emerge* em, char* metadata);
+
+/**
+ * Set a useflag to new_val
+ * @param head use flag to start searching
+ * @param use_search the target use flag name
+ * @param new_val the new value
+ * @param priority write priority
+ * @return the old value
+ */
+use_t use_set(UseFlag* head, char* use_search, use_t new_val, use_priority_t priority);
+
+/**
+ * Get a use flag from a list
+ * @param head the head of the linked list
+ * @param useflag the target useflag name
+ * @return found useflag, NULL if not found
+ */
+UseFlag* use_get(UseFlag* head, char* useflag);
+
+/**
+ * Free a list of flags
+ * @param head the head of the list
+ */
+void use_free(UseFlag* head);
+
+
+RequiredUse* use_build_required_use(char* target, use_t option);
 int ebuild_check_required_use(SelectedEbuild *ebuild);
-UseFlag* useflag_new(char* name, use_select_t status, use_priority_t priority);
-UseFlag * useflag_iuse_parse(Emerge* em, char *metadata);
-void useflag_free(UseFlag* ptr);
+UseReason* use_reason_new(SelectedEbuild* parent, AtomFlag* flag, Dependency* selected_by);
 void requireduse_free(RequiredUse* ptr);
 AtomFlag* dependency_useflag(Ebuild* resolved, AtomFlag* new_flags, AtomFlag* old_flags);
 
 void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required, use_priority_t priority);
 void emerge_parse_useflags(Emerge* emerge);
+void emerge_apply_package_use(Emerge* emerge);
 
 #endif //AUTOGENTOO_REQUIRE_USE_H

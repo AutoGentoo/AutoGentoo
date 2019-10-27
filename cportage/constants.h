@@ -17,6 +17,7 @@ typedef unsigned char* sha_hash;
 typedef struct __Package Package;
 typedef struct __Ebuild Ebuild;
 typedef struct __RequiredUse RequiredUse;
+typedef struct __UseReason UseReason;
 typedef struct __UseFlag UseFlag;
 typedef struct __PackageUse PackageUse;
 typedef struct __Repository Repository;
