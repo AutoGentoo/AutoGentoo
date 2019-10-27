@@ -50,6 +50,7 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 		UseFlag* explicit_search = NULL;
 		char* suggest_flag_name = NULL;
 		use_t set_to = target_val;
+		UseFlag* useflag_search = NULL;
 		
 		/* This use flag set is not conditional
 		 * Must have been selected by a parent depend line
@@ -71,26 +72,29 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 				set_to = USE_ENABLE;
 			
 			explicit_search = conflict_prev->reason->parent_ebuild->explicit_flags;
+			useflag_search = conflict_prev->reason->parent_ebuild->useflags;
 			suggest_flag_name = parent_dependency->target;
 		}
 		else if (current_reason->flag->option == ATOM_USE_ENABLE_IF_ON) {
 			/* depend[use?] */
 			suggest_flag_name = conflict_prev->name;
 			explicit_search = current_reason->parent_ebuild->explicit_flags;
+			useflag_search = conflict_prev->reason->parent_ebuild->useflags;
 		}
 		else if (current_reason->flag->option == ATOM_USE_DISABLE_IF_OFF) {
 			/* depend[use?] */
 			suggest_flag_name = conflict_prev->name;
 			explicit_search = current_reason->parent_ebuild->explicit_flags;
+			useflag_search = current_reason->parent_ebuild->useflags;
 		}
 		else if (current_reason->flag->option == ATOM_USE_EQUAL) {
-			explicit_search = current_reason->parent_ebuild->useflags;
+			useflag_search = explicit_search = current_reason->parent_ebuild->useflags;
 			suggest_flag_name = conflict_prev->name;
 		}
 		else if (current_reason->flag->option == ATOM_USE_OPPOSITE) {
 			/* Use this to reverse the value */
 			set_to = conflict_prev->status;
-			explicit_search = current_reason->parent_ebuild->useflags;
+			useflag_search = explicit_search = current_reason->parent_ebuild->useflags;
 			suggest_flag_name = conflict_prev->name;
 			
 		}
@@ -101,6 +105,13 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 		
 		UseFlag* target_flag = use_get(explicit_search, suggest_flag_name);
 		if (!target_flag) {
+			UseFlag* non_explicit = use_get(useflag_search, suggest_flag_name);
+			if (non_explicit && non_explicit->priority == PRIORITY_FORCE) {
+				/* We cannot change this flag */
+				suggestion_free(out);
+				return NULL;
+			}
+			
 			// This flag is not explicit, just disable it
 			Suggestion* remove_buf = suggestion_new(atom_str, ">=%s %s%s", conflict_prev->reason->parent_ebuild->ebuild->ebuild_key, set_to == USE_ENABLE ? "" : "-", suggest_flag_name);
 			remove_buf->next = out;

@@ -42,7 +42,17 @@ FILE* suggestion_read(Suggestion* s) {
 }
 
 void emerge_apply_suggestions(Emerge* em) {
+	for (int i = 0; i < em->profile->package_use->n; i++) {
+		PackageUse* current_pkuse = vector_get(em->profile->package_use, i);
+		use_free(current_pkuse->flags);
+		atom_free(current_pkuse->atom);
+		free(current_pkuse);
+	}
+	
+	vector_free(em->profile->package_use);
+	em->profile->package_use = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
+	
 	FILE* to_apply = suggestion_read(em->use_suggestions);
-	useflag_parse(to_apply, em->profile->package_use, KEYWORD_UNSTABLE, PRIORITY_NORMAL);
+	useflag_parse(to_apply, em->profile->package_use, KEYWORD_UNSTABLE, PRIORITY_FORCE);
 	fclose(to_apply);
 }

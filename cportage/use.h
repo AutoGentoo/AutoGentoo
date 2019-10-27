@@ -14,7 +14,6 @@ struct __PackageUse {
 	P_Atom* atom;
 	UseFlag* flags;
 	keyword_t keyword_required; // At least this keyword must be present to apply (package.use.stable)
-	PackageUse* next;
 };
 
 struct __UseReason {

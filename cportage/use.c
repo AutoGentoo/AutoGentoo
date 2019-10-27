@@ -26,6 +26,7 @@ use_t use_set(UseFlag* head, char* use_search, use_t new_val, use_priority_t pri
 	
 	use_t out = target->status;
 	target->status = new_val;
+	target->priority = priority;
 	
 	return out;
 }
@@ -338,7 +339,7 @@ void emerge_apply_package_use(Emerge* emerge) {
 				if (atom_match_ebuild(current_ebuild, current->atom)) {
 					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next) {
 						if (current_ebuild->keywords[emerge->target_arch] >= current->keyword_required)
-							use_set(current_ebuild->use, current_flag->name, current_flag->status, PRIORITY_NORMAL);
+							use_set(current_ebuild->use, current_flag->name, current_flag->status, current_flag->priority);
 					}
 				}
 			}

@@ -161,17 +161,18 @@ int emerge (Emerge* emerge) {
 	
 	/* The resolution failed, try again with these suggestion settings */
 	while (emerge->use_suggestions) {
-		if (current) {
-			Suggestion* current_end;
-			for (current_end = current; current->next; current = current->next);
-			current_end->next = emerge->use_suggestions;
-			emerge->use_suggestions = current;
-		}
-		
 		emerge_apply_suggestions(emerge); // Updates package.use
 		emerge_apply_package_use(emerge); // Updates IUSE in ebuilds
 		
-		current = emerge->use_suggestions;
+		if (current) {
+			Suggestion* current_next = current;
+			for (; current_next->next; current_next = current_next->next);
+			current->next = emerge->use_suggestions;
+		}
+		else {
+			current = emerge->use_suggestions;
+		}
+		
 		emerge->use_suggestions = NULL;
 		
 		selected = pd_layer_resolve(emerge, dep);    // Resolve again

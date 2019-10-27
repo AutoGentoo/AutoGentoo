@@ -153,9 +153,8 @@ SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild,
 	SelectedEbuild* prev_sel = pd_check_selected(selected, out);
 	
 	/* Not selected yet, good to go! */
-	if (!prev_sel) {
+	if (!prev_sel)
 		return out;
-	}
 	
 	
 	UseFlag* prev_conflict;
@@ -314,9 +313,9 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 		else if (!se)
 			return;
 		
-		vector_add(ebuild_set, se);
-		
 		if (se->action != PORTAGE_REPLACE || parent->options & EMERGE_DEEP) {
+			vector_add(ebuild_set, se);
+			
 			plog_enter_stack("bdepend %s", atom_stack_str);
 			__pd_layer_resolve__(parent, se->ebuild->bdepend, se, ebuild_set, blocked_set, dependency_order);
 			plog_exit_stack();
@@ -334,9 +333,17 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 			plog_exit_stack();
 			
 			free(atom_stack_str);
+			
+			vector_add(dependency_order, se);
+		}
+		else {
+			if (!target) { /* Atom pulled in by command line, reinstall it */
+				vector_add(ebuild_set, se);
+				vector_add(dependency_order, se);
+			}
 		}
 		
-		vector_add(dependency_order, se);
+		
 	}
 }
 
