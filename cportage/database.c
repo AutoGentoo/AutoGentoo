@@ -181,8 +181,7 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	
 	ebuild->older_slot = NULL;
 	ebuild->newer_slot = NULL;
-	ebuild->next_required = NULL;
-	ebuild->required_head = NULL;
+	ebuild->required_by = vector_new(VECTOR_UNORDERED | VECTOR_REMOVE);
 	
 	ebuild->cflags = portagedb_ebuild_read(pkg, "CFLAGS");
 	ebuild->cxxflags = portagedb_ebuild_read(pkg, "CXXFLAGS");

@@ -122,6 +122,10 @@ set(src_CPORTAGE
         cportage/profile.h
         cportage/conflict.c
         cportage/conflict.h
+        cportage/sets.c
+        cportage/sets.h
+        cportage/backtrack.c
+        cportage/backtrack.h
         )
 
 set(language_SOURCES

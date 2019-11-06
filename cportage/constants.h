@@ -31,5 +31,6 @@ typedef struct __RebuildEbuild RebuildEbuild;
 typedef struct __PortageDB PortageDB;
 typedef struct __Suggestion Suggestion;
 typedef struct __Keyword Keyword;
+typedef struct __PortageSet PortageSet;
 
 #endif //AUTOGENTOO_CONSTANTS_H

@@ -50,10 +50,6 @@ struct __InstalledEbuild {
 	
 	InstalledEbuild* older_slot;
 	InstalledEbuild* newer_slot;
-	
-	/* Dependency backtracking */
-	InstalledEbuild* next_required;
-	InstalledEbuild* required_head;
 };
 
 struct __InstalledPackage {

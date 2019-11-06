@@ -8,7 +8,6 @@
 #include "use.h"
 #include "directory.h"
 #include "portage_log.h"
-#include <linux/limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
