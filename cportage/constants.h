@@ -32,5 +32,6 @@ typedef struct __PortageDB PortageDB;
 typedef struct __Suggestion Suggestion;
 typedef struct __Keyword Keyword;
 typedef struct __PortageSet PortageSet;
+typedef struct __Backtrack Backtrack;
 
 #endif //AUTOGENTOO_CONSTANTS_H

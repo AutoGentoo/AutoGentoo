@@ -11,24 +11,6 @@
 #include "directory.h"
 #include "dependency.h"
 
-struct __DependQuery {
-	InstalledEbuild* selector;
-	char* depend_atom;
-};
-
-typedef enum {
-	EBUILD_REBUILD_DEPEND = 0x1, //!< Part of DEPEND set
-	EBUILD_REBUILD_RDEPEND = 0x2 //!< Part of RDEPEND set
-} rebuild_t;
-
-struct __RebuildEbuild {
-	InstalledEbuild* rebuild;
-	InstalledEbuild* old_slot;
-	P_Atom* selector;
-	Ebuild* new_slot; //!< NULL until the installation
-	rebuild_t type;
-};
-
 struct __InstalledEbuild {
 	InstalledPackage* parent;
 	AtomVersion* version;
@@ -43,6 +25,10 @@ struct __InstalledEbuild {
 	
 	Vector* rebuild_depend;
 	Vector* rebuild_rdepend;
+	
+	/* Don't update this package if it doesn't match
+	 * the installed ebuild depend dependecy requests */
+	Vector* required_by;
 	
 	char* cflags;
 	char* cxxflags;
@@ -65,7 +51,9 @@ struct __InstalledPackage {
 struct __PortageDB {
 	char* path; // /var/db/pkg/
 	Map* installed; // KEY : category/name
-	Vector* backtracking; //!< Array of rebuild requests
+	Vector* rebuilds; //!< Array of rebuild requests
+	Vector* backtracking;
+	
 };
 
 InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom, char* target_slot);
@@ -74,9 +62,6 @@ PortageDB* portagedb_read(Emerge* emerge);
 void portagedb_free(PortageDB* db);
 void installedebuild_free(InstalledEbuild* ebuild);
 void installedpackage_free(InstalledPackage* pkg);
-void backtrack_search(PortageDB* db, InstalledEbuild* parent, Dependency* deptree, rebuild_t type);
-void backtrack_new(PortageDB* db, InstalledEbuild* rebuild, P_Atom* atom, rebuild_t type);
-void backtrack_resolve(PortageDB* db, rebuild_t types);
 dependency_t ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* installed_ebuild);
 
 #endif //AUTOGENTOO_DATABASE_H

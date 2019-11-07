@@ -8,6 +8,7 @@
 #include "database.h"
 #include "suggestion.h"
 #include "conflict.h"
+#include "backtrack.h"
 #include <string.h>
 #include <autogentoo/hacksaw/hacksaw.h>
 #include <autogentoo/hacksaw/set.h>
@@ -312,6 +313,10 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 			continue;
 		else if (!se)
 			return;
+		
+		plog_enter_stack("backtrack %s", se->ebuild->ebuild_key);
+		backtrack_rebuild(parent, se, dependency_order, ebuild_set, blocked_set);
+		plog_exit_stack();
 		
 		if (se->action != PORTAGE_REPLACE || parent->options & EMERGE_DEEP) {
 			vector_add(ebuild_set, se);

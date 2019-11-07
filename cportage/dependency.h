@@ -44,6 +44,16 @@ struct __SelectedEbuild {
  */
 Vector* pd_layer_resolve(Emerge* parent, Dependency* depend);
 
+/**
+ * When dependency resolution reaches a single atom
+ * Resolve that atom and generate a SelectedEbuild
+ * @param emerge the parent emerge environment
+ * @param parent_ebuild ebuild that is selecting this one
+ * @param dep dependency that triggered this selection
+ * @param selected list of already selected ebuilds
+ * @return The new ebuild that has been selected, if NULL, a previously selected ebuild was updated
+ */
+SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild, Dependency* dep, Vector* selected);
 
 /* Helpers */
 Package* atom_resolve_package(Emerge* emerge, P_Atom* atom);

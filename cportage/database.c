@@ -8,6 +8,7 @@
 #include "portage_log.h"
 #include "directory.h"
 #include "dependency.h"
+#include "backtrack.h"
 #include <string.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -192,14 +193,17 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	char* buf_str = portagedb_ebuild_read(pkg, "DEPEND");
 	if (buf_str) {
 		ebuild->depend = depend_parse(buf_str);
-		backtrack_search(db, ebuild, ebuild->depend, EBUILD_REBUILD_DEPEND);
+		backtrack_rebuild_search(db, ebuild, ebuild->depend, EBUILD_REBUILD_DEPEND);
 		free(buf_str);
 	}
 	
 	buf_str = portagedb_ebuild_read(pkg, "RDEPEND");
 	if (buf_str) {
 		ebuild->rdepend = depend_parse(buf_str);
-		backtrack_search(db, ebuild, ebuild->rdepend, EBUILD_REBUILD_RDEPEND);
+		backtrack_rebuild_search(db, ebuild, ebuild->rdepend, EBUILD_REBUILD_RDEPEND);
+		
+		/* Perform a dependency backtrack later */
+		vector_add(db->backtracking, ebuild);
 		free(buf_str);
 	}
 	
@@ -284,6 +288,8 @@ PortageDB* portagedb_read(Emerge* emerge) {
 	
 	out->installed = map_new(4196, 0.8);
 	out->backtracking = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->rebuilds = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
+	
 	int ebuild_n = 0;
 	emerge->database = out;
 	
@@ -324,77 +330,20 @@ PortageDB* portagedb_read(Emerge* emerge) {
 	}
 	
 	if (EMERGE_USE_BINHOST & emerge->build_opts)
-		backtrack_resolve(out, EBUILD_REBUILD_RDEPEND);
+		backtrack_rebuild_resolve(out, EBUILD_REBUILD_RDEPEND);
 	else
-		backtrack_resolve(out, EBUILD_REBUILD_RDEPEND | EBUILD_REBUILD_DEPEND);
+		backtrack_rebuild_resolve(out, EBUILD_REBUILD_RDEPEND | EBUILD_REBUILD_DEPEND);
 	
 	return out;
-}
-
-void backtrack_search(PortageDB* db, InstalledEbuild* parent, Dependency* deptree, rebuild_t type) {
-	if (!deptree)
-		return;
-	
-	Dependency* next;
-	while (deptree) {
-		next = deptree->next;
-		backtrack_search(db, parent, deptree->selectors, type);
-		if (deptree->depends == IS_ATOM && deptree->atom->sub_opts == ATOM_SLOT_REBUILD)
-			backtrack_new(db, parent, deptree->atom, type);
-		deptree = next;
-	}
-}
-
-void backtrack_new(PortageDB* db, InstalledEbuild* rebuild, P_Atom* atom, rebuild_t type) {
-	RebuildEbuild* backtrack = malloc(sizeof(RebuildEbuild));
-	backtrack->new_slot = NULL;
-	backtrack->old_slot = NULL; //!< Needs to be resolved;
-	backtrack->rebuild = rebuild;
-	backtrack->selector = atom_dup(atom);
-	backtrack->type = type;
-	
-	vector_add(db->backtracking, backtrack);
-}
-
-void backtrack_resolve(PortageDB* db, rebuild_t types) {
-	for (int i = 0; i < db->backtracking->n; i++) {
-		RebuildEbuild* backtrack = (RebuildEbuild*)vector_get(db->backtracking, i);
-		if (!(backtrack->type & types))
-			continue;
-		
-		InstalledPackage* package = map_get(db->installed, backtrack->selector->key);
-		if (!package) {
-			plog_warn("Invalid backtracking request for package %s (%s)", backtrack->rebuild->parent->key, backtrack->selector->key);
-			plog_warn("Is %s a binary package?", backtrack->rebuild->parent->key);
-			continue;
-		}
-		
-		InstalledEbuild* curr;
-		for (curr = package->installed; curr; curr = curr->older_slot) {
-			if (backtrack->selector->slot && strcmp(curr->slot, backtrack->selector->slot) != 0)
-				continue;
-			backtrack->old_slot = curr;
-			
-			if (backtrack->type == EBUILD_REBUILD_DEPEND)
-				vector_add(curr->rebuild_depend, backtrack);
-			if (backtrack->type == EBUILD_REBUILD_RDEPEND)
-				vector_add(curr->rebuild_rdepend, backtrack);
-		}
-	}
-}
-
-void backtrack_free(RebuildEbuild* rebuild) {
-	atom_free(rebuild->selector);
-	free(rebuild);
 }
 
 void portagedb_free(PortageDB* db) {
 	free(db->path);
 	map_free(db->installed, (void (*) (void*))installedpackage_free);
 	
-	for (int i = 0; i < db->backtracking->n; i++)
-		backtrack_free((RebuildEbuild*)vector_get(db->backtracking, i));
-	vector_free(db->backtracking);
+	for (int i = 0; i < db->rebuilds->n; i++)
+		backtrack_rebuild_free((RebuildEbuild*) vector_get(db->rebuilds, i));
+	vector_free(db->rebuilds);
 	
 	free(db);
 }
