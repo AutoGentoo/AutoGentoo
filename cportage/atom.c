@@ -224,6 +224,18 @@ Dependency* dependency_build_atom(P_Atom* atom) {
 	return out;
 }
 
+Dependency* dependency_build_grouping(Dependency* selectors) {
+	Dependency* out = malloc(sizeof(Dependency));
+	out->atom = NULL;
+	out->target = NULL;
+	out->next = NULL;
+	out->depends = HAS_DEPENDS;
+	out->selector = USE_NONE;
+	out->selectors = selectors;
+	
+	return out;
+}
+
 Dependency* dependency_build_use(char* use_flag, use_t type, Dependency* selector) {
 	Dependency* out = malloc(sizeof(Dependency));
 	out->atom = NULL;

@@ -151,6 +151,7 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	ebuild->revision = atom->revision;
 	ebuild->rebuild_depend = vector_new(VECTOR_UNORDERED | VECTOR_REMOVE);
 	ebuild->rebuild_rdepend = vector_new(VECTOR_UNORDERED | VECTOR_REMOVE);
+	ebuild->required_by = vector_new(VECTOR_UNORDERED | VECTOR_REMOVE);
 	
 	atomflag_free(atom->useflags);
 	free(atom->key);
@@ -289,6 +290,7 @@ PortageDB* portagedb_read(Emerge* emerge) {
 	out->installed = map_new(4196, 0.8);
 	out->backtracking = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
 	out->rebuilds = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->blockers = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
 	
 	int ebuild_n = 0;
 	emerge->database = out;
@@ -333,6 +335,10 @@ PortageDB* portagedb_read(Emerge* emerge) {
 		backtrack_rebuild_resolve(out, EBUILD_REBUILD_RDEPEND);
 	else
 		backtrack_rebuild_resolve(out, EBUILD_REBUILD_RDEPEND | EBUILD_REBUILD_DEPEND);
+	
+	for (int i = 0; i < out->backtracking->n; i++) {
+		backtrack_resolve(out, vector_get(out->backtracking, i));
+	}
 	
 	return out;
 }

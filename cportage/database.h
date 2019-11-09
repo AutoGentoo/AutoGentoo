@@ -54,6 +54,7 @@ struct __PortageDB {
 	Vector* rebuilds; //!< Array of rebuild requests
 	Vector* backtracking;
 	
+	Vector* blockers;
 };
 
 InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom, char* target_slot);

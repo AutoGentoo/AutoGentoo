@@ -160,5 +160,6 @@ char* atom_get_str(P_Atom* atom);
 
 /* Defined in dependency.c */
 int atom_match_ebuild(Ebuild* ebuild, P_Atom* atom);
+Dependency* dependency_build_grouping(Dependency* selectors);
 
 #endif //AUTOGENTOO_ATOM_H

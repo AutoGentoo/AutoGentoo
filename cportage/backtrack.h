@@ -58,7 +58,7 @@ void backtrack_free(Backtrack* bt);
  * Add this ebuild to the required_by of every dependency
  * @param ebuild to resovle the rdepends for
  */
-void backtrack_resolve(InstalledEbuild* ebuild);
+void backtrack_resolve(PortageDB* db, InstalledEbuild* ebuild);
 
 void backtrack_rebuild_search(PortageDB* db, InstalledEbuild* parent, Dependency* deptree, rebuild_t type);
 void backtrack_rebuild_new(PortageDB* db, InstalledEbuild* rebuild, Dependency* dep, rebuild_t type);

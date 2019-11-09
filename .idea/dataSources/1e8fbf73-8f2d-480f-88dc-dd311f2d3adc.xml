@@ -8,31 +8,31 @@
       <ObjectId>18885</ObjectId>
       <Owner>postgres</Owner>
       <IntrospectionStateNumber>2424</IntrospectionStateNumber>
-      <Relations>sequence|table|19250|19252|1
-sequence|table|19258|19260|1
-sequence|table|19212|19214|1
-sequence|table|19242|19244|1
-sequence|table|19274|19276|1
-sequence|table|19266|19268|1
-sequence|table|19074|19076|1
+      <Relations>sequence|table|19191|19193|1
+sequence|table|19009|19011|1
+sequence|table|19459|19461|1
+sequence|table|19287|19289|1
+sequence|table|19295|19297|1
+sequence|table|19223|19225|1
+sequence|table|19231|19233|1
+sequence|table|27065|27067|1
 sequence|table|19164|19166|1
 sequence|table|19172|19174|1
-sequence|table|19134|19136|1
 sequence|table|19180|19182|1
+sequence|table|19134|19136|1
+sequence|table|19074|19076|1
 sequence|table|19020|19022|1
 sequence|table|19030|19032|1
 sequence|table|19038|19040|1
 sequence|table|19066|19068|1
 sequence|table|19048|19050|1
 sequence|table|19056|19058|1
-sequence|table|27065|27067|1
-sequence|table|19459|19461|1
-sequence|table|19223|19225|1
-sequence|table|19231|19233|1
-sequence|table|19287|19289|1
-sequence|table|19295|19297|1
-sequence|table|19191|19193|1
-sequence|table|19009|19011|1
+sequence|table|19274|19276|1
+sequence|table|19250|19252|1
+sequence|table|19258|19260|1
+sequence|table|19212|19214|1
+sequence|table|19242|19244|1
+sequence|table|19266|19268|1
 </Relations>
     </database>
     <database id="3" parent="1" name="postgres">

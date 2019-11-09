@@ -6,6 +6,7 @@
 #include "dependency.h"
 #include "database.h"
 #include <string.h>
+#include <errno.h>
 
 void backtrack_rebuild(Emerge* em, SelectedEbuild* se, Vector* dependency_ordered, Vector* dependency_selected,
                        Vector* dependency_blocks) {
@@ -39,6 +40,73 @@ void backtrack_rebuild(Emerge* em, SelectedEbuild* se, Vector* dependency_ordere
 	}
 }
 
+Dependency* prv_backtrack_check_dep(PortageDB* db, Dependency* dep) {
+	int resolved = 0;
+	Dependency* out;
+	
+	if (dep->depends == HAS_DEPENDS && strcmp(dep->target, "||") == 0) {
+		/* Check for only one */
+		
+		for (Dependency* curr = dep->selectors; curr; curr = curr->next) {
+			Dependency* res_dep = prv_backtrack_check_dep(db, curr);
+			
+			/* Something already selected */
+			if (res_dep && resolved) {
+				errno = 0;
+				plog_error("Multiple depends fuffilled when only one required");
+			}
+			
+			resolved++;
+		}
+	}
+	else if (dep->depends == HAS_DEPENDS) {
+		for (Dependency* curr = dep->selectors; curr; curr = curr->next) {
+			Dependency* res_dep = prv_backtrack_check_dep(db, curr);
+			if (!res_dep)
+				break;
+		}
+	}
+	else {
+	
+	}
+	
+	return resolved;
+}
+
+void prv_backtrack_resolve_dep(PortageDB* db, InstalledEbuild* ebuild, Dependency* dep) {
+	for (Dependency* curr = dep; curr; curr = curr->next) {
+		if (curr->depends == HAS_DEPENDS) {
+			prv_backtrack_resolve_dep(db, ebuild, dep->selectors);
+			continue;
+		}
+		
+		if (curr->atom->blocks != ATOM_BLOCK_NONE) {
+			vector_add(db->blockers, curr);
+			continue;
+		}
+		
+		InstalledPackage* pkg = map_get(db->installed, curr->atom->key);
+		if (!pkg) {
+			plog_error("Package %s depends on %s but it's not installed", ebuild->parent->key, curr->atom->key);
+			continue;
+			//exit(1);
+		}
+		
+		InstalledEbuild* curr_inst;
+		for (curr_inst = pkg->installed; curr_inst; curr_inst = curr_inst->older_slot) {
+			if (curr->atom->slot && strcmp(curr_inst->slot, curr->atom->slot) != 0)
+				continue;
+			
+			Backtrack* bt = backtrack_new(ebuild, curr);
+			vector_add(curr_inst->required_by, bt);
+		}
+	}
+}
+
+void backtrack_resolve(PortageDB* db, InstalledEbuild* ebuild) {
+	prv_backtrack_resolve_dep(db, ebuild, ebuild->rdepend);
+}
+
 Backtrack* backtrack_new(InstalledEbuild* required_by, Dependency* selected_by) {
 	Backtrack* out = malloc(sizeof(Backtrack));
 	
@@ -56,13 +124,10 @@ void backtrack_rebuild_search(PortageDB* db, InstalledEbuild* parent, Dependency
 	if (!deptree)
 		return;
 	
-	Dependency* next;
-	while (deptree) {
-		next = deptree->next;
-		backtrack_rebuild_search(db, parent, deptree->selectors, type);
-		if (deptree->depends == IS_ATOM && deptree->atom->sub_opts == ATOM_SLOT_REBUILD)
-			backtrack_rebuild_new(db, parent, deptree, type);
-		deptree = next;
+	for (Dependency* curr = deptree; curr; curr = curr->next) {
+		backtrack_rebuild_search(db, parent, curr->selectors, type);
+		if (curr->depends == IS_ATOM && curr->atom->sub_opts == ATOM_SLOT_REBUILD)
+			backtrack_rebuild_new(db, parent, curr, type);
 	}
 }
 
