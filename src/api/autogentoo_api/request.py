@@ -118,7 +118,7 @@ class Request:
 	
 	LINKAGE = (
 		"",
-		"sss",  # /* Host new */
+		"ssss",  # /* Host new */
 		"s",  # /* Host select */
 		"iss",  # /* Host edit */
 		"ss",  # /* Host authorize */
@@ -128,8 +128,8 @@ class Request:
 	)
 	
 	@staticmethod
-	def host_new(arch: str, profile: str, hostname: str) -> RequestStruct:
-		return RequestStruct(struct_type=Request.STRCT_HOST_NEW, args=(arch, profile, hostname))
+	def host_new(hostid: str, arch: str, profile: str, hostname: str) -> RequestStruct:
+		return RequestStruct(struct_type=Request.STRCT_HOST_NEW, args=(hostid, arch, profile, hostname))
 	
 	# request_type 1: make_conf 2: general
 	@staticmethod
@@ -199,7 +199,7 @@ class Request:
 		template = outdata.read_string()
 		
 		if template is None:
-			return None, -1, "Connection Error"
+			return Response(None, -1, "Connection Error")
 		
 		self.content = outdata.read_template(template)
 		

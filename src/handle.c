@@ -92,9 +92,12 @@ void HOST_NEW(Response* res, Request* request) {
 	
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
-
+	
+	if (strlen(request->structures[1]->data->host_new.hostid) != AUTOGETNOO_HOST_ID_LENGTH)
+		HANDLE_RETURN(BAD_REQUEST);
+	
 	/* Create the host */
-	Host* target = host_new(request->parent, host_id_new());
+	Host* target = host_new(request->parent, strdup(request->structures[1]->data->host_new.hostid));
 	target->arch = strdup(request->structures[1]->data->host_new.arch);
 	target->hostname = strdup(request->structures[1]->data->host_new.hostname);
 	target->profile = strdup(request->structures[1]->data->host_new.profile);

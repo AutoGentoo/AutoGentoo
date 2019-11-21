@@ -31,6 +31,7 @@ struct __RequestStructure {
 };
 
 struct __struct_Host_new {
+	char* hostid;
 	char* arch;
 	char* profile;
 	char* hostname;
@@ -82,7 +83,7 @@ struct __Raw {
 };
 
 static char* request_structure_linkage[] = {
-	"sss", /* Host new */
+	"ssss", /* Host new */
 	"s", /* Host select */
 	"is", /* Host edit */
 	"ss", /* Host authorize */

@@ -46,6 +46,9 @@ void string_vector_split(StringVector* vec, char* string, char* delim) {
 }
 
 void string_vector_free(StringVector* vec) {
+	if (!vec)
+		return;
+	
 	int i;
 	for (i = 0; i != vec->n; i++) {
 		free(string_vector_get(vec, i));
