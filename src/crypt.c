@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <openssl/ssl.h>
+#include <openssl/opensslv.h>
 
 void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair) {
 	X509_NAME* name = NULL;
@@ -53,7 +54,12 @@ int certificate_sign(X509* cert, RSA* rsa) {
 	
 	do {
 		// Create the certificate object
+		/* MMNNFFRBB major minor fix final beta/patch */
+#if (OPENSSL_VERSION_NUMBER & 0x00ff000fL) == 0x0010000fL
 		priv_key = EVP_PKEY_new();
+#elif (OPENSSL_VERSION_NUMBER & 0x00ff000fL) == 0x0000000fL
+		priv_key = EVP_PKEY_new();
+#endif
 		if (!priv_key) {
 			lerror("Failed to initialize EVP_PKEY");
 			break;
@@ -80,8 +86,12 @@ int certificate_sign(X509* cert, RSA* rsa) {
 		
 		status = 1;
 	} while (!status);
-	
+
+#if (OPENSSL_VERSION_NUMBER & 0x00ff000fL) == 0x0010000fL
 	EVP_PKEY_free(priv_key);
+#elif (OPENSSL_VERSION_NUMBER & 0x00ff000fL) == 0x0000000fL
+	EVP_MD_CTX_destroy(priv_key)
+#endif
 	
 	return status;
 }
