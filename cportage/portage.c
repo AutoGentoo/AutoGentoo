@@ -19,8 +19,15 @@
 int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm) {
 	FILE* hash = fdopen(fd, "r");
 	*target = malloc(EVP_MAX_MD_SIZE);
-	
+
+
+#if (OPENSSL_VERSION_NUMBER & 0x00ff000fL) == 0x0010000fL
 	EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
+#elif (OPENSSL_VERSION_NUMBER & 0x00ff000fL) == 0x0000000fL
+	EVP_MD_CTX* mdctx = EVP_MD_CTX_create();
+#endif
+	
+	
 	unsigned int md_len;
 	EVP_DigestInit_ex(mdctx, algorithm, NULL);
 	
@@ -31,7 +38,12 @@ int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm) {
 	}
 	
 	EVP_DigestFinal_ex(mdctx, *target, &md_len);
+
+#if (OPENSSL_VERSION_NUMBER & 0x00ff000fL) == 0x0010000fL
 	EVP_MD_CTX_free(mdctx);
+#elif (OPENSSL_VERSION_NUMBER & 0x00ff000fL) == 0x0000000fL
+	EVP_MD_CTX_destroy(mdctx);
+#endif
 	
 	return (int)md_len;
 }
