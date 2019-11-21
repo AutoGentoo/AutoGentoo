@@ -11,6 +11,7 @@
 #include <openssl/ssl.h>
 #include <autogentoo/writeconfig.h>
 #include <sys/socket.h>
+#include <string.h>
 #include "autogentoo/worker.h"
 
 int prv_random_string(char* out, size_t len);

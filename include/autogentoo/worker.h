@@ -20,6 +20,11 @@ typedef struct __WorkerRequest WorkerRequest;
 
 #include "host.h"
 
+enum {
+	WORKER_EXIT,
+	WORKER_JOB,
+};
+
 struct __WorkerRequest {
 	char* command_name;
 	char* host_id;

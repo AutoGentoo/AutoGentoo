@@ -10,6 +10,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/file.h>
+#include <wait.h>
 
 WorkerHandler* worker_handler_new(Server* parent) {
 	WorkerHandler* out = malloc(sizeof(WorkerHandler));
@@ -110,7 +111,7 @@ void worker_handler_loop(WorkerHandler* wh) {
 		pthread_mutex_unlock(&wh->lck);
 		
 		/* Write the request to the write_fifo */
-		int command = 0;
+		int command = WORKER_JOB;
 		write(wh->write_fifo, &command, sizeof(int));
 		
 		int len = (int)strlen(command_id);
@@ -144,6 +145,12 @@ void worker_handler_loop(WorkerHandler* wh) {
 		
 		pthread_mutex_unlock(&wh->write_lck);
 	}
+	
+	int exit_cmd = WORKER_EXIT;
+	write(wh->write_fifo, &exit_cmd, sizeof(int));
+	
+	/* Wait for the worker to exit */
+	wait(NULL);
 }
 
 int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** job_id) {
@@ -204,9 +211,11 @@ char* worker_register(char* host_id, char* command_name) {
 void worker_handler_free(WorkerHandler* wh) {
 	wh->keep_alive = 0;
 	
+	/* Tell the worker thread to exit */
 	pthread_cond_signal(&wh->sig);
 	pthread_join(wh->pid, NULL);
 	
+	/* Free the mutexes */
 	pthread_mutex_destroy(&wh->sig_lck);
 	pthread_mutex_destroy(&wh->write_lck);
 	pthread_mutex_destroy(&wh->read_lck);

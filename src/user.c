@@ -101,6 +101,9 @@ AccessToken* auth_issue_token(Server* server, AccessToken* creation_token) {
 }
 
 void token_free(AccessToken* tok) {
+	if (!tok)
+		return;
+	
 	free(tok->auth_token);
 	free(tok->user_id);
 	free(tok->host_id);

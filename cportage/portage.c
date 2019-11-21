@@ -14,25 +14,24 @@
 #include "emerge.h"
 #include "package.h"
 #include "directory.h"
+#include <openssl/evp.h>
 
 int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm) {
 	FILE* hash = fdopen(fd, "r");
 	*target = malloc(EVP_MAX_MD_SIZE);
 	
-	EVP_MD_CTX mdctx;
+	EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
 	unsigned int md_len;
-	EVP_MD_CTX_init(&mdctx);
-	EVP_DigestInit_ex(&mdctx, algorithm, NULL);
+	EVP_DigestInit_ex(mdctx, algorithm, NULL);
 	
 	char chunk[64];
 	ssize_t current_bytes = 0;
 	while ((current_bytes = fread(chunk, 64, 1, hash)) > 0) {
-		EVP_DigestUpdate(&mdctx, chunk, current_bytes);
+		EVP_DigestUpdate(mdctx, chunk, current_bytes);
 	}
 	
-	
-	EVP_DigestFinal_ex(&mdctx, *target, &md_len);
-	EVP_MD_CTX_cleanup(&mdctx);
+	EVP_DigestFinal_ex(mdctx, *target, &md_len);
+	EVP_MD_CTX_free(mdctx);
 	
 	return (int)md_len;
 }

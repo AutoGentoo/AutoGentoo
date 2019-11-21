@@ -23,8 +23,9 @@ void server_kill (Server* server) {
 		linfo("encrypt server exited");
 	}
 	pool_exit(server->pool_handler);
-	close(server->socket);
 	server_free(server);
+	close(server->socket);
 	linfo("server exited succuessfully");
+	fflush(stdout);
 	exit (0);
 }

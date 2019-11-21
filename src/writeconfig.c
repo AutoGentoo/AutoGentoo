@@ -1,6 +1,7 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cppcoreguidelines-narrowing-conversions"
 #include <stdlib.h>
 #include <string.h>
-#include <autogentoo/autogentoo.h>
 #include <netinet/in.h>
 #include <autogentoo/user.h>
 #include <errno.h>
@@ -183,8 +184,6 @@ Server* read_server(char* location, char* port, server_t opts) {
 	Host* host_temp;
 	AccessToken* token_temp;
 	
-	//size_t len = (size_t)read_int(fp);
-	
 	int current = read_int(fp);
 	while (current != AUTOGENTOO_FILE_END) {
 		switch (current) {
@@ -269,7 +268,6 @@ Host* read_host(FILE* fp) {
 	int current = 0;
 	while (current != AUTOGENTOO_HOST_END) {
 		Kernel* new_kernel;
-		AccessToken new_token;
 		current = read_int(fp);
 		switch (current) {
 			case AUTOGENTOO_HOST_KERNEL:

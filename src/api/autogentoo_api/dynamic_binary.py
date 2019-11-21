@@ -27,8 +27,6 @@ class DynamicBinary:
 		self.pos += size
 		
 		if len(outdata) < size:
-			print(self.pos)
-			print(outdata)
 			raise IOError("Failed to read %d bytes from data" % size)
 		
 		return outdata
@@ -182,11 +180,11 @@ class FileReader(DynamicBinary):
 		fcntl.flock(self.file.fileno(), fcntl.LOCK_EX)
 		
 		self.data = self.file.read()
+		self.template = ""
 		self.pos = 0
 		
 		fcntl.flock(self.file.fileno(), fcntl.LOCK_UN)
 		self.file.close()
-		print(len(self.data))
 
 
 class BinaryObject:

@@ -26,21 +26,21 @@ def script(_job_name: str, host: Host, _args=None):
 # NOTE: some CFLAGS may speed up the system on specific CPUs and not run on others
 # Refer to https://wiki.gentoo.org/wiki/GCC_optimization for details on what to write here
 # NEVER USE '-march=native' unless you are sure the compile server has the same cpu as the client
-CFLAGS=\"{cflags}\"
+CFLAGS="{cflags}"
 
 
 # CXXFLAGS are the same as CFLAGS except passed only to C++ compiles
-# Recommended: CXXFLAGS=\"${CFLAGS}\"
-CXXFLAGS=\"{cxxflags}\"
+# Recommended: CXXFLAGS="${CFLAGS}"
+CXXFLAGS="{cxxflags}"
 
 
 # USE flags will add or remove certain features of installed packages
 # The USE variable in this file will apply globally to every package
 # To change a use flags for one package, use package.use
-USE=\"{use}\"
+USE="{use}"
 
 # The following entries were appended by the user
-""".format(**vars(host), CFLAGS="{CFLAGS}"))
+""".format(**vars(host), CFLAGS="CFLAGS"))
 	
 	for key in host.extra:
 		fp.write("%s=\"%s\"\n" % (key, host.extra[key]))
@@ -48,15 +48,18 @@ USE=\"{use}\"
 	fp.write("""
 # The following should NOT be changed
 # Build directory
-PORTAGE_TMPDIR=\"{portage_tmpdir}\"
+PORTAGE_TMPDIR="{portage_tmpdir}"
 # ebuild portage tree (shared)
-PORTDIR=\"{portdir}\"
+PORTDIR="{portdir}"
 # Distfile directory (shared)
-DISTDIR=\"{distdir}\"
+DISTDIR="{distdir}"
 # Package binary directory
-PKGDIR=\"{pkgdir}\"
+PKGDIR="{pkgdir}"
 # Build log directory
-PORTAGE_LOGDIR=\"{portage_logdir}\"
+PORTAGE_LOGDIR="{portage_logdir}"
 # Log message language
-LC_MESSAGES=\"{lc_messages}\"
+LC_MESSAGES="{lc_messages}"
 """.format(**vars(host)))
+	
+	fp.flush()
+	fp.close()

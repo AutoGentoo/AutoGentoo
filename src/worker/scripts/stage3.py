@@ -16,6 +16,7 @@ Steps:
 
 from script import *
 from client import Host
+from . import make_conf
 
 
 def script(_job_name: str, host: Host, args=None):
@@ -76,13 +77,14 @@ def script(_job_name: str, host: Host, args=None):
 		else:
 			need_download = 0
 	
-	if need_download and download(url, filename) == 1:
-		raise RuntimeError("Failed to retrieve stage3 from %s" % url)
+	#if need_download and download(url, filename) == 1:
+	#	raise RuntimeError("Failed to retrieve stage3 from %s" % url)
 	
-	if extract(filename, ".") != 0:
-		raise RuntimeError("Failed to extract stage3")
+	#if extract(filename, ".") != 0:
+	#	raise RuntimeError("Failed to extract stage3")
 	
 	print("Preparing /etc/portage/")
+	mkdir("etc/portage/", host)
 	rmrf("etc/portage/package.use")
 	touch("etc/portage/package.use")
 	touch("etc/portage/package.env")
@@ -90,9 +92,17 @@ def script(_job_name: str, host: Host, args=None):
 	
 	print("Settings make.profile")
 	cd("etc/portage/", host)
-	rm("make.profile")
+	
+	try:
+		rm("make.profile")
+	except FileNotFoundError:
+		pass
+	
 	ln("%s/profiles/%s" % (host.portdir, host.profile), "make.profile")
 	
 	cd("/", host)
+	
+	print("Updating /etc/portage/make.conf")
+	make_conf.script(_job_name, host)
 	
 	touch(".stage3")

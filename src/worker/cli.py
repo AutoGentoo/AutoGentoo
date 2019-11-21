@@ -8,6 +8,8 @@ import rlcompleter
 import readline
 import traceback
 import time
+import signal
+import os
 
 histfile = ".autogentoo_history"
 try:
@@ -21,7 +23,7 @@ atexit.register(readline.write_history_file, histfile)
 
 
 class Cli:
-	def __init__(self, path, server_pid):
+	def __init__(self, path, server_pid: int):
 		self.path = path
 		self.server_pid = server_pid
 		self.server = Server(self.path, server_pid)
@@ -57,7 +59,7 @@ class Cli:
 			
 			self.update_completion()
 			try:
-				line = input("autogentoo > ").replace("\n", "").strip()
+				line = input("autogentoo > ").strip()
 				if not len(line):
 					continue
 			except KeyboardInterrupt:
@@ -121,13 +123,13 @@ class Cli:
 	def help(self):
 		self.pp.pprint(self.commands)
 	
-	@staticmethod
-	def q():
+	def q(self):
+		os.kill(self.server_pid, signal.SIGINT)
 		exit(0)
 
 
 def main(args):
-	cli = Cli(args[1], args[2])
+	cli = Cli(args[1], int(args[2]))
 	cli.cli()
 
 

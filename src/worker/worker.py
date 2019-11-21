@@ -6,10 +6,14 @@ import _thread
 from client import *
 import importlib
 from script import *
+import signal
 
 logfp = None
 WORKER_FIFO_REQUEST = "/tmp/autogentoo_worker.req"
 WORKER_FIFO_RESPONSE = "/tmp/autogentoo_worker.res"
+
+WORKER_EXIT = 0
+WORKER_JOB = 1
 
 
 class Worker:
@@ -39,17 +43,19 @@ class Worker:
 	
 	def start(self):
 		mkdir("logs")
+		self.server.read()
 		
 		while self.keep_alive:
-			self.server.read()
 			self.read_lck.acquire()
 			
 			command_enum = self.read_int()
-			if command_enum == 1 or command_enum == -1:
+			if command_enum == WORKER_EXIT or command_enum == -1:
 				self.read_lck.release()
 				# Kill this service
 				self.keep_alive = False
 				continue
+			
+			self.server.read()
 			
 			job_name = self.read_str()
 			command_name = self.read_str()
@@ -62,15 +68,25 @@ class Worker:
 			
 			self.read_lck.release()
 			
-			new_job = Job(self.server, self.server.hosts[host_id], job_name, command_name, argv)
-			new_job.run()
-			self.jobs.append(new_job)
+			error = False
+			try:
+				new_job = Job(self.server, self.server.hosts[host_id], job_name, command_name, argv)
+			except KeyError:
+				error = True
+			else:
+				new_job.run()
+				self.jobs.append(new_job)
 			
 			self.write_lck.acquire()
-			self.write_str(job_name)
-			self.write_int(new_job.res)
+			if error:
+				self.write_str("NULL")
+				self.write_int(1)
+			else:
+				self.write_str(job_name)
+				self.write_int(new_job.res)
 			self.write_lck.release()
 		
+		print("----Worker exits----")
 		self.request_fifo.close()
 		self.response_fifo.close()
 
@@ -173,10 +189,8 @@ def main(argv):
 	
 	worker = Worker(server)
 	
-	try:
-		worker.start()
-	except KeyboardInterrupt:
-		worker.close()
+	signal.signal(signal.SIGINT, signal.SIG_IGN)
+	worker.start()
 
 
 if __name__ == "__main__":
