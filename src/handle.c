@@ -145,7 +145,12 @@ void HOST_MAKE_CONF(Response* res, Request* request) {
 	else if (strcmp(make_conf.key, "USE") == 0)
 		string_overwrite(&host->environment->use, make_conf.value, 1);
 	else {
-		// HOLD FOR NOW
+		for (int i = 0; i < host->environment->extra->n; i++) {
+			SmallMap_key* key_value_pair = (SmallMap_key*) vector_get(host->environment->extra, i);
+			if (strcmp(key_value_pair->key, make_conf.key) == 0) {
+				string_overwrite((char**)&key_value_pair->data_ptr, make_conf.value, 1);
+			}
+		}
 	}
 	
 	HANDLE_RETURN(INTERNAL_ERROR);

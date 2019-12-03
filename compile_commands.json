@@ -381,6 +381,11 @@
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dautogentooapi_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/usr/include/python3.6m  -g -fPIC   -o CMakeFiles/autogentooapi.dir/src/api/host_serial.c.o   -c /home/atuser/git/AutoGentoo/src/api/host_serial.c",
+  "file": "/home/atuser/git/AutoGentoo/src/api/host_serial.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
   "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g   -o CMakeFiles/cportage-exec.dir/cportage/cemerge.c.o   -c /home/atuser/git/AutoGentoo/cportage/cemerge.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/cemerge.c"
 }

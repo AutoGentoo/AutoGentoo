@@ -8,16 +8,11 @@
 #include <autogentoo/crypt.h>
 #include <string.h>
 #include <openssl/err.h>
-#include <autogentoo/writeconfig.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <openssl/ssl.h>
-#include <openssl/opensslv.h>
 
 void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair) {
 	X509_NAME* name = NULL;
-	
-	int status = 0;
 	
 	const unsigned char* country = (unsigned char*)"US";
 	const unsigned char* organization = (unsigned char*)"AutoGentoo";
@@ -37,7 +32,7 @@ void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair) {
 	// Set the certificate's properties
 	ASN1_INTEGER_set (X509_get_serialNumber (*cert_out), serial);
 	X509_gmtime_adj (X509_get_notBefore (*cert_out), 0);
-	X509_gmtime_adj (X509_get_notAfter (*cert_out), (long)(60 * 60 * 24 * (days_valid ? days_valid : 1)));
+	X509_gmtime_adj (X509_get_notAfter (*cert_out), (60 * 60 * 24 * (days_valid ? days_valid : 1)));
 	name = X509_get_subject_name (*cert_out);
 	
 	X509_NAME_add_entry_by_txt (name, "C", MBSTRING_ASC, country, -1, -1, 0);

@@ -44,6 +44,14 @@ add_library(hacksaw SHARED
         ${hacksaw_SRC}
         )
 
+find_package (Python COMPONENTS Interpreter Development)
+add_library(autogentooapi SHARED
+        include/autogentoo/api/host_serial.h
+        src/api/host_serial.c
+)
+
+target_include_directories(autogentooapi PUBLIC ${Python_INCLUDE_DIRS})
+
 target_link_libraries(autogentoo hacksaw)
 target_link_libraries(cportage hacksaw)
 
