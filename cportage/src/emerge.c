@@ -6,7 +6,7 @@
 
 #include "emerge.h"
 #include <string.h>
-#include <share.h>
+#include "language/share.h"
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>

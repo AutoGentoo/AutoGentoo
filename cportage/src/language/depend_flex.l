@@ -1,7 +1,7 @@
 %{
 #define _GNU_SOURCE
 #include <stdio.h>
-#include <share.h>
+#include "../../src/language/share.h"
 #include <string.h>
 #include "depend.tab.h"
 

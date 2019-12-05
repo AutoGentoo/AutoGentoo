@@ -1,12 +1,11 @@
 %code requires {
-  #include "share.h"
   #include <stdlib.h>
   #include <string.h>
+  #include "share.h"
 }
 
 %{
 #include <stdio.h>
-#include "share.h"
 
 int yyparse(void);
 int yywrap() { return 1; }

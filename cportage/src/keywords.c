@@ -2,7 +2,7 @@
 // Created by atuser on 5/5/19.
 //
 
-#include <share.h>
+#include "language/share.h"
 #include "keywords.h"
 #include "portage_log.h"
 #include <string.h>

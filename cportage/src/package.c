@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <share.h>
+#include "language/share.h"
 #include <autogentoo/hacksaw/map.h>
 #include "database.h"
 

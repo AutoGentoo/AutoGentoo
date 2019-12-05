@@ -32,13 +32,6 @@ add_library(autogentoo SHARED
         ${worker_SOURCES}
         )
 
-add_library(cportage SHARED
-        ${src_CPORTAGE}
-        ${language_BIN}
-        ${language_PARSER}
-        ${language_SOURCES}
-        )
-
 add_library(hacksaw SHARED
         ${hacksaw_HEADERS}
         ${hacksaw_SRC}
@@ -53,7 +46,6 @@ add_library(autogentooapi SHARED
 target_include_directories(autogentooapi PUBLIC ${Python_INCLUDE_DIRS})
 
 target_link_libraries(autogentoo hacksaw)
-target_link_libraries(cportage hacksaw)
 
 #add_executable(autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
 add_executable(autogentoo-exec
@@ -64,20 +56,6 @@ add_executable(autogentoo-exec
 add_subdirectory("src/api/")
 set_target_properties(autogentoo-exec PROPERTIES OUTPUT_NAME autogentoo)
 add_dependencies(autogentoo-exec autogentoo_api)
-
-add_executable(cportage-exec
-        cportage/cemerge.c
-        )
-
-set_target_properties(cportage-exec PROPERTIES OUTPUT_NAME autogentoo-emerge)
-
-target_link_libraries(cportage-exec
-        cportage
-        ssl
-        crypto
-        archive
-        )
-
 
 target_link_libraries(autogentoo-exec
         autogentoo
@@ -92,6 +70,7 @@ add_executable(autogentoo-aabs
         ${arch_HEADERS}
         )
 
+add_subdirectory(cportage)
 
 #add_executable(autogentoo-test
 #        ${test_SOURCES}
@@ -119,9 +98,6 @@ MACRO(INSTALL_HEADERS_WITH_DIRECTORY HEADER_LIST)
                 INSTALL(FILES ${HEADER} DESTINATION ${DIR})
         ENDFOREACH(HEADER)
 ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
-
-INSTALL(TARGETS autogentoo-exec cportage-exec DESTINATION bin)
-INSTALL(TARGETS autogentoo cportage hacksaw DESTINATION lib)
 
 SET(PYTHON_WORKER
         src/worker/cli.py

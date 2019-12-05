@@ -10,7 +10,7 @@
 #include "emerge.h"
 #include <string.h>
 #include <ctype.h>
-#include <share.h>
+#include "language/share.h"
 
 char* strupr(char* str) {
 	for (char* c = str; *c; c++)

@@ -1,0 +1,74 @@
+set(src_CPORTAGE
+        src/package.c
+        src/package.h
+        src/constants.h
+        src/portage.c
+        src/portage.h
+        src/portage_log.c
+        src/portage_log.h
+        src/database.c
+        src/database.h
+        src/manifest.c
+        src/manifest.h
+        src/compress.c
+        src/compress.h
+        src/features.c
+        src/features.h
+        src/use.c
+        src/use.h
+        src/keywords.c
+        src/keywords.h
+        src/atom.c
+        src/atom.h
+        src/emerge.c
+        src/emerge.h
+        src/directory.c
+        src/directory.h
+        src/dependency.c
+        src/dependency.h
+        src/suggestion.c
+        src/suggestion.h
+        src/cportage_defines.h
+        src/globals.c
+        src/globals.h
+        src/profile.c
+        src/profile.h
+        src/conflict.c
+        src/conflict.h
+        src/sets.c
+        src/sets.h
+        src/backtrack.c
+        src/backtrack.h
+        )
+
+set(language_SOURCES
+        src/language/share.h
+        )
+
+set(language_PARSER
+        src/language/depend_bison.y
+        src/language/depend_flex.l
+        src/language/make_conf_bison.y
+        src/language/make_conf_flex.l
+        )
+
+flex_target(FLEX_DEPEND src/language/depend_flex.l
+        ${PROJECT_BINARY_DIR}/lang/depend.flex.c)
+bison_target(LANG_DEPEND
+        src/language/depend_bison.y
+        ${PROJECT_BINARY_DIR}/lang/depend.tab.c)
+
+flex_target(FLEX_MAKE_CONF src/language/make_conf_flex.l
+        ${PROJECT_BINARY_DIR}/lang/make_conf.flex.c)
+bison_target(LANG_MAKE_CONF
+        src/language/make_conf_bison.y
+        ${PROJECT_BINARY_DIR}/lang/make_conf.tab.c)
+
+add_flex_bison_dependency(FLEX_DEPEND LANG_DEPEND)
+add_flex_bison_dependency(FLEX_MAKE_CONF LANG_MAKE_CONF)
+
+set(language_BIN
+        ${BISON_LANG_DEPEND_OUTPUTS}
+        ${FLEX_FLEX_DEPEND_OUTPUTS}
+        ${BISON_LANG_MAKE_CONF_OUTPUTS}
+        ${FLEX_FLEX_MAKE_CONF_OUTPUTS})

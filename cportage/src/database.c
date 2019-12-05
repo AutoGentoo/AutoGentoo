@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include <share.h>
+#include "language/share.h"
 #include <unistd.h>
 #include <sys/stat.h>
 
@@ -46,7 +46,7 @@ dependency_t ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* install
 		return PORTAGE_DOWNGRADE;
 	
 	/* Check if the requested use flags match */
-	
+	return PORTAGE_REPLACE;
 }
 
 InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom, char* target_slot) {

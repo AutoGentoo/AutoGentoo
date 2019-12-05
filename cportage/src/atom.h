@@ -11,7 +11,6 @@ typedef struct __P_Atom P_Atom;
 typedef struct __AtomVersion AtomVersion;
 typedef struct __AtomFlag AtomFlag;
 typedef struct __Dependency Dependency;
-typedef struct __DependencyTree DependencyTree;
 
 typedef enum {
 	USE_NONE,

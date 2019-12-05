@@ -4,7 +4,7 @@
 
 
 #include <openssl/evp.h>
-#include <share.h>
+#include "language/share.h"
 #include <autogentoo/hacksaw/hacksaw.h>
 #include <autogentoo/hacksaw/getopt.h>
 #include "portage.h"

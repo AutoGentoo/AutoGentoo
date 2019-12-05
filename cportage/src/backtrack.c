@@ -42,7 +42,7 @@ void backtrack_rebuild(Emerge* em, SelectedEbuild* se, Vector* dependency_ordere
 
 Dependency* prv_backtrack_check_dep(PortageDB* db, Dependency* dep) {
 	int resolved = 0;
-	Dependency* out;
+	Dependency* out = NULL;
 	
 	if (dep->depends == HAS_DEPENDS && strcmp(dep->target, "||") == 0) {
 		/* Check for only one */
@@ -58,6 +58,9 @@ Dependency* prv_backtrack_check_dep(PortageDB* db, Dependency* dep) {
 			
 			resolved++;
 		}
+		
+		if (resolved > 1)
+			return NULL;
 	}
 	else if (dep->depends == HAS_DEPENDS) {
 		for (Dependency* curr = dep->selectors; curr; curr = curr->next) {
@@ -70,13 +73,19 @@ Dependency* prv_backtrack_check_dep(PortageDB* db, Dependency* dep) {
 	
 	}
 	
-	return resolved;
+	return out;
 }
 
 void prv_backtrack_resolve_dep(PortageDB* db, InstalledEbuild* ebuild, Dependency* dep) {
 	for (Dependency* curr = dep; curr; curr = curr->next) {
 		if (curr->depends == HAS_DEPENDS) {
-			prv_backtrack_resolve_dep(db, ebuild, dep->selectors);
+			if ((curr->selector == USE_DISABLE || curr->selector == USE_ENABLE)) {
+				UseFlag* u = use_get(ebuild->use, curr->target);
+				if (u && u->status == curr->selector) {
+					prv_backtrack_resolve_dep(db, ebuild, dep->selectors);
+				}
+			}
+			
 			continue;
 		}
 		
@@ -87,6 +96,7 @@ void prv_backtrack_resolve_dep(PortageDB* db, InstalledEbuild* ebuild, Dependenc
 		
 		InstalledPackage* pkg = map_get(db->installed, curr->atom->key);
 		if (!pkg) {
+			errno = 0;
 			plog_error("Package %s depends on %s but it's not installed", ebuild->parent->key, curr->atom->key);
 			continue;
 			//exit(1);

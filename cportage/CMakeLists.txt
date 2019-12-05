@@ -1,0 +1,52 @@
+cmake_minimum_required(VERSION 3.8)
+project(cportage VERSION "1.2.0" LANGUAGES C)
+
+SET(CMAKE_INSTALL_PREFIX /usr)
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+find_package(BISON REQUIRED)
+find_package(FLEX REQUIRED)
+
+include(files.txt)
+include_directories(src/language)
+
+execute_process(COMMAND bash -c "mkdir -p ${PROJECT_BINARY_DIR}/lang")
+
+add_library(cportage SHARED
+        ${src_CPORTAGE}
+        ${language_BIN}
+        ${language_PARSER}
+        ${language_SOURCES}
+        src/dep_v4.c src/dep_v4.h)
+
+target_link_libraries(cportage hacksaw)
+
+add_executable(cportage-exec
+        src/cemerge.c
+        )
+
+target_link_libraries(cportage-exec
+        cportage
+        ssl
+        crypto
+        archive
+        )
+
+MACRO(INSTALL_HEADERS_WITH_DIRECTORY HEADER_LIST)
+    FOREACH(HEADER ${${HEADER_LIST}})
+        STRING(REGEX MATCH "(.*)[/]" DIR ${HEADER})
+        INSTALL(FILES ${HEADER} DESTINATION ${DIR})
+    ENDFOREACH(HEADER)
+ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
+
+INSTALL(TARGETS cportage-exec DESTINATION bin)
+INSTALL(TARGETS cportage DESTINATION lib)
+
+#INSTALL_HEADERS_WITH_DIRECTORY(include_HEADERS)
+
+#IF( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json" )
+#    EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#            ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
+#            ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
+#            )
+#ENDIF()

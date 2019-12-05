@@ -472,13 +472,7 @@ SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom) {
 				if (!out->installed)
 					return out;
 				
-				int cmp = ebuild_installedebuild_cmp(out->ebuild, out->installed);
-				if (cmp > 0)
-					out->action = PORTAGE_UPDATE;
-				else if (cmp == 0)
-					out->action = PORTAGE_REPLACE;
-				else if (cmp < 0)
-					out->action = PORTAGE_DOWNGRADE;
+				out->action = ebuild_installedebuild_cmp(out->ebuild, out->installed);
 				
 				return out;
 			}

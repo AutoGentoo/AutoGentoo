@@ -11,15 +11,15 @@
 }
 
 %code requires {
-  #include "share.h"
-  #include "../globals.h"
+  #include "../../src/language/share.h"
+  #include "../../src/globals.h"
   #include <stdlib.h>
   #include <string.h>
 }
 
 %{
   #include <stdio.h>
-  #include "share.h"
+  #include "../../src/language/share.h"
 
   int mcparse(void);
   int mcwrap() { return 1; }

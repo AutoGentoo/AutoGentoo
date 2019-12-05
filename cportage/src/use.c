@@ -12,7 +12,7 @@
 #include "portage.h"
 #include "dependency.h"
 #include <stdlib.h>
-#include <share.h>
+#include "language/share.h"
 #include <ctype.h>
 
 use_t use_set(UseFlag* head, char* use_search, use_t new_val, use_priority_t priority) {

@@ -4,7 +4,7 @@
 #define _GNU_SOURCE
 #include "make_conf.tab.h"
 #include <stdio.h>
-#include <share.h>
+#include "../../src/language/share.h"
 #include <string.h>
 
 int mcerror(char *s) {
