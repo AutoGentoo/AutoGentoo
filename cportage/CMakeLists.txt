@@ -13,6 +13,7 @@ include_directories(src/language)
 execute_process(COMMAND bash -c "mkdir -p ${PROJECT_BINARY_DIR}/lang")
 
 add_library(cportage SHARED
+        ${include_CPORTAGE}
         ${src_CPORTAGE}
         ${language_BIN}
         ${language_PARSER}
@@ -32,21 +33,15 @@ target_link_libraries(cportage-exec
         archive
         )
 
-MACRO(INSTALL_HEADERS_WITH_DIRECTORY HEADER_LIST)
-    FOREACH(HEADER ${${HEADER_LIST}})
-        STRING(REGEX MATCH "(.*)[/]" DIR ${HEADER})
-        INSTALL(FILES ${HEADER} DESTINATION ${DIR})
-    ENDFOREACH(HEADER)
-ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
+install(DIRECTORY src/ DESTINATION include/cportage
+        FILES_MATCHING PATTERN "*.h")
 
 INSTALL(TARGETS cportage-exec DESTINATION bin)
 INSTALL(TARGETS cportage DESTINATION lib)
 
-#INSTALL_HEADERS_WITH_DIRECTORY(include_HEADERS)
-
-#IF( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json" )
-#    EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#            ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
-#            ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
-#            )
-#ENDIF()
+IF( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json" )
+    EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
+            )
+ENDIF()

@@ -1,44 +1,47 @@
-set(src_CPORTAGE
-        src/package.c
+set(include_CPORTAGE
         src/package.h
         src/constants.h
-        src/portage.c
         src/portage.h
-        src/portage_log.c
         src/portage_log.h
-        src/database.c
         src/database.h
-        src/manifest.c
         src/manifest.h
-        src/compress.c
         src/compress.h
-        src/features.c
         src/features.h
-        src/use.c
         src/use.h
-        src/keywords.c
         src/keywords.h
-        src/atom.c
         src/atom.h
-        src/emerge.c
         src/emerge.h
-        src/directory.c
         src/directory.h
-        src/dependency.c
         src/dependency.h
-        src/suggestion.c
         src/suggestion.h
         src/cportage_defines.h
-        src/globals.c
         src/globals.h
-        src/profile.c
         src/profile.h
-        src/conflict.c
         src/conflict.h
-        src/sets.c
         src/sets.h
-        src/backtrack.c
         src/backtrack.h
+        )
+
+set(src_CPORTAGE
+        src/package.c
+        src/portage.c
+        src/portage_log.c
+        src/database.c
+        src/manifest.c
+        src/compress.c
+        src/features.c
+        src/use.c
+        src/keywords.c
+        src/atom.c
+        src/emerge.c
+        src/directory.c
+        src/dependency.c
+        src/suggestion.c
+        src/globals.c
+        src/profile.c
+        src/conflict.c
+        src/sets.c
+        src/backtrack.c
         )
 
 set(language_SOURCES
