@@ -33,5 +33,8 @@ typedef struct __Suggestion Suggestion;
 typedef struct __Keyword Keyword;
 typedef struct __PortageSet PortageSet;
 typedef struct __Backtrack Backtrack;
+typedef struct __InstalledBacktrack InstalledBacktrack;
+typedef struct __ResolveEmerge ResolveEmerge;
+typedef struct __ResolvedEbuild ResolvedEbuild;
 
 #endif //AUTOGENTOO_CONSTANTS_H

@@ -9,7 +9,7 @@
 #include "constants.h"
 #include "atom.h"
 
-struct __Backtrack {
+struct __InstalledBacktrack {
 	InstalledEbuild* required_by;
 	Dependency* selected_by;
 };
@@ -36,7 +36,7 @@ struct __RebuildEbuild {
  * @param dependency_selected currently selected packages (unordered)
  * @param dependency_blocks package blockers
  */
-void backtrack_rebuild(Emerge* em, SelectedEbuild* se, Vector* dependency_ordered, Vector* dependency_selected,
+void installed_backtrack_rebuild(Emerge* em, SelectedEbuild* se, Vector* dependency_ordered, Vector* dependency_selected,
                        Vector* dependency_blocks);
 
 
@@ -46,23 +46,23 @@ void backtrack_rebuild(Emerge* em, SelectedEbuild* se, Vector* dependency_ordere
  * @param selected_by dependency that this is selected by
  * @return new backtracking request
  */
-Backtrack* backtrack_new(InstalledEbuild* required_by, Dependency* selected_by);
+InstalledBacktrack* installed_backtrack_new(InstalledEbuild* required_by, Dependency* selected_by);
 
 /**
  * Free a backtrack
  * @param bt
  */
-void backtrack_free(Backtrack* bt);
+void installed_backtrack_free(Backtrack* bt);
 
 /**
  * Add this ebuild to the required_by of every dependency
  * @param ebuild to resovle the rdepends for
  */
-void backtrack_resolve(PortageDB* db, InstalledEbuild* ebuild);
+void installed_backtrack_resolve(PortageDB* db, InstalledEbuild* ebuild);
 
-void backtrack_rebuild_search(PortageDB* db, InstalledEbuild* parent, Dependency* deptree, rebuild_t type);
-void backtrack_rebuild_new(PortageDB* db, InstalledEbuild* rebuild, Dependency* dep, rebuild_t type);
-void backtrack_rebuild_resolve(PortageDB* db, rebuild_t types);
-void backtrack_rebuild_free(RebuildEbuild* rebuild);
+void installed_backtrack_rebuild_search(PortageDB* db, InstalledEbuild* parent, Dependency* deptree, rebuild_t type);
+void installed_backtrack_rebuild_new(PortageDB* db, InstalledEbuild* rebuild, Dependency* dep, rebuild_t type);
+void installed_backtrack_rebuild_resolve(PortageDB* db, rebuild_t types);
+void installed_backtrack_rebuild_free(RebuildEbuild* rebuild);
 
 #endif //AUTOGENTOO_BACKTRACK_H

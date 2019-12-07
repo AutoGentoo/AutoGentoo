@@ -5,26 +5,18 @@
 #ifndef AUTOGENTOO_DEP_V4_H
 #define AUTOGENTOO_DEP_V4_H
 
-typedef struct __ResolvedEbuild ResolvedEbuild;
-typedef struct __ResolvedEbuild ResolvedEbuild;
 typedef struct __ResolveEmerge ResolveEmerge;
 
 #include <autogentoo/hacksaw/vector.h>
 #include "atom.h"
 #include "constants.h"
+#include "resolve.h"
 
 typedef enum {
 	BACKTRACK_NONE,
 	BACKTRACK_VERSION,
 	BACKTRACK_USE
 } backtrack_t;
-
-struct __UseChange {
-	/* Index of target ResolvedEbuild in parent
-	 * emerge request */
-	int resolve_index;
-	
-};
 
 struct __Backtrack {
 	/* Comes from the stack frame where
@@ -41,30 +33,9 @@ struct __Backtrack {
 	 * a different use flag configuration
 	 */
 	backtrack_t action;
-	
-	/*
-	 * A set of use flag changes if action == BACKTRACK_USE
-	 */
-	UseFlag* use_changes;
 };
 
-struct __ResolvedEbuild {
-	ResolvedEbuild* parent;
-	ResolvedEbuild* next; /* Used for backtracking if this */
-	
-	Dependency* selected_by;
-	InstalledEbuild* installed;
-	Ebuild* ebuild;
-	
-	
-	UseFlag* useflags;
-	UseFlag* explicit_flags;
-	
-	int action;
-	
-	/* Index where this resolve appears  */
-	int resolve_index;
-};
+
 
 struct __ResolveEmerge {
 	/*
@@ -91,6 +62,7 @@ struct __ResolveEmerge {
 	Emerge* parent;
 };
 
+Backtrack* backtrack_new(ResolvedEbuild* ebuild, Package* backtrack_to, backtrack_t action);
 Backtrack* dependency_resolve_ebuild(ResolveEmerge* emerge, ResolvedEbuild* selected_by, Dependency* dep, ResolvedEbuild** resolve_dest);
 Backtrack* dependency_resolve(ResolveEmerge* emerge, Dependency* dependency);
 

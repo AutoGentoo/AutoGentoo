@@ -18,7 +18,7 @@ add_library(cportage SHARED
         ${language_BIN}
         ${language_PARSER}
         ${language_SOURCES}
-        src/dep_v4.c src/dep_v4.h)
+        src/dep_v4.c src/dep_v4.h src/resolve.c src/resolve.h)
 
 target_link_libraries(cportage hacksaw)
 

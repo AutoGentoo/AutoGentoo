@@ -8,7 +8,7 @@
 #include "portage_log.h"
 #include "directory.h"
 #include "dependency.h"
-#include "backtrack.h"
+#include "installed_backtrack.h"
 #include <string.h>
 #include <stdio.h>
 #include <fcntl.h>

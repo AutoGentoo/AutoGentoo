@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include "language/share.h"
 #include <ctype.h>
+#include "resolve.h"
 
 use_t use_set(UseFlag* head, char* use_search, use_t new_val, use_priority_t priority) {
 	UseFlag* target = use_get(head, use_search);
@@ -106,7 +107,7 @@ char* use_expr_str(RequiredUse* expr) {
 	return out;
 }
 
-int use_check_expr(SelectedEbuild *ebuild, RequiredUse* expr) {
+int use_check_expr(ResolvedEbuild* ebuild, RequiredUse* expr) {
 	if (expr->option == USE_ENABLE || expr->option == USE_DISABLE) {
 		UseFlag* u = use_get(ebuild->useflags, expr->target);
 		use_t status = USE_NONE;
@@ -138,7 +139,7 @@ int use_check_expr(SelectedEbuild *ebuild, RequiredUse* expr) {
 	return 0;
 }
 
-int ebuild_check_required_use(SelectedEbuild *ebuild) {
+int ebuild_check_required_use(ResolvedEbuild* ebuild) {
 	if (!ebuild->ebuild->required_use)
 		return 1;
 	for (RequiredUse* expr = ebuild->ebuild->required_use; expr; expr = expr->next) {
@@ -154,7 +155,7 @@ int ebuild_check_required_use(SelectedEbuild *ebuild) {
 	return 1;
 }
 
-UseReason* use_reason_new(SelectedEbuild* parent, AtomFlag* flag, Dependency* selected_by) {
+UseReason* use_reason_new(ResolvedEbuild* parent, AtomFlag* flag, Dependency* selected_by) {
 	UseReason* reason = malloc(sizeof(UseReason));
 	reason->parent_ebuild = parent;
 	reason->flag = flag;
@@ -336,7 +337,7 @@ void emerge_apply_package_use(Emerge* emerge) {
 			
 			for (Ebuild* current_ebuild = target->ebuilds; current_ebuild; current_ebuild = current_ebuild->older) {
 				package_metadata_init(current_ebuild);
-				if (atom_match_ebuild(current_ebuild, current->atom)) {
+				if (ebuild_match_atom(current_ebuild, current->atom)) {
 					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next) {
 						if (current_ebuild->keywords[emerge->target_arch] >= current->keyword_required)
 							use_set(current_ebuild->use, current_flag->name, current_flag->status, current_flag->priority);
