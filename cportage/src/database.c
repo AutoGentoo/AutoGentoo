@@ -7,7 +7,6 @@
 #include "database.h"
 #include "portage_log.h"
 #include "directory.h"
-#include "dependency_old.h"
 #include "installed_backtrack.h"
 #include <string.h>
 #include <stdio.h>

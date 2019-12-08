@@ -3,7 +3,6 @@
 //
 
 #include "installed_backtrack.h"
-#include "dependency_old.h"
 #include "database.h"
 #include "dependency.h"
 #include <string.h>

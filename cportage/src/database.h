@@ -9,7 +9,6 @@
 #include "portage.h"
 #include "package.h"
 #include "directory.h"
-#include "dependency_old.h"
 #include "resolve.h"
 
 struct __InstalledEbuild {
