@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "use.h"
-#include "dep_v4.h"
+#include "dependency.h"
 #include "suggestion.h"
 #include "package.h"
 #include "conflict.h"

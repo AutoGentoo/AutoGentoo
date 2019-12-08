@@ -3,9 +3,9 @@
 //
 
 #include "installed_backtrack.h"
-#include "dependency.h"
+#include "dependency_old.h"
 #include "database.h"
-#include "dep_v4.h"
+#include "dependency.h"
 #include <string.h>
 #include <errno.h>
 

@@ -336,11 +336,6 @@
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/dependency.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/dependency.c",
-  "file": "/home/atuser/git/AutoGentoo/cportage/src/dependency.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage",
   "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/suggestion.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/suggestion.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/suggestion.c"
 },
@@ -366,8 +361,8 @@
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/backtrack.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/backtrack.c",
-  "file": "/home/atuser/git/AutoGentoo/cportage/src/backtrack.c"
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/installed_backtrack.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/installed_backtrack.c",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/installed_backtrack.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage",
@@ -393,5 +388,10 @@
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage",
   "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/dep_v4.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/dep_v4.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/dep_v4.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/resolve.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/resolve.c",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/resolve.c"
 }
 ]

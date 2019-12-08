@@ -11,11 +11,11 @@
 #include <errno.h>
 #include <stdlib.h>
 #include "portage.h"
-#include "dependency.h"
+#include "dependency_old.h"
 #include "globals.h"
 #include "suggestion.h"
 #include "resolve.h"
-#include "dep_v4.h"
+#include "dependency.h"
 #include <unistd.h>
 
 int number_len(int num) {

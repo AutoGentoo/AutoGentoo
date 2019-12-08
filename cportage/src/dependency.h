@@ -1,57 +1,87 @@
 //
-// Created by atuser on 5/19/19.
+// Created by atuser on 12/4/19.
 //
 
-#ifndef AUTOGENTOO_DEPENDENCY_H
-#define AUTOGENTOO_DEPENDENCY_H
+#ifndef AUTOGENTOO_DEP_V4_H
+#define AUTOGENTOO_DEP_V4_H
 
 #include <autogentoo/hacksaw/vector.h>
-#include <autogentoo/hacksaw/hacksaw.h>
-#include "constants.h"
 #include "atom.h"
+#include "constants.h"
+#include "resolve.h"
 
-struct __SelectedEbuild {
-	/* Next and depends not relevant */
-	SelectedEbuild* parent_ebuild;
-	Vector* use_change;
+typedef enum {
+	BACKTRACK_NONE,
+	BACKTRACK_VERSION,
+	BACKTRACK_USE
+} backtrack_t;
+
+struct __Backtrack {
+	/* Comes from the stack frame where
+	 * the dependency resolve failed */
+	ResolvedEbuild* failed;
 	
-	Dependency* selected_by;
-	InstalledEbuild* installed;
-	Ebuild* ebuild;
+	/* Keep bringing up failure
+	 * until stack frame resolving this package
+	*/
+	Package* backtrack_to;
 	
-	//dependency_t action;
-	
-	UseFlag* useflags;
-	UseFlag* explicit_flags;
+	/*
+	 * Should we try a different version or
+	 * a different use flag configuration
+	 */
+	backtrack_t action;
 };
 
-/**
- * Resolve a top-level depedency, generated a vector of selected ebuild,
- * All blockers are added to the end
- * @param parent the emerge environment
- * @param depend expression to look at
- */
-//Vector* pd_layer_resolve(Emerge* parent, Dependency* depend);
+Backtrack* backtrack_new(ResolvedEbuild* ebuild, Package* backtrack_to, backtrack_t action);
 
 /**
- * When dependency resolution reaches a single atom
- * Resolve that atom and generate a SelectedEbuild
- * @param emerge the parent emerge environment
- * @param parent_ebuild ebuild that is selecting this one
- * @param dep dependency that triggered this selection
- * @param selected list of already selected ebuilds
- * @return The new ebuild that has been selected, if NULL, a previously selected ebuild was updated
+ * Resolve an atom to a specific ebuild
+ * @param emerge parent emerge environment
+ * @param selected_by parent ebuild selection
+ * @param dep dependency selection
+ * @return resolved ebuild (NULL if no need to add to vector)
  */
-SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild, Dependency* dep, Vector* selected);
+ResolvedEbuild* dependency_resolve_ebuild(Emerge* emerge, ResolvedEbuild* selected_by, Dependency* dep);
 
-/* Helpers */
-//Package* atom_resolve_package(Emerge* emerge, P_Atom* atom);
-int pd_slot_cmp(char* slot_1, char* sub_slot_1, char* slot_2, char* sub_slot_2);
-//SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom);
-//SelectedEbuild* pd_check_selected(Vector* selected, SelectedEbuild* check);
+/**
+ * Raise an error if a blocked package is selected
+ * Marked blocked ebuilds as blocked
+ * @param emerge the parent environment
+ * @param atom the blocking atom
+ */
+void dependency_resolve_block(Emerge* emerge, ResolvedEbuild* blocker, P_Atom* atom);
 
-/* Util */
-void selected_ebuild_print(Emerge *em, SelectedEbuild *se);
-void selected_ebuild_free(SelectedEbuild* se);
+/**
+ * Main protocol to perform dependency resolution
+ * All dependencies will be placed into target vector
+ * @param emerge parent emerge environment
+ * @param parent current ebuild for use flag checks
+ * @param dependency the depend expression to iterate through
+ * @param add_to where to add the resolved ebuilds to
+ */
+void dependency_resolve(Emerge* emerge, ResolvedEbuild* parent, Dependency* dependency, Vector* add_to);
 
-#endif //AUTOGENTOO_DEPENDENCY_H
+/**
+ * Return the first match to an ebuild in the
+ * the search vector
+ *
+ * This is a recursive call, for the first
+ * use emerge->selected for search
+ *
+ * This will only check the slot
+ * @param search the vector of ResolvedEbuilds, will also check deps
+ * @param check the slot to attempt to match
+ * @return the first matched selected ebuild
+ */
+ResolvedEbuild* dependency_check_selected(Vector* search, ResolvedEbuild* check);
+
+/**
+ * Perform an in-order traversal of every dependency in traverse
+ * and add to target
+ * @param traverse a vector of tree heads
+ * @param target vector to build
+ */
+void dependency_build_vector(Vector* traverse, Vector* target);
+
+#endif //AUTOGENTOO_DEP_V4_H
