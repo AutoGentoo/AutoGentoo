@@ -10,17 +10,6 @@
 #include "constants.h"
 #include "atom.h"
 
-typedef enum {
-	PORTAGE_NEW = 1 << 0, //!< New package
-	PORTAGE_SLOT = 1 << 1, //!< Install side by side
-	PORTAGE_REMOVE = 1 << 2, //!< Remove package 'old'
-	PORTAGE_UPDATE = 1 << 3, //!< Install a new package and remove the old one
-	PORTAGE_DOWNGRADE = 1 << 4,
-	PORTAGE_REPLACE = 1 << 5,
-	PORTAGE_USE_FLAG = 1 << 6,
-	PORTAGE_BLOCK = 1 << 7
-} dependency_t;
-
 struct __SelectedEbuild {
 	/* Next and depends not relevant */
 	SelectedEbuild* parent_ebuild;
@@ -30,7 +19,7 @@ struct __SelectedEbuild {
 	InstalledEbuild* installed;
 	Ebuild* ebuild;
 	
-	dependency_t action;
+	//dependency_t action;
 	
 	UseFlag* useflags;
 	UseFlag* explicit_flags;
@@ -42,7 +31,7 @@ struct __SelectedEbuild {
  * @param parent the emerge environment
  * @param depend expression to look at
  */
-Vector* pd_layer_resolve(Emerge* parent, Dependency* depend);
+//Vector* pd_layer_resolve(Emerge* parent, Dependency* depend);
 
 /**
  * When dependency resolution reaches a single atom
@@ -56,10 +45,10 @@ Vector* pd_layer_resolve(Emerge* parent, Dependency* depend);
 SelectedEbuild* pd_resolve_single(Emerge* emerge, SelectedEbuild* parent_ebuild, Dependency* dep, Vector* selected);
 
 /* Helpers */
-Package* atom_resolve_package(Emerge* emerge, P_Atom* atom);
+//Package* atom_resolve_package(Emerge* emerge, P_Atom* atom);
 int pd_slot_cmp(char* slot_1, char* sub_slot_1, char* slot_2, char* sub_slot_2);
-SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom);
-SelectedEbuild* pd_check_selected(Vector* selected, SelectedEbuild* check);
+//SelectedEbuild* package_resolve_ebuild(Package* pkg, P_Atom* atom);
+//SelectedEbuild* pd_check_selected(Vector* selected, SelectedEbuild* check);
 
 /* Util */
 void selected_ebuild_print(Emerge *em, SelectedEbuild *se);

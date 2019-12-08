@@ -49,6 +49,46 @@ dependency_t ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* install
 	return PORTAGE_REPLACE;
 }
 
+int pd_compare_range(int,atom_version_t);
+
+int portagedb_ebuild_match(InstalledEbuild* ebuild, P_Atom* atom) {
+	int slot_cmp = 0;
+	int sub_slot_cmp = 0;
+	
+	if (atom->slot) {
+		slot_cmp = strcmp(ebuild->slot, atom->slot);
+		if (ebuild->sub_slot && atom->sub_slot)
+			sub_slot_cmp = strcmp(ebuild->sub_slot, atom->sub_slot);
+		
+		/* Only compare the slots */
+		if (!pd_compare_range(slot_cmp, atom->range))
+			return 0;
+		if (!pd_compare_range(sub_slot_cmp, atom->range))
+			return 0;
+	}
+	
+	int cmp = 0;
+	int cmp_rev = 0;
+	if (atom->version) {
+		cmp = atom_version_compare(ebuild->version, atom->version);
+		cmp_rev = ebuild->revision - atom->revision;
+	} else {
+		return 1;
+	}
+	
+	if (cmp == 0 && atom->range & ATOM_VERSION_E) {
+		if (atom->range == ATOM_VERSION_E) {
+			return cmp_rev == 0;
+		} else if (atom->range == ATOM_VERSION_REV)
+			return 1;
+	}
+	
+	if (pd_compare_range(cmp, atom->range))
+		return 1;
+	
+	return 0;
+}
+
 InstalledEbuild* portagedb_resolve_installed(PortageDB* db, P_Atom* atom, char* target_slot) {
 	InstalledPackage* db_pkg = map_get(db->installed, atom->key);
 	if (!db_pkg)
@@ -194,14 +234,14 @@ void portagedb_add_ebuild(PortageDB* db, FPNode* cat, FPNode* pkg) {
 	char* buf_str = portagedb_ebuild_read(pkg, "DEPEND");
 	if (buf_str) {
 		ebuild->depend = depend_parse(buf_str);
-		backtrack_rebuild_search(db, ebuild, ebuild->depend, EBUILD_REBUILD_DEPEND);
+		installed_backtrack_rebuild_search(db, ebuild, ebuild->depend, EBUILD_REBUILD_DEPEND);
 		free(buf_str);
 	}
 	
 	buf_str = portagedb_ebuild_read(pkg, "RDEPEND");
 	if (buf_str) {
 		ebuild->rdepend = depend_parse(buf_str);
-		backtrack_rebuild_search(db, ebuild, ebuild->rdepend, EBUILD_REBUILD_RDEPEND);
+		installed_backtrack_rebuild_search(db, ebuild, ebuild->rdepend, EBUILD_REBUILD_RDEPEND);
 		
 		/* Perform a dependency backtrack later */
 		vector_add(db->backtracking, ebuild);
@@ -332,12 +372,12 @@ PortageDB* portagedb_read(Emerge* emerge) {
 	}
 	
 	if (EMERGE_USE_BINHOST & emerge->build_opts)
-		backtrack_rebuild_resolve(out, EBUILD_REBUILD_RDEPEND);
+		installed_backtrack_rebuild_resolve(out, EBUILD_REBUILD_RDEPEND);
 	else
-		backtrack_rebuild_resolve(out, EBUILD_REBUILD_RDEPEND | EBUILD_REBUILD_DEPEND);
+		installed_backtrack_rebuild_resolve(out, EBUILD_REBUILD_RDEPEND | EBUILD_REBUILD_DEPEND);
 	
 	for (int i = 0; i < out->backtracking->n; i++) {
-		backtrack_resolve(out, vector_get(out->backtracking, i));
+		installed_backtrack_resolve(out, vector_get(out->backtracking, i));
 	}
 	
 	return out;
@@ -348,7 +388,7 @@ void portagedb_free(PortageDB* db) {
 	map_free(db->installed, (void (*) (void*))installedpackage_free);
 	
 	for (int i = 0; i < db->rebuilds->n; i++)
-		backtrack_rebuild_free((RebuildEbuild*) vector_get(db->rebuilds, i));
+		installed_backtrack_rebuild_free((RebuildEbuild*) vector_get(db->rebuilds, i));
 	vector_free(db->rebuilds);
 	
 	free(db);

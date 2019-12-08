@@ -12,14 +12,14 @@ set(include_CPORTAGE
         src/atom.h
         src/emerge.h
         src/directory.h
-        src/dependency.h
+#        src/dependency.h
         src/suggestion.h
         src/cportage_defines.h
         src/globals.h
         src/profile.h
         src/conflict.h
         src/sets.h
-        src/backtrack.h
+        src/installed_backtrack.h
         )
 
 set(src_CPORTAGE
@@ -35,13 +35,13 @@ set(src_CPORTAGE
         src/atom.c
         src/emerge.c
         src/directory.c
-        src/dependency.c
+#        src/dependency.c
         src/suggestion.c
         src/globals.c
         src/profile.c
         src/conflict.c
         src/sets.c
-        src/backtrack.c
+        src/installed_backtrack.c
         )
 
 set(language_SOURCES

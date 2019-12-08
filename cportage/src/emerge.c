@@ -14,6 +14,8 @@
 #include "dependency.h"
 #include "globals.h"
 #include "suggestion.h"
+#include "resolve.h"
+#include "dep_v4.h"
 #include <unistd.h>
 
 int number_len(int num) {
@@ -37,6 +39,7 @@ Emerge* emerge_new() {
 	out->default_repo = NULL;
 	
 	out->use_suggestions = NULL;
+	out->selected = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
 	
 	
 	return out;
@@ -132,7 +135,7 @@ int emerge (Emerge* emerge) {
 				free(expand_dep->atom->key);
 				asprintf(&expand_dep->atom->key, "%s/%s", current_cat_search->filename, expand_dep->atom->name);
 				
-				Package* try_package = atom_resolve_package(emerge, expand_dep->atom);
+				Package* try_package = package_resolve_atom(emerge, expand_dep->atom);
 				if (try_package)
 					string_vector_add(valid_categories, expand_dep->atom->key);
 				
@@ -156,7 +159,8 @@ int emerge (Emerge* emerge) {
 		}
 	}
 	
-	Vector* selected = pd_layer_resolve(emerge, dep);
+	dependency_resolve(emerge, NULL, dep, emerge->selected);
+	
 	Suggestion* current = NULL;
 	
 	/* The resolution failed, try again with these suggestion settings */
@@ -175,7 +179,8 @@ int emerge (Emerge* emerge) {
 		
 		emerge->use_suggestions = NULL;
 		
-		selected = pd_layer_resolve(emerge, dep);    // Resolve again
+		break;
+		//dependency_resolve(emerge, NULL, dep, emerge->selected);
 	}
 	
 	for (Suggestion* cs = current; cs; cs = cs->next) {
@@ -183,19 +188,22 @@ int emerge (Emerge* emerge) {
 		printf("%s\n\n", cs->line_addition);
 	}
 	
+	Vector* selected = vector_new(VECTOR_ORDERED);
+	dependency_build_vector(emerge->selected, selected);
+	
 	int max_width = number_len(selected->n);
 	for (int i = 0; i < selected->n; i++) {
-		SelectedEbuild* eb = vector_get(selected, i);
+		ResolvedEbuild* eb = vector_get(selected, i);
 		printf("(%*d) ", max_width, i + 1);
 		
-		selected_ebuild_print(emerge, eb);
+		resolved_ebuild_print(emerge, eb);
 	}
 	
-	for (int i = 0; i < selected->n; i++) {
-		selected_ebuild_free(vector_get(selected, i));
+	for (int i = 0; i < emerge->selected->n; i++) {
+		resolved_ebuild_free(vector_get(emerge->selected, i));
 	}
 	
-	vector_free(selected);
+	vector_free(emerge->selected);
 	
 	return 0;
 }

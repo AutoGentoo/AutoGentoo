@@ -11,6 +11,10 @@
 #include <stdlib.h>
 #include <autogentoo/hacksaw/log.h>
 #include <autogentoo/hacksaw/hacksaw.h>
+#include "constants.h"
+#include "dep_v4.h"
+#include "package.h"
+#include "database.h"
 
 static char log_time_buffer[64];
 static StringVector* portage_call_stack;
@@ -88,4 +92,71 @@ void portage_die(char* fmt, ...) {
 		fprintf(target, "%*c%s\n", i*2, ' ', string_vector_get(portage_call_stack, i));
 	}
 	exit(1);
+}
+
+void resolved_ebuild_print(Emerge* em, ResolvedEbuild* se) {
+	printf("[ ");
+	if (se->action & PORTAGE_NEW)
+		printf("N");
+	else
+		printf(" ");
+	
+	if (se->action & PORTAGE_SLOT)
+		printf("S");
+	else
+		printf(" ");
+	
+	if (se->action & PORTAGE_REPLACE)
+		printf("R");
+	else
+		printf(" ");
+	
+	if (se->action & PORTAGE_UPDATE)
+		printf("U");
+	else if (se->action & PORTAGE_DOWNGRADE)
+		printf("D");
+	else
+		printf(" ");
+	
+	if (se->action & PORTAGE_USE_FLAG)
+		printf("F");
+	else
+		printf(" ");
+	
+	if (se->action & PORTAGE_BLOCK)
+		printf("B");
+	else
+		printf(" ");
+	
+	printf(" ] %s", se->ebuild->ebuild_key);
+	
+	printf(" ");
+	for (UseFlag* use = se->useflags; use; use = use->next) {
+		UseFlag* ebuild_use = NULL;
+		use_t ebuild_use_status = USE_NONE;
+		
+		if (se->installed)
+			ebuild_use = use_get(se->installed->use, use->name);
+		
+		if (ebuild_use)
+			ebuild_use_status = ebuild_use->status;
+		else if (!(em->options & EMERGE_VERBOSE))
+			continue;
+		
+		if ((ebuild_use_status != use->status && se->installed) || em->options & EMERGE_VERBOSE) {
+			if (use->status == USE_ENABLE)
+				printf("\033[1;31m");
+			else
+				printf("\033[1;34m-");
+			printf("%s%s\033[0m ", use->name, ebuild_use_status != use->status && ebuild_use ? "*": "");
+		}
+	}
+	
+	if (se->installed) {
+		printf(" %s", se->installed->version->full_version);
+		if (se->installed->revision != 0)
+			printf("-r%d", se->installed->revision);
+	}
+	
+	printf("\n");
 }

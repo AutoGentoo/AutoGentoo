@@ -2,11 +2,14 @@
 // Created by atuser on 4/23/19.
 //
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedMacroInspection"
 #ifndef AUTOGENTOO_PORTAGE_LOG_H
 #define AUTOGENTOO_PORTAGE_LOG_H
 
 #include <stdio.h>
 #include <sys/time.h>   // for gettimeofday()
+#include "constants.h"
 
 #define LOG_TARGET stdout;
 
@@ -29,5 +32,8 @@ void plog_warn(char* fmt, ...);
 }
 
 void portage_die(char* fmt, ...);
+void resolved_ebuild_print(Emerge* em, ResolvedEbuild* se);
 
 #endif //AUTOGENTOO_PORTAGE_LOG_H
+
+#pragma clang diagnostic pop

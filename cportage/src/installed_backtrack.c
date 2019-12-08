@@ -5,11 +5,12 @@
 #include "installed_backtrack.h"
 #include "dependency.h"
 #include "database.h"
+#include "dep_v4.h"
 #include <string.h>
 #include <errno.h>
 
-void installed_backtrack_rebuild(Emerge* em, SelectedEbuild* se, Vector* dependency_ordered, Vector* dependency_selected,
-                       Vector* dependency_blocks) {
+void installed_backtrack_rebuild(Emerge* em, ResolvedEbuild* se, Vector* dependency_ordered, Vector* dependency_selected,
+                                 Vector* dependency_blocks) {
 	if (!se->installed)
 		return; /* No need to rebuilt, no one has this as a dep */
 	
@@ -35,7 +36,7 @@ void installed_backtrack_rebuild(Emerge* em, SelectedEbuild* se, Vector* depende
 		if (!rebuild)
 			continue;
 		
-		SelectedEbuild* se_rebuild = pd_resolve_single(em, se, current_rebuild->selector, dependency_selected);
+		ResolvedEbuild* se_rebuild = dependency_resolve_ebuild(em, se, current_rebuild->selector);
 		
 	}
 }
@@ -46,7 +47,6 @@ Dependency* prv_installed_backtrack_check_dep(PortageDB* db, Dependency* dep) {
 	
 	if (dep->depends == HAS_DEPENDS && strcmp(dep->target, "||") == 0) {
 		/* Check for only one */
-		
 		for (Dependency* curr = dep->selectors; curr; curr = curr->next) {
 			Dependency* res_dep = prv_installed_backtrack_check_dep(db, curr);
 			

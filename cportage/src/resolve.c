@@ -6,7 +6,6 @@
 #include <errno.h>
 #include "resolve.h"
 #include "package.h"
-#include "dep_v4.h"
 #include "database.h"
 #include <string.h>
 
@@ -19,6 +18,9 @@ int pd_compare_range(int cmp, atom_version_t range) {
 }
 
 int ebuild_match_atom(Ebuild* ebuild, P_Atom* atom) {
+	if (strcmp(ebuild->parent->key, atom->key) !=0)
+		return 0;
+	
 	int slot_cmp = 0;
 	int sub_slot_cmp = 0;
 	
@@ -63,6 +65,7 @@ ResolvedEbuild* resolved_ebuild_new(Ebuild* ebuild, P_Atom* atom) {
 	temp->installed = portagedb_resolve_installed(ebuild->parent->parent->parent->database, atom, ebuild->slot);
 	
 	temp->useflags = NULL;
+	temp->ebuild = ebuild;
 	temp->explicit_flags = NULL;
 	
 	temp->action = PORTAGE_NEW;
@@ -72,12 +75,15 @@ ResolvedEbuild* resolved_ebuild_new(Ebuild* ebuild, P_Atom* atom) {
 	if (temp->installed)
 		temp->action = ebuild_installedebuild_cmp(temp->ebuild, temp->installed);
 	
+	temp->pre_dependency = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
+	temp->post_depenendcy = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
+	
 	return temp;
 }
 
-Package* package_resolve_atom(ResolveEmerge* emerge, P_Atom* atom) {
+Package* package_resolve_atom(Emerge* emerge, P_Atom* atom) {
 	Repository* repo = NULL;
-	for (Repository* current = emerge->parent->repos; current; current = current->next) {
+	for (Repository* current = emerge->repos; current; current = current->next) {
 		if (strcmp(atom->repository, current->name) == 0) {
 			repo = current;
 			break;
@@ -95,10 +101,9 @@ Package* package_resolve_atom(ResolveEmerge* emerge, P_Atom* atom) {
 	return target_pkg;
 }
 
-ResolvedEbuild* resolved_ebuild_resolve(ResolveEmerge* em, P_Atom* atom) {
+ResolvedEbuild* resolved_ebuild_resolve(Emerge* em, P_Atom* atom) {
 	Package* pkg = package_resolve_atom(em, atom);
 	if (!pkg) {
-		portage_die("Package '%s' not found", atom->key);
 		return NULL;
 	}
 	
@@ -122,9 +127,10 @@ ResolvedEbuild* resolved_ebuild_resolve(ResolveEmerge* em, P_Atom* atom) {
 			}
 			
 			ResolvedEbuild* temp = resolved_ebuild_new(current, atom);
+			temp->environ = em;
 			
 			/* This is the index that this package is going to be added to */
-			temp->resolve_index = em->resolved_ebuilds->n;
+			temp->resolve_index = em->selected->n;
 			
 			if (current->keywords[pkg->parent->parent->target_arch] >= accept_keyword) {
 				/* Preferably use this set of ebuilds, this is added before
@@ -159,4 +165,15 @@ ResolvedEbuild* resolved_ebuild_resolve(ResolveEmerge* em, P_Atom* atom) {
 		current_link->next = add_to_end;
 	
 	return out;
+}
+
+void resolved_ebuild_free(ResolvedEbuild* ptr) {
+	if (!ptr)
+		return;
+	
+	use_free(ptr->useflags);
+	use_free(ptr->explicit_flags);
+	
+	resolved_ebuild_free(ptr->next);
+	free(ptr);
 }

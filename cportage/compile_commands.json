@@ -123,5 +123,10 @@
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
   "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/dep_v4.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/dep_v4.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/dep_v4.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/resolve.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/resolve.c",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/resolve.c"
 }
 ]

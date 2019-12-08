@@ -9,19 +9,21 @@
 #include "atom.h"
 
 typedef struct __ResolvedEbuild ResolvedEbuild;
-//typedef struct __UseChange UseChange;
 
 
-//struct __UseChange {
-//	/* Index of target ResolvedEbuild in parent
-//	 * emerge request */
-//	Vector* changed_by;
-//	UseFlag* change;
-//
-//	UseChange* next;
-//};
+typedef enum {
+	PORTAGE_NEW = 1 << 0, //!< New package
+	PORTAGE_SLOT = 1 << 1, //!< Install side by side
+	PORTAGE_REMOVE = 1 << 2, //!< Remove package 'old'
+	PORTAGE_UPDATE = 1 << 3, //!< Install a new package and remove the old one
+	PORTAGE_DOWNGRADE = 1 << 4,
+	PORTAGE_REPLACE = 1 << 5,
+	PORTAGE_USE_FLAG = 1 << 6,
+	PORTAGE_BLOCK = 1 << 7
+} dependency_t;
 
 struct __ResolvedEbuild {
+	Emerge* environ;
 	ResolvedEbuild* parent;
 	
 	/* Creates the backtracking iteration */
@@ -34,17 +36,21 @@ struct __ResolvedEbuild {
 	UseFlag* useflags;
 	UseFlag* explicit_flags;
 	
-	int action;
+	dependency_t action;
 	
 	/* Index where this resolve appears  */
 	int resolve_index;
 	
 	int unstable_keywords;
+	
+	Vector* pre_dependency;
+	Vector* post_depenendcy;
 };
 
 int ebuild_match_atom(Ebuild* ebuild, P_Atom* atom);
 ResolvedEbuild* resolved_ebuild_new(Ebuild* ebuild, P_Atom* atom);
-ResolvedEbuild* resolved_ebuild_resolve(ResolveEmerge* em, P_Atom* atom);
-Package* package_resolve_atom(ResolveEmerge* em, P_Atom* atom);
+ResolvedEbuild* resolved_ebuild_resolve(Emerge* em, P_Atom* atom);
+Package* package_resolve_atom(Emerge* em, P_Atom* atom);
+void resolved_ebuild_free(ResolvedEbuild* ptr);
 
 #endif //CPORTAGE_RESOLVE_H

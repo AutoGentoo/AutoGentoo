@@ -36,8 +36,8 @@ struct __RebuildEbuild {
  * @param dependency_selected currently selected packages (unordered)
  * @param dependency_blocks package blockers
  */
-void installed_backtrack_rebuild(Emerge* em, SelectedEbuild* se, Vector* dependency_ordered, Vector* dependency_selected,
-                       Vector* dependency_blocks);
+void installed_backtrack_rebuild(Emerge* em, ResolvedEbuild* se, Vector* dependency_ordered, Vector* dependency_selected,
+                                 Vector* dependency_blocks);
 
 
 /**

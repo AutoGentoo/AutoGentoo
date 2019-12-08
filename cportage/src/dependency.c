@@ -266,7 +266,7 @@ void __pd_layer_resolve__(Emerge* parent, Dependency* depend, SelectedEbuild* ta
 							use_match = 0;
 							break;
 						} else {
-							plog_warn("Blocker uses something ebuild conditional");
+							plog_warn("This profile is fucked");
 							plog_warn("If this ever comes up ima be pissed");
 						}
 					}
