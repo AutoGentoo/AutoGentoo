@@ -23,8 +23,8 @@ typedef enum {
 } arch_t;
 
 typedef enum {
-	KEYWORD_NONE,
 	KEYWORD_BROKEN,
+	KEYWORD_NONE,
 	KEYWORD_UNSTABLE,
 	KEYWORD_STABLE,
 } keyword_t;

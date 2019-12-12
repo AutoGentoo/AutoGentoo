@@ -16,15 +16,13 @@ Vector* vector_new(vector_opts opts) {
 	return out_ptr;
 }
 
-size_t vector_add(Vector* vec, void* el) {
+void** vector_add(Vector* vec, void* el) {
 	if (vec->s == (vec->n + 1)) {
 		vector_allocate(vec);
 	}
 	
 	vec->ptr[vec->n] = el;
-	
-	vec->n++;
-	return vec->n - 1; // Return index of item
+	return &vec->ptr[vec->n++]; // Return index of item
 }
 
 void* vector_remove(Vector* vec, int index) {

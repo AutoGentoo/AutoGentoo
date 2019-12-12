@@ -70,6 +70,9 @@ add_executable(autogentoo-aabs
         ${arch_HEADERS}
         )
 
+install(TARGETS autogentoo DESTINATION lib)
+install(TARGETS hacksaw DESTINATION lib)
+
 add_subdirectory(cportage)
 
 #add_executable(autogentoo-test

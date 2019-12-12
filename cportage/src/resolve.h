@@ -9,6 +9,8 @@
 #include "atom.h"
 
 typedef struct __ResolvedEbuild ResolvedEbuild;
+typedef struct __SeletecBy SelectedBy;
+typedef struct __ResolvedPackage ResolvedPackage;
 
 
 typedef enum {
@@ -22,14 +24,30 @@ typedef enum {
 	PORTAGE_BLOCK = 1 << 7
 } dependency_t;
 
-struct __ResolvedEbuild {
+struct __SelectedBy {
+	ResolvedPackage* parent;
+	Dependency* selected_by;
+};
+
+struct __ResolvedPackage {
 	Emerge* environ;
-	ResolvedEbuild* parent;
+	
+	ResolvedEbuild* ebuilds;
+	ResolvedEbuild* current;
+	
+	Vector* parents;
+	
+	Vector* pre_dependency;
+	Vector* post_dependency;
+};
+
+struct __ResolvedEbuild {
+	ResolvedPackage* parent;
 	
 	/* Creates the backtracking iteration */
 	ResolvedEbuild* next;
+	ResolvedEbuild* back;
 	
-	Dependency* selected_by;
 	InstalledEbuild* installed;
 	Ebuild* ebuild;
 	
@@ -37,20 +55,16 @@ struct __ResolvedEbuild {
 	UseFlag* explicit_flags;
 	
 	dependency_t action;
-	
-	/* Index where this resolve appears  */
-	int resolve_index;
-	
 	int unstable_keywords;
-	
-	Vector* pre_dependency;
-	Vector* post_depenendcy;
 };
 
 int ebuild_match_atom(Ebuild* ebuild, P_Atom* atom);
 ResolvedEbuild* resolved_ebuild_new(Ebuild* ebuild, P_Atom* atom);
-ResolvedEbuild* resolved_ebuild_resolve(Emerge* em, P_Atom* atom);
+ResolvedPackage* resolved_ebuild_resolve(Emerge* em, P_Atom* atom);
 Package* package_resolve_atom(Emerge* em, P_Atom* atom);
 void resolved_ebuild_free(ResolvedEbuild* ptr);
+
+int resolved_ebuild_is_blocked(Emerge*, ResolvedEbuild*);
+int resolved_ebuild_use_build(ResolvedEbuild* parent, ResolvedEbuild* out, P_Atom* atom);
 
 #endif //CPORTAGE_RESOLVE_H

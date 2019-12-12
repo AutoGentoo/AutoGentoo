@@ -29,16 +29,18 @@ void package_metadata_init(Ebuild* ebuild) {
 		ebuild->keywords[i] = KEYWORD_NONE;
 	
 	size_t name_size;
+	size_t name_size_n;
 	char* name = NULL;
 	
 	size_t value_size;
+	size_t value_size_n;
 	char* value = NULL;
 	
 	size_t n = 0;
 	
 	while(!feof(fp)) {
-		name_size = getdelim(&name, &n, '=', fp);
-		value_size = getdelim(&value, &n, '\n', fp);
+		name_size = getdelim(&name, &name_size_n, '=', fp);
+		value_size = getdelim(&value, &value_size_n, '\n', fp);
 		
 		if (!name || !value)
 			break;
@@ -122,7 +124,6 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	new_ebuild->feature_restrict = NULL;
 	new_ebuild->ebuild_key = parsed_key;
 	new_ebuild->blocked = 0;
-	
 	new_ebuild->metadata_init = 0;
 	
 	new_ebuild->category = atom_parsed->category;

@@ -103,7 +103,7 @@ int emerge (Emerge* emerge) {
 	emerge_parse_useflags(emerge);
 	
 	char* dep_expr_buff = NULL;
-	size_t dep_expr_size = 0;
+	size_t dep_expr_size = 1;
 	for (int i = 0; emerge->atoms[i]; i++)
 		dep_expr_size += strlen(emerge->atoms[i]) + 1;
 	

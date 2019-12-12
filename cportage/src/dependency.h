@@ -42,15 +42,27 @@ Backtrack* backtrack_new(ResolvedEbuild* ebuild, Package* backtrack_to, backtrac
  * @param dep dependency selection
  * @return resolved ebuild (NULL if no need to add to vector)
  */
-ResolvedEbuild* dependency_resolve_ebuild(Emerge* emerge, ResolvedEbuild* selected_by, Dependency* dep);
+ResolvedPackage* dependency_resolve_ebuild(Emerge* emerge, ResolvedEbuild* selected_by, Dependency* dep);
 
 /**
  * Raise an error if a blocked package is selected
  * Marked blocked ebuilds as blocked
  * @param emerge the parent environment
  * @param atom the blocking atom
+ * @return whether or not the block was resolved (portage_die() if not)
  */
-void dependency_resolve_block(Emerge* emerge, ResolvedEbuild* blocker, P_Atom* atom);
+int dependency_resolve_block(Emerge* emerge, ResolvedEbuild* blocker, P_Atom* atom);
+
+/**
+ * Add all the dependencies to the child vectors
+ * pre = [BDEPEND, DEPEND, RDEPEND]
+ * post = [POST]
+ * @param emerge parent emerge environment
+ * @param parent ebuild to add dependencies from
+ * @param add_to vector to add this ebuild to (NULL if already added)
+ * @param atom_stack_str log info
+ */
+int dependency_sub_resolve(Emerge* emerge, ResolvedPackage* parent, char* atom_stack_str);
 
 /**
  * Main protocol to perform dependency resolution
@@ -59,8 +71,9 @@ void dependency_resolve_block(Emerge* emerge, ResolvedEbuild* blocker, P_Atom* a
  * @param parent current ebuild for use flag checks
  * @param dependency the depend expression to iterate through
  * @param add_to where to add the resolved ebuilds to
+ * @return whether or not to stop resolving (could have been re-resolved inside)
  */
-void dependency_resolve(Emerge* emerge, ResolvedEbuild* parent, Dependency* dependency, Vector* add_to);
+int dependency_resolve(Emerge* emerge, ResolvedEbuild* parent, Dependency* dependency, Vector* add_to);
 
 /**
  * Return the first match to an ebuild in the
@@ -83,5 +96,7 @@ ResolvedEbuild* dependency_check_selected(Vector* search, ResolvedEbuild* check)
  * @param target vector to build
  */
 void dependency_build_vector(Vector* traverse, Vector* target);
+
+int dependency_check_blocked(Emerge* em, ResolvedEbuild* check);
 
 #endif //AUTOGENTOO_DEP_V4_H

@@ -490,30 +490,33 @@ char* atom_get_str(P_Atom* atom) {
 		else if (af->def == ATOM_DEFAULT_OFF)
 			strcat(flags, "(-)");
 		
-		if (af->option == ATOM_USE_ENABLE_IF_ON)
+		if (af->option == ATOM_USE_ENABLE_IF_ON || af->option == ATOM_USE_DISABLE_IF_OFF)
 			strcat(flags, "?");
-		else if (af->option == ATOM_USE_DISABLE_IF_OFF)
-			strcat(flags, "?");
-		else if (af->option == ATOM_USE_EQUAL)
-			strcat(flags, "=");
-		else if (af->option == ATOM_USE_EQUAL)
+		else if (af->option == ATOM_USE_EQUAL || af->option == ATOM_USE_OPPOSITE)
 			strcat(flags, "=");
 		
 		strcat(flags, " ");
 	}
 	
-	if (!flags[0]) {
-		if (atom->range != ATOM_VERSION_ALL)
-			asprintf(&out, "%s%s-%s", prefix, atom->key, atom->version->full_version);
-		else
-			asprintf(&out, "%s", atom->key);
-	}
-	else {
-		if (atom->range != ATOM_VERSION_ALL)
-			asprintf(&out, "%s%s-%s [ %s]", prefix, atom->key, atom->version->full_version, flags);
-		else
-			asprintf(&out, "%s [ %s]", atom->key, flags);
-	}
+	char* version_str = strdup("");
+	if (atom->range != ATOM_VERSION_ALL)
+		asprintf(&version_str, "-%s", atom->version->full_version);
+	
+	char* atom_with_slot = NULL;
+	if (atom->slot != NULL && atom->sub_slot != NULL)
+		asprintf(&atom_with_slot, "%s%s:%s/%s", atom->key, version_str, atom->slot, atom->sub_slot);
+	else if (atom->slot != NULL)
+		asprintf(&atom_with_slot, "%s%s:%s", atom->key, version_str, atom->slot);
+	else
+		asprintf(&atom_with_slot, "%s%s", atom->key, version_str);
+	
+	if (!flags[0])
+		asprintf(&out, "%s%s", prefix, atom_with_slot);
+	else
+		asprintf(&out, "%s%s [ %s]", prefix, atom_with_slot, flags);
+	
+	free(version_str);
+	free(atom_with_slot);
 
 	return out;
 }

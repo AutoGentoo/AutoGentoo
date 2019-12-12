@@ -29,7 +29,7 @@ struct __Vector {
 
 Vector* vector_new(vector_opts opts);
 
-size_t vector_add(Vector* vec, void* el);
+void** vector_add(Vector* vec, void* el);
 
 void* vector_remove(Vector* vec, int index);
 
