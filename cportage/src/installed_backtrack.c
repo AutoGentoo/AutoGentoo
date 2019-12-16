@@ -34,7 +34,7 @@ void installed_backtrack_rebuild(Emerge* em, ResolvedPackage* se) {
 		if (!rebuild)
 			continue;
 		
-		ResolvedPackage* se_rebuild = dependency_resolve_ebuild(em, se, current_rebuild->selector);
+		//ResolvedPackage* se_rebuild = dependency_resolve_ebuild(em, se, current_rebuild->selector);
 	}
 }
 

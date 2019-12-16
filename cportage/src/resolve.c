@@ -119,8 +119,10 @@ ResolvedPackage* resolved_ebuild_resolve(Emerge* em, P_Atom* atom) {
 	
 	ResolvedPackage* pkg_out = malloc(sizeof(ResolvedPackage));
 	pkg_out->environ = em;
-	pkg_out->pre_dependency = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
-	pkg_out->post_dependency = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
+	pkg_out->bdepend = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
+	pkg_out->depend = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
+	pkg_out->rdepend = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
+	pkg_out->pdepend = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
 	pkg_out->parents = set_new(selected_set_cmp);
 	pkg_out->current = NULL;
 	pkg_out->ebuilds = NULL;
@@ -208,6 +210,22 @@ ResolvedPackage* resolved_ebuild_resolve(Emerge* em, P_Atom* atom) {
 	return pkg_out;
 }
 
+void resolved_package_reset_children(ResolvedPackage* ptr) {
+	Vector* vecs[] = {
+			ptr->bdepend,
+			ptr->depend,
+			ptr->rdepend,
+			ptr->pdepend
+	};
+	
+	for (int v_i = 0; v_i < sizeof(vecs) / sizeof(vecs[0]); v_i++) {
+		for (int i = vecs[v_i]->n - 1; i >= 0; i--) {
+			ResolvedPackage* next_child = vector_get(vecs[v_i], i);
+			selected_unregister_parent(next_child, ptr);
+		}
+	}
+}
+
 void resolved_package_free(ResolvedPackage* ptr) {
 	for (int i = 0; i < ptr->parents->parent->n; i++)
 		free(set_get(ptr->parents, i));
@@ -215,17 +233,12 @@ void resolved_package_free(ResolvedPackage* ptr) {
 	set_free(ptr->parents);
 	resolved_ebuild_free(ptr->ebuilds);
 	
-	for (int i = 0; i < ptr->pre_dependency->n; i++) {
-		ResolvedPackage* next_child = vector_get(ptr->pre_dependency, i);
-		selected_unregister_parent(next_child, ptr);
-	}
-	for (int i = 0; i < ptr->post_dependency->n; i++) {
-		ResolvedPackage* next_child = vector_get(ptr->post_dependency, i);
-		selected_unregister_parent(next_child, ptr);
-	}
+	resolved_package_reset_children(ptr);
 	
-	vector_free(ptr->pre_dependency);
-	vector_free(ptr->post_dependency);
+	vector_free(ptr->bdepend);
+	vector_free(ptr->depend);
+	vector_free(ptr->rdepend);
+	vector_free(ptr->pdepend);
 	
 	vector_remove(ptr->added_to, ptr->remove_index);
 	for (int i = ptr->remove_index; i < ptr->added_to->n; i++) {

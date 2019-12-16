@@ -40,9 +40,10 @@ Backtrack* backtrack_new(ResolvedEbuild* ebuild, Package* backtrack_to, backtrac
  * @param emerge parent emerge environment
  * @param selected_by parent ebuild selection
  * @param dep dependency selection
- * @return resolved ebuild (NULL if no need to add to vector)
+ * @param res pointer to resolved ebuild (NULL if no need to add to vector)
+ * @return 0 if failure, 1 if found 2 if seleted
  */
-ResolvedPackage* dependency_resolve_ebuild(Emerge* emerge, ResolvedPackage* selected_by, Dependency* dep);
+int dependency_resolve_ebuild(Emerge* emerge, ResolvedPackage* selected_by, Dependency* dep, ResolvedPackage** res);
 
 /**
  * Raise an error if a blocked package is selected

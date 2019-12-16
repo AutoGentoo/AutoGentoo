@@ -85,16 +85,6 @@ void resolve_package_merge(ResolvedPackage* selected, ResolvedPackage* merge) {
 	set_union(selected->parents, merge->parents);
 }
 
-Backtrack* backtrack_new(ResolvedEbuild* ebuild, Package* backtrack_to, backtrack_t action) {
-	Backtrack* out = malloc(sizeof(Backtrack));
-	
-	out->failed = ebuild;
-	out->backtrack_to = backtrack_to;
-	out->action = action;
-	
-	return out;
-}
-
 void dependency_resolve_installed_backtrack(ResolvedPackage* resolve) {
 	Emerge* parent_env = resolve->environ;
 	
@@ -162,29 +152,31 @@ void dependency_resolve_installed_backtrack(ResolvedPackage* resolve) {
 	resolve->current = out;
 }
 
-ResolvedPackage* dependency_resolve_ebuild(Emerge* emerge, ResolvedPackage* selected_by, Dependency* dep) {
-	ResolvedPackage* all_ebuilds = resolved_ebuild_resolve(emerge, dep->atom);
-	selected_register_parent(all_ebuilds, selected_by_new(selected_by, dep));
-	dependency_resolve_installed_backtrack(all_ebuilds);
+int dependency_resolve_ebuild(Emerge* emerge, ResolvedPackage* selected_by, Dependency* dep, ResolvedPackage** res) {
+	*res = resolved_ebuild_resolve(emerge, dep->atom);
+	if (!(*res))
+		return 0;
 	
-	if (!all_ebuilds->current) {
-		portage_die("No matching ebuild for %s", atom_get_str(dep->atom));
-		return NULL;
+	selected_register_parent(*res, selected_by_new(selected_by, dep));
+	dependency_resolve_installed_backtrack(*res);
+	
+	if (!(*res)->current) {
+		return 0;
 	}
 	
-	resolved_ebuild_init(selected_by ? selected_by->current : NULL, all_ebuilds->current);
-	ResolvedPackage* prev_sel = selected_select(emerge->selected, all_ebuilds);
+	resolved_ebuild_init(selected_by ? selected_by->current : NULL, (*res)->current);
+	ResolvedPackage* prev_sel = selected_select(emerge->selected, (*res));
 	if (!prev_sel)
-		return all_ebuilds;
+		return 1;
 	
-	resolve_package_merge(prev_sel, all_ebuilds);
+	resolve_package_merge(prev_sel, (*res));
 	
 	if (!prev_sel->current)
 		portage_die("Failed to merge");
 	
 	/* There is a previously selected version of this
 	 * dont redo the dependencies*/
-	return NULL;
+	return 2;
 }
 
 int dependency_backtrack(Emerge* emerge, ResolvedPackage* parent, ResolvedPackage* start) {
@@ -285,45 +277,60 @@ int dependency_resolve_block(Emerge* emerge, ResolvedPackage* blocker, P_Atom* a
 
 int dependency_sub_resolve(Emerge* emerge, ResolvedPackage* parent, char* atom_stack_str) {
 	/* Clear old dependencies */
-	for (int i = 0; i < parent->pre_dependency->n; i++) {
-		ResolvedPackage* c = vector_get(parent->pre_dependency, i);
-		selected_unregister_parent(c, parent);
-	}
-	for (int i = 0; i < parent->post_dependency->n; i++) {
-		ResolvedPackage* c = vector_get(parent->post_dependency, i);
-		selected_unregister_parent(c, parent);
-	}
-	
-	parent->pre_dependency->n = 0;
-	parent->post_dependency->n = 0;
+	resolved_package_reset_children(parent);
 	
 	int stop_resolve = 0;
 	
 	if (!(emerge->options & EMERGE_USE_BINHOST)) {
 		plog_enter_stack("bdepend %s (VER = %s, SLOT=%s)", atom_stack_str, parent->current->ebuild->version->full_version, parent->current->ebuild->slot);
-		stop_resolve = dependency_resolve(emerge, parent, parent->current->ebuild->bdepend, parent->pre_dependency);
-		plog_exit_stack();
+		stop_resolve = dependency_resolve(emerge, parent, parent->current->ebuild->bdepend, parent->bdepend);
 		if (stop_resolve)
 			return 0;
+		else
+			plog_exit_stack();
 	}
 	
 	plog_enter_stack("depend %s (VER = %s, SLOT=%s)", atom_stack_str, parent->current->ebuild->version->full_version, parent->current->ebuild->slot);
-	stop_resolve = dependency_resolve(emerge, parent, parent->current->ebuild->depend, parent->pre_dependency);
-	plog_exit_stack();
+	stop_resolve = dependency_resolve(emerge, parent, parent->current->ebuild->depend, parent->depend);
 	if (stop_resolve)
 		return 0;
+	else
+		plog_exit_stack();
 	
 	plog_enter_stack("rdepend %s (VER = %s, SLOT=%s)", atom_stack_str, parent->current->ebuild->version->full_version, parent->current->ebuild->slot);
-	stop_resolve = dependency_resolve(emerge, parent, parent->current->ebuild->rdepend, parent->pre_dependency);
-	plog_exit_stack();
+	stop_resolve = dependency_resolve(emerge, parent, parent->current->ebuild->rdepend, parent->rdepend);
 	if (stop_resolve)
 		return 0;
+	else
+		plog_exit_stack();
 	
 	plog_enter_stack("pdepend %s (VER = %s, SLOT=%s)", atom_stack_str, parent->current->ebuild->version->full_version, parent->current->ebuild->slot);
-	stop_resolve = dependency_resolve(emerge, parent, parent->current->ebuild->pdepend, parent->post_dependency);
-	plog_exit_stack();
+	stop_resolve = dependency_resolve(emerge, parent, parent->current->ebuild->pdepend, parent->pdepend);
 	if (stop_resolve)
 		return 0;
+	else
+		plog_exit_stack();
+	
+	return 1;
+}
+
+int check_satified(Emerge* emerge, Dependency* dep) {
+	if (dep->depends == HAS_DEPENDS) {
+		for (Dependency* curr = dep->selectors; curr; curr = curr->next)
+			if (!check_satified(emerge, curr))
+				return 0;
+	}
+	else {
+		InstalledEbuild* e = portagedb_resolve_installed(emerge->database, dep->atom, NULL);
+		if (e)
+			return 1;
+		
+		ResolvedPackage* p = selected_get_atom(emerge->selected, dep->atom);
+		if (p)
+			return 1;
+		
+		return 0;
+	}
 	
 	return 1;
 }
@@ -336,24 +343,37 @@ int dependency_resolve(Emerge* emerge, ResolvedPackage* parent, Dependency* depe
 				UseFlag* u = use_get(parent->current->useflags, current_depend->target);
 				if (u && u->status == current_depend->selector) {
 					plog_enter_stack("%c%s?", current_depend->selector == USE_ENABLE ?: '!', current_depend->target);
-					dependency_resolve(emerge, parent, current_depend->selectors, add_to);
-					plog_exit_stack();
+					if (!dependency_resolve(emerge, parent, current_depend->selectors, add_to))
+						portage_die("Failed to resolve");
 				}
 			} else if (current_depend->selector == USE_LEAST_ONE) {
-				ResolvedEbuild* least_one_c = NULL;
-				InstalledEbuild* leasted_one_i = NULL;
-				Dependency* least_one_iter = NULL;
-				for (least_one_iter = current_depend->selectors; least_one_iter; least_one_iter = least_one_iter->next) {
-					//leasted_one_i = portagedb_resolve_installed(emerge->database, least_one_iter->atom, NULL);
-					if (leasted_one_i)
-						break; /* Satisfied */
+				int satisfied = 0;
+				Dependency* satisfied_dep = current_depend->selectors;
+				for (; satisfied_dep && !satisfied; satisfied_dep = satisfied_dep->next)
+					satisfied = check_satified(emerge, satisfied_dep);
+				
+				if (satisfied_dep) {
+					plog_info("Multi dep satified with atom %s", atom_get_str(satisfied_dep->atom));
+					if (dependency_resolve(emerge, parent, satisfied_dep, add_to))
+						continue;
 				}
 				
-				if (leasted_one_i)
-					;
+				/* Not satisfied, try all of them */
+				satisfied_dep = current_depend->selectors;
+				int passed = 0;
+				while (!passed && satisfied_dep) {
+					passed = dependency_resolve(emerge, parent, satisfied_dep, add_to);
+					if (!passed)
+						satisfied_dep = satisfied_dep->next;
+				}
+				
+				if (!passed) {
+					portage_die("Failed to resolve multi dep for ebuild %s", parent->current->ebuild->ebuild_key);
+				}
+				
 			} else if (current_depend->target == NULL) {
 				if (dependency_resolve(emerge, parent, current_depend->selectors, add_to) != 0)
-					return 1;
+					goto error;
 			}
 			else
 				portage_die("Illegal operator %s in a dependency expression", current_depend->target);
@@ -364,24 +384,23 @@ int dependency_resolve(Emerge* emerge, ResolvedPackage* parent, Dependency* depe
 		if (current_depend->atom->blocks != ATOM_BLOCK_NONE) {
 			plog_enter_stack("block !%s", atom_stack_str);
 			int block_res = dependency_resolve_block(emerge, parent, current_depend->atom);
-			plog_exit_stack();
 			
 			if (!block_res) /* Try a new version */
-				return 1;
+				goto error;
+			else
+				plog_exit_stack();
 			continue;
 		}
 		
-		ResolvedPackage* se = dependency_resolve_ebuild(emerge, parent, current_depend);
-		if (!se) { // This was previously selected
+		ResolvedPackage* se = NULL;
+		plog_enter_stack(atom_stack_str);
+		int res = dependency_resolve_ebuild(emerge, parent, current_depend, &se);
+		if (res == 0)
+			goto error;
+		else if (res == 2) { // This was previously selected
 			free(atom_stack_str);
 			continue;
 		}
-		
-		/*
-		plog_enter_stack("backtrack %s", se->ebuild->ebuild_key);
-		backtrack_rebuild(parent, se, dependency_order, ebuild_set, blocked_set);
-		plog_exit_stack();
-		 */
 		
 		if (se->current->action != PORTAGE_REPLACE || emerge->options & EMERGE_DEEP) {
 			se->remove_index = add_to->n;
@@ -389,13 +408,15 @@ int dependency_resolve(Emerge* emerge, ResolvedPackage* parent, Dependency* depe
 			vector_add(add_to, se);
 			
 			int passed = 0;
-			for (passed = 0; !passed && se->current; se->current = se->current->next) {
-				fflush(stdout);
+			for (; se->current; se->current = se->current->next) {
 				passed = dependency_sub_resolve(emerge, se, atom_stack_str);
+				if (passed)
+					break;
 			}
 			
 			if (!passed)
 				portage_die("Backtracking failed");
+			plog_exit_stack();
 			
 			free(atom_stack_str);
 		} else {
@@ -406,6 +427,16 @@ int dependency_resolve(Emerge* emerge, ResolvedPackage* parent, Dependency* depe
 			}
 		}
 	}
+	
+	return 1;
+
+error:
+	for (int i = add_to->n - 1; i >= 0; i--) {
+		selected_unregister_parent(vector_get(add_to, i), parent);
+	}
+	
+	plog_info("Erororororor");
+	fflush(stdout);
 	
 	return 0;
 }
@@ -422,8 +453,10 @@ void dependency_build_vector(Vector* traverse, Vector* target) {
 			//portage_die("No matching ebuild for %s", atom_str);
 			continue;
 		}
-		dependency_build_vector(current->pre_dependency, target);
+		dependency_build_vector(current->bdepend, target);
+		dependency_build_vector(current->depend, target);
+		dependency_build_vector(current->depend, target);
 		vector_add (target, current->current);
-		dependency_build_vector(current->post_dependency, target);
+		dependency_build_vector(current->pdepend, target);
 	}
 }

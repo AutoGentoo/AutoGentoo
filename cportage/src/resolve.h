@@ -37,8 +37,10 @@ struct __ResolvedPackage {
 	
 	Set* parents;
 	
-	Vector* pre_dependency;
-	Vector* post_dependency;
+	Vector* bdepend;
+	Vector* depend;
+	Vector* rdepend;
+	Vector* pdepend;
 	
 	int remove_index;
 	Vector* added_to;
@@ -71,5 +73,6 @@ int resolved_ebuild_use_build(ResolvedEbuild* out, Set* update_parents);
 
 SelectedBy* selected_by_new(ResolvedPackage* parent, Dependency* dep);
 void resolved_package_free(ResolvedPackage* ptr);
+void resolved_package_reset_children(ResolvedPackage* ptr);
 
 #endif //CPORTAGE_RESOLVE_H
