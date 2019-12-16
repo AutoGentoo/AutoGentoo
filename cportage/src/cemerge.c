@@ -14,6 +14,7 @@
 #include "database.h"
 #include <string.h>
 #include <errno.h>
+#include <signal.h>
 
 Emerge* emerge_main;
 
@@ -74,11 +75,16 @@ void print_help_wrapper(Opt* op, char* arg) {
 	exit(0);
 }
 
+void handle_sigint() {
+	portage_die("SIGINT");
+}
+
 int main (int argc, char** argv) {
 	plog_init();
 	plog_enter_stack("main");
 	Emerge* __emerge_main = emerge_new();
 	emerge_main = __emerge_main;
+	signal(SIGINT, handle_sigint);
 	
 	emerge_main->atoms = opt_handle(opt_handlers, argc, argv + 1);
 	emerge_main->repos = emerge_repos_conf(__emerge_main);

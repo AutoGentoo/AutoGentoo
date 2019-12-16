@@ -18,7 +18,7 @@ add_library(cportage SHARED
         ${language_BIN}
         ${language_PARSER}
         ${language_SOURCES}
-        src/dependency.c src/dependency.h src/resolve.c src/resolve.h)
+        src/dependency.c src/dependency.h src/resolve.c src/resolve.h src/selected.c src/selected.h src/block.c src/block.h)
 
 target_link_libraries(cportage hacksaw)
 

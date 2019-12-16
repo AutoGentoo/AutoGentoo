@@ -30,11 +30,23 @@ int set_inside(Set* s, void* item) {
 	return -1;
 }
 
-void set_add(Set* set, void* element) {
+int set_add(Set* set, void* element) {
 	int index = set_inside(set, element);
 	
-	if (index == -1)
+	if (index == -1) {
 		vector_add(set->parent, element);
+		return 1;
+	}
+
+	return 0;
+}
+
+void* set_remove(Set* set, void* element) {
+	int index = set_inside(set, element);
+	if (index == -1)
+		return NULL;
+	
+	return vector_remove(set->parent, index);
 }
 
 Set* set_dup(Set* s) {

@@ -123,7 +123,6 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	new_ebuild->atom_manifest = atom_man;
 	new_ebuild->feature_restrict = NULL;
 	new_ebuild->ebuild_key = parsed_key;
-	new_ebuild->blocked = 0;
 	new_ebuild->metadata_init = 0;
 	
 	new_ebuild->category = atom_parsed->category;

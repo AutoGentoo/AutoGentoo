@@ -35,5 +35,7 @@ typedef struct __PortageSet PortageSet;
 typedef struct __Backtrack Backtrack;
 typedef struct __InstalledBacktrack InstalledBacktrack;
 typedef struct __ResolvedEbuild ResolvedEbuild;
+typedef struct __SelectedBy SelectedBy;
+typedef struct __Selected Selected;
 
 #endif //AUTOGENTOO_CONSTANTS_H

@@ -6,10 +6,10 @@
 #define CPORTAGE_RESOLVE_H
 
 #include <autogentoo/hacksaw/vector.h>
+#include <autogentoo/hacksaw/set.h>
 #include "atom.h"
 
 typedef struct __ResolvedEbuild ResolvedEbuild;
-typedef struct __SeletecBy SelectedBy;
 typedef struct __ResolvedPackage ResolvedPackage;
 
 
@@ -35,10 +35,13 @@ struct __ResolvedPackage {
 	ResolvedEbuild* ebuilds;
 	ResolvedEbuild* current;
 	
-	Vector* parents;
+	Set* parents;
 	
 	Vector* pre_dependency;
 	Vector* post_dependency;
+	
+	int remove_index;
+	Vector* added_to;
 };
 
 struct __ResolvedEbuild {
@@ -64,7 +67,9 @@ ResolvedPackage* resolved_ebuild_resolve(Emerge* em, P_Atom* atom);
 Package* package_resolve_atom(Emerge* em, P_Atom* atom);
 void resolved_ebuild_free(ResolvedEbuild* ptr);
 
-int resolved_ebuild_is_blocked(Emerge*, ResolvedEbuild*);
-int resolved_ebuild_use_build(ResolvedEbuild* parent, ResolvedEbuild* out, P_Atom* atom);
+int resolved_ebuild_use_build(ResolvedEbuild* out, Set* update_parents);
+
+SelectedBy* selected_by_new(ResolvedPackage* parent, Dependency* dep);
+void resolved_package_free(ResolvedPackage* ptr);
 
 #endif //CPORTAGE_RESOLVE_H

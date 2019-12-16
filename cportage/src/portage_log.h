@@ -13,6 +13,8 @@
 
 #define LOG_TARGET stdout;
 
+extern int debug;
+
 void plog_init();
 void plog_enter_stack(char* stack_name, ...);
 void plog_exit_stack();
@@ -20,6 +22,8 @@ void plog_exit_stack();
 void plog_info(char* fmt, ...);
 void plog_error(char* fmt, ...);
 void plog_warn(char* fmt, ...);
+
+void plog_debug(char* fmt, ...);
 
 #define PLOG_BENCHMARK(stmt, name) { \
 	clock_t start, end; \

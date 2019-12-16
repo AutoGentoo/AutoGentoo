@@ -44,7 +44,7 @@ struct __Ebuild {
 	
 	char* ebuild_key;
 	
-	int blocked;
+	int inside_block;
 	
 	/* Cached in the database */
 	Dependency* depend;

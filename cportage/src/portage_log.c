@@ -19,6 +19,8 @@
 static char log_time_buffer[64];
 static StringVector* portage_call_stack;
 
+int debug = 0;
+
 void plog_init() {
 	portage_call_stack = string_vector_new();
 }
@@ -49,6 +51,19 @@ void plog_format_time() {
 void plog_info(char* fmt, ...) {
 	plog_format_time();
 	printf("[cportage - %s] INFO -- ", log_time_buffer);
+	va_list ap;
+	va_start(ap, fmt);
+	vprintf(fmt, ap);
+	printf("\n");
+	va_end(ap);
+}
+
+void plog_debug(char* fmt, ...) {
+	if (!debug)
+		return;
+	
+	plog_format_time();
+	printf("[cportage - %s] DEBUG -- ", log_time_buffer);
 	va_list ap;
 	va_start(ap, fmt);
 	vprintf(fmt, ap);

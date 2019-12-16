@@ -8,35 +8,33 @@
 #include <string.h>
 #include <errno.h>
 
-void installed_backtrack_rebuild(Emerge* em, ResolvedEbuild* se, Vector* dependency_ordered, Vector* dependency_selected,
-                                 Vector* dependency_blocks) {
-	if (!se->installed)
+void installed_backtrack_rebuild(Emerge* em, ResolvedPackage* se) {
+	if (!se->current->installed)
 		return; /* No need to rebuilt, no one has this as a dep */
 	
-	for (int i = 0; i < se->installed->rebuild_depend->n; i++) {
-		RebuildEbuild* current_rebuild = vector_get(se->installed->rebuild_depend, i);
+	for (int i = 0; i < se->current->installed->rebuild_depend->n; i++) {
+		RebuildEbuild* current_rebuild = vector_get(se->current->installed->rebuild_depend, i);
 		
 		int rebuild = 0;
-		char* installed_slot = se->installed->slot;
-		char* new_slot = se->ebuild->slot;
+		char* installed_slot = se->current->installed->slot;
+		char* new_slot = se->current->ebuild->slot;
 		
 		if (strcmp(installed_slot, new_slot) != 0)
 			rebuild = 1;
 		
-		installed_slot = se->installed->sub_slot;
-		new_slot = se->ebuild->sub_slot;
+		installed_slot = se->current->installed->sub_slot;
+		new_slot = se->current->ebuild->sub_slot;
 		
 		/* If one subslot is NULL and the other is not */
 		if ((!new_slot || !installed_slot) && new_slot != installed_slot) {
-			plog_error("new_slot is %s while installed_slot is %s", se->ebuild->slot, installed_slot);
+			plog_error("new_slot is %s while installed_slot is %s", se->current->ebuild->slot, installed_slot);
 			portage_die("Ebuilds subslot is NULL");
 		}
 		
 		if (!rebuild)
 			continue;
 		
-		ResolvedEbuild* se_rebuild = dependency_resolve_ebuild(em, se, current_rebuild->selector);
-		
+		ResolvedPackage* se_rebuild = dependency_resolve_ebuild(em, se, current_rebuild->selector);
 	}
 }
 
@@ -158,8 +156,8 @@ void installed_backtrack_rebuild_resolve(PortageDB* db, rebuild_t types) {
 		/* Get the parent  */
 		InstalledPackage* package = map_get(db->installed, backtrack->selector->atom->key);
 		if (!package) {
-			plog_warn("Invalid backtracking request for package %s (%s)", backtrack->rebuild->parent->key, backtrack->selector->atom->key);
-			plog_warn("Is %s a binary package?", backtrack->rebuild->parent->key);
+			plog_debug("Invalid backtracking request for package %s (%s)", backtrack->rebuild->parent->key, backtrack->selector->atom->key);
+			plog_debug("Is %s a binary package?", backtrack->rebuild->parent->key);
 			continue;
 		}
 		

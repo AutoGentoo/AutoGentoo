@@ -25,27 +25,42 @@ void** vector_add(Vector* vec, void* el) {
 	return &vec->ptr[vec->n++]; // Return index of item
 }
 
+/* Set index to NULL */
+void* prv_vector_keep_remove(Vector* vec, int index) {
+	void* out = vec->ptr[index];
+	vec->ptr[index] = NULL;
+	return out;
+}
+
+void* prv_vector_remove_unordered(Vector* vec, int index) {
+	void* last_data = vec->ptr[vec->n - 1];
+	void* out_data = vec->ptr[index];
+	
+	vec->ptr[index] = last_data;
+	vec->ptr[vec->n - 1] = NULL;
+	
+	return out_data;
+}
+
+void* prv_vector_remove_ordered(Vector* vec, int index) {
+	void* out_data = vec->ptr[index];
+	memcpy(&vec->ptr[index], &vec->ptr[index + 1], (vec->n - index) * sizeof(void*));
+	
+	return out_data;
+}
+
 void* vector_remove(Vector* vec, int index) {
 	if (index >= vec->n)
 		return NULL;
 	
-	void** to_edit = &vec->ptr[index];
-	void* out = *to_edit;
+	if (vec->opts & VECTOR_KEEP)
+		return prv_vector_keep_remove(vec, index);
 	
-	if (!(vec->opts & VECTOR_KEEP)) {
-		vec->n--;
-		
-		if (vec->opts & VECTOR_UNORDERED && index != vec->n)
-			*to_edit = vec->ptr[vec->n];
-		else
-			memcpy(&vec->ptr[index], &vec->ptr[index + 1], (vec->n - index) * sizeof(void*));
-		
-		vec->ptr[vec->n] = NULL;
-	}
-	else
-		*to_edit = NULL;
+	vec->n--;
+	if (vec->opts & VECTOR_UNORDERED)
+		return prv_vector_remove_unordered(vec, index);
 	
-	return out;
+	return prv_vector_remove_ordered(vec, index);
 }
 
 void vector_insert(Vector* vec, void* el, int index) {

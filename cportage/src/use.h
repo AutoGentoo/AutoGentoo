@@ -17,9 +17,8 @@ struct __PackageUse {
 };
 
 struct __UseReason {
-	ResolvedEbuild* parent_ebuild;
 	AtomFlag* flag;
-	Dependency* selected_by;
+	SelectedBy* selected_by;
 	
 	UseReason* next;
 };
@@ -86,7 +85,7 @@ void use_free(UseFlag* head);
 
 RequiredUse* use_build_required_use(char* target, use_t option);
 int ebuild_check_required_use(ResolvedEbuild* ebuild);
-UseReason* use_reason_new(ResolvedEbuild* parent, AtomFlag* flag, Dependency* selected_by);
+UseReason* use_reason_new(AtomFlag* flag, SelectedBy* selected_by);
 void requireduse_free(RequiredUse* ptr);
 AtomFlag* dependency_useflag(Ebuild* resolved, AtomFlag* new_flags, AtomFlag* old_flags);
 

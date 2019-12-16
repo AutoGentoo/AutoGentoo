@@ -154,9 +154,8 @@ int ebuild_check_required_use(ResolvedEbuild* ebuild) {
 	return 1;
 }
 
-UseReason* use_reason_new(ResolvedEbuild* parent, AtomFlag* flag, Dependency* selected_by) {
+UseReason* use_reason_new(AtomFlag* flag, SelectedBy* selected_by) {
 	UseReason* reason = malloc(sizeof(UseReason));
-	reason->parent_ebuild = parent;
 	reason->flag = flag;
 	reason->selected_by = selected_by;
 	reason->next = NULL;

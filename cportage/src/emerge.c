@@ -16,6 +16,7 @@
 #include "resolve.h"
 #include "dependency.h"
 #include <unistd.h>
+#include "selected.h"
 
 int number_len(int num) {
 	char out[32];
@@ -38,7 +39,7 @@ Emerge* emerge_new() {
 	out->default_repo = NULL;
 	
 	out->use_suggestions = NULL;
-	out->selected = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
+	out->selected = selected_new();
 	
 	
 	return out;
@@ -158,7 +159,7 @@ int emerge (Emerge* emerge) {
 		}
 	}
 	
-	dependency_resolve(emerge, NULL, dep, emerge->selected);
+	dependency_resolve(emerge, NULL, dep, emerge->selected->head);
 	
 	Suggestion* current = NULL;
 	
@@ -177,7 +178,6 @@ int emerge (Emerge* emerge) {
 		}
 		
 		emerge->use_suggestions = NULL;
-		
 		break;
 		//dependency_resolve(emerge, NULL, dep, emerge->selected);
 	}
@@ -188,7 +188,7 @@ int emerge (Emerge* emerge) {
 	}
 	
 	Vector* selected = vector_new(VECTOR_ORDERED);
-	dependency_build_vector(emerge->selected, selected);
+	dependency_build_vector(emerge->selected->head, selected);
 	
 	int max_width = number_len(selected->n);
 	for (int i = 0; i < selected->n; i++) {
@@ -198,11 +198,7 @@ int emerge (Emerge* emerge) {
 		resolved_ebuild_print(emerge, eb);
 	}
 	
-	for (int i = 0; i < emerge->selected->n; i++) {
-		resolved_ebuild_free(vector_get(emerge->selected, i));
-	}
-	
-	vector_free(emerge->selected);
+	selected_free(emerge->selected);
 	
 	return 0;
 }

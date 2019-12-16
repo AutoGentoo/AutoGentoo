@@ -42,7 +42,7 @@ Backtrack* backtrack_new(ResolvedEbuild* ebuild, Package* backtrack_to, backtrac
  * @param dep dependency selection
  * @return resolved ebuild (NULL if no need to add to vector)
  */
-ResolvedPackage* dependency_resolve_ebuild(Emerge* emerge, ResolvedEbuild* selected_by, Dependency* dep);
+ResolvedPackage* dependency_resolve_ebuild(Emerge* emerge, ResolvedPackage* selected_by, Dependency* dep);
 
 /**
  * Raise an error if a blocked package is selected
@@ -51,7 +51,7 @@ ResolvedPackage* dependency_resolve_ebuild(Emerge* emerge, ResolvedEbuild* selec
  * @param atom the blocking atom
  * @return whether or not the block was resolved (portage_die() if not)
  */
-int dependency_resolve_block(Emerge* emerge, ResolvedEbuild* blocker, P_Atom* atom);
+int dependency_resolve_block(Emerge* emerge, ResolvedPackage* blocker, P_Atom* atom);
 
 /**
  * Add all the dependencies to the child vectors
@@ -73,21 +73,7 @@ int dependency_sub_resolve(Emerge* emerge, ResolvedPackage* parent, char* atom_s
  * @param add_to where to add the resolved ebuilds to
  * @return whether or not to stop resolving (could have been re-resolved inside)
  */
-int dependency_resolve(Emerge* emerge, ResolvedEbuild* parent, Dependency* dependency, Vector* add_to);
-
-/**
- * Return the first match to an ebuild in the
- * the search vector
- *
- * This is a recursive call, for the first
- * use emerge->selected for search
- *
- * This will only check the slot
- * @param search the vector of ResolvedEbuilds, will also check deps
- * @param check the slot to attempt to match
- * @return the first matched selected ebuild
- */
-ResolvedEbuild* dependency_check_selected(Vector* search, ResolvedEbuild* check);
+int dependency_resolve(Emerge* emerge, ResolvedPackage* parent, Dependency* dependency, Vector* add_to);
 
 /**
  * Perform an in-order traversal of every dependency in traverse

@@ -50,7 +50,7 @@ struct __Emerge {
 	sha_hash hash_make_conf;
 	
 	PortageDB* database;
-	Vector* selected;
+	Selected* selected;
 	
 	Map* use_expand;
 	Profile* profile;
