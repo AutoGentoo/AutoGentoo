@@ -470,6 +470,8 @@ char* atom_get_str(P_Atom* atom) {
 	char flags[1024];
 	flags[0] = 0;
 	for (AtomFlag* af = atom->useflags; af; af = af->next) {
+		if (!debug && af->def != ATOM_NO_DEFAULT)
+			continue;
 		/*
 		ATOM_USE_DISABLE, //!< atom[-bar]
 		ATOM_USE_ENABLE, //!< atom[bar]
@@ -518,5 +520,48 @@ char* atom_get_str(P_Atom* atom) {
 	free(version_str);
 	free(atom_with_slot);
 
+	return out;
+}
+
+char* dependency_get_str(Dependency* dep) {
+	if (dep->depends == IS_ATOM)
+		return atom_get_str(dep->atom);
+	
+	int count = 0;
+	for (Dependency* start = dep->selectors; start; start = start->next, count++);
+	
+	char** ar = malloc(sizeof(char*) * count);
+	count = 0;
+	
+	int len = 6;
+	
+	for (Dependency* start = dep->selectors; start; start = start->next, count++) {
+		ar[count] = dependency_get_str(start);
+		len += (int)strlen(ar[count]) + 1;
+	}
+	
+	if (dep->target)
+		len += (int)strlen(dep->target) + 1;
+	
+	char* out = malloc(len);
+	out[0] = 0;
+	
+	if (dep->target)
+		sprintf(out, "%s ( ", dep->target);
+	else
+		sprintf(out, "( ");
+	
+	int end = (int)strlen(out);
+	for (int i = 0; i < count; i++) {
+		strcpy(out + end, ar[i]);
+		end = (int)strlen(out);
+		strcpy(out + end++, " ");
+		
+		free(ar[i]);
+	}
+	
+	strcat(out, ")");
+	free(ar);
+	
 	return out;
 }

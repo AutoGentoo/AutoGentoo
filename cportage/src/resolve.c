@@ -9,6 +9,7 @@
 #include "database.h"
 #include "conflict.h"
 #include <string.h>
+#include <assert.h>
 #include "suggestion.h"
 #include "selected.h"
 
@@ -32,13 +33,11 @@ int ebuild_match_atom(Ebuild* ebuild, P_Atom* atom) {
 		if (ebuild->sub_slot && atom->sub_slot)
 			sub_slot_cmp = strcmp(ebuild->sub_slot, atom->sub_slot);
 		
-		if (atom->range == ATOM_VERSION_ALL && atom->version == NULL)
-			return !slot_cmp;
 		
-		/* Only compare the slots */
-		if (!pd_compare_range(slot_cmp, atom->range))
+		if (slot_cmp != 0)
 			return 0;
-		if (!pd_compare_range(sub_slot_cmp, atom->range))
+		
+		if (sub_slot_cmp != 0)
 			return 0;
 	}
 	
@@ -73,6 +72,8 @@ ResolvedEbuild* resolved_ebuild_new(Ebuild* ebuild, P_Atom* atom) {
 	temp->useflags = NULL;
 	temp->ebuild = ebuild;
 	temp->explicit_flags = NULL;
+	temp->parent_slot = NULL;
+	temp->parent = NULL;
 	
 	temp->action = PORTAGE_NEW;
 	temp->unstable_keywords = 0;
@@ -103,29 +104,46 @@ Package* package_resolve_atom(Emerge* emerge, P_Atom* atom) {
 	return target_pkg;
 }
 
-SelectedBy* selected_by_new(ResolvedPackage* parent, Dependency* dep) {
-	SelectedBy* out = malloc(sizeof(SelectedBy));
-	out->parent = parent;
-	out->selected_by = dep;
+ResolvedSlot* resolved_slot_new(ResolvedEbuild* initial_ebuild) {
+	ResolvedSlot* out = malloc(sizeof(ResolvedSlot));
+	
+	out->next = NULL;
+	out->current = initial_ebuild;
+	out->head = initial_ebuild;
+	out->slot = strdup(initial_ebuild->ebuild->slot);
 	
 	return out;
 }
 
-ResolvedPackage* resolved_ebuild_resolve(Emerge* em, P_Atom* atom) {
-	Package* pkg = package_resolve_atom(em, atom);
+ResolvedSlot* resolved_slot_spit(ResolvedEbuild* head) {
+	if (!head)
+		return NULL;
+	
+	ResolvedSlot* slot_head = resolved_slot_new(head);
+	ResolvedSlot* current_slot = slot_head;
+	
+	ResolvedEbuild* current = head->next;
+	ResolvedEbuild* last = current;
+	
+	for (; current; last = current, current = current->next) {
+		if (strcmp(last->ebuild->slot, current->ebuild->slot) != 0) {
+			last->next = NULL; /* Break the main chain */
+			current_slot->next = resolved_slot_new(current);
+			current_slot = current_slot->next;
+		}
+		
+		current->parent_slot = current_slot;
+	}
+	
+	return slot_head;
+}
+
+SelectionRequest* selection_request_new(Emerge* em, ResolvedPackage* selected_by, ResolvedPackage* parent, Dependency* dep) {
+	Package* pkg = package_resolve_atom(em, dep->atom);
 	if (!pkg) {
 		return NULL;
 	}
 	
-	ResolvedPackage* pkg_out = malloc(sizeof(ResolvedPackage));
-	pkg_out->environ = em;
-	pkg_out->bdepend = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
-	pkg_out->depend = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
-	pkg_out->rdepend = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
-	pkg_out->pdepend = vector_new(VECTOR_ORDERED | VECTOR_REMOVE);
-	pkg_out->parents = set_new(selected_set_cmp);
-	pkg_out->current = NULL;
-	pkg_out->ebuilds = NULL;
 	
 	ResolvedEbuild* out = NULL;
 	ResolvedEbuild* current_link = NULL;
@@ -139,7 +157,7 @@ ResolvedPackage* resolved_ebuild_resolve(Emerge* em, P_Atom* atom) {
 	Ebuild* current;
 	for (current = pkg->ebuilds; current; current = current->older) {
 		package_metadata_init(current);
-		if (ebuild_match_atom(current, atom)) {
+		if (ebuild_match_atom(current, dep->atom)) {
 			keyword_t accept_keyword = KEYWORD_STABLE;
 			
 			/* Apply package.accept_keywords */
@@ -153,8 +171,8 @@ ResolvedPackage* resolved_ebuild_resolve(Emerge* em, P_Atom* atom) {
 				|| current->keywords[pkg->parent->parent->target_arch] == KEYWORD_BROKEN)
 				continue;
 			
-			ResolvedEbuild* temp = resolved_ebuild_new(current, atom);
-			temp->parent = pkg_out;
+			ResolvedEbuild* temp = resolved_ebuild_new(current, dep->atom);
+			temp->parent = parent;
 			
 			ResolvedEbuild** start = NULL;
 			ResolvedEbuild** end = NULL;
@@ -205,9 +223,11 @@ ResolvedPackage* resolved_ebuild_resolve(Emerge* em, P_Atom* atom) {
 			unstable_start->back = current_link;
 	}
 	
-	pkg_out->current = pkg_out->ebuilds = out;
+	SelectionRequest* out_sel = malloc(sizeof(SelectionRequest));
+	out_sel->head = resolved_slot_spit(out);
+	out_sel->selected_by = 
 	
-	return pkg_out;
+	return out_sel;
 }
 
 void resolved_package_reset_children(ResolvedPackage* ptr) {
@@ -224,6 +244,21 @@ void resolved_package_reset_children(ResolvedPackage* ptr) {
 			selected_unregister_parent(next_child, ptr);
 		}
 	}
+	
+	assert(ptr->bdepend->n == 0);
+	assert(ptr->depend->n == 0);
+	assert(ptr->rdepend->n == 0);
+	assert(ptr->pdepend->n == 0);
+}
+
+void resolved_slot_free(ResolvedSlot* slot) {
+	if (!slot)
+		return;
+	
+	free(slot->slot);
+	resolved_ebuild_free(slot->head);
+	resolved_slot_free(slot->next);
+	free(slot);
 }
 
 void resolved_package_free(ResolvedPackage* ptr) {
@@ -231,7 +266,7 @@ void resolved_package_free(ResolvedPackage* ptr) {
 		free(set_get(ptr->parents, i));
 	
 	set_free(ptr->parents);
-	resolved_ebuild_free(ptr->ebuilds);
+	resolved_slot_free(ptr->slot_head);
 	
 	resolved_package_reset_children(ptr);
 	
@@ -296,7 +331,7 @@ int resolved_ebuild_use_build(ResolvedEbuild* out, Set* update_parents) {
 			UseFlag* parent_flag = NULL;
 			ResolvedEbuild* parent = NULL;
 			if (current_parent->parent)
-				parent = current_parent->parent->current;
+				parent = rp_current(current_parent->parent);
 			if (parent)
 				parent_flag = use_get(parent->useflags, current_use->name);
 			
@@ -364,8 +399,8 @@ int resolved_ebuild_use_build(ResolvedEbuild* out, Set* update_parents) {
 						
 						char* atom_1 = atom_get_str(prev_explicit->reason->selected_by->selected_by->atom);
 						char* atom_2 = atom_get_str(ex_dup->reason->selected_by->selected_by->atom);
-						plog_error("%s DEP = %s wants %c%s", prev_explicit->reason->selected_by->parent->current->ebuild->ebuild_key, atom_1, prev_explicit->status == USE_ENABLE ? '+' : '-', prev_explicit->name);
-						plog_error("%s DEP = %s wants %c%s", ex_dup->reason->selected_by->parent->current->ebuild->ebuild_key, atom_2, ex_dup->status == USE_ENABLE ? '+' : '-', ex_dup->name);
+						plog_error("%s DEP = %s wants %c%s", rp_current(prev_explicit->reason->selected_by->parent)->ebuild->ebuild_key, atom_1, prev_explicit->status == USE_ENABLE ? '+' : '-', prev_explicit->name);
+						plog_error("%s DEP = %s wants %c%s", rp_current(ex_dup->reason->selected_by->parent)->ebuild->ebuild_key, atom_2, ex_dup->status == USE_ENABLE ? '+' : '-', ex_dup->name);
 						
 						free(atom_1);
 						free(atom_2);
@@ -386,4 +421,8 @@ int resolved_ebuild_use_build(ResolvedEbuild* out, Set* update_parents) {
 	set_union(out->parent->parents, update_parents);
 	
 	return 1;
+}
+
+ResolvedEbuild* rp_current(ResolvedPackage* pkg) {
+	return pkg->current_slot->current;
 }

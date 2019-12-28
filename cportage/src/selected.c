@@ -13,7 +13,7 @@
 
 char* selected_get_key(ResolvedPackage* pkg) {
 	char* key = NULL;
-	ResolvedEbuild* c_ebuild = pkg->current;
+	ResolvedEbuild* c_ebuild = pkg->current_slot->current;
 	if (!c_ebuild)
 		c_ebuild = pkg->ebuilds;
 	
@@ -49,19 +49,30 @@ ResolvedPackage* selected_select(Selected* selected, ResolvedPackage* pkg) {
 void selected_register_parent(ResolvedPackage* child, SelectedBy* parent_expr) {
 	if (!set_add(child->parents, parent_expr)) {
 		free(parent_expr);
-		return;
 	}
 }
 
 void selected_unregister_parent(ResolvedPackage* child, ResolvedPackage* parent) {
-	SelectedBy* search_for = selected_by_new(parent, NULL);
+	SelectedBy* search_for = selected_by_new(parent, NULL, NULL);
 	SelectedBy* to_free = set_remove(child->parents, search_for);
 	free(search_for);
 	if (to_free)
 		free(search_for);
 	
-	if (child->parents->parent->n != 0)
+	for (int i = child->remove_index + 1; i < child->added_to->n; i++)
+		((ResolvedPackage*)vector_get(child->added_to, i))->remove_index--;
+	
+	vector_remove(child->added_to, child->remove_index);
+	
+	
+	if (child->parents->parent->n != 0) {
+		Vector* new_add_to = ((SelectedBy*)set_get(child->parents, 0))->add_to;
+		child->added_to = new_add_to;
+		child->remove_index = new_add_to->n;
+		vector_add(new_add_to, child);
+		
 		return;
+	}
 	
 	/* No more parents, free this child */
 	char* key = selected_get_key(child);
@@ -76,25 +87,10 @@ ResolvedPackage* selected_get(Selected* sel, ResolvedPackage* check) {
 	char* key = selected_get_key(check);
 	ResolvedPackage* found = map_get(sel->seleted, key);
 	free(key);
-	if (found) {
-		plog_info("FOUND SELECTED");
-		fflush(stdout);
-	}
 	return found;
 }
 
 ResolvedPackage* selected_get_atom(Selected* sel, P_Atom* check) {
-	if (check->slot) {
-		char* key = NULL;
-		asprintf(&key, "%s:%s", check->key, check->slot);
-		ResolvedPackage* found = map_get(sel->seleted, key);
-		free(key);
-		
-		if (found && ebuild_match_atom(found->current->ebuild, check))
-			return found;
-		return NULL;
-	}
-	
 	Set* slots = map_get(sel->package_to_slot, check->key);
 	if (!slots)
 		return NULL;

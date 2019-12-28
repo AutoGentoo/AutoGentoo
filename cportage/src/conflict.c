@@ -71,30 +71,30 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 			else
 				set_to = USE_ENABLE;
 			
-			explicit_search = conflict_prev->reason->selected_by->parent->current->explicit_flags;
-			useflag_search = conflict_prev->reason->selected_by->parent->current->useflags;
+			explicit_search = rp_current(conflict_prev->reason->selected_by->parent)->explicit_flags;
+			useflag_search = rp_current(conflict_prev->reason->selected_by->parent)->useflags;
 			suggest_flag_name = parent_dependency->target;
 		}
 		else if (current_reason->flag->option == ATOM_USE_ENABLE_IF_ON) {
 			/* depend[use?] */
 			suggest_flag_name = conflict_prev->name;
-			explicit_search = current_reason->selected_by->parent->current->explicit_flags;
-			useflag_search = conflict_prev->reason->selected_by->parent->current->useflags;
+			explicit_search = rp_current(current_reason->selected_by->parent)->explicit_flags;
+			useflag_search = rp_current(conflict_prev->reason->selected_by->parent)->useflags;
 		}
 		else if (current_reason->flag->option == ATOM_USE_DISABLE_IF_OFF) {
 			/* depend[use?] */
 			suggest_flag_name = conflict_prev->name;
-			explicit_search = current_reason->selected_by->parent->current->explicit_flags;
-			useflag_search = current_reason->selected_by->parent->current->useflags;
+			explicit_search = rp_current(current_reason->selected_by->parent)->explicit_flags;
+			useflag_search = rp_current(current_reason->selected_by->parent)->useflags;
 		}
 		else if (current_reason->flag->option == ATOM_USE_EQUAL) {
-			useflag_search = explicit_search = current_reason->selected_by->parent->current->useflags;
+			useflag_search = explicit_search = rp_current(current_reason->selected_by->parent)->useflags;
 			suggest_flag_name = conflict_prev->name;
 		}
 		else if (current_reason->flag->option == ATOM_USE_OPPOSITE) {
 			/* Use this to reverse the value */
 			set_to = conflict_prev->status;
-			useflag_search = explicit_search = current_reason->selected_by->parent->current->useflags;
+			useflag_search = explicit_search = rp_current(current_reason->selected_by->parent)->useflags;
 			suggest_flag_name = conflict_prev->name;
 			
 		}
@@ -113,7 +113,7 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 			}
 			
 			// This flag is not explicit, just disable it
-			Suggestion* remove_buf = suggestion_new(atom_str, ">=%s %s%s", conflict_prev->reason->selected_by->parent->current->ebuild->ebuild_key, set_to == USE_ENABLE ? "" : "-", suggest_flag_name);
+			Suggestion* remove_buf = suggestion_new(atom_str, ">=%s %s%s", rp_current(conflict_prev->reason->selected_by->parent)->ebuild->ebuild_key, set_to == USE_ENABLE ? "" : "-", suggest_flag_name);
 			remove_buf->next = out;
 			out = remove_buf;
 			continue; /* Go to next error */

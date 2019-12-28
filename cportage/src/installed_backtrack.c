@@ -9,25 +9,25 @@
 #include <errno.h>
 
 void installed_backtrack_rebuild(Emerge* em, ResolvedPackage* se) {
-	if (!se->current->installed)
+	if (!se->current_slot->current->installed)
 		return; /* No need to rebuilt, no one has this as a dep */
 	
-	for (int i = 0; i < se->current->installed->rebuild_depend->n; i++) {
-		RebuildEbuild* current_rebuild = vector_get(se->current->installed->rebuild_depend, i);
+	for (int i = 0; i < se->current_slot->current->installed->rebuild_depend->n; i++) {
+		RebuildEbuild* current_rebuild = vector_get(se->current_slot->current->installed->rebuild_depend, i);
 		
 		int rebuild = 0;
-		char* installed_slot = se->current->installed->slot;
-		char* new_slot = se->current->ebuild->slot;
+		char* installed_slot = se->current_slot->current->installed->slot;
+		char* new_slot = se->current_slot->current->ebuild->slot;
 		
 		if (strcmp(installed_slot, new_slot) != 0)
 			rebuild = 1;
 		
-		installed_slot = se->current->installed->sub_slot;
-		new_slot = se->current->ebuild->sub_slot;
+		installed_slot = se->current_slot->current->installed->sub_slot;
+		new_slot = se->current_slot->current->ebuild->sub_slot;
 		
 		/* If one subslot is NULL and the other is not */
 		if ((!new_slot || !installed_slot) && new_slot != installed_slot) {
-			plog_error("new_slot is %s while installed_slot is %s", se->current->ebuild->slot, installed_slot);
+			plog_error("new_slot is %s while installed_slot is %s", se->current_slot->current->ebuild->slot, installed_slot);
 			portage_die("Ebuilds subslot is NULL");
 		}
 		

@@ -81,16 +81,26 @@ void* map_remove(Map* map, char* key) {
 	size_t index = map_get_hash(key, n) % map->size;
 	
 	MapItem* current = map->hash_table[index];
+	MapItem* before = NULL;
 	while (current) {
 		if (strcmp (current->key, key) == 0) {
 			void* out = current->data;
-			map->hash_table[index] = current->next;
+			
+			if (!before)
+				map->hash_table[index] = current->next;
+			else
+				before->next = current->next;
 			free(current->key);
 			free(current);
 			
 			return out;
 		}
+		
 		current = current->next;
+		if (!before)
+			before = map->hash_table[index];
+		else
+			before = before->next;
 	}
 	
 	return NULL;
