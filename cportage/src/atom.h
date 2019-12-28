@@ -7,11 +7,6 @@
 
 #include "constants.h"
 
-typedef struct __P_Atom P_Atom;
-typedef struct __AtomVersion AtomVersion;
-typedef struct __AtomFlag AtomFlag;
-typedef struct __Dependency Dependency;
-
 typedef enum {
 	USE_NONE,
 	USE_DISABLE, //!< !
@@ -98,6 +93,24 @@ struct __AtomFlag {
 };
 
 /**
+ * target? ( selector selector selector ) next_target? ( ... ) depend
+ */
+struct __Dependency {
+	Dependency* parent;
+	P_Atom* atom; // NULL if it has depends
+	char* target; // NULL if has atom
+	
+	use_t selector;
+	depend_t depends;
+	
+	// Selector list
+	Dependency* selectors;
+	
+	// Next target
+	Dependency* next;
+};
+
+/**
  * Selects a range of packages (or blocks)
  */
 struct __P_Atom {
@@ -120,24 +133,6 @@ struct __P_Atom {
 	
 	AtomFlag* useflags;
 	Dependency* parent;
-};
-
-/**
- * target? ( selector selector selector ) next_target? ( ... ) depend
- */
-struct __Dependency {
-	Dependency* parent;
-	P_Atom* atom; // NULL if it has depends
-	char* target; // NULL if has atom
-	
-	use_t selector;
-	depend_t depends;
-	
-	// Selector list
-	Dependency* selectors;
-	
-	// Next target
-	Dependency* next;
 };
 
 

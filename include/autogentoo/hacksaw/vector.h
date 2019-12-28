@@ -7,17 +7,16 @@
 
 #include <stdio.h>
 
-typedef enum __vector_opts vector_opts;
 typedef struct __Vector Vector;
 
 #define HACKSAW_VECTOR_INITIAL 32
 
-enum __vector_opts {
+typedef enum {
 	VECTOR_UNORDERED = 0x0, // Any order can be used (most efficient)
 	VECTOR_ORDERED = 0x1, // Keep the elements in order (don't use if not needed)
 	VECTOR_KEEP = 0x2, // Keep the memory unallocated
 	VECTOR_REMOVE = 0x0, // Remove the memory and replace the location
-};
+} vector_opts;
 
 struct __Vector {
 	void** ptr; // Location where elements are stored

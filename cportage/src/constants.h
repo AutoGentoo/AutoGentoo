@@ -34,7 +34,12 @@ typedef struct __Keyword Keyword;
 typedef struct __PortageSet PortageSet;
 typedef struct __Backtrack Backtrack;
 typedef struct __InstalledBacktrack InstalledBacktrack;
-typedef struct __ResolvedEbuild ResolvedEbuild;
 typedef struct __Selected Selected;
+
+/* From atom.h */
+typedef struct __P_Atom P_Atom;
+typedef struct __AtomVersion AtomVersion;
+typedef struct __AtomFlag AtomFlag;
+typedef struct __Dependency Dependency;
 
 #endif //AUTOGENTOO_CONSTANTS_H

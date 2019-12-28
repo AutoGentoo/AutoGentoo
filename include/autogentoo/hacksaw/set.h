@@ -2,8 +2,8 @@
 // Created by atuser on 9/24/19.
 //
 
-#ifndef AUTOGENTOO_SET_H
-#define AUTOGENTOO_SET_H
+#ifndef HACKSAW_SET_H
+#define HACKSAW_SET_H
 
 #include "vector.h"
 
@@ -25,4 +25,4 @@ Set* set_collapse(Set* to_collapse, void* (*merge_func)(void*, void*));
 void set_free(Set* ptr);
 void* set_remove(Set* set, void* element);
 
-#endif //AUTOGENTOO_SET_H
+#endif //HACKSAW_SET_H

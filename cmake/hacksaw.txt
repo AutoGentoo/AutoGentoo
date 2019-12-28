@@ -14,7 +14,6 @@ set(hacksaw_SRC
         hacksaw/util.c
         hacksaw/getopt.c
         hacksaw/set.c
-        hacksaw/conditional_set.c
         )
 
 set(hacksaw_HEADERS
@@ -30,6 +29,5 @@ set(hacksaw_HEADERS
         include/autogentoo/hacksaw/util.h
         include/autogentoo/hacksaw/getopt.h
         include/autogentoo/hacksaw/set.h
-        include/autogentoo/hacksaw/conditional_set.h
         )
 

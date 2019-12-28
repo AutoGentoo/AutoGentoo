@@ -1,68 +1,13 @@
 [
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/conf.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/conf.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/conf.c"
+  "command": "/usr/bin/c++  -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksawpp_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksawpp.dir/hacksawpp/Vector.cpp.o -c /home/atuser/git/AutoGentoo/hacksawpp/Vector.cpp",
+  "file": "/home/atuser/git/AutoGentoo/hacksawpp/Vector.cpp"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/debug.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/debug.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/debug.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/hash.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/hash.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/hash.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/log.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/log.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/log.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/map.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/map.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/map.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/small_map.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/small_map.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/small_map.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/string_vector.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/string_vector.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/string_vector.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/vector.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/vector.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/vector.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/linked_vector.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/linked_vector.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/linked_vector.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/util.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/util.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/util.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/getopt.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/getopt.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/getopt.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/set.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/set.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/set.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/linked_set.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/linked_set.c",
-  "file": "/home/atuser/git/AutoGentoo/hacksaw/linked_set.c"
+  "command": "/usr/bin/c++  -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksawpp_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksawpp.dir/hacksawpp/Set.cpp.o -c /home/atuser/git/AutoGentoo/hacksawpp/Set.cpp",
+  "file": "/home/atuser/git/AutoGentoo/hacksawpp/Set.cpp"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
@@ -216,8 +161,68 @@
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
-  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dautogentooapi_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/usr/include/python3.6m  -g -fPIC   -o CMakeFiles/autogentooapi.dir/src/api/host_serial.c.o   -c /home/atuser/git/AutoGentoo/src/api/host_serial.c",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dautogentooapi_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/usr/include/python2.7  -g -fPIC   -o CMakeFiles/autogentooapi.dir/src/api/host_serial.c.o   -c /home/atuser/git/AutoGentoo/src/api/host_serial.c",
   "file": "/home/atuser/git/AutoGentoo/src/api/host_serial.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/conf.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/conf.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/conf.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/debug.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/debug.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/debug.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/hash.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/hash.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/hash.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/log.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/log.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/log.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/map.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/map.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/map.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/small_map.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/small_map.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/small_map.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/string_vector.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/string_vector.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/string_vector.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/vector.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/vector.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/vector.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/linked_vector.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/linked_vector.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/linked_vector.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/util.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/util.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/util.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/getopt.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/getopt.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/getopt.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dhacksaw_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug  -g -fPIC   -o CMakeFiles/hacksaw.dir/hacksaw/set.c.o   -c /home/atuser/git/AutoGentoo/hacksaw/set.c",
+  "file": "/home/atuser/git/AutoGentoo/hacksaw/set.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug",
@@ -408,5 +413,20 @@
   "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage",
   "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/block.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/block.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/block.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage",
+  "command": "/usr/bin/cc -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/selection_request.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/selection_request.c",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/selection_request.c"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage",
+  "command": "/usr/bin/c++  -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/ResolvedPackage.cpp.o -c /home/atuser/git/AutoGentoo/cportage/src/ResolvedPackage.cpp",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/ResolvedPackage.cpp"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cmake-build-debug/cportage",
+  "command": "/usr/bin/c++  -DAUTOGENTOO_DEBUG -DAUTOGENTOO_WORKER_DIR=\\\"/home/atuser/git/AutoGentoo/src/worker\\\" -DDBPATH=\\\"test\\\" -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/include -I/home/atuser/git/AutoGentoo/include/autogentoo -I/home/atuser/git/AutoGentoo/cportage/language -I/home/atuser/git/AutoGentoo/cmake-build-debug -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/ResolveRequest.cpp.o -c /home/atuser/git/AutoGentoo/cportage/src/ResolveRequest.cpp",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/ResolveRequest.cpp"
 }
 ]
