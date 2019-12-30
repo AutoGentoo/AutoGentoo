@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include "language/share.h"
 #include <ctype.h>
-#include "deprecated/resolve.h"
 
 use_t use_set(UseFlag* head, char* use_search, use_t new_val, use_priority_t priority) {
 	UseFlag* target = use_get(head, use_search);
@@ -108,7 +107,7 @@ char* use_expr_str(RequiredUse* expr) {
 
 int use_check_expr(ResolvedEbuild* ebuild, RequiredUse* expr) {
 	if (expr->option == USE_ENABLE || expr->option == USE_DISABLE) {
-		UseFlag* u = use_get(ebuild->useflags, expr->target);
+		UseFlag* u = use_get(ebuild->use, expr->target);
 		use_t status = USE_NONE;
 		if (u)
 			status = u->status;
@@ -139,12 +138,12 @@ int use_check_expr(ResolvedEbuild* ebuild, RequiredUse* expr) {
 }
 
 int ebuild_check_required_use(ResolvedEbuild* ebuild) {
-	if (!ebuild->ebuild->required_use)
+	if (!ebuild->target->required_use)
 		return 1;
-	for (RequiredUse* expr = ebuild->ebuild->required_use; expr; expr = expr->next) {
+	for (RequiredUse* expr = ebuild->target->required_use; expr; expr = expr->next) {
 		if (use_check_expr(ebuild, expr) == 0) {
 			char* expr_fail = use_expr_str(expr);
-			plog_warn("Required use not met for ebuild %s", ebuild->ebuild->ebuild_key);
+			plog_warn("Required use not met for ebuild %s", ebuild->target->ebuild_key);
 			plog_warn(expr_fail);
 			free(expr_fail);
 			return 0;
@@ -152,15 +151,6 @@ int ebuild_check_required_use(ResolvedEbuild* ebuild) {
 	}
 	
 	return 1;
-}
-
-UseReason* use_reason_new(AtomFlag* flag, SelectedBy* selected_by) {
-	UseReason* reason = malloc(sizeof(UseReason));
-	reason->flag = flag;
-	reason->selected_by = selected_by;
-	reason->next = NULL;
-	
-	return reason;
 }
 
 UseFlag* use_new(char* name, use_t status, use_priority_t priority) {
@@ -179,7 +169,6 @@ UseFlag* use_new(char* name, use_t status, use_priority_t priority) {
 	out->name = strdup(name);
 	out->status = status;
 	out->priority = priority;
-	out->reason = NULL;
 	
 	return out;
 }

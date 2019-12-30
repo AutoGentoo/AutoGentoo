@@ -32,10 +32,6 @@ add_library(autogentoo SHARED
         ${worker_SOURCES}
 )
 
-add_library(hacksawpp SHARED
-        hacksawpp/Vector.cpp hacksawpp/Vector.h
-        hacksawpp/Set.cpp hacksawpp/Set.h)
-
 add_library(hacksaw SHARED
         ${hacksaw_HEADERS}
         ${hacksaw_SRC}

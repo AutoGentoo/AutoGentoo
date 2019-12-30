@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-dependency_t ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* installed_ebuild) {
+action_t ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* installed_ebuild) {
 	int cmp_slot = 0;
 	int cmp_slot_sub = 0;
 	int cmp = 0;

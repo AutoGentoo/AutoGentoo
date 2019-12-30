@@ -8,7 +8,7 @@
 #include <autogentoo/hacksaw/vector.h>
 #include "constants.h"
 #include "atom.h"
-#include "deprecated/resolve.h"
+#include "dep_graph/resolved_package.h"
 
 struct __InstalledBacktrack {
 	InstalledEbuild* required_by;

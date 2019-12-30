@@ -9,7 +9,6 @@
 #include "portage.h"
 #include "package.h"
 #include "directory.h"
-#include "deprecated/resolve.h"
 
 struct __InstalledEbuild {
 	InstalledPackage* parent;
@@ -63,7 +62,7 @@ PortageDB* portagedb_read(Emerge* emerge);
 void portagedb_free(PortageDB* db);
 void installedebuild_free(InstalledEbuild* ebuild);
 void installedpackage_free(InstalledPackage* pkg);
-dependency_t ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* installed_ebuild);
+action_t ebuild_installedebuild_cmp(Ebuild* ebuild, InstalledEbuild* installed_ebuild);
 int portagedb_ebuild_match(InstalledEbuild* ebuild, P_Atom* atom);
 
 #endif //AUTOGENTOO_DATABASE_H

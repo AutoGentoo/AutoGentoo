@@ -9,6 +9,7 @@
 #include "constants.h"
 #include "atom.h"
 #include "cportage_defines.h"
+#include "dep_graph/resolved_ebuild.h"
 
 struct __PackageUse {
 	P_Atom* atom;
@@ -73,7 +74,7 @@ void use_free(UseFlag* head);
 
 
 RequiredUse* use_build_required_use(char* target, use_t option);
-int ebuild_check_required_use(RequiredUse* ru);
+int ebuild_check_required_use(ResolvedEbuild* ebuild);
 void requireduse_free(RequiredUse* ptr);
 AtomFlag* dependency_useflag(Ebuild* resolved, AtomFlag* new_flags, AtomFlag* old_flags);
 

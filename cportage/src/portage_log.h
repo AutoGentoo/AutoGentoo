@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <sys/time.h>   // for gettimeofday()
 #include "constants.h"
+#include "dep_graph/resolved_ebuild.h"
 
 #define LOG_TARGET stdout;
 

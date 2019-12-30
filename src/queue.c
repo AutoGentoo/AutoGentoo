@@ -7,12 +7,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <autogentoo/request.h>
 
 int prv_handle_item (void* dest, void* data, char type, size_t item_size, void* end);
 
-Queue* queue_new (queue_t type, char* template, ...) {
-	Queue* out = malloc (sizeof (Queue));
+WorkerQueue* queue_new (queue_t type, char* template, ...) {
+	WorkerQueue* out = malloc (sizeof (WorkerQueue));
 	out->type = type;
 	out->template = strdup (template);
 	out->size = 0;
@@ -21,7 +20,7 @@ Queue* queue_new (queue_t type, char* template, ...) {
 	va_start (args, template);
 	
 	//out->args = malloc (get_item_size (template));
-	size_t offset = 0;
+	//size_t offset = 0;
 	/*
 	for (char* i = template; *i; i++) {
 		if (*i == 'i')
@@ -35,22 +34,22 @@ Queue* queue_new (queue_t type, char* template, ...) {
 	return out;
 }
 
-Queue** queue_find_end (Queue* q) {
-	Queue* end = q;
+WorkerQueue** queue_find_end (WorkerQueue* q) {
+	WorkerQueue* end = q;
 	while (end->last)
 		end = end->last;
 	return &(end->last);
 }
 
-Queue* queue_add (WorkerParent* dest, Queue* src) {
+WorkerQueue* queue_add (WorkerParent* dest, WorkerQueue* src) {
 	dest->tail->last = src;
 	dest->tail = src;
 	
 	return src;
 }
 
-Queue* queue_shrink (Queue* q) {
-	Queue* out = q->last;
+WorkerQueue* queue_shrink (WorkerQueue* q) {
+	WorkerQueue* out = q->last;
 	q->last = NULL;
 	return out;
 }
@@ -68,7 +67,7 @@ void prv_write_template (char* t, void* ptr, int fd) {
 	}
 }
 
-void queue_write (Queue* q, int fd) {
+void queue_write (WorkerQueue* q, int fd) {
 	while (q) {
 		write (fd, &q->type, sizeof (int));
 		write (fd, q->template, strlen (q->template));
@@ -80,15 +79,15 @@ void queue_write (Queue* q, int fd) {
 	write (fd, &k, sizeof (int));
 }
 
-Queue* queue_free_single (Queue* q) {
+WorkerQueue* queue_free_single (WorkerQueue* q) {
 	free (q->args);
 	free (q->template);
-	Queue* out = q->last;
+	WorkerQueue* out = q->last;
 	free (q);
 	
 	return out;
 }
-void queue_free (Queue* head) {
+void queue_free (WorkerQueue* head) {
 	while (head)
 		head = queue_free_single (head);
 }

@@ -14,6 +14,8 @@ set(hacksaw_SRC
         hacksaw/util.c
         hacksaw/getopt.c
         hacksaw/set.c
+        hacksaw/stack.c
+        hacksaw/queue.c
         )
 
 set(hacksaw_HEADERS
@@ -29,5 +31,7 @@ set(hacksaw_HEADERS
         include/autogentoo/hacksaw/util.h
         include/autogentoo/hacksaw/getopt.h
         include/autogentoo/hacksaw/set.h
+        include/autogentoo/hacksaw/stack.h
+        include/autogentoo/hacksaw/queue.h
         )
 

@@ -26,7 +26,7 @@ target_link_libraries(cportage hacksaw)
 
 add_executable(cportage-exec
         src/cemerge.c
-        src/dep_graph/resolved_ebuild.c src/dep_graph/resolved_ebuild.h)
+        src/dep_graph/resolved_ebuild.c src/dep_graph/resolved_ebuild.h src/dep_graph/resolve_request.c src/dep_graph/resolve_request.h src/dep_graph/resolved_slot.c src/dep_graph/resolved_slot.h src/dep_graph/resolved_package.c src/dep_graph/resolved_package.h)
 
 target_link_libraries(cportage-exec
         cportage

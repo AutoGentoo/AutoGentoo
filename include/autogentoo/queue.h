@@ -5,7 +5,7 @@
 #ifndef AUTOGENTOO_QUEUE_H
 #define AUTOGENTOO_QUEUE_H
 
-typedef struct __Queue Queue;
+typedef struct __WorkerQueue WorkerQueue;
 typedef struct __WorkerParent WorkerParent;
 
 #include <stdio.h>
@@ -17,26 +17,26 @@ typedef enum {
 	QUEUE_MAKECONF
 } queue_t;
 
-struct __Queue {
+struct __WorkerQueue {
 	queue_t type;
 	char* template;
 	void* args;
 	size_t size;
-	Queue* last;
+	WorkerQueue* last;
 };
 
 struct __WorkerParent {
-	Queue* head;
-	Queue* tail;
+	WorkerQueue* head;
+	WorkerQueue* tail;
 	pid_t proc_id;
 };
 
-Queue* queue_new (queue_t type, char* template, ...);
-Queue** queue_find_end (Queue* q);
-Queue* queue_add (WorkerParent* dest, Queue* src);
-Queue* queue_shrink (Queue* q);
-void queue_write (Queue* q, int fd);
-Queue* queue_free_single (Queue* q);
-void queue_free (Queue* head);
+WorkerQueue* queue_new (queue_t type, char* template, ...);
+WorkerQueue** queue_find_end (WorkerQueue* q);
+WorkerQueue* queue_add (WorkerParent* dest, WorkerQueue* src);
+WorkerQueue* queue_shrink (WorkerQueue* q);
+void queue_write (WorkerQueue* q, int fd);
+WorkerQueue* queue_free_single (WorkerQueue* q);
+void queue_free (WorkerQueue* head);
 
 #endif //AUTOGENTOO_QUEUE_H

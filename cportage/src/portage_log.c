@@ -12,7 +12,6 @@
 #include <autogentoo/hacksaw/log.h>
 #include <autogentoo/hacksaw/hacksaw.h>
 #include "constants.h"
-#include "deprecated/dependency.h"
 #include "package.h"
 #include "database.h"
 
@@ -143,10 +142,10 @@ void resolved_ebuild_print(Emerge* em, ResolvedEbuild* se) {
 	else
 		printf(" ");
 	
-	printf(" ] %s", se->ebuild->ebuild_key);
+	printf(" ] %s", se->target->ebuild_key);
 	
 	printf(" ");
-	for (UseFlag* use = se->useflags; use; use = use->next) {
+	for (UseFlag* use = se->use; use; use = use->next) {
 		UseFlag* ebuild_use = NULL;
 		use_t ebuild_use_status = USE_NONE;
 		
