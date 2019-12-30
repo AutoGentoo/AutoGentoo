@@ -14,6 +14,7 @@
 #include "emerge.h"
 #include "package.h"
 #include "directory.h"
+#include "compress.h"
 #include <openssl/evp.h>
 
 int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm) {
@@ -63,6 +64,8 @@ Repository* repository_new() {
 	Repository* out = malloc(sizeof(Repository));
 	
 	out->packages = map_new(65536, 0.8);
+	out->categories = vector_new(VECTOR_REMOVE | VECTOR_ORDERED);
+	out->categories_names = string_vector_new();
 	out->location = NULL;
 	out->next = NULL;
 	
@@ -264,17 +267,12 @@ void repository_free(Repository* repo) {
 			free(curr->sync_rsync_extra_opts);
 		}
 		
-		if (curr->category_manifests) {
-			for (i = 0; i < curr->category_manifests->n; i++) {
-				Manifest* cat_man = (Manifest*)vector_get(curr->category_manifests, i);
-				for (int j = 0; j < cat_man->parsed->n; j++) {
-					Manifest* atom_man = (Manifest*)vector_get(cat_man->parsed, j);
-					manifest_free(atom_man);
-				}
-				vector_free(cat_man->parsed);
-				manifest_free(cat_man);
+		if (curr->categories) {
+			for (i = 0; i < curr->categories->n; i++) {
+				StringVector* cat = (StringVector*)vector_get(curr->categories, i);
+				string_vector_free(cat);
 			}
-			vector_free(curr->category_manifests);
+			vector_free(curr->categories);
 		}
 		
 		if (curr->packages)
@@ -284,4 +282,77 @@ void repository_free(Repository* repo) {
 		curr = next;
 	}
 	
+}
+
+StringVector* prv_repository_category_init(Repository* repo, char* category) {
+	char* manifest_path;
+	asprintf(&manifest_path, "%s/%s/Manifest.gz", repo->location, category);
+	FILE* fp = fread_archive(manifest_path);
+	
+	if (!fp) {
+		plog_error("Failed to open category manifest %s", manifest_path);
+		free(manifest_path);
+		return NULL;
+	}
+	
+	free(manifest_path);
+	
+	char* line = NULL;
+	size_t line_size = 0;
+	
+	StringVector* out = string_vector_new();
+	
+	while (getline(&line, &line_size, fp) > 0) {
+		char* data_type = strtok(line, " ");
+		if (strcmp(data_type, "MANIFEST") != 0)
+			continue;
+		
+		char* package_name = strtok(NULL, "/");
+		string_vector_add(out, package_name);
+	}
+	
+	free(line);
+	fclose(fp);
+	
+	return out;
+}
+
+int repository_init(Repository* repo) {
+	char* repo_manifest_path = NULL;
+	asprintf(&repo_manifest_path, "%s/profiles/categories", repo->location);
+	
+	FILE* cat_manifest = fopen(repo_manifest_path, "r");
+	free(repo_manifest_path);
+	
+	if (!cat_manifest) {
+		plog_error("Invalid repository location %s", repo->location);
+		return 0;
+	}
+	
+	char* category = NULL;
+	size_t line_size = 0;
+	
+	while (getline(&category, &line_size, cat_manifest) > 0) {
+		category[line_size - 1] = 0; // Remove new line
+		
+		StringVector* cat = prv_repository_category_init(repo, category);
+		if (!cat)
+			return 0;
+		
+		string_vector_add(repo->categories_names, category);
+		vector_add(repo->categories, cat);
+	}
+	
+	free(category);
+	fclose(cat_manifest);
+	
+	for (int i = 0; i < repo->categories->n; i++) {
+		char* category_name = string_vector_get(repo->categories_names, i);
+		StringVector* category_packages = (StringVector*)vector_get(repo->categories, i);
+		
+		for (int j = 0; j < category_packages->n; j++)
+			package_init(repo, category_name, string_vector_get(category_packages, j));
+	}
+	
+	return 1;
 }

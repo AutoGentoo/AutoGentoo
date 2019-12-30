@@ -95,5 +95,6 @@ Profile* profile_new();
 void profile_implicit_use(Profile* update);
 void profile_parse(Profile* update, char* current_path, char* path);
 void profile_free(Profile* ptr);
+void profile_init(Profile* prof);
 
 #endif //AUTOGENTOO_PROFILE_H

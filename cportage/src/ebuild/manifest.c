@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "manifest.h"
-#include "portage_log.h"
-#include "compress.h"
+#include "../portage_log.h"
+#include "../compress.h"
 #include <string.h>
 
 static struct __manifest_type_link_t manifest_type_links[] = {
@@ -68,7 +68,7 @@ Vector* manifest_metadata_parse_fp(FILE* fp, char* dir_path) {
 			return out;
 		}
 		
-		Manifest* temp = malloc(sizeof(Manifest));
+		ManifestEntry* temp = malloc(sizeof(ManifestEntry));
 		temp->type = __type;
 		temp->parsed = NULL;
 		
@@ -99,11 +99,11 @@ Vector* manifest_metadata_parse(char* path) {
 }
 
 void manifest_metadata_deep(Vector* mans) {
-	Manifest* current;
+	ManifestEntry* current;
 	
 	FILE* fp;
 	for (int i = 0; i < mans->n; i++) {
-		current = (Manifest*)vector_get(mans, i);
+		current = (ManifestEntry*)vector_get(mans, i);
 		
 		fp = fread_archive(current->full_path);
 		if (!fp) {
@@ -114,7 +114,7 @@ void manifest_metadata_deep(Vector* mans) {
 	}
 }
 
-void manifest_free(Manifest* ptr) {
+void manifest_entry_free(ManifestEntry* ptr) {
 	free(ptr->filename);
 	free(ptr->parent_dir);
 	free(ptr->full_path);

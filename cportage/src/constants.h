@@ -21,7 +21,7 @@ typedef struct __UseFlag UseFlag;
 typedef struct __PackageUse PackageUse;
 typedef struct __Repository Repository;
 typedef struct __Emerge Emerge;
-typedef struct __Manifest Manifest;
+typedef struct __ManifestEntry ManifestEntry;
 typedef struct __ManifestHash ManifestHash;
 typedef struct __InstalledEbuild InstalledEbuild;
 typedef struct __InstalledPackage InstalledPackage;

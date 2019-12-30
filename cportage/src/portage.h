@@ -8,7 +8,7 @@
 #include <autogentoo/hacksaw/map.h>
 #include <openssl/evp.h>
 #include "constants.h"
-#include "manifest.h"
+#include "ebuild/manifest.h"
 
 struct __Repository {
 	Emerge* parent;
@@ -36,15 +36,19 @@ struct __Repository {
 	
 	int auto_sync; // true
 	
-	Vector* category_manifests;
+	Vector* categories; //!< Vector<StringVector> inner lists are package names (ordered)
+	StringVector* categories_names; //!< list of every category name (ordered)
+	
 	Map* packages;
 	
 	Repository* next;
 };
 
 Repository* emerge_repos_conf(Emerge* emerge);
-
 Repository* repository_new();
+
+int repository_init(Repository* repo);
+
 int portage_get_hash(sha_hash* target, char* path, const EVP_MD* algorithm);
 int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm);
 void repository_free(Repository* repo);

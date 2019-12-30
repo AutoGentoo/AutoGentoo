@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <autogentoo/hacksaw/vector.h>
-#include "constants.h"
+#include "../constants.h"
 
 typedef enum {
 	MANIFEST_IGNORE,
@@ -22,7 +22,7 @@ struct __ManifestHash {
 };
 
 
-struct __Manifest {
+struct __ManifestEntry {
 	char* full_path;
 	char* filename;
 	char* parent_dir;
@@ -40,6 +40,6 @@ struct __manifest_type_link_t {
 Vector* manifest_metadata_parse_fp(FILE* fp, char* dir_path);
 Vector* manifest_metadata_parse(char* path);
 void manifest_metadata_deep(Vector* mans);
-void manifest_free(Manifest* ptr);
+void manifest_entry_free(ManifestEntry* ptr);
 
 #endif //AUTOGENTOO_MANIFEST_H

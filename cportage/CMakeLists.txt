@@ -20,7 +20,7 @@ add_library(cportage SHARED
         ${language_SOURCES}
         src/block.c
         src/block.h
-        )
+        src/ebuild/metadata.c src/ebuild/metadata.h)
 
 target_link_libraries(cportage hacksaw)
 

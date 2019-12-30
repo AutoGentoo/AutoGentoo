@@ -4,7 +4,6 @@ set(include_CPORTAGE
         src/portage.h
         src/portage_log.h
         src/database.h
-        src/manifest.h
         src/compress.h
         src/features.h
         src/use.h
@@ -12,7 +11,6 @@ set(include_CPORTAGE
         src/atom.h
         src/emerge.h
         src/directory.h
-#        src/dependency.h
         src/suggestion.h
         src/cportage_defines.h
         src/globals.h
@@ -20,6 +18,9 @@ set(include_CPORTAGE
         src/conflict.h
         src/sets.h
         src/installed_backtrack.h
+
+
+        src/ebuild/manifest.h
         )
 
 set(src_CPORTAGE
@@ -27,7 +28,6 @@ set(src_CPORTAGE
         src/portage.c
         src/portage_log.c
         src/database.c
-        src/manifest.c
         src/compress.c
         src/features.c
         src/use.c
@@ -35,13 +35,15 @@ set(src_CPORTAGE
         src/atom.c
         src/emerge.c
         src/directory.c
-#        src/dependency.c
         src/suggestion.c
         src/globals.c
         src/profile.c
         src/conflict.c
         src/sets.c
         src/installed_backtrack.c
+
+
+        src/ebuild/manifest.c
         )
 
 set(language_SOURCES

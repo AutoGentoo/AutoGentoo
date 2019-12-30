@@ -4,7 +4,6 @@ find_package(FLEX REQUIRED)
 set(hacksaw_SRC
         hacksaw/conf.c
         hacksaw/debug.c
-        hacksaw/hash.c
         hacksaw/log.c
         hacksaw/map.c
         hacksaw/small_map.c

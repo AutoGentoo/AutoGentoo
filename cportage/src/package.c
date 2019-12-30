@@ -7,7 +7,7 @@
 #include "package.h"
 #include "portage.h"
 #include "portage_log.h"
-#include "manifest.h"
+#include "ebuild/manifest.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,9 +19,13 @@ void package_metadata_init(Ebuild* ebuild) {
 	if (ebuild->metadata_init)
 		return;
 	
-	FILE* fp = fopen(ebuild->atom_manifest->full_path, "r");
+	char* manifest_path = NULL;
+	asprintf(&manifest_path, "%s/Manifest", ebuild->path);
+	
+	FILE* fp = fopen(manifest_path, "r");
+	free(manifest_path);
 	if (!fp) {
-		plog_error("Failed to open %s", ebuild->atom_manifest->full_path);
+		plog_error("Failed to open %s", manifest_path);
 		return;
 	}
 	
@@ -35,8 +39,6 @@ void package_metadata_init(Ebuild* ebuild) {
 	size_t value_size;
 	size_t value_size_n;
 	char* value = NULL;
-	
-	size_t n = 0;
 	
 	while(!feof(fp)) {
 		name_size = getdelim(&name, &name_size_n, '=', fp);
@@ -91,12 +93,9 @@ void package_metadata_init(Ebuild* ebuild) {
 	fclose(fp);
 }
 
-Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man) {
+Ebuild* package_init(Repository* repo, char* category, char* name) {
 	char* parsed_key;
-	char* pcat = strdup(category_man->filename);
-	*strchr(pcat, '/') = 0;
-	asprintf(&parsed_key, "%s/%s", pcat, atom_man->filename);
-	free(pcat);
+	asprintf(&parsed_key, "%s/%s", category, name);
 	
 	P_Atom* atom_parsed = atom_new(parsed_key);
 	if (atom_parsed == NULL)
@@ -119,11 +118,11 @@ Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_ma
 	
 	Ebuild* new_ebuild = malloc(sizeof(Ebuild));
 	new_ebuild->parent = target;
-	new_ebuild->category_manifest = category_man;
-	new_ebuild->atom_manifest = atom_man;
 	new_ebuild->feature_restrict = NULL;
 	new_ebuild->ebuild_key = parsed_key;
 	new_ebuild->metadata_init = 0;
+	new_ebuild->path = NULL;
+	asprintf(&new_ebuild->path, "%s/%s/%s", repo->location, category, name);
 	
 	new_ebuild->category = atom_parsed->category;
 	new_ebuild->pn = atom_parsed->name;

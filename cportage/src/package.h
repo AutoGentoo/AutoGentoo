@@ -26,7 +26,7 @@ struct __Package {
 };
 
 #include "use.h"
-#include "manifest.h"
+#include "ebuild/manifest.h"
 #include "portage_log.h"
 
 /**
@@ -63,10 +63,9 @@ struct __Ebuild {
 	int revision;
 	
 	sha_hash meta_sha512;
-	
-	Manifest* atom_manifest;
-	Manifest* category_manifest;
 	int metadata_init;
+	
+	char* path;
 	
 	Ebuild* older;
 	Ebuild* newer;
@@ -76,7 +75,7 @@ Dependency* dependency_build_atom(P_Atom* atom);
 Dependency* dependency_build_use(char* use_flag, use_t type, Dependency* selector);
 
 void package_metadata_init(Ebuild* ebuild);
-Ebuild* package_init(Repository* repo, Manifest* category_man, Manifest* atom_man);
+Ebuild* package_init(Repository* repo, char* category, char* name);
 
 void package_free(Package* ptr);
 void ebuild_free(Ebuild* ptr);

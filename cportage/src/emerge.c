@@ -36,7 +36,7 @@ Emerge* emerge_new() {
 	out->default_repo = NULL;
 	
 	out->use_suggestions = NULL;
-	out->selected = selected_new();
+	//out->selected = selected_new();
 	
 	
 	return out;
@@ -60,37 +60,12 @@ int emerge (Emerge* emerge) {
 	free(make_conf_path);
 	*/
 	
-	char* metadata_path = NULL;
-	asprintf(&metadata_path, "%s/metadata/md5-cache", emerge->default_repo->location);
-	emerge->default_repo->category_manifests = manifest_metadata_parse(metadata_path);
-	free(metadata_path);
-	if (!emerge->default_repo->category_manifests) {
-		return errno;
-	}
-	
-	manifest_metadata_deep(emerge->default_repo->category_manifests);
-	
-	Manifest* current_cat;
-	Manifest* current_pkg;
-	for (int i = 0; i < emerge->default_repo->category_manifests->n; i++) {
-		current_cat = (Manifest*)vector_get(emerge->default_repo->category_manifests, i);
-		for (int j = 0; j < current_cat->parsed->n; j++) {
-			current_pkg = (Manifest*)vector_get(current_cat->parsed, j);
-			package_init(emerge->default_repo, current_cat, current_pkg);
-		}
-	}
+	if (!repository_init(emerge->default_repo))
+		return 1;
 	
 	/* Initialize the profile */
 	emerge->profile = profile_new();
-	
-	char profile_realpath[1024];
-	size_t profile_len = 0;
-	if ((profile_len = readlink("/etc/portage/make.profile", profile_realpath, sizeof(profile_realpath)-1)) == -1) {
-		portage_die("Failed to read make.profile link");
-	}
-	
-	profile_realpath[profile_len] = 0;
-	profile_parse(emerge->profile, "", profile_realpath);
+	profile_init(emerge->profile);
 	
 	/* Do this before package.use because globals need to be applied to packages on metadata_init()  */
 	emerge->use_expand = use_expand_new(emerge->default_repo);
@@ -123,20 +98,15 @@ int emerge (Emerge* emerge) {
 	for (Dependency* expand_dep = dep; expand_dep; expand_dep = expand_dep->next) {
 		if (expand_dep->atom && strcmp(expand_dep->atom->category, "SEARCH") == 0) {
 			StringVector* valid_categories = string_vector_new();
-			for (int i = 0; i < emerge->default_repo->category_manifests->n; i++) {
-				Manifest* current_cat_search = vector_get(emerge->default_repo->category_manifests, i);
+			for (int i = 0; i < emerge->default_repo->categories->n; i++) {
+				StringVector* current_cat_search = vector_get(emerge->default_repo->categories, i);
 				
-				char* cat_splt = strchr(current_cat_search->filename, '/');
-				*cat_splt = 0;
-				
-				free(expand_dep->atom->key);
-				asprintf(&expand_dep->atom->key, "%s/%s", current_cat_search->filename, expand_dep->atom->name);
-				
-				Package* try_package = package_resolve_atom(emerge, expand_dep->atom);
-				if (try_package)
-					string_vector_add(valid_categories, expand_dep->atom->key);
-				
-				*cat_splt = '/';
+				for (int j = 0; j < current_cat_search->n; j++) {
+					if (strcmp(expand_dep->atom->name, string_vector_get(current_cat_search, j)) == 0) {
+						string_vector_add(valid_categories, string_vector_get(emerge->default_repo->categories_names, i));
+						break; /* Cant have the same package name in one category */
+					}
+				}
 			}
 			
 			if (valid_categories->n == 0)
@@ -156,7 +126,7 @@ int emerge (Emerge* emerge) {
 		}
 	}
 	
-	dependency_resolve(emerge, NULL, dep, emerge->selected->head);
+	//dependency_resolve(emerge, NULL, dep, emerge->selected->head);
 	
 	Suggestion* current = NULL;
 	
@@ -185,7 +155,7 @@ int emerge (Emerge* emerge) {
 	}
 	
 	Vector* selected = vector_new(VECTOR_ORDERED);
-	dependency_build_vector(emerge->selected->head, selected);
+	//dependency_build_vector(emerge->selected->head, selected);
 	
 	int max_width = number_len(selected->n);
 	for (int i = 0; i < selected->n; i++) {
@@ -195,7 +165,7 @@ int emerge (Emerge* emerge) {
 		resolved_ebuild_print(emerge, eb);
 	}
 	
-	selected_free(emerge->selected);
+	//selected_free(emerge->selected);
 	
 	return 0;
 }

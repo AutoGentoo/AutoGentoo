@@ -9,7 +9,7 @@
 #include <autogentoo/hacksaw/getopt.h>
 #include "portage.h"
 #include "portage_log.h"
-#include "manifest.h"
+#include "ebuild/manifest.h"
 #include "emerge.h"
 #include "database.h"
 #include <string.h>

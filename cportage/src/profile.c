@@ -198,6 +198,17 @@ Profile* profile_new() {
 	out->package_provided = NULL;
 }
 
+void profile_init(Profile* prof) {
+	char profile_realpath[1024];
+	size_t profile_len = 0;
+	if ((profile_len = readlink("/etc/portage/make.profile", profile_realpath, sizeof(profile_realpath)-1)) == -1) {
+		portage_die("Failed to read make.profile link");
+	}
+	
+	profile_realpath[profile_len] = 0;
+	profile_parse(prof, "", profile_realpath);
+}
+
 void profile_implicit_use(Profile* update) {
 	/*
 	 * IUSE_IMPLICIT="prefix prefix-guest"
