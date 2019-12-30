@@ -16,22 +16,11 @@ struct __PackageUse {
 	keyword_t keyword_required; // At least this keyword must be present to apply (package.use.stable)
 };
 
-struct __UseReason {
-	AtomFlag* flag;
-	SelectedBy* selected_by;
-	
-	UseReason* next;
-};
-
 struct __UseFlag {
 	char* name;
 	use_t status; // Only USE_DISABLE and USE_ENABLE
 	use_priority_t priority;
 	UseFlag* next;
-	
-	/* DANGER ZONE DO NOT ACCESS */
-	/* Only use this when we need use backtracking */
-	UseReason* reason;
 };
 
 struct __RequiredUse {
@@ -84,8 +73,7 @@ void use_free(UseFlag* head);
 
 
 RequiredUse* use_build_required_use(char* target, use_t option);
-int ebuild_check_required_use(ResolvedEbuild* ebuild);
-UseReason* use_reason_new(AtomFlag* flag, SelectedBy* selected_by);
+int ebuild_check_required_use(RequiredUse* ru);
 void requireduse_free(RequiredUse* ptr);
 AtomFlag* dependency_useflag(Ebuild* resolved, AtomFlag* new_flags, AtomFlag* old_flags);
 

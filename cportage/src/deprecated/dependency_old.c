@@ -3,12 +3,12 @@
 //
 
 #include "dependency_old.h"
-#include "package.h"
-#include "portage.h"
-#include "database.h"
-#include "suggestion.h"
-#include "conflict.h"
-#include "installed_backtrack.h"
+#include "../package.h"
+#include "../portage.h"
+#include "../database.h"
+#include "../suggestion.h"
+#include "../conflict.h"
+#include "../installed_backtrack.h"
 #include <string.h>
 #include <autogentoo/hacksaw/hacksaw.h>
 #include <autogentoo/hacksaw/set.h>

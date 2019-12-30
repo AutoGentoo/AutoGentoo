@@ -18,13 +18,15 @@ add_library(cportage SHARED
         ${language_BIN}
         ${language_PARSER}
         ${language_SOURCES}
-        src/dependency.c src/dependency.h src/resolve.c src/resolve.h src/selected.c src/selected.h src/block.c src/block.h src/selection_request.c src/selection_request.h src/ResolvedPackage.cpp src/ResolvedPackage.h src/ResolveRequest.cpp src/ResolveRequest.h src/ResolvedEbuild.h)
+        src/block.c
+        src/block.h
+        )
 
 target_link_libraries(cportage hacksaw)
 
 add_executable(cportage-exec
         src/cemerge.c
-        )
+        src/dep_graph/resolved_ebuild.c src/dep_graph/resolved_ebuild.h)
 
 target_link_libraries(cportage-exec
         cportage

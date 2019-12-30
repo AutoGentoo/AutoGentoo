@@ -6,8 +6,8 @@
 #define AUTOGENTOO_DEP_V4_H
 
 #include <autogentoo/hacksaw/vector.h>
-#include "atom.h"
-#include "constants.h"
+#include "../atom.h"
+#include "../constants.h"
 #include "resolve.h"
 
 typedef enum {

@@ -4,7 +4,7 @@
 
 #include "installed_backtrack.h"
 #include "database.h"
-#include "dependency.h"
+#include "deprecated/dependency.h"
 #include <string.h>
 #include <errno.h>
 

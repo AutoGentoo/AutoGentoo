@@ -9,7 +9,7 @@
 #include "portage.h"
 #include "package.h"
 #include "directory.h"
-#include "resolve.h"
+#include "deprecated/resolve.h"
 
 struct __InstalledEbuild {
 	InstalledPackage* parent;

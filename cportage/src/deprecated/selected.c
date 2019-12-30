@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "selected.h"
-#include "package.h"
+#include "../package.h"
 #include <autogentoo/hacksaw/set.h>
 #include <string.h>
 

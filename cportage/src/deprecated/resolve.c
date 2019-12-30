@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "resolve.h"
-#include "package.h"
-#include "database.h"
-#include "conflict.h"
+#include "../package.h"
+#include "../database.h"
+#include "../conflict.h"
 #include <string.h>
 #include <assert.h>
-#include "suggestion.h"
+#include "../suggestion.h"
 #include "selected.h"
 
 int pd_compare_range(int cmp, atom_version_t range) {

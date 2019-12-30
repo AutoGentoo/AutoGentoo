@@ -7,8 +7,8 @@
 
 #include <autogentoo/hacksaw/vector.h>
 #include <autogentoo/hacksaw/hacksaw.h>
-#include "constants.h"
-#include "atom.h"
+#include "../constants.h"
+#include "../atom.h"
 
 struct __SelectedEbuild {
 	/* Next and depends not relevant */

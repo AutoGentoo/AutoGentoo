@@ -7,11 +7,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "dependency.h"
-#include "package.h"
-#include "database.h"
-#include "conflict.h"
-#include "suggestion.h"
-#include "installed_backtrack.h"
+#include "../package.h"
+#include "../database.h"
+#include "../conflict.h"
+#include "../suggestion.h"
+#include "../installed_backtrack.h"
 #include "selected.h"
 #include <string.h>
 #include <errno.h>

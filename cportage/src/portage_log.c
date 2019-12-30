@@ -12,7 +12,7 @@
 #include <autogentoo/hacksaw/log.h>
 #include <autogentoo/hacksaw/hacksaw.h>
 #include "constants.h"
-#include "dependency.h"
+#include "deprecated/dependency.h"
 #include "package.h"
 #include "database.h"
 

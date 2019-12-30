@@ -7,7 +7,7 @@
 
 #include <autogentoo/hacksaw/vector.h>
 #include <autogentoo/hacksaw/set.h>
-#include "atom.h"
+#include "../atom.h"
 
 typedef struct __ResolvedEbuild ResolvedEbuild;
 typedef struct __ResolvedPackage ResolvedPackage;

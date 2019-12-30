@@ -13,10 +13,10 @@
 #include "portage.h"
 #include "globals.h"
 #include "suggestion.h"
-#include "resolve.h"
-#include "dependency.h"
+#include "deprecated/resolve.h"
+#include "deprecated/dependency.h"
 #include <unistd.h>
-#include "selected.h"
+#include "deprecated/selected.h"
 
 int number_len(int num) {
 	char out[32];

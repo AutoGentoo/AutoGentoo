@@ -1,0 +1,11 @@
+//
+// Created by atuser on 12/29/19.
+//
+
+#ifndef AUTOGENTOO_RESOLVED_EBUILD_H
+#define AUTOGENTOO_RESOLVED_EBUILD_H
+
+
+
+
+#endif //AUTOGENTOO_RESOLVED_EBUILD_H
