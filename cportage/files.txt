@@ -19,6 +19,15 @@ set(include_CPORTAGE
         src/sets.h
         src/installed_backtrack.h
 
+        src/dep_graph/resolved_ebuild.c
+        src/dep_graph/resolved_ebuild.h
+        src/dep_graph/resolve_request.c
+        src/dep_graph/resolve_request.h
+        src/dep_graph/resolved_slot.c
+        src/dep_graph/resolved_slot.h
+        src/dep_graph/resolved_package.c
+        src/dep_graph/resolved_package.h
+
 
         src/ebuild/manifest.h
         )

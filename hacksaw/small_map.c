@@ -2,7 +2,6 @@
 // Created by atuser on 11/22/17.
 //
 
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "hacksaw/hacksaw.h"
@@ -90,4 +89,9 @@ void* small_map_get_index(SmallMap* smap, int index) {
 
 void* small_map_get_key_index(SmallMap* smap, int index) {
 	return ((SmallMap_key*) vector_get(smap, index))->key;
+}
+
+void small_map_foreach(SmallMap* smap, void (*f)(void*)) {
+	for (int i = 0; i < smap->n; i++)
+		f(small_map_get_index(smap, i));
 }

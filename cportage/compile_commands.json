@@ -1,137 +1,147 @@
 [
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc  -I/home/atuser/git/AutoGentoo/cportage/src/language  -g   -o CMakeFiles/cportage-exec.dir/src/cemerge.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/cemerge.c",
-  "file": "/home/atuser/git/AutoGentoo/cportage/src/cemerge.c"
-},
-{
-  "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/package.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/package.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/package.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/package.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/package.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/portage.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/portage.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/portage.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/portage.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/portage.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/portage_log.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/portage_log.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/portage_log.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/portage_log.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/portage_log.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/database.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/database.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/database.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/database.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/database.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/manifest.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/manifest.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/manifest.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/manifest.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/manifest.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/compress.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/compress.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/compress.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/compress.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/compress.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/features.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/features.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/features.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/features.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/features.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/use.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/use.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/use.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/use.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/use.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/keywords.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/keywords.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/keywords.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/keywords.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/keywords.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/atom.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/atom.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/atom.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/atom.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/atom.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/emerge.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/emerge.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/emerge.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/emerge.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/emerge.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/directory.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/directory.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/directory.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/directory.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/directory.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/suggestion.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/suggestion.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/suggestion.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/suggestion.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/suggestion.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/globals.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/globals.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/globals.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/globals.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/globals.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/profile.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/profile.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/profile.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/profile.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/profile.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/conflict.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/conflict.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/conflict.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/conflict.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/conflict.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/sets.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/sets.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/sets.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/sets.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/sets.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/installed_backtrack.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/installed_backtrack.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/src/installed_backtrack.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/installed_backtrack.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/src/installed_backtrack.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/lang/depend.tab.c.o   -c /home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/depend.tab.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/lang/depend.tab.c.o   -c /home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/depend.tab.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/depend.tab.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/lang/depend.flex.c.o   -c /home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/depend.flex.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/lang/depend.flex.c.o   -c /home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/depend.flex.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/depend.flex.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/lang/make_conf.tab.c.o   -c /home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/make_conf.tab.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/lang/make_conf.tab.c.o   -c /home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/make_conf.tab.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/make_conf.tab.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/lang/make_conf.flex.c.o   -c /home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/make_conf.flex.c",
+  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp  -fPIC   -o CMakeFiles/cportage.dir/lang/make_conf.flex.c.o   -c /home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/make_conf.flex.c",
   "file": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug/lang/make_conf.flex.c"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/dependency.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/dependency.c",
-  "file": "/home/atuser/git/AutoGentoo/cportage/src/dependency.c"
+  "command": "/usr/bin/c++   -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp    -std=gnu++17 -o CMakeFiles/hacksawpp.dir/hacksawpp/Vector.cpp.o -c /home/atuser/git/AutoGentoo/cportage/hacksawpp/Vector.cpp",
+  "file": "/home/atuser/git/AutoGentoo/cportage/hacksawpp/Vector.cpp"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/resolve.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/resolve.c",
-  "file": "/home/atuser/git/AutoGentoo/cportage/src/resolve.c"
+  "command": "/usr/bin/c++   -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp    -std=gnu++17 -o CMakeFiles/hacksawpp.dir/hacksawpp/Stack.cpp.o -c /home/atuser/git/AutoGentoo/cportage/hacksawpp/Stack.cpp",
+  "file": "/home/atuser/git/AutoGentoo/cportage/hacksawpp/Stack.cpp"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/selected.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/selected.c",
-  "file": "/home/atuser/git/AutoGentoo/cportage/src/selected.c"
+  "command": "/usr/bin/c++   -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp    -Wno-write-strings -std=gnu++17 -o CMakeFiles/cportage-exec.dir/src/ResolvedPackage.cpp.o -c /home/atuser/git/AutoGentoo/cportage/src/ResolvedPackage.cpp",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/ResolvedPackage.cpp"
 },
 {
   "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
-  "command": "/usr/bin/cc -Dcportage_EXPORTS -I/home/atuser/git/AutoGentoo/cportage/src/language  -g -fPIC   -o CMakeFiles/cportage.dir/src/block.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/block.c",
-  "file": "/home/atuser/git/AutoGentoo/cportage/src/block.c"
+  "command": "/usr/bin/c++   -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp    -Wno-write-strings -std=gnu++17 -o CMakeFiles/cportage-exec.dir/src/ResolveRequest.cpp.o -c /home/atuser/git/AutoGentoo/cportage/src/ResolveRequest.cpp",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/ResolveRequest.cpp"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
+  "command": "/usr/bin/c++   -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp    -Wno-write-strings -std=gnu++17 -o CMakeFiles/cportage-exec.dir/src/ResolveAtom.cpp.o -c /home/atuser/git/AutoGentoo/cportage/src/ResolveAtom.cpp",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/ResolveAtom.cpp"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
+  "command": "/usr/bin/c++   -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp    -Wno-write-strings -std=gnu++17 -o CMakeFiles/cportage-exec.dir/src/_ResolvedEbuild.cpp.o -c /home/atuser/git/AutoGentoo/cportage/src/_ResolvedEbuild.cpp",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/_ResolvedEbuild.cpp"
+},
+{
+  "directory": "/home/atuser/git/AutoGentoo/cportage/cmake-build-debug",
+  "command": "/usr/bin/cc  -I/home/atuser/git/AutoGentoo/cportage/src/language -I/home/atuser/git/AutoGentoo/cportage/../include -I/home/atuser/git/AutoGentoo/cportage/hacksawpp    -Wno-write-strings -o CMakeFiles/cportage-exec.dir/src/cemerge.c.o   -c /home/atuser/git/AutoGentoo/cportage/src/cemerge.c",
+  "file": "/home/atuser/git/AutoGentoo/cportage/src/cemerge.c"
 }
 ]

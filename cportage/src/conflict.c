@@ -29,7 +29,7 @@ inline void conflict_use_check(UseFlag* use1, UseFlag* use2, UseFlag** conflict1
 }
 
 Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
-	if (!conflict_prev->reason->selected_by)
+	/*if (!conflict_prev->reason->selected_by)
 		return NULL;
 	
 	Suggestion* out = NULL;
@@ -37,31 +37,31 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 	*(strchr(atom_str, ' ')) = 0;
 	
 	for (UseReason* current_reason = conflict_prev->reason; current_reason; current_reason = current_reason->next) {
-		/**
+		*//**
 			ATOM_USE_DISABLE, //!< atom[-bar]
 			ATOM_USE_ENABLE, //!< atom[bar]
 			ATOM_USE_ENABLE_IF_ON, //!< atom[bar?]
 			ATOM_USE_DISABLE_IF_OFF, //!< atom[!bar?]
 			ATOM_USE_EQUAL, //!< atom[bar=]
 			ATOM_USE_OPPOSITE //!< atom[!bar=]
-		 */
+		 *//*
 		
 		UseFlag* explicit_search = NULL;
 		char* suggest_flag_name = NULL;
 		use_t set_to = target_val;
 		UseFlag* useflag_search = NULL;
 		
-		/* This use flag set is not conditional
+		*//* This use flag set is not conditional
 		 * Must have been selected by a parent depend line
 		 * If no parent depend line, we try to stop this package from being pulled in
-		*/
+		*//*
 		if (current_reason->flag->option == ATOM_USE_DISABLE || current_reason->flag->option == ATOM_USE_ENABLE) {
-			/* use? ( expr ) */
+			*//* use? ( expr ) *//*
 			Dependency* parent_dependency = current_reason->selected_by->selected_by;
 			if (!parent_dependency) {
-				/* We could technically backtrack more
+				*//* We could technically backtrack more
 				 * Not going to implement this for now
-				 * */
+				 * *//*
 				return NULL;
 			}
 			
@@ -75,13 +75,13 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 			suggest_flag_name = parent_dependency->target;
 		}
 		else if (current_reason->flag->option == ATOM_USE_ENABLE_IF_ON) {
-			/* depend[use?] */
+			*//* depend[use?] *//*
 			suggest_flag_name = conflict_prev->name;
 			explicit_search = rp_current(current_reason->selected_by->parent)->explicit_flags;
 			useflag_search = rp_current(conflict_prev->reason->selected_by->parent)->useflags;
 		}
 		else if (current_reason->flag->option == ATOM_USE_DISABLE_IF_OFF) {
-			/* depend[use?] */
+			*//* depend[use?] *//*
 			suggest_flag_name = conflict_prev->name;
 			explicit_search = rp_current(current_reason->selected_by->parent)->explicit_flags;
 			useflag_search = rp_current(current_reason->selected_by->parent)->useflags;
@@ -91,7 +91,7 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 			suggest_flag_name = conflict_prev->name;
 		}
 		else if (current_reason->flag->option == ATOM_USE_OPPOSITE) {
-			/* Use this to reverse the value */
+			*//* Use this to reverse the value *//*
 			set_to = conflict_prev->status;
 			useflag_search = explicit_search = rp_current(current_reason->selected_by->parent)->useflags;
 			suggest_flag_name = conflict_prev->name;
@@ -106,7 +106,7 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 		if (!target_flag) {
 			UseFlag* non_explicit = use_get(useflag_search, suggest_flag_name);
 			if (non_explicit && non_explicit->priority == PRIORITY_FORCE) {
-				/* We cannot change this flag */
+				*//* We cannot change this flag *//*
 				suggestion_free(out);
 				return NULL;
 			}
@@ -115,7 +115,7 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 			Suggestion* remove_buf = suggestion_new(atom_str, ">=%s %s%s", rp_current(conflict_prev->reason->selected_by->parent)->ebuild->ebuild_key, set_to == USE_ENABLE ? "" : "-", suggest_flag_name);
 			remove_buf->next = out;
 			out = remove_buf;
-			continue; /* Go to next error */
+			continue; *//* Go to next error *//*
 		}
 		
 		Suggestion* buf = conflict_use_resolve(target_flag, set_to);
@@ -128,8 +128,9 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 		buf->next = out;
 		out = buf;
 	}
-	
 	return out;
+	*/
+	return NULL;
 }
 
 void suggestion_free(Suggestion* s) {

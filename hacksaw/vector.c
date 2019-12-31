@@ -100,3 +100,8 @@ void vector_free(Vector* vec) {
 	free(vec->ptr);
 	free(vec);
 }
+
+void vector_foreach(Vector* vec, void (*f)(void*)) {
+	for (int i = 0; i < vec->n; i++)
+		f(vector_get(vec, i));
+}

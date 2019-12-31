@@ -4,13 +4,12 @@
 
 #include "installed_backtrack.h"
 #include "database.h"
-#include "deprecated/dependency.h"
 #include <string.h>
 #include <errno.h>
 
 void installed_backtrack_rebuild(Emerge* em, ResolvedPackage* se) {
-	if (!se->current_slot->current->installed)
-		return; /* No need to rebuilt, no one has this as a dep */
+/*	if (!se->current_slot->current->installed)
+		return; *//* No need to rebuilt, no one has this as a dep *//*
 	
 	for (int i = 0; i < se->current_slot->current->installed->rebuild_depend->n; i++) {
 		RebuildEbuild* current_rebuild = vector_get(se->current_slot->current->installed->rebuild_depend, i);
@@ -25,7 +24,7 @@ void installed_backtrack_rebuild(Emerge* em, ResolvedPackage* se) {
 		installed_slot = se->current_slot->current->installed->sub_slot;
 		new_slot = se->current_slot->current->ebuild->sub_slot;
 		
-		/* If one subslot is NULL and the other is not */
+		*//* If one subslot is NULL and the other is not *//*
 		if ((!new_slot || !installed_slot) && new_slot != installed_slot) {
 			plog_error("new_slot is %s while installed_slot is %s", se->current_slot->current->ebuild->slot, installed_slot);
 			portage_die("Ebuilds subslot is NULL");
@@ -35,7 +34,7 @@ void installed_backtrack_rebuild(Emerge* em, ResolvedPackage* se) {
 			continue;
 		
 		//ResolvedPackage* se_rebuild = dependency_resolve_ebuild(em, se, current_rebuild->selector);
-	}
+	}*/
 }
 
 Dependency* prv_installed_backtrack_check_dep(PortageDB* db, Dependency* dep) {

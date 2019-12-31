@@ -44,4 +44,6 @@ void* vector_get(Vector* vec, int i);
 
 void vector_free(Vector* vec);
 
+void vector_foreach(Vector* vec, void (*f)(void*));
+
 #endif //HACKSAW_VECTOR_H

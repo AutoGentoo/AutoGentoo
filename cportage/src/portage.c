@@ -15,6 +15,7 @@
 #include "package.h"
 #include "directory.h"
 #include "compress.h"
+#include "cache.h"
 #include <openssl/evp.h>
 
 int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm) {
@@ -350,8 +351,12 @@ int repository_init(Repository* repo) {
 		char* category_name = string_vector_get(repo->categories_names, i);
 		StringVector* category_packages = (StringVector*)vector_get(repo->categories, i);
 		
-		for (int j = 0; j < category_packages->n; j++)
-			package_init(repo, category_name, string_vector_get(category_packages, j));
+		for (int j = 0; j < category_packages->n; j++) {
+			Ebuild* current = package_init(repo, category_name, string_vector_get(category_packages, j));
+			
+			if (repo->parent->options & EMERGE_CACHE)
+				cache_generate(current);
+		}
 	}
 	
 	return 1;

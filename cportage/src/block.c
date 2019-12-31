@@ -3,9 +3,10 @@
 //
 
 #include "block.h"
+#include "dep_graph/cmp.h"
 
 int resolved_ebuild_blocked(ResolvedEbuild* e, P_Atom* block_atom, UseFlag* use) {
-	if (!ebuild_match_atom(e->ebuild, block_atom))
+	if (!ebuild_match_atom(e->target, block_atom))
 		return 0;
 	
 	AtomFlag* af = NULL;

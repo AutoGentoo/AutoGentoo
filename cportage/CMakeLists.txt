@@ -20,13 +20,16 @@ add_library(cportage SHARED
         ${language_SOURCES}
         src/block.c
         src/block.h
-        src/ebuild/metadata.c src/ebuild/metadata.h)
+        src/ebuild/metadata.c
+        src/ebuild/metadata.h
+        src/cache.c
+        src/cache.h src/dep_graph/cmp.c src/dep_graph/cmp.h)
 
 target_link_libraries(cportage hacksaw)
 
 add_executable(cportage-exec
-        src/cemerge.c
-        src/dep_graph/resolved_ebuild.c src/dep_graph/resolved_ebuild.h src/dep_graph/resolve_request.c src/dep_graph/resolve_request.h src/dep_graph/resolved_slot.c src/dep_graph/resolved_slot.h src/dep_graph/resolved_package.c src/dep_graph/resolved_package.h)
+        src/main.c
+        )
 
 target_link_libraries(cportage-exec
         cportage

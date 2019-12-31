@@ -43,4 +43,6 @@ void* small_map_get_index(SmallMap* smap, int index);
 
 void* small_map_get_key_index(SmallMap* smap, int index);
 
+void small_map_foreach(SmallMap* smap, void (*f)(void*));
+
 #endif

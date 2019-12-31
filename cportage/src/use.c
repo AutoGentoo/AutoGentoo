@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include "language/share.h"
 #include <ctype.h>
+#include "dep_graph/cmp.h"
 
 use_t use_set(UseFlag* head, char* use_search, use_t new_val, use_priority_t priority) {
 	UseFlag* target = use_get(head, use_search);

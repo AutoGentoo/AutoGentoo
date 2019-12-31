@@ -5,7 +5,6 @@
 #ifndef CPORTAGE_BLOCK_H
 #define CPORTAGE_BLOCK_H
 
-#include "deprecated/resolve.h"
 #include "use.h"
 #include "portage_log.h"
 

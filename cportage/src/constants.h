@@ -5,13 +5,30 @@
 #ifndef AUTOGENTOO_CONSTANTS_H
 #define AUTOGENTOO_CONSTANTS_H
 
-#define FILEDIR "${PORTDIR}/${CATEGORY}/${PN}/FILES"
-#define WORKDIR "${PORTAGE_BUILDDIR}/WORK"
-#define T "${PORTAGE_BUILDDIR}/TEMP"
-#define D "${PORTAGE_BUILDDIR}/IMAGE"
-#define HOME "${PORTAGE_BUILDDIR}/HOMEDIR"
+#define FILEDIR "${PORTDIR}/${CATEGORY}/${PN}/files"
+
+#define WORKDIR "${PORTAGE_BUILDDIR}/work"
+#define T "${PORTAGE_BUILDDIR}/temp"
+#define D "${PORTAGE_BUILDDIR}/image"
+#define HOME "${PORTAGE_BUILDDIR}/homedir"
 #define DEFAULT_ROOT "/"
 #define DEFAULT_DISTDIR "/usr/portage/distfiles/"
+
+#ifndef PORTAGE_BIN_PATH
+#define PORTAGE_BIN_PATH "/usr/lib/cportage/bin"
+#endif
+
+#ifndef PORTAGE_BUILDDIR
+#define PORTAGE_BUILDDIR "/var/tmp/portage"
+#endif
+
+#ifndef PORTAGE_CACHE_OFFSET
+#define PORTAGE_CACHE_OFFSET "metadata/cportage-cache"
+#endif
+
+#ifndef PORTAGE_TMP_DIR
+#define PORTAGE_TMP_DIR ""
+#endif
 
 typedef unsigned char* sha_hash;
 typedef struct __Package Package;
@@ -23,6 +40,7 @@ typedef struct __Repository Repository;
 typedef struct __Emerge Emerge;
 typedef struct __ManifestEntry ManifestEntry;
 typedef struct __ManifestHash ManifestHash;
+typedef struct __Manifest Manifest;
 typedef struct __InstalledEbuild InstalledEbuild;
 typedef struct __InstalledPackage InstalledPackage;
 typedef struct __SelectedEbuild SelectedEbuild;

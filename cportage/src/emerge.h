@@ -23,6 +23,7 @@ typedef enum {
 	EMERGE_BUILDROOT = 1 << 7,
 	EMERGE_INSTALLROOT = 1 << 8,
 	EMERGE_VERBOSE = 1 << 9,
+	EMERGE_CACHE = 1 << 10,
 } emerge_opts_t;
 
 typedef enum {
