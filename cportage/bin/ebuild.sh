@@ -761,7 +761,6 @@ else
 		export USE="${USE} test"
 	fi
 	declare -r USE
-
 	if [[ -n $EBUILD_SH_ARGS ]] ; then
 		(
 			# Don't allow subprocesses to inherit the pipe which

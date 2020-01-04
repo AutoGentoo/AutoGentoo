@@ -57,6 +57,8 @@ struct __Emerge {
 	Profile* profile;
 	
 	Suggestion* use_suggestions;
+	
+	int jobs;
 };
 
 extern Emerge* emerge_main;

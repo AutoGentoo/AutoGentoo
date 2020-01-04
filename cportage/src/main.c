@@ -60,6 +60,11 @@ void cache(Opt* op, char* arg) {
 	emerge_main->options |= EMERGE_CACHE;
 }
 
+void jobs(Opt* op, char* arg) {
+	emerge_main->jobs = (int)strtol(arg, NULL, 10);
+}
+
+
 void print_help_wrapper(Opt* op, char* arg);
 
 Opt opt_handlers[] = {
@@ -72,6 +77,7 @@ Opt opt_handlers[] = {
 		{0,   "installroot", "Path to the root of install environment", set_installroot, OPT_LONG | OPT_ARG},
 		{0,   "target", "Target architecture", set_arch, OPT_LONG | OPT_ARG},
 		{0,   "cache", "Generate/regenerate the repository cache", cache, OPT_LONG},
+		{0,   "jobs", "Number of jobs", jobs, OPT_LONG | OPT_ARG},
 		{0, NULL, NULL, NULL, (opt_opts_t) 0}
 };
 

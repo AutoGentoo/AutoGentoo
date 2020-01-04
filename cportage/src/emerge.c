@@ -37,6 +37,7 @@ Emerge* emerge_new() {
 	out->default_repo = NULL;
 	
 	out->use_suggestions = NULL;
+	out->jobs = 1;
 	//out->selected = selected_new();
 	
 	
@@ -172,7 +173,8 @@ int emerge (Emerge* emerge) {
 }
 
 void emerge_free(Emerge* em) {
-	map_free(em->use_expand, NULL);
+	if (em->use_expand)
+		map_free(em->use_expand, NULL);
 	
 	free(em->buildroot);
 	free(em->installroot);

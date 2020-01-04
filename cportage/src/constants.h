@@ -5,15 +5,6 @@
 #ifndef AUTOGENTOO_CONSTANTS_H
 #define AUTOGENTOO_CONSTANTS_H
 
-#define FILEDIR "${PORTDIR}/${CATEGORY}/${PN}/files"
-
-#define WORKDIR "${PORTAGE_BUILDDIR}/work"
-#define T "${PORTAGE_BUILDDIR}/temp"
-#define D "${PORTAGE_BUILDDIR}/image"
-#define HOME "${PORTAGE_BUILDDIR}/homedir"
-#define DEFAULT_ROOT "/"
-#define DEFAULT_DISTDIR "/usr/portage/distfiles/"
-
 #ifndef PORTAGE_BIN_PATH
 #define PORTAGE_BIN_PATH "/usr/lib/cportage/bin"
 #endif
@@ -22,12 +13,26 @@
 #define PORTAGE_BUILDDIR "/var/tmp/portage"
 #endif
 
-#ifndef PORTAGE_CACHE_OFFSET
-#define PORTAGE_CACHE_OFFSET "metadata/cportage-cache"
+#define FILEDIR "${PORTDIR}/${CATEGORY}/${PN}/files"
+
+#define WORKDIR PORTAGE_BUILDDIR"/work"
+#define T PORTAGE_BUILDDIR"/temp"
+#define D PORTAGE_BUILDDIR"/image"
+#define HOME PORTAGE_BUILDDIR"/homedir"
+#define DEFAULT_ROOT "/"
+#define DEFAULT_DISTDIR "/usr/portage/distfiles/"
+#define PORTAGE_EAPI "7"
+
+#ifndef PORTAGE_GROUPNAME
+#define PORTAGE_GROUPNAME "autogentoo"
+#endif
+
+#ifndef PORTAGE_CACHE
+#define PORTAGE_CACHE "/usr/cportage"
 #endif
 
 #ifndef PORTAGE_TMP_DIR
-#define PORTAGE_TMP_DIR ""
+#define PORTAGE_TMP_DIR T
 #endif
 
 typedef unsigned char* sha_hash;

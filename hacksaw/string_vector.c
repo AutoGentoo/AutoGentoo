@@ -12,7 +12,10 @@ StringVector* string_vector_new() {
 }
 
 void string_vector_add(StringVector* vec, char* string) {
-	vector_add(vec, strdup(string));
+	if (!string)
+		vector_add(vec, NULL);
+	else
+		vector_add(vec, strdup(string));
 }
 
 void string_vector_insert(StringVector* vec, char* string, int index) {

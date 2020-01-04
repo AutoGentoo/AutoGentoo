@@ -34,17 +34,19 @@ struct __Package {
  */
 struct __Ebuild {
 	Package* parent;
+	char* name;
 	char* category;
-	char* pn;
-	char* pv;
-	char* pr;
 	
 	char* slot;
 	char* sub_slot;
 	
-	char* ebuild_key;
+	char* pf;
 	
-	int inside_block;
+	char* ebuild_key;
+	char* ebuild_md5;
+	char* ebuild;
+	char* path;
+	char* cache_file;
 	
 	/* Cached in the database */
 	Dependency* depend;
@@ -64,8 +66,6 @@ struct __Ebuild {
 	
 	sha_hash meta_sha512;
 	int metadata_init;
-	
-	char* path;
 	
 	Ebuild* older;
 	Ebuild* newer;

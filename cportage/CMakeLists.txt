@@ -23,7 +23,10 @@ add_library(cportage SHARED
         src/ebuild/metadata.c
         src/ebuild/metadata.h
         src/cache.c
-        src/cache.h src/dep_graph/cmp.c src/dep_graph/cmp.h)
+        src/cache.h src/dep_graph/cmp.c
+        src/dep_graph/cmp.h
+        src/ebuild/hash.c
+        src/ebuild/hash.h)
 
 target_link_libraries(cportage hacksaw)
 
@@ -37,6 +40,11 @@ target_link_libraries(cportage-exec
         crypto
         archive
         )
+
+target_compile_definitions(cportage PRIVATE
+        PORTAGE_BIN_PATH="${CMAKE_SOURCE_DIR}/cportage/bin"
+        PORTAGE_BUILDDIR="${CMAKE_BINARY_DIR}/cportage-build"
+        PORTAGE_CACHE="${CMAKE_BINARY_DIR}/cportage-meta")
 
 install(DIRECTORY src/ DESTINATION include/cportage
         FILES_MATCHING PATTERN "*.h")

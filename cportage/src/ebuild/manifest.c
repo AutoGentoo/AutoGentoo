@@ -99,8 +99,9 @@ int prv_manifest_parse(Manifest* ptr) {
 		ptr->dist
 	};
 	
-	while (getline(&line, &line_size, fp) > 0) {
-		line[line_size - 1] = 0;
+	ssize_t line_len = 0;
+	while ((line_len = getline(&line, &line_size, fp)) > 0) {
+		line[line_len - 1] = 0;
 		
 		char* type = strtok(line, " ");
 		char* filename = strtok(NULL, " ");

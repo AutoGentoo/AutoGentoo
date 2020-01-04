@@ -333,8 +333,9 @@ int repository_init(Repository* repo) {
 	char* category = NULL;
 	size_t line_size = 0;
 	
-	while (getline(&category, &line_size, cat_manifest) > 0) {
-		category[line_size - 1] = 0; // Remove new line
+	ssize_t line_len = 0;
+	while ((line_len = getline(&category, &line_size, cat_manifest)) > 0) {
+		category[line_len - 1] = 0; // Remove new line
 		
 		StringVector* cat = prv_repository_category_init(repo, category);
 		if (!cat)
@@ -347,17 +348,51 @@ int repository_init(Repository* repo) {
 	free(category);
 	fclose(cat_manifest);
 	
+	CacheHandler* cache_handler = cache_handler_new(repo->parent->jobs);
+	
 	for (int i = 0; i < repo->categories->n; i++) {
 		char* category_name = string_vector_get(repo->categories_names, i);
 		StringVector* category_packages = (StringVector*)vector_get(repo->categories, i);
 		
 		for (int j = 0; j < category_packages->n; j++) {
-			Ebuild* current = package_init(repo, category_name, string_vector_get(category_packages, j));
+			char* pm_path = NULL;
+			char* package_name = string_vector_get(category_packages, j);
+			asprintf(&pm_path, "%s/%s/%s/Manifest", repo->location, category_name, package_name);
 			
-			if (repo->parent->options & EMERGE_CACHE)
-				cache_generate(current);
+			FILE* package_manifest = fopen(pm_path, "r");
+			if (!package_manifest) {
+				plog_error("Failed to open package manifest %s/%s", category_name, package_name);
+				return 0;
+			}
+			
+			char* line = NULL;
+			line_size = 0;
+			line_len = 0;
+			
+			while ((line_len = getline(&line, &line_size, package_manifest)) > 0) {
+				char* type = strtok(line, " ");
+				if (strcmp(type, "EBUILD") != 0)
+					continue;
+				
+				char* ebuild_file = strtok(NULL, " \n");
+				char* pf_end = strstr(ebuild_file, ".ebuild");
+				*pf_end = 0;
+				
+				Ebuild* current = package_init(repo, category_name, ebuild_file);
+				
+				if (repo->parent->options & EMERGE_CACHE) {
+					if (cache_verify(current->cache_file, current->ebuild_md5))
+						continue;
+					cache_handler_request(cache_handler, current);
+				}
+			}
+			
+			free(line);
+			fclose(package_manifest);
 		}
 	}
+	
+	cache_handler_finish(cache_handler);
 	
 	return 1;
 }

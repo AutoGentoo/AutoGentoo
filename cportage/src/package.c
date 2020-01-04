@@ -14,6 +14,7 @@
 #include "language/share.h"
 #include <autogentoo/hacksaw/map.h>
 #include "database.h"
+#include "ebuild/hash.h"
 
 void package_metadata_init(Ebuild* ebuild) {
 	if (ebuild->metadata_init)
@@ -122,18 +123,31 @@ Ebuild* package_init(Repository* repo, char* category, char* name) {
 	new_ebuild->ebuild_key = parsed_key;
 	new_ebuild->metadata_init = 0;
 	new_ebuild->path = NULL;
-	asprintf(&new_ebuild->path, "%s/%s/%s", repo->location, category, name);
-	
-	new_ebuild->category = atom_parsed->category;
-	new_ebuild->pn = atom_parsed->name;
-	new_ebuild->pv = strdup(atom_parsed->version->full_version);
+	new_ebuild->ebuild = NULL;
+	new_ebuild->pf = NULL;
+	new_ebuild->cache_file = NULL;
+	new_ebuild->name = strdup(atom_parsed->name);
+	new_ebuild->category = strdup(category);
 	new_ebuild->revision = atom_parsed->revision;
-	
-	asprintf(&new_ebuild->pr, "r%d", atom_parsed->revision);
+	asprintf(&new_ebuild->path, "%s/%s/%s", repo->location, new_ebuild->category, new_ebuild->name);
 	
 	new_ebuild->slot = NULL;
 	new_ebuild->sub_slot = NULL;
 	new_ebuild->version = atom_parsed->version;
+	
+	if (new_ebuild->revision > 0)
+		asprintf(&new_ebuild->pf, "%s-%s-r%d", new_ebuild->name, new_ebuild->version->full_version, new_ebuild->revision);
+	else
+		asprintf(&new_ebuild->pf, "%s-%s", new_ebuild->name, new_ebuild->version->full_version);
+	
+	asprintf(&new_ebuild->ebuild, "%s/%s.ebuild", new_ebuild->path, new_ebuild->pf);
+	asprintf(&new_ebuild->cache_file, PORTAGE_CACHE"/%s/%s", new_ebuild->category, new_ebuild->pf);
+	
+	new_ebuild->ebuild_md5 = hash_md5(new_ebuild->ebuild);
+	if (!new_ebuild->ebuild_md5) {
+		plog_error("Failed to generate MD5 for %s", new_ebuild->ebuild);
+		portage_die("Hash generation failed");
+	}
 	
 	/* Cached in the database */
 	new_ebuild->depend = NULL;
@@ -204,10 +218,8 @@ void package_free(Package* ptr) {
 }
 
 void ebuild_free(Ebuild* ptr) {
+	free(ptr->name);
 	free(ptr->category);
-	free(ptr->pn);
-	free(ptr->pv);
-	free(ptr->pr);
 	free(ptr->ebuild_key);
 	
 	if (ptr->slot)
