@@ -20,13 +20,9 @@ void package_metadata_init(Ebuild* ebuild) {
 	if (ebuild->metadata_init)
 		return;
 	
-	char* manifest_path = NULL;
-	asprintf(&manifest_path, "%s/Manifest", ebuild->path);
-	
-	FILE* fp = fopen(manifest_path, "r");
-	free(manifest_path);
+	FILE* fp = fopen(ebuild->cache_file, "r");
 	if (!fp) {
-		plog_error("Failed to open %s", manifest_path);
+		plog_error("Failed to open %s", ebuild->cache_file);
 		return;
 	}
 	
@@ -40,6 +36,11 @@ void package_metadata_init(Ebuild* ebuild) {
 	size_t value_size;
 	size_t value_size_n;
 	char* value = NULL;
+	
+	char* line = NULL;
+	size_t line_size = 0;
+	getline(&line, &line_size, fp);
+	free(line);
 	
 	while(!feof(fp)) {
 		name_size = getdelim(&name, &name_size_n, '=', fp);

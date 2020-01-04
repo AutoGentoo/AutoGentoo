@@ -165,8 +165,10 @@ void cache_request_mainloop(CacheWorker* worker) {
 	
 	while (1) {
 		pthread_mutex_lock(&worker->handler->head_mutex);
-		if (!worker->handler->head)
+		if (!worker->handler->head) {
+			pthread_mutex_unlock(&worker->handler->head_mutex);
 			break;
+		}
 		
 		struct __CacheRequest* req = worker->handler->head;
 		worker->handler->head = worker->handler->head->next;
@@ -182,8 +184,6 @@ void cache_request_mainloop(CacheWorker* worker) {
 		
 		free(req);
 	}
-	
-	printf("Pthread exitting");
 }
 
 void cache_handler_finish(CacheHandler* handler) {

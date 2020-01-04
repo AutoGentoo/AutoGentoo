@@ -10,6 +10,7 @@
 typedef struct __ResolvedSlot ResolvedSlot;
 
 struct __ResolvedSlot {
+	
 	Vector* parent_requests; //!< ResolveRequest merge to make this slot
 	
 };

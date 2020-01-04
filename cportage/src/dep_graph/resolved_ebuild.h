@@ -42,5 +42,6 @@ struct __ResolvedEbuild {
 };
 
 ResolvedEbuild* re_new(Emerge* environ, P_Atom* atom, Ebuild* ebuild);
+char** re_get_env(ResolvedEbuild* re);
 
 #endif //AUTOGENTOO_RESOLVED_EBUILD_H
