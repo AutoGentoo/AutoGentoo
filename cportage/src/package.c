@@ -7,93 +7,12 @@
 #include "package.h"
 #include "portage.h"
 #include "portage_log.h"
-#include "ebuild/manifest.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "language/share.h"
 #include <autogentoo/hacksaw/map.h>
 #include "database.h"
 #include "ebuild/hash.h"
-
-void package_metadata_init(Ebuild* ebuild) {
-	if (ebuild->metadata_init)
-		return;
-	
-	FILE* fp = fopen(ebuild->cache_file, "r");
-	if (!fp) {
-		plog_error("Failed to open %s", ebuild->cache_file);
-		return;
-	}
-	
-	for (int i = 0; i < ARCH_END; i++)
-		ebuild->keywords[i] = KEYWORD_NONE;
-	
-	size_t name_size;
-	size_t name_size_n;
-	char* name = NULL;
-	
-	size_t value_size;
-	size_t value_size_n;
-	char* value = NULL;
-	
-	char* line = NULL;
-	size_t line_size = 0;
-	getline(&line, &line_size, fp);
-	free(line);
-	
-	while(!feof(fp)) {
-		name_size = getdelim(&name, &name_size_n, '=', fp);
-		value_size = getdelim(&value, &value_size_n, '\n', fp);
-		
-		if (!name || !value)
-			break;
-		
-		name[name_size - 1] = 0;
-		value[value_size - 1] = 0;
-		
-		if (strcmp(name, "DEPEND") == 0) {
-			if (ebuild->depend)
-				portage_die("DEPEND already allocated for %s", ebuild->ebuild_key);
-			ebuild->depend = depend_parse(value);
-		}
-		else if (strcmp(name, "RDEPEND") == 0) {
-			if (ebuild->rdepend)
-				portage_die("RDEPEND already allocated for %s", ebuild->ebuild_key);
-			ebuild->rdepend = depend_parse(value);
-		}
-		else if (strcmp(name, "PDEPEND") == 0) {
-			if (ebuild->pdepend)
-				portage_die("PDEPEND already allocated for %s", ebuild->ebuild_key);
-			ebuild->pdepend = depend_parse(value);
-		}
-		else if (strcmp(name, "BDEPEND") == 0) {
-			if (ebuild->bdepend)
-				portage_die("BDEPEND already allocated for %s", ebuild->ebuild_key);
-			ebuild->bdepend = depend_parse(value);
-		}
-		else if (strcmp(name, "SLOT") == 0) {
-			char* tok = strtok(value, "/");
-			ebuild->slot = strdup(tok);
-			
-			tok = strtok(NULL, "/");
-			if (tok)
-				ebuild->sub_slot = strdup(tok);
-		}
-		else if (strcmp(name, "REQUIRED_USE") == 0)
-			ebuild->required_use = required_use_parse(value);
-		else if (strcmp(name, "KEYWORDS") == 0)
-			keyword_parse(ebuild->keywords, value);
-		else if (strcmp(name, "IUSE") == 0)
-			ebuild->use = use_iuse_parse(ebuild->parent->parent->parent, value);
-	}
-	
-	free(value);
-	free(name);
-	
-	ebuild->metadata_init = 1;
-	fclose(fp);
-}
 
 Ebuild* package_init(Repository* repo, char* category, char* name) {
 	char* parsed_key;

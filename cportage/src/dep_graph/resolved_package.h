@@ -7,19 +7,18 @@
 
 #include <autogentoo/hacksaw/vector.h>
 #include "../constants.h"
-#include "resolve_request.h"
 
-typedef struct __ResolvedPackage ResolvedPackage;
 
 struct __ResolvedPackage {
+	Emerge* environ;
 	Package* parent;
 	
 	Vector* selected_slots; //!< Slots waiting to be installed
 	Vector* requests; //!< Unmerged pure requests
 };
 
-ResolvedPackage* rp_new(Package* parent);
-
+ResolvedPackage* rp_get(Emerge* environ, char* key);
+ResolvedPackage* rp_new(Emerge* environ, Package* parent);
 void rp_merge(ResolvedPackage* rp, ResolveRequest* rr);
 
 #endif //AUTOGENTOO_RESOLVED_PACKAGE_H

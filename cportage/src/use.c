@@ -13,7 +13,8 @@
 #include <stdlib.h>
 #include "language/share.h"
 #include <ctype.h>
-#include "dep_graph/cmp.h"
+#include "dep_graph/resolve.h"
+#include "ebuild/cache.h"
 
 use_t use_set(UseFlag* head, char* use_search, use_t new_val, use_priority_t priority) {
 	UseFlag* target = use_get(head, use_search);
@@ -324,7 +325,7 @@ void emerge_apply_package_use(Emerge* emerge) {
 				continue;
 			
 			for (Ebuild* current_ebuild = target->ebuilds; current_ebuild; current_ebuild = current_ebuild->older) {
-				package_metadata_init(current_ebuild);
+				ebuild_metadata(current_ebuild);
 				if (ebuild_match_atom(current_ebuild, current->atom)) {
 					for (UseFlag* current_flag = current->flags; current_flag; current_flag = current_flag->next) {
 						if (current_ebuild->keywords[emerge->target_arch] >= current->keyword_required)

@@ -13,10 +13,10 @@
 #include <wait.h>
 #include <errno.h>
 #include <openssl/md5.h>
-#include "portage.h"
-#include "ebuild/hash.h"
+#include <share.h>
+#include "../portage.h"
+#include "hash.h"
 #include "cache.h"
-#include "package.h"
 
 int cache_verify(char* file, char* md5_expanded) {
 	FILE* fp = fopen(file, "r");
@@ -43,7 +43,7 @@ char* prv_cache_variable(Vector* dest, char* fmt, ...) {
 	return __dest_tm;
 }
 
-int cache_generate(Ebuild* target, int index) {
+int cache_generate(Ebuild* target, int thread_num) {
 	if (!target)
 		return 1;
 	
@@ -57,7 +57,7 @@ int cache_generate(Ebuild* target, int index) {
 		pvr = prv_cache_variable(cache_to_free, "PVR=%s", target->version->full_version);
 	}
 	
-	printf("Cache %s/%s (thread %d)\n", target->category, target->pf, index);
+	printf("Cache %s/%s (thread %d)\n", target->category, target->pf, thread_num);
 	fflush(stdout);
 	
 	char* env[] = {
@@ -197,4 +197,103 @@ void cache_handler_finish(CacheHandler* handler) {
 	vector_foreach(handler->pids, free);
 	free(handler->pids);
 	free(handler);
+}
+
+void ebuild_metadata(Ebuild* ebuild) {
+	if (ebuild->metadata_init)
+		return;
+	
+	FILE* fp = fopen(ebuild->cache_file, "r");
+	if (!fp) {
+		plog_error("Failed to open %s", ebuild->cache_file);
+		return;
+	}
+	
+	for (int i = 0; i < ARCH_END; i++)
+		ebuild->keywords[i] = KEYWORD_NONE;
+	
+	size_t name_size_n;
+	char* name = NULL;
+	
+	size_t value_size_n;
+	char* value = NULL;
+	
+	char* line = NULL;
+	size_t line_size = 0;
+	ssize_t n = getline(&line, &line_size, fp);
+	line[n - 1] = 0;
+	if (strcmp(line, ebuild->ebuild_md5) != 0) {
+		fclose(fp);
+		int cache_res = cache_generate(ebuild, 0);
+		if (cache_res != 0)
+			portage_die("Failed to generate cache for %s/%s", ebuild->category, ebuild->pf);
+		
+		fp = fopen(ebuild->cache_file, "r");
+		if (!fp) {
+			free(line);
+			portage_die("Failed to open %s", ebuild->cache_file);
+			return;
+		}
+		
+		n = getline(&line, &line_size, fp);
+		if (strcmp(line, ebuild->ebuild_md5) != 0) {
+			fclose(fp);
+			free(line);
+			portage_die("Failed to generate valid cache file for %s/%s", ebuild->category, ebuild->pf);
+		}
+	}
+	
+	free(line);
+	
+	while(!feof(fp)) {
+		size_t name_size = getdelim(&name, &name_size_n, '=', fp);
+		size_t value_size = getdelim(&value, &value_size_n, '\n', fp);
+		
+		if (!name || !value)
+			break;
+		
+		name[name_size - 1] = 0;
+		value[value_size - 1] = 0;
+		
+		if (strcmp(name, "DEPEND") == 0) {
+			if (ebuild->depend)
+				portage_die("DEPEND already allocated for %s", ebuild->ebuild_key);
+			ebuild->depend = depend_parse(value);
+		}
+		else if (strcmp(name, "RDEPEND") == 0) {
+			if (ebuild->rdepend)
+				portage_die("RDEPEND already allocated for %s", ebuild->ebuild_key);
+			ebuild->rdepend = depend_parse(value);
+		}
+		else if (strcmp(name, "PDEPEND") == 0) {
+			if (ebuild->pdepend)
+				portage_die("PDEPEND already allocated for %s", ebuild->ebuild_key);
+			ebuild->pdepend = depend_parse(value);
+		}
+		else if (strcmp(name, "BDEPEND") == 0) {
+			if (ebuild->bdepend)
+				portage_die("BDEPEND already allocated for %s", ebuild->ebuild_key);
+			ebuild->bdepend = depend_parse(value);
+		}
+		else if (strcmp(name, "SLOT") == 0) {
+			char* tok = strtok(value, "/");
+			ebuild->slot = strdup(tok);
+			
+			tok = strtok(NULL, "/");
+			if (tok)
+				ebuild->sub_slot = strdup(tok);
+		}
+		else if (strcmp(name, "REQUIRED_USE") == 0)
+			ebuild->required_use = required_use_parse(value);
+		else if (strcmp(name, "KEYWORDS") == 0)
+			keyword_parse(ebuild->keywords, value);
+		else if (strcmp(name, "IUSE") == 0)
+			ebuild->use = use_iuse_parse(ebuild->parent->parent->parent, value);
+	}
+	
+	free(value);
+	free(name);
+	
+	ebuild->metadata_init = 1;
+	fclose(fp);
 }

@@ -3,7 +3,7 @@
 //
 
 #include "block.h"
-#include "dep_graph/cmp.h"
+#include "dep_graph/resolve.h"
 
 int resolved_ebuild_blocked(ResolvedEbuild* e, P_Atom* block_atom, UseFlag* use) {
 	if (!ebuild_match_atom(e->target, block_atom))

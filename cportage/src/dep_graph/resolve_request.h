@@ -6,11 +6,9 @@
 #define AUTOGENTOO_RESOLVE_REQUEST_H
 
 #include "../constants.h"
+#include "resolved_package.h"
 #include <hacksaw/vector.h>
 #include <autogentoo/hacksaw/queue.h>
-
-typedef struct __ResolveRequest ResolveRequest;
-typedef struct __ResolveAtom ResolveAtom;
 
 struct __ResolveAtom {
 	P_Atom* atom;
@@ -20,8 +18,15 @@ struct __ResolveAtom {
 };
 
 struct __ResolveRequest {
+	Emerge* environ;
+	ResolvedPackage* parent;
+	
 	ResolveAtom* selected_by;
-	Queue* ebuild; //!< list of Ebuild* in order by priority
+	Queue* ebuilds; //!< list of Ebuild* in order by priority
 };
+
+ResolveAtom* ra_new(ResolveRequest* parent, P_Atom* atom);
+ResolveRequest* rr_new(Emerge* environ, ResolveRequest* parent, P_Atom* atom);
+
 
 #endif //AUTOGENTOO_RESOLVE_REQUEST_H

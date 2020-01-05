@@ -58,6 +58,10 @@ typedef struct __Backtrack Backtrack;
 typedef struct __InstalledBacktrack InstalledBacktrack;
 typedef struct __Selected Selected;
 
+typedef struct __ResolveRequest ResolveRequest;
+typedef struct __ResolveAtom ResolveAtom;
+typedef struct __ResolvedPackage ResolvedPackage;
+
 /* From atom.h */
 typedef struct __P_Atom P_Atom;
 typedef struct __AtomVersion AtomVersion;

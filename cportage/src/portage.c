@@ -15,7 +15,7 @@
 #include "package.h"
 #include "directory.h"
 #include "compress.h"
-#include "cache.h"
+#include "ebuild/cache.h"
 #include <openssl/evp.h>
 
 int portage_get_hash_fd(sha_hash* target, int fd, const EVP_MD* algorithm) {

@@ -27,6 +27,7 @@ struct __Queue {
 Queue* queue_new();
 void queue_add(Queue* self, void* data);
 void* queue_pop(Queue* self);
+void* queue_peek(Queue* self);
 void queue_foreach(Queue* self, void (*f)(void*));
 void queue_concat(Queue* dest, Queue* to_add);
 void queue_free(Queue* self);

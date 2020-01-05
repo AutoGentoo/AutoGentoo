@@ -74,7 +74,6 @@ struct __Ebuild {
 Dependency* dependency_build_atom(P_Atom* atom);
 Dependency* dependency_build_use(char* use_flag, use_t type, Dependency* selector);
 
-void package_metadata_init(Ebuild* ebuild);
 Ebuild* package_init(Repository* repo, char* category, char* name);
 
 void package_free(Package* ptr);

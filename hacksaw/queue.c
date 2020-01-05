@@ -46,6 +46,13 @@ void* queue_pop(Queue* self) {
 	return out;
 }
 
+void* queue_peek(Queue* self) {
+	if (!self->head)
+		return NULL;
+	
+	return self->head->data;
+}
+
 void queue_foreach(Queue* self, void (*f)(void*)) {
 	for (struct _Node* current = self->head; current; current = current->next)
 		f(current->data);

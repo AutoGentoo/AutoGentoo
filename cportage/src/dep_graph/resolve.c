@@ -2,9 +2,12 @@
 // Created by atuser on 12/31/19.
 //
 
-#include "cmp.h"
+#include <errno.h>
+#include "resolve.h"
 #include "string.h"
+#include "../portage.h"
 #include "../package.h"
+#include "../emerge.h"
 
 
 int pd_compare_range(int cmp, atom_version_t range) {
@@ -55,4 +58,24 @@ int ebuild_match_atom(Ebuild* ebuild, P_Atom* atom) {
 		return 1;
 	
 	return 0;
+}
+
+Package* package_resolve_atom(Emerge* em, P_Atom* atom) {
+	Repository* repo = NULL;
+	for (Repository* current = em->repos; current; current = current->next) {
+		if (strcmp(atom->repository, current->name) == 0) {
+			repo = current;
+			break;
+		}
+	}
+	
+	if (!repo) {
+		errno = EINVAL;
+		plog_error("Repository not found %s", atom->repository);
+		return NULL;
+	}
+	
+	Package* target_pkg = map_get(repo->packages, atom->key);
+	
+	return target_pkg;
 }

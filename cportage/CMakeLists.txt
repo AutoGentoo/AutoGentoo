@@ -20,11 +20,9 @@ add_library(cportage SHARED
         ${language_SOURCES}
         src/block.c
         src/block.h
-        src/ebuild/metadata.c
-        src/ebuild/metadata.h
-        src/cache.c
-        src/cache.h src/dep_graph/cmp.c
-        src/dep_graph/cmp.h
+        src/ebuild/cache.c
+        src/ebuild/cache.h src/dep_graph/resolve.c
+        src/dep_graph/resolve.h
         src/ebuild/hash.c
         src/ebuild/hash.h)
 

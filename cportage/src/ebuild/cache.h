@@ -30,7 +30,7 @@ struct __CacheHandler {
 	int jobs;
 };
 
-#include "constants.h"
+#include "../constants.h"
 
 CacheWorker* cache_worker_new(CacheHandler* parent);
 CacheHandler* cache_handler_new(int jobs);
@@ -39,6 +39,8 @@ void cache_request_mainloop(CacheWorker* worker);
 void cache_handler_finish(CacheHandler* handler);
 int cache_verify(char* file, char* md5_expanded);
 
-int cache_generate(Ebuild* target, int index);
+int cache_generate(Ebuild* target, int thread_num);
+
+void ebuild_metadata(Ebuild* ebuild);
 
 #endif //AUTOGENTOO_CACHE_H
