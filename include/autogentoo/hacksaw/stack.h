@@ -8,15 +8,16 @@
 typedef struct __Stack Stack;
 
 struct __Stack {
-	struct _Node {
+	struct stack_Node {
 		void* data;
-		struct _Node* next;
+		struct stack_Node* next;
 	}* head_node;
 };
 
 Stack* stack_new();
 void stack_add(Stack* self, void* data);
 void* stack_pop(Stack* self);
+void* stack_peek(Stack* self);
 void stack_foreach(Stack* self, void (*f)(void*));
 void stack_free(Stack* self);
 

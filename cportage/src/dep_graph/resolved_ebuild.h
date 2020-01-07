@@ -39,9 +39,16 @@ struct __ResolvedEbuild {
 	UseFlag* explicit;
 	
 	action_t action;
+	
+	Vector* bdepend;
+	Vector* depend;
+	Vector* rdepend;
+	Vector* pdepend;
 };
 
 ResolvedEbuild* re_new(Emerge* environ, P_Atom* atom, Ebuild* ebuild);
 char** re_get_env(ResolvedEbuild* re);
+void re_deselect(ResolvedEbuild* re); //!< Also frees this
+void re_free(ResolvedEbuild* re);
 
 #endif //AUTOGENTOO_RESOLVED_EBUILD_H

@@ -8,12 +8,16 @@
 #include "../portage_log.h"
 #include "../package.h"
 
+
+int rr_cmp(ResolveRequest* r1, ResolveRequest* r2) {
+	return r1 == r2;
+}
+
 ResolveAtom* ra_new(ResolveRequest* parent, P_Atom* atom) {
 	ResolveAtom* out = malloc(sizeof(ResolveAtom));
 	
 	out->atom = atom;
 	out->parent = parent;
-	out->parent_slots = vector_new(VECTOR_UNORDERED | VECTOR_REMOVE);
 	
 	return out;
 }
@@ -24,6 +28,8 @@ ResolveRequest* rr_new(Emerge* environ, ResolveRequest* parent, P_Atom* atom) {
 	out->environ = environ;
 	out->selected_by = ra_new(out, atom);
 	out->ebuilds = NULL;
+	out->old = queue_new();
+	out->parent_slot = NULL;
 	
 	Package* pkg = package_resolve_atom(environ, atom);
 	if (!pkg) {
@@ -59,4 +65,21 @@ ResolveRequest* rr_new(Emerge* environ, ResolveRequest* parent, P_Atom* atom) {
 	out->parent = rp_new(environ, pkg);
 	
 	return out;
+}
+
+Ebuild* rr_current(ResolveRequest* rr) {
+	return (Ebuild*)queue_peek(rr->ebuilds);
+}
+
+Ebuild* rr_next(ResolveRequest* rr) {
+	queue_add(rr->old, queue_pop(rr->ebuilds));
+	return rr_current(rr);
+}
+
+void rr_reset(ResolveRequest* rr) {
+	queue_concat(rr->old, rr->ebuilds);
+	
+	Queue* temp = rr->ebuilds;
+	rr->ebuilds = rr->old;
+	rr->old = temp;
 }

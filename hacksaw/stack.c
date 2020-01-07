@@ -14,18 +14,25 @@ Stack* stack_new() {
 }
 
 void stack_add(Stack* self, void* data) {
-	struct _Node* new_node = malloc(sizeof(struct _Node));
+	struct stack_Node* new_node = malloc(sizeof(struct stack_Node));
 	new_node->next = self->head_node;
 	new_node->data = data;
 	
 	self->head_node = new_node;
 }
 
+void* stack_peek(Stack* self) {
+	if (!self->head_node)
+		return NULL;
+	
+	return self->head_node->data;
+}
+
 void* stack_pop(Stack* self) {
 	if (!self->head_node)
 		return NULL;
 	
-	struct _Node* del_node = self->head_node;
+	struct stack_Node* del_node = self->head_node;
 	self->head_node = del_node->next;
 	
 	void* out = del_node->data;
@@ -35,7 +42,7 @@ void* stack_pop(Stack* self) {
 }
 
 void stack_foreach(Stack* self, void (*f)(void*)) {
-	for (struct _Node* current = self->head_node; current; current = current->next)
+	for (struct stack_Node* current = self->head_node; current; current = current->next)
 		f(current->data);
 }
 

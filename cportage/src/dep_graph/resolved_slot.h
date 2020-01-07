@@ -6,6 +6,7 @@
 #define AUTOGENTOO_RESOLVED_SLOT_H
 
 #include <autogentoo/hacksaw/vector.h>
+#include <autogentoo/hacksaw/set.h>
 #include "resolved_ebuild.h"
 #include "resolved_package.h"
 
@@ -15,7 +16,7 @@ struct __ResolvedSlot {
 	ResolvedPackage* parent;
 	
 	ResolvedEbuild* target;
-	Vector* parent_requests; //!< ResolveRequest merge to make this slot
+	Set* parent_requests; //!< ResolveRequest merge to make this slot
 };
 
 ResolvedSlot* rs_new(ResolvedPackage* rp);

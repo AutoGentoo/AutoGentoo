@@ -9,9 +9,9 @@
 
 typedef struct __Queue Queue;
 
-struct _Node {
+struct queue_Node {
 	void* data;
-	struct _Node* next;
+	struct queue_Node* next;
 };
 
 /**
@@ -20,8 +20,8 @@ struct _Node {
  * Access time for kth-item is O(n) (don't do this)
  */
 struct __Queue {
-	struct _Node* head;
-	struct _Node* tail;
+	struct queue_Node* head;
+	struct queue_Node* tail;
 };
 
 Queue* queue_new();

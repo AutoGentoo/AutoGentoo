@@ -15,7 +15,7 @@ Queue* queue_new() {
 }
 
 void queue_add(Queue* self, void* data) {
-	struct _Node* new_node = malloc(sizeof(struct _Node));
+	struct queue_Node* new_node = malloc(sizeof(struct queue_Node));
 	new_node->data = data;
 	new_node->next = NULL;
 	
@@ -34,7 +34,7 @@ void* queue_pop(Queue* self) {
 	if (!self->head)
 		return NULL;
 	
-	struct _Node* del_node = self->head;
+	struct queue_Node* del_node = self->head;
 	self->head = self->head->next;
 	
 	if (self->tail == del_node)
@@ -54,7 +54,7 @@ void* queue_peek(Queue* self) {
 }
 
 void queue_foreach(Queue* self, void (*f)(void*)) {
-	for (struct _Node* current = self->head; current; current = current->next)
+	for (struct queue_Node* current = self->head; current; current = current->next)
 		f(current->data);
 }
 
