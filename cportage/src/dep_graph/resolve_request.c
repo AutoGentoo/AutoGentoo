@@ -13,20 +13,11 @@ int rr_cmp(ResolveRequest* r1, ResolveRequest* r2) {
 	return r1 == r2;
 }
 
-ResolveAtom* ra_new(ResolveRequest* parent, P_Atom* atom) {
-	ResolveAtom* out = malloc(sizeof(ResolveAtom));
-	
-	out->atom = atom;
-	out->parent = parent;
-	
-	return out;
-}
-
-ResolveRequest* rr_new(Emerge* environ, ResolveRequest* parent, P_Atom* atom) {
+ResolveRequest* rr_new(Emerge* environ, ResolveRequest* parent, P_Atom* atom, Vector* add_to) {
 	ResolveRequest* out = malloc(sizeof(ResolveRequest));
 	
 	out->environ = environ;
-	out->selected_by = ra_new(out, atom);
+	out->atom = atom;
 	out->ebuilds = NULL;
 	out->old = queue_new();
 	out->parent_slot = NULL;
@@ -63,6 +54,9 @@ ResolveRequest* rr_new(Emerge* environ, ResolveRequest* parent, P_Atom* atom) {
 	queue_concat(prior_1, prior_2);
 	out->ebuilds = prior_1;
 	out->parent = rp_new(environ, pkg);
+	
+	out->added_to = add_to;
+	out->index = vector_add(out->added_to, out);
 	
 	return out;
 }

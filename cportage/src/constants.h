@@ -59,7 +59,6 @@ typedef struct __InstalledBacktrack InstalledBacktrack;
 typedef struct __Selected Selected;
 
 typedef struct __ResolveRequest ResolveRequest;
-typedef struct __ResolveAtom ResolveAtom;
 typedef struct __ResolvedPackage ResolvedPackage;
 
 /* From atom.h */

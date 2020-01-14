@@ -28,7 +28,7 @@ struct __Vector {
 
 Vector* vector_new(vector_opts opts);
 
-void** vector_add(Vector* vec, void* el);
+int vector_add(Vector* vec, void* el);
 
 void* vector_remove(Vector* vec, int index);
 

@@ -9,6 +9,7 @@ typedef struct __ResolvedEbuild ResolvedEbuild;
 
 #include "../constants.h"
 #include "../use.h"
+#include "resolved_slot.h"
 
 
 typedef enum {
@@ -30,7 +31,7 @@ typedef enum {
  */
 struct __ResolvedEbuild {
 	Emerge* environ;
-	P_Atom* atom;
+	ResolvedSlot* parent;
 	
 	Ebuild* target;
 	InstalledEbuild* installed;
@@ -44,11 +45,12 @@ struct __ResolvedEbuild {
 	Vector* depend;
 	Vector* rdepend;
 	Vector* pdepend;
+	
+	int dep_graph_resolved;
 };
 
-ResolvedEbuild* re_new(Emerge* environ, P_Atom* atom, Ebuild* ebuild);
+ResolvedEbuild* re_new(Emerge* environ, Ebuild* ebuild, ResolvedSlot* parent);
 char** re_get_env(ResolvedEbuild* re);
-void re_deselect(ResolvedEbuild* re); //!< Also frees this
-void re_free(ResolvedEbuild* re);
+void re_free(ResolvedEbuild* re); //!< Also deselects this
 
 #endif //AUTOGENTOO_RESOLVED_EBUILD_H

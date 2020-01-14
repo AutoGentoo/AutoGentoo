@@ -16,13 +16,13 @@ Vector* vector_new(vector_opts opts) {
 	return out_ptr;
 }
 
-void** vector_add(Vector* vec, void* el) {
+int vector_add(Vector* vec, void* el) {
 	if (vec->s == (vec->n + 1)) {
 		vector_allocate(vec);
 	}
 	
 	vec->ptr[vec->n] = el;
-	return &vec->ptr[vec->n++]; // Return index of item
+	return vec->n++; // Return index of item
 }
 
 /* Set index to NULL */

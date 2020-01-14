@@ -10,6 +10,7 @@
 #include <stdarg.h>
 #include "../package.h"
 #include "../portage.h"
+#include "resolve_request.h"
 #include <string.h>
 
 char* prv_asrprintf(char* fmt, ...) {
@@ -23,23 +24,20 @@ char* prv_asrprintf(char* fmt, ...) {
 	return __dest_tm;
 }
 
-ResolvedEbuild* re_new(Emerge* environ, P_Atom* atom, Ebuild* ebuild) {
-	/* Emerge* environ;
-	P_Atom* atom;
-	
-	Ebuild* target;
-	InstalledEbuild* installed;
-	
-	UseFlag* use;
-	UseFlag* explicit;
-	
-	action_t action; */
-	
+ResolvedEbuild* re_new(Emerge* environ, Ebuild* ebuild, ResolvedSlot* parent) {
 	ResolvedEbuild* out = malloc(sizeof(ResolvedEbuild));
 	out->environ = environ;
-	out->atom = atom;
+	out->parent = parent;
 	
 	out->target = ebuild;
+	
+	out->use = NULL;
+	out->explicit = NULL;
+	
+	out->bdepend = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->depend = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->rdepend = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
+	out->pdepend = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
 	
 	return out;
 }
@@ -86,4 +84,27 @@ char** re_get_env(ResolvedEbuild* re) {
 		env[i] = env_temp[i];
 	
 	return env;
+}
+
+void re_free(ResolvedEbuild* re) {
+	use_free(re->use);
+	use_free(re->explicit);
+	
+	Vector* to_free[] = {
+			re->bdepend,
+			re->depend,
+			re->rdepend,
+			re->pdepend
+	};
+	for (int i = 0; i < 4; i++) {
+		vector_foreach(to_free[i], (void (*)(void*)) rr_free);
+		vector_free(to_free[i]);
+	}
+	
+	if (re->parent->delete_on_re_free) {
+		re->parent->target = NULL;
+		rs_free(re->parent);
+	}
+	
+	free(re);
 }

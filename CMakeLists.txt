@@ -30,12 +30,12 @@ add_library(autogentoo SHARED
         ${http_BIN}
         ${http_PARSER}
         ${worker_SOURCES}
-)
+        include/autogentoo/hacksaw/queue_set.h)
 
 add_library(hacksaw SHARED
         ${hacksaw_HEADERS}
         ${hacksaw_SRC}
-        )
+        hacksaw/queue_set.c)
 
 find_package (Python COMPONENTS Interpreter Development)
 add_library(autogentooapi SHARED
