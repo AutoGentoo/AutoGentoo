@@ -77,3 +77,10 @@ void rr_reset(ResolveRequest* rr) {
 	rr->ebuilds = rr->old;
 	rr->old = temp;
 }
+
+void rr_free(ResolveRequest* rr) {
+	queue_free(rr->ebuilds);
+	queue_free(rr->old);
+	
+	free(rr);
+}

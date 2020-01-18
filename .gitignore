@@ -47,3 +47,4 @@ src/temp_api/*
 /doc/*
 build-debug/*
 *workspace.xml
+.idea/dataSources/*

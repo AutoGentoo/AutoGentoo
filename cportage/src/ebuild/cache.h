@@ -5,6 +5,8 @@
 #ifndef AUTOGENTOO_CACHE_H
 #define AUTOGENTOO_CACHE_H
 
+#include <autogentoo/hacksaw/queue.h>
+
 typedef struct __CacheHandler CacheHandler;
 typedef struct __CacheWorker CacheWorker;
 
@@ -16,11 +18,7 @@ struct __CacheWorker {
 };
 
 struct __CacheHandler {
-	struct __CacheRequest {
-		Ebuild* target;
-		struct __CacheRequest* next;
-	}* head;
-	
+	Queue* request_queue;
 	pthread_mutex_t head_mutex;
 	pthread_cond_t cond;
 	

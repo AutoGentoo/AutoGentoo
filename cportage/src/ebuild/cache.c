@@ -124,7 +124,7 @@ CacheWorker* cache_worker_new(CacheHandler* parent) {
 
 CacheHandler* cache_handler_new(int jobs) {
 	CacheHandler* out = malloc(sizeof(CacheHandler));
-	out->head = NULL;
+	out->request_queue = queue_new();
 	
 	pthread_cond_init(&out->cond, NULL);
 	pthread_mutex_init(&out->head_mutex, NULL);
@@ -148,12 +148,8 @@ CacheHandler* cache_handler_new(int jobs) {
 }
 
 void cache_handler_request(CacheHandler* handler, Ebuild* target) {
-	struct __CacheRequest* req = malloc(sizeof(struct __CacheRequest));
-	req->target = target;
-	
 	pthread_mutex_lock(&handler->head_mutex);
-	req->next = handler->head;
-	handler->head = req;
+	queue_add(handler->request_queue, target);
 	pthread_mutex_unlock(&handler->head_mutex);
 }
 
@@ -165,24 +161,21 @@ void cache_request_mainloop(CacheWorker* worker) {
 	
 	while (1) {
 		pthread_mutex_lock(&worker->handler->head_mutex);
-		if (!worker->handler->head) {
+		if (!queue_peek(worker->handler->request_queue)) {
 			pthread_mutex_unlock(&worker->handler->head_mutex);
 			break;
 		}
 		
-		struct __CacheRequest* req = worker->handler->head;
-		worker->handler->head = worker->handler->head->next;
+		Ebuild* target = queue_pop(worker->handler->request_queue);
 		pthread_mutex_unlock(&worker->handler->head_mutex);
 		
-		int res = cache_generate(req->target, worker->index);
+		int res = cache_generate(target, worker->index);
 		fflush(stdout);
 		if (res != 0) {
 			errno = 0;
-			plog_error("pthread failed -- %s", req->target->ebuild);
+			plog_error("pthread failed -- %s", target->ebuild);
 			exit(res);
 		}
-		
-		free(req);
 	}
 }
 
@@ -235,7 +228,7 @@ void ebuild_metadata(Ebuild* ebuild) {
 			return;
 		}
 		
-		n = getline(&line, &line_size, fp);
+		getline(&line, &line_size, fp);
 		if (strcmp(line, ebuild->ebuild_md5) != 0) {
 			fclose(fp);
 			free(line);

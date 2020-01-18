@@ -9,6 +9,7 @@ find_package(FLEX REQUIRED)
 
 include(files.txt)
 include_directories(src/language)
+include_directories(../include)
 
 execute_process(COMMAND bash -c "mkdir -p ${PROJECT_BINARY_DIR}/lang")
 

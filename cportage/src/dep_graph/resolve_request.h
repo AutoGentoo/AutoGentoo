@@ -8,7 +8,7 @@
 #include "../constants.h"
 #include "resolved_package.h"
 #include "resolved_slot.h"
-#include <hacksaw/vector.h>
+#include <autogentoo/hacksaw/vector.h>
 #include <autogentoo/hacksaw/queue.h>
 #include <autogentoo/hacksaw/stack.h>
 #include <autogentoo/hacksaw/set.h>
