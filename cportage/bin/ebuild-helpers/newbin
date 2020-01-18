@@ -1,0 +1,57 @@
+#!/bin/bash
+# Copyright 1999-2012 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+source "${PORTAGE_BIN_PATH}"/isolated-functions.sh || exit 1
+
+helper=${0##*/}
+
+if [[ -z ${T} ]] || [[ -z ${2} ]] ; then
+	__helpers_die "${helper}: Need two arguments, old file and new file"
+	exit 1
+fi
+
+(($#>2)) && \
+	eqawarn "QA Notice: ${helper} called with more than 2 arguments: ${*:3}"
+
+stdin=
+if ___eapi_newins_supports_reading_from_standard_input && [[ $1 == "-" ]]; then
+	stdin=yes
+fi
+
+TMP=$(mktemp -d "${T}/.newins_tmp_XXXXXX")
+trap 'rm -rf "${TMP}"' EXIT
+
+if [[ ${stdin} ]] ; then
+	if [[ -t 0 ]] ; then
+		__helpers_die "!!! ${helper}: Input is from a terminal"
+		exit 1
+	fi
+	cat > "${TMP}/$2"
+	ret=$?
+else
+	if [[ ! -e $1 ]] ; then
+		__helpers_die "!!! ${helper}: $1 does not exist"
+		exit 1
+	fi
+
+	cp_args="-f"
+	if [[ ${helper} == newins ]] ; then
+		if ___eapi_doins_and_newins_preserve_symlinks; then
+			cp_args+=" -P"
+		fi
+	fi
+
+	cp ${cp_args} "$1" "${TMP}/$2"
+	ret=$?
+fi
+
+if [[ ${ret} -ne 0 ]] ; then
+	__helpers_die "${0##*/} failed"
+	exit ${ret}
+fi
+
+do${helper#new} "${TMP}/$2"
+ret=$?
+[[ $ret -ne 0 ]] && __helpers_die "${helper} failed"
+exit $ret

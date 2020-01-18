@@ -1,0 +1,38 @@
+#!/bin/bash
+# Copyright 1999-2018 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+source "${PORTAGE_BIN_PATH}"/isolated-functions.sh || exit 1
+
+if ___eapi_dodoc_supports_-r; then
+	__PORTAGE_HELPER='dodoc' exec doins "$@"
+fi
+
+if [ $# -lt 1 ] ; then
+	__helpers_die "${0##*/}: at least one argument needed"
+	exit 1
+fi
+
+if ! ___eapi_has_prefix_variables; then
+	ED=${D}
+fi
+
+dir="${ED%/}/usr/share/doc/${PF}/${_E_DOCDESTTREE_#/}"
+if [ ! -d "${dir}" ] ; then
+	install -d "${dir}"
+fi
+
+ret=0
+for x in "$@" ; do
+	if [ -d "${x}" ] ; then
+		eqawarn "QA Notice: dodoc argument '${x}' is a directory"
+	elif [ -s "${x}" ] ; then
+		install -m0644 "${x}" "${dir}" || { ((ret|=1)); continue; }
+	elif [ ! -e "${x}" ] ; then
+		echo "!!! ${0##*/}: $x does not exist" 1>&2
+		((ret|=1))
+	fi
+done
+
+[[ $ret -ne 0 ]] && __helpers_die "${0##*/} failed"
+exit ${ret}

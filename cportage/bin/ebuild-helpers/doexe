@@ -1,0 +1,46 @@
+#!/bin/bash
+# Copyright 1999-2018 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+source "${PORTAGE_BIN_PATH}"/isolated-functions.sh || exit 1
+
+if [[ $# -lt 1 ]] ; then
+	__helpers_die "${0##*/}: at least one argument needed"
+	exit 1
+fi
+
+if ! ___eapi_has_prefix_variables; then
+	ED=${D}
+fi
+
+if [[ ! -d ${ED%/}/${_E_EXEDESTTREE_#/} ]] ; then
+	install -d "${ED%/}/${_E_EXEDESTTREE_#/}"
+fi
+
+TMP=$(mktemp -d "${T}/.doexe_tmp_XXXXXX")
+
+ret=0
+
+for x in "$@" ; do
+	if [ -L "${x}" ] ; then
+		cp "$x" "$TMP"
+		mysrc=$TMP/${x##*/}
+	elif [ -d "${x}" ] ; then
+		__vecho "doexe: warning, skipping directory ${x}"
+		continue
+	else
+		mysrc="${x}"
+	fi
+	if [ -e "$mysrc" ] ; then
+		install ${EXEOPTIONS} "$mysrc" "${ED%/}/${_E_EXEDESTTREE_#/}"
+	else
+		echo "!!! ${0##*/}: $mysrc does not exist" 1>&2
+		false
+	fi
+	((ret|=$?))
+done
+
+rm -rf "$TMP"
+
+[[ $ret -ne 0 ]] && __helpers_die "${0##*/} failed"
+exit $ret

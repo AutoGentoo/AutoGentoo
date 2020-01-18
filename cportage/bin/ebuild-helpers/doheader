@@ -1,0 +1,20 @@
+#!/bin/bash
+# Copyright 1999-2018 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+source "${PORTAGE_BIN_PATH}"/isolated-functions.sh || exit 1
+
+if ! ___eapi_has_doheader; then
+	die "${0##*/} is not supported in EAPI ${EAPI}"
+fi
+
+if [[ $# -lt 1 ]] || [[ $1 == -r && $# -lt 2 ]] ; then
+	__helpers_die "${0##*/}: at least one argument needed"
+	exit 1
+fi
+
+export _E_INSDESTTREE_='/usr/include/'
+if ___eapi_has_DESTTREE_INSDESTTREE; then
+	export INSDESTTREE=${_E_INSDESTTREE_}
+fi
+exec doins "$@"

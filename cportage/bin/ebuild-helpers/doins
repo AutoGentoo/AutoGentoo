@@ -1,0 +1,98 @@
+#!/bin/bash
+# Copyright 1999-2019 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+source "${PORTAGE_BIN_PATH}"/isolated-functions.sh || exit 1
+
+helper=${__PORTAGE_HELPER:-${0##*/}}
+
+if [[ ${helper} == dodoc ]] ; then
+	if [ $# -eq 0 ] ; then
+		# default_src_install may call dodoc with no arguments
+		# when DOC is defined but empty, so simply return
+		# sucessfully in this case.
+		eqawarn "QA Notice: dodoc called with no arguments"
+		exit 0
+	fi
+	export INSOPTIONS=-m0644
+	export DIROPTIONS=""
+	export _E_INSDESTTREE_=usr/share/doc/${PF}/${_E_DOCDESTTREE_}
+else
+	if ! ___eapi_has_DESTTREE_INSDESTTREE; then
+		[[ -n ${INSDESTTREE} ]] &&
+			die "${0##*/}: \${INSDESTTREE} has been banned for EAPI '$EAPI'; use 'into' instead"
+	else
+		# backwards compatibility
+		_E_INSDESTTREE_=${INSDESTTREE}
+	fi
+fi
+
+if [ $# -lt 1 ] ; then
+	__helpers_die "${helper}: at least one argument needed"
+	exit 1
+fi
+
+DOINS_ARGS=()
+if [[ "$1" == "-r" ]] ; then
+	DOINS_ARGS+=( --recursive )
+	shift
+fi
+
+if ! ___eapi_has_prefix_variables; then
+	export ED="${D}"
+fi
+
+if [[ ${_E_INSDESTTREE_#${ED}} != "${_E_INSDESTTREE_}" ]]; then
+	__vecho "-------------------------------------------------------" 1>&2
+	__vecho "You should not use \${D} or \${ED} with helpers." 1>&2
+	__vecho "  --> ${_E_INSDESTTREE_}" 1>&2
+	__vecho "-------------------------------------------------------" 1>&2
+	__helpers_die "${helper} used with \${D} or \${ED}"
+	exit 1
+fi
+
+if ___eapi_doins_and_newins_preserve_symlinks; then
+	DOINS_ARGS+=( --preserve_symlinks )
+fi
+
+if ___eapi_helpers_can_die; then
+	DOINS_ARGS+=( --helpers_can_die )
+fi
+
+if [[ -n "${INSOPTIONS}" ]]; then
+	DOINS_ARGS+=( "--insoptions=${INSOPTIONS}" )
+fi
+
+if [[ -n "${DIROPTIONS}" ]]; then
+	DOINS_ARGS+=( "--diroptions=${DIROPTIONS}" )
+fi
+
+if [[ -n "${PORTAGE_ACTUAL_DISTDIR}" ]]; then
+	DOINS_ARGS+=( "--distdir=${PORTAGE_ACTUAL_DISTDIR}" )
+fi
+
+if [[ "${DOINSSTRICTOPTION}" == 1 ]]; then
+	DOINS_ARGS+=( --strict_option )
+fi
+
+if has xattr ${FEATURES}; then
+	DOINS_ARGS+=(
+		--enable_copy_xattr
+		"--xattr_exclude=${PORTAGE_XATTR_EXCLUDE}"
+	)
+fi
+
+DOINS_ARGS+=(
+	"--helper=${helper}"
+	"--dest=${ED%/}/${_E_INSDESTTREE_#/}"
+)
+
+# Explicitly set PYTHONPATH to non empty.
+# If PYTHONPATH is empty (not unset), it means "add current working directory
+# to the import path" if the Python is prior to 3.4, which would cause
+# unexpected import. See also #469338.
+PYTHONPATH=${PORTAGE_PYTHONPATH:-${PORTAGE_PYM_PATH}} \
+	"${PORTAGE_PYTHON:-/usr/bin/python}" \
+	"${PORTAGE_BIN_PATH:-/usr/lib/portage/bin}"/doins.py \
+	"${DOINS_ARGS[@]}" -- "$@" || \
+{ __helpers_die "${helper} failed"; exit 1; }

@@ -1,0 +1,44 @@
+#!/bin/bash
+# Copyright 2013-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+INSTALL_XATTR=${EPREFIX}/usr/bin/install-xattr
+# Use safe cwd, avoiding unsafe import for bug #469338.
+export __PORTAGE_HELPER_CWD=${PWD}
+cd "${PORTAGE_PYM_PATH}"
+export __PORTAGE_HELPER_PATH=${BASH_SOURCE[0]}
+
+if [[ ${PORTAGE_INSTALL_XATTR_IMPLEMENTATION} == "c" ]]; then
+	implementation="c"
+elif [[ ${PORTAGE_INSTALL_XATTR_IMPLEMENTATION} == "python" ]]; then
+	implementation="python"
+else
+	# If PORTAGE_INSTALL_XATTR_IMPLEMENTATION is unset or not set to "c" or "python"
+	# then we'll autodetect, preferring "c" but falling back on "python"
+	if [[ -x "${INSTALL_XATTR}" ]]; then
+		implementation="c"
+	else
+		implementation="python"
+	fi
+fi
+
+# Filter internal portage paths from PATH, in order to avoid
+# a possible exec loop or fork bomb (see bug 547086).
+IFS=':'
+set -f
+path=
+for x in ${PATH}; do
+	[[ ${x} == */portage/*/ebuild-helpers* ]] && continue
+	path+=":${x}"
+done
+PATH=${path#:}
+
+if [[ "${implementation}" == "c" ]]; then
+	exec "${INSTALL_XATTR}" "$@"
+elif [[ "${implementation}" == "python" ]]; then
+	PYTHONPATH=${PORTAGE_PYTHONPATH:-${PORTAGE_PYM_PATH}} \
+		exec "${PORTAGE_PYTHON:-/usr/bin/python}" "${PORTAGE_BIN_PATH}/install.py" "$@"
+else
+	echo "Unknown implementation for PORTAGE_INSTALL_XATTR_IMPLEMENTATION"
+	exit -1
+fi

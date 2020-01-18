@@ -1,0 +1,18 @@
+# Check for accidential install into ${D}/${D}
+
+DD_check() {
+	if [[ -d ${D%/}${D} ]] ; then
+		eqawarn "QA Notice: files installed in \${D}/\${D}:"
+		local files=()
+		while read -r -d $'\0' i ; do
+			files+=( "${i#${D%/}${D}}" )
+		done < <(find "${D%/}${D}" -print0)
+		eqatag -v double-D "${files[@]/#//}"
+		die "Aborting due to QA concerns: ${#files[@]} files installed in ${D%/}${D}"
+	fi
+}
+
+DD_check
+: # guarantee successful exit
+
+# vim:ft=sh

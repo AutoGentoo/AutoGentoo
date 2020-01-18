@@ -1,0 +1,32 @@
+#!/bin/bash
+# Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+#
+# emake: Run make and automatically pass along flags set in the env.  We support
+# MAKEOPTS & EXTRA_EMAKE which allows the user to customize behavior (such as
+# parallel builds and load limiting).  The latter overrides the ebuild and thus
+# should be used with caution (more a debugging knob).
+#
+# With newer EAPIs, we also automatically fail the build if make itself fails.
+
+source "${PORTAGE_BIN_PATH}"/isolated-functions.sh || exit 1
+
+cmd=(
+	${MAKE:-make} ${MAKEOPTS} "$@" ${EXTRA_EMAKE}
+)
+
+if [[ ${PORTAGE_QUIET} != 1 ]] ; then
+	(
+	for arg in "${cmd[@]}" ; do
+		[[ ${arg} == *" "* ]] \
+			&& printf "'%s' " "${arg}" \
+			|| printf "%s " "${arg}"
+	done
+	printf "\n"
+	) >&2
+fi
+
+"${cmd[@]}"
+ret=$?
+[[ ${ret} -ne 0 ]] && __helpers_die "${0##*/} failed"
+exit ${ret}

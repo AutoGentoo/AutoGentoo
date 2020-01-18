@@ -4,6 +4,6 @@ cmake-build-debug/*
 **/.autogentoo.config
 build-debug/*
 *workspace.xml
-bin/*
+#bin/*
 env/*
 temp/*

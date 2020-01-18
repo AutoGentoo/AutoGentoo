@@ -1,0 +1,11 @@
+#!/bin/bash
+# Copyright 1999-2010 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+if [[ $# -lt 1 ]] ; then
+	source "${PORTAGE_BIN_PATH}"/isolated-functions.sh || exit 1
+	__helpers_die "${0##*/}: at least one argument needed"
+	exit 1
+fi
+
+_E_EXEDESTTREE_='/etc/init.d/' exec doexe "$@"
