@@ -20,7 +20,7 @@ void queue_add(Queue* self, void* data) {
 	new_node->next = NULL;
 	
 	
-	if (self->head) {
+	if (!self->head) {
 		self->head = new_node;
 		self->tail = new_node;
 	}
