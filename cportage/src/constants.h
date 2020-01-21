@@ -35,6 +35,8 @@
 #define PORTAGE_TMP_DIR T
 #endif
 
+#define PORTAGE_CACHE_PHASE "pretend"
+
 typedef unsigned char* sha_hash;
 typedef struct __Package Package;
 typedef struct __Ebuild Ebuild;

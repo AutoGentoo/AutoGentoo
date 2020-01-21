@@ -65,7 +65,7 @@ int cache_generate(Ebuild* target, int thread_num) {
 			"PORTAGE_BUILDDIR="PORTAGE_BUILDDIR,
 			"PORTAGE_TMP_DIR="PORTAGE_TMP_DIR,
 			"WORKDIR="WORKDIR,
-			"EBUILD_PHASE=setup",
+			"EBUILD_PHASE="PORTAGE_CACHE_PHASE,
 			"EMERGE_FROM=ebuild",
 			"T="T,
 			"D="D,
@@ -90,7 +90,7 @@ int cache_generate(Ebuild* target, int thread_num) {
 	pid_t env_pid = fork();
 	
 	if (env_pid == 0) {
-		remove(PORTAGE_BUILDDIR"/.setuped");
+		remove(PORTAGE_BUILDDIR"/."PORTAGE_CACHE_PHASE"ed");
 		char* args[] = {
 				PORTAGE_BIN_PATH"/gencache.sh",
 				NULL,

@@ -3,8 +3,6 @@
 unalias -a
 unset BASH_COMPAT
 
-rm -rf ${PORTAGE_BUILDDIR}/.${1}ed
-
 source ${PORTAGE_BIN_PATH}/ebuild.sh ""
 
 if [ ! -d "$CACHE_DIR" ]; then
