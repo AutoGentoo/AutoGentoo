@@ -6,6 +6,7 @@ AUTOGENTOO_SERVER_TOKEN = 0xfffff000
 AUTOGENTOO_HOST_END = 0xaaaaaaaa
 AUTOGENTOO_FILE_END = 0xffffffff
 AUTOGENTOO_SUDO_TOKEN = 0xcccccccc
+AUTOGENTOO_HOST_ID_LENGTH = 16
 
 
 class Server(BinaryObject):
@@ -23,6 +24,7 @@ class Server(BinaryObject):
 		
 		self.sudo_token = None
 		self.autogentoo_org_token = None
+		self.data = ()
 
 	def read_host(self):
 		host = Host(self.reader, self)
@@ -97,6 +99,7 @@ class Host(BinaryObject):
 		self.portage_tmpdir = ""
 		self.portdir = ""
 		self.use = ""
+		self.data = ()
 		
 		self.extra = {}
 	
@@ -128,6 +131,18 @@ class Host(BinaryObject):
 		
 		if self.reader.read_int() & 0xffffffff != AUTOGENTOO_HOST_END:
 			raise IOError("Expected end of host")
+	
+	def extra_keys(self):
+		return [{"k": k, "v": v} for k, v in self.extra.items()]
+	
+	@staticmethod
+	def generate_id():
+		import random
+		out_str = ""
+		for i in range(AUTOGENTOO_HOST_ID_LENGTH):
+			out_str += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[int(random.random()*62)]
+		
+		return out_str
 	
 	def write(self):
 		self.data = (

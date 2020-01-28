@@ -93,7 +93,7 @@ void HOST_NEW(Response* res, Request* request) {
 	if (!tok)
 		HANDLE_RETURN(FORBIDDEN);
 	
-	if (strlen(request->structures[1]->data->host_new.hostid) != AUTOGETNOO_HOST_ID_LENGTH)
+	if (strlen(request->structures[1]->data->host_new.hostid) != AUTOGENTOO_HOST_ID_LENGTH)
 		HANDLE_RETURN(BAD_REQUEST);
 	
 	/* Create the host */
@@ -501,7 +501,8 @@ void HOST_STAGE3(Response* res, Request* request) {
 	worker_req.host_id = host->id;
 	
 	worker_req.n = 1;
-	worker_req.args = &request->structures[2]->data->job_select.job_name;
+	worker_req.args = malloc(sizeof(char*));
+	worker_req.args[0] = request->structures[2]->data->job_select.job_name;
 	
 	char* job_name = NULL;
 	int worker_res = worker_handler_request(request->parent->job_handler, &worker_req, &job_name);

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from client import Server
+from client import Server, Host
 from autogentoo_api.request import *
 import pprint
 import atexit
@@ -103,7 +103,7 @@ class Cli:
 	def mkhost(self, arch, profile, hostname):
 		req = Request(Address("localhost", 9491), Request.REQ_HOST_NEW, [
 			Request.authorize("cli", self.server.sudo_token),
-			Request.host_new(arch, profile, hostname)
+			Request.host_new(Host.generate_id(), arch, profile, hostname)
 		])
 		
 		req.send()
@@ -124,15 +124,23 @@ class Cli:
 		self.pp.pprint(self.commands)
 	
 	def q(self):
-		os.kill(self.server_pid, signal.SIGINT)
+		if self.server_pid != -1:
+			os.kill(self.server_pid, signal.SIGINT)
+		
 		exit(0)
 
 
 def main(args):
+	if len(args) != 3:
+		print("usage %s [config path] [server_pid]" % args[0])
+		return 1
+	
 	cli = Cli(args[1], int(args[2]))
 	cli.cli()
+	
+	return 0
 
 
 if __name__ == "__main__":
 	import sys
-	main(sys.argv)
+	exit(main(sys.argv))

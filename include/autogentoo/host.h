@@ -17,7 +17,7 @@ typedef struct __Host Host;
 #include "kernel.h"
 #include "host_environment.h"
 
-#define AUTOGETNOO_HOST_ID_LENGTH 16
+#define AUTOGENTOO_HOST_ID_LENGTH 16
 
 /**
  * @brief Are the chroot directories mounted

@@ -1,12 +1,9 @@
 #define _GNU_SOURCE
 
 #include <stdlib.h>
-#include <unistd.h>
 #include <autogentoo/host.h>
 #include <string.h>
 #include <limits.h>
-#include <sys/wait.h>
-#include <autogentoo/user.h>
 #include <errno.h>
 #include <autogentoo/writeconfig.h>
 #include <sys/stat.h>
@@ -29,7 +26,7 @@ char* prv_gen_random(size_t len) {
 }
 
 inline char* host_id_new() {
-	return prv_gen_random(AUTOGETNOO_HOST_ID_LENGTH);
+	return prv_gen_random(AUTOGENTOO_HOST_ID_LENGTH);
 }
 
 Host* host_new(Server* server, char* id) {
@@ -171,9 +168,6 @@ int host_write_make_conf(Host* host) {
 	
 	return 0;
 }
-
-int read_int(FILE* fp);
-size_t write_int(int src, FILE* fp);
 
 void host_getstatus(Host* host) {
 	char* host_directory = host_path(host, "");

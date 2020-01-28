@@ -367,9 +367,8 @@ int repository_init(Repository* repo) {
 			
 			char* line = NULL;
 			line_size = 0;
-			line_len = 0;
 			
-			while ((line_len = getline(&line, &line_size, package_manifest)) > 0) {
+			while (getline(&line, &line_size, package_manifest) > 0) {
 				char* type = strtok(line, " ");
 				if (strcmp(type, "EBUILD") != 0)
 					continue;

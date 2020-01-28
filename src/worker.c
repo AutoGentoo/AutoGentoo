@@ -178,6 +178,8 @@ int worker_handler_request(WorkerHandler* wh, WorkerRequest* request, char** job
 	int res = 0;
 	read(wh->read_fifo, &res, sizeof(int));
 	
+	printf("WORKER RES %d\n", res);
+	
 	pthread_mutex_unlock(&wh->read_lck);
 	
 	return res;

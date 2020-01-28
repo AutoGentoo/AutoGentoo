@@ -14,7 +14,7 @@ void handle_sigint (int sig) {
 void server_kill (Server* server) {
 	write_server(server);
 	
-	if (server->opts & ENCRYPT) {
+	if (!(server->opts & NOENCRYPT)) {
 		pthread_kill(server->rsa_child->pid, SIGINT);
 		close(server->rsa_child->socket);
 		pthread_join(server->rsa_child->pid, NULL);

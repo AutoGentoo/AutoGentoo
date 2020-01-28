@@ -15,7 +15,7 @@ Opt opt_handlers[] = {
 		{0,   "log",     "Pipe output to logfile",                          pipe_to_log,        OPT_LONG | OPT_ARG},
 		{'t', "target",  "Target server (localhost default)",               set_target,         OPT_SHORT | OPT_LONG |
 		                                                                                        OPT_ARG},
-		{0,   "encrypt", "Start an encrypted socket as well",               set_is_encrypted,   OPT_LONG},
+		{0,   "encrypt", "Start an encrypted socket as well",               set_is_unencrypted,   OPT_LONG},
 		{0,   "cert",    "speificy certificate file",                       set_encrypt_opts,   OPT_LONG | OPT_ARG},
 		{0,   "rsa",     "speificy rsa private key file",                   set_encrypt_opts,   OPT_LONG | OPT_ARG},
 		{0,   "sign",    "sign the rsa key with the certificate",           set_encrypt_opts,   OPT_LONG},
@@ -60,8 +60,8 @@ void set_encrypt_opts (Opt* op, char* arg) {
 	}
 }
 
-void set_is_encrypted (Opt* op, char* c) {
-	server_opts |= ENCRYPT;
+void set_is_unencrypted (Opt* op, char* c) {
+	server_opts |= NOENCRYPT;
 	OpenSSL_add_all_algorithms();
 	ERR_load_BIO_strings();
 	ERR_load_crypto_strings();
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
 	free(location);
 	main_server->keep_alive = 1;
 	
-	if (main_server->opts & ENCRYPT) {
+	if (!(main_server->opts & NOENCRYPT)) {
 		main_server->rsa_child = server_encrypt_new(main_server, AUTOGENTOO_PORT_ENCRYPT, cert_file, rsa_file, enc_server_options);
 		if (!main_server->rsa_child) {
 			server_free(main_server);
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 		}
 	}
 	
-	if (main_server->opts & ENCRYPT)
+	if (!(main_server->opts & NOENCRYPT))
 		pthread_create(
 				&main_server->rsa_child->pid,
 				NULL,

@@ -43,7 +43,7 @@ typedef enum {
 	DAEMON = 0x1, //!< Run the server in background as a service
 	NO_DEBUG = 0x0, //!< Turn off debug information
 	DEBUG = 0x2, //!< Turn on debug information
-	ENCRYPT = 0x4  //!< Start an encrypted socket
+	NOENCRYPT = 0x4  //!< Don't start an encrypted socket
 } server_t;
 
 typedef enum {
