@@ -241,3 +241,23 @@ void worker_lock(int fd) {
 void worker_unlock(int fd) {
 	flock(fd, LOCK_UN);
 }
+
+int worker_job(Host* host, char* command, char** job_name, int argc, ...) {
+	WorkerRequest worker_req;
+	worker_req.command_name = "stage3";
+	worker_req.host_id = host->id;
+	
+	worker_req.n = argc;
+	worker_req.args = malloc(sizeof(char*) * argc);
+	
+	va_list args;
+	va_start(args, argc);
+	
+	for (int i = 0; i < argc; i++) {
+		worker_req.args[i] = va_arg(args, char*);
+	}
+	
+	va_end(args);
+	
+	return worker_handler_request(host->parent->job_handler, &worker_req, job_name);
+}

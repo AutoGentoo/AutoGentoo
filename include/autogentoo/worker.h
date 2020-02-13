@@ -78,4 +78,6 @@ void worker_handler_free(WorkerHandler* wh);
 void worker_lock(int fd);
 void worker_unlock(int fd);
 
+int worker_job(Host* host, char* command, char** job_name, int argc, ...);
+
 #endif //AUTOGENTOO_WORKER_H
