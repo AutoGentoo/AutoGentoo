@@ -79,6 +79,7 @@ struct __NamespaceManager {
 	
 	int keep_alive;
 	pthread_t pthread_pid;
+	pthread_mutex_t init_lock;
 };
 
 int namespace_get_flags();

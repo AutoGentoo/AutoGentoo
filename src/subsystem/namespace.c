@@ -75,6 +75,9 @@ NamespaceManager* ns_manager_new(Server* parent) {
 		return NULL;
 	}
 	
+	pthread_mutex_init(&out->init_lock, NULL);
+	pthread_mutex_lock(&out->init_lock);
+	
 	return out;
 }
 
@@ -83,6 +86,7 @@ void ns_manager_main(NamespaceManager* nsm) {
 		struct sockaddr addr;
 		socklen_t addr_len;
 		
+		pthread_mutex_unlock(&nsm->init_lock);
 		int client_sock = accept(nsm->sock, &addr, &addr_len);
 		if (client_sock < 0)
 			continue; /* Failed to accept, could be an nsm->kill() */
@@ -125,6 +129,4 @@ void ns_manager_main(NamespaceManager* nsm) {
 
 int ns_manager_start(NamespaceManager* nsm) {
 	pthread_create(&nsm->pthread_pid, NULL, (void* (*)(void*)) ns_manager_main, nsm);
-	
-	
 }
