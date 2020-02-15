@@ -17,6 +17,7 @@ typedef int (*namespace_callback)(void* arg);
 
 typedef struct __HostNamespace HostNamespace;
 typedef struct __NamespaceManager NamespaceManager;
+typedef struct __Namespace Namespace;
 
 typedef enum {
 	/* Server to worker */
@@ -60,6 +61,14 @@ struct __HostNamespace {
 	RSA* key;
 };
 
+struct __Namespace {
+	Host* target;
+	
+	char* portdir; /* Gentoo package repo (read-only) */
+	char* target_dir; /* Where we want to chroot */
+	char* worker_dir; /* AutoGentoo worker scripts (read-only) */
+};
+
 struct __NamespaceManager {
 	Server* parent;
 	SmallMap* host_to_ns;
@@ -78,8 +87,7 @@ struct __NamespaceManager {
 };
 
 int namespace_get_flags();
-pid_t namespace_spawn(HostNamespace* target, namespace_callback callback, void* arg);
-int namespace_main(char** script_and_dir);
+int namespace_main(Namespace* ns);
 HostNamespace* namespace_new(Host* parent);
 NamespaceManager* ns_manager_new(Server* parent);
 int ns_manager_start(NamespaceManager* nsm);

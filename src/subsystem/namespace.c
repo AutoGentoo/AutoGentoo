@@ -11,32 +11,68 @@
 #include <autogentoo/crypt.h>
 #include <autogentoo/writeconfig.h>
 #include <sys/mount.h>
+#include <sys/stat.h>
+#include <syscall.h>
 
 int namespace_get_flags() {
 	return CLONE_NEWUSER | CLONE_NEWIPC | CLONE_NEWUTS | CLONE_NEWNET | CLONE_NEWPID | CLONE_NEWNS;
 }
 
-pid_t namespace_spawn(HostNamespace* target, namespace_callback callback, void* arg) {
-
+static int pivot_root(const char *new_root, const char *put_old) {
+	return (int)syscall(SYS_pivot_root, new_root, put_old);
 }
 
-int namespace_main(char** ag_root_and_target_id) {
-	char* parent_dir = ag_root_and_target_id[0];
-	char* host_id = ag_root_and_target_id[1];
+int namespace_chroot_pivot(Namespace* ns) {
+	/*
+	 * 1. Remount the chroot dir as a bind
+	 *    (pivot needs the root to be mounted)
+	 * 2. bind-mount worker ro
+	 * 3. bind-mount portage ro
+	 * 4. Create an old-root buffer
+	 * 5. pivot root to old-root
+	 * 6. umount lazy on old-root
+	 * 7. mount a procfs
+	 * 8. chroot.
+	 * */
 	
-	char* target_dir = NULL;
-	asprintf(&target_dir, "%s/%s", parent_dir, host_id);
+	int out = 0;
 	
-	char* path = AUTOGENTOO_WORKER_DIR "/worker.py";
-	char* const argv[] = {path, NULL};
+	out += mount(ns->target_dir, ns->target_dir, "", MS_BIND, NULL);
+	out += chdir(ns->target_dir);
 	
-	char* worker_mount_dest = NULL;
-	asprintf(&worker_mount_dest, "%s/autogentoo/worker/", );
+	out += mkdir("autogentoo/worker/", 0700);
+	out += mkdir("autogentoo/portage", 0700);
 	
-	mount(AUTOGENTOO_WORKER_DIR, "");
+	out += mount(ns->worker_dir, "autogentoo/worker", "", MS_BIND | MS_RDONLY, NULL);
+	out += mount(ns->portdir, "autogentoo/portage", "", MS_BIND | MS_RDONLY, NULL);
 	
-	chroot(target_dir);
-	int res = execv(path, argv);
+	out += mkdir("old-root", 0700);
+	out += pivot_root(".", "old-root");
+	
+	umount2("oldroot", MNT_DETACH);
+	
+	out += mount("proc", "proc", "proc", MS_MGC_VAL, NULL);
+	out += chroot(".");
+	
+	sethostname(ns->target->hostname, strlen(ns->target->hostname));
+	
+	
+	return out;
+}
+
+int namespace_main(Namespace* ns) {
+	int res = namespace_chroot_pivot(ns);
+	if (res != 0) {
+		lerror("Failed to enter chroot isolation");
+		lerror("Error [%d] %s", errno, strerror(errno));
+		
+		return res;
+	}
+	
+	char* script_name = "/autogentoo/worker/worker.py";
+	char* argv[] = {script_name, NULL};
+	
+	res = execv(script_name, argv);
 	
 	return res;
 }
