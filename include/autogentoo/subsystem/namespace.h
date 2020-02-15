@@ -56,13 +56,8 @@ struct __HostNamespace {
 	pid_t init_pid;
 	int ns_flags;
 	
-	/* NS Manager on top */
-	char* access_up;
-	char* access_down;
-	
 	/* public key send from init script */
 	RSA* key;
-	
 };
 
 struct __NamespaceManager {
@@ -84,7 +79,7 @@ struct __NamespaceManager {
 
 int namespace_get_flags();
 pid_t namespace_spawn(HostNamespace* target, namespace_callback callback, void* arg);
-int namespace_main(char* public_key);
+int namespace_main(char** script_and_dir);
 HostNamespace* namespace_new(Host* parent);
 NamespaceManager* ns_manager_new(Server* parent);
 int ns_manager_start(NamespaceManager* nsm);

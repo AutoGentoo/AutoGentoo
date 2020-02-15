@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <autogentoo/crypt.h>
 #include <autogentoo/writeconfig.h>
+#include <sys/mount.h>
 
 int namespace_get_flags() {
 	return CLONE_NEWUSER | CLONE_NEWIPC | CLONE_NEWUTS | CLONE_NEWNET | CLONE_NEWPID | CLONE_NEWNS;
@@ -19,10 +20,25 @@ pid_t namespace_spawn(HostNamespace* target, namespace_callback callback, void* 
 
 }
 
-int namespace_main(char* public_key) {
+int namespace_main(char** ag_root_and_target_id) {
+	char* parent_dir = ag_root_and_target_id[0];
+	char* host_id = ag_root_and_target_id[1];
 	
+	char* target_dir = NULL;
+	asprintf(&target_dir, "%s/%s", parent_dir, host_id);
 	
-	return 0;
+	char* path = AUTOGENTOO_WORKER_DIR "/worker.py";
+	char* const argv[] = {path, NULL};
+	
+	char* worker_mount_dest = NULL;
+	asprintf(&worker_mount_dest, "%s/autogentoo/worker/", );
+	
+	mount(AUTOGENTOO_WORKER_DIR, "");
+	
+	chroot(target_dir);
+	int res = execv(path, argv);
+	
+	return res;
 }
 
 NamespaceManager* ns_manager_new(Server* parent) {
@@ -129,4 +145,8 @@ void ns_manager_main(NamespaceManager* nsm) {
 
 int ns_manager_start(NamespaceManager* nsm) {
 	pthread_create(&nsm->pthread_pid, NULL, (void* (*)(void*)) ns_manager_main, nsm);
+	
+	/* Wait for nsm to initialize and accept connections */
+	pthread_mutex_lock(&nsm->init_lock);
+	pthread_mutex_unlock(&nsm->init_lock);
 }
