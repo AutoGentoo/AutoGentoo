@@ -103,6 +103,6 @@ void host_free(Host* host);
  */
 void host_init_extras(Host* target);
 
-int host_write_make_conf(Host* host);
+int host_init(Host* host);
 
 #endif

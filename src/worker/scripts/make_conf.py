@@ -18,7 +18,6 @@ def script(_job_name: str, host: Host, _args=None):
 	template = open("templates/make.conf", "r").read()
 	
 	content = pystache.render(template, host)
-	print(content)
 	
 	fp.write(content)
 	fp.flush()
