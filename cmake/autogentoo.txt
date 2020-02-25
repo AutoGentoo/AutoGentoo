@@ -29,6 +29,7 @@ set(src_SOURCES
         src/host_environment.c
         src/cli.c
         src/subsystem/namespace.c
+        src/subsystem/net.c
         )
 
 set(include_HEADERS
@@ -61,6 +62,7 @@ set(include_HEADERS
         include/autogentoo/host_environment.h
         include/autogentoo/cli.h
         include/autogentoo/subsystem/namespace.h
+        include/autogentoo/subsystem/net.h
         )
 
 set(test_SOURCES

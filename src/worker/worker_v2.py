@@ -9,8 +9,7 @@ from script import *
 import signal
 
 logfp = None
-WORKER_FIFO_REQUEST = "/tmp/autogentoo_worker.req"
-WORKER_FIFO_RESPONSE = "/tmp/autogentoo_worker.res"
+WORKER_SOCK_UDS = "/autogentoo/"
 
 WORKER_EXIT = 0
 WORKER_JOB = 1

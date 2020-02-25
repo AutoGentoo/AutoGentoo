@@ -209,9 +209,9 @@ int host_job(Host* host, char* job, ...) {
 	
 	worker_req.n = 1;
 	worker_req.args = malloc(sizeof(char*));
-	worker_req.args[0] = request->structures[2]->data->job_select.job_name;
+	//worker_req.args[0] = request->structures[2]->data->job_select.job_name;
 	
 	char* job_name = NULL;
-	int worker_res = worker_handler_request(request->parent->job_handler, &worker_req, &job_name);
-	
+	//int worker_res = worker_handler_request(request->parent->job_handler, &worker_req, &job_name);
+	return 0;
 }

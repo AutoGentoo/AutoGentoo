@@ -54,8 +54,7 @@ int namespace_chroot_pivot(Namespace* ns) {
 	out += mount("proc", "proc", "proc", MS_MGC_VAL, NULL);
 	out += chroot(".");
 	
-	sethostname(ns->target->hostname, strlen(ns->target->hostname));
-	
+	out += sethostname(ns->target->hostname, strlen(ns->target->hostname));
 	
 	return out;
 }
