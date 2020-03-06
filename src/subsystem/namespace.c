@@ -15,7 +15,9 @@
 #include <syscall.h>
 
 int namespace_get_flags() {
-	return CLONE_NEWUSER | CLONE_NEWIPC | CLONE_NEWUTS | CLONE_NEWNET | CLONE_NEWPID | CLONE_NEWNS;
+	return CLONE_NEWUSER | CLONE_NEWIPC | CLONE_NEWUTS |
+	//CLONE_NEWNET | // Don't isolate network for now.
+	CLONE_NEWPID | CLONE_NEWNS;
 }
 
 static int pivot_root(const char *new_root, const char *put_old) {

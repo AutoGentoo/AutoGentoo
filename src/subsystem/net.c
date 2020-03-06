@@ -8,8 +8,8 @@
 #include <string.h>
 #include <autogentoo/subsystem/net.h>
 
-NetworkInterface* network_interface_new(pid_t pid) {
-	NetworkInterface* out = malloc(sizeof(NetworkInterface));
+NetworkBridge* network_bridge_new(pid_t pid) {
+	NetworkBridge* out = malloc(sizeof(NetworkBridge));
 	
 	out->target = pid;
 	out->interface_n = ++interface_n;
@@ -26,4 +26,8 @@ NetworkInterface* network_interface_new(pid_t pid) {
 	asprintf(&out->addr_command_child, "ifconfig %s %s", out->name_child, out->address_child);
 	
 	return out;
+}
+
+int network_bridge_pinit(NetworkBridge* ni) {
+	
 }
