@@ -73,8 +73,10 @@ int namespace_main(Namespace* ns) {
 	char* script_name = "/autogentoo/worker/worker.py";
 	char* argv[] = {script_name, NULL};
 	
+	/* Take over this namespace
+	 * All processes will be spawned from here
+	 * */
 	res = execv(script_name, argv);
-	
 	return res;
 }
 

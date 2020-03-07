@@ -11,7 +11,14 @@ class DynamicBinary:
 		self.read_only = read_only
 		
 		self.template = ""
-	
+		self.template_binding = {
+			"i": self.read_int,
+			"s": self.read_string,
+		}
+
+	def add_binding(self, template, f_proto):
+		self.template_binding[template] = f_proto
+
 	def write(self, buffer):
 		if self.read_only:
 			raise TypeError("This object is read only")
@@ -98,14 +105,11 @@ class DynamicBinary:
 	
 	def read_template(self, template) -> List[Union[int, str, List]]:
 		out = []
-		
 		i = 0
 		
 		while i < len(template):
-			if template[i] == 's':
-				out.append(self.read_string())
-			elif template[i] == 'i':
-				out.append(self.read_int())
+			if template[i] in self.template_binding:
+				out.append(self.template_binding[template[i]]())
 			elif template[i] == 'a':
 				i += 1
 				iter_count = self.read_int()
