@@ -1,4 +1,4 @@
-from autogentoo_api.dynamic_binary import FileReader, BinaryObject
+from autogentoo_api.dynamic_binary import BufferedDynamicBinary
 
 AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd
 AUTOGENTOO_HOST = 0xfffffff0
@@ -8,7 +8,7 @@ AUTOGENTOO_FILE_END = 0xffffffff
 AUTOGENTOO_SUDO_TOKEN = 0xcccccccc
 AUTOGENTOO_HOST_ID_LENGTH = 16
 
-
+"""
 class Server(BinaryObject):
 	def __init__(self, path, parent_pid):
 		self.path = path
@@ -74,13 +74,12 @@ class Server(BinaryObject):
 		self.reader.start_write()
 		super().write()
 		self.reader.end_write()
+"""
 
 
-class Host(BinaryObject):
-	def __init__(self, reader: FileReader, parent):
-		super(Host, self).__init__(reader, "siissssssssssssi")
-
-		self.parent = parent
+class Host(BufferedDynamicBinary):
+	def __init__(self, stream):
+		super(Host, self).__init__(stream)
 		
 		self.id = ""
 		self.status = -1
@@ -102,8 +101,12 @@ class Host(BinaryObject):
 		self.data = ()
 		
 		self.extra = {}
+		
+		self.add_binding("h", self.read_host)
 	
-	def read(self):
+	def read_host(self):
+		self.buffer_read()
+		
 		(
 			self.id,
 			self.status,
@@ -123,13 +126,13 @@ class Host(BinaryObject):
 			self.portdir,
 			self.use,
 			extra_n
-		) = super().read()
+		) = self.read_template("siissssssssssssi")
 		
 		for i in range(extra_n):
-			key = self.reader.read_string()
-			self.extra[key] = self.reader.read_string()
+			key = self.read_string()
+			self.extra[key] = self.read_string()
 		
-		if self.reader.read_int() & 0xffffffff != AUTOGENTOO_HOST_END:
+		if self.read_int() & 0xffffffff != AUTOGENTOO_HOST_END:
 			raise IOError("Expected end of host")
 	
 	def extra_keys(self):
@@ -143,7 +146,7 @@ class Host(BinaryObject):
 			out_str += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[int(random.random()*62)]
 		
 		return out_str
-	
+	"""
 	def write(self):
 		self.data = (
 			AUTOGENTOO_HOST,
@@ -169,11 +172,10 @@ class Host(BinaryObject):
 		)
 		
 		super().write()
-	
-	def get_path(self, sub=""):
-		return "%s/%s/%s" % (self.parent.path, self.id, sub)
+	"""
 
 
+"""
 class Token(BinaryObject):
 	def __init__(self, reader):
 		super(Token, self).__init__(reader, "sssi")
@@ -202,3 +204,4 @@ class Token(BinaryObject):
 		)
 		
 		super().write()
+"""

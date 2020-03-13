@@ -170,6 +170,27 @@ class DynamicBinary:
 		return outstr
 
 
+class BufferedDynamicBinary(DynamicBinary):
+	def __init__(self, stream):
+		super(BufferedDynamicBinary, self).__init__()
+		self.stream = stream
+
+	def buffer_read(self, bs=1024):
+		self.data = b""
+
+		b = b""
+		n = 0
+		passed = False
+
+		while len(b) == bs or not passed:
+			b = self.stream.read(bs)
+			self.data += b
+			n += len(b)
+			passed = True
+
+		return self.data
+
+
 class FileReader(DynamicBinary):
 	def __init__(self, path, parent_pid):
 		super(FileReader, self).__init__()

@@ -43,6 +43,7 @@ int namespace_chroot_pivot(Namespace* ns) {
 	out += chdir(ns->target_dir);
 	
 	out += mkdir("autogentoo/worker/", 0700);
+	out += mkdir("autogentoo/worker/logs/", 0700);
 	out += mkdir("autogentoo/portage", 0700);
 	
 	out += mount(ns->worker_dir, "autogentoo/worker", "", MS_BIND | MS_RDONLY, NULL);

@@ -7,54 +7,46 @@ from client import *
 import importlib
 from script import *
 import signal
-import socket
-from log import Log
 
 logfp = None
-WORKER_SOCK_UDS = "/autogentoo/comm.uds"
-WORKER_LOG = "/autogentoo/worker.log"
+WORKER_FIFO_REQUEST = "/tmp/autogentoo_worker.req"
+WORKER_FIFO_RESPONSE = "/tmp/autogentoo_worker.res"
 
 WORKER_EXIT = 0
 WORKER_JOB = 1
 
 
 class Worker:
-	server_uds: socket.socket
+	request_fifo = None
+	response_fifo = None
+	
+	read_lck = None
+	write_lck = None
 	
 	pid = None
 	running_jobs = {}
-	log: Log
 	
 	keep_alive = True
 	
-	def __init__(self):
-		self.job_queue = []
-		self.pid = os.getpid()  # should be 1
-		self.log = Log(WORKER_LOG)
+	def __init__(self, server: Server):
+		self.server = server
 		
-		self.server_uds = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
-		self.bind()
-		self.listen()
-	
-	def bind(self):
-		try:
-			self.server_uds.bind("WORKER_SOCK_UDS")
-		except Error as e:
-			self.log.error(e.strerror, e.errno)
+		self.request_fifo = open(WORKER_FIFO_REQUEST, "rb")
+		self.response_fifo = open(WORKER_FIFO_RESPONSE, "wb")
 		
-	def listen(self):
-		try:
-			self.server_uds.listen(32)
-		except Error as e:
-			self.log.error(e.strerror, e.errno)
+		self.pid = os.getpid()
+		self.jobs = []
+		self.keep_alive = True
+		
+		self.read_lck = _thread.allocate_lock()
+		self.write_lck = _thread.allocate_lock()
 	
 	def start(self):
-		mkdir("/autogentoo/logs")
+		mkdir("logs")
+		self.server.read()
 		
 		while self.keep_alive:
-			conn, adr = self.server_uds.accept()
-			
-			
+			self.read_lck.acquire()
 			
 			command_enum = self.read_int()
 			if command_enum == WORKER_EXIT or command_enum == -1:
