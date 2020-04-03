@@ -4,11 +4,13 @@
 #include "ag_http.tab.h"
 #include <stdio.h>
 
+int error = 0;
+
 int ag_httperror(char *s) {
     fprintf(stderr, "%s in line %d near '%s'\n", s, ag_httplineno, ag_httptext);
     error = 1;
     
-    return error;
+    return 1;
 }
 
 HttpRequest* ag_http_parse (char* buffer) {

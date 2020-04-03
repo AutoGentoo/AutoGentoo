@@ -218,7 +218,7 @@ void server_free (Server* server) {
 	vector_free(server->hosts);
 	map_free(server->auth_tokens, (void (*)(void*))token_free);
 	
-	worker_handler_free(server->job_handler);
+	nsm_free(server->job_handler);
 	free(server->autogentoo_org_token);
 	free(server->sudo_token);
 	

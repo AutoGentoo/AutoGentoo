@@ -8,8 +8,6 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <string.h>
-#include <fcntl.h>
-#include <sys/file.h>
 #include <wait.h>
 
 WorkerHandler* worker_handler_new(Server* parent) {
@@ -232,14 +230,6 @@ void worker_handler_free(WorkerHandler* wh) {
 	free(wh);
 	
 	linfo("Exited WorkerHandler with worker_handler_free()");
-}
-
-void worker_lock(int fd) {
-	flock(fd, LOCK_EX);
-}
-
-void worker_unlock(int fd) {
-	flock(fd, LOCK_UN);
 }
 
 int worker_job(Host* host, char* command, char** job_name, int argc, ...) {

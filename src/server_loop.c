@@ -81,8 +81,7 @@ void server_start (Server* server) {
 	
 	write_server(server);
 	
-	server->job_handler = worker_handler_new(server);
-	worker_handler_start(server->job_handler);
+	server->job_handler = nsm_new(server);
 	
 	while (server->keep_alive) { // Main accept loop
 		int temp_fd = accept4(server->socket, (struct sockaddr*) &clientaddr, &addrlen, SOCK_CLOEXEC);

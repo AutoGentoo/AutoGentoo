@@ -155,7 +155,8 @@ int host_setstatus(Host* host) {
 	struct stat st;
 	
 	if (stat(host_directory, &st) != 0) {
-		lerror("Error on stat [%d] %s", errno, strerror(errno));
+		mkdir(host_path(host, ""), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+		lwarning("Recreating host directory %s", host->id);
 		
 		host->environment_status = HOST_ENV_VOID;
 	}
@@ -193,25 +194,5 @@ int host_init(Host* host) {
 		}
 	}
 	
-	int stat_stat = host_setstatus(host);
-	if (stat_stat != 0)
-		return stat_stat;
-	
-	
-	
-	return 0;
-}
-
-int host_job(Host* host, char* job, ...) {
-	WorkerRequest worker_req;
-	worker_req.command_name = strdup(job);
-	worker_req.host_id = host->id;
-	
-	worker_req.n = 1;
-	worker_req.args = malloc(sizeof(char*));
-	//worker_req.args[0] = request->structures[2]->data->job_select.job_name;
-	
-	char* job_name = NULL;
-	//int worker_res = worker_handler_request(request->parent->job_handler, &worker_req, &job_name);
 	return 0;
 }

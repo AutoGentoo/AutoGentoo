@@ -19,8 +19,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 execute_process(COMMAND bash -c "mkdir -p {cportage,http}")
 
-#add_definitions(-DAUTOGENTOO_WORKER_DIR="${CMAKE_INSTALL_PREFIX}/share/autogentoo")
-add_definitions(-DAUTOGENTOO_WORKER_DIR="${CMAKE_SOURCE_DIR}/src/worker")
+add_definitions(-DAUTOGENTOO_WORKER_DIR="${CMAKE_INSTALL_PREFIX}/share/autogentoo")
+add_definitions(-DAUTOGENTOO_WORKER_DIR_DEBUG="${CMAKE_SOURCE_DIR}/src/worker")
 add_definitions(-DDBPATH="test")
 add_definitions(-DAUTOGENTOO_DEBUG)
 
@@ -107,6 +107,7 @@ SET(PYTHON_WORKER
         src/worker/client.py
         src/worker/worker.py
         src/worker/script.py
+        src/worker/util.py
         )
 SET(WORKER_SCRIPTS
         src/worker/scripts/emerge.py

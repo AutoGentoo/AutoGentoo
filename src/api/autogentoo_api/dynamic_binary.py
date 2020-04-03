@@ -167,10 +167,9 @@ class DynamicBinary:
 
 
 class FileReader(DynamicBinary):
-	def __init__(self, path, parent_pid):
+	def __init__(self, path):
 		super(FileReader, self).__init__()
 		
-		self.parent_pid = parent_pid
 		self.path = path
 		self.file = None
 		self.data = b""

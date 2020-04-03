@@ -40,7 +40,8 @@ struct __AccessToken { // Serverside auth
 };
 
 #include "host.h"
-#include <autogentoo/request.h>
+
+typedef struct __Request Request;
 
 AccessToken* authorize(Request* request, token_access_t access_level, auth_t type);
 

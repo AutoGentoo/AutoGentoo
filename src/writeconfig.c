@@ -8,6 +8,7 @@
 #include <autogentoo/host_environment.h>
 #include <autogentoo/writeconfig.h>
 #include <semaphore.h>
+#include <sys/file.h>
 
 void* read_void(size_t len, FILE* fp) {
 	void* out = malloc (len);
@@ -43,6 +44,14 @@ ssize_t write_int_fd(int fd, int i) {
 	return write(fd, &to_send, sizeof(int));
 }
 
+void worker_lock(int fd) {
+	flock(fd, LOCK_EX);
+}
+
+void worker_unlock(int fd) {
+	flock(fd, LOCK_UN);
+}
+
 size_t write_server(Server* server) {
 	char* config_file_name = ".autogentoo.config";
 	char* config_file = malloc(strlen(server->location) + strlen(config_file_name) + 2);
@@ -50,7 +59,6 @@ size_t write_server(Server* server) {
 	
 	
 	FILE* to_write = fopen(config_file, "wb+");
-	worker_lock(fileno(to_write));
 	
 	if (to_write == NULL) {
 		lerror("Failed to open '%s' for writing-----------", config_file);
@@ -71,8 +79,6 @@ size_t write_server(Server* server) {
 	
 	worker_unlock(fileno(to_write));
 	fclose(to_write);
-	
-	
 	return size;
 }
 
@@ -164,9 +170,6 @@ size_t write_host_fp(Host* host, FILE* fp) {
 	
 	size += write_int(AUTOGENTOO_HOST_END, fp);
 	
-	if (host_setstatus(host) != 0)
-		lerror("Failed to set status for %s", host->id);
-	
 	return size;
 }
 
@@ -238,7 +241,6 @@ Host* read_host(FILE* fp) {
 	out->arch = read_string(fp);
 	
 	out->environment = host_environment_new(out);
-	
 	
 	out->environment->cflags = read_string(fp);
 	out->environment->cxxflags = read_string(fp);

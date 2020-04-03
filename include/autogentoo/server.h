@@ -72,7 +72,7 @@ typedef enum {
 #include "thread.h"
 #include "queue.h"
 #include "user.h"
-#include <autogentoo/worker.h>
+#include "subsystem/namespace.h"
 
 /**
  * @brief The main struct that hold hosts/bindings and other information
@@ -89,7 +89,7 @@ struct __Server {
 	
 	volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
 	PoolHandler* pool_handler; //!< For socket requests
-	WorkerHandler* job_handler; //!< For running jobs
+	NamespaceManager* job_handler; //!< For running jobs
 	
 	pid_t pid;
 	pthread_t pthread;
@@ -178,7 +178,7 @@ struct __Connection {
 	int encrypted_fd;
 };
 
-#include "host.h"
+typedef struct __Host Host;
 
 /**
  * Creates a new server ready to start

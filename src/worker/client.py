@@ -1,5 +1,7 @@
 from autogentoo_api.dynamic_binary import FileReader, BinaryObject
 
+from util import Streamable
+
 AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd
 AUTOGENTOO_HOST = 0xfffffff0
 AUTOGENTOO_SERVER_TOKEN = 0xfffff000
@@ -10,12 +12,12 @@ AUTOGENTOO_HOST_ID_LENGTH = 16
 
 
 class Server(BinaryObject):
-	def __init__(self, path, parent_pid):
+	def __init__(self, path):
 		self.path = path
-		self.parent_pid = parent_pid
+		#self.parent_pid = parent_pid
 		self.file = "%s/.autogentoo.config" % self.path
 		
-		reader = FileReader(self.file, parent_pid)
+		reader = FileReader(self.file)
 		
 		super(Server, self).__init__(reader, "")
 		
@@ -77,9 +79,8 @@ class Server(BinaryObject):
 
 
 class Host(BinaryObject):
-	def __init__(self, reader: FileReader, parent):
+	def __init__(self, reader: Streamable, parent=None):
 		super(Host, self).__init__(reader, "siissssssssssssi")
-
 		self.parent = parent
 		
 		self.id = ""

@@ -7,6 +7,15 @@
 
 #define _GNU_SOURCE
 
+typedef struct __Namespace Namespace;
+typedef struct __NamespaceManager NamespaceManager;
+typedef struct __Job Job;
+
+/* From util-linux */
+#define _PATH_PROC_UIDMAP	"/proc/self/uid_map"
+#define _PATH_PROC_GIDMAP	"/proc/self/gid_map"
+#define _PATH_PROC_SETGROUPS	"/proc/self/setgroups"
+
 #include <fcntl.h>
 #include <sched.h>
 #include <autogentoo/hacksaw/hacksaw.h>
@@ -14,10 +23,6 @@
 #include <autogentoo/host.h>
 
 typedef int (*namespace_callback)(void* arg);
-
-typedef struct __HostNamespace HostNamespace;
-typedef struct __NamespaceManager NamespaceManager;
-typedef struct __Namespace Namespace;
 
 typedef enum {
 	/* Server to worker */
@@ -29,67 +34,50 @@ typedef enum {
 	NS_UPDATE
 } ns_command;
 
-static struct namespace_file {
+extern struct namespace_file {
 	int nstype;
 	const char *name;
 	int fd;
-} namespace_files[] = {
-		/* Careful the order is significant in this array.
-		 *
-		 * The user namespace comes either first or last: first if
-		 * you're using it to increase your privilege and last if
-		 * you're using it to decrease.  We enter the namespaces in
-		 * two passes starting initially from offset 1 and then offset
-		 * 0 if that fails.
-		 */
-		{ .nstype = CLONE_NEWUSER,  .name = "ns/user", .fd = -1 },
-		{ .nstype = CLONE_NEWCGROUP,.name = "ns/cgroup", .fd = -1 },
-		{ .nstype = CLONE_NEWIPC,   .name = "ns/ipc",  .fd = -1 },
-		{ .nstype = CLONE_NEWUTS,   .name = "ns/uts",  .fd = -1 },
-		{ .nstype = CLONE_NEWNET,   .name = "ns/net",  .fd = -1 },
-		{ .nstype = CLONE_NEWPID,   .name = "ns/pid",  .fd = -1 },
-		{ .nstype = CLONE_NEWNS,    .name = "ns/mnt",  .fd = -1 },
-		{ .nstype = 0, .name = NULL, .fd = -1 }
-};
-
-struct __HostNamespace {
-	Host* parent;
-	pid_t init_pid;
-	int ns_flags;
-	
-	/* public key send from init script */
-	RSA* key;
-};
+} namespace_files[];
 
 struct __Namespace {
+	pid_t worker_pid;
 	Host* target;
 	
 	char* portdir; /* Gentoo package repo (read-only) */
 	char* target_dir; /* Where we want to chroot */
 	char* worker_dir; /* AutoGentoo worker scripts (read-only) */
+	
+	int running;
 };
 
 struct __NamespaceManager {
 	Server* parent;
 	SmallMap* host_to_ns;
+};
+
+struct __Job {
+	NamespaceManager* parent;
+	Host* target;
 	
-	int sock;
-	char* sock_path;
+	char* script;
 	
-	/* Private key generated on server
-	 * No public key here
-	*/
-	RSA* key;
-	
-	int keep_alive;
-	pthread_t pthread_pid;
-	pthread_mutex_t init_lock;
+	int argc;
+	char** argv;
 };
 
 int namespace_get_flags();
 int namespace_main(Namespace* ns);
-HostNamespace* namespace_new(Host* parent);
-NamespaceManager* ns_manager_new(Server* parent);
-int ns_manager_start(NamespaceManager* nsm);
+
+Namespace* ns_new(Host* target);
+NamespaceManager* nsm_new(Server* parent);
+void nsm_free(NamespaceManager* nsm);
+
+/**
+ * Request a worker to perform a job
+ * @param job_request the job holding the necessary information
+ * @return the job name as a string
+ */
+char* nsm_job(Job* job_request, int* res);
 
 #endif //AUTOGENTOO_NAMESPACE_H

@@ -19,6 +19,7 @@
 #include <sys/inotify.h>
 #include "autogentoo/worker.h"
 #include <openssl/ssl.h>
+#include <autogentoo/subsystem/namespace.h>
 
 RequestLink requests[] = {
 		{REQ_GET,             {.http_fh=GET}},
@@ -182,35 +183,7 @@ void HOST_EMERGE(Response* res, Request* request) {
 		HANDLE_RETURN(FORBIDDEN);
 	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
 	
-	
-	WorkerRequest* strct_worker_request = malloc(sizeof(WorkerRequest));
-	strct_worker_request->command_name = "emerge";
-	strct_worker_request->host_id = host->id;
-	
-	StringVector* worker_args = string_vector_new();
-	string_vector_add(worker_args, "-v");
-	
-	char* token = strtok(request->structures[2]->data->emerge.emerge, " ");
-	while(token) {
-		string_vector_add(worker_args, token);
-		token = strtok(NULL, " ");
-	}
-	string_vector_add(worker_args, NULL);
-	
-	strct_worker_request->args = (char**)worker_args->ptr;
-	strct_worker_request->n = (int)worker_args->n - 1; // Ignore NULL at end
-	
-	char* job_name;
-	int worker_res = worker_handler_request(request->parent->job_handler, strct_worker_request, &job_name);
-	
-	if (!job_name)
-		HANDLE_RETURN(INTERNAL_ERROR);
-	
-	dynamic_binary_add(res->content, 's', job_name);
-	
-	free(strct_worker_request);
-	
-	HANDLE_RETURN(get_res(worker_res));
+	HANDLE_RETURN(NOT_IMPLEMENTED);
 }
 
 void HOST_MNTCHROOT(Response* res, Request* request) {
@@ -496,10 +469,29 @@ void HOST_STAGE3(Response* res, Request* request) {
 	
 	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
 	
-	char* job_name = NULL;
-	int worker_res = worker_job(host, "stage3", &job_name, 1, request->structures[2]->data->job_select.job_name);
+	
+	/**
+	 *
+	 * NamespaceManager* parent;
+	Host* target;
+	
+	char* script;
+	
+	char** argv;
+	int argc;
+	 */
+	Job job_request = {
+			request->parent->job_handler,
+			host,
+			request->structures[2]->data->job_select.job_name,
+			0,
+			NULL
+	};
+	
+	int response_code = 0;
+	char* job_name = nsm_job(&job_request, &response_code);
 	
 	dynamic_binary_add(res->content, 's', job_name);
 	
-	HANDLE_RETURN(get_res(worker_res));
+	HANDLE_RETURN(get_res(response_code));
 }

@@ -2,8 +2,11 @@
 // Created by atuser on 12/2/18.
 //
 
+#ifdef AUTOGENTOO_DEPRACATED
+
 #ifndef AUTOGENTOO_WORKER_H
 #define AUTOGENTOO_WORKER_H
+
 
 #include <stdio.h>
 #include <pthread.h>
@@ -81,3 +84,4 @@ void worker_unlock(int fd);
 int worker_job(Host* host, char* command, char** job_name, int argc, ...);
 
 #endif //AUTOGENTOO_WORKER_H
+#endif // AUTOGENTOO_DEPRACATED

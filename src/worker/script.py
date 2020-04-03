@@ -12,6 +12,7 @@ cp = copy2
 mv = move
 rm = os.remove
 rmdir = os.rmdir
+pwd = os.getcwd()
 logfp = None
 
 
@@ -20,16 +21,11 @@ def s(cmd):
 	return out.returncode
 
 
-def cd(path: str, host=None):
-	if host is not None:
-		path = host.get_path() + path
+def cd(path: str):
 	os.chdir(path)
 
 
-def mkdir(path, host=None):
-	if host is not None and len(path) and path[0] == "/":
-		path = host.get_path() + path
-	
+def mkdir(path):
 	return os.makedirs(path, exist_ok=True)
 
 
@@ -69,18 +65,6 @@ def extract(filename: str, output_dir):
 		print("Error [%d] %s" % (out, os.strerror(out)))
 	
 	return out
-
-
-def chroot(host):
-	cd("/", host=host)
-	
-	try:
-		os.chroot(".")
-	except PermissionError:
-		print("[ERROR], server needs to be root!")
-		return 1
-	
-	return 0
 
 
 def touch(filepath):

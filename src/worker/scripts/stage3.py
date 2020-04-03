@@ -24,39 +24,42 @@ def script(_job_name: str, host: Host, args=None):
 		raise RuntimeError("Host must be specified for stage3.py")
 	
 	# Make the host path and cd to it
-	mkdir(host.get_path())
-	cd("", host)
+	cd("")
+	
+	stage_dist = "/autogentoo/stage_dist"
 	
 	print("Initializing autogentoo directories")
-	mkdir("autogentoo")
-	mkdir(host.portage_logdir, host)
-	mkdir(host.portage_tmpdir, host)
-	mkdir(host.pkgdir, host)
-	mkdir(host.portdir, host)
+	mkdir("/autogentoo")
+	mkdir(stage_dist)
+	mkdir(host.portage_logdir)
+	mkdir(host.portage_tmpdir)
+	mkdir(host.pkgdir)
+	mkdir(host.portdir)
 	
 	mirror = "http://mirrors.rit.edu/gentoo"
 	url_pre = "%s/releases/%s/autobuilds" % (mirror, host.arch)
 	
-	metafile = "latest-stage3-%s.txt" % host.arch
+	metafile = "/autogentoo/stage_dist/latest-stage3-%s.txt" % host.arch
 	if args is not None:
 		if "systemd" in args:
 			metafile = "latest-stage3-%s-systemd.txt" % host.arch
 	
 	metaurl = "%s/%s" % (url_pre, metafile)
-	if download(metaurl, ".stage3.latest") == 1:
+	metatarget = stage_dist + "/.stage3.latest"
+	if download(metaurl, metatarget) == 1:
 		print("Failed to download %s" % metaurl)
 		metafile = "latest-stage3-%s.txt" % host.arch
 		metaurl = "%s/%s" % (url_pre, metafile)
 		print("Trying %s" % metaurl)
-		if download(metaurl, ".stage3.latest") == 1:
+		if download(metaurl, metatarget) == 1:
 			print("Failed to download %s\nStop" % metaurl)
 			raise RuntimeError("Failed to retrieve metadata")
 	
-	with open(".stage3.latest", "r") as metafp:
+	with open(metatarget, "r") as metafp:
 		lines = [x for x in metafp.readlines() if x[0] != "#"]
 		
 		url = "%s/%s" % (url_pre, lines[0].split(" ")[0])
-		filename = url[url.rfind("/") + 1:]
+		filename = stage_dist + "/" + url[url.rfind("/") + 1:]
 		metafp.close()
 	
 	if download(url + ".DIGESTS", filename + ".DIGESTS") == 1:
@@ -84,14 +87,14 @@ def script(_job_name: str, host: Host, args=None):
 		raise RuntimeError("Failed to extract stage3")
 	
 	print("Preparing /etc/portage/")
-	mkdir("etc/portage/", host)
-	rmrf("etc/portage/package.use")
-	touch("etc/portage/package.use")
-	touch("etc/portage/package.env")
-	touch("etc/portage/package.accept_keywords")
+	mkdir("/etc/portage/")
+	rmrf("/etc/portage/package.use")
+	touch("/etc/portage/package.use")
+	touch("/etc/portage/package.env")
+	touch("/etc/portage/package.accept_keywords")
 	
 	print("Settings make.profile")
-	cd("etc/portage/", host)
+	cd("/etc/portage/")
 	
 	try:
 		rm("make.profile")
@@ -100,7 +103,7 @@ def script(_job_name: str, host: Host, args=None):
 	
 	ln("%s/profiles/%s" % (host.portdir, host.profile), "make.profile")
 	
-	cd("/", host)
+	cd("/")
 	
 	print("Updating /etc/portage/make.conf")
 	make_conf.script(_job_name, host)

@@ -23,10 +23,9 @@ atexit.register(readline.write_history_file, histfile)
 
 
 class Cli:
-	def __init__(self, path, server_pid: int):
+	def __init__(self, path):
 		self.path = path
-		self.server_pid = server_pid
-		self.server = Server(self.path, server_pid)
+		self.server = Server(self.path)
 		self.commands = {
 			"stage3": ("host_id", "args"),
 			"mkhost": ("arch", "profile", "hostname"),
@@ -124,18 +123,15 @@ class Cli:
 		self.pp.pprint(self.commands)
 	
 	def q(self):
-		if self.server_pid != -1:
-			os.kill(self.server_pid, signal.SIGINT)
-		
 		exit(0)
 
 
 def main(args):
-	if len(args) != 3:
-		print("usage %s [config path] [server_pid]" % args[0])
+	if len(args) != 2:
+		print("usage %s [config path]" % args[0])
 		return 1
 	
-	cli = Cli(args[1], int(args[2]))
+	cli = Cli(args[1])
 	cli.cli()
 	
 	return 0
