@@ -183,7 +183,26 @@ void HOST_EMERGE(Response* res, Request* request) {
 		HANDLE_RETURN(FORBIDDEN);
 	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
 	
-	HANDLE_RETURN(NOT_IMPLEMENTED);
+	/**	 * NamespaceManager* parent;
+	Host* target;
+	char* script;
+	char** argv;
+	int argc;
+	 
+	 */
+	
+	Job job_request = {
+			request->parent->job_handler,
+			host,
+			"emerge",
+			request->structures[2]->data->job_select.job_name,
+	};
+	
+	int response_code = 0;
+	char* job_name = nsm_job(&job_request, &response_code);
+	
+	dynamic_binary_add(res->content, 's', job_name);
+	HANDLE_RETURN(get_res(response_code));
 }
 
 void HOST_MNTCHROOT(Response* res, Request* request) {
@@ -470,28 +489,12 @@ void HOST_STAGE3(Response* res, Request* request) {
 	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
 	
 	
-	/**
-	 *
-	 * NamespaceManager* parent;
-	Host* target;
-	
-	char* script;
-	
-	char** argv;
-	int argc;
-	 */
-	Job job_request = {
-			request->parent->job_handler,
-			host,
-			request->structures[2]->data->job_select.job_name,
-			0,
-			NULL
-	};
-	
 	int response_code = 0;
-	char* job_name = nsm_job(&job_request, &response_code);
+	char* job_name = NULL;
+	asprintf(&job_name, "%s_stage3", host->id);
+	
+	stage3_bootstrap(host, request->structures[2]->data->job_select.job_name);
 	
 	dynamic_binary_add(res->content, 's', job_name);
-	
 	HANDLE_RETURN(get_res(response_code));
 }

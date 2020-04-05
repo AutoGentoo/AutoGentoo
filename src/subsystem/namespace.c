@@ -13,7 +13,6 @@
 #include <autogentoo/writeconfig.h>
 #include <wait.h>
 #include <err.h>
-#include <dirent.h>
 
 int namespace_get_flags() {
 	return CLONE_NEWIPC | CLONE_NEWUTS | CLONE_NEWPID | CLONE_NEWNS;
@@ -55,7 +54,8 @@ int namespace_chroot_pivot(Namespace* ns) {
 	
 	out = mkdir("autogentoo/", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 	out = mkdir("autogentoo/worker/", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-	out = mkdir("autogentoo/portage", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	out = mkdir("/usr", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	out = mkdir("/usr/portage", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 	
 	out = mount(ns->worker_dir, "autogentoo/worker", "", MS_BIND | MS_RDONLY, NULL);
 	if (out != 0) {
@@ -63,7 +63,7 @@ int namespace_chroot_pivot(Namespace* ns) {
 		return out;
 	}
 	
-	out = mount(ns->portdir, "autogentoo/portage", "", MS_BIND | MS_RDONLY, NULL);
+	out = mount(ns->portdir, "usr/portage", "", MS_BIND | MS_RDONLY, NULL);
 	if (out != 0) {
 		lerror("ERROR [%d] Failed to mount portage: %s", errno, strerror(errno));
 		return out;
@@ -114,6 +114,28 @@ int namespace_main(Namespace* ns) {
 	
 	res = execv(script_name, argv);
 	return res;
+}
+
+int stage3_bootstrap(Host* host, char* args) {
+#ifdef AUTOGENTOO_DEBUG
+	char* script = AUTOGENTOO_WORKER_DIR_DEBUG "/stage3.py";
+#else
+	char* script = AUTOGENTOO_WORKER_DIR "/stage3.py";
+#endif
+	
+	char* argv[] = {script, host->parent->location, host->id, args, NULL};
+	
+	pid_t pid = fork();
+	if (pid == -1) {
+		lerror("fork() failed [%d]: %s", errno, strerror(errno));
+		exit(errno);
+	}
+	else if (pid == 0) {
+		int res = execv(script, argv);
+		exit(res);
+	}
+	
+	return 0;
 }
 
 Namespace* ns_new(Host* target) {
@@ -200,6 +222,21 @@ char* nsm_job(Job* job_request, int* res) {
 	char* socket_path = host_path(job_request->target, "/autogentoo/comm.uds");
 	strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
 	
+	size_t ptr_buf_n = 0;
+	char* ptr_buf = NULL;
+	FILE* buff_sock = open_memstream(&ptr_buf, &ptr_buf_n);
+	if (!buff_sock) {
+		perror("open_memstream() failed");
+		close(fd);
+	}
+	write_host_fp(job_request->target, buff_sock);
+	write_string(job_request->script, buff_sock);
+	
+	write_string(job_request->arg, buff_sock);
+	
+	fflush (buff_sock);
+	long pos = ftell(buff_sock);
+	
 	if (connect(fd, (struct sockaddr*) &addr, sizeof(addr)) == -1) {
 		perror("connect error");
 		close(fd);
@@ -207,19 +244,21 @@ char* nsm_job(Job* job_request, int* res) {
 		return NULL;
 	}
 	
-	FILE* sock = fdopen(fd, "rb+");
+	int wrote = write(fd, ptr_buf, (int)pos);
+	if (wrote == -1) {
+		perror("write() error");
+		close(fd);
+		
+		return NULL;
+	}
 	
-	write_host_fp(job_request->target, sock);
-	write_string(job_request->script, sock);
+	fclose(buff_sock);
+	free(ptr_buf);
 	
-	write_int(job_request->argc, sock);
-	for (int i = 0; i < job_request->argc; i++)
-		write_string(job_request->argv[i], sock);
+	*res = read_int_fd(fd);
+	char* job_name = read_string_fd(fd);
 	
-	*res = read_int(sock);
-	char* job_name = read_string(sock);
-	
-	fclose(sock);
+	close(fd);
 	
 	return job_name;
 }

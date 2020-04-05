@@ -1,6 +1,6 @@
 from client import Host
 from script import *
-from scripts import stage3
+import stage3
 
 
 def validate_chroot(_job_name: str, host: Host):

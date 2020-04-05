@@ -1,6 +1,4 @@
-from api.dynamic_binary import FileReader, BinaryObject
-
-from util import Streamable
+from api.dynamic_binary import FileReader, BinaryObject, Streamable
 
 AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd
 AUTOGENTOO_HOST = 0xfffffff0
@@ -14,7 +12,6 @@ AUTOGENTOO_HOST_ID_LENGTH = 16
 class Server(BinaryObject):
 	def __init__(self, path):
 		self.path = path
-		#self.parent_pid = parent_pid
 		self.file = "%s/.autogentoo.config" % self.path
 		
 		reader = FileReader(self.file)
@@ -52,9 +49,9 @@ class Server(BinaryObject):
 			if current == AUTOGENTOO_HOST:
 				self.read_host()
 			elif current == AUTOGENTOO_SERVER_TOKEN:
-				self.autogentoo_org_token = self.reader.read_string()
+				self.autogentoo_org_token = self.reader.read_str()
 			elif current == AUTOGENTOO_SUDO_TOKEN:
-				self.sudo_token = self.reader.read_string()
+				self.sudo_token = self.reader.read_str()
 			elif current == AUTOGENTOO_ACCESS_TOKEN:
 				self.read_token()
 			else:
@@ -104,16 +101,20 @@ class Host(BinaryObject):
 		
 		self.extra = {}
 	
+	def __getitem__(self, item):
+		try:
+			return eval("self.%s" % item)
+		except:
+			return ""
+	
 	def read(self):
 		(
 			self.id,
 			self.status,
 			self.env_status,
-			
 			self.hostname,
 			self.profile,
 			self.arch,
-			
 			self.cflags,
 			self.cxxflags,
 			self.distdir,
@@ -127,11 +128,12 @@ class Host(BinaryObject):
 		) = super().read()
 		
 		for i in range(extra_n):
-			key = self.reader.read_string()
-			self.extra[key] = self.reader.read_string()
+			key = self.reader.read_str()
+			self.extra[key] = self.reader.read_str()
 		
-		if self.reader.read_int() & 0xffffffff != AUTOGENTOO_HOST_END:
-			raise IOError("Expected end of host")
+		final = self.reader.read_int()
+		if final & 0xffffffff != AUTOGENTOO_HOST_END:
+			raise IOError("Expected end of host got %s" % hex(final))
 	
 	def extra_keys(self):
 		return [{"k": k, "v": v} for k, v in self.extra.items()]

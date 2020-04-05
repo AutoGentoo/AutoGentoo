@@ -194,9 +194,9 @@ class Request:
 		self.client.close()
 		
 		self.code = outdata.read_int()
-		self.message = outdata.read_string()
+		self.message = outdata.read_str()
 		
-		template = outdata.read_string()
+		template = outdata.read_str()
 		
 		if template is None:
 			return Response(None, -1, "Connection Error")

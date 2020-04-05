@@ -39,6 +39,26 @@ int read_int_fd(int fd) {
 	return ntohl((uint32_t) out);
 }
 
+char* read_string_fd(int fd) {
+	size_t len = (size_t)read_int_fd(fd);
+	
+	if (!len)
+		return NULL;
+	
+	char* out = malloc(len + 1);
+	
+	if (!out) {
+		lerror("Failed to allocate memory with size %d", len + 1);
+		close(fd);
+		exit(1);
+	}
+	
+	read(fd, out, len);
+	out[len] = 0;
+	
+	return out;
+}
+
 ssize_t write_int_fd(int fd, int i) {
 	int to_send = htonl((uint32_t) i);
 	return write(fd, &to_send, sizeof(int));
@@ -313,6 +333,7 @@ char* read_string(FILE* fp) {
 	
 	if (!out) {
 		lerror("Failed to allocate memory with size %d", len + 1);
+		fclose(fp);
 		exit(1);
 	}
 	

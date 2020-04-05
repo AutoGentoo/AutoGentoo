@@ -118,6 +118,7 @@ size_t write_string (char* src, FILE* fp);
  */
 char* read_string (FILE* fp);
 int read_int_fd(int fd);
+char* read_string_fd(int fd);
 ssize_t write_int_fd(int fd, int i);
 
 /**

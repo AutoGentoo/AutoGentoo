@@ -6,6 +6,7 @@ import traceback
 import functools
 import hashlib
 import subprocess
+import sys
 
 print = functools.partial(print, flush=True)
 cp = copy2
@@ -13,11 +14,10 @@ mv = move
 rm = os.remove
 rmdir = os.rmdir
 pwd = os.getcwd()
-logfp = None
 
 
 def s(cmd):
-	out = subprocess.run(cmd, shell=True, stdout=logfp, stderr=logfp)
+	out = subprocess.run(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
 	return out.returncode
 
 

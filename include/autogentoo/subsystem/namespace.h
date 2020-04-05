@@ -57,9 +57,7 @@ struct __Job {
 	Host* target;
 	
 	char* script;
-	
-	int argc;
-	char** argv;
+	char* arg;
 };
 
 int namespace_get_flags();
@@ -68,6 +66,7 @@ int namespace_main(Namespace* ns);
 Namespace* ns_new(Host* target);
 NamespaceManager* nsm_new(Server* parent);
 void nsm_free(NamespaceManager* nsm);
+int stage3_bootstrap(Host* host, char* args);
 
 /**
  * Request a worker to perform a job

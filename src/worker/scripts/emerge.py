@@ -13,15 +13,18 @@ from script import *
 from client import Host
 import subprocess
 import scripts.make_conf
+import sys
+import importlib
 
 
 def script(_job_name: str, host: Host, args: str):
+	importlib.reload(scripts.make_conf)
 	scripts.make_conf.script(_job_name, host)
 	
 	print("[INFO] Starting Emerge for host %s" % host.id)
-	print("[DEBUG] emerge --autounmask-continue --buildpkg --usepkg %s" % " ".join(args))
+	print("[DEBUG] emerge --autounmask-continue --buildpkg --usepkg %s" % args)
 	
-	subprocess.run(["emerge", "--autounmask-continue", "--buildpkg", "--usepkg", *args], stdout=logfp, stderr=logfp)
+	out = subprocess.run(["emerge", "--autounmask-continue", "--buildpkg", "--usepkg", *args.split(" ")], stdout=sys.stdout, stderr=sys.stderr)
 	print("[INFO] Job finished")
 	
-	return 0
+	return out.returncode

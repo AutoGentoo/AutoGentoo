@@ -5,12 +5,13 @@ import threading
 import importlib
 import signal
 import socket
-from random import random
+import random
 from typing import Union
 
-from util import SockStream
-from .script import *
+from api.dynamic_binary import SockStream
+from script import *
 from client import Host
+import scripts.emerge, scripts.make_conf, scripts.package_etc
 
 
 class WorkerThread(threading.Thread, SockStream):
@@ -22,7 +23,7 @@ class WorkerThread(threading.Thread, SockStream):
 	
 	host: Union[Host, None]
 	command: str
-	args: list
+	arg: str
 	res: int
 	
 	def __init__(self, job_name: str, client: socket.socket):
@@ -34,17 +35,19 @@ class WorkerThread(threading.Thread, SockStream):
 		self.module = None
 		self.status = -1
 		self.res = -1
+		self.pid = 0
+		self.logfile = "/autogentoo/jobs/%s.log" % job_name
 		
-		self.args = []
+		self.args = ""
 	
 	def lock(self):
-		cwd = pwd()
+		cwd = pwd
 		cd(self.working_dir)
 		touch(self.logfile + ".lck")
 		cd(cwd)
 	
 	def unlock(self):
-		cwd = pwd()
+		cwd = pwd
 		cd(self.working_dir)
 		rm(self.logfile + ".lck")
 		cd(cwd)
@@ -55,14 +58,13 @@ class WorkerThread(threading.Thread, SockStream):
 			return -1
 		elif self.pid == 0:
 			# Run the script
-			importlib.reload(self.module)
 			
 			logfp = open(self.logfile, "a+")
 			sys.stdout = logfp
 			sys.stderr = logfp
 			
 			try:
-				ret = self.module.script(self.job_name, self.host, self.args)
+				ret = self.module.script(self.job_name, self.host, self.arg)
 			except Exception:
 				traceback.print_exc()
 				ret = 1
@@ -78,31 +80,42 @@ class WorkerThread(threading.Thread, SockStream):
 		os.kill(self.pid, signal.SIGKILL)
 	
 	def run(self):
+		self.read_data()
+		
+		s = self.read_int()
+		print(s)
+		
 		self.host = Host(self)
-		self.host.read()
-		
-		self.command = self.read_str()
-		argc = self.read_int()
-		
-		for i in range(argc):
-			self.args.append(self.read_str())
 		
 		try:
-			self.module = importlib.import_module("scripts.%s" % self.command)
-		except ModuleNotFoundError:
-			self.res = 404
-		else:
-			self.res = 200
+			self.host.read()
+		except:
+			traceback.print_exc(file=sys.stdout)
+			self.res = 400
+		
+		self.command = self.read_str()
+		self.arg = self.read_str()
+		
+		if self.res != 400:
+			try:
+				self.module = eval("scripts.%s" % self.command)
+				importlib.reload(self.module)
+			except:
+				print("Failed to load module scripts.%s" % self.command)
+				self.res = 404
+			else:
+				self.res = 200
 		
 		self.write_int(self.res)
 		self.write_str(self.job_name)
 		self.close()
 		
-		self.lock()
-		self.run_job()
-		self.unlock()
+		if self.res == 200:
+			self.lock()
+			self.res = self.run_job()
+			self.unlock()
 		
-		print("%s (%s) exited -> %s" % (self.job_name, self.pid, self.status))
+		print("%s exited -> %s" % (self.job_name, self.res))
 
 
 class Worker:
@@ -131,7 +144,7 @@ class Worker:
 		
 		while exists:
 			name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
-			exists = stat('logs/%s.log' % name) != 0
+			exists = stat('/autogentoo/jobs/%s.log' % name) != 0
 		
 		return name
 	
@@ -140,7 +153,7 @@ class Worker:
 		self.server_sock.bind(self.server_path)
 		self.server_sock.listen(2)
 		
-		mkdir("logs")
+		mkdir("/autogentoo/jobs/")
 		
 		while self.keep_alive:
 			conn, address = self.server_sock.accept()
@@ -162,7 +175,6 @@ class Worker:
 
 
 def main():
-	signal.signal(signal.SIGINT, signal.SIG_IGN)
 	handler = Worker()
 	handler.start()
 

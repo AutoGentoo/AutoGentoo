@@ -8,17 +8,23 @@ take current variables from host and overwrite the file
 """
 
 from client import Host
-import pystache
+from string import Template
 
 
 def script(_job_name: str, host: Host, _args=None):
-	filename = host.get_path("etc/portage/make.conf")
+	filename = "/etc/portage/make.conf"
 	
 	fp = open(filename, "w+")
-	template = open("templates/make.conf", "r").read()
+	template = open("/templates/make.conf", "r").read()
 	
-	content = pystache.render(template, host)
+	t = Template(template)
+	fp.write(t.substitute(host))
 	
-	fp.write(content)
+	fp.write("\n")
+	for key in host.extra:
+		if key == "video":
+			continue
+		fp.write("%s=\"%s\"\n" % (key, host.extra[key]))
+	
 	fp.flush()
 	fp.close()

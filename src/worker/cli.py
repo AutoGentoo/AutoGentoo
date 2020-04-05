@@ -21,12 +21,15 @@ atexit.register(readline.write_history_file, histfile)
 
 
 class Cli:
+	port = 9491
+	
 	def __init__(self, path):
 		self.path = path
 		self.server = Server(self.path)
 		self.commands = {
 			"stage3": ("host_id", "args"),
 			"mkhost": ("arch", "profile", "hostname"),
+			"emerge": ("host_id", "emerge_str"),
 			"ls": (),
 			"help": (),
 			"q": (),
@@ -86,7 +89,7 @@ class Cli:
 		return eval("self.%s(*args)" % cmd_name)
 	
 	def stage3(self, host_id, args=""):
-		req = Request(Address("localhost", 9491), Request.REQ_HOST_STAGE3, [
+		req = Request(Address("localhost", self.port), Request.REQ_HOST_STAGE3, [
 			Request.authorize("cli", self.server.sudo_token),
 			Request.host_select(host_id),
 			Request.job_select(args)
@@ -97,8 +100,20 @@ class Cli:
 		
 		print(res.content)
 	
+	def emerge(self, host_id, emerge_str):
+		req = Request(Address("localhost", self.port), Request.REQ_HOST_EMERGE, [
+			Request.authorize("cli", self.server.sudo_token),
+			Request.host_select(host_id),
+			Request.host_emerge(emerge_str)
+		])
+		
+		req.send()
+		res = req.recv()
+		
+		print(res.content)
+	
 	def mkhost(self, arch, profile, hostname):
-		req = Request(Address("localhost", 9491), Request.REQ_HOST_NEW, [
+		req = Request(Address("localhost", self.port), Request.REQ_HOST_NEW, [
 			Request.authorize("cli", self.server.sudo_token),
 			Request.host_new(Host.generate_id(), arch, profile, hostname)
 		])
