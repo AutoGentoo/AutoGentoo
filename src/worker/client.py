@@ -1,4 +1,4 @@
-from autogentoo_api.dynamic_binary import FileReader, BinaryObject
+from api.dynamic_binary import FileReader, BinaryObject
 
 from util import Streamable
 

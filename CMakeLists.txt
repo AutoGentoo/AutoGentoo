@@ -37,14 +37,6 @@ add_library(hacksaw SHARED
         ${hacksaw_SRC}
         hacksaw/queue_set.c)
 
-find_package (Python COMPONENTS Interpreter Development)
-add_library(autogentooapi SHARED
-        include/autogentoo/api/host_serial.h
-        src/api/host_serial.c
-)
-
-target_include_directories(autogentooapi PUBLIC ${Python_INCLUDE_DIRS})
-
 target_link_libraries(autogentoo hacksaw)
 
 #add_executable(autogentoo-build ${arch_SOURCES} ${arch_HEADERS})
@@ -53,9 +45,7 @@ add_executable(autogentoo-exec
         src/autogentoo.c
         )
 
-add_subdirectory("src/api/")
 set_target_properties(autogentoo-exec PROPERTIES OUTPUT_NAME autogentoo)
-add_dependencies(autogentoo-exec autogentoo_api)
 
 target_link_libraries(autogentoo-exec
         autogentoo
@@ -109,6 +99,12 @@ SET(PYTHON_WORKER
         src/worker/script.py
         src/worker/util.py
         )
+SET(WORKER_API
+        src/worker/api/dynamic_binary.py
+        src/worker/api/request.py
+        src/worker/api/stream.py
+        src/worker/api/test.py
+        )
 SET(WORKER_SCRIPTS
         src/worker/scripts/emerge.py
         src/worker/scripts/stage3.py
@@ -118,6 +114,7 @@ SET(WORKER_SCRIPTS
 
 
 INSTALL(PROGRAMS ${PYTHON_WORKER} DESTINATION share/autogentoo/)
+INSTALL(PROGRAMS ${WORKER_API} DESTINATION share/autogentoo/api)
 INSTALL(PROGRAMS ${WORKER_SCRIPTS} DESTINATION share/autogentoo/scripts/)
 
 INSTALL_HEADERS_WITH_DIRECTORY(include_HEADERS)

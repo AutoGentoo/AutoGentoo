@@ -1,15 +1,13 @@
 #! /usr/bin/env python
 
 from client import Server, Host
-from autogentoo_api.request import *
+from api.request import *
 import pprint
 import atexit
 import rlcompleter
 import readline
 import traceback
 import time
-import signal
-import os
 
 histfile = ".autogentoo_history"
 try:

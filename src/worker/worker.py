@@ -116,7 +116,7 @@ class Worker:
 		self.keep_alive = True
 		
 		self.running_jobs = {}
-		self.server_path = "/worker/comm.uds"
+		self.server_path = "/autogentoo/comm.uds"
 		
 		try:
 			os.unlink(self.server_path)

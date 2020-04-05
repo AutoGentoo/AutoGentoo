@@ -16,6 +16,8 @@ typedef struct __Job Job;
 #define _PATH_PROC_GIDMAP	"/proc/self/gid_map"
 #define _PATH_PROC_SETGROUPS	"/proc/self/setgroups"
 
+#define UNSHARE_PROPAGATION_DEFAULT	(MS_REC | MS_PRIVATE)
+
 #include <fcntl.h>
 #include <sched.h>
 #include <autogentoo/hacksaw/hacksaw.h>
@@ -33,12 +35,6 @@ typedef enum {
 	/* Worker to server */
 	NS_UPDATE
 } ns_command;
-
-extern struct namespace_file {
-	int nstype;
-	const char *name;
-	int fd;
-} namespace_files[];
 
 struct __Namespace {
 	pid_t worker_pid;
