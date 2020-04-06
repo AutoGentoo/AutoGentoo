@@ -1,6 +1,6 @@
 #! /usr/bin/env python
+import fcntl
 import string
-import sys
 import threading
 import importlib
 import signal

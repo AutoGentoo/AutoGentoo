@@ -80,8 +80,12 @@ void server_start (Server* server) {
 	}
 	
 	write_server(server);
-	
 	server->job_handler = nsm_new(server);
+	for (int i = 0; i < server->hosts->n; i++) {
+		Host* current = (Host*)vector_get(server->hosts, i);
+		Namespace* ns = ns_new(current);
+		small_map_insert(server->job_handler->host_to_ns, current->id, ns);
+	}
 	
 	while (server->keep_alive) { // Main accept loop
 		int temp_fd = accept4(server->socket, (struct sockaddr*) &clientaddr, &addrlen, SOCK_CLOEXEC);

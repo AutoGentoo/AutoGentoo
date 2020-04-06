@@ -124,7 +124,6 @@ int stage3_bootstrap(Host* host, char* args) {
 #endif
 	
 	char* argv[] = {script, host->parent->location, host->id, args, NULL};
-	
 	pid_t pid = fork();
 	if (pid == -1) {
 		lerror("fork() failed [%d]: %s", errno, strerror(errno));

@@ -79,6 +79,7 @@ size_t write_server(Server* server) {
 	
 	
 	FILE* to_write = fopen(config_file, "wb+");
+	worker_lock(fileno(to_write));
 	
 	if (to_write == NULL) {
 		lerror("Failed to open '%s' for writing-----------", config_file);

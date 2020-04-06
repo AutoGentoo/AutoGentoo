@@ -121,6 +121,9 @@ int read_int_fd(int fd);
 char* read_string_fd(int fd);
 ssize_t write_int_fd(int fd, int i);
 
+void worker_lock(int fd);
+void worker_unlock(int fd);
+
 /**
  * Write an integer to file
  * @param src the integer to write
