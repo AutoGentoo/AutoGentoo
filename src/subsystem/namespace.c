@@ -116,14 +116,20 @@ int namespace_main(Namespace* ns) {
 	return res;
 }
 
-int stage3_bootstrap(Host* host, char* args) {
+struct __prv_stage3_request {
+	Host* host;
+	char* args;
+};
+
+int prv_stage3_wait_thread(struct __prv_stage3_request* stage3_request) {
 #ifdef AUTOGENTOO_DEBUG
 	char* script = AUTOGENTOO_WORKER_DIR_DEBUG "/stage3.py";
 #else
 	char* script = AUTOGENTOO_WORKER_DIR "/stage3.py";
 #endif
 	
-	char* argv[] = {script, host->parent->location, host->id, args, NULL};
+	int ret = 0;
+	char* argv[] = {script, stage3_request->host->parent->location, stage3_request->host->id, stage3_request->args, NULL};
 	pid_t pid = fork();
 	if (pid == -1) {
 		lerror("fork() failed [%d]: %s", errno, strerror(errno));
@@ -133,16 +139,57 @@ int stage3_bootstrap(Host* host, char* args) {
 		int res = execv(script, argv);
 		exit(res);
 	}
+	else {
+		host_set_chroot(stage3_request->host, CHR_INIT);
+		waitpid(pid, &ret, 0);
+		Namespace* ns = NULL;
+		if (ret == 0) { /* Stage3 init successful */
+			ns = ns_new(stage3_request->host);
+		}
+		if (ret != 0 || !ns) {
+			host_set_chroot(stage3_request->host, CHR_NOT_MOUNTED);
+			lerror("Failed to init stage3 for %s", stage3_request->host->id);
+			errno = ret;
+		}
+		else {
+			linfo("Successful stage3 of %s", stage3_request->host->id);
+			small_map_insert(stage3_request->host->parent->job_handler->host_to_ns, stage3_request->host->id, ns);
+		}
+		
+		free(stage3_request->args);
+	}
+	
+	return ret;
+}
+
+int stage3_bootstrap(Host* host, const char* args) {
+	struct __prv_stage3_request* stage3_request = malloc(sizeof(struct __prv_stage3_request));
+	
+	stage3_request->host = host;
+	stage3_request->args = strdup(args);
+	
+	pthread_t wait_thread;
+	pthread_create(&wait_thread, NULL, (void* (*)(void*)) prv_stage3_wait_thread, stage3_request);
 	
 	return 0;
 }
 
 Namespace* ns_new(Host* target) {
+	struct stat stat_buf;
+	char* stage3_check = host_path(target, "/.stage3");
+	if (stat(stage3_check, &stat_buf) != 0) {
+		host_set_chroot(target, CHR_NOT_MOUNTED);
+		free(stage3_check);
+		return NULL;
+	}
+	
+	free(stage3_check);
+	
 	Namespace* out = malloc(sizeof(Namespace));
 	
 	out->target = target;
 	out->target_dir = host_path(target, "");
-	out->portdir = "/usr/portage";   // NEED TO CHANGE !!!!!
+	out->portdir = "/usr/portage";
 
 #ifdef AUTOGENTOO_DEBUG
 	out->worker_dir = AUTOGENTOO_WORKER_DIR_DEBUG;
@@ -153,29 +200,13 @@ Namespace* ns_new(Host* target) {
 	out->worker_pid = -1;
 	out->running = 1;
 	
-	if (-1 == unshare(namespace_get_flags())) {
-		lerror("Failed to unshare for namespace %s\n", target->id);
-		lerror("error [%d] %s", errno, stderr);
-	}
-	
-	out->worker_pid = fork();
-	
-	if (out->worker_pid == -1) {
+	if (clone((int (*)(void*)) namespace_main, malloc(1024 * 1024), namespace_get_flags(), out) == -1) {
 		lerror("Failed to start namespace worker %s", target->id);
 		lerror("error [%d] %s", errno, strerror(errno));
 		exit(errno);
 	}
-	else if (out->worker_pid == 0) { /* Child thread */
-		int res = namespace_main(out);
-		
-		/* Unlock the lock file
-		 * TODO */
-		
-		exit(res);
-	}
-	else {
-		// Wait until pid starts or fails
-	}
+	
+	host_set_chroot(target, CHR_MOUNTED);
 	
 	return out;
 }

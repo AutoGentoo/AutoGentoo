@@ -44,7 +44,7 @@ def script(_job_name: str, host: Host, args=None, bootstrap=False):
 	mirror = "http://mirrors.rit.edu/gentoo"
 	url_pre = "%s/releases/%s/autobuilds" % (mirror, host.arch)
 	
-	metafile = ROOT + "/autogentoo/stage_dist/latest-stage3-%s.txt" % host.arch
+	metafile = "latest-stage3-%s.txt" % host.arch
 	if args is not None:
 		if "systemd" in args:
 			metafile = "latest-stage3-%s-systemd.txt" % host.arch
@@ -67,7 +67,7 @@ def script(_job_name: str, host: Host, args=None, bootstrap=False):
 		filename = url[url.rfind("/") + 1:]
 		metafp.close()
 	
-	if download(url + ".DIGESTS", filename + ".DIGESTS") == 1:
+	if download(url + ".DIGESTS", stage_dist + "/" + filename + ".DIGESTS") == 1:
 		raise RuntimeError("Failed to retrieve DIGESTS file")
 	
 	digest_parse = digest(stage_dist + "/" + filename + ".DIGESTS")
@@ -111,7 +111,7 @@ def script(_job_name: str, host: Host, args=None, bootstrap=False):
 	cd(ROOT + "/")
 	
 	print("Updating /etc/portage/make.conf")
-	make_conf.script(_job_name, host)
+	make_conf.script(_job_name, host, root=ROOT + "/")
 	
 	touch(".stage3")
 	

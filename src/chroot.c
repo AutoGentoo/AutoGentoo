@@ -67,7 +67,7 @@ response_t chroot_mount(Host* host) {
 				lerror("Failed to mount %s", dest_temp);
 				string_vector_free(mounted);
 				free(dest_temp);
-				host->chroot_status = CHR_NOT_MOUNTED;
+				host->__chroot_status__ = CHR_NOT_MOUNTED;
 				return INTERNAL_ERROR;
 			}
 			lwarning("mounting %s to %s", mnt.src, dest_temp);
@@ -79,6 +79,6 @@ response_t chroot_mount(Host* host) {
 	}
 	
 	string_vector_free(mounted);
-	host->chroot_status = CHR_MOUNTED;
+	host->__chroot_status__ = CHR_MOUNTED;
 	return OK;
 }

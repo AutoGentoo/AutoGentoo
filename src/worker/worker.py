@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-import fcntl
 import string
 import threading
 import importlib
@@ -156,22 +155,33 @@ class Worker:
 		mkdir("/autogentoo/jobs/")
 		
 		while self.keep_alive:
-			conn, address = self.server_sock.accept()
+			try:
+				conn, address = self.server_sock.accept()
+			except:
+				break
 			
-			job_name = Worker.new_job_name()
-			self.running_jobs[job_name] = WorkerThread(job_name, conn)
-			
-			print("%s connected - %s" % (address, job_name))
-			self.running_jobs[job_name].start()
+			try:
+				job_name = Worker.new_job_name()
+				self.running_jobs[job_name] = WorkerThread(job_name, conn)
+				
+				print("%s connected - %s" % (address, job_name))
+				try:
+					self.running_jobs[job_name].start()
+				except RuntimeError:
+					print(self.running_jobs)
+			except:
+				traceback.print_exc()
+				conn.close()
 		
 		print("----Worker exits----")
-		self.server_sock.close()
+		self.close()
 
 	def close(self):
 		self.server_sock.close()
 		
-		for job in self.running_jobs:
-			job.join()
+		for key in self.running_jobs:
+			self.running_jobs[key].raise_exception()
+			self.running_jobs[key].join()
 
 
 def main():

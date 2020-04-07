@@ -11,11 +11,11 @@ from client import Host
 from string import Template
 
 
-def script(_job_name: str, host: Host, _args=None):
-	filename = "/etc/portage/make.conf"
+def script(_job_name: str, host: Host, _args=None, root="/"):
+	filename = root + "etc/portage/make.conf"
 	
 	fp = open(filename, "w+")
-	template = open("/templates/make.conf", "r").read()
+	template = open(root + "templates/make.conf", "r").read()
 	
 	t = Template(template)
 	fp.write(t.substitute(host))

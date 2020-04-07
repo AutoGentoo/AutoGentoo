@@ -254,7 +254,9 @@ Host* read_host(FILE* fp) {
 	Host* out = malloc(sizeof(Host));
 	
 	out->id = read_string(fp);
-	out->chroot_status = (chroot_t)read_int(fp);
+	
+	pthread_mutex_init(&out->cs_mutex, NULL);
+	out->__chroot_status__ = (chroot_t)read_int(fp);
 	out->environment_status = (host_env_t)read_int(fp);
 	
 	out->hostname = read_string(fp);

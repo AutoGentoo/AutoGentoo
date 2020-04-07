@@ -29,7 +29,8 @@ typedef struct __Host Host;
  */
 typedef enum {
 	CHR_NOT_MOUNTED,
-	CHR_MOUNTED
+	CHR_MOUNTED,
+	CHR_INIT /* Only true while the stage3 is initializing */
 } chroot_t;
 
 typedef enum {
@@ -54,7 +55,8 @@ struct __Host {
 	
 	char* abi;
 	
-	chroot_t chroot_status; //!< Is the chroot ready?
+	pthread_mutex_t cs_mutex; //!< chroot status needs to be synchronized
+	chroot_t __chroot_status__; //!< Is the chroot ready?
 	host_env_t environment_status; //!< Is the environment ready to compile
 	
 	HostEnvironment* environment;
@@ -74,6 +76,9 @@ char* host_id_new();
  * @return a pointer to the Host
  */
 Host* host_new(Server* server, char* id);
+
+chroot_t host_get_chroot(Host*);
+void host_set_chroot(Host*, chroot_t target);
 
 /**
  * Updates the current status of the host by reading its directory

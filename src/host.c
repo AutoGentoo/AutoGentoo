@@ -33,7 +33,9 @@ Host* host_new(Server* server, char* id) {
 	Host* out = malloc(sizeof(Host));
 	out->parent = server;
 	out->id = id; // Dont need to dup, never accessed elsewhere
-	out->chroot_status = CHR_NOT_MOUNTED;
+	
+	pthread_mutex_init(&out->cs_mutex, NULL);
+	out->__chroot_status__ = CHR_NOT_MOUNTED;
 	out->environment_status = HOST_ENV_VOID;
 	out->environment = malloc(sizeof(HostEnvironment));
 	
@@ -94,6 +96,7 @@ void host_free(Host* host) {
 	free(host->profile);
 	free(host->arch);
 	
+	pthread_mutex_destroy(&host->cs_mutex);
 	host_environment_free(host->environment);
 	
 	if (host->kernel != NULL) {
@@ -195,4 +198,18 @@ int host_init(Host* host) {
 	}
 	
 	return 0;
+}
+
+chroot_t host_get_chroot(Host* h) {
+	pthread_mutex_lock(&h->cs_mutex);
+	chroot_t out = h->__chroot_status__;
+	pthread_mutex_unlock(&h->cs_mutex);
+	
+	return out;
+}
+
+void host_set_chroot(Host* h, chroot_t target) {
+	pthread_mutex_lock(&h->cs_mutex);
+	h->__chroot_status__ = target;
+	pthread_mutex_unlock(&h->cs_mutex);
 }

@@ -20,6 +20,7 @@ typedef enum {
 	HTTP_BAD_GATEWAY = 502,
 	HTTP_SERVICE_UNAVAILABLE = 503,
 	HTTP_CHROOT_NOT_MOUNTED = 504,
+	HTTP_CHROOT_INIT = 505,
 	SIG_AUTOGENTOO_SEGV = 999
 } response_nt;
 
@@ -53,6 +54,7 @@ struct __Response {
 #define BAD_GATEWAY (response_t) {HTTP_BAD_GATEWAY, "Bad Gateway", 11}
 #define SERVICE_UNAVAILABLE (response_t) {HTTP_SERVICE_UNAVAILABLE, "Service Unavailable", 19}
 #define CHROOT_NOT_MOUNTED (response_t) {HTTP_CHROOT_NOT_MOUNTED, "Chroot Not Mounted", 18}
+#define CHROOT_INIT (response_t) {HTTP_CHROOT_INIT, "Chroot Initializing", 19}
 #define AUTOGENTOO_SEGV (response_t) {SIG_AUTOGENTOO_SEGV, "Segmentation Falt", 17}
 
 extern response_t res_list[];

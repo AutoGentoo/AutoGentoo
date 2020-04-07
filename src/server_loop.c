@@ -84,6 +84,9 @@ void server_start (Server* server) {
 	for (int i = 0; i < server->hosts->n; i++) {
 		Host* current = (Host*)vector_get(server->hosts, i);
 		Namespace* ns = ns_new(current);
+		if (!ns)
+			continue;
+		
 		small_map_insert(server->job_handler->host_to_ns, current->id, ns);
 	}
 	

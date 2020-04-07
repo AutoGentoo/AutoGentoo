@@ -12,7 +12,6 @@
 #include <autogentoo/http.h>
 #include <autogentoo/user.h>
 #include <autogentoo/api/dynamic_binary.h>
-#include <autogentoo/chroot.h>
 #include <sys/utsname.h>
 #include <autogentoo/writeconfig.h>
 #include <errno.h>
@@ -28,7 +27,6 @@ RequestLink requests[] = {
 		{REQ_MAKE_CONF,       {.ag_fh=HOST_MAKE_CONF}},
 		{REQ_HOST_DEL,        {.ag_fh=HOST_DEL}},
 		{REQ_HOST_EMERGE,     {.ag_fh=HOST_EMERGE}},
-		{REQ_HOST_MNTCHROOT,  {.ag_fh=HOST_MNTCHROOT}},
 		{REQ_AUTH_ISSUE_TOK,  {.ag_fh=AUTH_ISSUE_TOK}},
 		{REQ_AUTH_REFRESH_TOK,{.ag_fh=AUTH_REFRESH_TOK}},
 		{REQ_SRV_INFO,        {.ag_fh=SRV_INFO}},
@@ -45,7 +43,6 @@ RequestNameLink request_names[] = {
 		{REQ_MAKE_CONF,       "MAKE_CONF"},
 		{REQ_HOST_DEL,        "HOST_DEL"},
 		{REQ_HOST_EMERGE,     "HOST_EMERGE"},
-		{REQ_HOST_MNTCHROOT,  "HOST_MNTCHROOT"},
 		{REQ_AUTH_ISSUE_TOK,  "AUTH_ISSUE_TOK"},
 		{REQ_AUTH_REFRESH_TOK,"AUTH_REFRESH_TOK"},
 		{REQ_SRV_INFO,        "SRV_INFO"},
@@ -154,7 +151,35 @@ void HOST_MAKE_CONF(Response* res, Request* request) {
 		}
 	}
 	
-	HANDLE_RETURN(INTERNAL_ERROR);
+	if (host_get_chroot(host) == CHR_NOT_MOUNTED) {
+		HANDLE_RETURN(OK);
+	}
+	else if (host_get_chroot(host) == CHR_INIT) {
+		HANDLE_RETURN(CHROOT_INIT);
+	}
+	
+	int status = 0;
+	Job job_request = {
+			/*
+			NamespaceManager* parent;
+			Host* target;
+			char* script;
+			char* arg
+			*/
+			request->parent->job_handler,
+			host,
+			"make_conf",
+			""
+	};
+	char* job_name = nsm_job(&job_request, &status);
+	
+	if (job_name)
+		free(job_name);
+	
+	if (status != 200)
+		HANDLE_RETURN(INTERNAL_ERROR);
+	else
+		HANDLE_RETURN(OK);
 }
 
 void HOST_DEL(Response* res, Request* request) {
@@ -183,15 +208,20 @@ void HOST_EMERGE(Response* res, Request* request) {
 		HANDLE_RETURN(FORBIDDEN);
 	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
 	
-	/**	 * NamespaceManager* parent;
-	Host* target;
-	char* script;
-	char** argv;
-	int argc;
-	 
-	 */
+	if (host_get_chroot(host) == CHR_NOT_MOUNTED) {
+		HANDLE_RETURN(CHROOT_NOT_MOUNTED);
+	}
+	else if (host_get_chroot(host) == CHR_INIT) {
+		HANDLE_RETURN(CHROOT_INIT);
+	}
 	
 	Job job_request = {
+			/**
+			NamespaceManager* parent;
+			Host* target;
+			char* script;
+			char* arg
+			 */
 			request->parent->job_handler,
 			host,
 			"emerge",
@@ -203,18 +233,6 @@ void HOST_EMERGE(Response* res, Request* request) {
 	
 	dynamic_binary_add(res->content, 's', job_name);
 	HANDLE_RETURN(get_res(response_code));
-}
-
-void HOST_MNTCHROOT(Response* res, Request* request) {
-	HANDLE_CHECK_STRUCTURES({STRCT_AUTHORIZE, STRCT_HOST_SELECT});
-	AccessToken* tok = authorize (request, TOKEN_HOST_MOD, AUTH_TOKEN_HOST);
-	if (!tok)
-		HANDLE_RETURN(FORBIDDEN);
-
-	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
-
-	response_t ret = chroot_mount(host);
-	HANDLE_RETURN(ret);
 }
 
 void SRV_INFO(Response* res, Request* request) {
@@ -487,7 +505,12 @@ void HOST_STAGE3(Response* res, Request* request) {
 		HANDLE_RETURN(FORBIDDEN);
 	
 	HANDLE_GET_HOST(request->structures[1]->data.host_select.hostname)
-	
+	if (host_get_chroot(host) == CHR_MOUNTED) {
+		HANDLE_RETURN(OK);
+	}
+	else if (host_get_chroot(host) == CHR_INIT) {
+		HANDLE_RETURN(CHROOT_INIT);
+	}
 	
 	int response_code = 0;
 	char* job_name = NULL;
