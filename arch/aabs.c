@@ -30,9 +30,9 @@
 aabs_main* aabs = NULL;
 
 void aabs_create(char* config) {
-	aabs = calloc(1, sizeof(aabs_main));
-	
-	aabs_ini_t* ini_temp = aabs_ini_parse(config);
+    aabs = calloc(1, sizeof(aabs_main));
+
+    aabs_ini_t* ini_temp = aabs_ini_parse(config);
 }
 
 aabs_pkg_t* aabs_library_search(char* lib);

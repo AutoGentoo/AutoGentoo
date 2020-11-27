@@ -27,20 +27,20 @@
 typedef struct __aabs_depend_t aabs_depend_t;
 
 typedef enum {
-	AABS_DEP_MOD_ANY = 1,
-	AABS_DEP_MOD_EQ,
-	AABS_DEP_MOD_GE,
-	AABS_DEP_MOD_LE,
-	AABS_DEP_MOD_GT,
-	AABS_DEP_MOD_LT
+    AABS_DEP_MOD_ANY = 1,
+    AABS_DEP_MOD_EQ,
+    AABS_DEP_MOD_GE,
+    AABS_DEP_MOD_LE,
+    AABS_DEP_MOD_GT,
+    AABS_DEP_MOD_LT
 } aabs_depmod_t;
 
 struct __aabs_depend_t {
-	char* name;
-	char* version;
-	char* desc;
-	unsigned long name_hash;
-	aabs_depmod_t mod;
+    char* name;
+    char* version;
+    char* desc;
+    unsigned long name_hash;
+    aabs_depmod_t mod;
 };
 
 aabs_depend_t* aabs_dep_from_str(char* dep_str);

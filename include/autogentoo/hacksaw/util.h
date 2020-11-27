@@ -11,6 +11,6 @@ int string_find(char** array, char* element, size_t n);
 
 void fix_path(char* ptr);
 
-char* string_strip (char* str);
+char* string_strip(char* str);
 
 #endif

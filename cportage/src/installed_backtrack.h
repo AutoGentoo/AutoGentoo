@@ -11,22 +11,22 @@
 #include "dep_graph/resolved_package.h"
 
 struct __InstalledBacktrack {
-	InstalledEbuild* required_by;
-	Dependency* selected_by;
+    InstalledEbuild* required_by;
+    Dependency* selected_by;
 };
 
 typedef enum {
-	EBUILD_REBUILD_DEPEND = 0x1, //!< Part of DEPEND set
-	EBUILD_REBUILD_RDEPEND = 0x2 //!< Part of RDEPEND set
+    EBUILD_REBUILD_DEPEND = 0x1, //!< Part of DEPEND set
+    EBUILD_REBUILD_RDEPEND = 0x2 //!< Part of RDEPEND set
 } rebuild_t;
 
 /**
  * A rebuilt request caused by a slot change and '=' operator
  */
 struct __RebuildEbuild {
-	InstalledEbuild* rebuild;
-	Dependency* selector;
-	rebuild_t type;
+    InstalledEbuild* rebuild;
+    Dependency* selector;
+    rebuild_t type;
 };
 
 /**
@@ -61,8 +61,11 @@ void installed_backtrack_free(Backtrack* bt);
 void installed_backtrack_resolve(PortageDB* db, InstalledEbuild* ebuild);
 
 void installed_backtrack_rebuild_search(PortageDB* db, InstalledEbuild* parent, Dependency* deptree, rebuild_t type);
+
 void installed_backtrack_rebuild_new(PortageDB* db, InstalledEbuild* rebuild, Dependency* dep, rebuild_t type);
+
 void installed_backtrack_rebuild_resolve(PortageDB* db, rebuild_t types);
+
 void installed_backtrack_rebuild_free(RebuildEbuild* rebuild);
 
 #endif //AUTOGENTOO_BACKTRACK_H

@@ -19,8 +19,8 @@ typedef struct __SmallMap_key SmallMap_key;
 */
 
 struct __SmallMap_key {
-	char* key;
-	void* data_ptr;
+    char* key;
+    void* data_ptr;
 };
 
 typedef Vector SmallMap;
@@ -33,7 +33,7 @@ void* small_map_get(SmallMap* smap, char* key);
 
 void* small_map_delete(SmallMap* smap, char* key);
 
-void* small_map_delete_index (SmallMap* smap, int index);
+void* small_map_delete_index(SmallMap* smap, int index);
 
 void small_map_free(SmallMap* smap, int free_data);
 
@@ -43,6 +43,6 @@ void* small_map_get_index(SmallMap* smap, int index);
 
 void* small_map_get_key_index(SmallMap* smap, int index);
 
-void small_map_foreach(SmallMap* smap, void (*f)(void*));
+void small_map_foreach(SmallMap* smap, void (* f)(void*));
 
 #endif

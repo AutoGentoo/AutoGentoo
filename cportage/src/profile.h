@@ -13,16 +13,16 @@ typedef struct __PackageMask PackageMask;
 #include "atom.h"
 
 typedef enum {
-	PACKAGE_MASK,
-	PACKAGE_UNMASK
+    PACKAGE_MASK,
+    PACKAGE_UNMASK
 } mask_t;
 
 struct __PackageMask {
-	P_Atom* atom;
-	mask_t mask;
-	
-	PackageMask* next;
-	PackageMask** last;
+    P_Atom* atom;
+    mask_t mask;
+
+    PackageMask* next;
+    PackageMask** last;
 };
 
 /**
@@ -55,46 +55,50 @@ struct __PackageMask {
       virtuals
  */
 struct __Profile {
-	/* make.defaults also passed into make.conf */
-	Map* make_conf;
-	
-	/* The system set */
-	Vector* packages;
-	
-	/* The system set */
-	Vector* profile_packages;
-	
-	/* Used for stage1 and stage2, We can do this now yay!! */
-	Vector* package_build;
-	
-	/* package.keywords overrided by non-deprecated package.accept_keywords */
-	/* above keywords overrided by /etc/portage/package.accept_keywords */
-	Vector* package_accept_keywords;
-	
-	/* Sourced after profile.bashrc, inside the bashrc directory in profile */
-	Vector* package_bashrc;
-	
-	/* Package mask */
-	/* Mark an ebuild as masked */
-	Vector* package_mask;
-	
-	/* Create a fake install folder in db */
-	Vector* package_provided;
-	
-	/*  */
-	/* overrided by /etc/portage/package.use */
-	Vector* package_use;
-	
-	Map* use;
-	
-	/* Only use for use defaults */
-	Map* implicit_use;
+    /* make.defaults also passed into make.conf */
+    Map* make_conf;
+
+    /* The system set */
+    Vector* packages;
+
+    /* The system set */
+    Vector* profile_packages;
+
+    /* Used for stage1 and stage2, We can do this now yay!! */
+    Vector* package_build;
+
+    /* package.keywords overrided by non-deprecated package.accept_keywords */
+    /* above keywords overrided by /etc/portage/package.accept_keywords */
+    Vector* package_accept_keywords;
+
+    /* Sourced after profile.bashrc, inside the bashrc directory in profile */
+    Vector* package_bashrc;
+
+    /* Package mask */
+    /* Mark an ebuild as masked */
+    Vector* package_mask;
+
+    /* Create a fake install folder in db */
+    Vector* package_provided;
+
+    /*  */
+    /* overrided by /etc/portage/package.use */
+    Vector* package_use;
+
+    Map* use;
+
+    /* Only use for use defaults */
+    Map* implicit_use;
 };
 
 Profile* profile_new();
+
 void profile_implicit_use(Profile* update);
+
 void profile_parse(Profile* update, char* current_path, char* path);
+
 void profile_free(Profile* ptr);
+
 void profile_init(Profile* prof);
 
 #endif //AUTOGENTOO_PROFILE_H

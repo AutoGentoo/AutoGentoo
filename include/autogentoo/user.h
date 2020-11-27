@@ -15,28 +15,28 @@
 typedef struct __AccessToken AccessToken;
 
 typedef enum {
-	TOKEN_NONE,
-	TOKEN_SERVER_READ = 1 << 0,
-	TOKEN_SERVER_WRITE = TOKEN_SERVER_READ | 1 << 1, //!< Create hosts
-	TOKEN_SERVER_AUTOGENTOO_ORG = 1 << 2, //!< Register users from server (no read/write)
-	TOKEN_HOST_READ = 1 << 3,
-	TOKEN_HOST_EMERGE = TOKEN_HOST_READ | 1 << 4, //!< Can't change host settings
-	TOKEN_HOST_WRITE = TOKEN_HOST_EMERGE | 1 << 5, //!< Write to make.conf
-	TOKEN_HOST_MOD = TOKEN_HOST_WRITE | 1 << 6, //!< Can delete host
-	TOKEN_SERVER_SUPER = 0xFF, //!< All permissions
+    TOKEN_NONE,
+    TOKEN_SERVER_READ = 1 << 0,
+    TOKEN_SERVER_WRITE = TOKEN_SERVER_READ | 1 << 1, //!< Create hosts
+    TOKEN_SERVER_AUTOGENTOO_ORG = 1 << 2, //!< Register users from server (no read/write)
+    TOKEN_HOST_READ = 1 << 3,
+    TOKEN_HOST_EMERGE = TOKEN_HOST_READ | 1 << 4, //!< Can't change host settings
+    TOKEN_HOST_WRITE = TOKEN_HOST_EMERGE | 1 << 5, //!< Write to make.conf
+    TOKEN_HOST_MOD = TOKEN_HOST_WRITE | 1 << 6, //!< Can delete host
+    TOKEN_SERVER_SUPER = 0xFF, //!< All permissions
 } token_access_t;
 
 typedef enum {
-	AUTH_TOKEN_NONE,
-	AUTH_TOKEN_SERVER,
-	AUTH_TOKEN_HOST
+    AUTH_TOKEN_NONE,
+    AUTH_TOKEN_SERVER,
+    AUTH_TOKEN_HOST
 } auth_t;
 
 struct __AccessToken { // Serverside auth
-	char* user_id;
-	char* host_id; //!< Target host
-	char* auth_token;
-	token_access_t access_level;
+    char* user_id;
+    char* host_id; //!< Target host
+    char* auth_token;
+    token_access_t access_level;
 };
 
 #include "host.h"
@@ -54,6 +54,7 @@ AccessToken* auth_issue_token(Server* server, AccessToken* creation_token);
 void token_free(AccessToken* tok);
 
 void init_random_mutex()__attribute__ ((constructor));
+
 void free_random_mutex()__attribute__ ((destructor));
 
 #endif //AUTOGENTOO_USER_H

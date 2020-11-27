@@ -10,34 +10,34 @@
 #include "conflict.h"
 
 inline void conflict_use_check(UseFlag* use1, UseFlag* use2, UseFlag** conflict1, UseFlag** conflict2) {
-	/* Check if the explicit flags from previous and current selections match */
-	UseFlag* sel_explicit_key = NULL;
-	UseFlag* out_explicit_key = NULL;
-	for (sel_explicit_key = use1; sel_explicit_key; sel_explicit_key = sel_explicit_key->next) {
-		for (out_explicit_key = use2; out_explicit_key; out_explicit_key = out_explicit_key->next) {
-			if (strcmp(sel_explicit_key->name, out_explicit_key->name) == 0 &&
-			    sel_explicit_key->status != out_explicit_key->status)
-				break;
-		}
-		
-		if (out_explicit_key) /* Error */
-			break;
-	}
-	
-	*conflict1 = sel_explicit_key;
-	*conflict2 = out_explicit_key;
+    /* Check if the explicit flags from previous and current selections match */
+    UseFlag* sel_explicit_key = NULL;
+    UseFlag* out_explicit_key = NULL;
+    for (sel_explicit_key = use1; sel_explicit_key; sel_explicit_key = sel_explicit_key->next) {
+        for (out_explicit_key = use2; out_explicit_key; out_explicit_key = out_explicit_key->next) {
+            if (strcmp(sel_explicit_key->name, out_explicit_key->name) == 0 &&
+                sel_explicit_key->status != out_explicit_key->status)
+                break;
+        }
+
+        if (out_explicit_key) /* Error */
+            break;
+    }
+
+    *conflict1 = sel_explicit_key;
+    *conflict2 = out_explicit_key;
 }
 
 Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
-	/*if (!conflict_prev->reason->selected_by)
-		return NULL;
-	
-	Suggestion* out = NULL;
-	char* atom_str = atom_get_str(conflict_prev->reason->selected_by->selected_by->atom);
-	*(strchr(atom_str, ' ')) = 0;
-	
-	for (UseReason* current_reason = conflict_prev->reason; current_reason; current_reason = current_reason->next) {
-		*//**
+    /*if (!conflict_prev->reason->selected_by)
+        return NULL;
+
+    Suggestion* out = NULL;
+    char* atom_str = atom_get_str(conflict_prev->reason->selected_by->selected_by->atom);
+    *(strchr(atom_str, ' ')) = 0;
+
+    for (UseReason* current_reason = conflict_prev->reason; current_reason; current_reason = current_reason->next) {
+        *//**
 			ATOM_USE_DISABLE, //!< atom[-bar]
 			ATOM_USE_ENABLE, //!< atom[bar]
 			ATOM_USE_ENABLE_IF_ON, //!< atom[bar?]
@@ -130,17 +130,17 @@ Suggestion* conflict_use_resolve(UseFlag* conflict_prev, use_t target_val) {
 	}
 	return out;
 	*/
-	return NULL;
+    return NULL;
 }
 
 void suggestion_free(Suggestion* s) {
-	Suggestion* temp;
-	
-	for (Suggestion* c = s; c;) {
-		free(c->required_by);
-		free(c->line_addition);
-		temp = c->next;
-		free(c);
-		c = temp;
-	}
+    Suggestion* temp;
+
+    for (Suggestion* c = s; c;) {
+        free(c->required_by);
+        free(c->line_addition);
+        temp = c->next;
+        free(c);
+        c = temp;
+    }
 }

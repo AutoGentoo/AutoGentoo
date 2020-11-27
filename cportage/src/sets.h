@@ -9,14 +9,16 @@
 #include "atom.h"
 
 struct __PortageSet {
-	char* name;
-	Vector* atoms;
+    char* name;
+    Vector* atoms;
 };
 
 PortageSet* portage_set_new(char* atoms);
+
 Dependency* portage_set_expand(PortageSet* set);
 
 PortageSet* portage_set_selected_packages(Emerge* em);
+
 PortageSet* portage_set_selected_sets(Emerge* em);
 
 

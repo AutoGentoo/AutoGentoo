@@ -12,25 +12,24 @@ typedef struct __NetworkBridge NetworkBridge;
 static int interface_n = 0;
 
 struct __NetworkInterface {
-	
+
 };
 
 struct __NetworkBridge {
-	pid_t target;
-	
-	int interface_n; /* Interface number on parent pid */
-	
-	char* init_command;
-	char* addr_command;
-	char* addr_command_child;
-	
-	char* name_parent; /* veth[interface_n] */
-	char* name_child; /* eth0 */
-	
-	char* address_parent; /* 10.0.0.[2 * interface_n] */
-	char* address_child; /* 10.0.0.[2 * interface_n + 1] */
-};
+    pid_t target;
 
+    int interface_n; /* Interface number on parent pid */
+
+    char* init_command;
+    char* addr_command;
+    char* addr_command_child;
+
+    char* name_parent; /* veth[interface_n] */
+    char* name_child; /* eth0 */
+
+    char* address_parent; /* 10.0.0.[2 * interface_n] */
+    char* address_child; /* 10.0.0.[2 * interface_n + 1] */
+};
 
 
 NetworkBridge* network_bridge_new(pid_t pid);
@@ -50,7 +49,6 @@ int network_bridge_pinit(NetworkBridge* ni);
  * @return error code (0 for success)
  */
 int network_bridge_cinit(NetworkBridge* ni);
-
 
 
 #endif //AUTOGENTOO_NET_H

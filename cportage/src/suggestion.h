@@ -10,14 +10,16 @@
 #include "atom.h"
 
 struct __Suggestion {
-	char* required_by;
-	char* line_addition;
-	
-	Suggestion* next;
+    char* required_by;
+    char* line_addition;
+
+    Suggestion* next;
 };
 
 Suggestion* suggestion_new(char* required_by, char* line, ...);
+
 FILE* suggestion_read(Suggestion* s);
+
 void emerge_apply_suggestions(Emerge* em);
 
 #endif //AUTOGENTOO_SUGGESTION_H

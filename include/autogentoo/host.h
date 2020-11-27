@@ -28,16 +28,16 @@ typedef struct __Host Host;
  * This is reset/updated after every restart (not persistant)
  */
 typedef enum {
-	CHR_NOT_MOUNTED,
-	CHR_MOUNTED,
-	CHR_INIT /* Only true while the stage3 is initializing */
+    CHR_NOT_MOUNTED,
+    CHR_MOUNTED,
+    CHR_INIT /* Only true while the stage3 is initializing */
 } chroot_t;
 
 typedef enum {
-	HOST_ENV_VOID,   // Environment does not exist
-	HOST_ENV_STAGE3, // Stage3 is unpacked but configs need writing
-	HOST_ENV_BASE,   // Stage3 packages still need to be made into binaries
-	HOST_ENV_READY   // Everything is ready to go
+    HOST_ENV_VOID,   // Environment does not exist
+    HOST_ENV_STAGE3, // Stage3 is unpacked but configs need writing
+    HOST_ENV_BASE,   // Stage3 packages still need to be made into binaries
+    HOST_ENV_READY   // Everything is ready to go
 } host_env_t;
 
 /**
@@ -47,20 +47,20 @@ typedef enum {
  * /etc/portage/make.conf.
  */
 struct __Host {
-	Server* parent; //!< The parent server
-	char* id; //!< The ID of the Host
-	char* profile; //!< Portage profile, see possible values with eselect profile list
-	char* hostname; //!< Hostname of the host (shows up in the graphical client)
-	char* arch; //!<  The portage-arch (eg. amd64)
-	
-	char* abi;
-	
-	pthread_mutex_t cs_mutex; //!< chroot status needs to be synchronized
-	chroot_t __chroot_status__; //!< Is the chroot ready?
-	host_env_t environment_status; //!< Is the environment ready to compile
-	
-	HostEnvironment* environment;
-	Vector* kernel;
+    Server* parent; //!< The parent server
+    char* id; //!< The ID of the Host
+    char* profile; //!< Portage profile, see possible values with eselect profile list
+    char* hostname; //!< Hostname of the host (shows up in the graphical client)
+    char* arch; //!<  The portage-arch (eg. amd64)
+
+    char* abi;
+
+    pthread_mutex_t cs_mutex; //!< chroot status needs to be synchronized
+    chroot_t __chroot_status__; //!< Is the chroot ready?
+    host_env_t environment_status; //!< Is the environment ready to compile
+
+    HostEnvironment* environment;
+    Vector* kernel;
 };
 
 /**
@@ -78,6 +78,7 @@ char* host_id_new();
 Host* host_new(Server* server, char* id);
 
 chroot_t host_get_chroot(Host*);
+
 void host_set_chroot(Host*, chroot_t target);
 
 /**
@@ -85,6 +86,7 @@ void host_set_chroot(Host*, chroot_t target);
  * @param host the host to update the status of
  */
 void host_getstatus(Host* host);
+
 int host_setstatus(Host* host);
 
 /**

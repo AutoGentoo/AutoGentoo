@@ -15,17 +15,17 @@ pthread_mutex_t log_mutex;
 static FILE* target = NULL;
 
 void init_log() {
-	target = stdout;
-	pthread_mutex_init(&log_mutex, NULL);
+    target = stdout;
+    pthread_mutex_init(&log_mutex, NULL);
 }
 
 void close_log() {
-	fclose(target);
-	pthread_mutex_destroy(&log_mutex);
+    fclose(target);
+    pthread_mutex_destroy(&log_mutex);
 }
 
 void lset(FILE* _target) {
-	target = _target;
+    target = _target;
 }
 
 #define AUTOGENTOO_LOG_PRINT(star_color) \
@@ -41,30 +41,30 @@ pthread_mutex_unlock(&log_mutex);
 
 void ldinfo(char* format, ...) {
 #ifdef AUTOGENTOO_SHOW_DEBUG
-	AUTOGENTOO_LOG_PRINT(ANSI_GREEN)
+    AUTOGENTOO_LOG_PRINT(ANSI_GREEN)
 #endif
 }
 
 void ldwarning(char* format, ...) {
 #ifdef AUTOGENTOO_SHOW_DEBUG
-	AUTOGENTOO_LOG_PRINT(ANSI_YELLOW)
+    AUTOGENTOO_LOG_PRINT(ANSI_YELLOW)
 #endif
 }
 
 void lderror(char* format, ...) {
 #ifdef AUTOGENTOO_SHOW_DEBUG
-	AUTOGENTOO_LOG_PRINT(ANSI_RED)
+    AUTOGENTOO_LOG_PRINT(ANSI_RED)
 #endif
 }
 
 void lerror(char* format, ...) {
-	AUTOGENTOO_LOG_PRINT(ANSI_RED)
+    AUTOGENTOO_LOG_PRINT(ANSI_RED)
 }
 
 void lwarning(char* format, ...) {
-	AUTOGENTOO_LOG_PRINT(ANSI_YELLOW)
+    AUTOGENTOO_LOG_PRINT(ANSI_YELLOW)
 }
 
 void linfo(char* format, ...) {
-	AUTOGENTOO_LOG_PRINT(ANSI_GREEN)
+    AUTOGENTOO_LOG_PRINT(ANSI_GREEN)
 }

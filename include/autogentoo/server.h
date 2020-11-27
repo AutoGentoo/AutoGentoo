@@ -39,34 +39,34 @@ typedef struct __Connection Connection;
  * Server options for enabling/disabling server features
  */
 typedef enum {
-	ASYNC = 0x0, //!< Run the server in the terminal
-	DAEMON = 0x1, //!< Run the server in background as a service
-	NO_DEBUG = 0x0, //!< Turn off debug information
-	DEBUG = 0x2, //!< Turn on debug information
-	NOENCRYPT = 0x4  //!< Don't start an encrypted socket
+    ASYNC = 0x0, //!< Run the server in the terminal
+    DAEMON = 0x1, //!< Run the server in background as a service
+    NO_DEBUG = 0x0, //!< Turn off debug information
+    DEBUG = 0x2, //!< Turn on debug information
+    NOENCRYPT = 0x4  //!< Don't start an encrypted socket
 } server_t;
 
 typedef enum {
-	ENC_CERT_SIGN = 1 << 1,
-	ENC_GEN_RSA = 1 << 2 | ENC_CERT_SIGN,
-	ENC_GEN_CERT = 1 << 3 | ENC_CERT_SIGN,
-	ENC_READ_CERT = 1 << 4,
-	ENC_READ_RSA = 1 << 5,
+    ENC_CERT_SIGN = 1 << 1,
+    ENC_GEN_RSA = 1 << 2 | ENC_CERT_SIGN,
+    ENC_GEN_CERT = 1 << 3 | ENC_CERT_SIGN,
+    ENC_READ_CERT = 1 << 4,
+    ENC_READ_RSA = 1 << 5,
 } enc_server_t;
 
 /**
  * Holds the status of a connection
  */
 typedef enum {
-	SERVER_ERROR, //!< recv() error
-	CONNECTED, //!< Successfully connected
-	FAILED, //!< Client disconnected closing the connection
-	CLOSED //!< Closed successfully with connection_free()
+    SERVER_ERROR, //!< recv() error
+    CONNECTED, //!< Successfully connected
+    FAILED, //!< Client disconnected closing the connection
+    CLOSED //!< Closed successfully with connection_free()
 } con_t;
 
 typedef enum {
-	COM_PLAIN,
-	COM_RSA
+    COM_PLAIN,
+    COM_RSA
 } com_t;
 
 #include "thread.h"
@@ -80,65 +80,65 @@ typedef enum {
  * This is pretty much required throughout the entire program so keep it!
  */
 struct __Server {
-	char* location; //!< The working directory of the server
-	char* port;  //!< The port to bind to
-	server_t opts; //!< The options that the server was initilized with
-	
-	/* AutoGentoo Related */
-	Vector* hosts; //!< A list of hosts
-	
-	volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
-	PoolHandler* pool_handler; //!< For socket requests
-	NamespaceManager* job_handler; //!< For running jobs
-	
-	pid_t pid;
-	pthread_t pthread;
-	int socket;
-	
-	/* Secure server */
-	EncryptServer* rsa_child;
-	
-	/* Authentication */
-	char* autogentoo_org_token; //!< Just a dup of the key
-	char* sudo_token;
-	
-	Map* auth_tokens;
-	
-	pthread_mutex_t config_mutex;
-	pthread_mutex_t ack_mutex;
-	pthread_mutex_t worker_ready;
+    char* location; //!< The working directory of the server
+    char* port;  //!< The port to bind to
+    server_t opts; //!< The options that the server was initilized with
+
+    /* AutoGentoo Related */
+    Vector* hosts; //!< A list of hosts
+
+    volatile int keep_alive; //!< Set to 0 if you want the main loop to exit
+    PoolHandler* pool_handler; //!< For socket requests
+    NamespaceManager* job_handler; //!< For running jobs
+
+    pid_t pid;
+    pthread_t pthread;
+    int socket;
+
+    /* Secure server */
+    EncryptServer* rsa_child;
+
+    /* Authentication */
+    char* autogentoo_org_token; //!< Just a dup of the key
+    char* sudo_token;
+
+    Map* auth_tokens;
+
+    pthread_mutex_t config_mutex;
+    pthread_mutex_t ack_mutex;
+    pthread_mutex_t worker_ready;
 };
 
 #ifndef connection_read
 #define connection_read(dest, size) \
 conn->communication_type == COM_RSA ? \
-	SSL_read(conn->encrypted_connection, dest, (int)size) : read(conn->fd, dest, size)
+    SSL_read(conn->encrypted_connection, dest, (int)size) : read(conn->fd, dest, size)
 #endif
 
 #ifndef connection_write
 #define connection_write(conn, src, size) \
 conn->communication_type == COM_RSA ? \
-	SSL_write(conn->encrypted_connection, src, (int)size) : write (conn->fd, src, size);
+    SSL_write(conn->encrypted_connection, src, (int)size) : write (conn->fd, src, size);
 #endif
 
 struct __EncryptServer {
-	Server* parent;
-	char* port;
-	pthread_t pid;
-	enc_server_t opts;
-	
-	char* rsa_path;
-	char* cert_path;
-	
-	int socket;
-	
-	/** ONLY AUTOGENTOO_S
-	 * 2048 RSA encryption
-	 * Serverside encryption
-	 **/
-	X509* certificate;
-	SSL_CTX* context;
-	RSA* key_pair;
+    Server* parent;
+    char* port;
+    pthread_t pid;
+    enc_server_t opts;
+
+    char* rsa_path;
+    char* cert_path;
+
+    int socket;
+
+    /** ONLY AUTOGENTOO_S
+     * 2048 RSA encryption
+     * Serverside encryption
+     **/
+    X509* certificate;
+    SSL_CTX* context;
+    RSA* key_pair;
 };
 
 /**
@@ -148,8 +148,8 @@ struct __EncryptServer {
  * The IP of the request is matched to a Host using this struct
  */
 struct __HostBind {
-	char* ip; //!< The IP to bind the host to
-	struct __Host* host; //!< The target of the host binding
+    char* ip; //!< The IP to bind the host to
+    struct __Host* host; //!< The target of the host binding
 };
 
 /**
@@ -161,21 +161,21 @@ struct __HostBind {
  * Since every connection runs in its own thread the pthread_t is kept here as well
  */
 struct __Connection {
-	struct __Server* parent; //!< The parent server of the connection
-	void* request; //!< The entire request
-	size_t size;
-	char* ip; //!< The IP of the connected client
-	int fd; //!< The file descriptor that points to the open connections
-	int worker;
-	con_t status; //!< The status of the current Connection
-	com_t communication_type; //!< Are we using an encryption or not
-	
-	/** ONLY AUTOGENTOO_S
-	 * 2048 RSA encryption
-	 * Clientside encryption
-	 **/
-	SSL* encrypted_connection;
-	int encrypted_fd;
+    struct __Server* parent; //!< The parent server of the connection
+    void* request; //!< The entire request
+    size_t size;
+    char* ip; //!< The IP of the connected client
+    int fd; //!< The file descriptor that points to the open connections
+    int worker;
+    con_t status; //!< The status of the current Connection
+    com_t communication_type; //!< Are we using an encryption or not
+
+    /** ONLY AUTOGENTOO_S
+     * 2048 RSA encryption
+     * Clientside encryption
+     **/
+    SSL* encrypted_connection;
+    int encrypted_fd;
 };
 
 typedef struct __Host Host;
@@ -190,6 +190,7 @@ typedef struct __Host Host;
 Server* server_new(char* location, char* port, server_t opts);
 
 void server_encrypt_start(EncryptServer* server);
+
 EncryptServer* server_encrypt_new(Server* parent, char* port, char* cert_path, char* rsa_path, enc_server_t opts);
 
 /**
@@ -247,13 +248,13 @@ void daemonize(char* _cwd);
  */
 void server_free(Server* server);
 
-void server_encrypt_free (EncryptServer* server);
+void server_encrypt_free(EncryptServer* server);
 
 void server_kill(Server* server);
 
-void handle_sigint (int sig);
+void handle_sigint(int sig);
 
-char* server_get_path (Server* parent, char* path);
+char* server_get_path(Server* parent, char* path);
 
 extern Server* srv;
 

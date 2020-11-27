@@ -16,20 +16,23 @@ typedef struct __UseExpand UseExpand;
 typedef struct __UseExpandEntry UseExpandEntry;
 
 struct __UseExpandEntry {
-	char* flag_name;
-	char* description;
+    char* flag_name;
+    char* description;
 };
 
 struct __UseExpand {
-	Repository* parent;
-	
-	char* variable_name;
-	Vector* possible_values;
+    Repository* parent;
+
+    char* variable_name;
+    Vector* possible_values;
 };
 
 Map* use_expand_new(Repository* repo);
-void make_conf_parse(Emerge *em);
+
+void make_conf_parse(Emerge* em);
+
 void make_conf_use(Emerge* em);
+
 void make_conf_add(Map* make_conf, char* key, char* value);
 
 #endif //AUTOGENTOO_GLOBALS_H

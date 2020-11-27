@@ -12,11 +12,11 @@ typedef struct __NamespaceManager NamespaceManager;
 typedef struct __Job Job;
 
 /* From util-linux */
-#define _PATH_PROC_UIDMAP	"/proc/self/uid_map"
-#define _PATH_PROC_GIDMAP	"/proc/self/gid_map"
-#define _PATH_PROC_SETGROUPS	"/proc/self/setgroups"
+#define _PATH_PROC_UIDMAP    "/proc/self/uid_map"
+#define _PATH_PROC_GIDMAP    "/proc/self/gid_map"
+#define _PATH_PROC_SETGROUPS    "/proc/self/setgroups"
 
-#define UNSHARE_PROPAGATION_DEFAULT	(MS_REC | MS_PRIVATE)
+#define UNSHARE_PROPAGATION_DEFAULT    (MS_REC | MS_PRIVATE)
 
 #include <fcntl.h>
 #include <sched.h>
@@ -24,48 +24,52 @@ typedef struct __Job Job;
 #include <openssl/rsa.h>
 #include <autogentoo/host.h>
 
-typedef int (*namespace_callback)(void* arg);
+typedef int (* namespace_callback)(void* arg);
 
 typedef enum {
-	/* Server to worker */
-	NS_WORK,
-	NS_HOST_REPL,
-	NS_KILL,
-	
-	/* Worker to server */
-	NS_UPDATE
+    /* Server to worker */
+    NS_WORK,
+    NS_HOST_REPL,
+    NS_KILL,
+
+    /* Worker to server */
+    NS_UPDATE
 } ns_command;
 
 struct __Namespace {
-	pid_t worker_pid;
-	Host* target;
-	
-	char* portdir; /* Gentoo package repo (read-only) */
-	char* target_dir; /* Where we want to chroot */
-	char* worker_dir; /* AutoGentoo worker scripts (read-only) */
-	
-	int running;
+    pid_t worker_pid;
+    Host* target;
+
+    char* portdir; /* Gentoo package repo (read-only) */
+    char* target_dir; /* Where we want to chroot */
+    char* worker_dir; /* AutoGentoo worker scripts (read-only) */
+
+    int running;
 };
 
 struct __NamespaceManager {
-	Server* parent;
-	SmallMap* host_to_ns;
+    Server* parent;
+    SmallMap* host_to_ns;
 };
 
 struct __Job {
-	NamespaceManager* parent;
-	Host* target;
-	
-	char* script;
-	char* arg;
+    NamespaceManager* parent;
+    Host* target;
+
+    char* script;
+    char* arg;
 };
 
 int namespace_get_flags();
+
 int namespace_main(Namespace* ns);
 
 Namespace* ns_new(Host* target);
+
 NamespaceManager* nsm_new(Server* parent);
+
 void nsm_free(NamespaceManager* nsm);
+
 int stage3_bootstrap(Host* host, const char* args);
 
 /**

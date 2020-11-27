@@ -5,29 +5,29 @@
 #include <autogentoo/api/dynamic_binary.h>
 
 typedef enum {
-	HTTP_OK = 200,
-	HTTP_CREATED = 201,
-	HTTP_NO_CONTENT = 204,
-	HTTP_BAD_REQUEST = 400,
-	HTTP_UNAUTHORIZED = 401,
-	HTTP_FORBIDDEN = 403,
-	HTTP_NOT_FOUND = 404,
-	HTTP_METHOD_NOT_ALLOWED = 405,
-	HTTP_REQUEST_TIMEOUT = 408,
-	HTTP_UPGRADE_REQUIRED = 426,
-	HTTP_INTERNAL_ERROR = 500,
-	HTTP_NOT_IMPLEMENTED = 501,
-	HTTP_BAD_GATEWAY = 502,
-	HTTP_SERVICE_UNAVAILABLE = 503,
-	HTTP_CHROOT_NOT_MOUNTED = 504,
-	HTTP_CHROOT_INIT = 505,
-	SIG_AUTOGENTOO_SEGV = 999
+    HTTP_OK = 200,
+    HTTP_CREATED = 201,
+    HTTP_NO_CONTENT = 204,
+    HTTP_BAD_REQUEST = 400,
+    HTTP_UNAUTHORIZED = 401,
+    HTTP_FORBIDDEN = 403,
+    HTTP_NOT_FOUND = 404,
+    HTTP_METHOD_NOT_ALLOWED = 405,
+    HTTP_REQUEST_TIMEOUT = 408,
+    HTTP_UPGRADE_REQUIRED = 426,
+    HTTP_INTERNAL_ERROR = 500,
+    HTTP_NOT_IMPLEMENTED = 501,
+    HTTP_BAD_GATEWAY = 502,
+    HTTP_SERVICE_UNAVAILABLE = 503,
+    HTTP_CHROOT_NOT_MOUNTED = 504,
+    HTTP_CHROOT_INIT = 505,
+    SIG_AUTOGENTOO_SEGV = 999
 } response_nt;
 
 typedef struct {
-	response_nt code;
-	char* message;
-	size_t len;
+    response_nt code;
+    char* message;
+    size_t len;
 } response_t;
 
 typedef struct __Response Response;
@@ -61,8 +61,8 @@ extern response_t res_list[];
 
 #define SOCK_CHECK_CONN(sock, ret_size)\
 if (fcntl(sock, F_GETFD) == -1 || errno == EBADF) { \
-	close (sock); \
-	return ret_size; \
+    close (sock); \
+    return ret_size; \
 }
 
 #include <sys/types.h>

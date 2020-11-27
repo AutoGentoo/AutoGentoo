@@ -32,73 +32,73 @@
 typedef struct _aabs_makepkg_t aabs_makepkg_t;
 
 struct _aabs_makepkg_t {
-	aabs_pkg_t* target;
-	
-	char* download_uri;
-	aabs_svec_t* checksums;
-	
-	/* build environment variables */
-	char* CHOST;
-	char* CFLAGS;
-	char* CXXFLAGS;
-	
-	/* PKGBUILD variables */
-	char* PKGDEST;
-	char* SRCDEST;
-	char* SRCPKGDEST;
-	char* LOGDEST;
-	char* PACKAGER;
-	char* BUILDDIR;
-	char* CARCH;
-	char* PKGEXT;
-	char* GNUPGHOME;
-	char* GPGKEY;
-	
-	struct archive* pkg;
-	
-	/* Package struct so we can memcpy */
-	
-	unsigned long name_hash;
-	char* filename;
-	char* base;
-	char* name;
-	char* version;
-	char* desc;
-	char* url;
-	char* packager;
-	char* md5sum;
-	char* sha256sum;
-	char* base64_sig;
-	char* arch;
-	
-	/* The binary archive */
-	struct archive* mtree;
-	
-	/* This is simply a list provided by the db */
-	aabs_svec_t* files;
-	aabs_vec_t* backup;
-	
-	aabs_svec_t* licenses;
-	aabs_svec_t* replaces;
-	aabs_svec_t* groups;
-	aabs_vec_t* depends;
-	aabs_vec_t* optdepends;
-	aabs_vec_t* conflicts;
-	aabs_vec_t* provides;
-	
-	/* Currently unused */
-	aabs_vec_t* makedepends;
-	aabs_vec_t* checkdepends;
-	
-	aabs_time_t builddate;
-	aabs_time_t installdate;
-	
-	off_t size;
-	off_t isize;
-	off_t download_size;
-	
-	aabs_pkgreason_t reason;
-	aabs_pkgvalidation_t validation;
+    aabs_pkg_t* target;
+
+    char* download_uri;
+    aabs_svec_t* checksums;
+
+    /* build environment variables */
+    char* CHOST;
+    char* CFLAGS;
+    char* CXXFLAGS;
+
+    /* PKGBUILD variables */
+    char* PKGDEST;
+    char* SRCDEST;
+    char* SRCPKGDEST;
+    char* LOGDEST;
+    char* PACKAGER;
+    char* BUILDDIR;
+    char* CARCH;
+    char* PKGEXT;
+    char* GNUPGHOME;
+    char* GPGKEY;
+
+    struct archive* pkg;
+
+    /* Package struct so we can memcpy */
+
+    unsigned long name_hash;
+    char* filename;
+    char* base;
+    char* name;
+    char* version;
+    char* desc;
+    char* url;
+    char* packager;
+    char* md5sum;
+    char* sha256sum;
+    char* base64_sig;
+    char* arch;
+
+    /* The binary archive */
+    struct archive* mtree;
+
+    /* This is simply a list provided by the db */
+    aabs_svec_t* files;
+    aabs_vec_t* backup;
+
+    aabs_svec_t* licenses;
+    aabs_svec_t* replaces;
+    aabs_svec_t* groups;
+    aabs_vec_t* depends;
+    aabs_vec_t* optdepends;
+    aabs_vec_t* conflicts;
+    aabs_vec_t* provides;
+
+    /* Currently unused */
+    aabs_vec_t* makedepends;
+    aabs_vec_t* checkdepends;
+
+    aabs_time_t builddate;
+    aabs_time_t installdate;
+
+    off_t size;
+    off_t isize;
+    off_t download_size;
+
+    aabs_pkgreason_t reason;
+    aabs_pkgvalidation_t validation;
 };
 
 aabs_makepkg_t* aabs_makepkg_create(char* PKGBUILD);

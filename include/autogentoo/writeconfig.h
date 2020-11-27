@@ -8,22 +8,22 @@
 typedef struct __AutoGentoo_Memconfig AutoGentoo_Memconfig;
 
 typedef enum {
-	AUTOGENTOO_FILE_END = 0xffffffff,
-	AUTOGENTOO_HOST = 0xfffffff0,
-	
-	// Because Host* is extensible this is required
-	AUTOGENTOO_HOST_END = 0xaaaaaaaa,
-	
-	// Host entries for autogentoo extensions
-	AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb,
-	AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd,
-	AUTOGENTOO_SUDO_TOKEN = 0xcccccccc,
-	AUTOGENTOO_SERVER_TOKEN = 0xfffff000
+    AUTOGENTOO_FILE_END = 0xffffffff,
+    AUTOGENTOO_HOST = 0xfffffff0,
+
+    // Because Host* is extensible this is required
+    AUTOGENTOO_HOST_END = 0xaaaaaaaa,
+
+    // Host entries for autogentoo extensions
+    AUTOGENTOO_HOST_KERNEL = 0xbbbbbbbb,
+    AUTOGENTOO_ACCESS_TOKEN = 0xdddddddd,
+    AUTOGENTOO_SUDO_TOKEN = 0xcccccccc,
+    AUTOGENTOO_SERVER_TOKEN = 0xfffff000
 } AutoGentoo_WriteConfig;
 
 struct __AutoGentoo_Memconfig {
-	void* buffer_file;
-	size_t size;
+    void* buffer_file;
+    size_t size;
 };
 
 static AutoGentoo_Memconfig buffer_file;
@@ -32,9 +32,10 @@ static AutoGentoo_Memconfig buffer_file;
  * Write the server to file
  * @param server the server to write
  */
-size_t write_server (Server* server);
+size_t write_server(Server* server);
 
 size_t write_access_token_fp(AccessToken* token, FILE* fp);
+
 AccessToken* read_access_token(FILE* fp);
 
 /**
@@ -42,14 +43,14 @@ AccessToken* read_access_token(FILE* fp);
  * @param server the server to write
  * @param fp the fp open to write to
  */
-size_t write_server_fp (Server* server, FILE* fp);
+size_t write_server_fp(Server* server, FILE* fp);
 
 /**
  * Write a host to file
  * @param host the host to write to file
  * @param fp the file to write to
  */
-size_t write_host_fp (Host* host, FILE* fp);
+size_t write_host_fp(Host* host, FILE* fp);
 
 /**
  * Write an active HostTemplate/stage to file
@@ -70,14 +71,14 @@ size_t write_host_fp (Host* host, FILE* fp);
  * @param location the localtion of the file
  * @return a new server that was read from the file
  */
-Server* read_server (char* location, char* port, server_t opts);
+Server* read_server(char* location, char* port, server_t opts);
 
 /**
  * Read host from file
  * @param fp the open file to read from
  * @return the new host created after reading the file
  */
-Host* read_host (FILE* fp);
+Host* read_host(FILE* fp);
 
 /**
  * Read host binding from file
@@ -108,7 +109,7 @@ Host* read_host (FILE* fp);
  * @param src the string to write
  * @param fp the file to write to
  */
-size_t write_string (char* src, FILE* fp);
+size_t write_string(char* src, FILE* fp);
 
 /**
  * Reads a string from file \
@@ -116,12 +117,16 @@ size_t write_string (char* src, FILE* fp);
  * @param fp the file to read from
  * @return a dynamically allocated string that has been read from file
  */
-char* read_string (FILE* fp);
+char* read_string(FILE* fp);
+
 int read_int_fd(int fd);
+
 char* read_string_fd(int fd);
+
 ssize_t write_int_fd(int fd, int i);
 
 void worker_lock(int fd);
+
 void worker_unlock(int fd);
 
 /**
@@ -129,16 +134,17 @@ void worker_unlock(int fd);
  * @param src the integer to write
  * @param fp the file to write to
  */
-size_t write_int (int src, FILE* fp);
+size_t write_int(int src, FILE* fp);
 
 /**
  * Read an integer from file
  * @param fp the file to read from
  * @return the integer that has been read
  */
-int read_int (FILE* fp);
+int read_int(FILE* fp);
 
 void* read_void(size_t len, FILE* fp);
+
 size_t write_void(void* ptr, size_t len, FILE* fp);
 
 #endif

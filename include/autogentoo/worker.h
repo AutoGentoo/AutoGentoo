@@ -24,38 +24,38 @@ typedef struct __WorkerRequest WorkerRequest;
 #include "host.h"
 
 enum {
-	WORKER_EXIT,
-	WORKER_JOB,
+    WORKER_EXIT,
+    WORKER_JOB,
 };
 
 struct __WorkerRequest {
-	char* command_name;
-	char* host_id;
-	
-	int n;
-	char** args;
+    char* command_name;
+    char* host_id;
+
+    int n;
+    char** args;
 };
 
 struct __WorkerHandler {
-	Server* parent;
-	pthread_t pid;
-	pid_t worker_pid;
-	
-	pthread_mutex_t sig_lck;
-	pthread_cond_t sig;
-	
-	int read_fifo;
-	int write_fifo;
-	
-	pthread_mutex_t write_lck;
-	pthread_mutex_t read_lck;
-	
-	pthread_mutex_t request_lck;
-	pthread_mutex_t lck;
-	
-	WorkerRequest* request;
-	
-	int keep_alive;
+    Server* parent;
+    pthread_t pid;
+    pid_t worker_pid;
+
+    pthread_mutex_t sig_lck;
+    pthread_cond_t sig;
+
+    int read_fifo;
+    int write_fifo;
+
+    pthread_mutex_t write_lck;
+    pthread_mutex_t read_lck;
+
+    pthread_mutex_t request_lck;
+    pthread_mutex_t lck;
+
+    WorkerRequest* request;
+
+    int keep_alive;
 };
 
 WorkerHandler* worker_handler_new(Server* parent);

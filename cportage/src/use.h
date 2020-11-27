@@ -12,23 +12,23 @@
 #include "dep_graph/resolved_ebuild.h"
 
 struct __PackageUse {
-	P_Atom* atom;
-	UseFlag* flags;
-	keyword_t keyword_required; // At least this keyword must be present to apply (package.use.stable)
+    P_Atom* atom;
+    UseFlag* flags;
+    keyword_t keyword_required; // At least this keyword must be present to apply (package.use.stable)
 };
 
 struct __UseFlag {
-	char* name;
-	use_t status; // Only USE_DISABLE and USE_ENABLE
-	use_priority_t priority;
-	UseFlag* next;
+    char* name;
+    use_t status; // Only USE_DISABLE and USE_ENABLE
+    use_priority_t priority;
+    UseFlag* next;
 };
 
 struct __RequiredUse {
-	char* target;
-	use_t option;
-	RequiredUse* depend;
-	RequiredUse* next;
+    char* target;
+    use_t option;
+    RequiredUse* depend;
+    RequiredUse* next;
 };
 
 /**
@@ -74,12 +74,17 @@ void use_free(UseFlag* head);
 
 
 RequiredUse* use_build_required_use(char* target, use_t option);
+
 int ebuild_check_required_use(ResolvedEbuild* ebuild);
+
 void requireduse_free(RequiredUse* ptr);
+
 AtomFlag* dependency_useflag(Ebuild* resolved, AtomFlag* new_flags, AtomFlag* old_flags);
 
 void useflag_parse(FILE* fp, Vector* useflags, keyword_t keyword_required, use_priority_t priority);
+
 void emerge_parse_useflags(Emerge* emerge);
+
 void emerge_apply_package_use(Emerge* emerge);
 
 #endif //AUTOGENTOO_REQUIRE_USE_H

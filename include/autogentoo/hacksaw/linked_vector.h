@@ -8,10 +8,10 @@
 typedef struct __LinkedNode LinkedNode;
 
 struct __LinkedNode {
-	void* data;
+    void* data;
 
-	LinkedNode* prev;
-	LinkedNode* next;
+    LinkedNode* prev;
+    LinkedNode* next;
 };
 
 LinkedNode** linked_vector_new();

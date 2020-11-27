@@ -13,20 +13,20 @@ typedef struct __Endian Endian;
 typedef struct __EndianNode EndianNode;
 
 typedef enum {
-	ENDIAN_CHAR = 1, //!< Don't make any changes
-	ENDIAN_U16 = 2,
-	ENDIAN_U32 = 4,
-	ENDIAN_U64 = 8
+    ENDIAN_CHAR = 1, //!< Don't make any changes
+    ENDIAN_U16 = 2,
+    ENDIAN_U32 = 4,
+    ENDIAN_U64 = 8
 } endian_convert_t;
 
 struct __EndianNode {
-	size_t offset;
-	endian_convert_t type;
+    size_t offset;
+    endian_convert_t type;
 };
 
 struct __Endian {
-	void* src;
-	Vector* nodes;
+    void* src;
+    Vector* nodes;
 };
 
 uint32_t htonl(uint32_t host);

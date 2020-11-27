@@ -13,9 +13,9 @@ typedef struct __ConfSection ConfSection;
 typedef struct __ConfVariable ConfVariable;
 
 struct __Conf {
-	char* path;
-	StringVector* sections;
-	Map* variables; // Key: [sectionName](variableName)
+    char* path;
+    StringVector* sections;
+    Map* variables; // Key: [sectionName](variableName)
 };
 
 Conf* conf_new(char* path);

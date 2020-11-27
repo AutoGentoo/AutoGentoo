@@ -14,14 +14,14 @@
 /* OLD */
 
 typedef enum {
-	AUTOGENTOO_RSA_VERIFY, //!< Check if we have updated public key
-	AUTOGENTOO_RSA_CORRECT, //!< RSA exchange complete
-	AUTOGENTOO_RSA_INCORRECT, //!< RSA wrong key
-	AUTOGENTOO_RSA_AUTH_CONTINUE, //!< Server has public key, continue with handshake
-	
-	AUTOGENTOO_RSA_SERVERSIDE_PUBLIC = 1 << 0,
-	AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC = 1 << 1,
-	AUTOGENTOO_RSA_NOAUTH = AUTOGENTOO_RSA_SERVERSIDE_PUBLIC | AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC
+    AUTOGENTOO_RSA_VERIFY, //!< Check if we have updated public key
+    AUTOGENTOO_RSA_CORRECT, //!< RSA exchange complete
+    AUTOGENTOO_RSA_INCORRECT, //!< RSA wrong key
+    AUTOGENTOO_RSA_AUTH_CONTINUE, //!< Server has public key, continue with handshake
+
+    AUTOGENTOO_RSA_SERVERSIDE_PUBLIC = 1 << 0,
+    AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC = 1 << 1,
+    AUTOGENTOO_RSA_NOAUTH = AUTOGENTOO_RSA_SERVERSIDE_PUBLIC | AUTOGENTOO_RSA_CLIENTSIDE_PUBLIC
 } rsa_t;
 /*
 int rsa_recv_public(Connection* conn);
@@ -39,10 +39,13 @@ rsa_t rsa_load_binding(Connection* conn);
 
 /* OpenSSL Certificate */
 int rsa_generate(RSA** target);
+
 int certificate_sign(X509* cert, RSA* rsa);
+
 void x509_generate(int serial, int days_valid, X509** cert_out, RSA* key_pair);
+
 int x509_generate_write(EncryptServer* parent);
 
-char* fread_sha256 (FILE* fp);
+char* fread_sha256(FILE* fp);
 
 #endif //AUTOGENTOO_CRYPT_H

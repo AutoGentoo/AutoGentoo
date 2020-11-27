@@ -9,9 +9,9 @@
 #include "request_generate.h"
 
 static struct __request_check {
-	request_t type;
-	int n;
-	request_structure_t args[3];
+    request_t type;
+    int n;
+    request_structure_t args[3];
 } request_checks[] = {
 /*		{REQ_INSTALL, 3, {STRCT_HOSTSELECT, STRCT_AUTHORIZE, STRCT_HOSTINSTALL}},
 		{REQ_EDIT, 3, {STRCT_HOSTSELECT, STRCT_AUTHORIZE, STRCT_HOSTEDIT}},
@@ -24,17 +24,17 @@ static struct __request_check {
 		{REQ_HANDOFF, 1, {STRCT_HOSTSELECT}},
 		{REQ_HOSTWRITE, 2, {STRCT_HOSTSELECT, STRCT_AUTHORIZE}},
 		{REQ_WORKERHANDOFF, 2, {STRCT_HOSTSELECT, STRCT_WORKERRESPONSE}} */
-		
-		{REQ_HOST_NEW, 2, {STRCT_AUTHORIZE, STRCT_HOST_NEW}}
+
+        {REQ_HOST_NEW, 2, {STRCT_AUTHORIZE, STRCT_HOST_NEW}}
 };
 
-static struct __request_check request_check_not_found = {(request_t)-1, 0, {}};
+static struct __request_check request_check_not_found = {(request_t) -1, 0, {}};
 
 typedef enum {
-	REQ_CHK_OK,
-	REQ_CHK_EINVALID, /* Request type is invalid */
-	REQ_CHK_EINCORRECT_N, /* Incorrect number of arguments */
-	REQ_CHK_EINVALID_ARGS /* Invalid argument types */
+    REQ_CHK_OK,
+    REQ_CHK_EINVALID, /* Request type is invalid */
+    REQ_CHK_EINCORRECT_N, /* Incorrect number of arguments */
+    REQ_CHK_EINVALID_ARGS /* Invalid argument types */
 } request_check_error_t;
 
 request_check_error_t request_check(ClientRequest* req);

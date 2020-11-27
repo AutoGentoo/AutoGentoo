@@ -21,14 +21,14 @@ void print_vec(Vector* vec);
 void print_string_vec(StringVector* vec);
 
 struct __test1 {
-	int a;
-	int b;
+    int a;
+    int b;
 };
 
 struct __test2 {
-	int a;
-	int b;
-	int c;
+    int a;
+    int b;
+    int c;
 };
 
 #endif //HACKSAW_DEBUG_H

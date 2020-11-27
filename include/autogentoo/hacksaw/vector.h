@@ -12,18 +12,18 @@ typedef struct __Vector Vector;
 #define HACKSAW_VECTOR_INITIAL 32
 
 typedef enum {
-	VECTOR_UNORDERED = 0x0, // Any order can be used (most efficient)
-	VECTOR_ORDERED = 0x1, // Keep the elements in order (don't use if not needed)
-	VECTOR_KEEP = 0x2, // Keep the memory unallocated
-	VECTOR_REMOVE = 0x0, // Remove the memory and replace the location
+    VECTOR_UNORDERED = 0x0, // Any order can be used (most efficient)
+    VECTOR_ORDERED = 0x1, // Keep the elements in order (don't use if not needed)
+    VECTOR_KEEP = 0x2, // Keep the memory unallocated
+    VECTOR_REMOVE = 0x0, // Remove the memory and replace the location
 } vector_opts;
 
 struct __Vector {
-	void** ptr; // Location where elements are stored
-	int n; // Number of filled places
-	size_t s; // Max number of elements (increments by HACKSAW_VECTOR_INCREMENT)
-	
-	vector_opts opts;
+    void** ptr; // Location where elements are stored
+    int n; // Number of filled places
+    size_t s; // Max number of elements (increments by HACKSAW_VECTOR_INCREMENT)
+
+    vector_opts opts;
 };
 
 Vector* vector_new(vector_opts opts);
@@ -44,6 +44,6 @@ void* vector_get(Vector* vec, int i);
 
 void vector_free(Vector* vec);
 
-void vector_foreach(Vector* vec, void (*f)(void*));
+void vector_foreach(Vector* vec, void (* f)(void*));
 
 #endif //HACKSAW_VECTOR_H

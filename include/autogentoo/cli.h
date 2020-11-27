@@ -8,6 +8,7 @@
 #define AUTOGENTOO_CLI_H
 
 pthread_t cli_start(Server* server);
+
 void* cli(Server* server);
 
 #endif //AUTOGENTOO_CLI_H
