@@ -9,17 +9,24 @@ int cmp_default(void* e1, void* e2) {
     return e1 == e2;
 }
 
+
+void queue_set_free(QueueSet* q) {
+    OBJECT_FREE(q->parent);
+    free(q);
+}
+
 QueueSet* queue_set_new(element_cmp cmp) {
     QueueSet* out = malloc(sizeof(QueueSet));
 
+    out->free = (void (*)(void*)) queue_set_free;
     out->parent = queue_new();
     out->cmp = cmp ? cmp : cmp_default;
 
     return out;
 }
 
-int queue_set_inside(QueueSet* q, void* el) {
-    for (struct queue_Node* current = q->parent->head; current; current = current->next) {
+int queue_set_inside(QueueSet* q, RefObject* el) {
+    for (LinkedNode* current = q->parent->head; current; current = current->next) {
         if (q->cmp(current->data, el))
             return 1;
     }
@@ -27,7 +34,7 @@ int queue_set_inside(QueueSet* q, void* el) {
     return 0;
 }
 
-int queue_set_add(QueueSet* q, void* el) {
+int queue_set_add(QueueSet* q, RefObject* el) {
     if (queue_set_inside(q, el))
         return 0;
 
@@ -35,19 +42,14 @@ int queue_set_add(QueueSet* q, void* el) {
     return 1;
 }
 
-void* queue_set_peek(QueueSet* q) {
+RefObject* queue_set_peek(QueueSet* q) {
     return queue_peek(q->parent);
 }
 
-void* queue_set_pop(QueueSet* q) {
+RefObject* queue_set_pop(QueueSet* q) {
     return queue_pop(q->parent);
 }
 
-void queue_set_foreach(QueueSet* q, void (* f)(void*)) {
+void queue_set_foreach(QueueSet* q, void (* f)(RefObject*)) {
     queue_foreach(q->parent, f);
-}
-
-void queue_set_free(QueueSet* q) {
-    queue_free(q->parent);
-    free(q);
 }

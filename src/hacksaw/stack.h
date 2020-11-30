@@ -5,25 +5,14 @@
 #ifndef AUTOGENTOO_STACK_H
 #define AUTOGENTOO_STACK_H
 
-typedef struct __Stack Stack;
+#include "linked_vector.h"
 
-struct __Stack {
-    struct stack_Node {
-        void* data;
-        struct stack_Node* next;
-    } * head_node;
-};
+typedef LinkedVector Stack;
 
 Stack* stack_new();
-
-void stack_add(Stack* self, void* data);
-
-void* stack_pop(Stack* self);
-
-void* stack_peek(Stack* self);
-
-void stack_foreach(Stack* self, void (* f)(void*));
-
-void stack_free(Stack* self);
+void stack_add(Stack* self, RefObject* data);
+RefObject* stack_pop(Stack* self);
+RefObject* stack_peek(Stack* self);
+void stack_foreach(Stack* self, void (* f)(RefObject*));
 
 #endif //AUTOGENTOO_STACK_H

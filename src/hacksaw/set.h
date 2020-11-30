@@ -6,32 +6,25 @@
 #define HACKSAW_SET_H
 
 #include "vector.h"
+#include "object.h"
 
-typedef struct __Set Set;
+typedef struct Set_prv Set;
 
 typedef int (* element_cmp)(void*, void*);
 
-struct __Set {
+struct Set_prv {
+    OBJECT_HEADER
     Vector* parent;
     element_cmp cmp_func;
 };
 
 Set* set_new(element_cmp cmp_func);
-
-int set_add(Set* set, void* element);
-
-void* set_get(Set* s, int i);
-
-int set_inside(Set* s, void* item);
-
+U32 set_add(Set* set, RefObject* element);
+RefObject* set_get(Set* s, U32 i);
+I32 set_inside(Set* s, RefObject* item);
 Set* set_dup(Set* s);
-
 void set_union(Set* s1, Set* s2);
-
-Set* set_collapse(Set* to_collapse, void* (* merge_func)(void*, void*));
-
-void set_free(Set* ptr);
-
-void* set_remove(Set* set, void* element);
+Set* set_collapse(Set* to_collapse, RefObject* (* merge_func)(RefObject*, RefObject*));
+RefObject* set_remove(Set* set, RefObject* element);
 
 #endif //HACKSAW_SET_H

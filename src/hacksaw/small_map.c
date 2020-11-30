@@ -6,22 +6,28 @@
 #include <stdlib.h>
 #include "hacksaw.h"
 
-SmallMap* small_map_new(int start_size) {
+static void small_map_key_free(SmallMap_key* self) {
+    free(self->key);
+    OBJECT_DECREF(self->data_ptr);
+    free(self);
+}
+
+SmallMap* small_map_new(U32 start_size) {
     SmallMap* out = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
-    vector_allocate_to_size(out, (size_t) start_size);
+    vector_allocate_to_size(out, start_size);
     return out;
 }
 
-void small_map_insert(SmallMap* smap, char* key, void* data) {
+void small_map_insert(SmallMap* smap, const char* key, RefObject* data) {
     SmallMap_key* ptr = malloc(sizeof(SmallMap_key));
+    ptr->free = (void (*)(void*)) small_map_key_free;
     ptr->key = strdup(key);
     ptr->data_ptr = data;
-    vector_add(smap, ptr);
+    vector_add(smap, (RefObject*) ptr);
 }
 
-void* small_map_get(SmallMap* smap, char* key) {
-    int i;
-    for (i = 0; i != smap->n; i++) {
+RefObject* small_map_get(SmallMap* smap, const char* key) {
+    for (U32 i = 0; i != smap->n; i++) {
         SmallMap_key* current_key = (SmallMap_key*) vector_get(smap, i);
         if (strcmp(key, current_key->key) == 0)
             return current_key->data_ptr;
@@ -29,10 +35,9 @@ void* small_map_get(SmallMap* smap, char* key) {
     return NULL;
 }
 
-void* small_map_delete(SmallMap* smap, char* key) {
-    int i;
+RefObject* small_map_delete(SmallMap* smap, const char* key) {
     SmallMap_key* current_key = NULL;
-    for (i = 0; i != smap->n; i++) {
+    for (U32 i = 0; i != smap->n; i++) {
         current_key = (SmallMap_key*) vector_get(smap, i);
         if (strcmp(key, current_key->key) == 0) {
             free(current_key->key);
@@ -46,7 +51,7 @@ void* small_map_delete(SmallMap* smap, char* key) {
     return NULL;
 }
 
-void* small_map_delete_index(SmallMap* smap, int index) {
+RefObject* small_map_delete_index(SmallMap* smap, U32 index) {
     if (index >= smap->n || index < 0)
         return NULL;
 
@@ -56,23 +61,9 @@ void* small_map_delete_index(SmallMap* smap, int index) {
     return current_key->data_ptr;
 }
 
-void small_map_free(SmallMap* smap, int free_data) {
-    int i;
-    for (i = 0; i != smap->n; i++) {
-        SmallMap_key* current_key = (SmallMap_key*) vector_get(smap, i);
-        free(current_key->key);
-        if (free_data)
-            free(current_key->data_ptr);
-        free(current_key);
-    }
-
-    vector_free(smap);
-}
-
-char* small_map_get_key(SmallMap* smap, void* data) {
-    int i;
+char* small_map_get_key(SmallMap* smap, RefObject* data) {
     SmallMap_key* current_key = NULL;
-    for (i = 0; i != smap->n; i++) {
+    for (U32 i = 0; i != smap->n; i++) {
         current_key = (SmallMap_key*) vector_get(smap, i);
         if (data == current_key->data_ptr)
             return current_key->key;
@@ -80,14 +71,14 @@ char* small_map_get_key(SmallMap* smap, void* data) {
     return NULL;
 }
 
-void* small_map_get_index(SmallMap* smap, int index) {
+RefObject* small_map_get_index(SmallMap* smap, U32 index) {
     if (index >= smap->n || index < 0)
         return NULL;
 
     return ((SmallMap_key*) vector_get(smap, index))->data_ptr;
 }
 
-void* small_map_get_key_index(SmallMap* smap, int index) {
+char* small_map_get_key_index(SmallMap* smap, U32 index) {
     return ((SmallMap_key*) vector_get(smap, index))->key;
 }
 

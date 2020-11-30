@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "vector.h"
 
-typedef struct __SmallMap_key SmallMap_key;
+typedef struct SmallMap_key_prv SmallMap_key;
 
 /**
  * Vector is essentailly this:
@@ -18,31 +18,22 @@ typedef struct __SmallMap_key SmallMap_key;
  *          |   ...     ...
 */
 
-struct __SmallMap_key {
+struct SmallMap_key_prv {
+    REFERENCE_OBJECT
     char* key;
-    void* data_ptr;
+    RefObject* data_ptr;
 };
 
 typedef Vector SmallMap;
 
-SmallMap* small_map_new(int start_size);
-
-void small_map_insert(SmallMap* smap, char* key, void* data);
-
-void* small_map_get(SmallMap* smap, char* key);
-
-void* small_map_delete(SmallMap* smap, char* key);
-
-void* small_map_delete_index(SmallMap* smap, int index);
-
-void small_map_free(SmallMap* smap, int free_data);
-
-char* small_map_get_key(SmallMap* smap, void* data);
-
-void* small_map_get_index(SmallMap* smap, int index);
-
-void* small_map_get_key_index(SmallMap* smap, int index);
-
+SmallMap* small_map_new(U32 start_size);
+void small_map_insert(SmallMap* smap, const char* key, RefObject* data);
+RefObject* small_map_get(SmallMap* smap, const char* key);
+RefObject* small_map_delete(SmallMap* smap, const char* key);
+RefObject* small_map_delete_index(SmallMap* smap, U32 index);
+char* small_map_get_key(SmallMap* smap, RefObject* data);
+RefObject* small_map_get_index(SmallMap* smap, U32 index);
+char* small_map_get_key_index(SmallMap* smap, U32 index);
 void small_map_foreach(SmallMap* smap, void (* f)(void*));
 
 #endif

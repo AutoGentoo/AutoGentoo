@@ -7,30 +7,35 @@
 #include "set.h"
 #include "log.h"
 
+static void set_free(Set* self) {
+    OBJECT_FREE(self->parent);
+    free(self);
+}
+
 Set* set_new(element_cmp cmp_func) {
     Set* out = malloc(sizeof(Set));
+    out->free = (void (*)(void*)) set_free;
     out->parent = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);
     out->cmp_func = cmp_func;
 
     return out;
 }
 
-void* set_get(Set* s, int i) {
+RefObject* set_get(Set* s, U32 i) {
     return vector_get(s->parent, i);
 }
 
-int set_inside(Set* s, void* item) {
+I32 set_inside(Set* s, RefObject* item) {
     for (int i = 0; i < s->parent->n; i++) {
-        if (s->cmp_func && s->cmp_func(item, set_get(s, i)) == 0)
-            return i;
-        else if (!s->cmp_func && item == set_get(s, i))
+        if ((s->cmp_func && s->cmp_func(item, set_get(s, i)) == 0)
+            || (!s->cmp_func && item == set_get(s, i)))
             return i;
     }
 
     return -1;
 }
 
-int set_add(Set* set, void* element) {
+U32 set_add(Set* set, RefObject* element) {
     int index = set_inside(set, element);
 
     if (index == -1) {
@@ -41,7 +46,7 @@ int set_add(Set* set, void* element) {
     return 0;
 }
 
-void* set_remove(Set* set, void* element) {
+RefObject* set_remove(Set* set, RefObject* element) {
     int index = set_inside(set, element);
     if (index == -1)
         return NULL;
@@ -64,7 +69,7 @@ void set_union(Set* s1, Set* s2) {
         return;
     }
 
-    for (int i = 0; i < s2->parent->n; i++)
+    for (U32 i = 0; i < s2->parent->n; i++)
         set_add(s1, set_get(s2, i));
 }
 
@@ -78,13 +83,13 @@ Set* set_intersect(Set* s1, Set* s2) {
 
     /* Iterate through the bigger one */
     if (s1->parent->n > s2->parent->n) {
-        for (int i = 0; i < s1->parent->n; i++) {
+        for (U32 i = 0; i < s1->parent->n; i++) {
             void* element = set_get(s1, i);
             if (set_inside(s2, element) != -1)
                 set_add(out, element);
         }
     } else {
-        for (int i = 0; i < s2->parent->n; i++) {
+        for (U32 i = 0; i < s2->parent->n; i++) {
             void* element = set_get(s2, i);
             if (set_inside(s1, element) != -1)
                 set_add(out, element);
@@ -94,7 +99,7 @@ Set* set_intersect(Set* s1, Set* s2) {
     return out;
 }
 
-Set* set_collapse(Set* to_collapse, void* (* merge_func)(void*, void*)) {
+Set* set_collapse(Set* to_collapse, RefObject* (* merge_func)(RefObject*, RefObject*)) {
     Set* out_set = set_new(to_collapse->cmp_func);
     Set* has_read = set_new(to_collapse->cmp_func);
 
@@ -117,12 +122,7 @@ Set* set_collapse(Set* to_collapse, void* (* merge_func)(void*, void*)) {
         }
     }
 
-    set_free(has_read);
+    OBJECT_FREE(has_read);
 
     return out_set;
-}
-
-void set_free(Set* ptr) {
-    vector_free(ptr->parent);
-    free(ptr);
 }

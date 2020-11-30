@@ -6,66 +6,35 @@
 #include <stdlib.h>
 
 Queue* queue_new() {
-    Queue* out = malloc(sizeof(Queue));
-
-    out->head = NULL;
-    out->tail = NULL;
-
-    return out;
+    return linked_vector_new();
 }
 
-void queue_add(Queue* self, void* data) {
-    struct queue_Node* new_node = malloc(sizeof(struct queue_Node));
-    new_node->data = data;
-    new_node->next = NULL;
-
-
-    if (!self->head) {
-        self->head = new_node;
-        self->tail = new_node;
-    } else {
-        self->tail->next = new_node;
-        self->tail = new_node;
-    }
+void queue_add(Queue* self, RefObject* data) {
+    linked_vector_append(self, data);
 }
 
-void* queue_pop(Queue* self) {
+RefObject* queue_pop(Queue* self) {
     if (!self->head)
         return NULL;
 
-    struct queue_Node* del_node = self->head;
-    self->head = self->head->next;
+    LinkedNode* node = self->head;
+    self->head = node->next;
 
-    if (self->tail == del_node)
-        self->tail = NULL;
+    OBJECT_INCREF(node->data);
+    RefObject* to_pop = node->data;
+    OBJECT_FREE(node);
 
-    void* out = del_node->data;
-    free(del_node);
-
-    return out;
+    return to_pop;
 }
 
-void* queue_peek(Queue* self) {
+RefObject* queue_peek(Queue* self) {
     if (!self->head)
         return NULL;
 
     return self->head->data;
 }
 
-void queue_foreach(Queue* self, void (* f)(void*)) {
-    for (struct queue_Node* current = self->head; current; current = current->next)
+void queue_foreach(Queue* self, void (* f)(RefObject*)) {
+    for (LinkedNode* current = self->head; current; current = current->next)
         f(current->data);
-}
-
-void queue_concat(Queue* dest, Queue* to_add) {
-    dest->tail->next = to_add->head;
-    dest->tail = to_add->tail;
-    to_add->head = NULL;
-}
-
-void queue_free(Queue* self) {
-    while (self->head)
-        queue_pop(self);
-
-    free(self);
 }

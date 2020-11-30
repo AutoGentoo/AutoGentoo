@@ -5,25 +5,23 @@
 #ifndef HACKSAW_STRING_VECTOR_H
 #define HACKSAW_STRING_VECTOR_H
 
-#include "vector.h"
+#include "object.h"
 
-typedef Vector StringVector;
+typedef struct StringVector_prv StringVector;
+
+struct StringVector_prv {
+    OBJECT_HEADER
+    char** ptr; // Location where elements are stored
+    U32 n; // Number of filled places
+    U32 s; // Max number of elements (increments by HACKSAW_VECTOR_INCREMENT)
+};
 
 StringVector* string_vector_new();
-
-void string_vector_add(StringVector* vec, char* string);
-
-void string_vector_remove(StringVector* vec, int index);
-
-void string_vector_insert(StringVector* vec, char* string, int index);
-
-void string_vector_set(StringVector* vec, char* string, int index);
-
-char* string_vector_get(StringVector* vec, int index);
-
-void string_vector_split(StringVector* vec, char* string, char* delim);
-
-void string_vector_free(StringVector* vec);
-
+void string_vector_add(StringVector* vec, const char* string);
+void string_vector_remove(StringVector* vec, U32 index);
+void string_vector_insert(StringVector* vec, const char* string, U32 index);
+void string_vector_set(StringVector* vec, const char* string, U32 index);
+char* string_vector_get(StringVector* vec, U32 index);
+void string_vector_split(StringVector* vec, char* string, const char* delim);
 
 #endif //HACKSAW_STRING_VECTOR_H

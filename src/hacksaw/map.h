@@ -7,10 +7,11 @@
 
 #include <stdio.h>
 #include "string_vector.h"
+#include "object.h"
 #include <stdint.h>
 
-typedef struct __Map Map;
-typedef struct __MapItem MapItem;
+typedef struct Map_prv Map;
+typedef struct MapItem_prv MapItem;
 
 typedef void (* free_function)(void*);
 
@@ -21,18 +22,19 @@ typedef void (* free_function)(void*);
  * @file map.h
  * @brief Hash map structure using murmur3 hashing
  */
-struct __Map {
+struct Map_prv {
+    REFERENCE_OBJECT
     MapItem** hash_table; // similar to Vector position are arbitrary
-    int n; // Only need if we need to resize the array
-    int overlaps; // Number of key overlaps
-    size_t size; // Current size of map
-    size_t realloc_at; // Target size to trigger a reallocation
-    double threshold; // Upper bound percent full
+    U32 n; // Only need if we need to resize the array
+    U32 overlaps; // Number of key overlaps
+    U64 size; // Current size of map
+    U64 realloc_at; // Target size to trigger a reallocation
+    F64 threshold; // Upper bound percent full
 };
 
-struct __MapItem {
+struct MapItem_prv {
     char* key;
-    void* data;
+    RefObject* data;
     MapItem* next;
 };
 
@@ -51,7 +53,7 @@ void* map_get(Map* map, char* key);
  * @param data Pointer to data that will be copied
  * @return returns the hash generated from the key
  */
-void* map_insert(Map* map, char* key, void* data);
+void* map_insert(Map* map, const char* key, RefObject* data);
 
 /**
  * Create a new map with array size new_size
@@ -60,14 +62,14 @@ void* map_insert(Map* map, char* key, void* data);
  * @param threshold realloc at threshold per-cent full
  * @return new array
  */
-Map* map_new(size_t new_size, double threshold);
+Map* map_new(U64 new_size, F64 threshold);
 
 /**
  * Realloc the map and repack the keys
  * @param map map to repack
  * @param size new array size
  */
-void map_realloc(Map* map, size_t size);
+void map_realloc(Map* map, U64 size);
 
 /**
  * Remove a key from the map
@@ -83,7 +85,7 @@ void* map_remove(Map* map, char* key);
  * @param nbytes sizeof dataptr
  * @return 32-bit unsigned hash value
  */
-uint32_t map_get_hash(const void* data, size_t nbytes); // Returns offset from hash_table[0]
+U32 map_get_hash(const void* data, U32 nbytes); // Returns offset from hash_table[0]
 
 /**
  * Iterate through map and find all the keys
@@ -91,13 +93,5 @@ uint32_t map_get_hash(const void* data, size_t nbytes); // Returns offset from h
  * @return a StringVector of the keys
  */
 StringVector* map_all_keys(Map* map);
-
-/**
- * Free the map and all its data
- * @param map to free
- * @param __free for each MapItem allocated, __free (item->data) will be called
- * NULL to not free data
- */
-void map_free(Map* map, free_function __free);
 
 #endif // HACKSAW_MAP_H

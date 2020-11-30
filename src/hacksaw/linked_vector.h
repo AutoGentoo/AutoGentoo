@@ -5,25 +5,28 @@
 #ifndef HACKSAW_LINKED_VECTOR_H
 #define HACKSAW_LINKED_VECTOR_H
 
-typedef struct __LinkedNode LinkedNode;
+#include "object.h"
 
-struct __LinkedNode {
-    void* data;
+typedef struct LinkedNode_prv LinkedNode;
+typedef struct LinkedVector_prv LinkedVector;
+
+struct LinkedNode_prv {
+    OBJECT_HEADER
+    RefObject* data;
 
     LinkedNode* prev;
     LinkedNode* next;
 };
 
-LinkedNode** linked_vector_new();
+struct LinkedVector_prv {
+    OBJECT_HEADER
+    LinkedNode* head;
+    LinkedNode* tail;
+};
 
-LinkedNode* linked_vector_get(LinkedNode** head_ref, int index);
-
-LinkedNode* linked_vector_append(LinkedNode** prev_ref, void* data);
-
-LinkedNode* linked_vector_prepend(LinkedNode** next_ref, void* data);
-
-void linked_node_free(LinkedNode* node, int free_data);
-
-void linked_vector_free(LinkedNode** head_ref, int free_data);
+LinkedVector* linked_vector_new();
+LinkedNode* linked_vector_get(LinkedVector* self, int index);
+LinkedNode* linked_vector_append(LinkedVector* self, RefObject* data);
+LinkedNode* linked_vector_prepend(LinkedVector* self, RefObject* data);
 
 #endif //HACKSAW_LINKED_VECTOR_H

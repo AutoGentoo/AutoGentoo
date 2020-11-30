@@ -1,19 +1,36 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hacksaw.h"
-#include <stdint.h>
 
 void* prv_map_insert_item(Map* map, MapItem* item);
 
 void prv_map_realloc_item(Map* map, MapItem* list);
 
+static void prv_map_free_bucket(Map* map, MapItem* item) {
+    if (!item)
+        return;
 
-Map* map_new(size_t new_size, double threshold) {
+    prv_map_free_bucket(map, item->next);
+    free(item->key);
+    OBJECT_DECREF(item->data);
+    free(item);
+}
+
+static void map_free(Map* map) {
+    for (int i = 0; i < map->size; i++)
+        prv_map_free_bucket(map, map->hash_table[i]);
+    free(map->hash_table);
+    free(map);
+}
+
+Map* map_new(size_t new_size, F64 threshold) {
     Map* out = malloc(sizeof(Map));
 
+    out->free = (void (*)(void *)) map_free;
+    out->reference_count = 0;
     out->size = new_size;
     out->threshold = threshold;
-    out->realloc_at = (size_t) (threshold * new_size);
+    out->realloc_at = (U64) (threshold * new_size);
 
     out->hash_table = calloc(new_size, sizeof(MapItem*));
     out->overlaps = 0;
@@ -31,16 +48,15 @@ void prv_map_realloc_item(Map* map, MapItem* list) {
     prv_map_insert_item(map, list);
 }
 
-void map_realloc(Map* map, size_t size) {
-    size_t old_size = map->size;
+void map_realloc(Map* map, U64 size) {
+    U32 old_size = map->size;
     MapItem** old_table = map->hash_table;
 
     map->hash_table = calloc(size, sizeof(MapItem*));
     map->size = size;
     map->realloc_at = map->size * map->threshold;
 
-    int i;
-    for (i = 0; i < old_size; i++)
+    for (U32 i = 0; i < old_size; i++)
         if (old_table[i] != NULL)
             prv_map_realloc_item(map, old_table[i]);
 
@@ -51,8 +67,7 @@ StringVector* map_all_keys(Map* map) {
     StringVector* out = string_vector_new();
 
     MapItem* current = NULL;
-    int i;
-    for (i = 0; i < map->size && out->n < map->n; i++) {
+    for (U32 i = 0; i < map->size && out->n < map->n; i++) {
         current = map->hash_table[i];
         while (current) {
             string_vector_add(out, current->key);
@@ -64,8 +79,8 @@ StringVector* map_all_keys(Map* map) {
 }
 
 void* map_get(Map* map, char* key) {
-    size_t n = strlen(key);
-    size_t index = map_get_hash(key, n) % map->size;
+    U32 n = strlen(key);
+    U32 index = map_get_hash(key, n) % map->size;
 
     MapItem* current = map->hash_table[index];
     while (current) {
@@ -78,8 +93,8 @@ void* map_get(Map* map, char* key) {
 }
 
 void* map_remove(Map* map, char* key) {
-    size_t n = strlen(key);
-    size_t index = map_get_hash(key, n) % map->size;
+    U32 n = strlen(key);
+    U32 index = map_get_hash(key, n) % map->size;
 
     MapItem* current = map->hash_table[index];
     MapItem* before = NULL;
@@ -108,9 +123,9 @@ void* map_remove(Map* map, char* key) {
 }
 
 void* prv_map_insert_item(Map* map, MapItem* item) {
-    size_t n = strlen(item->key);
-    uint32_t hash = map_get_hash(item->key, n);
-    uint32_t offset = hash % map->size;
+    U32 n = strlen(item->key);
+    U32 hash = map_get_hash(item->key, n);
+    U32 offset = hash % map->size;
 
     if (map->hash_table[offset] != NULL)
         map->overlaps++;
@@ -134,7 +149,7 @@ void* prv_map_insert_item(Map* map, MapItem* item) {
     return NULL;
 }
 
-void* map_insert(Map* map, char* key, void* data) {
+void* map_insert(Map* map, const char* key, RefObject* data) {
     if (map->n + 1 >= map->realloc_at)
         map_realloc(map, map->size * 2);
 
@@ -153,22 +168,20 @@ void* map_insert(Map* map, char* key, void* data) {
  * @param nbytes
  * @return
  */
-uint32_t map_get_hash(const void* data, size_t nbytes) {
+U32 map_get_hash(const void* data, U32 nbytes) {
     if (data == NULL || nbytes == 0)
         return 0;
 
-    const uint32_t c1 = 0xcc9e2d51;
-    const uint32_t c2 = 0x1b873593;
+    const U32 c1 = 0xcc9e2d51;
+    const U32 c2 = 0x1b873593;
 
-    const int nblocks = (int) (nbytes / 4);
-    const uint32_t* blocks = (const uint32_t*) (data);
-    const uint8_t* tail = (const uint8_t*) (data + (nblocks * 4));
+    const U32 nblocks = (U32) (nbytes / 4);
+    const U32* blocks = (const U32*) (data);
+    const U8* tail = (const U8*) (data + (nblocks * 4));
 
-    uint32_t h = 0;
-
-    int i;
-    uint32_t k;
-    for (i = 0; i < nblocks; i++) {
+    U32 h = 0;
+    U32 k = 0;
+    for (U32 i = 0; i < nblocks; i++) {
         k = blocks[i];
 
         k *= c1;
@@ -203,23 +216,4 @@ uint32_t map_get_hash(const void* data, size_t nbytes) {
     h ^= h >> 16;
 
     return h;
-}
-
-void prv_map_free_bucket(Map* map, MapItem* item, free_function __free) {
-    if (!item)
-        return;
-
-    prv_map_free_bucket(map, item->next, __free);
-    free(item->key);
-    if (__free)
-        __free(item->data);
-    free(item);
-    //map->n--;
-}
-
-void map_free(Map* map, free_function __free) {
-    for (int i = 0; i < map->size; i++)
-        prv_map_free_bucket(map, map->hash_table[i], __free);
-    free(map->hash_table);
-    free(map);
 }

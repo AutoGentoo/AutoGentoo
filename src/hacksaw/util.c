@@ -13,10 +13,9 @@ void prv_mkdir(const char* dir) {
     }
     char tmp[256];
     char* p = NULL;
-    size_t len;
 
     snprintf(tmp, sizeof(tmp), "%s", dir);
-    len = strlen(tmp);
+    U32 len = strlen(tmp);
     if (tmp[len - 1] == '/')
         tmp[len - 1] = 0;
     for (p = tmp + 1; *p; p++) {
@@ -50,9 +49,8 @@ void file_copy(char* src, char* dest) {
     fclose(fp_dest);
 }
 
-int string_find(char** array, char* element, size_t n) {
-    int i;
-    for (i = 0; i != n; i++)
+int string_find(char** array, char* element, U32 n) {
+    for (U32 i = 0; i != n; i++)
         if (strcmp(element, array[i]) == 0)
             return i;
     return -1;
@@ -60,8 +58,7 @@ int string_find(char** array, char* element, size_t n) {
 
 void fix_path(char* ptr) {
     size_t n = strlen(ptr);
-    int i;
-    for (i = 1; i != n; i++) {
+    for (U32 i = 1; i != n; i++) {
         if (ptr[i] == '/' && ptr[i - 1] == '/') {
             strcpy(&ptr[i - 1], &ptr[i]);
             ptr[n - 1] = 0;
@@ -73,11 +70,11 @@ void fix_path(char* ptr) {
 char* string_strip(char* str) {
     size_t len = strlen(str);
 
-    int i;
-    for (i = 0; i < len && str[i] == ' '; i++);
+    U32 i = 0;
+    for (; i < len && str[i] == ' '; i++);
 
-    int j;
-    for (j = (int) len; j > i && str[j] == ' '; j--);
+    U32 j = len;
+    for (; j > i && str[j] == ' '; j--);
 
-    return strndup(str + i, (size_t) j - i);
+    return strndup(str + i, (U32) j - i);
 }
