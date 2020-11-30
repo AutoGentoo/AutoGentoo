@@ -1,9 +1,0 @@
-#.idea/*
-.idea/workspace.*
-cmake-build-debug/*
-**/.autogentoo.config
-build-debug/*
-*workspace.xml
-#bin/*
-env/*
-temp/*
