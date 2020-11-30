@@ -4,7 +4,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "hacksaw/hacksaw.h"
+#include "hacksaw.h"
 
 SmallMap* small_map_new(int start_size) {
     SmallMap* out = vector_new(VECTOR_REMOVE | VECTOR_UNORDERED);

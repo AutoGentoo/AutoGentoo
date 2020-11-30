@@ -2,7 +2,7 @@
 // Created by atuser on 12/30/19.
 //
 
-#include <hacksaw/queue.h>
+#include "queue.h"
 #include <stdlib.h>
 
 Queue* queue_new() {

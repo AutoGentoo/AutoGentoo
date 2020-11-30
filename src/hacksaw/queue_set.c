@@ -3,7 +3,7 @@
 //
 
 #include <stdlib.h>
-#include <hacksaw/queue_set.h>
+#include "queue_set.h"
 
 int cmp_default(void* e1, void* e2) {
     return e1 == e2;

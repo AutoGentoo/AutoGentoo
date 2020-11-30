@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "hacksaw/string_vector.h"
+#include "string_vector.h"
 
 StringVector* string_vector_new() {
     return vector_new(VECTOR_ORDERED | VECTOR_REMOVE);

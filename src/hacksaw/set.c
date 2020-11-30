@@ -4,8 +4,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <hacksaw/set.h>
-#include <hacksaw/log.h>
+#include "set.h"
+#include "log.h"
 
 Set* set_new(element_cmp cmp_func) {
     Set* out = malloc(sizeof(Set));

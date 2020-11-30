@@ -2,7 +2,7 @@
 // Created by atuser on 10/19/17.
 //
 
-#include "hacksaw/vector.h"
+#include "vector.h"
 #include <stdlib.h>
 #include <string.h>
 

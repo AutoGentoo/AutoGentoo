@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "hacksaw/hacksaw.h"
+#include "hacksaw.h"
 #include <stdint.h>
 
 void* prv_map_insert_item(Map* map, MapItem* item);

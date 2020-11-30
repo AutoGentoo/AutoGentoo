@@ -8,7 +8,6 @@
 #include <stddef.h>
 #include "vector.h"
 #include "string_vector.h"
-#include "conf.h"
 
 void init_log_mutex() __attribute__((constructor));
 

@@ -2,8 +2,8 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <dirent.h>
-#include "hacksaw/log.h"
-#include "hacksaw/util.h"
+#include "log.h"
+#include "util.h"
 
 void prv_mkdir(const char* dir) {
     DIR* _dir = opendir(dir);

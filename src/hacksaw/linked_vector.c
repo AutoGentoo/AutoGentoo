@@ -3,7 +3,7 @@
 //
 
 #include <stdlib.h>
-#include "hacksaw/hacksaw.h"
+#include "hacksaw.h"
 
 LinkedNode* _linked_node_new() {
     LinkedNode* out = malloc(sizeof(LinkedNode));

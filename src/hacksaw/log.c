@@ -3,7 +3,7 @@
 //
 
 #include <stdio.h>
-#include "hacksaw/log.h"
+#include "log.h"
 #include <stdarg.h>
 #include <pthread.h>
 

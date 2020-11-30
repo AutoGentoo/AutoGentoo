@@ -5,7 +5,6 @@
 #ifndef HACKSAW_HACKSAW_H
 #define HACKSAW_HACKSAW_H
 
-#include "conf.h"
 #include "debug.h"
 #include "log.h"
 #include "map.h"

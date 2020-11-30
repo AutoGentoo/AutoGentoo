@@ -4,8 +4,8 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <hacksaw/getopt.h>
-#include "hacksaw/log.h"
+#include "getopt.h"
+#include "log.h"
 #include "getopt.h"
 
 char** opt_handle(Opt* opts, int argc, char** argv) {

@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <hacksaw/stack.h>
+#include "stack.h"
 
 Stack* stack_new() {
     Stack* out = malloc(sizeof(Stack));
