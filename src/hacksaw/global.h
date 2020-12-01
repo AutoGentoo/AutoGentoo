@@ -29,13 +29,4 @@ typedef float F32;
 typedef double F64;
 typedef long double F128;
 
-/* Architecture specific types */
-#if UINTPTR_MAX == 0xffffffff /* 32-bit addressing mode */
-typedef U32 PXX;
-#elif UINTPTR_MAX == 0xffffffffffffffff /* 64-bit addressing mode */
-typedef U64 PXX;
-#else /* Not either? */
-#error "This architecture is not supported"
-#endif
-
 #endif //AUTOGENTOO_GLOBAL_H

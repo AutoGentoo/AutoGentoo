@@ -23,12 +23,12 @@ struct Message_prv
     /* General purpose parameters */
     struct
     {
-        PXX val1;
-        PXX val2;
-        PXX val3;
-        PXX val4;
-        PXX val5;
-        PXX val6;
+        U64 val1;
+        U64 val2;
+        U64 val3;
+        U64 val4;
+        U64 val5;
+        U64 val6;
     } data;
 };
 
