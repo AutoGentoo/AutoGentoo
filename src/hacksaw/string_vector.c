@@ -8,18 +8,21 @@
 #include "string_vector.h"
 #include "vector.h"
 
-static void string_vector_free(StringVector* self) {
+static void string_vector_free(StringVector* self)
+{
     if (!self)
         return;
 
-    for (U32 i = 0; i != self->n; i++) {
+    for (U32 i = 0; i != self->n; i++)
+    {
         free(string_vector_get(self, i));
     }
     free(self->ptr);
     free(self);
 }
 
-StringVector* string_vector_new() {
+StringVector* string_vector_new()
+{
     StringVector* self = malloc(sizeof(StringVector));
 
     self->free = (void (*)(void*)) string_vector_free;
@@ -30,15 +33,18 @@ StringVector* string_vector_new() {
     return self;
 }
 
-void string_vector_add(StringVector* vec, const char* string) {
-    if (vec->s == (vec->n + 1)) {
+void string_vector_add(StringVector* vec, const char* string)
+{
+    if (vec->s == (vec->n + 1))
+    {
         vector_allocate((Vector*) vec);
     }
 
     vec->ptr[vec->n++] = strdup(string);
 }
 
-void string_vector_insert(StringVector* vec, const char* string, U32 index) {
+void string_vector_insert(StringVector* vec, const char* string, U32 index)
+{
     if (vec->s <= (vec->n + 1))
         vector_allocate((Vector*) vec);
 
@@ -47,7 +53,8 @@ void string_vector_insert(StringVector* vec, const char* string, U32 index) {
     vec->n++;
 }
 
-void string_vector_set(StringVector* vec, const char* string, U32 index) {
+void string_vector_set(StringVector* vec, const char* string, U32 index)
+{
     while (vec->s >= index)
         vector_allocate((Vector*) vec);
 
@@ -60,23 +67,28 @@ void string_vector_set(StringVector* vec, const char* string, U32 index) {
 
 
 void* prv_vector_remove_ordered(Vector* vec, int index);
-void string_vector_remove(StringVector* vec, U32 index) {
+
+void string_vector_remove(StringVector* vec, U32 index)
+{
     char* out = prv_vector_remove_ordered((Vector*) vec, index);
     free(out);
 }
 
-void string_vector_split(StringVector* vec, char* string, const char* delim) {
+void string_vector_split(StringVector* vec, char* string, const char* delim)
+{
     if (string == NULL)
         return;
 
     char* buff = strtok(string, delim);
 
-    while (buff != NULL) {
+    while (buff != NULL)
+    {
         string_vector_add(vec, buff);
         buff = strtok(NULL, delim);
     }
 }
 
-char* string_vector_get(StringVector* vec, U32 index) {
+char* string_vector_get(StringVector* vec, U32 index)
+{
     return (char*) vector_get((Vector*) vec, index);
 }

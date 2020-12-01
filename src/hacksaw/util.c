@@ -5,9 +5,11 @@
 #include "log.h"
 #include "util.h"
 
-void prv_mkdir(const char* dir) {
+void prv_mkdir(const char* dir)
+{
     DIR* _dir = opendir(dir);
-    if (_dir) {
+    if (_dir)
+    {
         closedir(_dir);
         return;
     }
@@ -18,8 +20,10 @@ void prv_mkdir(const char* dir) {
     U32 len = strlen(tmp);
     if (tmp[len - 1] == '/')
         tmp[len - 1] = 0;
-    for (p = tmp + 1; *p; p++) {
-        if (*p == '/') {
+    for (p = tmp + 1; *p; p++)
+    {
+        if (*p == '/')
+        {
             *p = 0;
             mkdir(tmp, 0777);
             *p = '/';
@@ -28,19 +32,22 @@ void prv_mkdir(const char* dir) {
     mkdir(tmp, 0777);
 }
 
-void file_copy(char* src, char* dest) {
+void file_copy(char* src, char* dest)
+{
     FILE* fp_src = fopen(src, "r");
     if (fp_src == NULL)
         return lerror("could not open file '%s'", src);
 
     FILE* fp_dest = fopen(dest, "w+");
-    if (fp_dest == NULL) {
+    if (fp_dest == NULL)
+    {
         fclose(fp_src);
         return lerror("could not open file '%s' for writing", dest);
     }
 
     int c = fgetc(fp_src);
-    while (c != EOF) {
+    while (c != EOF)
+    {
         fputc(c, fp_dest);
         c = fgetc(fp_src);
     }
@@ -49,17 +56,21 @@ void file_copy(char* src, char* dest) {
     fclose(fp_dest);
 }
 
-int string_find(char** array, char* element, U32 n) {
+int string_find(char** array, char* element, U32 n)
+{
     for (U32 i = 0; i != n; i++)
         if (strcmp(element, array[i]) == 0)
             return i;
     return -1;
 }
 
-void fix_path(char* ptr) {
+void fix_path(char* ptr)
+{
     size_t n = strlen(ptr);
-    for (U32 i = 1; i != n; i++) {
-        if (ptr[i] == '/' && ptr[i - 1] == '/') {
+    for (U32 i = 1; i != n; i++)
+    {
+        if (ptr[i] == '/' && ptr[i - 1] == '/')
+        {
             strcpy(&ptr[i - 1], &ptr[i]);
             ptr[n - 1] = 0;
             n--;
@@ -67,7 +78,8 @@ void fix_path(char* ptr) {
     }
 }
 
-char* string_strip(char* str) {
+char* string_strip(char* str)
+{
     size_t len = strlen(str);
 
     U32 i = 0;

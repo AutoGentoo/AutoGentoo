@@ -9,18 +9,20 @@
 #include <Python.h>
 
 typedef struct Message_prv Message;
-typedef struct MessageDataFrame_prv MessageDataFrame;
+typedef struct MessageFrame_prv MessageFrame;
 
 /* Use this messaging tactic for general purpose IPC
  * with low bandwith parameter passing
  *
  * Up to 6 * sizeof(void*) of data
  * */
-struct Message_prv {
+struct Message_prv
+{
     U32 token;
 
     /* General purpose parameters */
-    struct {
+    struct
+    {
         PXX val1;
         PXX val2;
         PXX val3;
@@ -32,10 +34,11 @@ struct Message_prv {
 
 /* If high band of data needs to be sent/received,
  * use a data frame */
-struct MessageDataFrame_prv {
+struct MessageFrame_prv
+{
     Message parent;
 
-    U32 size;
+    U64 size;
     void* data;
 };
 

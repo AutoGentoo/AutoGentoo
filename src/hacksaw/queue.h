@@ -18,8 +18,11 @@ typedef LinkedVector Queue;
 Queue* queue_new();
 
 void queue_add(Queue* self, RefObject* data);
+
 RefObject* queue_pop(Queue* self);
+
 RefObject* queue_peek(Queue* self);
+
 void queue_foreach(Queue* self, void (* f)(RefObject*));
 
 #endif //AUTOGENTOO_QUEUE_H

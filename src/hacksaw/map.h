@@ -22,7 +22,8 @@ typedef void (* free_function)(void*);
  * @file map.h
  * @brief Hash map structure using murmur3 hashing
  */
-struct Map_prv {
+struct Map_prv
+{
     REFERENCE_OBJECT
     MapItem** hash_table; // similar to Vector position are arbitrary
     U32 n; // Only need if we need to resize the array
@@ -32,7 +33,8 @@ struct Map_prv {
     F64 threshold; // Upper bound percent full
 };
 
-struct MapItem_prv {
+struct MapItem_prv
+{
     char* key;
     RefObject* data;
     MapItem* next;

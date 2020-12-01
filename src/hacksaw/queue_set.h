@@ -10,8 +10,10 @@
 
 typedef struct QueueSet_prv QueueSet;
 
-struct QueueSet_prv {
+struct QueueSet_prv
+{
     OBJECT_HEADER
+
     Queue* parent;
     element_cmp cmp;
 };
@@ -19,9 +21,13 @@ struct QueueSet_prv {
 QueueSet* queue_set_new(element_cmp cmp);
 
 int queue_set_inside(QueueSet* q, RefObject* el);
+
 int queue_set_add(QueueSet* q, RefObject* el);
+
 RefObject* queue_set_peek(QueueSet* q);
+
 RefObject* queue_set_pop(QueueSet* q);
+
 void queue_set_foreach(QueueSet* q, void (* f)(RefObject*));
 
 #endif //AUTOGENTOO_QUEUE_SET_H

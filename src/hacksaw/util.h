@@ -5,9 +5,13 @@
 #include "global.h"
 
 void prv_mkdir(const char* dir);
+
 void file_copy(char* src, char* dest);
+
 int string_find(char** array, char* element, U32 n);
+
 void fix_path(char* ptr);
+
 char* string_strip(char* str);
 
 #endif

@@ -14,17 +14,20 @@
 static pthread_mutex_t log_mutex;
 static FILE* target = NULL;
 
-void init_log() {
+void init_log()
+{
     target = stdout;
     pthread_mutex_init(&log_mutex, NULL);
 }
 
-void close_log() {
+void close_log()
+{
     fclose(target);
     pthread_mutex_destroy(&log_mutex);
 }
 
-void lset(FILE* _target) {
+void lset(FILE* _target)
+{
     target = _target;
 }
 
@@ -39,32 +42,38 @@ fprintf(target, ANSI_RESET "\n"); \
 fflush(target); \
 pthread_mutex_unlock(&log_mutex);
 
-void ldinfo(char* format, ...) {
+void ldinfo(char* format, ...)
+{
 #ifdef AUTOGENTOO_SHOW_DEBUG
     AUTOGENTOO_LOG_PRINT(ANSI_GREEN)
 #endif
 }
 
-void ldwarning(char* format, ...) {
+void ldwarning(char* format, ...)
+{
 #ifdef AUTOGENTOO_SHOW_DEBUG
     AUTOGENTOO_LOG_PRINT(ANSI_YELLOW)
 #endif
 }
 
-void lderror(char* format, ...) {
+void lderror(char* format, ...)
+{
 #ifdef AUTOGENTOO_SHOW_DEBUG
     AUTOGENTOO_LOG_PRINT(ANSI_RED)
 #endif
 }
 
-void lerror(char* format, ...) {
+void lerror(char* format, ...)
+{
     AUTOGENTOO_LOG_PRINT(ANSI_RED)
 }
 
-void lwarning(char* format, ...) {
+void lwarning(char* format, ...)
+{
     AUTOGENTOO_LOG_PRINT(ANSI_YELLOW)
 }
 
-void linfo(char* format, ...) {
+void linfo(char* format, ...)
+{
     AUTOGENTOO_LOG_PRINT(ANSI_GREEN)
 }

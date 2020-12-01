@@ -18,13 +18,21 @@
 #define ANSI_COLOR   "\x1b[39m"
 
 void init_log() __attribute__((constructor));
+
 void close_log() __attribute__((destructor));
+
 void lset(FILE* target);
+
 void lerror(char* format, ...);
+
 void lwarning(char* format, ...);
+
 void linfo(char* format, ...);
+
 void lderror(char* format, ...);
+
 void ldwarning(char* format, ...);
+
 void ldinfo(char* format, ...);
 
 #endif //HACKSAW_LOG_H

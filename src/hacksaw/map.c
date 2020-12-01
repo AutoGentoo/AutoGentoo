@@ -6,7 +6,8 @@ void* prv_map_insert_item(Map* map, MapItem* item);
 
 void prv_map_realloc_item(Map* map, MapItem* list);
 
-static void prv_map_free_bucket(Map* map, MapItem* item) {
+static void prv_map_free_bucket(Map* map, MapItem* item)
+{
     if (!item)
         return;
 
@@ -16,17 +17,19 @@ static void prv_map_free_bucket(Map* map, MapItem* item) {
     free(item);
 }
 
-static void map_free(Map* map) {
+static void map_free(Map* map)
+{
     for (int i = 0; i < map->size; i++)
         prv_map_free_bucket(map, map->hash_table[i]);
     free(map->hash_table);
     free(map);
 }
 
-Map* map_new(size_t new_size, F64 threshold) {
+Map* map_new(size_t new_size, F64 threshold)
+{
     Map* out = malloc(sizeof(Map));
 
-    out->free = (void (*)(void *)) map_free;
+    out->free = (void (*)(void*)) map_free;
     out->reference_count = 0;
     out->size = new_size;
     out->threshold = threshold;
@@ -39,7 +42,8 @@ Map* map_new(size_t new_size, F64 threshold) {
     return out;
 }
 
-void prv_map_realloc_item(Map* map, MapItem* list) {
+void prv_map_realloc_item(Map* map, MapItem* list)
+{
     if (!list)
         return;
 
@@ -48,7 +52,8 @@ void prv_map_realloc_item(Map* map, MapItem* list) {
     prv_map_insert_item(map, list);
 }
 
-void map_realloc(Map* map, U64 size) {
+void map_realloc(Map* map, U64 size)
+{
     U32 old_size = map->size;
     MapItem** old_table = map->hash_table;
 
@@ -63,13 +68,16 @@ void map_realloc(Map* map, U64 size) {
     free(old_table);
 }
 
-StringVector* map_all_keys(Map* map) {
+StringVector* map_all_keys(Map* map)
+{
     StringVector* out = string_vector_new();
 
     MapItem* current = NULL;
-    for (U32 i = 0; i < map->size && out->n < map->n; i++) {
+    for (U32 i = 0; i < map->size && out->n < map->n; i++)
+    {
         current = map->hash_table[i];
-        while (current) {
+        while (current)
+        {
             string_vector_add(out, current->key);
             current = current->next;
         }
@@ -78,12 +86,14 @@ StringVector* map_all_keys(Map* map) {
     return out;
 }
 
-void* map_get(Map* map, char* key) {
+void* map_get(Map* map, char* key)
+{
     U32 n = strlen(key);
     U32 index = map_get_hash(key, n) % map->size;
 
     MapItem* current = map->hash_table[index];
-    while (current) {
+    while (current)
+    {
         if (strcmp(current->key, key) == 0)
             return current->data;
         current = current->next;
@@ -92,14 +102,17 @@ void* map_get(Map* map, char* key) {
     return NULL;
 }
 
-void* map_remove(Map* map, char* key) {
+void* map_remove(Map* map, char* key)
+{
     U32 n = strlen(key);
     U32 index = map_get_hash(key, n) % map->size;
 
     MapItem* current = map->hash_table[index];
     MapItem* before = NULL;
-    while (current) {
-        if (strcmp(current->key, key) == 0) {
+    while (current)
+    {
+        if (strcmp(current->key, key) == 0)
+        {
             void* out = current->data;
 
             if (!before)
@@ -122,7 +135,8 @@ void* map_remove(Map* map, char* key) {
     return NULL;
 }
 
-void* prv_map_insert_item(Map* map, MapItem* item) {
+void* prv_map_insert_item(Map* map, MapItem* item)
+{
     U32 n = strlen(item->key);
     U32 hash = map_get_hash(item->key, n);
     U32 offset = hash % map->size;
@@ -130,8 +144,10 @@ void* prv_map_insert_item(Map* map, MapItem* item) {
     if (map->hash_table[offset] != NULL)
         map->overlaps++;
 
-    for (MapItem* iter = map->hash_table[offset]; iter; iter = iter->next) {
-        if (strcmp(iter->key, item->key) == 0) {
+    for (MapItem* iter = map->hash_table[offset]; iter; iter = iter->next)
+    {
+        if (strcmp(iter->key, item->key) == 0)
+        {
             void* out = iter->data;
 
             iter->data = item->data;
@@ -149,7 +165,8 @@ void* prv_map_insert_item(Map* map, MapItem* item) {
     return NULL;
 }
 
-void* map_insert(Map* map, const char* key, RefObject* data) {
+void* map_insert(Map* map, const char* key, RefObject* data)
+{
     if (map->n + 1 >= map->realloc_at)
         map_realloc(map, map->size * 2);
 
@@ -168,7 +185,8 @@ void* map_insert(Map* map, const char* key, RefObject* data) {
  * @param nbytes
  * @return
  */
-U32 map_get_hash(const void* data, U32 nbytes) {
+U32 map_get_hash(const void* data, U32 nbytes)
+{
     if (data == NULL || nbytes == 0)
         return 0;
 
@@ -181,7 +199,8 @@ U32 map_get_hash(const void* data, U32 nbytes) {
 
     U32 h = 0;
     U32 k = 0;
-    for (U32 i = 0; i < nblocks; i++) {
+    for (U32 i = 0; i < nblocks; i++)
+    {
         k = blocks[i];
 
         k *= c1;
@@ -194,7 +213,8 @@ U32 map_get_hash(const void* data, U32 nbytes) {
     }
 
     k = 0;
-    switch (nbytes & 3) {
+    switch (nbytes & 3)
+    {
         case 3:
             k ^= tail[2] << 16;
         case 2:

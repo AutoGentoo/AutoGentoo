@@ -2,8 +2,8 @@
 // Created by tumbar on 11/30/20.
 //
 
-#ifndef AUTOGENTOO_TCP_H
-#define AUTOGENTOO_TCP_H
+#ifndef AUTOGENTOO_TCP_SERVER_H
+#define AUTOGENTOO_TCP_SERVER_H
 
 #include <pthread.h>
 #include <hacksaw/object.h>
@@ -17,17 +17,20 @@
 typedef struct TCPServer_prv TCPServer;
 typedef struct Request_prv Request;
 
-typedef enum {
+typedef enum
+{
     NETWORK_TYPE_NET,
     NETWORK_TYPE_UNIX
 } net_type_t;
 
-typedef union {
+typedef union
+{
     U16 port;   /* network endpoint */
     char* path; /* Unix domain endpoint */
 } Address;
 
-struct TCPServer_prv {
+struct TCPServer_prv
+{
     PyObject_HEAD
     int socket;
     net_type_t type;
@@ -44,14 +47,15 @@ struct TCPServer_prv {
     pthread_mutex_t lock;
     pthread_cond_t cond;
 
-    PyObject* (*callback) (PyObject* self, PyObject* args);
+    PyObject* callback;
 };
 
-struct Request_prv {
+struct Request_prv
+{
     REFERENCE_OBJECT
     int client;
 };
 
-const extern PyTypeObject PyTCPServerType;
+extern PyTypeObject TCPServerType;
 
-#endif //AUTOGENTOO_TCP_H
+#endif //AUTOGENTOO_TCP_SERVER_H

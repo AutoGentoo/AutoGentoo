@@ -5,15 +5,18 @@
 #include "queue.h"
 #include <stdlib.h>
 
-Queue* queue_new() {
+Queue* queue_new()
+{
     return linked_vector_new();
 }
 
-void queue_add(Queue* self, RefObject* data) {
+void queue_add(Queue* self, RefObject* data)
+{
     linked_vector_append(self, data);
 }
 
-RefObject* queue_pop(Queue* self) {
+RefObject* queue_pop(Queue* self)
+{
     if (!self->head)
         return NULL;
 
@@ -27,14 +30,16 @@ RefObject* queue_pop(Queue* self) {
     return to_pop;
 }
 
-RefObject* queue_peek(Queue* self) {
+RefObject* queue_peek(Queue* self)
+{
     if (!self->head)
         return NULL;
 
     return self->head->data;
 }
 
-void queue_foreach(Queue* self, void (* f)(RefObject*)) {
+void queue_foreach(Queue* self, void (* f)(RefObject*))
+{
     for (LinkedNode* current = self->head; current; current = current->next)
         f(current->data);
 }

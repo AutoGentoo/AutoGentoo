@@ -19,7 +19,9 @@
 
 /* Create an object that we can cast to */
 typedef struct Object_prv Object;
-struct Object_prv {
+
+struct Object_prv
+{
     OBJECT_HEADER
 };
 
@@ -34,7 +36,9 @@ OBJECT_HEADER            \
 U64 reference_count;
 
 typedef struct RefObject_prv RefObject;
-struct RefObject_prv {
+
+struct RefObject_prv
+{
     REFERENCE_OBJECT
 };
 
