@@ -21,7 +21,7 @@ TCPServer_repr(TCPServer* self)
     } else
     {
         obj = PyUnicode_FromFormat("TCPServer<port=%zu, workers=%zu>",
-                                   self->address.port,
+                                   self->address.net_addr.port,
                                    self->worker_n);
     }
 
@@ -70,7 +70,8 @@ TCPServer_init(TCPServer* self, PyObject* args, PyObject* kwds)
     {
         /* Use a normal port */
         self->type = NETWORK_TYPE_NET;
-        self->address.port = PyLong_AsLong(py_address);
+        self->address.net_addr.port = PyLong_AsLong(py_address);
+        self->address.net_addr.ip = 0x0;
     } else
     {
         /* Invalid input type */
@@ -97,8 +98,8 @@ static void TCPServer_worker_run(TCPServer* self)
         pthread_mutex_unlock(&self->lock);
 
         /* Read the request from the client socket */
-        U32 message_length = 0;
-        read(req->client, &message_length, 4);
+        U64 message_length = 0;
+        read(req->client, &message_length, sizeof(message_length));
 
         MessageFrame message;
         read(req->client, &message, message_length);
@@ -121,61 +122,19 @@ static void TCPServer_worker_run(TCPServer* self)
             PyErr_Format(PyExc_AttributeError, "A callback has not been set up");
         } else
         {
-            PyObject* args = NULL;
-
-            if (message.size)
-            {
-                args = PyTuple_New(8);
-                PyTuple_SetItem(args, 7, PyBytes_FromStringAndSize(message.data, message.size));
-            } else
-            {
-                args = PyTuple_New(7);
-            }
-
-            PyTuple_SetItem(args, 0, PyLong_FromLong(message.parent.token));
-            PyTuple_SetItem(args, 1, PyBytes_FromStringAndSize((const char*) &message.parent.data.val1, sizeof(PXX)));
-            PyTuple_SetItem(args, 2, PyBytes_FromStringAndSize((const char*) &message.parent.data.val2, sizeof(PXX)));
-            PyTuple_SetItem(args, 3, PyBytes_FromStringAndSize((const char*) &message.parent.data.val3, sizeof(PXX)));
-            PyTuple_SetItem(args, 4, PyBytes_FromStringAndSize((const char*) &message.parent.data.val4, sizeof(PXX)));
-            PyTuple_SetItem(args, 5, PyBytes_FromStringAndSize((const char*) &message.parent.data.val5, sizeof(PXX)));
-            PyTuple_SetItem(args, 6, PyBytes_FromStringAndSize((const char*) &message.parent.data.val6, sizeof(PXX)));
-
+            PyObject* args = PyMessage_FromMessageFrame(&response);
             PyObject* py_response = PyObject_CallObject(self->callback, args);
-
-            if (!PyTuple_Check(py_response)
-                || PyObject_Length(py_response) != 7
-                || PyObject_Length(py_response) != 9)
-            {
-                lwarning("Response type is not a tuple or incorrect length!");
-                send_reply = 0;
-            } else
-            {
-                if (PyObject_Length(py_response) == 7)
-                {
-                    /* Reply with a Message */
-                    response.data = NULL;
-                    response.size = 0;
-                } else if (PyObject_Length(py_response) == 9)
-                {
-                    PyBytes_AsStringAndSize(PyTuple_GetItem(args, 7), (char**) &response.data, (I64*) &response.size);
-                }
-
-                response.parent.token = PyLong_AsLong(PyTuple_GetItem(args, 0));
-                response.parent.data.val1 = PyLong_AsLong(PyTuple_GetItem(args, 1));
-                response.parent.data.val2 = PyLong_AsLong(PyTuple_GetItem(args, 2));
-                response.parent.data.val3 = PyLong_AsLong(PyTuple_GetItem(args, 3));
-                response.parent.data.val4 = PyLong_AsLong(PyTuple_GetItem(args, 4));
-                response.parent.data.val5 = PyLong_AsLong(PyTuple_GetItem(args, 5));
-                response.parent.data.val6 = PyLong_AsLong(PyTuple_GetItem(args, 6));
-
-                send_reply = 1;
-            }
+            PyMessage_AsMessageFrame(py_response, &response);
         }
         PyGILState_Release(gstate);
 
         /* Send the reply */
         if (send_reply)
         {
+            /* Tell the client how long the response is */
+            U64 total_length = sizeof(Message) + sizeof(response.size) + response.size;
+            write(req->client, &total_length, sizeof(total_length));
+
             /* Send just the message first */
             write(req->client, &response, sizeof(Message));
 
@@ -272,7 +231,7 @@ static void TCPServer_run(TCPServer* self)
 {
     /* Initialize the server socket */
     if (self->type == NETWORK_TYPE_NET)
-        self->socket = TCPServer_init_network_socket(self->address.port);
+        self->socket = TCPServer_init_network_socket(self->address.net_addr.port);
     else if (self->type == NETWORK_TYPE_UNIX)
         self->socket = TCPServer_init_unix_socket(self->address.path);
 
@@ -355,8 +314,7 @@ TCPServer_set_request_callback(TCPServer* self, PyObject* args, PyObject* kwds)
     Py_INCREF(cb);
     self->callback = cb;
 
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject*
@@ -374,15 +332,9 @@ TCPServer_dealloc(TCPServer* self, PyObject* args, PyObject* kwds)
 }
 
 static PyMethodDef TCPServer_methods[] = {
-        {
-                "set_request_callback", (PyCFunction) TCPServer_set_request_callback,
-                                                                       METH_VARARGS |
-                                                                       METH_KEYWORDS,                "Set the callback function for TCP requests"
-        },
-        {
-                "start",                (PyCFunction) TCPServer_start, METH_VARARGS | METH_KEYWORDS, "Start the server"
-        },
-        {       "stop",                 (PyCFunction) TCPServer_stop,  METH_VARARGS | METH_KEYWORDS, "Stop the server"},
+        {"set_request_callback", (PyCFunction) TCPServer_set_request_callback,METH_VARARGS | METH_KEYWORDS, "Set the callback function for TCP requests"},
+        {"start",                (PyCFunction) TCPServer_start, METH_VARARGS | METH_KEYWORDS, "Start the server"},
+        {"stop",                 (PyCFunction) TCPServer_stop,  METH_VARARGS | METH_KEYWORDS, "Stop the server"},
         {NULL}  /* Sentinel */
 };
 

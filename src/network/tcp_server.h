@@ -25,7 +25,10 @@ typedef enum
 
 typedef union
 {
-    U16 port;   /* network endpoint */
+    struct {
+        U16 port;
+        U32 ip; /* Support only IPv4 */
+    } net_addr;
     char* path; /* Unix domain endpoint */
 } Address;
 

@@ -1,4 +1,4 @@
-from typing import Union, Callable
+from typing import Union, Callable, Tuple
 
 
 class TCPServer:
@@ -9,3 +9,6 @@ class TCPServer:
     def stop(self): ...
 
     def set_request_callback(self, callback: Callable[[tuple], None]): ...
+
+
+def send_message(address: Union[Tuple[int, int], str]) -> tuple :...

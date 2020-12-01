@@ -42,4 +42,7 @@ struct MessageFrame_prv
     void* data;
 };
 
+PyObject* PyMessage_FromMessageFrame(MessageFrame*);
+int PyMessage_AsMessageFrame(PyObject*, MessageFrame*);
+
 #endif //AUTOGENTOO_MESSAGE_H

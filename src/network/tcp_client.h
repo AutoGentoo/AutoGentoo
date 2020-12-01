@@ -9,10 +9,10 @@
 #include "tcp_server.h"
 #include "message.h"
 
-void tcp_client_send_message(Address address,
-                             net_type_t addr_type,
-                             MessageFrame* messsage,
-                             MessageFrame* reply);
+int tcp_client_send_message(Address address,
+                            net_type_t addr_type,
+                            MessageFrame* messsage,
+                            MessageFrame* reply);
 
 
 #endif //AUTOGENTOO_TCP_CLIENT_H
