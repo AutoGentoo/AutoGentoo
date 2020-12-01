@@ -1,7 +1,7 @@
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
-add_library(hacksaw STATIC
+add_library(hacksaw SHARED
         hacksaw.h
         log.c
         map.c

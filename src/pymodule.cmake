@@ -1,7 +1,7 @@
 function(setup_pymodule target)
     # Link the module to the python runtime
-    target_include_directories(${target} PUBLIC ${Python_INCLUDE_DIRS})
-    target_link_libraries(${target} PUBLIC Python3::Python)
+    target_include_directories(${target} PUBLIC ${Python_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/src/)
+    target_link_libraries(${target} PUBLIC Python3::Python hacksaw)
 
     # Don't name the library libautogentoo_network
     # because python does not like the 'lib' prefix

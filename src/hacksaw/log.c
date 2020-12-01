@@ -11,7 +11,7 @@
 #define AUTOGENTOO_SHOW_DEBUG
 
 
-pthread_mutex_t log_mutex;
+static pthread_mutex_t log_mutex;
 static FILE* target = NULL;
 
 void init_log() {

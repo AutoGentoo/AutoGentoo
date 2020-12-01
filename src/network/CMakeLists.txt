@@ -1,6 +1,5 @@
 add_library(autogentoo_network SHARED
-        message.c
         message.h
-        )
+        tcp.c tcp.h)
 
 setup_pymodule(autogentoo_network)
