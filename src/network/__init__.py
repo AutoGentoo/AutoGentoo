@@ -15,9 +15,12 @@ def build_message(token: int, *args: Union[int, float], **kwargs) -> Message:
         elif isinstance(s, int):
             return s.to_bytes(8, signed=False, byteorder=sys.byteorder)
 
-    parsed_args: List[bytes] = [convert_to_bin(0)] * 6
-    for i, arg in enumerate(args):
-        parsed_args[i] = convert_to_bin(arg)
+    parsed_args = []
+    for arg in args:
+        parsed_args.append(convert_to_bin(arg))
+
+    for i in range(6 - len(args)):
+        parsed_args.append(convert_to_bin(0))
 
     data_param: Optional[bytes] = None
     if 'data' in kwargs:
