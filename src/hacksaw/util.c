@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <dirent.h>
+#include <stdlib.h>
 #include "log.h"
 #include "util.h"
 
@@ -89,4 +90,20 @@ char* string_strip(char* str)
     for (; j > i && str[j] == ' '; j--);
 
     return strndup(str + i, (U32) j - i);
+}
+
+static void ref_string_free(RefString* self)
+{
+    free(self->ptr);
+    free(self);
+}
+
+RefObject* ref_string(char* str)
+{
+    RefString* self = malloc(sizeof(RefString));
+    self->free = (void (*)(void*)) ref_string_free;
+    self->ptr = str;
+    self->reference_count = 0;
+
+    return (RefObject*) self;
 }

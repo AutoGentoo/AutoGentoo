@@ -6,7 +6,7 @@
 #define AUTOGENTOO_QUEUE_H
 
 #include <stdio.h>
-#include "hacksaw.h"
+#include "linked_vector.h"
 
 typedef LinkedVector Queue;
 

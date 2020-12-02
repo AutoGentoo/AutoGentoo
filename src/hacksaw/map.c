@@ -2,9 +2,9 @@
 #include <string.h>
 #include "hacksaw.h"
 
-void* prv_map_insert_item(Map* map, MapItem* item);
+static inline void* prv_map_insert_item(Map* map, MapItem* item);
 
-void prv_map_realloc_item(Map* map, MapItem* list);
+static inline void prv_map_realloc_item(Map* map, MapItem* list);
 
 static void prv_map_free_bucket(Map* map, MapItem* item)
 {
@@ -41,27 +41,25 @@ Map* map_new(size_t new_size, F64 threshold)
     return out;
 }
 
-void prv_map_realloc_item(Map* map, MapItem* list)
+static void prv_map_realloc_item(Map* map, MapItem* list)
 {
-    if (!list)
-        return;
-
-    prv_map_realloc_item(map, list->next);
+    if (list->next)
+        prv_map_realloc_item(map, list->next);
     list->next = NULL;
     prv_map_insert_item(map, list);
 }
 
-void map_realloc(Map* map, U64 size)
+static inline void map_realloc(Map* map, U64 size)
 {
-    U32 old_size = map->size;
+    U64 old_size = map->size;
     MapItem** old_table = map->hash_table;
 
     map->hash_table = calloc(size, sizeof(MapItem*));
     map->size = size;
     map->realloc_at = map->size * map->threshold;
 
-    for (U32 i = 0; i < old_size; i++)
-        if (old_table[i] != NULL)
+    for (U64 i = 0; i < old_size; i++)
+        if (old_table[i])
             prv_map_realloc_item(map, old_table[i]);
 
     free(old_table);
@@ -134,7 +132,7 @@ void* map_remove(Map* map, char* key)
     return NULL;
 }
 
-void* prv_map_insert_item(Map* map, MapItem* item)
+static inline void* prv_map_insert_item(Map* map, MapItem* item)
 {
     U32 n = strlen(item->key);
     U32 hash = map_get_hash(item->key, n);

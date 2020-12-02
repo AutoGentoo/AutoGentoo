@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/un.h>
+#include <hacksaw/log.h>
 
 static PyObject*
 TCPServer_repr(TCPServer* self)
@@ -122,11 +123,8 @@ static void TCPServer_worker_run(TCPServer* self)
             PyObject* args = PyTuple_New(1);
             PyTuple_SetItem(args, 0, PyMessage_FromMessageFrame(&message));
             PyObject* kwargs = PyDict_New();
-
-            Py_INCREF(self->callback);
             PyObject* py_response = PyObject_Call(self->callback, args, kwargs);
 
-            Py_DECREF(self->callback);
             Py_DECREF(args);
             Py_DECREF(kwargs);
 
@@ -250,12 +248,12 @@ static Request* request_new(int client_sock)
     self->reference_count = 0;
     self->client = client_sock;
 
-    OBJECT_INCREF(self);
     return self;
 }
 
 static void TCPServer_run(TCPServer* self)
 {
+    self->is_alive = 1;
     while (self->keep_alive)
     {
         /* Wait for a TCP connection */
@@ -284,6 +282,8 @@ static void TCPServer_run(TCPServer* self)
     {
         remove(self->address.path);
     }
+
+    self->is_alive = 0;
 }
 
 static PyObject* TCPServer_start(TCPServer* self, PyObject* args, PyObject* kwds)
@@ -356,6 +356,12 @@ TCPServer_set_request_callback(TCPServer* self, PyObject* args, PyObject* kwds)
 static PyObject*
 TCPServer_dealloc(TCPServer* self, PyObject* args, PyObject* kwds)
 {
+    if (self->is_alive)
+    {
+        PyObject* stop_method = PyObject_GetAttrString((PyObject*) self, "stop");
+        PyObject_CallNoArgs(stop_method);
+    }
+
     if (self->type == NETWORK_TYPE_UNIX)
         free(self->address.path);
 

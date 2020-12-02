@@ -8,4 +8,6 @@ add_subdirectory(hacksaw)
 # Define all of the Python submodules
 # This will compile all of the interface modules
 include(pymodule.cmake)  # Python module macros
+
 add_subdirectory(network)
+add_subdirectory(cportage)

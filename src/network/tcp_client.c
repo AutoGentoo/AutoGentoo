@@ -6,6 +6,7 @@
 #include "tcp_client.h"
 #include <netinet/in.h>
 #include <sys/un.h>
+#include <hacksaw/log.h>
 
 int tcp_client_send_message(Address address,
                             net_type_t addr_type,

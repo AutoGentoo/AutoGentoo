@@ -1,6 +1,6 @@
 import struct
 import sys
-from typing import Union, List, Optional
+from typing import Union, Optional
 
 from .autogentoo_network import *
 

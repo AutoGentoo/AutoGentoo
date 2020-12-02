@@ -6,9 +6,8 @@
 #define HACKSAW_MAP_H
 
 #include <stdio.h>
-#include "string_vector.h"
 #include "object.h"
-#include <stdint.h>
+#include "string_vector.h"
 
 typedef struct Map_prv Map;
 typedef struct MapItem_prv MapItem;
@@ -65,13 +64,6 @@ void* map_insert(Map* map, const char* key, RefObject* data);
  * @return new array
  */
 Map* map_new(U64 new_size, F64 threshold);
-
-/**
- * Realloc the map and repack the keys
- * @param map map to repack
- * @param size new array size
- */
-void map_realloc(Map* map, U64 size);
 
 /**
  * Remove a key from the map

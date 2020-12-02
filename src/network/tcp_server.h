@@ -42,7 +42,8 @@ struct TCPServer_prv
     /* Multi-threaded related */
     pthread_t run_thread;
 
-    U32 keep_alive;
+    U8 keep_alive;
+    U8 is_alive;
     U32 worker_n;
     pthread_t* worker_threads;
 
