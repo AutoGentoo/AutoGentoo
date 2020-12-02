@@ -92,10 +92,10 @@ static PyMethodDef module_methods[] = {
         {NULL, NULL,                                    0, NULL}
 };
 
-static PyModuleDef module_network = {
+static PyModuleDef module = {
         PyModuleDef_HEAD_INIT,
         .m_name = "autogentoo_network",
-        .m_doc = "CUDA processing for qMAPP data.",
+        .m_doc = "Multithreaded TCP IPC protocol",
         .m_size = -1,
         module_methods
 };
@@ -105,7 +105,7 @@ PyInit_autogentoo_network(void)
 {
     PyObject* m = NULL;
 
-    m = PyModule_Create(&module_network);
+    m = PyModule_Create(&module);
     if (m == NULL)
         return NULL;
 

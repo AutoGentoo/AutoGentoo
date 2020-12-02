@@ -6,6 +6,7 @@
 #define AUTOGENTOO_PORTAGE_H
 
 #include <hacksaw/hacksaw.h>
+#include <Python.h>
 
 typedef struct Portage_prv Portage;
 
@@ -85,6 +86,7 @@ typedef enum {
 } atom_repo_t;
 
 struct Portage_prv {
+    PyObject_HEAD
     LUT* global_flags;
     LUT* packages;
 };

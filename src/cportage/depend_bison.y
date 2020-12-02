@@ -6,7 +6,6 @@
 
 %{
 #include <stdio.h>
-#include <cportage/portage.h>
 
 int yyparse(void);
 int yywrap() { return 1; }
@@ -15,7 +14,7 @@ extern int yylineno;
 extern char* yytext;
 extern void* yyout;
 
-extern Portage* parent;
+extern void* parent;
 
 void yyerror(const char *message);
 %}
@@ -51,7 +50,7 @@ void yyerror(const char *message);
 %token <identifier> REPOSITORY
 %token <atom_type> ATOM
 %token END_OF_FILE
-%token <use_default> USE_DEFAULT;
+%token <use_default> USE_DEFAULT
 %token <slot> SLOT
 %token <use_select> USESELECT
 %token DEPEND

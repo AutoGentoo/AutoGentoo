@@ -8,6 +8,8 @@
 int error = 0;
 #include <signal.h>
 
+Portage* parent = NULL;
+
 int asprintf(char **strp, const char *fmt, ...);
 
 int yyerror(const char *s) {
@@ -18,14 +20,16 @@ int yyerror(const char *s) {
     return error;
 }
 
-Dependency* depend_parse (const char* buffer) {
+Dependency* depend_parse (Portage* pparent, const char* buffer) {
     yylineno = 0;
     char* depend_expr_str = NULL;
     asprintf(&depend_expr_str, "DEPEND_EXPR_AUTOGENTOO %s", buffer);
 
+    parent = pparent;
     YY_BUFFER_STATE bs = yy_scan_string(depend_expr_str);
     yy_switch_to_buffer(bs);
     yyparse();
+    parent = NULL;
 
     free(depend_expr_str);
     yy_delete_buffer(bs);
@@ -33,14 +37,16 @@ Dependency* depend_parse (const char* buffer) {
     return (Dependency*)yyout;
 }
 
-Dependency* cmdline_parse (const char* buffer) {
+Dependency* cmdline_parse (Portage* pparent, const char* buffer) {
     yylineno = 0;
     char* depend_expr_str = NULL;
     asprintf(&depend_expr_str, "COMMAND_LINE_AUTOGENTOO %s", buffer);
 
+    parent = pparent;
     YY_BUFFER_STATE bs = yy_scan_string(depend_expr_str);
     yy_switch_to_buffer(bs);
     yyparse();
+    parent = NULL;
 
     free(depend_expr_str);
     yy_delete_buffer(bs);
@@ -67,14 +73,16 @@ Atom* atom_parse (const char* buffer) {
     return atom_out;
 }
 
-RequiredUse* required_use_parse (const char* buffer) {
+RequiredUse* required_use_parse (Portage* pparent, const char* buffer) {
     yylineno = 0;
     char* depend_expr_str = NULL;
     asprintf(&depend_expr_str, "RUSE_EXPR_AUTOGENTOO %s", buffer);
 
+    parent = pparent;
     YY_BUFFER_STATE bs = yy_scan_string(depend_expr_str);
     yy_switch_to_buffer(bs);
     yyparse();
+    parent = NULL;
 
     free(depend_expr_str);
     yy_delete_buffer(bs);

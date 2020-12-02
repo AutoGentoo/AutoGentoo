@@ -81,32 +81,6 @@ RequiredUse* use_build_required_use(Portage* parent, const char* target, use_ope
     return out;
 }
 
-static void atomflag_free(AtomFlag* self)
-{
-    OBJECT_DECREF(self->next);
-    free(self->name);
-    free(self);
-}
-
-AtomFlag* atomflag_build(char* name)
-{
-    AtomFlag* out = malloc(sizeof(AtomFlag));
-    out->free = (void (*)(void*)) atomflag_free;
-    out->reference_count = 0;
-    out->option = ATOM_USE_ENABLE;
-
-    if (name[0] == '-') {
-        out->option = ATOM_USE_DISABLE;
-        name++;
-    }
-
-    out->name = strdup(name);
-    out->def = 0;
-    out->next = NULL;
-
-    return out;
-}
-
 Dependency* dependency_build_atom(Atom* atom)
 {
     Dependency* self = dependency_new();
@@ -142,16 +116,4 @@ Dependency* dependency_build_use(Portage* parent,
     self->children = children;
 
     return self;
-}
-
-Atom* cmdline_atom_new(char* name)
-{
-    char* cmd_temp = NULL;
-    asprintf(&cmd_temp, "SEARCH/%s", name);
-
-    Atom* out = atom_new(cmd_temp);
-    free(cmd_temp);
-    free(name);
-
-    return out;
 }
