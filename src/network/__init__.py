@@ -1,51 +1,33 @@
-from typing import NamedTuple, Union, Callable, Optional
+import struct
+import sys
+from typing import Union, List, Optional
+
 from .autogentoo_network import *
 
 
-class Message(NamedTuple):
-    """
-    These are not actually stubs but actually
-    the tuples that are the used in request parsing
-    """
-    token: int
-    val1: bytes
-    val2: bytes
-    val3: bytes
-    val4: bytes
-    val5: bytes
-    val6: bytes
+def build_message(token: int, *args: Union[int, float], **kwargs) -> Message:
+    if len(args) > 6:
+        raise TypeError("Message only supports up to 6 parameters")
 
+    def convert_to_bin(s) -> bytes:
+        if isinstance(s, float):
+            return struct.pack('d', s)
+        elif isinstance(s, int):
+            return s.to_bytes(8, signed=False, byteorder=sys.byteorder)
 
-class MessageFrame(Message):
-    data: bytes
+    parsed_args: List[bytes] = [convert_to_bin(0)] * 6
+    for i, arg in enumerate(args):
+        parsed_args[i] = convert_to_bin(arg)
 
+    data_param: Optional[bytes] = None
+    if 'data' in kwargs:
+        data_param = kwargs['data']
 
-class AutoGentooTCPServer(TCPServer):
-    """
-    Wrap the C TCP Server to handle
-    callbacks with the above named tuples
-    """
-
-    callback: Optional[Callable[[Union[Message, MessageFrame]], None]]
-
-    def __init__(self, address: Union[str, int]):
-        super().__init__(address)
-        super().set_request_callback(self.request_handler)
-
-        self.callback = None
-
-    def set_request_callback(self, callback: Callable[[Union[Message, MessageFrame]], None]):
-        self.callback = callback
-
-    def request_handler(self, request: tuple):
-        # Check if we have a callback set up
-        if self.callback is None:
-            raise AttributeError("A callback needs to be set up!")
-
-        # Convert the request to one of the named tuples
-        if len(request) == 7:
-            self.callback(Message(*request))
-        elif len(request) == 8:
-            self.callback(MessageFrame(*request))
-        else:
-            raise TypeError("Invalid request tuple of length: %d" % len(request))
+    return Message((token,
+                    parsed_args[0],
+                    parsed_args[1],
+                    parsed_args[2],
+                    parsed_args[3],
+                    parsed_args[4],
+                    parsed_args[5],
+                    data_param))

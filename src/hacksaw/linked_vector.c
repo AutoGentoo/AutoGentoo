@@ -34,11 +34,13 @@ static void linked_vector_free(LinkedVector* self)
         OBJECT_FREE(current_ref);
         current_ref = buf_ref;
     }
+
+    free(self);
 }
 
 LinkedVector* linked_vector_new()
 {
-    LinkedVector* out = malloc(sizeof(LinkedVector*));
+    LinkedVector* out = malloc(sizeof(LinkedVector));
 
     out->head = NULL;
     out->free = (void (*)(void*)) linked_vector_free;

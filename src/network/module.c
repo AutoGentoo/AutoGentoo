@@ -29,7 +29,7 @@ static PyObject* Py_send_message(PyObject* self, PyObject* args, PyObject* kwds)
         if (PyObject_Length(py_address) != 2)
         {
             PyErr_Format(PyExc_TypeError, "Expected address tuple to be of length 2");
-            Py_RETURN_NONE;
+            return NULL;
         }
 
         type = NETWORK_TYPE_NET;
@@ -51,12 +51,13 @@ static PyObject* Py_send_message(PyObject* self, PyObject* args, PyObject* kwds)
     PyMessage_AsMessageFrame(py_message, &message);
 
     /* Send the request and wait for reply */
+    int res = 0;
     Py_BEGIN_ALLOW_THREADS
-        if (tcp_client_send_message(address, type, &message, &reply) != 0)
-        {
-            Py_RETURN_NONE;
-        }
+        res = tcp_client_send_message(address, type, &message, &reply);
     Py_END_ALLOW_THREADS
+
+    if (res != 0)
+        Py_RETURN_NONE;
 
     /* Convert the reply to python object */
     PyObject* py_reply = PyMessage_FromMessageFrame(&reply);
@@ -66,6 +67,25 @@ static PyObject* Py_send_message(PyObject* self, PyObject* args, PyObject* kwds)
 
     return py_reply;
 }
+
+static PyStructSequence_Field PyMessage_Fields[] = {
+        {.name="token", "Request token usually stored in enum"},
+        {.name="val1", "Parameter 1 (8 bytes)"},
+        {.name="val2", "Parameter 2 (8 bytes)"},
+        {.name="val3", "Parameter 3 (8 bytes)"},
+        {.name="val4", "Parameter 4 (8 bytes)"},
+        {.name="val5", "Parameter 5 (8 bytes)"},
+        {.name="val6", "Parameter 6 (8 bytes)"},
+        {.name="data", "Arbitrarily sized data"},
+        {NULL, NULL}
+};
+
+static PyStructSequence_Desc PyMessage_Desc = {
+        .name = "autogentoo_network.Message",
+        .doc = "Model a message structure",
+        .fields = PyMessage_Fields,
+        .n_in_sequence=8
+};
 
 static PyMethodDef module_methods[] = {
         {"send_message", (PyCFunction) Py_send_message, METH_KEYWORDS | METH_VARARGS, "Send a message to a TCP server"},
@@ -81,25 +101,52 @@ static PyModuleDef module_network = {
 };
 
 PyMODINIT_FUNC
-PyInit_interferometry_processing(void)
+PyInit_autogentoo_network(void)
 {
     PyObject* m = NULL;
-    if (PyType_Ready(&TCPServerType) < 0)
-        return NULL;
 
     m = PyModule_Create(&module_network);
     if (m == NULL)
         return NULL;
 
+    if (PyStructSequence_InitType2(&PyMessageType, &PyMessage_Desc) != 0)
+    {
+        PyErr_Format(PyExc_ImportError, "Failed to initialize Message");
+        Py_DECREF(m);
+        return NULL;
+    }
+
+
+    if (PyType_Ready(&TCPServerType) < 0)
+    {
+        Py_DECREF(m);
+        return NULL;
+    }
+    if (PyType_Ready(&PyMessageType) < 0)
+    {
+        Py_DECREF(m);
+        return NULL;
+    }
+
     Py_INCREF(&TCPServerType);
+    Py_INCREF(&PyMessageType);
     if (PyModule_AddObject(m, "TCPServer", (PyObject*) &TCPServerType) < 0)
-        goto error;
+    {
+        PyErr_PrintEx(0);
+        Py_DECREF(&TCPServerType);
+        Py_DECREF(&PyMessageType);
+        Py_DECREF(m);
+        return NULL;
+    }
+
+    if (PyModule_AddObject(m, "Message", (PyObject*) &PyMessageType) < 0)
+    {
+        PyErr_PrintEx(0);
+        Py_DECREF(&TCPServerType);
+        Py_DECREF(&PyMessageType);
+        Py_DECREF(m);
+        return NULL;
+    }
 
     return m;
-
-    error:
-    Py_DECREF(&TCPServerType);
-    Py_DECREF(m);
-
-    return NULL;
 }

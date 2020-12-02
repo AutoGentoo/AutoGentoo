@@ -24,7 +24,7 @@ typedef void (* free_function)(void*);
  */
 struct Map_prv
 {
-    REFERENCE_OBJECT
+    OBJECT_HEADER
     MapItem** hash_table; // similar to Vector position are arbitrary
     U32 n; // Only need if we need to resize the array
     U32 overlaps; // Number of key overlaps

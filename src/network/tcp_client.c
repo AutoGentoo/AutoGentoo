@@ -43,10 +43,6 @@ int tcp_client_send_message(Address address,
         }
     }
 
-    /* Tell the server how long the message is */
-    U64 total_length = sizeof(Message) + sizeof(messsage->size) + messsage->size;
-    write(sock, &total_length, sizeof(total_length));
-
     /* Send the message */
     write(sock, messsage, sizeof(Message));
 
@@ -55,12 +51,8 @@ int tcp_client_send_message(Address address,
     if (messsage->size)
         write(sock, messsage->data, messsage->size);
 
-    /* Read the response length from server */
-    U64 response_length = 0;
-    read(sock, &response_length, sizeof(response_length));
-
     /* Read the message */
-    read(sock, &reply, sizeof(Message));
+    read(sock, reply, sizeof(Message));
     read(sock, &reply->size, sizeof(reply->size));
 
     if (reply->size)

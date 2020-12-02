@@ -44,6 +44,6 @@ struct RefObject_prv
 
 #define OBJECT_FREE(__self) if (__self) __self->free(__self)
 #define OBJECT_INCREF(__self) __self->reference_count++
-#define OBJECT_DECREF(__self) if (__self && --__self->reference_count) OBJECT_FREE(__self)
+#define OBJECT_DECREF(__self) if (__self && !--__self->reference_count) OBJECT_FREE(__self)
 
 #endif //AUTOGENTOO_OBJECT_H

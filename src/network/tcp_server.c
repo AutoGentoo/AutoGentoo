@@ -98,11 +98,8 @@ static void TCPServer_worker_run(TCPServer* self)
         pthread_mutex_unlock(&self->lock);
 
         /* Read the request from the client socket */
-        U64 message_length = 0;
-        read(req->client, &message_length, sizeof(message_length));
-
         MessageFrame message;
-        read(req->client, &message, message_length);
+        read(req->client, &message, sizeof(Message));
 
         read(req->client, &message.size, sizeof(message.size));
         if (message.size)
@@ -122,19 +119,35 @@ static void TCPServer_worker_run(TCPServer* self)
             PyErr_Format(PyExc_AttributeError, "A callback has not been set up");
         } else
         {
-            PyObject* args = PyMessage_FromMessageFrame(&response);
-            PyObject* py_response = PyObject_CallObject(self->callback, args);
-            PyMessage_AsMessageFrame(py_response, &response);
+            PyObject* args = PyTuple_New(1);
+            PyTuple_SetItem(args, 0, PyMessage_FromMessageFrame(&message));
+            PyObject* kwargs = PyDict_New();
+
+            Py_INCREF(self->callback);
+            PyObject* py_response = PyObject_Call(self->callback, args, kwargs);
+
+            Py_DECREF(self->callback);
+            Py_DECREF(args);
+            Py_DECREF(kwargs);
+
+            if (py_response != NULL)
+            {
+                send_reply = 1;
+                PyMessage_AsMessageFrame(py_response, &response);
+            }
+            else
+            {
+                PyErr_PrintEx(0);
+                lerror("Failed to run callback");
+                send_reply = 0;
+            }
+            Py_XDECREF(py_response);
         }
         PyGILState_Release(gstate);
 
         /* Send the reply */
         if (send_reply)
         {
-            /* Tell the client how long the response is */
-            U64 total_length = sizeof(Message) + sizeof(response.size) + response.size;
-            write(req->client, &total_length, sizeof(total_length));
-
             /* Send just the message first */
             write(req->client, &response, sizeof(Message));
 
@@ -143,10 +156,21 @@ static void TCPServer_worker_run(TCPServer* self)
             if (response.size)
                 write(req->client, response.data, response.size);
         }
+        else
+        {
+            /* Write zeroes */
+            void* zeros = calloc(1, sizeof(Message) + sizeof(response.size));
+            write(req->client, zeros, sizeof(Message) + sizeof(response.size));
+            free(zeros);
+        }
 
         /* Free frame memory if needed */
         if (message.size)
             free(message.data);
+        if (response.size)
+            free(message.data);
+
+        close(req->client);
         OBJECT_FREE(req);
     }
 }
@@ -225,16 +249,13 @@ static Request* request_new(int client_sock)
     self->free = free;
     self->reference_count = 0;
     self->client = client_sock;
+
+    OBJECT_INCREF(self);
+    return self;
 }
 
 static void TCPServer_run(TCPServer* self)
 {
-    /* Initialize the server socket */
-    if (self->type == NETWORK_TYPE_NET)
-        self->socket = TCPServer_init_network_socket(self->address.net_addr.port);
-    else if (self->type == NETWORK_TYPE_UNIX)
-        self->socket = TCPServer_init_unix_socket(self->address.path);
-
     while (self->keep_alive)
     {
         /* Wait for a TCP connection */
@@ -258,6 +279,11 @@ static void TCPServer_run(TCPServer* self)
         /* Notify workers of a new request */
         pthread_cond_broadcast(&self->cond);
     }
+
+    if (self->type == NETWORK_TYPE_UNIX)
+    {
+        remove(self->address.path);
+    }
 }
 
 static PyObject* TCPServer_start(TCPServer* self, PyObject* args, PyObject* kwds)
@@ -270,8 +296,16 @@ static PyObject* TCPServer_start(TCPServer* self, PyObject* args, PyObject* kwds
         pthread_create(&self->worker_threads[i], NULL, (void* (*)(void*)) TCPServer_worker_run, self);
     }
 
+    /* Initialize the server socket */
+    if (self->type == NETWORK_TYPE_NET)
+        self->socket = TCPServer_init_network_socket(self->address.net_addr.port);
+    else if (self->type == NETWORK_TYPE_UNIX)
+        self->socket = TCPServer_init_unix_socket(self->address.path);
+
     /* Start up the server main thread */
     pthread_create(&self->run_thread, NULL, (void* (*)(void*)) TCPServer_run, self);
+
+    Py_RETURN_NONE;
 }
 
 static PyObject* TCPServer_stop(TCPServer* self, PyObject* args, PyObject* kwds)
@@ -296,6 +330,8 @@ static PyObject* TCPServer_stop(TCPServer* self, PyObject* args, PyObject* kwds)
 
     /* Free main thread data */
     pthread_join(self->run_thread, NULL);
+
+    Py_RETURN_NONE;
 }
 
 static PyObject*
@@ -326,8 +362,8 @@ TCPServer_dealloc(TCPServer* self, PyObject* args, PyObject* kwds)
     pthread_mutex_destroy(&self->lock);
     free(self->worker_threads);
 
+    Py_XDECREF(self->callback);
     OBJECT_FREE(self->request_queue);
-    free(self);
     Py_TYPE(self)->tp_free((PyObject*) self);
 }
 

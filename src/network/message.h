@@ -45,4 +45,6 @@ struct MessageFrame_prv
 PyObject* PyMessage_FromMessageFrame(MessageFrame*);
 int PyMessage_AsMessageFrame(PyObject*, MessageFrame*);
 
+extern PyTypeObject PyMessageType;
+
 #endif //AUTOGENTOO_MESSAGE_H

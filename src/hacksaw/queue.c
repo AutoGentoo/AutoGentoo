@@ -23,8 +23,8 @@ RefObject* queue_pop(Queue* self)
     LinkedNode* node = self->head;
     self->head = node->next;
 
-    OBJECT_INCREF(node->data);
     RefObject* to_pop = node->data;
+    OBJECT_INCREF(to_pop);
     OBJECT_FREE(node);
 
     return to_pop;

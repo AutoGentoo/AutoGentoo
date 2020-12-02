@@ -11,9 +11,8 @@ function(setup_pymodule target)
             PREFIX ""
     )
 
-    add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${target}> "${CMAKE_CURRENT_SOURCE_DIR}/${target}.so"
-            BYPRODUCTS "${CMAKE_CURRENT_SOURCE_DIR}/${target}.so"
-            )
-
+    add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${target}.so"
+            COMMAND ${CMAKE_COMMAND} -E create_symlink "$<TARGET_FILE:${target}>" "${CMAKE_CURRENT_SOURCE_DIR}/${target}.so"
+            DEPENDS "$<TARGET_FILE:${target}>"
+    )
 endfunction()

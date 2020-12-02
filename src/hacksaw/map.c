@@ -30,7 +30,6 @@ Map* map_new(size_t new_size, F64 threshold)
     Map* out = malloc(sizeof(Map));
 
     out->free = (void (*)(void*)) map_free;
-    out->reference_count = 0;
     out->size = new_size;
     out->threshold = threshold;
     out->realloc_at = (U64) (threshold * new_size);
