@@ -38,10 +38,10 @@ typedef enum {
 } atom_use_t;
 
 typedef enum {
-    ATOM_NO_DEFAULT, //!< use
+    ATOM_DEFAULT_NONE, //!< use
     ATOM_DEFAULT_ON, //!< use(+)
     ATOM_DEFAULT_OFF, //!< use(-)
-} atom_use_default;
+} atom_use_default_t;
 
 typedef enum {
     ATOM_VERSION_NONE,

@@ -102,7 +102,7 @@ static PyInitFunc(PyRequiredUse_init, RequiredUse)
         return -1;
 
     memcpy(&self->global_flag, &duped->global_flag, sizeof(RequiredUse) - offsetof(RequiredUse, global_flag));
-    Py_TYPE(self)->tp_free((PyObject*) duped);
+    Py_TYPE(duped)->tp_free((PyObject*) duped);
     return 0;
 }
 

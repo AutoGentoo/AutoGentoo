@@ -3,10 +3,10 @@
 //
 
 #include "Python.h"
-#include "structmember.h"
 #include "atom.h"
 #include "dependency.h"
 #include "use.h"
+#include "structmember.h"
 
 PyFastMethod(PyCportage_Init, PyObject*)
 {
@@ -80,7 +80,7 @@ PyInit_autogentoo_cportage(void)
         || PyModule_AddObject(m, "AtomFlag", (PyObject*) &PyAtomFlagType) < 0
         || PyModule_AddObject(m, "Atom", (PyObject*) &PyAtomType) < 0
         || PyModule_AddObject(m, "Portage", (PyObject*) &PyPortageType) < 0
-        || PyModule_AddObject(m, "PyUseFlagType", (PyObject*) &PyUseFlagType) < 0
+        || PyModule_AddObject(m, "UseFlag", (PyObject*) &PyUseFlagType) < 0
         || PyModule_AddObject(m, "RequiredUse", (PyObject*) &PyRequiredUseType) < 0
         )
     {
@@ -94,6 +94,58 @@ PyInit_autogentoo_cportage(void)
         Py_DECREF(m);
         return NULL;
     }
+    
+    /* use_operator_t */
+    PyModule_AddIntMacro(m, USE_OP_NONE);
+    PyModule_AddIntMacro(m, USE_OP_DISABLE);
+    PyModule_AddIntMacro(m, USE_OP_ENABLE);
+    PyModule_AddIntMacro(m, USE_OP_LEAST_ONE);
+    PyModule_AddIntMacro(m, USE_OP_EXACT_ONE);
+    PyModule_AddIntMacro(m, USE_OP_MOST_ONE);
+    
+    /* use_state_t */
+    PyModule_AddIntMacro(m, USE_STATE_UNKNOWN);
+    PyModule_AddIntMacro(m, USE_STATE_DISABLED);
+    PyModule_AddIntMacro(m, USE_STATE_ENABLED);
 
+    /* atom_use_t */
+    PyModule_AddIntMacro(m, ATOM_USE_DISABLE);
+    PyModule_AddIntMacro(m, ATOM_USE_ENABLE);
+    PyModule_AddIntMacro(m, ATOM_USE_ENABLE_IF_ON);
+    PyModule_AddIntMacro(m, ATOM_USE_DISABLE_IF_OFF);
+    PyModule_AddIntMacro(m, ATOM_USE_EQUAL);
+    PyModule_AddIntMacro(m, ATOM_USE_OPPOSITE);
+
+    /* atom_use_default_t */
+    PyModule_AddIntMacro(m, ATOM_DEFAULT_NONE);
+    PyModule_AddIntMacro(m, ATOM_DEFAULT_ON);
+    PyModule_AddIntMacro(m, ATOM_DEFAULT_OFF);
+
+    /* atom_version_t */
+    PyModule_AddIntMacro(m, ATOM_VERSION_NONE);
+    PyModule_AddIntMacro(m, ATOM_VERSION_E);
+    PyModule_AddIntMacro(m, ATOM_VERSION_L);
+    PyModule_AddIntMacro(m, ATOM_VERSION_G);
+    PyModule_AddIntMacro(m, ATOM_VERSION_REV);
+    PyModule_AddIntMacro(m, ATOM_VERSION_ALL);
+    PyModule_AddIntMacro(m, ATOM_VERSION_GE);
+    PyModule_AddIntMacro(m, ATOM_VERSION_LE);
+
+    /* atom_block_t */
+    PyModule_AddIntMacro(m, ATOM_BLOCK_NONE);
+    PyModule_AddIntMacro(m, ATOM_BLOCK_SOFT);
+    PyModule_AddIntMacro(m, ATOM_BLOCK_HARD);
+
+    /* atom_slot_t */
+    PyModule_AddIntMacro(m, ATOM_SLOT_IGNORE);
+    PyModule_AddIntMacro(m, ATOM_SLOT_REBUILD);
+
+    /* atom_version_pre_t */
+    PyModule_AddIntMacro(m, ATOM_PREFIX_ALPHA);
+    PyModule_AddIntMacro(m, ATOM_PREFIX_BETA);
+    PyModule_AddIntMacro(m, ATOM_PREFIX_PRE);
+    PyModule_AddIntMacro(m, ATOM_PREFIX_RC);
+    PyModule_AddIntMacro(m, ATOM_PREFIX_NONE);
+    PyModule_AddIntMacro(m, ATOM_PREFIX_P);
     return m;
 }

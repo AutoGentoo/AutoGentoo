@@ -45,7 +45,7 @@ struct AtomFlag_prv {
     PyObject_HEAD
     char* name;
     atom_use_t option;
-    atom_use_default def;
+    atom_use_default_t def;
     AtomFlag* next;
     AtomFlag* PyIterator_self__;
 };

@@ -30,8 +30,9 @@ class TestStringMethods(unittest.TestCase):
     def test_atom_use(self):
         atom = cportage.Atom("cat2/pkg3-2.2.34[flag1,-flag2]")
         print(atom.useflags)
-        print(atom.useflags.next)
-        print(list(atom.useflags))
+        flags: List[cportage.AtomFlag] = list(atom.useflags)
+        self.assertEqual(flags[0].name, "flag1")
+        self.assertEqual(flags[1].name, "flag2")
 
     def test_parse_1(self):
         deps = cportage.Dependency("use1? ( cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )")
@@ -43,7 +44,9 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(deps_children[1].atom.name, "pkg2")
 
     def test_parse_2(self):
-        pass
+        deps = cportage.Dependency("use1? ( >=cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )")
+        self.assertEqual(deps.children.atom.range, cportage.AtomVersionT.GE)
+        self.assertEqual(deps.children.next.atom.range, cportage.AtomVersionT.ALL)
 
 
 if __name__ == '__main__':

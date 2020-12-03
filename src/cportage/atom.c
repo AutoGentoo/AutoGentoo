@@ -77,7 +77,7 @@ static PyInitFunc(PyAtom_init, Atom)
         return -1;
 
     memcpy(&self->id, &duped->id, sizeof(Atom) - offsetof(Atom, id));
-    Py_TYPE(self)->tp_free((PyObject*) duped);
+    Py_TYPE(duped)->tp_free((PyObject*) duped);
     return 0;
 }
 

@@ -43,7 +43,7 @@ static PyInitFunc(PyDependency_init, Dependency)
         return -1;
 
     memcpy(&self->use_operator, &duped->use_operator, sizeof(Dependency) - offsetof(Dependency , use_operator));
-    Py_TYPE(self)->tp_free((PyObject*) duped);
+    Py_TYPE(duped)->tp_free((PyObject*) duped);
     return 0;
 }
 
