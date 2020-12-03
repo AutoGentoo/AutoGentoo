@@ -355,7 +355,7 @@ static PyMethod(TCPServer_dealloc, TCPServer)
     if (self->is_alive)
     {
         PyObject* stop_method = PyObject_GetAttrString((PyObject*) self, "stop");
-        PyObject_CallNoArgs(stop_method);
+        PyObject_Call(stop_method, PyTuple_New(0), NULL);
     }
 
     if (self->type == NETWORK_TYPE_UNIX)

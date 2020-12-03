@@ -37,36 +37,27 @@ PyObject* PyMessage_FromMessageFrame(MessageFrame* self)
     return out;
 }
 
-int PyMessage_AsMessageFrame(PyObject* self, MessageFrame* dest)
+void PyMessage_AsMessageFrame(PyObject* self, MessageFrame* dest)
 {
-    if (!Py_IS_TYPE(self, &PyMessageType))
-    {
-        memset(dest, 0, sizeof(MessageFrame));
-        return 1;
-    } else
-    {
-        dest->parent.token = PyLong_AsLong(PyStructSequence_GetItem(self, 0));
-        dest->parent.data.val1 = PyBytes_AsLong(PyStructSequence_GetItem(self, 1));
-        dest->parent.data.val2 = PyBytes_AsLong(PyStructSequence_GetItem(self, 2));
-        dest->parent.data.val3 = PyBytes_AsLong(PyStructSequence_GetItem(self, 3));
-        dest->parent.data.val4 = PyBytes_AsLong(PyStructSequence_GetItem(self, 4));
-        dest->parent.data.val5 = PyBytes_AsLong(PyStructSequence_GetItem(self, 5));
-        dest->parent.data.val6 = PyBytes_AsLong(PyStructSequence_GetItem(self, 6));
+    dest->parent.token = PyLong_AsLong(PyStructSequence_GetItem(self, 0));
+    dest->parent.data.val1 = PyBytes_AsLong(PyStructSequence_GetItem(self, 1));
+    dest->parent.data.val2 = PyBytes_AsLong(PyStructSequence_GetItem(self, 2));
+    dest->parent.data.val3 = PyBytes_AsLong(PyStructSequence_GetItem(self, 3));
+    dest->parent.data.val4 = PyBytes_AsLong(PyStructSequence_GetItem(self, 4));
+    dest->parent.data.val5 = PyBytes_AsLong(PyStructSequence_GetItem(self, 5));
+    dest->parent.data.val6 = PyBytes_AsLong(PyStructSequence_GetItem(self, 6));
 
-        PyObject* data_ob = PyStructSequence_GetItem(self, 7);
-        if (data_ob == Py_None)
-        {
-            dest->size = 0;
-            dest->data = NULL;
-        }
-        else
-        {
-            dest->size = PyObject_Length(data_ob);
-            dest->data = malloc(dest->size);
-
-            memcpy(dest->data, PyBytes_AsString(data_ob), dest->size);
-        }
+    PyObject* data_ob = PyStructSequence_GetItem(self, 7);
+    if (data_ob == Py_None)
+    {
+        dest->size = 0;
+        dest->data = NULL;
     }
+    else
+    {
+        dest->size = PyObject_Length(data_ob);
+        dest->data = malloc(dest->size);
 
-    return 0;
+        memcpy(dest->data, PyBytes_AsString(data_ob), dest->size);
+    }
 }

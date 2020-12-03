@@ -23,9 +23,15 @@ static PyModuleDef module = {
 PyMODINIT_FUNC
 PyInit_autogentoo_cportage(void)
 {
+#if !(PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 7)
+#error "Python 3.7+ is required"
+#endif
+
     PyObject* m = PyModule_Create(&module);
     if (m == NULL)
         return NULL;
+
+    Py_Initialize();
 
     if (PyType_Ready(&PyDependencyType) < 0
         || PyType_Ready(&PyAtomType) < 0
@@ -41,7 +47,10 @@ PyInit_autogentoo_cportage(void)
 
     Py_INCREF(&PyDependencyType);
     Py_INCREF(&PyAtomType);
+    Py_INCREF(&PyAtomVersionType);
     Py_INCREF(&PyPortageType);
+    Py_INCREF(&PyUseFlagType);
+    Py_INCREF(&PyRequiredUseType);
     if (PyModule_AddObject(m, "Dependency", (PyObject*) &PyDependencyType) < 0
         || PyModule_AddObject(m, "AtomVersion", (PyObject*) &PyAtomVersionType) < 0
         || PyModule_AddObject(m, "Atom", (PyObject*) &PyAtomType) < 0
@@ -54,7 +63,10 @@ PyInit_autogentoo_cportage(void)
         PyErr_Print();
         Py_DECREF(&PyDependencyType);
         Py_DECREF(&PyAtomType);
+        Py_DECREF(&PyAtomVersionType);
         Py_DECREF(&PyPortageType);
+        Py_DECREF(&PyUseFlagType);
+        Py_DECREF(&PyRequiredUseType);
         Py_DECREF(m);
         return NULL;
     }

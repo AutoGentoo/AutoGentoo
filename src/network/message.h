@@ -43,7 +43,7 @@ struct MessageFrame_prv
 };
 
 PyObject* PyMessage_FromMessageFrame(MessageFrame*);
-int PyMessage_AsMessageFrame(PyObject*, MessageFrame*);
+void PyMessage_AsMessageFrame(PyObject* self, MessageFrame* dest);
 
 extern PyTypeObject PyMessageType;
 
