@@ -473,16 +473,16 @@ PyObject* PyAtom_richcompare(Atom* self, Atom* other, int op)
 {
     int compare = strcmp(self->category, other->category);
     if (compare != 0)
-        Py_RETURN_RICHCOMPARE(0, compare, op);
+        Py_RETURN_RICHCOMPARE(compare, 0, op);
 
     compare = strcmp(self->name, other->name);
-    Py_RETURN_RICHCOMPARE(0, compare, op);
+    Py_RETURN_RICHCOMPARE(compare, 0, op);
 }
 
 PyObject* PyAtomVersion_richcompare(AtomVersion* self, AtomVersion* other, int op)
 {
     int compare = atom_version_compare(self, other);
-    Py_RETURN_RICHCOMPARE(0, compare, op);
+    Py_RETURN_RICHCOMPARE(compare, 0, op);
 }
 
 static PyMemberDef PyAtomFlag_members[] = {

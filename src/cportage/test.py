@@ -29,7 +29,6 @@ class TestStringMethods(unittest.TestCase):
 
     def test_atom_use(self):
         atom = cportage.Atom("cat2/pkg3-2.2.34[flag1,-flag2]")
-        print(atom.useflags)
         flags: List[cportage.AtomFlag] = list(atom.useflags)
         self.assertEqual(flags[0].name, "flag1")
         self.assertEqual(flags[1].name, "flag2")
@@ -47,6 +46,28 @@ class TestStringMethods(unittest.TestCase):
         deps = cportage.Dependency("use1? ( >=cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )")
         self.assertEqual(deps.children.atom.range, cportage.AtomVersionT.GE)
         self.assertEqual(deps.children.next.atom.range, cportage.AtomVersionT.ALL)
+
+    def test_readonly(self):
+        atom = cportage.Atom("cat2/pkg3")
+        with self.assertRaises(AttributeError):
+            atom.id = 0
+
+    def test_id_match(self):
+        atom1 = cportage.Atom("cat/pkg-1.2.34")
+        atom2 = cportage.Atom("cat/pkg")
+
+        self.assertEqual(atom1.id, atom2.id)
+
+    def test_version_compare_1(self):
+        version_1 = cportage.AtomVersion("1.0.0")
+        version_2 = cportage.AtomVersion("1.2.0")
+        self.assertGreater(version_2, version_1)
+        self.assertEqual(version_1, version_1)
+
+    def test_version_compare_2(self):
+        version_1 = cportage.AtomVersion("1.3.0")
+        version_2 = cportage.AtomVersion("1.2.9")
+        self.assertLess(version_2, version_1)
 
 
 if __name__ == '__main__':
