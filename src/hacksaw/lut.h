@@ -66,7 +66,7 @@ struct LUT_prv {
 
 LUT* lut_new(U64 new_size);
 lut_id lut_insert(LUT* self, const char* key, RefObject* data);
-void lut_insert_id(LUT* self, const char* key, lut_id id, RefObject* data, lut_flag_t flag);
+void lut_insert_id(LUT* self, const char* key, RefObject* data, lut_id id, lut_flag_t flag);
 const char* lut_get_key(LUT* self, lut_id id);
 RefObject* lut_get(LUT* self, lut_id id);
 lut_id lut_get_id(LUT* self, const char* key, lut_flag_t*);

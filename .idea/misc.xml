@@ -5,21 +5,5 @@
     <sourceRoots>
       <file path="$PROJECT_DIR$/src" />
     </sourceRoots>
-    <excludeRoots>
-      <file path="$PROJECT_DIR$/autom4te.cache" />
-      <file path="$PROJECT_DIR$/cportage/cmake-build-debug" />
-      <file path="$PROJECT_DIR$/cportage/src/deprecated" />
-      <file path="$PROJECT_DIR$/doc" />
-      <file path="$PROJECT_DIR$/include/autogentoo/hacksaw/deprecated" />
-      <file path="$PROJECT_DIR$/m4" />
-      <file path="$PROJECT_DIR$/src/.deps" />
-      <file path="$PROJECT_DIR$/src/.libs" />
-      <file path="$PROJECT_DIR$/src/api/venv" />
-      <file path="$PROJECT_DIR$/src/scripts/.idea" />
-      <file path="$PROJECT_DIR$/src/scripts/build" />
-    </excludeRoots>
-  </component>
-  <component name="JavaScriptSettings">
-    <option name="languageLevel" value="ES6" />
   </component>
 </project>

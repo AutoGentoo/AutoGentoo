@@ -116,11 +116,11 @@ lut_id lut_insert(LUT* self, const char* key, RefObject* data)
 
     lut_flag_t flag = 0;
     lut_id out = lut_get_id(self, key, &flag);
-    lut_insert_id(self, key, out, data, flag);
+    lut_insert_id(self, key, data, out, flag);
     return out;
 }
 
-void lut_insert_id(LUT* self, const char* key, lut_id id, RefObject* data, lut_flag_t flag)
+void lut_insert_id(LUT* self, const char* key, RefObject* data, lut_id id, lut_flag_t flag)
 {
     LUTNode* node = lut_node_new();
 
@@ -221,6 +221,6 @@ lut_id lut_get_id(LUT* self, const char* key, lut_flag_t* flag)
     if (flag)
         *flag = LUT_FLAG_NOT_FOUND;
     return (((lut_id)hash << LUT_HASH_SHIFT) & LUT_HASH_MASK)
-            || (((lut_id)hash_overlap << LUT_OVERLAP_SHIFT) & LUT_OVERLAP_MASK);
+            | (((lut_id)hash_overlap << LUT_OVERLAP_SHIFT) & LUT_OVERLAP_MASK);
 
 }

@@ -59,8 +59,8 @@ Use_t use_get_global(Portage* parent, const char* useflag)
             use_flag_init(new_flag, useflag, USE_STATE_UNKNOWN);
 
             /* Add the flag to the global map */
-            lut_insert_id(parent->global_flags, useflag,
-                          out, ref_pyobject((PyObject*) new_flag), flag);
+            lut_insert_id(parent->global_flags, useflag, ref_pyobject((PyObject*) new_flag),
+                          out, flag);
 
             /* reference held by ref_pyobject */
             Py_DECREF(new_flag);
@@ -93,16 +93,16 @@ static PyMethod(PyRequiredUse_dealloc, RequiredUse)
 
 static PyInitFunc(PyRequiredUse_init, RequiredUse)
 {
-    PyErr_SetString(PyExc_Warning, "'RequiredUse' should not be explcitely __init__'ed");
+    PyErr_SetString(PyExc_Warning, "'RequiredUse' should not be explicitly __init__'ed");
     PyErr_Print();
     PyErr_Clear();
     return 0;
 }
 
-RequiredUse* use_build_required_use(Portage* parent, const char* target, use_operator_t option)
+RequiredUse* use_build_required_use(const char* target, use_operator_t option)
 {
     RequiredUse* out = (RequiredUse*) PyRequiredUse_new(&PyRequiredUseType, NULL, NULL);
-    out->global_flag = use_get_global(parent, target);
+    out->global_flag = use_get_global(global_portage, target);
 
     out->option = option;
     out->depend = NULL;

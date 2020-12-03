@@ -8,7 +8,37 @@
 #include "dependency.h"
 #include "use.h"
 
+PyFastMethod(PyCportage_Init, PyObject*)
+{
+    if (nargs != 1)
+    {
+        PyErr_Format(PyExc_TypeError, "cportage.init() expects a single argument");
+        return NULL;
+    }
+
+    Py_INCREF(args[0]);
+    global_portage = (Portage*) args[0];
+    Py_RETURN_NONE;
+}
+
+PyFastMethod(PyCportage_Close, PyObject*)
+{
+    if (nargs != 0)
+    {
+        PyErr_Format(PyExc_TypeError, "cportage.close() takes no arguments");
+        return NULL;
+    }
+
+    Py_XDECREF(global_portage);
+    global_portage = NULL;
+    Py_RETURN_NONE;
+}
+
+
+
 static PyMethodDef module_methods[] = {
+        {"init", (PyCFunction) PyCportage_Init, METH_FASTCALL, "Initialize the global portage struct"},
+        {"close", (PyCFunction) PyCportage_Close, METH_FASTCALL, "Close the global portage struct"},
         {NULL, NULL,0, NULL}
 };
 

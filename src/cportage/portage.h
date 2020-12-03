@@ -83,5 +83,6 @@ struct Portage_prv {
 };
 
 extern PyTypeObject PyPortageType;
+extern Portage* global_portage;
 
 #endif //AUTOGENTOO_PORTAGE_H

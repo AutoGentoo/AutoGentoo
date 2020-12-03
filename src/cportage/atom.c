@@ -114,23 +114,6 @@ static const struct
         {1, ATOM_PREFIX_P},
 };
 
-static void atom_version_free(AtomVersion* self)
-{
-    if (!self)
-        return;
-
-    /* We are not reference counted so we can assume this is the head node */
-    do
-    {
-        AtomVersion* next_node = self->next;
-        if (self->v)
-            free(self->v);
-        free(self);
-
-        self = next_node;
-    } while (self);
-}
-
 static PyNewFunc(PyAtomVersion_new)
 {
     AtomVersion* self = (AtomVersion*) type->tp_alloc(type, 0);
@@ -236,6 +219,12 @@ PyMethod(PyAtomVersion_dealloc, AtomVersion)
 
 int atom_init(Atom* self, const char* input)
 {
+    if (!global_portage)
+    {
+        lerror("global_portage needs to be initialize with autogentoo_cportage.init()");
+        return 1;
+    }
+
     self->revision = 0;
     self->version = NULL;
     self->useflags = NULL;
@@ -294,8 +283,13 @@ int atom_init(Atom* self, const char* input)
     asprintf(&self->key, "%s/%s", self->category, self->name);
 
     lut_flag_t flag = 0;
-    /* TODO ADD portage */
-    self->id = lut_get_id()
+    self->id = lut_get_id(global_portage->packages, self->key, &flag);
+    printf("got id %lu\n", self->id);
+    if (flag == LUT_FLAG_NOT_FOUND)
+    {
+        /* Add the package to the LUT */
+        lut_insert_id(global_portage->packages, self->key, NULL, self->id, flag);
+    }
 
     free(d_input);
     return 0;
@@ -434,6 +428,7 @@ PyTypeObject PyAtomVersionType = {
         .tp_init = (initproc) PyAtomVersion_init,
         .tp_dealloc = (destructor) PyAtomVersion_dealloc,
         .tp_repr = (reprfunc) PyAtomVersion_repr,
+        .tp_richcompare = (richcmpfunc) PyAtomVersion_richcompare
 };
 
 PyTypeObject PyAtomType = {

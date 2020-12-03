@@ -25,7 +25,7 @@ struct Dependency_prv {
     Dependency* PyIterator_self__;
 };
 
-Dependency* dependency_build_use(Portage* portage, const char* use_flag, use_operator_t type, Dependency* children);
+Dependency* dependency_build_use(const char* use_flag, use_operator_t type, Dependency* children);
 Dependency* dependency_build_grouping(Dependency* children);
 Dependency* dependency_build_atom(Atom* atom);
 

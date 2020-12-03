@@ -60,13 +60,11 @@ Dependency* dependency_build_grouping(Dependency* children)
     return self;
 }
 
-Dependency* dependency_build_use(Portage* parent,
-                                 const char* use_flag,
-                                 use_operator_t type,
-                                 Dependency* children)
+Dependency* dependency_build_use(const char* use_flag, use_operator_t type, Dependency* children)
 {
     Dependency* self = (Dependency*) PyDependency_new(&PyDependencyType, NULL, NULL);
-    self->use_condition = use_get_global(parent, use_flag);
+    self->use_condition = use_get_global(global_portage, use_flag);
+    self->use_operator = type;
 
     self->children = children;
     return self;

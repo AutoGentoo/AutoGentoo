@@ -6,15 +6,19 @@
 
 %{
 #include <stdio.h>
+#include "language.h"
 
 int yyparse(void);
 int yywrap() { return 1; }
 int yylex();
-extern int yylineno;
-extern char* yytext;
-extern void* yyout;
+int yylineno;
+int yylloc;
+char* yytext;
+void* yyout;
 
-extern void* parent;
+#define YYERROR_VERBOSE 1
+
+extern Portage* global_portage;
 
 void yyerror(const char *message);
 %}
@@ -81,18 +85,18 @@ program:                                        {yyout = NULL;}
             ;
 
 required_use_expr   : depend_expr_sel '(' required_use_expr ')' {
-                                                                    $$ = use_build_required_use(parent, $1.target, $1.t);
+                                                                     $$ = use_build_required_use($1.target, $1.t);
                                                                     free($1.target);
 
                                                                     Py_XINCREF($3);
                                                                     $$->depend = $3;
                                                                 }
                     | required_use_expr required_use_expr       {$$ = $1; Py_XINCREF($2); $$->next = $2;}
-                    | use_expr                                  {$$ = use_build_required_use(parent, $1.target, $1.t); free($1.target);}
+                    | use_expr                                  {$$ = use_build_required_use($1.target, $1.t); free($1.target);}
                     | '(' required_use_expr ')'                 {$$ = $2;}
                     ;
 
-depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_build_use(parent, $p.target, $p.t, $c); free($p.target);}
+depend_expr  :    depend_expr_sel[p] '(' depend_expr[c] ')' {$$ = dependency_build_use($p.target, $p.t, $c); free($p.target);}
                 | '(' depend_expr[c] ')'                    {$$ = dependency_build_grouping($c);}
                 | atom                                      {$$ = dependency_build_atom($1);}
                 | depend_expr depend_expr                   {$$ = $1; $1->next = $2;}

@@ -6,6 +6,7 @@ set(language_PARSER
         depend_flex.l
         make_conf_bison.y
         make_conf_flex.l
+        language.c
         )
 
 flex_target(FLEX_DEPEND depend_flex.l
@@ -40,7 +41,7 @@ add_library(autogentoo_cportage SHARED
         ../python_util.h atom.h dependency.c dependency.h portage.c)
 
 setup_pymodule(autogentoo_cportage)
-target_include_directories(autogentoo_cportage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(autogentoo_cportage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(autogentoo_cportage PUBLIC hacksaw)
 
 add_custom_target(autogentoo_cportage_test

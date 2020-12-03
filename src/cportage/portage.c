@@ -9,6 +9,8 @@
 #define PORTAGE_INITIAL_PKG_LUT_SIZE 512
 #endif
 
+Portage* global_portage = NULL;
+
 PyNewFunc(PyPortage_new)
 {
     Portage* self = (Portage*) type->tp_alloc(type, 0);
@@ -42,6 +44,4 @@ PyTypeObject PyPortageType = {
         .tp_new = PyPortage_new,
         .tp_init = (initproc) PyPortage_init,
         .tp_dealloc = (destructor) PyPortage_dealloc,
-        //.tp_members = PyDependency_members,
-        //.tp_methods = PyAtom_methods,
 };

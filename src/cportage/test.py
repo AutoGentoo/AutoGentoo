@@ -7,8 +7,8 @@ import cportage
 
 
 class TestStringMethods(unittest.TestCase):
-    def test_portage_init(self):
-        cportage.Portage()
+    def setUp(self) -> None:
+        cportage.init(cportage.Portage())
 
     def test_atom_1(self):
         atom = cportage.Atom("cat/pkg-1.2.34")
@@ -21,13 +21,14 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(repr(atom.version), "AtomVersion<2.2.34>")
 
     def test_parse_1(self):
-        portage = cportage.Portage()
-        deps = cportage.Dependency.parse(portage, "use1? ( cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )")
+        deps = cportage.Dependency.parse("use1? ( cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )")
         print(deps.children)
 
         for dep in deps.children:
             print(dep, dep.atom, dep.atom.id)
 
+    def tearDown(self) -> None:
+        cportage.close()
 
 if __name__ == '__main__':
     unittest.main()

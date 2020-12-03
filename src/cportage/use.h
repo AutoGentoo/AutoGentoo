@@ -25,7 +25,7 @@ struct UseFlag_prv {
 };
 
 Use_t use_get_global(Portage* parent, const char* useflag);
-RequiredUse* use_build_required_use(Portage* portage, const char* target, use_operator_t option);
+RequiredUse* use_build_required_use(const char* target, use_operator_t option);
 
 extern PyTypeObject PyUseFlagType;
 extern PyTypeObject PyRequiredUseType;
