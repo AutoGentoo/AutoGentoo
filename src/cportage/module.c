@@ -16,29 +16,20 @@ PyFastMethod(PyCportage_Init, PyObject*)
         return NULL;
     }
 
+    Py_XDECREF(global_portage);
     Py_INCREF(args[0]);
     global_portage = (Portage*) args[0];
     Py_RETURN_NONE;
 }
 
-PyFastMethod(PyCportage_Close, PyObject*)
+void PyCportage_free()
 {
-    if (nargs != 0)
-    {
-        PyErr_Format(PyExc_TypeError, "cportage.close() takes no arguments");
-        return NULL;
-    }
-
     Py_XDECREF(global_portage);
     global_portage = NULL;
-    Py_RETURN_NONE;
 }
-
-
 
 static PyMethodDef module_methods[] = {
         {"init", (PyCFunction) PyCportage_Init, METH_FASTCALL, "Initialize the global portage struct"},
-        {"close", (PyCFunction) PyCportage_Close, METH_FASTCALL, "Close the global portage struct"},
         {NULL, NULL,0, NULL}
 };
 
@@ -47,7 +38,8 @@ static PyModuleDef module = {
         .m_name = "autogentoo_cportage",
         .m_doc = "Backend to portage, parses metadata",
         .m_size = -1,
-        module_methods
+        .m_free = PyCportage_free,
+        .m_methods = module_methods
 };
 
 PyMODINIT_FUNC
@@ -66,6 +58,7 @@ PyInit_autogentoo_cportage(void)
     if (PyType_Ready(&PyDependencyType) < 0
         || PyType_Ready(&PyAtomType) < 0
         || PyType_Ready(&PyAtomVersionType) < 0
+        || PyType_Ready(&PyAtomFlagType) < 0
         || PyType_Ready(&PyPortageType) < 0
         || PyType_Ready(&PyUseFlagType) < 0
         || PyType_Ready(&PyRequiredUseType) < 0
@@ -78,18 +71,19 @@ PyInit_autogentoo_cportage(void)
     Py_INCREF(&PyDependencyType);
     Py_INCREF(&PyAtomType);
     Py_INCREF(&PyAtomVersionType);
+    Py_INCREF(&PyAtomFlagType);
     Py_INCREF(&PyPortageType);
     Py_INCREF(&PyUseFlagType);
     Py_INCREF(&PyRequiredUseType);
     if (PyModule_AddObject(m, "Dependency", (PyObject*) &PyDependencyType) < 0
         || PyModule_AddObject(m, "AtomVersion", (PyObject*) &PyAtomVersionType) < 0
+        || PyModule_AddObject(m, "AtomFlag", (PyObject*) &PyAtomFlagType) < 0
         || PyModule_AddObject(m, "Atom", (PyObject*) &PyAtomType) < 0
         || PyModule_AddObject(m, "Portage", (PyObject*) &PyPortageType) < 0
         || PyModule_AddObject(m, "PyUseFlagType", (PyObject*) &PyUseFlagType) < 0
         || PyModule_AddObject(m, "RequiredUse", (PyObject*) &PyRequiredUseType) < 0
         )
     {
-        assert(0);
         PyErr_Print();
         Py_DECREF(&PyDependencyType);
         Py_DECREF(&PyAtomType);

@@ -72,8 +72,6 @@ Use_t use_get_global(Portage* parent, const char* useflag)
     return 0;
 }
 
-static PyParseMethod(PyRequiredUse_parse, RequiredUse, required_use_parse)
-
 static PyNewFunc(PyRequiredUse_new)
 {
     RequiredUse* self = (RequiredUse*) type->tp_alloc(type, 0);
@@ -93,9 +91,18 @@ static PyMethod(PyRequiredUse_dealloc, RequiredUse)
 
 static PyInitFunc(PyRequiredUse_init, RequiredUse)
 {
-    PyErr_SetString(PyExc_Warning, "'RequiredUse' should not be explicitly __init__'ed");
-    PyErr_Print();
-    PyErr_Clear();
+    static char* kwlist[] = {"required_use_string", NULL};
+    const char* required_use_string = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &required_use_string))
+        return -1;
+
+    RequiredUse* duped = required_use_parse(required_use_string);
+    if (!duped)
+        return -1;
+
+    memcpy(&self->global_flag, &duped->global_flag, sizeof(RequiredUse) - offsetof(RequiredUse, global_flag));
+    Py_TYPE(self)->tp_free((PyObject*) duped);
     return 0;
 }
 
@@ -110,11 +117,6 @@ RequiredUse* use_build_required_use(const char* target, use_operator_t option)
     return out;
 }
 
-static PyMethodDef PyRequiredUse_methods[] = {
-        {"parse", (PyCFunction) PyRequiredUse_parse, METH_STATIC | METH_FASTCALL, "parse required use string"},
-        {NULL }
-};
-
 static PyMemberDef PyUseFlag_members[] = {
         {"name", T_STRING, offsetof(UseFlag, name), READONLY},
         {"state", T_BOOL, offsetof(UseFlag, state), 0},
@@ -126,7 +128,7 @@ static PyMemberDef PyRequiredUse_members[] = {
         {"depend", T_OBJECT, offsetof(RequiredUse, depend), READONLY},
         {"next", T_OBJECT, offsetof(RequiredUse, next), READONLY},
         {"id", T_ULONGLONG, offsetof(RequiredUse, global_flag), READONLY},
-        {"operator", T_ULONGLONG, offsetof(RequiredUse, option), READONLY},
+        {"operator", T_INT, offsetof(RequiredUse, option), READONLY},
         {NULL }
 };
 
@@ -153,6 +155,5 @@ PyTypeObject PyRequiredUseType = {
         .tp_new = PyRequiredUse_new,
         .tp_init = (initproc) PyRequiredUse_init,
         .tp_dealloc = (destructor) PyRequiredUse_dealloc,
-        .tp_methods = PyRequiredUse_methods,
         .tp_members = PyRequiredUse_members
 };

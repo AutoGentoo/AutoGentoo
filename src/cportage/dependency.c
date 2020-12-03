@@ -32,9 +32,18 @@ static PyNewFunc(PyDependency_new)
 
 static PyInitFunc(PyDependency_init, Dependency)
 {
-    PyErr_SetString(PyExc_Warning, "'Dependency' should not be explcitely __init__'ed");
-    PyErr_Print();
-    PyErr_Clear();
+    static char* kwlist[] = {"depend_string", NULL};
+    const char* depend_string = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &depend_string))
+        return -1;
+
+    Dependency * duped = depend_parse(depend_string);
+    if (!duped)
+        return -1;
+
+    memcpy(&self->use_operator, &duped->use_operator, sizeof(Dependency) - offsetof(Dependency , use_operator));
+    Py_TYPE(self)->tp_free((PyObject*) duped);
     return 0;
 }
 
@@ -89,13 +98,6 @@ static PyObject* PyDependency_next(Dependency* self)
     return NULL;
 }
 
-static PyParseMethod(PyDependency_parse, Dependency, depend_parse)
-
-static PyMethodDef PyDependency_methods[] = {
-        {"parse", (PyCFunction) PyDependency_parse, METH_STATIC | METH_FASTCALL, "parse dependency string"},
-        {NULL }
-};
-
 static PyMemberDef PyDependency_members[] = {
         {"use_operator", T_INT, offsetof(Dependency, use_operator), READONLY},
         {"use_condition", T_ULONGLONG, offsetof(Dependency, use_condition), READONLY},
@@ -117,7 +119,6 @@ PyTypeObject PyDependencyType = {
         .tp_init = (initproc) PyDependency_init,
         .tp_dealloc = (destructor) PyDependency_dealloc,
         .tp_members = PyDependency_members,
-        .tp_methods = PyDependency_methods,
         .tp_iter = (getiterfunc) PyDependency_iter,
         .tp_iternext = (iternextfunc) PyDependency_next
 };

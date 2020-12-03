@@ -87,11 +87,9 @@ program:                                        {yyout = NULL;}
 required_use_expr   : depend_expr_sel '(' required_use_expr ')' {
                                                                      $$ = use_build_required_use($1.target, $1.t);
                                                                     free($1.target);
-
-                                                                    Py_XINCREF($3);
                                                                     $$->depend = $3;
                                                                 }
-                    | required_use_expr required_use_expr       {$$ = $1; Py_XINCREF($2); $$->next = $2;}
+                    | required_use_expr required_use_expr       {$$ = $1; $$->next = $2;}
                     | use_expr                                  {$$ = use_build_required_use($1.target, $1.t); free($1.target);}
                     | '(' required_use_expr ')'                 {$$ = $2;}
                     ;
@@ -110,7 +108,7 @@ use_expr     : '!' IDENTIFIER        {$$.target = $2; $$.t = USE_OP_DISABLE;}
              | IDENTIFIER            {$$.target = $1; $$.t = USE_OP_ENABLE;}
              ;
 
-atom        : atom_repo '[' atom_flags ']' {Py_XINCREF($3); $$->useflags = $3;}
+atom        : atom_repo '[' atom_flags ']' {$$->useflags = $3;}
             | atom_repo                    {$$->useflags = NULL;}
             ;
 
@@ -119,7 +117,7 @@ atom_flags  : '!' atom_flag '?'     {$$ = $2; $$->option = ATOM_USE_DISABLE_IF_O
             | atom_flag '?'         {$$ = $1; $$->option = ATOM_USE_ENABLE_IF_ON;}
             | atom_flag '='         {$$ = $1; $$->option = ATOM_USE_EQUAL;}
             | atom_flag             {$$ = $1;}
-            | atom_flags ',' atom_flags {$$ = $1; Py_XINCREF($3); $$->next = $3;}
+            | atom_flags ',' atom_flags {$$ = $1; $$->next = $3;}
             ;
 
 atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); free($1); $$->def = ATOM_NO_DEFAULT;}
@@ -170,8 +168,8 @@ command_atom   : atom_repo              {$$ = $1;}
                ;
 
 command_line   : command_atom                    {$$ = dependency_build_atom($1);}
-               | command_atom '[' atom_flags ']' {Py_XINCREF($3); $1->useflags = $3; $$ = dependency_build_atom($1);}
-               | command_line command_line       {$$ = $1; Py_XINCREF($2); $$->next = $2;}
+               | command_atom '[' atom_flags ']' {$1->useflags = $3; $$ = dependency_build_atom($1);}
+               | command_line command_line       {$$ = $1; $$->next = $2;}
                |                                 {$$ = NULL;}
                ;
 

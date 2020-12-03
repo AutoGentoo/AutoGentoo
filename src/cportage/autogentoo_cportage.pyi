@@ -1,9 +1,15 @@
+from typing import Optional
+
+
 class ID(int):
     pass
 
 
 class AtomVersion:
-    pass
+    raw: str
+
+    def __init__(self, version_string: str): ...
+    def __cmp__(self, other: AtomVersion): ...
 
 
 class UseFlag:
@@ -12,14 +18,27 @@ class UseFlag:
 
     def __init__(self, name: str, state: bool): ...
 
+class AtomFlag:
+    name: str
+    option: int
+    default: int
+    next: Optional['AtomFlag']
+
+    def __init__(self, expr: str): ...
+    def __next__(self) -> AtomFlag: ...
+    def __iter__(self) -> AtomFlag: ...
+
 
 class Portage:
     pass
 
 
 class RequiredUse:
-    @staticmethod
-    def parse(portage: Portage, use_string: str): ...
+    id: ID
+    operator: int
+    depend: 'RequiredUse'
+    next: 'RequiredUse'
+    def __init__(self, required_use_string: str): ...
 
 
 class Atom:
@@ -39,7 +58,7 @@ class Atom:
     revision: int
 
     version: AtomVersion
-    useflags: UseFlag
+    useflags: AtomFlag
 
     def __init__(self, atom_string: str): ...
 
@@ -49,14 +68,12 @@ class Dependency:
     use_condition: ID
     atom: Atom
 
-    children: 'Dependency'
-    next: 'Dependency'
+    def __init__(self, depend_string: str): ...
+
+    children: Optional['Dependency']
+    next: Optional['Dependency']
 
     def __next__(self) -> 'Dependency': ...
     def __iter__(self) -> 'Dependency': ...
 
-    @staticmethod
-    def parse(to_parse: str) -> 'Dependency': ...
-
 def init(portage: Portage): ...
-def close(): ...

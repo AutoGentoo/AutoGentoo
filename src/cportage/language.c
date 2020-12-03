@@ -246,4 +246,3 @@ RequiredUse* required_use_parse(const char* buffer)
 
     return (RequiredUse*) yyout;
 }
-

@@ -22,7 +22,7 @@ struct AtomVersion_prv {
 
 struct Atom_prv {
     PyObject_HEAD
-            Package_t id;
+    Package_t id;
 
     char* category;
     char* name;
@@ -47,14 +47,17 @@ struct AtomFlag_prv {
     atom_use_t option;
     atom_use_default def;
     AtomFlag* next;
+    AtomFlag* PyIterator_self__;
 };
 
-AtomFlag* atomflag_build(char* name);
+AtomFlag* atomflag_build(const char* name);
+void atomflag_init(AtomFlag* self, const char* name);
 PyNewFunc(PyAtom_new);
 int atom_init(Atom* self, const char* input);
 Atom* cmdline_atom_new(char* name);
 I32 atom_version_compare(AtomVersion* first, AtomVersion* second);
 
+extern PyTypeObject PyAtomFlagType;
 extern PyTypeObject PyAtomVersionType;
 extern PyTypeObject PyAtomType;
 

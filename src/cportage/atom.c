@@ -6,6 +6,7 @@
 #include "atom.h"
 #include "python_util.h"
 #include "structmember.h"
+#include "language.h"
 
 static PyObject*
 PyAtom_repr(Atom* self)
@@ -27,6 +28,40 @@ PyAtomVersion_repr(AtomVersion* self)
     return obj;
 }
 
+static PyObject*
+PyAtomFlag_repr(AtomFlag* self)
+{
+    char prefix[2] = "\0\0";
+    char suffix[2] = "\0\0";
+
+    switch (self->option)
+    {
+        case ATOM_USE_DISABLE:
+            *prefix = '-';
+            break;
+        case ATOM_USE_ENABLE:
+            break;
+        case ATOM_USE_ENABLE_IF_ON:
+            *suffix = '?';
+            break;
+        case ATOM_USE_DISABLE_IF_OFF:
+            *prefix = '!';
+            *suffix = '?';
+            break;
+        case ATOM_USE_EQUAL:
+            *suffix = '=';
+            break;
+        case ATOM_USE_OPPOSITE:
+            *prefix = '!';
+            *suffix = '=';
+            break;
+    }
+
+    PyObject* obj = PyUnicode_FromFormat("AtomFlag<%s%s%s>", prefix, self->name, suffix);
+    Py_XINCREF(obj);
+    return obj;
+}
+
 PyNewFunc(PyAtom_new) {return type->tp_alloc(type, 0);}
 
 static PyInitFunc(PyAtom_init, Atom)
@@ -37,7 +72,13 @@ static PyInitFunc(PyAtom_init, Atom)
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &atom_string))
         return -1;
 
-    return atom_init(self, atom_string);
+    Atom* duped = atom_parse(atom_string);
+    if (!duped)
+        return -1;
+
+    memcpy(&self->id, &duped->id, sizeof(Atom) - offsetof(Atom, id));
+    Py_TYPE(self)->tp_free((PyObject*) duped);
+    return 0;
 }
 
 static PyMethod(PyAtom_dealloc, Atom)
@@ -75,44 +116,78 @@ Atom* cmdline_atom_new(char* name)
     return out;
 }
 
-
-static void atomflag_free(AtomFlag* self)
+static PyNewFunc(PyAtomFlag_new)
 {
-    Py_XDECREF(self->next);
-    free(self->name);
-    free(self);
+    AtomFlag* self = (AtomFlag*) type->tp_alloc(type, 0);
+    self->def = 0;
+    self->name = NULL;
+    self->option = 0;
+    self->next = NULL;
+    self->PyIterator_self__ = NULL;
+    return (PyObject*) self;
 }
 
-AtomFlag* atomflag_build(char* name)
+static PyInitFunc(PyAtomFlag_init, AtomFlag)
 {
-    AtomFlag* out = malloc(sizeof(AtomFlag));
-    out->option = ATOM_USE_ENABLE;
+    static char* kwlist[] = {"expr", NULL};
+    const char* expr = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &expr))
+        return -1;
+
+    atomflag_init(self, expr);
+    return 0;
+}
+
+static PyMethod(PyAtomFlag_dealloc, AtomFlag)
+{
+    Py_XDECREF(self->next);
+
+    if (self->name)
+        free(self->name);
+    Py_TYPE(self)->tp_free((PyObject*) self);
+}
+
+static PyObject* PyAtomFlag_iter(AtomFlag* self)
+{
+    Py_INCREF(self);
+    self->PyIterator_self__ = self;
+    return (PyObject*) self;
+}
+static PyObject* PyAtomFlag_next(AtomFlag* self)
+{
+    if (self->PyIterator_self__)
+    {
+        AtomFlag* out = self->PyIterator_self__;
+        Py_INCREF(out);
+        self->PyIterator_self__ = self->PyIterator_self__->next;
+        return (PyObject*) out;
+    }
+
+    return NULL;
+}
+
+AtomFlag* atomflag_build(const char* name)
+{
+    AtomFlag* self = (AtomFlag*) PyAtomFlag_new(&PyAtomFlagType, NULL, NULL);
+    atomflag_init(self, name);
+    return self;
+}
+
+void atomflag_init(AtomFlag* self, const char* name)
+{
+    self->option = ATOM_USE_ENABLE;
 
     if (name[0] == '-')
     {
-        out->option = ATOM_USE_DISABLE;
+        self->option = ATOM_USE_DISABLE;
         name++;
     }
 
-    out->name = strdup(name);
-    out->def = 0;
-    out->next = NULL;
-
-    return out;
+    self->name = strdup(name);
+    self->def = 0;
+    self->next = NULL;
 }
-
-static const struct
-{
-    U8 prefix_string_len;
-    atom_version_pre_t pre;
-} atom_prefix_links[] = {
-        {5, ATOM_PREFIX_ALPHA},
-        {4, ATOM_PREFIX_BETA},
-        {3, ATOM_PREFIX_PRE},
-        {2, ATOM_PREFIX_RC},
-        {0, ATOM_PREFIX_NONE},
-        {1, ATOM_PREFIX_P},
-};
 
 static PyNewFunc(PyAtomVersion_new)
 {
@@ -127,6 +202,19 @@ static PyNewFunc(PyAtomVersion_new)
 
 static void atom_version_init(AtomVersion* self, const char* input)
 {
+    static const struct
+    {
+        U8 prefix_string_len;
+        atom_version_pre_t pre;
+    } atom_prefix_links[] = {
+            {5, ATOM_PREFIX_ALPHA},
+            {4, ATOM_PREFIX_BETA},
+            {3, ATOM_PREFIX_PRE},
+            {2, ATOM_PREFIX_RC},
+            {0, ATOM_PREFIX_NONE},
+            {1, ATOM_PREFIX_P},
+    };
+
     char* version_str = strdup(input);
     AtomVersion* current_node = NULL;
     AtomVersion* next_node = NULL;
@@ -146,8 +234,7 @@ static void atom_version_init(AtomVersion* self, const char* input)
         else
             prefix_len = prefix_splt - buf;
 
-        atom_version_pre_t prefix = -1;
-
+        atom_version_pre_t prefix;
         prefix = -1;
         for (int i = 0; i < sizeof(atom_prefix_links) / sizeof(atom_prefix_links[0]); i++)
         {
@@ -284,7 +371,6 @@ int atom_init(Atom* self, const char* input)
 
     lut_flag_t flag = 0;
     self->id = lut_get_id(global_portage->packages, self->key, &flag);
-    printf("got id %lu\n", self->id);
     if (flag == LUT_FLAG_NOT_FOUND)
     {
         /* Add the package to the LUT */
@@ -336,9 +422,8 @@ I32 atom_version_compare(AtomVersion* first, AtomVersion* second)
         if (scs[scs_l - 1] > '9')
             scs_suf = scs[scs_l - 1];
 
-        I32 cmp_1 = 0;
-        I32 cmp_2 = 0;
-
+        I32 cmp_1;
+        I32 cmp_2;
         if ((scf[0] != '0' || scf_l == 1) && (scs[0] != '0' || scs_l == 1))
         {
             cmp_1 = (I32) strtol(scf, NULL, 10);
@@ -400,6 +485,19 @@ PyObject* PyAtomVersion_richcompare(AtomVersion* self, AtomVersion* other, int o
     Py_RETURN_RICHCOMPARE(0, compare, op);
 }
 
+static PyMemberDef PyAtomFlag_members[] = {
+        {"name", T_STRING, offsetof(AtomFlag, name), READONLY, "Flag name"},
+        {"option", T_INT, offsetof(AtomFlag, option), READONLY, "Enable or disable?"},
+        {"default", T_INT, offsetof(AtomFlag, option), READONLY, "Default value if not found"},
+        {"next", T_OBJECT, offsetof(AtomFlag, next), READONLY, "Next flag in linked list"},
+        {NULL, 0, 0, 0, NULL}
+};
+
+static PyMemberDef PyAtomVersion_members[] = {
+        {"raw", T_STRING, offsetof(AtomVersion, full_version), READONLY, "The string representation of this version"},
+        {NULL, 0, 0, 0, NULL}
+};
+
 static PyMemberDef PyAtom_members[] = {
         {"id", T_ULONGLONG, offsetof(Atom, id), READONLY, "Package id used for LUT"},
         {"category", T_STRING, offsetof(Atom, category), READONLY, "Portage package category"},
@@ -417,6 +515,22 @@ static PyMemberDef PyAtom_members[] = {
         {NULL, 0, 0, 0, NULL}
 };
 
+PyTypeObject PyAtomFlagType = {
+        PyVarObject_HEAD_INIT(NULL, 0)
+        .tp_name = "autogentoo_cportage.AtomFlag",
+        .tp_doc = "A way to use flag switches inside an atom",
+        .tp_basicsize = sizeof(AtomFlag),
+        .tp_itemsize = 0,
+        .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+        .tp_new = PyAtomFlag_new,
+        .tp_init = (initproc) PyAtomFlag_init,
+        .tp_dealloc = (destructor) PyAtomFlag_dealloc,
+        .tp_repr = (reprfunc) PyAtomFlag_repr,
+        .tp_members = PyAtomFlag_members,
+        .tp_iter = (getiterfunc) PyAtomFlag_iter,
+        .tp_iternext = (iternextfunc) PyAtomFlag_next
+};
+
 PyTypeObject PyAtomVersionType = {
         PyVarObject_HEAD_INIT(NULL, 0)
         .tp_name = "autogentoo_cportage.AtomVersion",
@@ -428,6 +542,7 @@ PyTypeObject PyAtomVersionType = {
         .tp_init = (initproc) PyAtomVersion_init,
         .tp_dealloc = (destructor) PyAtomVersion_dealloc,
         .tp_repr = (reprfunc) PyAtomVersion_repr,
+        .tp_members = PyAtomVersion_members,
         .tp_richcompare = (richcmpfunc) PyAtomVersion_richcompare
 };
 
