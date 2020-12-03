@@ -4,6 +4,7 @@
 
 #include "tcp_server.h"
 #include "message.h"
+#include "python_util.h"
 #include <structmember.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -30,8 +31,7 @@ TCPServer_repr(TCPServer* self)
     return obj;
 }
 
-static PyObject*
-TCPServer_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
+static PyNewFunc(TCPServer_new)
 {
     TCPServer* self = (TCPServer*) type->tp_alloc(type, 0);
 
@@ -53,8 +53,7 @@ TCPServer_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
     return (PyObject*) self;
 }
 
-static int
-TCPServer_init(TCPServer* self, PyObject* args, PyObject* kwds)
+static PyInitFunc(TCPServer_init, TCPServer)
 {
     static char* kwlist[] = {"address", NULL};
 
@@ -285,8 +284,7 @@ static void TCPServer_run(TCPServer* self)
 
     self->is_alive = 0;
 }
-
-static PyObject* TCPServer_start(TCPServer* self, PyObject* args, PyObject* kwds)
+static PyMethod(TCPServer_start, TCPServer)
 {
     self->keep_alive = 1;
 
@@ -308,7 +306,7 @@ static PyObject* TCPServer_start(TCPServer* self, PyObject* args, PyObject* kwds
     Py_RETURN_NONE;
 }
 
-static PyObject* TCPServer_stop(TCPServer* self, PyObject* args, PyObject* kwds)
+static PyMethod(TCPServer_stop, TCPServer)
 {
     /* Wait until we can synchronize to the worker threads */
     pthread_mutex_lock(&self->lock);
@@ -334,8 +332,7 @@ static PyObject* TCPServer_stop(TCPServer* self, PyObject* args, PyObject* kwds)
     Py_RETURN_NONE;
 }
 
-static PyObject*
-TCPServer_set_request_callback(TCPServer* self, PyObject* args, PyObject* kwds)
+static PyMethod(TCPServer_set_request_callback, TCPServer)
 {
     static char* kwlist[] = {"callback", NULL};
 
@@ -353,8 +350,7 @@ TCPServer_set_request_callback(TCPServer* self, PyObject* args, PyObject* kwds)
     Py_RETURN_NONE;
 }
 
-static PyObject*
-TCPServer_dealloc(TCPServer* self, PyObject* args, PyObject* kwds)
+static PyMethod(TCPServer_dealloc, TCPServer)
 {
     if (self->is_alive)
     {

@@ -110,13 +110,13 @@ COMMAND_LINE_AUTOGENTOO {return COMMAND_LINE;}
 {repo}                  {yylval.identifier = strdup(yytext + 2); return REPOSITORY;}
 {slot}                  {
                             size_t len = strlen(yytext);
-                            yylval.slot.sub_opts = ATOM_SLOT_IGNORE;
+                            yylval.slot.slot_opts = ATOM_SLOT_IGNORE;
                             if (yytext[len - 1] == '*') {
-                                yylval.slot.sub_opts = ATOM_SLOT_IGNORE;
+                                yylval.slot.slot_opts = ATOM_SLOT_IGNORE;
                                 yytext[--len] = 0;
                             }
                             else if (yytext[len - 1] == '=') {
-                                yylval.slot.sub_opts = ATOM_SLOT_REBUILD;
+                                yylval.slot.slot_opts = ATOM_SLOT_REBUILD;
                                 yytext[--len] = 0;
                             }
 
@@ -156,7 +156,8 @@ COMMAND_LINE_AUTOGENTOO {return COMMAND_LINE;}
 [\,]                    {return ',';}
 [\~]                    {return '~';}
 {atom}                  {
-                            yylval.atom_type = atom_new(yytext);
+                            yylval.atom_type = (Atom*)PyAtom_new(&PyAtomType, NULL, NULL);
+                            atom_init(yylval.atom_type, yytext);
                             return ATOM;
                         }
 

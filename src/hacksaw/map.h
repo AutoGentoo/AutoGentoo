@@ -54,7 +54,7 @@ void* map_get(Map* map, char* key);
  * @param data Pointer to data that will be copied
  * @return returns the hash generated from the key
  */
-void* map_insert(Map* map, const char* key, RefObject* data);
+void map_insert(Map* map, const char* key, RefObject* data);
 
 /**
  * Create a new map with array size new_size
@@ -71,7 +71,7 @@ Map* map_new(U64 new_size, F64 threshold);
  * @param key
  * @return the data ptr from the key, NULL if key not found
  */
-void* map_remove(Map* map, char* key);
+RefObject* map_remove(Map* map, char* key);
 
 /**
  * Get 32-bit Murmur3 hash

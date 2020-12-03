@@ -92,17 +92,35 @@ char* string_strip(char* str)
     return strndup(str + i, (U32) j - i);
 }
 
-static void ref_string_free(RefString* self)
+static void ref_string_free(RefData* self)
 {
     free(self->ptr);
     free(self);
 }
 
+static void ref_pyobect_free(RefData* self)
+{
+    Py_XDECREF(self->ptr);
+    free(self);
+}
+
 RefObject* ref_string(char* str)
 {
-    RefString* self = malloc(sizeof(RefString));
+    RefData* self = malloc(sizeof(RefData));
     self->free = (void (*)(void*)) ref_string_free;
     self->ptr = str;
+    self->reference_count = 0;
+
+    return (RefObject*) self;
+}
+
+RefObject* ref_pyobject(PyObject* data)
+{
+    RefData* self = malloc(sizeof(RefData));
+    self->free = (void (*)(void*)) ref_pyobect_free;
+
+    Py_XINCREF(data);
+    self->ptr = data;
     self->reference_count = 0;
 
     return (RefObject*) self;

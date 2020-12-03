@@ -1,30 +1,18 @@
-find_package(BISON REQUIRED)
-find_package(FLEX REQUIRED)
-
 add_library(hacksaw SHARED
         hacksaw.h
-        log.c
-        map.c
-        small_map.c
-        string_vector.c
-        vector.c
-        linked_vector.c
-        util.c
-        set.c
-        stack.c
-        queue.c
-        queue_set.c
-        log.h
-        map.h
-        small_map.h
-        string_vector.h
-        vector.h
-        linked_vector.h
-        util.h
-        set.h
-        stack.h
-        queue.h
+        log.c log.h
+        map.c map.h
+        small_map.c small_map.h
+        string_vector.c string_vector.h
+        vector.c vector.h
+        linked_vector.c linked_vector.h
+        util.c util.h
+        set.c set.h
+        stack.c stack.h
+        queue.c queue.h
+        queue_set.c queue_set.h
         object.h
         global.h
-        lut.c
-        lut.h)
+        lut.c lut.h)
+
+setup_python_lib(hacksaw)

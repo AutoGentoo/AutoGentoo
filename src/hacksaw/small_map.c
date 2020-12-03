@@ -4,7 +4,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "hacksaw.h"
+#include "small_map.h"
 
 static void small_map_key_free(SmallMap_key* self)
 {

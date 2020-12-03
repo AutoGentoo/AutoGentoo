@@ -1,7 +1,8 @@
 #ifndef CPORTAGE_COMPILER_SHARE_H
 #define CPORTAGE_COMPILER_SHARE_H
 
-#include "expr.h"
+#include "use.h"
+#include "dependency.h"
 
 extern int indent;
 extern int error;

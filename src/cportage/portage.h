@@ -29,11 +29,6 @@ typedef enum {
 } use_state_t;
 
 typedef enum {
-    IS_ATOM,
-    HAS_DEPENDS,
-} depend_t;
-
-typedef enum {
     ATOM_USE_DISABLE, //!< atom[-bar]
     ATOM_USE_ENABLE, //!< atom[bar]
     ATOM_USE_ENABLE_IF_ON, //!< atom[bar?]
@@ -80,15 +75,13 @@ typedef enum {
     ATOM_PREFIX_P
 } atom_version_pre_t;
 
-typedef enum {
-    ATOM_REPO_ALL,
-    ATOM_REPO_DEFINED
-} atom_repo_t;
-
 struct Portage_prv {
     PyObject_HEAD
+
     LUT* global_flags;
     LUT* packages;
 };
+
+extern PyTypeObject PyPortageType;
 
 #endif //AUTOGENTOO_PORTAGE_H

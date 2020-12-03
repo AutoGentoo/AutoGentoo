@@ -6,8 +6,10 @@
 #include "tcp_server.h"
 #include "message.h"
 #include "tcp_client.h"
+#include "python_util.h"
 
-static PyObject* Py_send_message(PyObject* self, PyObject* args, PyObject* kwds) {
+static PyMethod(Py_send_message, PyObject)
+{
     static char* kwlist[] = {"address", "message", NULL};
 
     PyObject *py_address = NULL, *py_message = NULL;
@@ -117,12 +119,9 @@ PyInit_autogentoo_network(void)
     }
 
 
-    if (PyType_Ready(&TCPServerType) < 0)
-    {
-        Py_DECREF(m);
-        return NULL;
-    }
-    if (PyType_Ready(&PyMessageType) < 0)
+    if (PyType_Ready(&TCPServerType) < 0
+        || PyType_Ready(&PyMessageType) < 0
+    )
     {
         Py_DECREF(m);
         return NULL;
@@ -130,18 +129,10 @@ PyInit_autogentoo_network(void)
 
     Py_INCREF(&TCPServerType);
     Py_INCREF(&PyMessageType);
-    if (PyModule_AddObject(m, "TCPServer", (PyObject*) &TCPServerType) < 0)
+    if (PyModule_AddObject(m, "TCPServer", (PyObject*) &TCPServerType) < 0
+        || PyModule_AddObject(m, "Message", (PyObject*) &PyMessageType) < 0)
     {
-        PyErr_PrintEx(0);
-        Py_DECREF(&TCPServerType);
-        Py_DECREF(&PyMessageType);
-        Py_DECREF(m);
-        return NULL;
-    }
-
-    if (PyModule_AddObject(m, "Message", (PyObject*) &PyMessageType) < 0)
-    {
-        PyErr_PrintEx(0);
+        PyErr_Print();
         Py_DECREF(&TCPServerType);
         Py_DECREF(&PyMessageType);
         Py_DECREF(m);

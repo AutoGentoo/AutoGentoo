@@ -1,9 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
-#include "hacksaw.h"
+#include "map.h"
 
 static inline void* prv_map_insert_item(Map* map, MapItem* item);
-
 static inline void prv_map_realloc_item(Map* map, MapItem* list);
 
 static void prv_map_free_bucket(Map* map, MapItem* item)
@@ -99,7 +98,7 @@ void* map_get(Map* map, char* key)
     return NULL;
 }
 
-void* map_remove(Map* map, char* key)
+RefObject* map_remove(Map* map, char* key)
 {
     U32 n = strlen(key);
     U32 index = map_get_hash(key, n) % map->size;
@@ -110,7 +109,7 @@ void* map_remove(Map* map, char* key)
     {
         if (strcmp(current->key, key) == 0)
         {
-            void* out = current->data;
+            RefObject* out = current->data;
 
             if (!before)
                 map->hash_table[index] = current->next;
@@ -162,7 +161,7 @@ static inline void* prv_map_insert_item(Map* map, MapItem* item)
     return NULL;
 }
 
-void* map_insert(Map* map, const char* key, RefObject* data)
+void map_insert(Map* map, const char* key, RefObject* data)
 {
     if (map->n + 1 >= map->realloc_at)
         map_realloc(map, map->size * 2);
@@ -172,16 +171,10 @@ void* map_insert(Map* map, const char* key, RefObject* data)
     to_copy->data = data;
     to_copy->next = NULL;
 
-    return prv_map_insert_item(map, to_copy);
+    OBJECT_INCREF(data);
+    prv_map_insert_item(map, to_copy);
 }
 
-
-/**
- *
- * @param data
- * @param nbytes
- * @return
- */
 U32 map_get_hash(const void* data, U32 nbytes)
 {
     if (data == NULL || nbytes == 0)

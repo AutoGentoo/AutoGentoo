@@ -1,3 +1,6 @@
+find_package(BISON REQUIRED)
+find_package(FLEX REQUIRED)
+
 set(language_PARSER
         depend_bison.y
         depend_flex.l
@@ -29,16 +32,16 @@ set(language_BIN
 set(language_SOURCES
         ${language_BIN}
         ${language_PARSER}
-        ${language_HEADERS}
-        make_conf.c)
+        ${language_HEADERS})
 
 add_library(autogentoo_cportage SHARED
         ${language_SOURCES}
-        portage.h module.c expr.c expr.h atom.c)
-
-target_include_directories(autogentoo_cportage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+        portage.h module.c use.c use.h atom.c
+        ../python_util.h atom.h dependency.c dependency.h portage.c)
 
 setup_pymodule(autogentoo_cportage)
+target_include_directories(autogentoo_cportage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(autogentoo_cportage PUBLIC hacksaw)
 
 add_custom_target(autogentoo_cportage_test
         COMMAND ${LD_PRELOAD} ${CMAKE_CURRENT_SOURCE_DIR}/test.py

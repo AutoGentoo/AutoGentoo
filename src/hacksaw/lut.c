@@ -14,6 +14,12 @@
 
 static void lut_free(LUT* self)
 {
+    for (U32 i = 0; i < self->size; i++)
+    {
+        OBJECT_FREE(self->table[i]);
+    }
+
+    free(self->table);
     free(self);
 }
 

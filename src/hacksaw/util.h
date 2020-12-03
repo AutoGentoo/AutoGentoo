@@ -2,6 +2,7 @@
 #define HACKSAW_UTIL_H
 
 #include <stdio.h>
+#include "Python.h"
 #include "global.h"
 #include "object.h"
 
@@ -11,11 +12,11 @@ int string_find(char** array, char* element, U32 n);
 void fix_path(char* ptr);
 char* string_strip(char* str);
 
-typedef struct RefString_prv RefString;
+typedef struct RefData_prv RefData;
 
-struct RefString_prv {
+struct RefData_prv {
     REFERENCE_OBJECT
-    char* ptr;
+    void* ptr;
 };
 
 /**
@@ -25,5 +26,12 @@ struct RefString_prv {
  * @return reference type of RefString
  */
 RefObject* ref_string(char* str);
+
+/**
+ * Wrap a python object in an object
+ * @param self
+ * @return
+ */
+RefObject* ref_pyobject(PyObject* self);
 
 #endif
