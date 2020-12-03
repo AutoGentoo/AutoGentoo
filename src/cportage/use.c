@@ -61,6 +61,9 @@ Use_t use_get_global(Portage* parent, const char* useflag)
             /* Add the flag to the global map */
             lut_insert_id(parent->global_flags, useflag,
                           out, ref_pyobject((PyObject*) new_flag), flag);
+
+            /* reference held by ref_pyobject */
+            Py_DECREF(new_flag);
         }
 
         return out;

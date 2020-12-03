@@ -20,6 +20,14 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(repr(atom), "Atom<category=cat2, name=pkg3>")
         self.assertEqual(repr(atom.version), "AtomVersion<2.2.34>")
 
+    def test_parse_1(self):
+        portage = cportage.Portage()
+        deps = cportage.Dependency.parse(portage, "use1? ( cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )")
+        print(deps.children)
+
+        for dep in deps.children:
+            print(dep, dep.atom)
+
 
 if __name__ == '__main__':
     unittest.main()

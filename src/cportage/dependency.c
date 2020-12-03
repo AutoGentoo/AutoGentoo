@@ -11,8 +11,8 @@
 
 static PyMethod(PyDependency_dealloc, Dependency)
 {
-    Py_XDECREF(self->atom);
     Py_XDECREF(self->next);
+    Py_XDECREF(self->atom);
     Py_XDECREF(self->children);
     Py_TYPE(self)->tp_free((PyObject*) self);
 }
@@ -24,6 +24,7 @@ static PyNewFunc(PyDependency_new)
     self->children = NULL;
     self->use_condition = 0;
     self->atom = NULL;
+    self->PyIterator_self__ = NULL;
 
     return (PyObject*) self;
 }
@@ -40,8 +41,6 @@ static PyInitFunc(PyDependency_init, Dependency)
 Dependency* dependency_build_atom(Atom* atom)
 {
     Dependency* self = (Dependency*) PyDependency_new(&PyDependencyType, NULL, NULL);
-
-    Py_XINCREF(atom);
     self->atom = atom;
 
     Py_XDECREF(self->children);
@@ -53,8 +52,6 @@ Dependency* dependency_build_atom(Atom* atom)
 Dependency* dependency_build_grouping(Dependency* children)
 {
     Dependency* self = (Dependency*) PyDependency_new(&PyDependencyType, NULL, NULL);
-
-    Py_XINCREF(children);
     self->children = children;
 
     Py_XDECREF(self->atom);
@@ -71,19 +68,27 @@ Dependency* dependency_build_use(Portage* parent,
     Dependency* self = (Dependency*) PyDependency_new(&PyDependencyType, NULL, NULL);
     self->use_condition = use_get_global(parent, use_flag);
 
-    Py_XINCREF(children);
     self->children = children;
-
     return self;
 }
 
-static PyObject* PyDependency_iter(PyObject* self) {return self;}
+static PyObject* PyDependency_iter(Dependency* self)
+{
+    Py_INCREF(self);
+    self->PyIterator_self__ = self;
+    return (PyObject*) self;
+}
 static PyObject* PyDependency_next(Dependency* self)
 {
-    if (self->next)
-        return (PyObject*) self->next;
+    if (self->PyIterator_self__)
+    {
+        Dependency* out = self->PyIterator_self__;
+        Py_INCREF(out);
+        self->PyIterator_self__ = self->PyIterator_self__->next;
+        return (PyObject*) out;
+    }
 
-    Py_RETURN_NONE;
+    return NULL;
 }
 
 static PyParseMethod(PyDependency_parse, Dependency, depend_parse)
@@ -95,9 +100,9 @@ static PyMethodDef PyDependency_methods[] = {
 static PyMemberDef PyDependency_members[] = {
         {"use_operator", T_INT, offsetof(Dependency, use_operator), READONLY},
         {"use_condition", T_ULONGLONG, offsetof(Dependency, use_condition), READONLY},
-        {"atom", T_OBJECT, offsetof(Dependency, use_condition), READONLY},
-        {"children", T_OBJECT, offsetof(Dependency, use_condition), READONLY},
-        {"next", T_OBJECT, offsetof(Dependency, use_condition), READONLY},
+        {"atom", T_OBJECT, offsetof(Dependency, atom), READONLY},
+        {"children", T_OBJECT, offsetof(Dependency, children), READONLY},
+        {"next", T_OBJECT, offsetof(Dependency, next), READONLY},
         {NULL, 0, 0, 0, NULL}
 };
 
@@ -114,6 +119,6 @@ PyTypeObject PyDependencyType = {
         .tp_dealloc = (destructor) PyDependency_dealloc,
         .tp_members = PyDependency_members,
         .tp_methods = PyDependency_methods,
-        .tp_iter = PyDependency_iter,
+        .tp_iter = (getiterfunc) PyDependency_iter,
         .tp_iternext = (iternextfunc) PyDependency_next
 };
