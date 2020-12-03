@@ -293,6 +293,10 @@ int atom_init(Atom* self, const char* input)
     self->repository = NULL;
     asprintf(&self->key, "%s/%s", self->category, self->name);
 
+    lut_flag_t flag = 0;
+    /* TODO ADD portage */
+    self->id = lut_get_id()
+
     free(d_input);
     return 0;
 }
@@ -388,8 +392,18 @@ I32 atom_version_compare(AtomVersion* first, AtomVersion* second)
 }
 PyObject* PyAtom_richcompare(Atom* self, Atom* other, int op)
 {
-    Py_RETURN_RICHCOMPARE(self, other,
-                          atom_version_compare(self->version, other->version));
+    int compare = strcmp(self->category, other->category);
+    if (compare != 0)
+        Py_RETURN_RICHCOMPARE(0, compare, op);
+
+    compare = strcmp(self->name, other->name);
+    Py_RETURN_RICHCOMPARE(0, compare, op);
+}
+
+PyObject* PyAtomVersion_richcompare(AtomVersion* self, AtomVersion* other, int op)
+{
+    int compare = atom_version_compare(self, other);
+    Py_RETURN_RICHCOMPARE(0, compare, op);
 }
 
 static PyMemberDef PyAtom_members[] = {

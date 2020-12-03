@@ -111,13 +111,14 @@ RequiredUse* use_build_required_use(Portage* parent, const char* target, use_ope
 }
 
 static PyMethodDef PyRequiredUse_methods[] = {
-        {"parse", (PyCFunction) PyRequiredUse_parse, METH_STATIC | METH_FASTCALL, "parse required use string"}
+        {"parse", (PyCFunction) PyRequiredUse_parse, METH_STATIC | METH_FASTCALL, "parse required use string"},
+        {NULL }
 };
 
 static PyMemberDef PyUseFlag_members[] = {
         {"name", T_STRING, offsetof(UseFlag, name), READONLY},
         {"state", T_BOOL, offsetof(UseFlag, state), 0},
-        {NULL, 0, 0, 0, NULL}
+        {NULL }
 };
 
 
@@ -126,7 +127,7 @@ static PyMemberDef PyRequiredUse_members[] = {
         {"next", T_OBJECT, offsetof(RequiredUse, next), READONLY},
         {"id", T_ULONGLONG, offsetof(RequiredUse, global_flag), READONLY},
         {"operator", T_ULONGLONG, offsetof(RequiredUse, option), READONLY},
-        {NULL, 0, 0, 0, NULL}
+        {NULL }
 };
 
 PyTypeObject PyUseFlagType = {

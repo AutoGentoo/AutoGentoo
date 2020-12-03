@@ -94,7 +94,8 @@ static PyObject* PyDependency_next(Dependency* self)
 static PyParseMethod(PyDependency_parse, Dependency, depend_parse)
 
 static PyMethodDef PyDependency_methods[] = {
-        {"parse", (PyCFunction) PyDependency_parse, METH_STATIC | METH_FASTCALL, "parse dependency string"}
+        {"parse", (PyCFunction) PyDependency_parse, METH_STATIC | METH_FASTCALL, "parse dependency string"},
+        {NULL }
 };
 
 static PyMemberDef PyDependency_members[] = {
@@ -110,7 +111,7 @@ static PyMemberDef PyDependency_members[] = {
 PyTypeObject PyDependencyType = {
         PyVarObject_HEAD_INIT(NULL, 0)
         .tp_name = "autogentoo_cportage.Dependency",
-        .tp_doc = "A way to keep trace of a dependecy expression",
+        .tp_doc = "A way to keep track of a dependency expression",
         .tp_basicsize = sizeof(Dependency),
         .tp_itemsize = 0,
         .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,

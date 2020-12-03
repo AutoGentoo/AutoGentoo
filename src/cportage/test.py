@@ -26,7 +26,7 @@ class TestStringMethods(unittest.TestCase):
         print(deps.children)
 
         for dep in deps.children:
-            print(dep, dep.atom)
+            print(dep, dep.atom, dep.atom.id)
 
 
 if __name__ == '__main__':
