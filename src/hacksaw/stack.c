@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include "stack.h"
 
-Stack* stack_new()
+Stack* stack_new(void)
 {
     return linked_vector_new();
 }

@@ -5,7 +5,7 @@
 #include "queue.h"
 #include <stdlib.h>
 
-Queue* queue_new()
+Queue* queue_new(void)
 {
     return linked_vector_new();
 }

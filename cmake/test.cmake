@@ -1,0 +1,28 @@
+function(setup_cmocka)
+    include(${CMAKE_SOURCE_DIR}/third_party/cmocka/cmake/Modules/AddCMockaTest.cmake)
+    include(${CMAKE_SOURCE_DIR}/cmake/AddMockedTest.cmake)
+endfunction()
+
+set(CMAKE_DISABLED_TESTS ${CMAKE_DISABLED_TESTS})
+
+macro(add_test target)
+    if (${target} IN_LIST CMAKE_DISABLED_TESTS)
+        message("-- Skipping test ${target}")
+    else()
+        _add_test(${ARGV})
+    endif()
+endmacro()
+
+macro(set_tests_properties target)
+    if (${target} IN_LIST CMAKE_DISABLED_TESTS)
+    else()
+        _set_tests_properties(${ARGV})
+    endif()
+endmacro()
+
+option(ENABLE_TESTS "Perform unit tests after build" OFF)
+if (ENABLE_TESTS)
+    setup_cmocka()
+    enable_testing()
+    add_subdirectory(${CMAKE_SOURCE_DIR}/src/test)
+endif(ENABLE_TESTS)

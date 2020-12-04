@@ -17,22 +17,22 @@
 #define ANSI_BOLD    "\x1b[1m"
 #define ANSI_COLOR   "\x1b[39m"
 
-void init_log() __attribute__((constructor));
+void init_log(void) __attribute__((constructor));
 
-void close_log() __attribute__((destructor));
+void close_log(void) __attribute__((destructor));
 
 void lset(FILE* target);
 
-void lerror(char* format, ...);
+void lerror(const char* format, ...);
 
-void lwarning(char* format, ...);
+void lwarning(const char* format, ...);
 
-void linfo(char* format, ...);
+void linfo(const char* format, ...);
 
-void lderror(char* format, ...);
+void lderror(const char* format, ...);
 
-void ldwarning(char* format, ...);
+void ldwarning(const char* format, ...);
 
-void ldinfo(char* format, ...);
+void ldinfo(const char* format, ...);
 
 #endif //HACKSAW_LOG_H

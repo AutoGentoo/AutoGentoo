@@ -38,7 +38,7 @@ static void linked_vector_free(LinkedVector* self)
     free(self);
 }
 
-LinkedVector* linked_vector_new()
+LinkedVector* linked_vector_new(void)
 {
     LinkedVector* out = malloc(sizeof(LinkedVector));
 

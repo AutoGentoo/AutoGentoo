@@ -29,7 +29,7 @@ void yyerror(const char *message);
     char* identifier;
     Atom* atom_type;
     Dependency* depend_type;
-    atom_use_default use_default;
+    atom_use_default_t use_default;
     RequiredUse* use_type;
     struct {
         use_operator_t val;
@@ -120,7 +120,7 @@ atom_flags  : '!' atom_flag '?'     {$$ = $2; $$->option = ATOM_USE_DISABLE_IF_O
             | atom_flags ',' atom_flags {$$ = $1; $$->next = $3;}
             ;
 
-atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); free($1); $$->def = ATOM_NO_DEFAULT;}
+atom_flag   : IDENTIFIER            {$$ = atomflag_build($1); free($1); $$->def = ATOM_DEFAULT_NONE;}
             | IDENTIFIER USE_DEFAULT{$$ = atomflag_build($1); free($1); $$->def = $2;}
             ;
 

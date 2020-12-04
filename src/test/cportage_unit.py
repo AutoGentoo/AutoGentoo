@@ -33,6 +33,14 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(flags[0].name, "flag1")
         self.assertEqual(flags[1].name, "flag2")
 
+    def test_atom_slot(self):
+        atom = cportage.Atom("cat2/pkg3-2.2.34:3")
+        self.assertEqual(atom.slot, "3")
+
+        atom = cportage.Atom("cat2/pkg3-2.2.34:83/5")
+        self.assertEqual(atom.slot, "83")
+        self.assertEqual(atom.sub_slot, "5")
+
     def test_parse_1(self):
         deps = cportage.Dependency("use1? ( cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )")
 
@@ -74,6 +82,18 @@ class TestStringMethods(unittest.TestCase):
         atom2 = cportage.Atom("cat2/pkg3-2.2.34-r2")
 
         self.assertGreater(atom2.version, atom1.version)
+
+    def test_ebuild_1(self):
+        ebuild = cportage.Ebuild("/usr/portage/", "sys-devel", "gcc-4.8.0")
+        self.assertEqual(ebuild.category, "sys-devel")
+        self.assertEqual(ebuild.name, "gcc")
+        self.assertEqual(ebuild.package_key, "sys-devel/gcc")
+        self.assertEqual(ebuild.key, "sys-devel/gcc-4.8.0")
+        self.assertEqual(ebuild.version, cportage.AtomVersion("4.8.0"))
+
+    def test_init_error(self):
+        with self.assertRaises(TypeError):
+            cportage.init(None)
 
 
 if __name__ == '__main__':

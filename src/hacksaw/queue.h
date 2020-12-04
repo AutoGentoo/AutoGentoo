@@ -15,7 +15,7 @@ typedef LinkedVector Queue;
  * Access time for start is O(1)
  * Access time for kth-item is O(n) (don't do this)
  */
-Queue* queue_new();
+Queue* queue_new(void);
 
 void queue_add(Queue* self, RefObject* data);
 

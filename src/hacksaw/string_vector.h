@@ -18,7 +18,7 @@ struct StringVector_prv
     U32 s; // Max number of elements (increments by HACKSAW_VECTOR_INCREMENT)
 };
 
-StringVector* string_vector_new();
+StringVector* string_vector_new(void);
 
 void string_vector_add(StringVector* vec, const char* string);
 

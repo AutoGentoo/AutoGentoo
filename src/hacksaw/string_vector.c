@@ -21,7 +21,7 @@ static void string_vector_free(StringVector* self)
     free(self);
 }
 
-StringVector* string_vector_new()
+StringVector* string_vector_new(void)
 {
     StringVector* self = malloc(sizeof(StringVector));
 

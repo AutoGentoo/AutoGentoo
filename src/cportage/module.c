@@ -16,6 +16,11 @@ PyFastMethod(PyCportage_Init, PyObject*)
         PyErr_Format(PyExc_TypeError, "cportage.init() expects a single argument");
         return NULL;
     }
+    if (Py_TYPE(args[0]) != &PyPortageType)
+    {
+        PyErr_Format(PyExc_TypeError, "cportage.init() expects Portage() object");
+        return NULL;
+    }
 
     Py_XDECREF(global_portage);
     Py_INCREF(args[0]);

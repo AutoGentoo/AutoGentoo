@@ -7,6 +7,7 @@
 
 #include <hacksaw/hacksaw.h>
 #include <Python.h>
+#include "python_util.h"
 
 typedef struct Portage_prv Portage;
 
@@ -105,6 +106,9 @@ struct Portage_prv {
     LUT* global_flags;
     LUT* packages;
 };
+
+PyNewFunc(PyPortage_new);
+PyInitFunc(PyPortage_init, Portage);
 
 extern PyTypeObject PyPortageType;
 extern Portage* global_portage;

@@ -15,4 +15,4 @@ add_library(hacksaw SHARED
         global.h
         lut.c lut.h)
 
-setup_python_lib(hacksaw)
+LinkPythonLib(hacksaw)

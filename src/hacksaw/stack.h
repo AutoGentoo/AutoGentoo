@@ -9,7 +9,7 @@
 
 typedef LinkedVector Stack;
 
-Stack* stack_new();
+Stack* stack_new(void);
 
 void stack_add(Stack* self, RefObject* data);
 

@@ -38,7 +38,6 @@ int ebuild_init(Ebuild* self,
     SAFE_REF_TAKE(self->category, atom->category);
     SAFE_REF_TAKE(self->slot, atom->slot);
     SAFE_REF_TAKE(self->sub_slot, atom->sub_slot);
-    SAFE_REF_TAKE(self->version, atom->version);
 
     /* Free the atom (no longer needed) */
     Py_DECREF(atom);
@@ -94,6 +93,7 @@ static PyMemberDef PyEbuild_members[] = {
         {"category", T_STRING, offsetof(Ebuild, category), READONLY},
         {"slot", T_STRING, offsetof(Ebuild, slot), READONLY},
         {"sub_slot", T_STRING, offsetof(Ebuild, sub_slot), READONLY},
+        {"package_key", T_STRING, offsetof(Ebuild, package_key), READONLY},
         {"key", T_STRING, offsetof(Ebuild, key), READONLY},
         {"ebuild", T_STRING, offsetof(Ebuild, ebuild), READONLY},
         {"path", T_STRING, offsetof(Ebuild, path), READONLY},

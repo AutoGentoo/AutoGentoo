@@ -28,7 +28,7 @@ struct LinkedVector_prv
     LinkedNode* tail;
 };
 
-LinkedVector* linked_vector_new();
+LinkedVector* linked_vector_new(void);
 
 LinkedNode* linked_vector_get(LinkedVector* self, int index);
 

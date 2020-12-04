@@ -76,6 +76,7 @@ class Ebuild:
     category: str
     slot: str
     sub_slot: str
+    package_key: str
     key: str
     ebuild: str
     path: str

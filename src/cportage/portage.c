@@ -27,6 +27,7 @@ PyInitFunc(PyPortage_init, Portage)
     return 0;
 }
 
+static
 PyMethod(PyPortage_dealloc, Portage)
 {
     OBJECT_FREE(self->global_flags);

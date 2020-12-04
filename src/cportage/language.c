@@ -134,7 +134,7 @@ void language_begin_token(const char* t, const char* token_name)
 #endif
 }
 
-void language_increment_line()
+void language_increment_line(void)
 {
     buffer_pos->nRow++;
 }
@@ -148,7 +148,7 @@ static void language_feed_string(const char* input)
     buffer_pos->lBuffer = (int) strlen(input) + 1;
 }
 
-inline type_delim_t language_get_type_delim()
+inline type_delim_t language_get_type_delim(void)
 {
     return buffer_pos->delim;
 }
@@ -173,7 +173,7 @@ int yyerror(const char* s)
 {
     yy_error_ag_0_ = 1;
     language_print_error(s);
-    return error;
+    return yy_error_ag_0_;
 }
 
 Dependency* depend_parse(const char* buffer)

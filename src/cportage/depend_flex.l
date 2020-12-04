@@ -45,29 +45,30 @@ repo            [\:][\:]{identifier}
                             language_increment_line();
                         }
 [ \t\r\\]+              {language_begin_token(yytext, "tab");};
-{repo}                  {language_begin_token(yytext, "repo"); yylval.identifier = strdup(yytext + 2); return REPOSITORY;}
+{repo}                  {yylval.identifier = strdup(yytext + 2); language_begin_token(yytext, "repo"); return REPOSITORY;}
 {slot}                  {
-                            language_begin_token(yytext, "slot");
-                            size_t len = strlen(yytext);
+                            char* ref = yytext;
+                            int len = strlen(ref);
+                            language_begin_token(ref, "slot");
                             yylval.slot.slot_opts = ATOM_SLOT_IGNORE;
-                            if (yytext[len - 1] == '*') {
+                            if (ref[len - 1] == '*') {
                                 yylval.slot.slot_opts = ATOM_SLOT_IGNORE;
-                                yytext[--len] = 0;
+                                ref[--len] = 0;
                             }
-                            else if (yytext[len - 1] == '=') {
+                            else if (ref[len - 1] == '=') {
                                 yylval.slot.slot_opts = ATOM_SLOT_REBUILD;
-                                yytext[--len] = 0;
+                                ref[--len] = 0;
                             }
 
-                            char* name_splt = strchr(yytext + 1, '/');
+                            char* name_splt = strchr(ref + 1, '/');
                             if (name_splt)
                                 *name_splt = 0;
-                            if (yytext[1] == 0) {
+                            if (ref[1] == 0) {
                                 yylval.slot.name = NULL;
                                 yylval.slot.sub_name = NULL;
                                 return SLOT;
                             }
-                            yylval.slot.name = strdup(yytext + 1);
+                            yylval.slot.name = strdup(ref + 1);
                             if (name_splt)
                                 yylval.slot.sub_name = strdup(name_splt + 1);
                             else
