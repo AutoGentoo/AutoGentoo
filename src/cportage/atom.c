@@ -86,16 +86,12 @@ static PyMethod(PyAtom_dealloc, Atom)
     Py_XDECREF(self->useflags);
     Py_XDECREF(self->version);
 
-    free(self->key);
-
-    if (self->slot)
-        free(self->slot);
-    if (self->sub_slot)
-        free(self->sub_slot);
-
-    free(self->repository);
-    free(self->category);
-    free(self->name);
+    SAFE_FREE(self->key);
+    SAFE_FREE(self->slot);
+    SAFE_FREE(self->sub_slot);
+    SAFE_FREE(self->repository);
+    SAFE_FREE(self->category);
+    SAFE_FREE(self->name);
     Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
@@ -142,9 +138,7 @@ static PyInitFunc(PyAtomFlag_init, AtomFlag)
 static PyMethod(PyAtomFlag_dealloc, AtomFlag)
 {
     Py_XDECREF(self->next);
-
-    if (self->name)
-        free(self->name);
+    SAFE_FREE(self->name);
     Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
@@ -196,6 +190,7 @@ static PyNewFunc(PyAtomVersion_new)
     self->full_version = NULL;
     self->next = NULL;
     self->prefix = 0;
+    self->revision = 0;
 
     return (PyObject*) self;
 }
@@ -278,7 +273,11 @@ static void atom_version_init(AtomVersion* self, const char* input)
     }
 
     free(version_str);
-    self->full_version = strdup(input);
+    self->full_version = NULL;
+    if (self->revision)
+        asprintf(&self->full_version, "%s-r%d", input, self->revision);
+    else
+        self->full_version = strdup(input);
 }
 
 static PyInitFunc(PyAtomVersion_init, AtomVersion)
@@ -296,11 +295,8 @@ static PyInitFunc(PyAtomVersion_init, AtomVersion)
 PyMethod(PyAtomVersion_dealloc, AtomVersion)
 {
     Py_XDECREF(self->next);
-
-    if (self->v)
-        free(self->v);
-    if (self->full_version)
-        free(self->full_version);
+    SAFE_FREE(self->v);
+    SAFE_FREE(self->full_version);
     Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
@@ -312,7 +308,6 @@ int atom_init(Atom* self, const char* input)
         return 1;
     }
 
-    self->revision = 0;
     self->version = NULL;
     self->useflags = NULL;
     self->slot = NULL;
@@ -336,6 +331,8 @@ int atom_init(Atom* self, const char* input)
     char* last_dash = strrchr(name_ident, '-');
     int check_second = 0;
 
+    int revision = 0;
+
     if (last_dash)
     {
         if (isdigit(last_dash[1]))
@@ -351,7 +348,7 @@ int atom_init(Atom* self, const char* input)
         {
             *second_dash = 0;
             ver_splt = second_dash;
-            self->revision = (int) strtol(last_dash + 2, NULL, 10);
+            revision = (int) strtol(last_dash + 2, NULL, 10);
         } else
             *last_dash = '-';
     }
@@ -359,6 +356,7 @@ int atom_init(Atom* self, const char* input)
     if (ver_splt)
     {
         self->version = (AtomVersion*) PyAtomVersion_new(&PyAtomVersionType, NULL, NULL);
+        self->version->revision = revision;
         atom_version_init(self->version, ver_splt + 1);
         *ver_splt = 0;
     }
@@ -381,10 +379,10 @@ int atom_init(Atom* self, const char* input)
     return 0;
 }
 
-I32 atom_version_compare(AtomVersion* first, AtomVersion* second)
+I32 atom_version_compare(const AtomVersion* first, const AtomVersion* second)
 {
-    AtomVersion* cf = first;
-    AtomVersion* cs = second;
+    const AtomVersion* cf = first;
+    const AtomVersion* cs = second;
 
     for (; cf && cs; cf = cf->next, cs = cs->next)
     {
@@ -467,7 +465,7 @@ I32 atom_version_compare(AtomVersion* first, AtomVersion* second)
     if (cs)
         return -1;
 
-    return 0;
+    return first->revision - second->revision;
 }
 PyObject* PyAtom_richcompare(Atom* self, Atom* other, int op)
 {
@@ -509,7 +507,6 @@ static PyMemberDef PyAtom_members[] = {
         {"slot_opts", T_INT, offsetof(Atom, slot_opts), READONLY},
         {"range", T_INT, offsetof(Atom, range), READONLY},
         {"blocks", T_INT, offsetof(Atom, blocks), READONLY},
-        {"revision", T_INT, offsetof(Atom, revision), READONLY},
         {"version", T_OBJECT, offsetof(Atom, version), READONLY},
         {"useflags", T_OBJECT, offsetof(Atom, useflags), READONLY},
         {NULL, 0, 0, 0, NULL}

@@ -7,6 +7,7 @@
 #include "dependency.h"
 #include "use.h"
 #include "structmember.h"
+#include "ebuild.h"
 
 PyFastMethod(PyCportage_Init, PyObject*)
 {
@@ -62,6 +63,7 @@ PyInit_autogentoo_cportage(void)
         || PyType_Ready(&PyPortageType) < 0
         || PyType_Ready(&PyUseFlagType) < 0
         || PyType_Ready(&PyRequiredUseType) < 0
+        || PyType_Ready(&PyEbuildType) < 0
         )
     {
         Py_DECREF(m);
@@ -75,6 +77,7 @@ PyInit_autogentoo_cportage(void)
     Py_INCREF(&PyPortageType);
     Py_INCREF(&PyUseFlagType);
     Py_INCREF(&PyRequiredUseType);
+    Py_INCREF(&PyEbuildType);
     if (PyModule_AddObject(m, "Dependency", (PyObject*) &PyDependencyType) < 0
         || PyModule_AddObject(m, "AtomVersion", (PyObject*) &PyAtomVersionType) < 0
         || PyModule_AddObject(m, "AtomFlag", (PyObject*) &PyAtomFlagType) < 0
@@ -82,15 +85,18 @@ PyInit_autogentoo_cportage(void)
         || PyModule_AddObject(m, "Portage", (PyObject*) &PyPortageType) < 0
         || PyModule_AddObject(m, "UseFlag", (PyObject*) &PyUseFlagType) < 0
         || PyModule_AddObject(m, "RequiredUse", (PyObject*) &PyRequiredUseType) < 0
+        || PyModule_AddObject(m, "Ebuild", (PyObject*) &PyEbuildType) < 0
         )
     {
         PyErr_Print();
         Py_DECREF(&PyDependencyType);
         Py_DECREF(&PyAtomType);
         Py_DECREF(&PyAtomVersionType);
+        Py_DECREF(&PyAtomFlagType);
         Py_DECREF(&PyPortageType);
         Py_DECREF(&PyUseFlagType);
         Py_DECREF(&PyRequiredUseType);
+        Py_DECREF(&PyEbuildType);
         Py_DECREF(m);
         return NULL;
     }
@@ -147,5 +153,24 @@ PyInit_autogentoo_cportage(void)
     PyModule_AddIntMacro(m, ATOM_PREFIX_RC);
     PyModule_AddIntMacro(m, ATOM_PREFIX_NONE);
     PyModule_AddIntMacro(m, ATOM_PREFIX_P);
+
+    /* arch_t */
+    PyModule_AddIntMacro(m, ARCH_AMD64);
+    PyModule_AddIntMacro(m, ARCH_X86);
+    PyModule_AddIntMacro(m, ARCH_ARM);
+    PyModule_AddIntMacro(m, ARCH_ARM64);
+    PyModule_AddIntMacro(m, ARCH_HPPA);
+    PyModule_AddIntMacro(m, ARCH_IA64);
+    PyModule_AddIntMacro(m, ARCH_PPC);
+    PyModule_AddIntMacro(m, ARCH_PPC64);
+    PyModule_AddIntMacro(m, ARCH_SPARC);
+    PyModule_AddIntMacro(m, ARCH_END);
+
+    /* keyword_t */
+    PyModule_AddIntMacro(m, KEYWORD_BROKEN);
+    PyModule_AddIntMacro(m, KEYWORD_NONE);
+    PyModule_AddIntMacro(m, KEYWORD_UNSTABLE);
+    PyModule_AddIntMacro(m, KEYWORD_STABLE);
+
     return m;
 }

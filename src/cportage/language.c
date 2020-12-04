@@ -185,7 +185,7 @@ Dependency* depend_parse(const char* buffer)
 
     if (yy_error_ag_0_)
     {
-        Py_XDECREF((Dependency*) yyout);
+        Py_XDECREF(yyout);
         return NULL;
     }
 
@@ -202,7 +202,7 @@ Dependency* cmdline_parse(const char* buffer)
 
     if (yy_error_ag_0_)
     {
-        Py_XDECREF((Dependency*) yyout);
+        Py_XDECREF(yyout);
         return NULL;
     }
 
@@ -219,7 +219,7 @@ Atom* atom_parse(const char* buffer)
 
     if (yy_error_ag_0_)
     {
-        Py_XDECREF((Dependency*) yyout);
+        Py_XDECREF(yyout);
         return NULL;
     }
 
@@ -240,7 +240,7 @@ RequiredUse* required_use_parse(const char* buffer)
 
     if (yy_error_ag_0_)
     {
-        Py_XDECREF((RequiredUse*) yyout);
+        Py_XDECREF(yyout);
         return NULL;
     }
 

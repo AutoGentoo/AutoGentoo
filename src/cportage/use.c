@@ -40,8 +40,7 @@ static PyInitFunc(PyUseFlag_init, UseFlag)
 
 static PyMethod(PyUseFlag_dealloc, UseFlag)
 {
-    if (self->name)
-        free(self->name);
+    SAFE_FREE(self->name);
     Py_TYPE(self)->tp_free((PyObject*) self);
 }
 

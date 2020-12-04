@@ -17,6 +17,7 @@ struct AtomVersion_prv {
     char* full_version; //!< Only set on the first one
     char* v; //!< If there is a prefix, only include the integer part, if none 0
     atom_version_pre_t prefix;
+    int revision;
     AtomVersion* next;
 };
 
@@ -35,7 +36,6 @@ struct Atom_prv {
 
     atom_version_t range;
     atom_block_t blocks;
-    int revision;
 
     AtomVersion* version;
     AtomFlag* useflags;
@@ -55,7 +55,7 @@ void atomflag_init(AtomFlag* self, const char* name);
 PyNewFunc(PyAtom_new);
 int atom_init(Atom* self, const char* input);
 Atom* cmdline_atom_new(char* name);
-I32 atom_version_compare(AtomVersion* first, AtomVersion* second);
+I32 atom_version_compare(const AtomVersion* first, const AtomVersion* second);
 
 extern PyTypeObject PyAtomFlagType;
 extern PyTypeObject PyAtomVersionType;

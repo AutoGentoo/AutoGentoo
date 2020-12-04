@@ -38,7 +38,7 @@ set(language_SOURCES
 add_library(autogentoo_cportage SHARED
         ${language_SOURCES}
         portage.h module.c use.c use.h atom.c
-        ../python_util.h atom.h dependency.c dependency.h portage.c)
+        ../python_util.h atom.h dependency.c dependency.h portage.c ebuild.c ebuild.h)
 
 setup_pymodule(autogentoo_cportage)
 target_include_directories(autogentoo_cportage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})

@@ -75,6 +75,30 @@ typedef enum {
     ATOM_PREFIX_P
 } atom_version_pre_t;
 
+/**
+ * Only includes supported architectures
+ * amd64	x86	alpha	arm	arm64	hppa	ia64	ppc	ppc64	sparc
+ */
+typedef enum {
+    ARCH_AMD64,
+    ARCH_X86,
+    ARCH_ARM,
+    ARCH_ARM64,
+    ARCH_HPPA,
+    ARCH_IA64,
+    ARCH_PPC,
+    ARCH_PPC64,
+    ARCH_SPARC,
+    ARCH_END
+} arch_t;
+
+typedef enum {
+    KEYWORD_BROKEN,
+    KEYWORD_NONE,
+    KEYWORD_UNSTABLE,
+    KEYWORD_STABLE,
+} keyword_t;
+
 struct Portage_prv {
     PyObject_HEAD
 

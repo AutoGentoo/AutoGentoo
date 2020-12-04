@@ -69,6 +69,12 @@ class TestStringMethods(unittest.TestCase):
         version_2 = cportage.AtomVersion("1.2.9")
         self.assertLess(version_2, version_1)
 
+    def test_version_revision(self):
+        atom1 = cportage.Atom("cat2/pkg3-2.2.34-r1")
+        atom2 = cportage.Atom("cat2/pkg3-2.2.34-r2")
+
+        self.assertGreater(atom2.version, atom1.version)
+
 
 if __name__ == '__main__':
     unittest.main()

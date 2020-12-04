@@ -65,6 +65,26 @@ class AtomVersionPreT(enum.IntEnum):
     P = autogentoo_cportage.ATOM_PREFIX_ALPHA
 
 
+class ArchT(enum.IntEnum):
+    ARCH_AMD64 = autogentoo_cportage.ARCH_AMD64
+    ARCH_X86 = autogentoo_cportage.ARCH_X86
+    ARCH_ARM = autogentoo_cportage.ARCH_ARM
+    ARCH_ARM64 = autogentoo_cportage.ARCH_ARM64
+    ARCH_HPPA = autogentoo_cportage.ARCH_HPPA
+    ARCH_IA64 = autogentoo_cportage.ARCH_IA64
+    ARCH_PPC = autogentoo_cportage.ARCH_PPC
+    ARCH_PPC64 = autogentoo_cportage.ARCH_PPC64
+    ARCH_SPARC = autogentoo_cportage.ARCH_SPARC
+    ARCH_END = autogentoo_cportage.ARCH_END
+
+
+class KeywordT(enum.IntEnum):
+    KEYWORD_BROKEN = autogentoo_cportage.KEYWORD_BROKEN
+    KEYWORD_NONE = autogentoo_cportage.KEYWORD_NONE
+    KEYWORD_UNSTABLE = autogentoo_cportage.KEYWORD_UNSTABLE
+    KEYWORD_STABLE = autogentoo_cportage.KEYWORD_STABLE
+
+
 class AtomFlag(autogentoo_cportage.AtomFlag):
     @property
     def option(self) -> AtomUseT:
