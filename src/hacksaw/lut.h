@@ -41,8 +41,11 @@ typedef U64 lut_id;
 
 typedef enum {
     LUT_FLAG_NONE,
-    LUT_FLAG_EXISTS,            //!< This key already exists in the map
-    LUT_FLAG_NOT_FOUND          //!< This key does not yet exist in the map
+    LUT_FLAG_NOT_FOUND = 0x1,   //!< This key does not yet exist in the map
+    LUT_FLAG_EXISTS = 0x2,      //!< This key already exists in the map
+    LUT_FLAG_REFERENCE = 0x4,   //!< This is a normal Object*
+    LUT_FLAG_PYTHON = 0x8,      //!< PyObject*
+    LUT_FLAG_ARBITRARY = 0x10   //!< Don't perform
 } lut_flag_t;
 
 struct LUTNode_prv {
@@ -50,7 +53,7 @@ struct LUTNode_prv {
 
     lut_id id; //!< Serialized position in LUT
     char* key;
-    RefObject* data;
+    U64 data;
 
     lut_flag_t flags; //!< Some metadata about how this node was generated
     LUTNode* next;
@@ -65,10 +68,11 @@ struct LUT_prv {
 };
 
 LUT* lut_new(U64 new_size);
-lut_id lut_insert(LUT* self, const char* key, RefObject* data);
-void lut_insert_id(LUT* self, const char* key, RefObject* data, lut_id id, lut_flag_t flag);
+lut_id lut_insert(LUT* self, const char* key, U64 data, lut_flag_t flags);
+void lut_insert_id(LUT* self, const char* key, U64 data, lut_id id, lut_flag_t flag);
 const char* lut_get_key(LUT* self, lut_id id);
-RefObject* lut_get(LUT* self, lut_id id);
+U64 lut_get(LUT* self, lut_id id);
+
 lut_id lut_get_id(LUT* self, const char* key, lut_flag_t*);
 
 #endif //AUTOGENTOO_LUT_H

@@ -56,6 +56,7 @@ class Atom:
     useflags: AtomFlag
 
     def __init__(self, atom_string: str): ...
+    def matches(self, ebuild: Ebuild) -> bool: ...
 
 
 class Dependency:
@@ -87,7 +88,6 @@ class Ebuild:
     rdepend: Optional[Dependency]
     pdepend: Optional[Dependency]
 
-    use: UseFlag
     required_use: RequiredUse
     src_uri: Dependency
 

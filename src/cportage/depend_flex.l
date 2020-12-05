@@ -76,11 +76,11 @@ repo            [\:][\:]{identifier}
 
                             return SLOT;
                         }
-"??"                    {language_begin_token(yytext, NULL); yylval.use_select.target = strdup(yytext); yylval.use_select.val = USE_OP_MOST_ONE; return USESELECT;}
-"||"                    {language_begin_token(yytext, NULL); yylval.use_select.target = strdup(yytext); yylval.use_select.val = USE_OP_LEAST_ONE; return USESELECT;}
-"^^"                    {language_begin_token(yytext, NULL); yylval.use_select.target = strdup(yytext); yylval.use_select.val = USE_OP_EXACT_ONE; return USESELECT;}
-"(+)"                   {language_begin_token(yytext, NULL); yylval.use_default = ATOM_DEFAULT_ON; return USE_DEFAULT;}
-"(-)"                   {language_begin_token(yytext, NULL); yylval.use_default = ATOM_DEFAULT_OFF; return USE_DEFAULT;}
+"??"                    {yylval.use_select.target = strdup(yytext); language_begin_token(yytext, NULL); yylval.use_select.val = USE_OP_MOST_ONE; return USESELECT;}
+"||"                    {yylval.use_select.target = strdup(yytext); language_begin_token(yytext, NULL); yylval.use_select.val = USE_OP_LEAST_ONE; return USESELECT;}
+"^^"                    {yylval.use_select.target = strdup(yytext); language_begin_token(yytext, NULL); yylval.use_select.val = USE_OP_EXACT_ONE; return USESELECT;}
+"(+)"                   {yylval.use_default = ATOM_DEFAULT_ON; language_begin_token(yytext, NULL); return USE_DEFAULT;}
+"(-)"                   {yylval.use_default = ATOM_DEFAULT_OFF; language_begin_token(yytext, NULL); return USE_DEFAULT;}
 "-"                     {language_begin_token(yytext, NULL); return '-';}
 "<"                     {language_begin_token(yytext, NULL); return '<';}
 ">"                     {language_begin_token(yytext, NULL); return '>';}

@@ -32,7 +32,8 @@ struct Ebuild_prv {
     Dependency* rdepend;
     Dependency* pdepend; //!< Must be installed after this package is
 
-    UseFlag* use; //!< Read iuse, then apply globals (make.conf), then package.use
+    LUT* local_use;  /* Initialized by IUSE
+                      * this has lower preference  */
     Vector* feature_restrict;
     keyword_t keywords[ARCH_END];
 
@@ -47,6 +48,14 @@ struct Ebuild_prv {
     Ebuild* older;
     Ebuild* newer;
 };
+
+PyNewFunc(PyEbuild_new);
+int ebuild_init(Ebuild* self,
+                const char* repository_path,
+                const char* category,
+                const char* name_and_version);
+
+int ebuild_metadata_init(Ebuild* self);
 
 extern PyTypeObject PyEbuildType;
 

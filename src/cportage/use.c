@@ -8,15 +8,15 @@
 #include "language.h"
 #include <structmember.h>
 
-static PyNewFunc(PyUseFlag_new)
+PyNewFunc(PyUseFlag_new)
 {
     UseFlag* self = (UseFlag*) type->tp_alloc(type, 0);
     self->name = NULL;
-    self->state = 0;
+    self->state = USE_STATE_UNKNOWN;
     return (PyObject*) self;
 }
 
-static void use_flag_init(UseFlag* self, const char* name, use_state_t state)
+void use_flag_init(UseFlag* self, const char* name, use_state_t state)
 {
     self->name = strdup(name);
     self->state = state;
@@ -58,8 +58,8 @@ Use_t use_get_global(Portage* parent, const char* useflag)
             use_flag_init(new_flag, useflag, USE_STATE_UNKNOWN);
 
             /* Add the flag to the global map */
-            lut_insert_id(parent->global_flags, useflag, ref_pyobject((PyObject*) new_flag),
-                          out, flag);
+            lut_insert_id(parent->global_flags, useflag, (U64) new_flag,
+                          out, flag | LUT_FLAG_PYTHON);
 
             /* reference held by ref_pyobject */
             Py_DECREF(new_flag);

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <Python.h>
 #include "lut.h"
 #include "map.h"
 
@@ -26,7 +27,10 @@ static void lut_free(LUT* self)
 static void lut_node_free(LUTNode* self)
 {
     OBJECT_FREE(self->next);
-    OBJECT_DECREF(self->data);
+    if (self->flags & LUT_FLAG_PYTHON)
+        Py_XDECREF(self->data);
+    else if (self->flags & LUT_FLAG_REFERENCE)
+        OBJECT_DECREF(((RefObject*)self->data));
 
     free(self->key);
     free(self);
@@ -40,7 +44,7 @@ static inline LUTNode* lut_node_new()
     self->id = 0;
     self->flags = 0;
 
-    self->data = NULL;
+    self->data = 0;
     self->key = NULL;
     return self;
 }
@@ -109,31 +113,34 @@ LUT* lut_new(U64 new_size)
     return self;
 }
 
-lut_id lut_insert(LUT* self, const char* key, RefObject* data)
+lut_id lut_insert(LUT* self, const char* key, U64 data, lut_flag_t flags)
+{
+    lut_flag_t flag = 0;
+    lut_id out = lut_get_id(self, key, &flag);
+    lut_insert_id(self, key, data, out, flag | flags);
+    return out;
+}
+
+void lut_insert_id(LUT* self, const char* key, U64 data, lut_id id, lut_flag_t flag)
 {
     if (self->n + 1 >= self->realloc_at)
         lut_realloc(self, self->size * 2);
 
-    lut_flag_t flag = 0;
-    lut_id out = lut_get_id(self, key, &flag);
-    lut_insert_id(self, key, data, out, flag);
-    return out;
-}
-
-void lut_insert_id(LUT* self, const char* key, RefObject* data, lut_id id, lut_flag_t flag)
-{
     LUTNode* node = lut_node_new();
 
     /* Initialize the node */
-    OBJECT_INCREF(data);
-    node->data = data;
+    if (flag & LUT_FLAG_PYTHON)
+        Py_XINCREF(data);
+    else if (flag & LUT_FLAG_REFERENCE)
+        OBJECT_INCREF(((RefObject*)data));
+    node->data = (U64)data;
     node->id = id;
     node->flags = flag;
     node->key = strdup(key);
 
     LUTNode** bucket = lut_get_bucket(self, LUT_ID_GET_HASH(node->id));
 
-    if (node->flags == LUT_FLAG_NOT_FOUND)
+    if (node->flags & LUT_FLAG_NOT_FOUND)
     {
         if (!*bucket)
             *bucket = node;
@@ -145,8 +152,10 @@ void lut_insert_id(LUT* self, const char* key, RefObject* data, lut_id id, lut_f
 
             current_node->next = node;
         }
+
+        self->n++;
     }
-    else if (node->flags == LUT_FLAG_EXISTS)
+    else if (node->flags & LUT_FLAG_EXISTS)
     {
         /* This should always be non-NULL */
         assert(*bucket);
@@ -159,12 +168,21 @@ void lut_insert_id(LUT* self, const char* key, RefObject* data, lut_id id, lut_f
         /* Overwrite the old reference */
         if (data != current_node->data)
         {
-            OBJECT_INCREF(data);
-            OBJECT_DECREF(current_node->data);
+            if (flag & LUT_FLAG_PYTHON)
+                Py_XINCREF(data);
+            else if (flag & LUT_FLAG_REFERENCE)
+                OBJECT_INCREF(((RefObject*)data));
+
+            if (current_node->flags & LUT_FLAG_PYTHON)
+                Py_XDECREF(current_node->data);
+            else if (current_node->flags & LUT_FLAG_REFERENCE)
+                OBJECT_DECREF(((RefObject*)current_node->data));
+
             current_node->data = data;
         }
 
         OBJECT_FREE(node);
+        current_node->flags = flag;
     }
 }
 
@@ -180,7 +198,7 @@ const char* lut_get_key(LUT* self, lut_id id)
     return NULL;
 }
 
-RefObject* lut_get(LUT* self, lut_id id)
+U64 lut_get(LUT* self, lut_id id)
 {
     LUTNode** bucket = lut_get_bucket(self, LUT_ID_GET_HASH(id));
     for (LUTNode* current_node = *bucket; current_node; current_node = current_node->next)
@@ -189,7 +207,7 @@ RefObject* lut_get(LUT* self, lut_id id)
             return current_node->data;
     }
 
-    return NULL;
+    return 0;
 }
 
 lut_id lut_get_id(LUT* self, const char* key, lut_flag_t* flag)

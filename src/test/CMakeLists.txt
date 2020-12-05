@@ -1,5 +1,5 @@
 add_test(NAME cportage_unit
-        COMMAND ${LD_PRELOAD} ${CMAKE_CURRENT_SOURCE_DIR}/cportage_unit.py
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cportage_unit.py
         )
 
 

@@ -7,6 +7,7 @@
 #include "python_util.h"
 #include "structmember.h"
 #include "language.h"
+#include "ebuild.h"
 
 static PyObject*
 PyAtom_repr(Atom* self)
@@ -214,6 +215,13 @@ static void atom_version_init(AtomVersion* self, const char* input)
     AtomVersion* current_node = NULL;
     AtomVersion* next_node = NULL;
 
+    char* last_dash = strrchr(version_str, '-');
+    if (last_dash && last_dash[1] == 'r')
+    {
+        self->revision = (int) strtol(last_dash + 2, NULL, 10);
+        *last_dash = 0;
+    }
+
     char* buf = version_str;
     char* buf_splt = strpbrk(buf, "._-");
 
@@ -273,11 +281,7 @@ static void atom_version_init(AtomVersion* self, const char* input)
     }
 
     free(version_str);
-    self->full_version = NULL;
-    if (self->revision)
-        asprintf(&self->full_version, "%s-r%d", input, self->revision);
-    else
-        self->full_version = strdup(input);
+    self->full_version = strdup(input);
 }
 
 static PyInitFunc(PyAtomVersion_init, AtomVersion)
@@ -331,8 +335,7 @@ int atom_init(Atom* self, const char* input)
     char* last_dash = strrchr(name_ident, '-');
     int check_second = 0;
 
-    int revision = 0;
-
+    /* Check if this atom has a revision at the end of its version */
     if (last_dash)
     {
         if (isdigit(last_dash[1]))
@@ -348,15 +351,16 @@ int atom_init(Atom* self, const char* input)
         {
             *second_dash = 0;
             ver_splt = second_dash;
-            revision = (int) strtol(last_dash + 2, NULL, 10);
-        } else
-            *last_dash = '-';
+
+        }
+
+        /* Let version_init parse the revision */
+        *last_dash = '-';
     }
 
     if (ver_splt)
     {
         self->version = (AtomVersion*) PyAtomVersion_new(&PyAtomVersionType, NULL, NULL);
-        self->version->revision = revision;
         atom_version_init(self->version, ver_splt + 1);
         *ver_splt = 0;
     }
@@ -372,7 +376,7 @@ int atom_init(Atom* self, const char* input)
     if (flag == LUT_FLAG_NOT_FOUND)
     {
         /* Add the package to the LUT */
-        lut_insert_id(global_portage->packages, self->key, NULL, self->id, flag);
+        lut_insert_id(global_portage->packages, self->key, 0, self->id, flag);
     }
 
     free(d_input);
@@ -469,11 +473,7 @@ I32 atom_version_compare(const AtomVersion* first, const AtomVersion* second)
 }
 PyObject* PyAtom_richcompare(Atom* self, Atom* other, int op)
 {
-    int compare = strcmp(self->category, other->category);
-    if (compare != 0)
-        Py_RETURN_RICHCOMPARE(compare, 0, op);
-
-    compare = strcmp(self->name, other->name);
+    int compare = strcmp(self->key, other->key);
     Py_RETURN_RICHCOMPARE(compare, 0, op);
 }
 
@@ -482,6 +482,40 @@ PyObject* PyAtomVersion_richcompare(AtomVersion* self, AtomVersion* other, int o
     int compare = atom_version_compare(self, other);
     Py_RETURN_RICHCOMPARE(compare, 0, op);
 }
+
+int atom_matches(Atom* self, Ebuild* target)
+{
+    if (strcmp(self->key, target->package_key) != 0)
+    {
+        return 0;
+    }
+
+    int version_compare = atom_version_compare(self->version, target->version);
+    if (version_compare == 0)
+        return (int)(self->range & ATOM_VERSION_E);
+    else if (version_compare > 0)                     /* atom version is greater than ebuild's */
+        return (int)(self->range & ATOM_VERSION_L);
+    else if (version_compare < 0)
+        return (int)(self->range & ATOM_VERSION_G);
+}
+
+static PyObject* PyAtom_matches(Atom* self, const PyObject* args[], const int nargs)
+{
+    if (nargs != 1 || !PyObject_TypeCheck(args[0], &PyEbuildType))
+    {
+        PyErr_SetString(PyExc_TypeError, "Expected a single argument of type Ebuild");
+        return NULL;
+    }
+
+    if (atom_matches(self, (Ebuild*) args[0]))
+        Py_RETURN_TRUE;
+    Py_RETURN_FALSE;
+}
+
+static PyMethodDef PyAtom_methods[] = {
+        {"matches", (PyCFunction) PyAtom_matches, METH_FASTCALL},
+        {NULL, NULL, 0}
+};
 
 static PyMemberDef PyAtomFlag_members[] = {
         {"name", T_STRING, offsetof(AtomFlag, name), READONLY, "Flag name"},
@@ -555,5 +589,6 @@ PyTypeObject PyAtomType = {
         .tp_dealloc = (destructor) PyAtom_dealloc,
         .tp_repr = (reprfunc) PyAtom_repr,
         .tp_members = PyAtom_members,
+        .tp_methods = PyAtom_methods,
         .tp_richcompare = (richcmpfunc) PyAtom_richcompare,
 };

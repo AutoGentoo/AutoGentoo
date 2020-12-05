@@ -84,12 +84,15 @@ class TestStringMethods(unittest.TestCase):
         self.assertGreater(atom2.version, atom1.version)
 
     def test_ebuild_1(self):
-        ebuild = cportage.Ebuild("/usr/portage/", "sys-devel", "gcc-4.8.0")
+        ebuild = cportage.Ebuild("/var/db/repos/gentoo", "sys-devel", "gcc-9.3.0-r2")
         self.assertEqual(ebuild.category, "sys-devel")
         self.assertEqual(ebuild.name, "gcc")
         self.assertEqual(ebuild.package_key, "sys-devel/gcc")
-        self.assertEqual(ebuild.key, "sys-devel/gcc-4.8.0")
-        self.assertEqual(ebuild.version, cportage.AtomVersion("4.8.0"))
+        self.assertEqual(ebuild.key, "sys-devel/gcc-9.3.0-r2")
+        self.assertEqual(ebuild.version, cportage.AtomVersion("9.3.0-r2"))
+
+        self.assertEqual(ebuild.ebuild, "/var/db/repos/gentoo/sys-devel/gcc/gcc-9.3.0-r2.ebuild")
+        self.assertEqual(ebuild.cache_file, "/var/db/repos/gentoo/metadata/md5-cache/sys-devel/gcc-9.3.0-r2")
 
     def test_init_error(self):
         with self.assertRaises(TypeError):

@@ -8,15 +8,16 @@
 #include <cportage/module.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include <ebuild.h>
 
 #define CTEST(name) static void name(void** state)
 
 CTEST(test_atom_full)
 {
     Atom* atom = atom_parse("!!>=cat2/pkg3-2.2.34-r6:3/32::repository"
-                            "[use_enable,-use_disable,"
+                            "[use_enable, -use_disable,"
                             "use_equal=, !use_opposite=,"
-                            "!disable_if_off?," "enable_if_on?]");
+                            "!disable_if_off?, enable_if_on?]");
     assert_string_equal(atom->category, "cat2");
     assert_string_equal(atom->name, "pkg3");
     assert_string_equal(atom->version->full_version, "2.2.34-r6");
@@ -59,8 +60,18 @@ CTEST(test_atom_full)
     Py_DECREF(atom);
 }
 
+CTEST(test_ebuild_init)
+{
+    Ebuild* self = (Ebuild*) PyEbuild_new(&PyEbuildType, NULL, NULL);
+    assert_int_equal(ebuild_init(self, "/var/db/repos/gentoo", "sys-devel", "gcc-9.3.0-r2"), 0);
+
+    assert_int_equal(ebuild_metadata_init(self), 0);
+    Py_DECREF(self);
+}
+
 const static struct CMUnitTest cportage_tests[] = {
         cmocka_unit_test(test_atom_full),
+        cmocka_unit_test(test_ebuild_init),
 };
 
 int main(void)
@@ -72,7 +83,6 @@ int main(void)
     module = PyInit_autogentoo_cportage();
     if (!module)
         return 1;
-
 
     p = (Portage*) PyPortage_new(&PyPortageType, NULL, NULL);
     PyPortage_init(p, NULL, NULL);
