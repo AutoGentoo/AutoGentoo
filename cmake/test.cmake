@@ -5,14 +5,6 @@ endfunction()
 
 set(CMAKE_DISABLED_TESTS ${CMAKE_DISABLED_TESTS})
 
-macro(add_test target)
-    if (${target} IN_LIST CMAKE_DISABLED_TESTS)
-        message("-- Skipping test ${target}")
-    else()
-        _add_test(${ARGV})
-    endif()
-endmacro()
-
 macro(set_tests_properties target)
     if (${target} IN_LIST CMAKE_DISABLED_TESTS)
     else()

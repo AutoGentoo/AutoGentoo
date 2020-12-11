@@ -84,8 +84,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertGreater(atom2.version, atom1.version)
 
     def test_ebuild_1(self):
-        print(os.getcwd(), flush=True)
-        ebuild = cportage.Ebuild("../../../data/test-repo", "sys-devel", "gcc-9.3.0-r1")
+        ebuild = cportage.Ebuild("data/test-repo", "sys-devel", "gcc-9.3.0-r1")
         self.assertEqual(ebuild.category, "sys-devel")
         self.assertEqual(ebuild.name, "gcc")
         self.assertEqual(ebuild.package_key, "sys-devel/gcc")
