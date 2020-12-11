@@ -19,9 +19,7 @@ jobs:
     - name: Submodules
       # We need to clone the third-party repostitories
       run: |
-        cd $GITHUB_WORKSPACE
-        git submodule sync
-        git submodule update
+        git submodule update --init --recursive
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
