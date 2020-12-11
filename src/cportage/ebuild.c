@@ -1,0 +1,321 @@
+//
+// Created by tumbar on 12/3/20.
+//
+
+#include <stdio.h>
+#include "ebuild.h"
+#include "language.h"
+#include <structmember.h>
+
+PyNewFunc(PyEbuild_new)
+{
+    Ebuild* self = (Ebuild*) type->tp_alloc(type, 0);
+    memset(&self->name, 0, sizeof(Ebuild) - offsetof(Ebuild, name));
+    return (PyObject*) self;
+}
+
+int ebuild_init(Ebuild* self,
+                const char* repository_path,
+                const char* category,
+                const char* name_and_version)
+{
+    asprintf(&self->key, "%s/%s", category, name_and_version);
+    self->repository_path = strdup(repository_path);
+
+    Atom* atom = atom_parse(self->key);
+    if (!atom)
+    {
+        PyErr_Format(PyExc_RuntimeError, "Failed to parse atom '%s'", self->key);
+        return -1;
+    }
+
+    /* Take all of the atom's references away */
+    SAFE_REF_TAKE(self->package_key, atom->key)
+    SAFE_REF_TAKE(self->version, atom->version)
+    SAFE_REF_TAKE(self->name, atom->name)
+    SAFE_REF_TAKE(self->category, atom->category)
+    SAFE_REF_TAKE(self->slot, atom->slot)
+    SAFE_REF_TAKE(self->sub_slot, atom->sub_slot)
+
+    /* Free the atom (no longer needed) */
+    Py_DECREF(atom);
+
+    assert(self->version);
+
+    char cache_file_raw[PATH_MAX];
+    sprintf(cache_file_raw, "%s/%s/%s-%s.ebuild",
+            self->repository_path, self->package_key, self->name,
+            self->version->full_version);
+
+    self->ebuild = realpath(cache_file_raw, NULL);
+    if (!self->ebuild)
+    {
+        PyErr_Format(PyExc_FileNotFoundError, "Ebuild file not found '%s'", cache_file_raw);
+        return -1;
+    }
+
+    sprintf(cache_file_raw, "%s/metadata/md5-cache/%s",self->repository_path, self->key);
+    self->cache_file = realpath(cache_file_raw, NULL);
+    if (!self->cache_file)
+    {
+        PyErr_Format(PyExc_FileNotFoundError, "Cache file not found '%s'", cache_file_raw);
+        return -1;
+    }
+
+    return 0;
+}
+
+static void ebuild_keyword_init(Ebuild* self, char* line)
+{
+    const static struct
+    {
+        arch_t l;
+        char* str;
+    } keyword_links[] = {
+            {ARCH_AMD64, "amd64"},
+            {ARCH_X86,   "x86"},
+            {ARCH_ARM,   "arm"},
+            {ARCH_ARM64, "arm64"},
+            {ARCH_HPPA,  "hppa"},
+            {ARCH_IA64,  "ia64"},
+            {ARCH_PPC,   "ppc"},
+            {ARCH_PPC64, "ppc64"},
+            {ARCH_SPARC, "sparc"},
+            {ARCH_END, NULL}
+    };
+
+    for (char* tok = strtok(line, " \n\t"); tok; tok = strtok(NULL, " \n\t"))
+    {
+        if (tok[0] == 0)
+            continue;
+        keyword_t opt = KEYWORD_STABLE;
+        size_t offset = 0;
+        if (tok[0] == '~')
+        {
+            opt = KEYWORD_UNSTABLE;
+            offset = 1;
+        } else if (tok[0] == '-')
+        {
+            opt = KEYWORD_BROKEN;
+            offset = 1;
+        }
+
+        char* target = tok + offset;
+        if (strcmp(target, "**") == 0)
+        {
+            for (int i = 0; i < ARCH_END; i++)
+                self->keywords[i] = opt;
+            continue;
+        }
+        if (strcmp(target, "*") == 0)
+        {
+            for (int i = 0; i < ARCH_END; i++)
+                self->keywords[i] = opt;
+            continue;
+        }
+
+        for (int i = 0; i < ARCH_END; i++)
+        {
+            if (strcmp(keyword_links[i].str, target) == 0)
+            {
+                self->keywords[keyword_links[i].l] = opt;
+                break;
+            }
+        }
+    }
+}
+
+static void ebuild_iuse_init(Ebuild* self, char* line)
+{
+    OBJECT_FREE(self->local_use);
+    self->local_use = lut_new(32);
+
+    for (char* token = strtok(line, " "); token; token = strtok(NULL, " "))
+    {
+        UseFlag* flag = (UseFlag*) PyUseFlag_new(&PyUseFlagType, NULL, NULL);
+
+        if (*token == '+')
+        {
+            flag->state = USE_STATE_ENABLED;
+            token++;
+        } else if (*token == '-')
+        {
+            flag->state = USE_STATE_DISABLED;
+            token++;
+        }
+
+        flag->name = strdup(token);
+
+        /* Add this flag to the local look-up table */
+        lut_insert(self->local_use, flag->name, (U64) flag, LUT_FLAG_PYTHON);
+
+        Py_DECREF(flag);
+    }
+}
+
+int ebuild_metadata_init(Ebuild* self)
+{
+    FILE* fp = fopen(self->cache_file, "r");
+    if (!fp)
+    {
+        PyErr_Format(PyExc_FileNotFoundError, "Failed to open %s", self->cache_file);
+        return -1;
+    }
+
+    for (int i = 0; i < ARCH_END; i++)
+        self->keywords[i] = KEYWORD_NONE;
+
+    static const struct
+    {
+        const char* name_match;
+        U64 ebuild_target_offset;
+    } depend_setup[] = {
+            {"DEPEND",  offsetof(Ebuild, depend)},
+            {"RDEPEND", offsetof(Ebuild, rdepend)},
+            {"PDEPEND", offsetof(Ebuild, pdepend)},
+            {"BDEPEND", offsetof(Ebuild, bdepend)},
+    };
+
+    char* name = NULL, * value = NULL;
+    U64 name_size_n = 0, value_size_n = 0;
+
+    while (!feof(fp))
+    {
+        ssize_t name_size = getdelim(&name, &name_size_n, '=', fp);
+        ssize_t value_size = getdelim(&value, &value_size_n, '\n', fp);
+
+        if (!name || name_size == -1 || !value || value_size == -1)
+            break;
+
+        if (name_size > 0)
+            name[name_size - 1] = 0;
+        if (value_size)
+            value[value_size - 1] = 0;
+        for (U32 i = 0; i < sizeof(depend_setup) / sizeof(depend_setup[0]); i++)
+        {
+            if (strcmp(name, depend_setup[i].name_match) == 0)
+            {
+                Dependency** target = (Dependency**) (((U8*) self) + depend_setup[i].ebuild_target_offset);
+                *target = depend_parse(value);
+            }
+        }
+
+        if (strcmp(name, "SLOT") == 0)
+        {
+            char* tok = strtok(value, "/");
+            self->slot = strdup(tok);
+
+            tok = strtok(NULL, "/");
+            if (tok)
+                self->sub_slot = strdup(tok);
+        } else if (strcmp(name, "REQUIRED_USE") == 0)
+            self->required_use = required_use_parse(value);
+        else if (strcmp(name, "KEYWORDS") == 0)
+            ebuild_keyword_init(self, value);
+        else if (strcmp(name, "IUSE") == 0)
+            ebuild_iuse_init(self, value);
+    }
+
+    free(value);
+    free(name);
+
+    self->metadata_init = 1;
+    fclose(fp);
+
+    return 0;
+}
+
+static PyFastMethod(PyEbuild_metadata_init, Ebuild)
+{
+    if (nargs != 0)
+    {
+        PyErr_Format(PyExc_TypeError, "Expected no arguments to Ebuild.metadata_init, got '%d'", nargs);
+        return NULL;
+    }
+
+    if (ebuild_metadata_init(self) != 0)
+    {
+        PyErr_Format(PyExc_RuntimeError, "Failed to initialize metadata for %s", self->key);
+    }
+
+    Py_RETURN_NONE;
+}
+
+PyInitFunc(PyEbuild_init, Ebuild)
+{
+    static char* kwlist[] = {"repository_path", "category", "name_and_version", NULL};
+    const char* repository_path = NULL;
+    const char* category = NULL;
+    const char* name_and_version = NULL;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "sss", kwlist,
+                                     &repository_path,
+                                     &category,
+                                     &name_and_version))
+        return -1;
+    return ebuild_init(self, repository_path, category, name_and_version);
+}
+
+PyMethod(PyEbuild_dealloc, Ebuild)
+{
+    SAFE_FREE(self->name);
+    SAFE_FREE(self->category);
+    SAFE_FREE(self->repository_path);
+    SAFE_FREE(self->key);
+    SAFE_FREE(self->package_key);
+    SAFE_FREE(self->path);
+    SAFE_FREE(self->cache_file);
+    SAFE_FREE(self->ebuild);
+    SAFE_FREE(self->slot);
+    SAFE_FREE(self->sub_slot);
+
+    Py_XDECREF(self->depend);
+    Py_XDECREF(self->bdepend);
+    Py_XDECREF(self->rdepend);
+    Py_XDECREF(self->pdepend);
+
+    OBJECT_FREE(self->local_use);
+    OBJECT_FREE(self->feature_restrict);
+
+    Py_XDECREF(self->required_use);
+    Py_XDECREF(self->src_uri);
+
+    Py_XDECREF(self->version);
+    Py_TYPE(self)->tp_free((PyObject*) self);
+}
+
+static PyMemberDef PyEbuild_members[] = {
+        {"name",          T_STRING, offsetof(Ebuild, name),          READONLY},
+        {"category",      T_STRING, offsetof(Ebuild, category),      READONLY},
+        {"slot",          T_STRING, offsetof(Ebuild, slot),          READONLY},
+        {"sub_slot",      T_STRING, offsetof(Ebuild, sub_slot),      READONLY},
+        {"package_key",   T_STRING, offsetof(Ebuild, package_key),   READONLY},
+        {"key",           T_STRING, offsetof(Ebuild, key),           READONLY},
+        {"ebuild",        T_STRING, offsetof(Ebuild, ebuild),        READONLY},
+        {"path",          T_STRING, offsetof(Ebuild, path),          READONLY},
+        {"cache_file",    T_STRING, offsetof(Ebuild, cache_file),    READONLY},
+        {"depend",        T_OBJECT, offsetof(Ebuild, depend),        READONLY},
+        {"bdepend",       T_OBJECT, offsetof(Ebuild, bdepend),       READONLY},
+        {"rdepend",       T_OBJECT, offsetof(Ebuild, rdepend),       READONLY},
+        {"pdepend",       T_OBJECT, offsetof(Ebuild, pdepend),       READONLY},
+        {"required_use",  T_OBJECT, offsetof(Ebuild, required_use),  READONLY},
+        {"src_uri",       T_OBJECT, offsetof(Ebuild, src_uri),       READONLY},
+        {"version",       T_OBJECT, offsetof(Ebuild, version),       READONLY},
+        {"metadata_init", T_BOOL,   offsetof(Ebuild, metadata_init), READONLY},
+        {"older",         T_OBJECT, offsetof(Ebuild, older),         READONLY},
+        {"newer",         T_OBJECT, offsetof(Ebuild, newer),         READONLY},
+        {NULL, 0, 0, 0, NULL}
+};
+
+PyTypeObject PyEbuildType = {
+        PyVarObject_HEAD_INIT(NULL, 0)
+        .tp_name = "autogentoo_cportage.Ebuild",
+        .tp_doc = "A package that can be emerged",
+        .tp_basicsize = sizeof(Ebuild),
+        .tp_itemsize = 0,
+        .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+        .tp_new = PyEbuild_new,
+        .tp_init = (initproc) PyEbuild_init,
+        .tp_dealloc = (destructor) PyEbuild_dealloc,
+        .tp_members = PyEbuild_members,
+};

@@ -8,3 +8,5 @@
 *.ac linguist-vendored
 doc/* linguist-vendored
 CMakeLists.txt linguist-vendored
+*.sh linguist-vendored
+cportage/bin/* linguist-vendored
