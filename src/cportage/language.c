@@ -7,7 +7,7 @@
 #include "language.h"
 
 #ifndef LANGUAGE_DEBUG
-#define LANGUAGE_DEBUG 1
+#define LANGUAGE_DEBUG 0
 #endif
 
 extern void* dependout;

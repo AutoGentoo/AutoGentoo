@@ -160,9 +160,10 @@ atomflags       [\[][ ]*{atomflag}([ ]*,[ ]*{atomflag})*[ ]*[\]]
 [\,]                    {language_begin_token(yytext, NULL); return ',';}
 [\~]                    {language_begin_token(yytext, NULL); return '~';}
 {atom}                  {
+                            char* reference = yytext;
+                            language_begin_token(reference, "atom");
                             dependlval.atom_type = (Atom*)PyAtom_new(&PyAtomType, NULL, NULL);
-                            atom_init(dependlval.atom_type, yytext);
-                            language_begin_token(yytext, "atom");
+                            atom_init(dependlval.atom_type, reference);
                             return ATOM;
                         }
 
