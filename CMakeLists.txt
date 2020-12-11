@@ -21,7 +21,7 @@ if (CUSTOM_PYTHON)
     set(Python3_INCLUDE_DIR ${CUSTOM_PYTHON_ROOT}/include/python${CUSTOM_PYTHON_VERSION})
     set(CMAKE_FIND_USE_CMAKE_PATH FALSE)
     set(Python3_ROOT_DIR ${CUSTOM_PYTHON_ROOT})
-    message("-- Building with Python${CUSTOM_PYTHON_VERSION} in ${CUSTOM_PYTHON_ROOT}")
+    message(STATUS "Building with Python${CUSTOM_PYTHON_VERSION} in ${CUSTOM_PYTHON_ROOT}")
 endif()
 
 set(Python3_FIND_VIRTUALENV "ONLY")
@@ -35,7 +35,7 @@ if (SANITIZER_BUILD)
     add_compile_options(-fsanitize=address)
     add_link_options(-fsanitize=address)
 
-    message("-- Building with AddressSanitizer")
+    message(STATUS "Building with AddressSanitizer")
 endif()
 
 # This will compile all of the interface modules

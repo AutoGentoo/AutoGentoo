@@ -84,15 +84,17 @@ class TestStringMethods(unittest.TestCase):
         self.assertGreater(atom2.version, atom1.version)
 
     def test_ebuild_1(self):
-        ebuild = cportage.Ebuild("/var/db/repos/gentoo", "sys-devel", "gcc-9.3.0-r2")
+        ebuild = cportage.Ebuild("data/test-repo", "sys-devel", "gcc-9.3.0-r1")
         self.assertEqual(ebuild.category, "sys-devel")
         self.assertEqual(ebuild.name, "gcc")
         self.assertEqual(ebuild.package_key, "sys-devel/gcc")
-        self.assertEqual(ebuild.key, "sys-devel/gcc-9.3.0-r2")
-        self.assertEqual(ebuild.version, cportage.AtomVersion("9.3.0-r2"))
+        self.assertEqual(ebuild.key, "sys-devel/gcc-9.3.0-r1")
+        self.assertEqual(ebuild.version, cportage.AtomVersion("9.3.0-r1"))
 
-        self.assertEqual(ebuild.ebuild, "/var/db/repos/gentoo/sys-devel/gcc/gcc-9.3.0-r2.ebuild")
-        self.assertEqual(ebuild.cache_file, "/var/db/repos/gentoo/metadata/md5-cache/sys-devel/gcc-9.3.0-r2")
+        self.assertTrue(ebuild.ebuild.endswith("sys-devel/gcc/gcc-9.3.0-r1.ebuild"))
+        self.assertTrue(ebuild.cache_file.endswith("sys-devel/gcc-9.3.0-r1"))
+        self.assertFalse(".." in ebuild.ebuild)  # Make sure the path was expanded
+        self.assertFalse(".." in ebuild.cache_file)  # Make sure the path was expanded
 
     def test_init_error(self):
         with self.assertRaises(TypeError):

@@ -1,7 +1,7 @@
 import enum
 
-from .autogentoo_cportage import AtomVersion, UseFlag, Portage, init, Ebuild
-from . import autogentoo_cportage
+from autogentoo_cportage import AtomVersion, UseFlag, Portage, init, Ebuild
+import autogentoo_cportage
 
 
 class UseOperatorT(enum.IntEnum):

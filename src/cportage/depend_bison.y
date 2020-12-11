@@ -81,7 +81,7 @@ depend_expr_sel : '!' IDENTIFIER '?'    {$$.target = $2; $$.t = USE_OP_DISABLE;}
                 | USESELECT             {$$.target = NULL; $$.t = $1;}
                 ;
 
-depend_expr  :    depend_expr_sel '(' depend_expr ')'       {$$ = dependency_build_use($1.target, $1.t, $3); if ($1.target) free($1.target);}
+depend_expr  :    depend_expr_sel '(' depend_expr ')'       {$$ = dependency_build_use($1.target, $1.t, $3);}
                 | '(' depend_expr ')'                       {$$ = dependency_build_grouping($2);}
                 | atom                                      {$$ = dependency_build_atom($1);}
                 | depend_expr depend_expr                   {$$ = $1; $1->next = $2;}
