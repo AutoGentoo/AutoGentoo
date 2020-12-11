@@ -65,7 +65,7 @@ CTEST(test_atom_full)
 CTEST(test_ebuild_init)
 {
     Ebuild* self = (Ebuild*) PyEbuild_new(&PyEbuildType, NULL, NULL);
-    assert_int_equal(ebuild_init(self, "/var/db/repos/gentoo", "sys-devel", "gcc-9.3.0-r2"), 0);
+    assert_int_equal(ebuild_init(self, "../../../data/test-repo", "sys-devel", "gcc-9.3.0-r1"), 0);
 
     assert_int_equal(ebuild_metadata_init(self), 0);
     Py_DECREF(self);
