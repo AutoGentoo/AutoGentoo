@@ -1,3 +1,5 @@
+%option prefix="depend"
+
 %{
 #include <stdio.h>
 #include "language.h"
@@ -26,6 +28,8 @@ atom            {identifier}\/{identifier}(\-{version})?
 slotname        ({letter}|{digit}|"_")({letter}|{digit}|"_"|"-"|"."|"+")*
 slot            [\:]({slotname}(\/{slotname})?)?[\*|\=]?
 repo            [\:][\:]{identifier}
+atomflag        [!]?{identifier}(\([\+|\-]\))?[\?|=]?
+atomflags       [\[][ ]*{atomflag}([ ]*,[ ]*{atomflag})*[ ]*[\]]
 
 %%
 [\x01]                  {
@@ -41,22 +45,22 @@ repo            [\:][\:]{identifier}
                             }
                         }
 [\n]                    {
-                            language_begin_token(yytext, "\\n");
+                            language_begin_token(yytext, "newline");
                             language_increment_line();
                         }
 [ \t\r\\]+              {language_begin_token(yytext, "tab");};
-{repo}                  {yylval.identifier = strdup(yytext + 2); language_begin_token(yytext, "repo"); return REPOSITORY;}
+{repo}                  {dependlval.identifier = strdup(yytext + 2); language_begin_token(yytext, "repo"); return REPOSITORY;}
 {slot}                  {
                             char* ref = yytext;
                             int len = strlen(ref);
                             language_begin_token(ref, "slot");
-                            yylval.slot.slot_opts = ATOM_SLOT_IGNORE;
+                            dependlval.slot.slot_opts = ATOM_SLOT_IGNORE;
                             if (ref[len - 1] == '*') {
-                                yylval.slot.slot_opts = ATOM_SLOT_IGNORE;
+                                dependlval.slot.slot_opts = ATOM_SLOT_IGNORE;
                                 ref[--len] = 0;
                             }
                             else if (ref[len - 1] == '=') {
-                                yylval.slot.slot_opts = ATOM_SLOT_REBUILD;
+                                dependlval.slot.slot_opts = ATOM_SLOT_REBUILD;
                                 ref[--len] = 0;
                             }
 
@@ -64,23 +68,83 @@ repo            [\:][\:]{identifier}
                             if (name_splt)
                                 *name_splt = 0;
                             if (ref[1] == 0) {
-                                yylval.slot.name = NULL;
-                                yylval.slot.sub_name = NULL;
+                                dependlval.slot.name = NULL;
+                                dependlval.slot.sub_name = NULL;
                                 return SLOT;
                             }
-                            yylval.slot.name = strdup(ref + 1);
+                            dependlval.slot.name = strdup(ref + 1);
                             if (name_splt)
-                                yylval.slot.sub_name = strdup(name_splt + 1);
+                                dependlval.slot.sub_name = strdup(name_splt + 1);
                             else
-                                yylval.slot.sub_name = NULL;
+                                dependlval.slot.sub_name = NULL;
 
                             return SLOT;
                         }
-"??"                    {yylval.use_select.target = strdup(yytext); language_begin_token(yytext, NULL); yylval.use_select.val = USE_OP_MOST_ONE; return USESELECT;}
-"||"                    {yylval.use_select.target = strdup(yytext); language_begin_token(yytext, NULL); yylval.use_select.val = USE_OP_LEAST_ONE; return USESELECT;}
-"^^"                    {yylval.use_select.target = strdup(yytext); language_begin_token(yytext, NULL); yylval.use_select.val = USE_OP_EXACT_ONE; return USESELECT;}
-"(+)"                   {yylval.use_default = ATOM_DEFAULT_ON; language_begin_token(yytext, NULL); return USE_DEFAULT;}
-"(-)"                   {yylval.use_default = ATOM_DEFAULT_OFF; language_begin_token(yytext, NULL); return USE_DEFAULT;}
+{atomflags}             {
+                            char* textref = yytext;
+                            language_begin_token(yytext, NULL);
+                            AtomFlag* start = NULL;
+                            AtomFlag* last = NULL;
+                            AtomFlag* current;
+
+                            for (char* tok = strtok(textref + 1, " ,]"); tok; tok = strtok(NULL, " ,]"))
+                            {
+                                size_t len = strlen(tok);
+                                if (!len)
+                                    continue;
+                                atom_use_t option;
+
+                                if (*tok == '!' && tok[len - 1] == '?')
+                                {
+                                    tok[len - 1] = 0;
+                                    tok++;
+                                    option = ATOM_USE_DISABLE_IF_OFF;
+                                }
+                                else if (*tok == '!' && tok[len - 1] == '=')
+                                {
+                                    tok[len - 1] = 0;
+                                    tok++;
+                                    option = ATOM_USE_OPPOSITE;
+                                }
+                                else if (tok[len - 1] == '?')
+                                {
+                                    tok[len - 1] = 0;
+                                    option = ATOM_USE_ENABLE_IF_ON;
+                                }
+                                else if (tok[len - 1] == '=')
+                                {
+                                    tok[len - 1] = 0;
+                                    option = ATOM_USE_EQUAL;
+                                }
+                                else if (*tok == '-')
+                                {
+                                    tok++;
+                                    option = ATOM_USE_DISABLE;
+                                }
+                                else
+                                    option = ATOM_USE_ENABLE;
+
+                                current = atomflag_build(tok);
+                                current->option = option;
+
+                                if (!last)
+                                    last = current;
+                                else
+                                {
+                                    last->next = current;
+                                    last = current;
+                                }
+
+                                if (!start)
+                                    start = current;
+                            }
+
+                            dependlval.atom_flags = start;
+                            return ATOM_FLAGS;
+                        }
+"??"                    {language_begin_token(yytext, NULL); dependlval.use_select = USE_OP_MOST_ONE; return USESELECT;}
+"||"                    {language_begin_token(yytext, NULL); dependlval.use_select = USE_OP_LEAST_ONE; return USESELECT;}
+"^^"                    {language_begin_token(yytext, NULL); dependlval.use_select = USE_OP_EXACT_ONE; return USESELECT;}
 "-"                     {language_begin_token(yytext, NULL); return '-';}
 "<"                     {language_begin_token(yytext, NULL); return '<';}
 ">"                     {language_begin_token(yytext, NULL); return '>';}
@@ -96,8 +160,8 @@ repo            [\:][\:]{identifier}
 [\,]                    {language_begin_token(yytext, NULL); return ',';}
 [\~]                    {language_begin_token(yytext, NULL); return '~';}
 {atom}                  {
-                            yylval.atom_type = (Atom*)PyAtom_new(&PyAtomType, NULL, NULL);
-                            atom_init(yylval.atom_type, yytext);
+                            dependlval.atom_type = (Atom*)PyAtom_new(&PyAtomType, NULL, NULL);
+                            atom_init(dependlval.atom_type, yytext);
                             language_begin_token(yytext, "atom");
                             return ATOM;
                         }
@@ -105,7 +169,7 @@ repo            [\:][\:]{identifier}
 [\*]                    {language_begin_token(yytext, "star"); return '*';}
 
 {identifier}            {
-                            yylval.identifier = strdup(yytext);
+                            dependlval.identifier = yytext;
                             language_begin_token(yytext, "identifier");
                             return IDENTIFIER;
                         }

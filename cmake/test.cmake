@@ -20,7 +20,6 @@ macro(set_tests_properties target)
     endif()
 endmacro()
 
-option(ENABLE_TESTS "Perform unit tests after build" OFF)
 if (ENABLE_TESTS)
     setup_cmocka()
     enable_testing()

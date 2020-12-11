@@ -8,11 +8,27 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED YES)
 
 # Setup the Python development environment
+option(CUSTOM_PYTHON "Enable a custom path to a python library" OFF)
+option(ENABLE_TESTS "Perform unit tests after build" OFF)
+
+if (CUSTOM_PYTHON)
+    if (Python3_USE_STATIC_LIBS)
+        set(Python3_LIBRARY ${CUSTOM_PYTHON_ROOT}/lib/libpython${CUSTOM_PYTHON_VERSION}.a)
+    else()
+        set(Python3_LIBRARY ${CUSTOM_PYTHON_ROOT}/lib/libpython${CUSTOM_PYTHON_VERSION}.so)
+    endif()
+    set(Python3_EXECUTABLE ${CUSTOM_PYTHON_ROOT}/bin/python${CUSTOM_PYTHON_VERSION})
+    set(Python3_INCLUDE_DIR ${CUSTOM_PYTHON_ROOT}/include/python${CUSTOM_PYTHON_VERSION})
+    set(CMAKE_FIND_USE_CMAKE_PATH FALSE)
+    set(Python3_ROOT_DIR ${CUSTOM_PYTHON_ROOT})
+    message("-- Building with Python${CUSTOM_PYTHON_VERSION} in ${CUSTOM_PYTHON_ROOT}")
+endif()
+
 set(Python3_FIND_VIRTUALENV "ONLY")
 find_package(Python3 COMPONENTS Development)
 
 add_compile_definitions(_GNU_SOURCE)
-add_compile_options(-O3 -pipe -Wno-unused-result -g -fno-omit-frame-pointer)
+add_compile_options(-Wno-unused-result -g -fno-omit-frame-pointer)
 add_link_options(-fno-omit-frame-pointer)
 
 if (SANITIZER_BUILD)

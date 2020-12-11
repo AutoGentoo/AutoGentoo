@@ -324,7 +324,8 @@ int atom_init(Atom* self, const char* input)
     char* cat_splt = strchr(d_input, '/');
     if (!cat_splt)
     {
-        lwarning("Invalid atom: %s", d_input);
+        language_print_error("Invalid atom: '%s'", d_input);
+        free(d_input);
         return 1;
     }
 

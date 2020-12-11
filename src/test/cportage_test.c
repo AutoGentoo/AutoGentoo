@@ -9,6 +9,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 #include <ebuild.h>
+#include <dirent.h>
 
 #define CTEST(name) static void name(void** state)
 
@@ -18,6 +19,7 @@ CTEST(test_atom_full)
                             "[use_enable, -use_disable,"
                             "use_equal=, !use_opposite=,"
                             "!disable_if_off?, enable_if_on?]");
+    assert_non_null(atom);
     assert_string_equal(atom->category, "cat2");
     assert_string_equal(atom->name, "pkg3");
     assert_string_equal(atom->version->full_version, "2.2.34-r6");
@@ -69,9 +71,92 @@ CTEST(test_ebuild_init)
     Py_DECREF(self);
 }
 
+CTEST(test_parse_all_metadata)
+{
+    /* Parse the entire repository */
+    /* We can just free each ebuild immediately */
+
+    struct dirent* dp;
+    struct dirent* dp2;
+    struct dirent* dp3;
+    DIR* dfd;
+    DIR* dfd2;
+    DIR* dfd3;
+
+    char* repository_path = "/var/db/repos/gentoo/";
+    assert_non_null(dfd = opendir(repository_path));
+
+    char path1[PATH_MAX];
+    char path2[PATH_MAX];
+
+    while ((dp = readdir(dfd)) != NULL)
+    {
+        struct stat stbuf;
+        sprintf(path1, "%s/%s", repository_path, dp->d_name);
+        assert_int_not_equal(stat(path1, &stbuf), -1);
+
+        if (*dp->d_name == '.')
+            continue;
+
+        if (S_ISDIR(stbuf.st_mode))
+        {
+            /* Skip directories without '-' */
+            if (!strchr(dp->d_name, '-'))
+                continue;
+
+            const char* category = dp->d_name;
+            assert_non_null(dfd2 = opendir(path1));
+
+            while ((dp2 = readdir(dfd2)) != NULL)
+            {
+                if (*dp2->d_name == '.')
+                    continue;
+                sprintf(path2, "%s/%s/%s", repository_path, category, dp2->d_name);
+                assert_int_not_equal(stat(path2, &stbuf), -1);
+                if (!S_ISDIR(stbuf.st_mode))
+                    continue;
+
+                assert_non_null(dfd3 = opendir(path2));
+
+                while ((dp3 = readdir(dfd3)) != NULL)
+                {
+                    if (*dp3->d_name == '.')
+                        continue;
+                    char* name_and_value = dp3->d_name;
+                    char* match = strstr(name_and_value, ".ebuild");
+                    if (!match)
+                        continue;
+                    *match = 0;
+
+                    Ebuild* self = (Ebuild*) PyEbuild_new(&PyEbuildType, NULL, NULL);
+                    assert_int_equal(ebuild_init(self, repository_path, category, name_and_value), 0);
+                    assert_int_equal(ebuild_metadata_init(self), 0);
+                    Py_DECREF(self);
+                }
+
+                closedir(dfd3);
+            }
+
+            closedir(dfd2);
+        }
+    }
+
+    closedir(dfd);
+}
+
+CTEST(test_parse_invalid)
+{
+    assert_null(atom_parse("package-name-not-atom"));
+    assert_null(cmdline_parse("33"));
+    assert_null(required_use_parse(" ?? "));
+    assert_null(depend_parse("use? "));
+}
+
 const static struct CMUnitTest cportage_tests[] = {
         cmocka_unit_test(test_atom_full),
         cmocka_unit_test(test_ebuild_init),
+        //cmocka_unit_test(test_parse_all_metadata),
+        cmocka_unit_test(test_parse_invalid),
 };
 
 int main(void)
@@ -81,8 +166,7 @@ int main(void)
 
     Py_Initialize();
     module = PyInit_autogentoo_cportage();
-    if (!module)
-        return 1;
+    assert_non_null(module);
 
     p = (Portage*) PyPortage_new(&PyPortageType, NULL, NULL);
     PyPortage_init(p, NULL, NULL);
@@ -93,10 +177,6 @@ int main(void)
     Py_DECREF(p);
     Py_DECREF(module);
 
-    if (Py_FinalizeEx() != 0)
-    {
-        lerror("Failed to free Python memory!");
-    }
-
+    assert_int_equal(Py_FinalizeEx(), 0);
     return ret;
 }

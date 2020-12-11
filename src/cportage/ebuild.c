@@ -40,6 +40,8 @@ int ebuild_init(Ebuild* self,
     /* Free the atom (no longer needed) */
     Py_DECREF(atom);
 
+    assert(self->version);
+
     char cache_file_raw[PATH_MAX];
     sprintf(cache_file_raw, "%s/%s/%s-%s.ebuild",
             self->repository_path, self->package_key, self->name,
