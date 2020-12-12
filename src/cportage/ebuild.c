@@ -191,14 +191,21 @@ int ebuild_metadata_init(Ebuild* self)
             name[name_size - 1] = 0;
         if (value_size)
             value[value_size - 1] = 0;
+
+        U8 is_dep = 0;
         for (U32 i = 0; i < sizeof(depend_setup) / sizeof(depend_setup[0]); i++)
         {
             if (strcmp(name, depend_setup[i].name_match) == 0)
             {
                 Dependency** target = (Dependency**) (((U8*) self) + depend_setup[i].ebuild_target_offset);
                 *target = depend_parse(value);
+                is_dep = 1;
+                break;
             }
         }
+
+        if (is_dep)
+            continue;
 
         if (strcmp(name, "SLOT") == 0)
         {

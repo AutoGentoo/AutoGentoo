@@ -14,7 +14,6 @@ int requiredusewrap() { return 1; }
 int requireduselex();
 int requireduselineno;
 int requireduselloc;
-char* yytext;
 void* requireduseout;
 
 #define REQUIREDUSEERROR_VERBOSE 1
@@ -24,31 +23,16 @@ extern Portage* global_portage;
 void requireduseerror(const char *message);
 %}
 
-%start program
+%start program_required_use
 
 %union {
     char* identifier;
-    Atom* atom_type;
-    Dependency* depend_type;
     atom_use_default_t use_default;
-    RequiredUse* use_type;
+    RequiredUse* required_use;
     struct {
-        use_operator_t val;
         char* target;
+        use_operator_t operator;
      } use_select;
-
-    struct {
-        char* target;
-        use_operator_t t;
-    } depend_expr_select;
-
-    struct {
-        char* name;
-        char* sub_name;
-        atom_slot_t slot_opts;
-    } slot;
-
-    AtomFlag* atom_flag;
 }
 
 %token <identifier> IDENTIFIER
@@ -60,33 +44,40 @@ void requireduseerror(const char *message);
 %token REQUIRED_USE
 %token COMMAND_LINE
 
-%type <use_type> required_use_expr
-%type <depend_expr_select> depend_expr_sel
-%type <depend_expr_select> use_expr
+%type <required_use> required_use_expr
+%type <required_use> required_use_single
+%type <use_select> depend_expr_sel
+%type <use_select> use_expr
+
+%destructor { if($$.target) free($$.target); } <use_select>
+%destructor { Py_DECREF($$); } <required_use>
 
 %%
 
-program:                                        {requireduseout = NULL;}
+program_required_use:                           {requireduseout = NULL;}
             | REQUIRED_USE required_use_expr    {requireduseout = (void*)$2;}
             | END_OF_FILE                       {requireduseout = NULL;}
             ;
 
-required_use_expr   : depend_expr_sel required_use_expr         {
-                                                                     $$ = use_build_required_use($1.target, $1.t);
-                                                                     free($1.target);
-                                                                     $$->depend = $2;
+required_use_single : depend_expr_sel '(' required_use_expr ')' {
+                                                                     $$ = use_build_required_use($1.target, $1.operator);
+                                                                     if ($1.target)
+                                                                        free($1.target);
+                                                                     $$->depend = $3;
                                                                 }
-                    | required_use_expr required_use_expr       {$$ = $1; $$->next = $2;}
-                    | '(' required_use_expr ')'                 {$$ = $2;}
-                    | use_expr                                  {$$ = use_build_required_use($1.target, $1.t); free($1.target);}
+                    | use_expr                                  {$$ = use_build_required_use($1.target, $1.operator);}
                     ;
 
-use_expr     : '!' IDENTIFIER        {$$.target = $2; $$.t = USE_OP_DISABLE;}
-             | IDENTIFIER            {$$.target = $1; $$.t = USE_OP_ENABLE;}
+required_use_expr   : required_use_single                         {$$ = $1;}
+                    | required_use_expr required_use_single       {$$ = $1; $$->next = $2;}
+                    ;
+
+use_expr     : '!' IDENTIFIER        {$$.target = $2; $$.operator = USE_OP_DISABLE;}
+             | IDENTIFIER            {$$.target = $1; $$.operator = USE_OP_ENABLE;}
              ;
 
 depend_expr_sel : use_expr '?'       {$$ = $1;}
-                | USESELECT          {$$.target = $1.target; $$.t = $1.val;}
+                | USESELECT          {$$.target = $1.target; $$.operator = $1.operator;}
                 ;
 
 %%

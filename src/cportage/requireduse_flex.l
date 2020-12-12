@@ -41,9 +41,9 @@ identifier      ({letter}|{digit}|_|\+|\*|\-)+
                             language_increment_line();
                         }
 [ \t\r\\]+              {language_begin_token(yytext, "tab");};
-"??"                    {requireduselval.use_select.target = strdup(yytext); language_begin_token(yytext, NULL); requireduselval.use_select.val = USE_OP_MOST_ONE; return USESELECT;}
-"||"                    {requireduselval.use_select.target = strdup(yytext); language_begin_token(yytext, NULL); requireduselval.use_select.val = USE_OP_LEAST_ONE; return USESELECT;}
-"^^"                    {requireduselval.use_select.target = strdup(yytext); language_begin_token(yytext, NULL); requireduselval.use_select.val = USE_OP_EXACT_ONE; return USESELECT;}
+"??"                    {requireduselval.use_select.target = NULL; language_begin_token(yytext, NULL); requireduselval.use_select.operator = USE_OP_MOST_ONE; return USESELECT;}
+"||"                    {requireduselval.use_select.target = NULL; language_begin_token(yytext, NULL); requireduselval.use_select.operator = USE_OP_LEAST_ONE; return USESELECT;}
+"^^"                    {requireduselval.use_select.target = NULL; language_begin_token(yytext, NULL); requireduselval.use_select.operator = USE_OP_EXACT_ONE; return USESELECT;}
 "(+)"                   {requireduselval.use_default = ATOM_DEFAULT_ON; language_begin_token(yytext, NULL); return USE_DEFAULT;}
 "(-)"                   {requireduselval.use_default = ATOM_DEFAULT_OFF; language_begin_token(yytext, NULL); return USE_DEFAULT;}
 "-"                     {language_begin_token(yytext, NULL); return '-';}
@@ -66,6 +66,6 @@ identifier      ({letter}|{digit}|_|\+|\*|\-)+
                             return IDENTIFIER;
                         }
 [<<EOF>>|'']            {language_begin_token(yytext, "eof"); return END_OF_FILE;}
-.                       {language_begin_token(yytext, "invalid"); printf("Unknown character: %s\n", yytext);}
+.                       {language_begin_token(yytext, "invalid"); language_print_error("Unknown character: %s", yytext);}
 
 %%

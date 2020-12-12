@@ -62,12 +62,31 @@ CTEST(test_atom_full)
     Py_DECREF(atom);
 }
 
+CTEST(test_depend)
+{
+    Dependency* deps = depend_parse("use1? ( >=cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )");
+    assert_non_null(deps);
+
+    assert_string_equal(lut_get_key(global_portage->global_flags, deps->use_condition), "use1");
+    assert_string_equal(deps->children->atom->name, "pkg3");
+    assert_string_equal(deps->children->next->atom->name, "pkg2");
+
+    Py_DECREF(deps);
+}
+
 CTEST(test_ebuild_init)
 {
     Ebuild* self = (Ebuild*) PyEbuild_new(&PyEbuildType, NULL, NULL);
+    assert_non_null(self);
     assert_int_equal(ebuild_init(self, "data/test-repo", "sys-devel", "gcc-9.3.0-r1"), 0);
-
     assert_int_equal(ebuild_metadata_init(self), 0);
+
+    assert_non_null(self->pdepend);
+    assert_non_null(self->rdepend);
+    assert_non_null(self->bdepend);
+    assert_non_null(self->depend);
+
+    assert_int_equal(Py_REFCNT(self), 1);
     Py_DECREF(self);
 }
 
@@ -147,14 +166,15 @@ CTEST(test_parse_all_metadata)
 CTEST(test_parse_invalid)
 {
     assert_null(atom_parse("package-name-not-atom"));
-    assert_null(cmdline_parse("33"));
+    //assert_null(cmdline_parse("33"));
     assert_null(required_use_parse(" ?? "));
     assert_null(depend_parse("use? "));
 }
 
 const static struct CMUnitTest cportage_tests[] = {
+        cmocka_unit_test(test_depend),
         cmocka_unit_test(test_atom_full),
-        cmocka_unit_test(test_ebuild_init),
+        //cmocka_unit_test(test_ebuild_init),
         //cmocka_unit_test(test_parse_all_metadata),
         cmocka_unit_test(test_parse_invalid),
 };

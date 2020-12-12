@@ -1,2 +1,2 @@
-leak:_PyObject_Malloc
+leak:_PyObject_Malloc*
 leak:libpython*

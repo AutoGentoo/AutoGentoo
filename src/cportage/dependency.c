@@ -11,8 +11,8 @@
 
 static PyMethod(PyDependency_dealloc, Dependency)
 {
-    Py_XDECREF(self->next);
     Py_XDECREF(self->atom);
+    Py_XDECREF(self->next);
     Py_XDECREF(self->children);
     Py_TYPE(self)->tp_free((PyObject*) self);
 }
@@ -72,7 +72,10 @@ Dependency* dependency_build_grouping(Dependency* children)
 Dependency* dependency_build_use(const char* use_flag, use_operator_t type, Dependency* children)
 {
     Dependency* self = (Dependency*) PyDependency_new(&PyDependencyType, NULL, NULL);
-    self->use_condition = use_get_global(global_portage, use_flag);
+    if (use_flag != NULL)
+        self->use_condition = use_get_global(global_portage, use_flag);
+    else
+        self->use_condition = 0;
     self->use_operator = type;
 
     self->children = children;

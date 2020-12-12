@@ -1,6 +1,7 @@
 add_test(NAME cportage_unit
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMAND ${CMAKE_COMMAND} -E env
+            ${LD_PRELOAD}
             LSAN_OPTIONS=suppressions=data/leak.supp
             PYTHONPATH=${CMAKE_BINARY_DIR}/src/cportage/  # Used to help import the module with out 'make install'
             ${CMAKE_CURRENT_SOURCE_DIR}/cportage_unit.py
