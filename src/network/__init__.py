@@ -23,7 +23,7 @@ def build_message(token: int, *args: Union[int, float], **kwargs) -> Message:
         parsed_args.append(convert_to_bin(0))
 
     data_param: Optional[bytes] = None
-    if 'data' in kwargs:
+    if "data" in kwargs:
         data_param = kwargs["data"]
 
     return Message(
@@ -35,6 +35,6 @@ def build_message(token: int, *args: Union[int, float], **kwargs) -> Message:
             parsed_args[3],
             parsed_args[4],
             parsed_args[5],
-            data_param
+            data_param,
         )
     )
