@@ -14,7 +14,7 @@ def build_message(token: int, *args: Union[int, float], **kwargs) -> Message:
             return struct.pack("d", s)
         elif isinstance(s, int):
             return s.to_bytes(8, signed=False, byteorder=sys.byteorder)
-        return b''
+        return b""
 
     parsed_args = []
     for arg in args:
