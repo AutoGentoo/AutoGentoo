@@ -1,3 +1,7 @@
+![Lint](https://github.com/AutoGentoo/AutoGentoo/workflows/Lint/badge.svg)
+![build](https://github.com/AutoGentoo/AutoGentoo/workflows/default/badge.svg)
+![sanitizer-build](https://github.com/AutoGentoo/AutoGentoo/workflows/sanitizer/badge.svg)
+
 # AutoGentoo
 A gentoo portage binhost manager
 
