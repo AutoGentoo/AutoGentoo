@@ -9,7 +9,8 @@ set(CMAKE_C_STANDARD_REQUIRED YES)
 
 # Setup the Python development environment
 option(CUSTOM_PYTHON "Enable a custom path to a python library" OFF)
-option(ENABLE_TESTS "Perform unit tests after build" OFF)
+option(SANITIZER_BUILD "Build with AddressSanitizer" OFF)
+set(ASAN_LIB "libasan.so" CACHE STRING "Path to address santizer library")
 
 if (CUSTOM_PYTHON)
     if (Python3_USE_STATIC_LIBS)
@@ -31,9 +32,12 @@ add_compile_definitions(_GNU_SOURCE)
 add_compile_options(-Wno-unused-result -g -fno-omit-frame-pointer)
 add_link_options(-fno-omit-frame-pointer)
 
+set(LD_PRELOAD "")
 if (SANITIZER_BUILD)
     add_compile_options(-fsanitize=address)
     add_link_options(-fsanitize=address)
+
+    set(LD_PRELOAD "LD_PRELOAD=${ASAN_LIB}")
 
     message(STATUS "Building with AddressSanitizer")
 endif()

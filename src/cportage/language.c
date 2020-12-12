@@ -35,6 +35,9 @@ struct YYLTYPE
 extern YYLTYPE dependlloc;
 extern YYLTYPE requireduselloc;
 
+void requireduselex_destroy();
+void dependlex_destroy();
+
 __thread enum {
     PARSER_LANGUAGE_DEPEND,
     PARSER_LANGUAGE_REQUIRED_USE
@@ -264,6 +267,7 @@ RequiredUse* required_use_parse(const char* buffer)
     language_init_new(&pos, LANGUAGE_REQUIRED_USE);
     language_feed_string(buffer);
     requireduseparse();
+    requireduselex_destroy();
 
     if (yy_error_ag_0_)
     {

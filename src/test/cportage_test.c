@@ -11,6 +11,57 @@
 #include <ebuild.h>
 #include <dirent.h>
 
+struct atom_verify_proto {
+    const char* category;
+    const char* name;
+    const char* full_version;
+    atom_version_t version_select;
+};
+
+struct use_verify_proto {
+    const char* use_name;
+    use_operator_t operator;
+};
+
+static Dependency* dependency_verify_atom(Dependency* current, U32 count, struct atom_verify_proto verify[])
+{
+    for (U32 i = 0; i < count; i++)
+    {
+        assert_non_null(current->atom);
+        assert_string_equal(current->atom->category, verify[i].category);
+        assert_string_equal(current->atom->name, verify[i].name);
+
+        if (verify[i].full_version)
+        {
+            assert_non_null(current->atom->version);
+            assert_string_equal(current->atom->version->full_version, verify[i].full_version);
+        }
+        else
+        {
+            assert_null(current->atom->version);
+        }
+
+        assert_int_equal(current->atom->range, verify[i].version_select);
+        current = current->next;
+    }
+
+    return current;
+}
+
+static Dependency* dependency_verify_use(Dependency* current, U32 count, struct use_verify_proto verify[])
+{
+    for (U32 i = 0; i < count; i++)
+    {
+        assert_null(current->atom);
+        assert_int_equal(current->use_operator, verify[i].operator);
+        if (current->use_condition)
+            assert_string_equal(lut_get_key(global_portage->global_flags, current->use_condition), verify[i].use_name);
+        current = current->next;
+    }
+
+    return current;
+}
+
 #define CTEST(name) static void name(void** state)
 
 CTEST(test_atom_full)
@@ -62,12 +113,58 @@ CTEST(test_atom_full)
     Py_DECREF(atom);
 }
 
+CTEST(test_depend)
+{
+    Dependency* deps = depend_parse("use1? ( >=cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )");
+    assert_non_null(deps);
+
+    assert_string_equal(lut_get_key(global_portage->global_flags, deps->use_condition), "use1");
+    assert_string_equal(deps->children->atom->name, "pkg3");
+    assert_string_equal(deps->children->next->atom->name, "pkg2");
+
+    Py_DECREF(deps);
+}
+
 CTEST(test_ebuild_init)
 {
     Ebuild* self = (Ebuild*) PyEbuild_new(&PyEbuildType, NULL, NULL);
+    assert_non_null(self);
     assert_int_equal(ebuild_init(self, "data/test-repo", "sys-devel", "gcc-9.3.0-r1"), 0);
-
     assert_int_equal(ebuild_metadata_init(self), 0);
+
+    assert_non_null(self->pdepend);
+    assert_non_null(self->rdepend);
+    assert_non_null(self->bdepend);
+    assert_non_null(self->depend);
+
+    struct atom_verify_proto verify_atom_1[] = {
+            {"app-portage", "elt-patches", "20170815", ATOM_VERSION_GE},
+            {"sys-devel", "bison", "1.875", ATOM_VERSION_GE},
+            {"sys-devel", "flex", "2.5.4", ATOM_VERSION_GE},
+    };
+    struct atom_verify_proto verify_atom_2[] = {
+            {"sys-devel", "gettext", NULL, ATOM_VERSION_ALL},
+    };
+    struct atom_verify_proto verify_atom_3[] = {
+            {"dev-util", "dejagnu", "1.4.4", ATOM_VERSION_GE},
+            {"sys-devel", "autogen", "5.5.4", ATOM_VERSION_GE},
+    };
+
+    struct use_verify_proto verify_use_1[] = {
+            {"nls", USE_OP_ENABLE}
+    };
+    struct use_verify_proto verify_use_2[] = {
+            {"test", USE_OP_ENABLE}
+    };
+
+    Dependency* current = self->bdepend;
+    current = dependency_verify_atom(current, 3, verify_atom_1);
+    assert_null(dependency_verify_atom(current->children, 1, verify_atom_2));
+    current = dependency_verify_use(current, 1, verify_use_1);
+    assert_null(dependency_verify_atom(current->children, 2, verify_atom_3));
+    assert_null(dependency_verify_use(current, 1, verify_use_2));
+
+    assert_int_equal(Py_REFCNT(self), 1);
     Py_DECREF(self);
 }
 
@@ -147,12 +244,13 @@ CTEST(test_parse_all_metadata)
 CTEST(test_parse_invalid)
 {
     assert_null(atom_parse("package-name-not-atom"));
-    assert_null(cmdline_parse("33"));
+    //assert_null(cmdline_parse("33"));
     assert_null(required_use_parse(" ?? "));
     assert_null(depend_parse("use? "));
 }
 
 const static struct CMUnitTest cportage_tests[] = {
+        cmocka_unit_test(test_depend),
         cmocka_unit_test(test_atom_full),
         cmocka_unit_test(test_ebuild_init),
         //cmocka_unit_test(test_parse_all_metadata),

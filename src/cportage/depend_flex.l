@@ -23,21 +23,21 @@ letter          [a-zA-Z]
 digit           [0-9]
 version_suf     ("_alpha"|"_beta"|"_pre"|"_rc"|""|"_p")
 version         {digit}+("."{digit}+)*{letter}?({version_suf}{digit}*)*("-r"{digit}+)?[\*]?
-identifier      ({letter}|{digit}|_|\+|\*|\-)+
+identifier      ({letter}|{digit}|_|\+|\-)+
 atom            {identifier}\/{identifier}(\-{version})?
 slotname        ({letter}|{digit}|"_")({letter}|{digit}|"_"|"-"|"."|"+")*
 slot            [\:]({slotname}(\/{slotname})?)?[\*|\=]?
 repo            [\:][\:]{identifier}
 atomflag        [!]?{identifier}(\([\+|\-]\))?[\?|=]?
 atomflags       [\[][ ]*{atomflag}([ ]*,[ ]*{atomflag})*[ ]*[\]]
+use_select      [!]?{identifier}\?
 
 %%
 [\x01]                  {
-                            language_begin_token(yytext, "delim");
+                            language_begin_token(dependtext, "delim");
                             switch(language_get_type_delim())
                             {
                                 case LANGUAGE_DEPEND: return DEPEND;
-                                case LANGUAGE_REQUIRED_USE: return REQUIRED_USE;
                                 case LANGUAGE_CMDLINE: return COMMAND_LINE;
                                 case LANGUAGE_IGNORE:
                                 default:
@@ -45,13 +45,13 @@ atomflags       [\[][ ]*{atomflag}([ ]*,[ ]*{atomflag})*[ ]*[\]]
                             }
                         }
 [\n]                    {
-                            language_begin_token(yytext, "newline");
+                            language_begin_token(dependtext, "newline");
                             language_increment_line();
                         }
-[ \t\r\\]+              {language_begin_token(yytext, "tab");};
-{repo}                  {dependlval.identifier = strdup(yytext + 2); language_begin_token(yytext, "repo"); return REPOSITORY;}
+[ \t\r\\]+              {language_begin_token(dependtext, "tab");};
+{repo}                  {language_begin_token(dependtext, "repo"); dependlval.identifier = strdup(dependtext + 2); return REPOSITORY;}
 {slot}                  {
-                            char* ref = yytext;
+                            char* ref = dependtext;
                             int len = strlen(ref);
                             language_begin_token(ref, "slot");
                             dependlval.slot.slot_opts = ATOM_SLOT_IGNORE;
@@ -81,8 +81,8 @@ atomflags       [\[][ ]*{atomflag}([ ]*,[ ]*{atomflag})*[ ]*[\]]
                             return SLOT;
                         }
 {atomflags}             {
-                            char* textref = yytext;
-                            language_begin_token(yytext, NULL);
+                            char* textref = dependtext;
+                            language_begin_token(dependtext, "atomflags");
                             AtomFlag* start = NULL;
                             AtomFlag* last = NULL;
                             AtomFlag* current;
@@ -142,41 +142,60 @@ atomflags       [\[][ ]*{atomflag}([ ]*,[ ]*{atomflag})*[ ]*[\]]
                             dependlval.atom_flags = start;
                             return ATOM_FLAGS;
                         }
-"??"                    {language_begin_token(yytext, NULL); dependlval.use_select = USE_OP_MOST_ONE; return USESELECT;}
-"||"                    {language_begin_token(yytext, NULL); dependlval.use_select = USE_OP_LEAST_ONE; return USESELECT;}
-"^^"                    {language_begin_token(yytext, NULL); dependlval.use_select = USE_OP_EXACT_ONE; return USESELECT;}
-"-"                     {language_begin_token(yytext, NULL); return '-';}
-"<"                     {language_begin_token(yytext, NULL); return '<';}
-">"                     {language_begin_token(yytext, NULL); return '>';}
-"="                     {language_begin_token(yytext, NULL); return '=';}
-"!"                     {language_begin_token(yytext, NULL); return '!';}
-[\[]                    {language_begin_token(yytext, NULL); return '[';}
-[\]]                    {language_begin_token(yytext, NULL); return ']';}
-[\?]                    {language_begin_token(yytext, NULL); return '?';}
-[\(]                    {language_begin_token(yytext, NULL); return '(';}
-[\)]                    {language_begin_token(yytext, NULL); return ')';}
-[\^]                    {language_begin_token(yytext, NULL); return '^';}
-[\|]                    {language_begin_token(yytext, NULL); return '|';}
-[\,]                    {language_begin_token(yytext, NULL); return ',';}
-[\~]                    {language_begin_token(yytext, NULL); return '~';}
+{use_select}            {
+                            char* ref = dependtext;
+                            language_begin_token(ref, "use_select");
+
+                            if (*ref == '!')
+                            {
+                                dependlval.depend_expr_select.operator = USE_OP_DISABLE;
+                                ref++;
+                            }
+                            else
+                            {
+                                dependlval.depend_expr_select.operator = USE_OP_ENABLE;
+                            }
+
+                            size_t len = strlen(ref);
+                            ref[len - 1] = 0;
+                            dependlval.depend_expr_select.target = strndup(ref, len - 1);
+                            return USESELECT;
+                        }
+"??"                    {language_begin_token(dependtext, NULL); dependlval.depend_expr_select.target = NULL; dependlval.depend_expr_select.operator = USE_OP_MOST_ONE; return USESELECT;}
+"||"                    {language_begin_token(dependtext, NULL); dependlval.depend_expr_select.target = NULL; dependlval.depend_expr_select.operator = USE_OP_LEAST_ONE; return USESELECT;}
+"^^"                    {language_begin_token(dependtext, NULL); dependlval.depend_expr_select.target = NULL; dependlval.depend_expr_select.operator = USE_OP_EXACT_ONE; return USESELECT;}
+"-"                     {language_begin_token(dependtext, NULL); return '-';}
+"<"                     {language_begin_token(dependtext, NULL); return '<';}
+">"                     {language_begin_token(dependtext, NULL); return '>';}
+"="                     {language_begin_token(dependtext, NULL); return '=';}
+"!"                     {language_begin_token(dependtext, NULL); return '!';}
+[\[]                    {language_begin_token(dependtext, NULL); return '[';}
+[\]]                    {language_begin_token(dependtext, NULL); return ']';}
+[\?]                    {language_begin_token(dependtext, NULL); return '?';}
+[\(]                    {language_begin_token(dependtext, NULL); return '(';}
+[\)]                    {language_begin_token(dependtext, NULL); return ')';}
+[\^]                    {language_begin_token(dependtext, NULL); return '^';}
+[\|]                    {language_begin_token(dependtext, NULL); return '|';}
+[\,]                    {language_begin_token(dependtext, NULL); return ',';}
+[\~]                    {language_begin_token(dependtext, NULL); return '~';}
 {atom}                  {
-                            char* reference = yytext;
+                            char* reference = dependtext;
                             language_begin_token(reference, "atom");
                             dependlval.atom_type = (Atom*)PyAtom_new(&PyAtomType, NULL, NULL);
                             atom_init(dependlval.atom_type, reference);
                             return ATOM;
                         }
 
-[\*]                    {language_begin_token(yytext, "star"); return '*';}
+[\*]                    {language_begin_token(dependtext, "star"); return '*';}
 
 {identifier}            {
-                            dependlval.identifier = yytext;
-                            language_begin_token(yytext, "identifier");
-                            return IDENTIFIER;
+                            char* ref = dependtext;
+                            language_print_error("Invalid identifier '%s'", ref);
+                            language_begin_token(ref, "identifier");
                         }
 
 
-[<<EOF>>|'']            {language_begin_token(yytext, "eof"); return END_OF_FILE;}
-.                       {language_begin_token(yytext, "invalid"); printf("Unknown character: %s\n", yytext);}
+[<<EOF>>|'']            {language_begin_token(dependtext, "eof"); return END_OF_FILE;}
+.                       {language_begin_token(dependtext, "invalid"); printf("Unknown character: %s\n", dependtext);}
 
 %%

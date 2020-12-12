@@ -27,7 +27,7 @@ typedef struct
 Dependency* depend_parse(const char* buffer);
 RequiredUse* required_use_parse(const char* buffer);
 Atom* atom_parse(const char* buffer);
-Dependency* cmdline_parse(const char* buffer);
+//Dependency* cmdline_parse(const char* buffer);
 
 void language_init_new(YYBUFFERPOS* buffer, type_delim_t delim);
 void language_increment_line(void);
