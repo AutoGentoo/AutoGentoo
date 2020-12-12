@@ -21,11 +21,11 @@ struct RequiredUse_prv {
 struct UseFlag_prv {
     PyObject_HEAD
     char* name;
-    use_state_t state;
+    U8 state;
 };
 
 PyNewFunc(PyUseFlag_new);
-void use_flag_init(UseFlag* self, const char* name, use_state_t state);
+void use_flag_init(UseFlag* self, const char* name, U8 state);
 
 Use_t use_get_global(Portage* parent, const char* useflag);
 RequiredUse* use_build_required_use(const char* target, use_operator_t option);

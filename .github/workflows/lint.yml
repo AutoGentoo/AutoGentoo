@@ -26,5 +26,5 @@ jobs:
           # Enable linters
           black: true
           mypy: true
+          mypy_args: "--disallow-any-unimported --disallow-any-expr"
           auto_fix: true
-

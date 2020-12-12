@@ -127,8 +127,8 @@ static void ebuild_keyword_init(Ebuild* self, char* line)
 
 static void ebuild_iuse_init(Ebuild* self, char* line)
 {
-    OBJECT_FREE(self->local_use);
-    self->local_use = lut_new(32);
+    Py_XDECREF(self->iuse);
+    self->iuse = PyDict_New();
 
     for (char* token = strtok(line, " "); token; token = strtok(NULL, " "))
     {
@@ -146,9 +146,7 @@ static void ebuild_iuse_init(Ebuild* self, char* line)
 
         flag->name = strdup(token);
 
-        /* Add this flag to the local look-up table */
-        lut_insert(self->local_use, flag->name, (U64) flag, LUT_FLAG_PYTHON);
-
+        PyDict_SetItemString(self->iuse, flag->name, (PyObject*) flag);
         Py_DECREF(flag);
     }
 }
@@ -271,6 +269,9 @@ PyInitFunc(PyEbuild_init, Ebuild)
 
 PyMethod(PyEbuild_dealloc, Ebuild)
 {
+    Py_XDECREF(self->older);
+    Py_XDECREF(self->newer);
+
     SAFE_FREE(self->name);
     SAFE_FREE(self->category);
     SAFE_FREE(self->repository_path);
@@ -287,7 +288,7 @@ PyMethod(PyEbuild_dealloc, Ebuild)
     Py_XDECREF(self->rdepend);
     Py_XDECREF(self->pdepend);
 
-    OBJECT_FREE(self->local_use);
+    Py_XDECREF(self->iuse);
     OBJECT_FREE(self->feature_restrict);
 
     Py_XDECREF(self->required_use);
@@ -314,6 +315,7 @@ static PyMemberDef PyEbuild_members[] = {
         {"required_use",  T_OBJECT, offsetof(Ebuild, required_use),  READONLY},
         {"src_uri",       T_OBJECT, offsetof(Ebuild, src_uri),       READONLY},
         {"version",       T_OBJECT, offsetof(Ebuild, version),       READONLY},
+        {"iuse",          T_OBJECT, offsetof(Ebuild, iuse),          READONLY},
         {"metadata_init", T_BOOL,   offsetof(Ebuild, metadata_init), READONLY},
         {"older",         T_OBJECT, offsetof(Ebuild, older),         READONLY},
         {"newer",         T_OBJECT, offsetof(Ebuild, newer),         READONLY},

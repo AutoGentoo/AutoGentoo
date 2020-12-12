@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-import os
 import sys
 import unittest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-import network
+from autogentoo import network
 
 
 SERVER_ADDR = "/tmp/network.autogentoo.test.sock"

@@ -47,7 +47,7 @@ PythonModule(autogentoo_cportage
         portage.h module.c use.c use.h atom.c
         ../python_util.h atom.h dependency.c
         dependency.h portage.c ebuild.c ebuild.h module.h
-        language.c
+        language.c package.c package.h
 
         ${depend_SOURCES}
         ${requireduse_SOURCES}

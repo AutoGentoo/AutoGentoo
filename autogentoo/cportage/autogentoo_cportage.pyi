@@ -1,4 +1,5 @@
-from typing import Optional
+from typing import Optional, Dict
+
 
 class AtomVersion:
     raw: str
@@ -24,8 +25,24 @@ class AtomFlag:
     def __iter__(self) -> AtomFlag: ...
 
 
+class Package:
+    package_id: int
+    category: str
+    name: str
+    key: str
+    ebuilds: Ebuild
+
+    def __init__(self, key: str): ...
+    def add_ebuild(self, ebuild: Ebuild): ...
+    def match_atom(self, atom: Atom): ...
+
+
 class Portage:
-    pass
+    def __init__(self): ...
+    def add_package(self, package: Package): ...
+    def get_package(self, package_id: int) -> 'Package': ...
+    def match_atom(self, atom: Atom) -> Ebuild: ...
+    def get_use_flag(self, use_flag: int) -> UseFlag: ...
 
 
 class RequiredUse:
@@ -82,6 +99,7 @@ class Ebuild:
     ebuild: str
     path: str
     cache_file: str
+    iuse: Dict[str, UseFlag]
 
     depend: Optional[Dependency]
     bdepend: Optional[Dependency]
@@ -102,6 +120,7 @@ class Ebuild:
                  name_and_version: str): ...
 
 def init(portage: Optional[Portage]): ...
+def get_portage() -> Portage: ...
 
 # /* use_operator_t */
 USE_OP_NONE: int = ...

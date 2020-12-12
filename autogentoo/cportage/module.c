@@ -8,6 +8,7 @@
 #include "use.h"
 #include "structmember.h"
 #include "ebuild.h"
+#include "package.h"
 
 PyFastMethod(PyCportage_Init, PyObject*)
 {
@@ -28,6 +29,25 @@ PyFastMethod(PyCportage_Init, PyObject*)
     Py_RETURN_NONE;
 }
 
+PyFastMethod(PyCportage_get_portage, PyObject*)
+{
+    if (nargs != 0)
+    {
+        PyErr_Format(PyExc_TypeError, "Does not take an argument");
+        return NULL;
+    }
+
+    if (global_portage)
+    {
+        Py_INCREF(global_portage);
+        return (PyObject*) global_portage;
+    }
+
+    PyErr_Format(PyExc_RuntimeError, "Global portage has not been initialized (call cportage.init())");
+    return NULL;
+}
+
+
 void PyCportage_free()
 {
     Py_XDECREF(global_portage);
@@ -36,6 +56,7 @@ void PyCportage_free()
 
 static PyMethodDef module_methods[] = {
         {"init", (PyCFunction) PyCportage_Init, METH_FASTCALL, "Initialize the global portage struct"},
+        {"get_portage", (PyCFunction) PyCportage_get_portage, METH_FASTCALL},
         {NULL, NULL,0, NULL}
 };
 
@@ -69,6 +90,7 @@ PyInit_autogentoo_cportage(void)
         || PyType_Ready(&PyUseFlagType) < 0
         || PyType_Ready(&PyRequiredUseType) < 0
         || PyType_Ready(&PyEbuildType) < 0
+        || PyType_Ready(&PyPackageType) < 0
         )
     {
         Py_DECREF(m);
@@ -83,6 +105,7 @@ PyInit_autogentoo_cportage(void)
     Py_INCREF(&PyUseFlagType);
     Py_INCREF(&PyRequiredUseType);
     Py_INCREF(&PyEbuildType);
+    Py_INCREF(&PyPackageType);
     if (PyModule_AddObject(m, "Dependency", (PyObject*) &PyDependencyType) < 0
         || PyModule_AddObject(m, "AtomVersion", (PyObject*) &PyAtomVersionType) < 0
         || PyModule_AddObject(m, "AtomFlag", (PyObject*) &PyAtomFlagType) < 0
@@ -91,6 +114,7 @@ PyInit_autogentoo_cportage(void)
         || PyModule_AddObject(m, "UseFlag", (PyObject*) &PyUseFlagType) < 0
         || PyModule_AddObject(m, "RequiredUse", (PyObject*) &PyRequiredUseType) < 0
         || PyModule_AddObject(m, "Ebuild", (PyObject*) &PyEbuildType) < 0
+        || PyModule_AddObject(m, "Package", (PyObject*) &PyPackageType) < 0
         )
     {
         PyErr_Print();
@@ -102,6 +126,7 @@ PyInit_autogentoo_cportage(void)
         Py_DECREF(&PyUseFlagType);
         Py_DECREF(&PyRequiredUseType);
         Py_DECREF(&PyEbuildType);
+        Py_DECREF(&PyPackageType);
         Py_DECREF(m);
         return NULL;
     }
@@ -115,7 +140,6 @@ PyInit_autogentoo_cportage(void)
     PyModule_AddIntMacro(m, USE_OP_MOST_ONE);
     
     /* use_state_t */
-    PyModule_AddIntMacro(m, USE_STATE_UNKNOWN);
     PyModule_AddIntMacro(m, USE_STATE_DISABLED);
     PyModule_AddIntMacro(m, USE_STATE_ENABLED);
 

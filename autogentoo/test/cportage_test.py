@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-import os
-import sys
 import unittest
 from typing import List
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-import cportage
+from autogentoo import cportage
 
 
 class TestStringMethods(unittest.TestCase):
+    portage: cportage.Portage
+
     def setUp(self) -> None:
-        cportage.init(cportage.Portage())
+        self.portage = cportage.Portage()
+        cportage.init(self.portage)
 
     def test_atom_1(self):
         atom = cportage.Atom("cat/pkg-1.2.34")
@@ -99,6 +99,20 @@ class TestStringMethods(unittest.TestCase):
     def test_init_error(self):
         with self.assertRaises(TypeError):
             cportage.init(None)
+
+    def test_package(self):
+        p = cportage.Package("sys-devel/gcc")
+        self.portage.add_package(p)
+
+        pkg: cportage.Package = self.portage.get_package(p.package_id)
+        ebuild = cportage.Ebuild("data/test-repo", "sys-devel", "gcc-9.3.0-r1")
+        pkg.add_ebuild(ebuild)
+
+        # Can't add the same ebuild twice
+        with self.assertRaises(RuntimeError):
+            pkg.add_ebuild(ebuild)
+
+        self.assertEqual(p, pkg)
 
 
 if __name__ == "__main__":

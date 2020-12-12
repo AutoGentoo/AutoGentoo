@@ -8,6 +8,7 @@
 
 #.idea/*
 .idea/workspace.*
+**/.idea/workspace.*
 cmake-build-*/*
 venv/*
 build-debug/*

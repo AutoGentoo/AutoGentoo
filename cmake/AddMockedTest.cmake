@@ -15,7 +15,7 @@ function(add_mocked_test name)
       "${multiValueArgs}" ${ARGN} )
 
     # define test
-    add_cmocka_test(test_${name}
+    add_cmocka_test(${name}
                     SOURCES ${ADD_MOCKED_TEST_SOURCES}
                     COMPILE_OPTIONS ${ADD_MOCKED_TEST_COMPILE_OPTIONS}
                     LINK_LIBRARIES cmocka
@@ -26,5 +26,5 @@ function(add_mocked_test name)
             )
  
     # allow using includes from autogentoo/ directory
-    target_include_directories(test_${name} PRIVATE ${CMAKE_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
+    target_include_directories(${name} PRIVATE ${CMAKE_SOURCE_DIR}/src ${INCLUDE_DIRECTORIES})
 endfunction(add_mocked_test)
