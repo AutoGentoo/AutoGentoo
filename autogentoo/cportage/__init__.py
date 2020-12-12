@@ -1,7 +1,7 @@
 import enum
 
-from autogentoo_cportage import AtomVersion, UseFlag, Portage, init, Ebuild
-import autogentoo_cportage
+from .autogentoo_cportage import AtomVersion, UseFlag, Portage, init, Ebuild
+from . import autogentoo_cportage
 
 
 class UseOperatorT(enum.IntEnum):
@@ -87,39 +87,47 @@ class KeywordT(enum.IntEnum):
 
 class AtomFlag(autogentoo_cportage.AtomFlag):
     @property
+    # type: ignore
     def option(self) -> AtomUseT:
         return AtomUseT(super().option)
 
     @property
+    # type: ignore
     def default(self) -> AtomUseDefaultT:
         return AtomUseDefaultT(super().option)
 
 
 class RequiredUse(autogentoo_cportage.RequiredUse):
     @property
+    # type: ignore
     def operator(self) -> UseOperatorT:
         return UseOperatorT(super().operator)
 
 
 class Atom(autogentoo_cportage.Atom):
     @property
+    # type: ignore
     def slot_opts(self) -> AtomSlotT:
         return AtomSlotT(super().slot_opts)
 
     @property
+    # type: ignore
     def range(self) -> AtomVersionT:
         return AtomVersionT(super().range)
 
     @property
+    # type: ignore
     def blocks(self) -> AtomBlockT:
         return AtomBlockT(super().blocks)
 
 
 class Dependency(autogentoo_cportage.Dependency):
     @property
+    # type: ignore
     def use_operator(self) -> UseOperatorT:
         return UseOperatorT(super().use_operator)
 
     @property
+    # type: ignore
     def use_condition(self) -> UseOperatorT:
         return UseOperatorT(super().use_condition)

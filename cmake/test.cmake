@@ -14,4 +14,4 @@ endmacro()
 
 setup_cmocka()
 enable_testing()
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/test)
+add_subdirectory(${CMAKE_SOURCE_DIR}/autogentoo/test)

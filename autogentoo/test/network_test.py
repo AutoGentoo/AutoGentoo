@@ -2,6 +2,7 @@
 import os
 import sys
 import unittest
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 import network
 
@@ -34,5 +35,5 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(response.val1, int(4).to_bytes(8, byteorder=sys.byteorder))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

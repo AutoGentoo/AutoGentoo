@@ -7,7 +7,7 @@ function(LinkPythonLib target)
     # Link the module to the python runtime
     target_include_directories(${target} PUBLIC
             ${Python_INCLUDE_DIRS}
-            ${CMAKE_SOURCE_DIR}/src/
+            ${CMAKE_SOURCE_DIR}/autogentoo/
             ${PYTHON_LIB_INCLUDE_DIRECTORIES}
     )
     target_compile_options(${target} PUBLIC ${PYTHON_LIB_COMPILE_OPTIONS})
@@ -15,6 +15,10 @@ function(LinkPythonLib target)
             Python3::Python
             ${PYTHON_LIB_LINK_LIBRARIES})
     target_link_options(${target} PUBLIC ${LINK_OPTIONS})
+
+    add_custom_command(TARGET ${target}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${target}> ${CMAKE_CURRENT_SOURCE_DIR}/$<TARGET_FILE_NAME:${target}>)
 
     if ("${PYTHON_LIB_DEPEND}" STREQUAL "")
     else()
