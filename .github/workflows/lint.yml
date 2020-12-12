@@ -11,13 +11,20 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v2
 
-      # Install your linters here
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+
+      - name: Install Python dependencies
+        run: pip install black flake8 mypy
 
       - name: Run linters
         uses: wearerequired/lint-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Enable your linters here
-          mypy: true
+          # Enable linters
+          black: true
           flake8: true
+          mypy: true
 
