@@ -32,8 +32,7 @@ struct Ebuild_prv {
     Dependency* rdepend;
     Dependency* pdepend; //!< Must be installed after this package is
 
-    LUT* local_use;  /* Initialized by IUSE
-                      * this has lower preference  */
+    PyObject* iuse;
     Vector* feature_restrict;
     keyword_t keywords[ARCH_END];
 

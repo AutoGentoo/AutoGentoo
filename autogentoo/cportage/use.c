@@ -12,11 +12,11 @@ PyNewFunc(PyUseFlag_new)
 {
     UseFlag* self = (UseFlag*) type->tp_alloc(type, 0);
     self->name = NULL;
-    self->state = USE_STATE_UNKNOWN;
+    self->state = USE_STATE_DISABLED;
     return (PyObject*) self;
 }
 
-void use_flag_init(UseFlag* self, const char* name, use_state_t state)
+void use_flag_init(UseFlag* self, const char* name, U8 state)
 {
     self->name = strdup(name);
     self->state = state;
@@ -27,7 +27,7 @@ static PyInitFunc(PyUseFlag_init, UseFlag)
     static char* kwlist[] = {"name", "state", NULL};
 
     const char* name = NULL;
-    use_state_t state = 0;
+    U8 state = 0;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "sp", kwlist, &name, &state))
         return -1;
@@ -55,7 +55,7 @@ Use_t use_get_global(Portage* parent, const char* useflag)
         if (flag == LUT_FLAG_NOT_FOUND)
         {
             UseFlag* new_flag = (UseFlag*) PyUseFlag_new(&PyUseFlagType, NULL, NULL);
-            use_flag_init(new_flag, useflag, USE_STATE_UNKNOWN);
+            use_flag_init(new_flag, useflag, USE_STATE_DISABLED);
 
             /* Add the flag to the global map */
             lut_insert_id(parent->global_flags, useflag, (U64) new_flag,

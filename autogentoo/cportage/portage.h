@@ -23,11 +23,10 @@ typedef enum {
     USE_OP_MOST_ONE, //!< ??
 } use_operator_t;
 
-typedef enum {
-    USE_STATE_UNKNOWN,
-    USE_STATE_DISABLED,
-    USE_STATE_ENABLED
-} use_state_t;
+enum {
+    USE_STATE_DISABLED = 0,
+    USE_STATE_ENABLED = 1
+};
 
 typedef enum {
     ATOM_USE_DISABLE, //!< atom[-bar]
