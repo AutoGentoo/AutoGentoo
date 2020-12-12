@@ -2,7 +2,7 @@ import struct
 import sys
 from typing import Union, Optional
 
-from autogentoo_network import *
+from .autogentoo_network import Message, TCPServer, send_message
 
 
 def build_message(token: int, *args: Union[int, float], **kwargs) -> Message:
@@ -14,6 +14,7 @@ def build_message(token: int, *args: Union[int, float], **kwargs) -> Message:
             return struct.pack("d", s)
         elif isinstance(s, int):
             return s.to_bytes(8, signed=False, byteorder=sys.byteorder)
+        return b''
 
     parsed_args = []
     for arg in args:

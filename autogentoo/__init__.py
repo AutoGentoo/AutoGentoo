@@ -1,2 +1,2 @@
-import cportage
-import network
+from . import cportage
+from . import network

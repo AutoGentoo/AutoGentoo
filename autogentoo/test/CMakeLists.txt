@@ -1,26 +1,23 @@
-add_test(NAME cportage_unit
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E env
+macro(PythonUnitTest name)
+    add_test(NAME ${name}_Python
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E env
             ${LD_PRELOAD}
-            LSAN_OPTIONS=suppressions=data/leak.supp
-            PYTHONPATH=${CMAKE_BINARY_DIR}/src/cportage/  # Used to help import the module with out 'make install'
-            ${CMAKE_CURRENT_SOURCE_DIR}/cportage_unit.py
-        )
+            ${EXEC_ENV}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${name}_test.py
+            )
+endmacro()
 
-add_test(NAME network_unit
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E env
-        ${LD_PRELOAD}
-        LSAN_OPTIONS=suppressions=data/leak.supp
-        PYTHONPATH=${CMAKE_BINARY_DIR}/src/network/  # Used to help import the module with out 'make install'
-        ${CMAKE_CURRENT_SOURCE_DIR}/network_unit.py
-        )
+macro(CUnitTest name)
+    add_mocked_test(${name}_C
+            SOURCES ${name}_test.c
+            LINK_LIBRARIES hacksaw Python3::Python autogentoo_${name}
+            INCLUDE_DIRECTORIES ${Python_INCLUDE_DIRS}
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            ENVIRONMENT ${EXEC_ENV}
+            )
+endmacro()
 
-
-add_mocked_test(cportage
-        SOURCES cportage_test.c
-        LINK_LIBRARIES hacksaw Python3::Python autogentoo_cportage
-        INCLUDE_DIRECTORIES ${Python_INCLUDE_DIRS}
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        ENVIRONMENT LSAN_OPTIONS=suppressions=data/leak.supp
-        )
+CUnitTest(cportage)
+PythonUnitTest(cportage)
+PythonUnitTest(network)

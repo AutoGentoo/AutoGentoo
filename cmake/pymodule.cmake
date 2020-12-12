@@ -16,6 +16,10 @@ function(LinkPythonLib target)
             ${PYTHON_LIB_LINK_LIBRARIES})
     target_link_options(${target} PUBLIC ${LINK_OPTIONS})
 
+    add_custom_command(TARGET ${target}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${target}> ${CMAKE_CURRENT_SOURCE_DIR}/$<TARGET_FILE_NAME:${target}>)
+
     if ("${PYTHON_LIB_DEPEND}" STREQUAL "")
     else()
         add_dependencies(${target} ${PYTHON_LIB_DEPEND})
