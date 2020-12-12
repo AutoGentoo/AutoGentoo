@@ -26,5 +26,4 @@ jobs:
           # Enable linters
           black: true
           mypy: true
-          auto_fix: true
-
+          auto_fix: ${{ github.event_name == 'pull_request' }}
