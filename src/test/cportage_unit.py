@@ -101,5 +101,5 @@ class TestStringMethods(unittest.TestCase):
             cportage.init(None)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
