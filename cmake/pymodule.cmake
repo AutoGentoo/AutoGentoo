@@ -7,7 +7,7 @@ function(LinkPythonLib target)
     # Link the module to the python runtime
     target_include_directories(${target} PUBLIC
             ${Python_INCLUDE_DIRS}
-            ${CMAKE_SOURCE_DIR}/src/
+            ${CMAKE_SOURCE_DIR}/autogentoo/
             ${PYTHON_LIB_INCLUDE_DIRECTORIES}
     )
     target_compile_options(${target} PUBLIC ${PYTHON_LIB_COMPILE_OPTIONS})
