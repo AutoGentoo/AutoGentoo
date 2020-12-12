@@ -2,7 +2,7 @@ import struct
 import sys
 from typing import Union, Optional
 
-from .autogentoo_network import *
+from autogentoo_network import *
 
 
 def build_message(token: int, *args: Union[int, float], **kwargs) -> Message:
