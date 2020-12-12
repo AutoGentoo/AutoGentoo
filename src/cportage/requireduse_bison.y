@@ -69,7 +69,7 @@ required_use_single : depend_expr_sel '(' required_use_expr ')' {
                     ;
 
 required_use_expr   : required_use_single                         {$$ = $1;}
-                    | required_use_expr required_use_single       {$$ = $1; $$->next = $2;}
+                    | required_use_expr required_use_expr         {$$ = $1; $$->next = $2;}
                     ;
 
 use_expr     : '!' IDENTIFIER        {$$.target = $2; $$.operator = USE_OP_DISABLE;}

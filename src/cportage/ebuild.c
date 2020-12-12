@@ -198,6 +198,12 @@ int ebuild_metadata_init(Ebuild* self)
             if (strcmp(name, depend_setup[i].name_match) == 0)
             {
                 Dependency** target = (Dependency**) (((U8*) self) + depend_setup[i].ebuild_target_offset);
+                if (*target)
+                {
+                    lerror("%s cannot be defined twice in the same file", name);
+                    return 1;
+                }
+
                 *target = depend_parse(value);
                 is_dep = 1;
                 break;

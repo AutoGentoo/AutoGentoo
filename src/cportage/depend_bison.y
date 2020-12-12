@@ -73,14 +73,12 @@ void dependerror(const char *message);
 
 %%
 
-program_depend:                                 {dependout = NULL;}
-            | DEPEND depend_expr                {dependout = (void*)$2;}
-            //| COMMAND_LINE command_line       {dependout = $2;}
-            | END_OF_FILE                       {dependout = NULL;}
-            ;
+program_depend : DEPEND depend_expr                {dependout = (void*)$2;}
+               | DEPEND                            {dependout = NULL;}
+               ;
 
 depend_expr  : depend_expr_single               {$$ = $1;}
-             | depend_expr depend_expr_single   {$$ = $1; $$->next = $2;}
+             | depend_expr depend_expr          {$$ = $1; $$->next = $2;}
 
 depend_expr_single  : atom                          {$$ = dependency_build_atom($1);}
                     | USESELECT '(' depend_expr ')' {$$ = dependency_build_use($1.target, $1.operator, $3); free($1.target);}
