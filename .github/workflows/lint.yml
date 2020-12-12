@@ -26,4 +26,5 @@ jobs:
           # Enable linters
           black: true
           mypy: true
+          auto_fix: true
 
