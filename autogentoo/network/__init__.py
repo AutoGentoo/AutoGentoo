@@ -5,7 +5,9 @@ from typing import Union, Optional, Dict
 from .autogentoo_network import Message, TCPServer, send_message
 
 
-def build_message(token: int, *args: Union[int, float], **kwargs: Optional[bytes]) -> Message:
+def build_message(
+    token: int, *args: Union[int, float], **kwargs: Optional[bytes]
+) -> Message:
     if len(args) > 6:
         raise TypeError("Message only supports up to 6 parameters")
 
