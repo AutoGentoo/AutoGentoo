@@ -1,3 +1,6 @@
 [submodule "third_party/cmocka"]
 	path = third_party/cmocka
 	url = https://github.com/AutoGentoo/cmocka.git
+[submodule "data/cportage-repo"]
+	path = data/cportage-repo
+	url = git@github.com:AutoGentoo/cportage-meta.git
