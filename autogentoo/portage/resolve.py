@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from queue import Queue
 from typing import List, Optional, Dict, Generator, Tuple
 
 from autogentoo.cportage import (
@@ -49,7 +50,7 @@ def resolve_single(
         )
 
     if depend_expr.atom is not None:  # Simple atom selection
-        sel_ebuild = emerge_session().select_atom(depend_expr.atom)
+        sel_ebuild = emerge_session().select_atom(parent, depend_expr.atom)
 
         if depend_expr.atom.useflags is None:
             return sel_ebuild
@@ -76,8 +77,6 @@ def resolve_single(
                 sel_ebuild.add_use_requirement(use.name, atom_flag)
             else:
                 sel_ebuild.add_use_requirement(use.name, AtomUseT(use.option))
-
-            # TODO Schedule use flag setting
 
         return sel_ebuild
     else:
@@ -144,9 +143,11 @@ class UseSelection(Hookable):
         if self.flag == AtomUseT.ENABLE:
             self.target_value = True
             self.enforcing = True
+            parent.schedule_use(UseFlag(use_flag.name, True))
         elif self.flag == AtomUseT.DISABLE:
             self.target_value = False
             self.enforcing = True
+            parent.schedule_use(UseFlag(use_flag.name, False))
         elif self.flag == AtomUseT.DISABLE_IF_OFF:
             if not self.target_value:
                 self.enforcing = True
@@ -158,7 +159,7 @@ class UseSelection(Hookable):
         elif self.flag == AtomUseT.OPPOSITE:
             self.enforcing = True
             self.target_value = not self.target_value
-            parent.set_use(UseFlag(use_flag.name, self.target_value))
+            parent.schedule_use(UseFlag(use_flag.name, self.target_value))
 
     def run_hook(self, arg: bool):
         """
@@ -333,7 +334,7 @@ class UseConditional(Hookable):
 
 
 class SelectedEbuild(ResolveDependency):
-    selected_by: List[Atom]
+    selected_by: Dict[Atom, Optional["SelectedEbuild"]]
 
     # The original ebuild
     ebuild: Ebuild
@@ -348,27 +349,32 @@ class SelectedEbuild(ResolveDependency):
     use_flag_hooks: Dict[str, List[Hookable]]
     global_flag_hooks: List[Hookable]  # Trigger when any use flag is changed
 
+    # Flags to set next time we regenerate
+    flags: Queue[UseFlag]
+
     generators: DependencyContainer[ResolveDependency]
     resolved_deps: DependencyContainer[ResolveDependency]
 
-    def __init__(self, atom: Atom, ebuild: Ebuild):
-        self.selected_by = []
+    def __init__(self, parent: Optional["SelectedEbuild"], atom: Atom, ebuild: Ebuild):
+        self.selected_by = {}
+
         self.ebuild = ebuild
         self.useflags = {}
         self.use_flag_hooks = {}
         self.global_flag_hooks = []
+        self.flags = Queue()
 
         self.generators = DependencyContainer[ResolveDependency]()
 
         self._is_dirty = True
-        self.add_selected_by(atom)
+        self.add_selected_by(parent, atom)
 
     def get_resolved(self) -> Optional[ResolveDependency]:
         self.regenerate()
         return self
 
-    def add_selected_by(self, atom: Atom):
-        self.selected_by.append(atom)
+    def add_selected_by(self, parent: Optional["SelectedEbuild"], atom: Atom):
+        self.selected_by[atom] = parent
 
     def change_within_slot(self, atom: Atom) -> bool:
         """
@@ -410,6 +416,9 @@ class SelectedEbuild(ResolveDependency):
             if not self.ebuild.metadata_init:
                 self.ebuild.initialize_metadata()
 
+            # Update use flags by flushing the flag buffer
+            self.flush_use()
+
             # Make sure all use-flags conform to requirements
             if self.ebuild.required_use is not None:
                 self.add_use_hook(None, RequiredUseHook(self, self.ebuild.required_use))
@@ -429,6 +438,7 @@ class SelectedEbuild(ResolveDependency):
 
             self._is_dirty = False
 
+        # Regenerate children (recursively)
         # All non-dirty expressions are already cached
         # We can just remove everyone and re-append
         self.resolved_deps.clear()
@@ -454,8 +464,8 @@ class SelectedEbuild(ResolveDependency):
     def add_use_requirement(self, name: str, flag: AtomUseT):
         """
         Select a use flag required by an atom
-        :param name:
-        :param flag:
+        :param name: name of the atom flag
+        :param flag: atom flag setting
         :return:
         """
 
@@ -465,8 +475,8 @@ class SelectedEbuild(ResolveDependency):
     def add_use_hook(self, useflag: Optional[UseFlag], hook: Hookable):
         """
         Associate an action with a flag changing
-        :param useflag:
-        :param hook:
+        :param useflag: useflag to run hook on, None for all useflags
+        :param hook: action to take when useflag is changed
         :return:
         """
 
@@ -481,27 +491,38 @@ class SelectedEbuild(ResolveDependency):
         self.use_flag_hooks[useflag.name].append(hook)
         hook.run_hook(self.get_use(useflag.name).state)
 
-    def set_use(self, useflag: UseFlag):
+    def schedule_use(self, useflag: UseFlag):
         """
-        Enable a or disable a use flag for
-        an ebuild being installed. Run all of the
-        dependency hooks associated with this flag
-        :param useflag: useflag to enable/disable
+        Update a useflag upon regeneration
+        :param useflag: useflag to update
         :return: None
         """
 
-        # Only run the hooks if there is a change in state
-        if self.get_use(useflag.name).state != useflag.state:
-            self.useflags[useflag.name] = useflag
+        self.flags.put(useflag)
+        self._is_dirty = True
 
-            # Run all of the use-hooks for this flag
-            if useflag.name in self.use_flag_hooks:
-                for hook in self.use_flag_hooks[useflag.name]:
-                    hook.run_hook(useflag.state)
+    def flush_use(self):
+        """
+        Update all of the buffered useflags
+        and run their change hooks.
+        :return: None
+        """
 
-            # Run global use-hooks
-            for hook in self.global_flag_hooks:
-                hook.run_hook(None)
+        while not self.flags.empty():
+            useflag = self.flags.get()
+
+            # Only run the hooks if there is a change in state
+            if self.get_use(useflag.name).state != useflag.state:
+                self.useflags[useflag.name] = useflag
+
+                # Run all of the use-hooks for this flag
+                if useflag.name in self.use_flag_hooks:
+                    for hook in self.use_flag_hooks[useflag.name]:
+                        hook.run_hook(useflag.state)
+
+                # Run global use-hooks
+                for hook in self.global_flag_hooks:
+                    hook.run_hook(None)
 
 
 class InstallPackage:
@@ -512,7 +533,7 @@ class InstallPackage:
         self.key = key
         self.selected_ebuild_slots = {}
 
-    def match_atom(self, atom: Atom, ebuild: Ebuild) -> SelectedEbuild:
+    def match_atom(self, parent: Optional["SelectedEbuild"], atom: Atom, ebuild: Ebuild) -> SelectedEbuild:
         # Check if slot has already been selected
         if ebuild.slot in self.selected_ebuild_slots:
             # See if this atom matches the selected ebuild
@@ -532,17 +553,18 @@ class InstallPackage:
                     return sel_ebuild
 
             # We need to create a new selected ebuild and add it here
-            return self.add_atom(atom, ebuild)
+            return self.add_atom(parent, atom, ebuild)
 
-    def add_atom(self, atom: Atom, ebuild: Ebuild) -> SelectedEbuild:
+    def add_atom(self, parent: Optional["SelectedEbuild"], atom: Atom, ebuild: Ebuild) -> SelectedEbuild:
         """
         Add a SelectedEbuild in its slot
+        :param parent: parent package that triggered this
         :param atom: atom that selected with ebuild
         :param ebuild: ebuild selected by atom
         :return: SelectedEbuild generated from the atom+ebuild
         """
 
-        sel_ebuild = SelectedEbuild(atom, ebuild)
+        sel_ebuild = SelectedEbuild(parent, atom, ebuild)
         self.selected_ebuild_slots[sel_ebuild.ebuild.slot] = sel_ebuild
         return sel_ebuild
 
@@ -555,7 +577,7 @@ class Emerge:
         self.portage = get_portage()
         self.selected_packages = {}
 
-    def select_atom(self, atom: Atom) -> SelectedEbuild:
+    def select_atom(self, parent: Optional["SelectedEbuild"], atom: Atom) -> SelectedEbuild:
         ebuild = self.portage.match_atom(atom)
         if ebuild is None:
             raise ResolutionException("No ebuild to match '%s' could be found" % atom)
@@ -564,8 +586,8 @@ class Emerge:
             # Ebuild with this key has already been selected
             # See if we can match this to an existing slot
             install_pkg = self.selected_packages[ebuild.key]
-            return install_pkg.match_atom(atom, ebuild)
+            return install_pkg.match_atom(parent, atom, ebuild)
         else:
             pkg = InstallPackage(atom.key)
             self.selected_packages[pkg.key] = pkg
-            return pkg.add_atom(atom, ebuild)
+            return pkg.add_atom(parent, atom, ebuild)
