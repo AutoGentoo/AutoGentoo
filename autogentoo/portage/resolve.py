@@ -533,7 +533,9 @@ class InstallPackage:
         self.key = key
         self.selected_ebuild_slots = {}
 
-    def match_atom(self, parent: Optional["SelectedEbuild"], atom: Atom, ebuild: Ebuild) -> SelectedEbuild:
+    def match_atom(
+        self, parent: Optional["SelectedEbuild"], atom: Atom, ebuild: Ebuild
+    ) -> SelectedEbuild:
         # Check if slot has already been selected
         if ebuild.slot in self.selected_ebuild_slots:
             # See if this atom matches the selected ebuild
@@ -555,7 +557,9 @@ class InstallPackage:
             # We need to create a new selected ebuild and add it here
             return self.add_atom(parent, atom, ebuild)
 
-    def add_atom(self, parent: Optional["SelectedEbuild"], atom: Atom, ebuild: Ebuild) -> SelectedEbuild:
+    def add_atom(
+        self, parent: Optional["SelectedEbuild"], atom: Atom, ebuild: Ebuild
+    ) -> SelectedEbuild:
         """
         Add a SelectedEbuild in its slot
         :param parent: parent package that triggered this
@@ -577,7 +581,9 @@ class Emerge:
         self.portage = get_portage()
         self.selected_packages = {}
 
-    def select_atom(self, parent: Optional["SelectedEbuild"], atom: Atom) -> SelectedEbuild:
+    def select_atom(
+        self, parent: Optional["SelectedEbuild"], atom: Atom
+    ) -> SelectedEbuild:
         ebuild = self.portage.match_atom(atom)
         if ebuild is None:
             raise ResolutionException("No ebuild to match '%s' could be found" % atom)
