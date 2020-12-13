@@ -7,8 +7,6 @@
 
 #include "portage.h"
 
-typedef struct RequiredUse_prv RequiredUse;
-typedef struct UseFlag_prv UseFlag;
 
 struct RequiredUse_prv {
     PyObject_HEAD
@@ -31,9 +29,6 @@ PyNewFunc(PyUseFlag_new);
 void use_flag_init(UseFlag* self, const char* name, U8 state);
 
 Use_t use_get_global(Portage* parent, const char* useflag);
-RequiredUse* use_build_required_use(const char* target, use_operator_t option);
-
-extern PyTypeObject PyUseFlagType;
-extern PyTypeObject PyRequiredUseType;
+RequiredUse* use_build_required_use(char* target, use_operator_t option);
 
 #endif //AUTOGENTOO_USE_H

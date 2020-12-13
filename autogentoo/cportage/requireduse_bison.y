@@ -49,23 +49,23 @@ void requireduseerror(const char *message);
 %type <use_select> depend_expr_sel
 %type <use_select> use_expr
 
+%destructor { free($$); } <identifier>
 %destructor { if($$.target) free($$.target); } <use_select>
 %destructor { Py_DECREF($$); } <required_use>
 
 %%
 
-program_required_use:                           {requireduseout = NULL;}
-            | REQUIRED_USE required_use_expr    {requireduseout = (void*)$2;}
-            | END_OF_FILE                       {requireduseout = NULL;}
+program_required_use:
+              REQUIRED_USE required_use_expr    {requireduseout = (void*)$2;}
+            | REQUIRED_USE                      {requireduseout = NULL;}
             ;
 
-required_use_single : depend_expr_sel '(' required_use_expr ')' {
+required_use_single : use_expr                                  {$$ = use_build_required_use($1.target, $1.operator);}
+                    | depend_expr_sel '(' required_use_expr ')' {
                                                                      $$ = use_build_required_use($1.target, $1.operator);
-                                                                     if ($1.target)
-                                                                        free($1.target);
                                                                      $$->depend = $3;
                                                                 }
-                    | use_expr                                  {$$ = use_build_required_use($1.target, $1.operator);}
+                    | '(' required_use_expr ')'                 {$$ = $2;}
                     ;
 
 required_use_expr   : required_use_single                         {$$ = $1;}
@@ -77,7 +77,7 @@ use_expr     : '!' IDENTIFIER        {$$.target = $2; $$.operator = USE_OP_DISAB
              ;
 
 depend_expr_sel : use_expr '?'       {$$ = $1;}
-                | USESELECT          {$$.target = $1.target; $$.operator = $1.operator;}
+                | USESELECT          {$$ = $1;}
                 ;
 
 %%

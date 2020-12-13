@@ -18,7 +18,9 @@ class PortageUnitTests(unittest.TestCase):
 
     def test_parse(self):
         pkg = Package("sys-devel/gcc")
-        pkg.add_ebuild(Ebuild("data/test-repo", "sys-devel", "gcc-9.3.0-r1"))
+        pkg.add_ebuild(
+            Ebuild(None, "data/test-repo/metadata", "sys-devel", "gcc-9.3.0-r1")
+        )
 
         self.portage.add_package(pkg)
 

@@ -3,7 +3,9 @@
 //
 
 #include "package.h"
+#include "ebuild.h"
 #include "structmember.h"
+#include "atom.h"
 
 PyNewFunc(PyPackage_new)
 {

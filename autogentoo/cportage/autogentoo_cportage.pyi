@@ -123,7 +123,8 @@ class Ebuild:
     newer: Optional[Ebuild]
 
     def __init__(self,
-                 repository_path: str,
+                 ebuild_repo: Optional[str],
+                 cache_repo: str,
                  category: str,
                  name_and_version: str): ...
 

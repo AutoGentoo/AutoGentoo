@@ -5,11 +5,11 @@
 #ifndef AUTOGENTOO_PORTAGE_H
 #define AUTOGENTOO_PORTAGE_H
 
+#include "common.h"
 #include <hacksaw/hacksaw.h>
 #include <Python.h>
 #include "python_util.h"
 
-typedef struct Portage_prv Portage;
 
 typedef lut_id Use_t;
 typedef lut_id Package_t;
@@ -110,8 +110,5 @@ PyInitFunc(PyPortage_init, Portage);
 PyFastMethod(PyPortage_match_atom, Portage);
 PyFastMethod(PyPortage_add_package, Portage);
 PyFastMethod(PyPortage_get_package, Portage);
-
-extern PyTypeObject PyPortageType;
-extern Portage* global_portage;
 
 #endif //AUTOGENTOO_PORTAGE_H

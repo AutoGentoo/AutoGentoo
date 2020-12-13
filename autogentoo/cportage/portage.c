@@ -5,6 +5,7 @@
 #include "portage.h"
 #include "python_util.h"
 #include "package.h"
+#include "atom.h"
 
 #ifndef PORTAGE_INITIAL_PKG_LUT_SIZE
 #define PORTAGE_INITIAL_PKG_LUT_SIZE 512

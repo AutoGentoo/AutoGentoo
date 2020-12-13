@@ -3,6 +3,7 @@ import unittest
 from typing import List
 
 from autogentoo import cportage
+from autogentoo.cportage import UseOperatorT
 
 
 class CPortageUnitTests(unittest.TestCase):
@@ -84,16 +85,19 @@ class CPortageUnitTests(unittest.TestCase):
         self.assertGreater(atom2.version, atom1.version)
 
     def test_ebuild_1(self):
-        ebuild = cportage.Ebuild("data/test-repo", "sys-devel", "gcc-9.3.0-r1")
+        ebuild = cportage.Ebuild(
+            None, "data/test-repo/metadata", "sys-devel", "gcc-9.3.0-r1"
+        )
         self.assertEqual(ebuild.category, "sys-devel")
         self.assertEqual(ebuild.name, "gcc")
         self.assertEqual(ebuild.package_key, "sys-devel/gcc")
         self.assertEqual(ebuild.key, "sys-devel/gcc-9.3.0-r1")
         self.assertEqual(ebuild.version, cportage.AtomVersion("9.3.0-r1"))
 
-        self.assertTrue(ebuild.ebuild.endswith("sys-devel/gcc/gcc-9.3.0-r1.ebuild"))
+        self.assertEqual(ebuild.ebuild, None)
+        # self.assertTrue(ebuild.ebuild.endswith("sys-devel/gcc/gcc-9.3.0-r1.ebuild"))
         self.assertTrue(ebuild.cache_file.endswith("sys-devel/gcc-9.3.0-r1"))
-        self.assertFalse(".." in ebuild.ebuild)  # Make sure the path was expanded
+        # self.assertFalse(".." in ebuild.ebuild)  # Make sure the path was expanded
         self.assertFalse(".." in ebuild.cache_file)  # Make sure the path was expanded
 
     def test_init_error(self):
@@ -105,7 +109,9 @@ class CPortageUnitTests(unittest.TestCase):
         self.portage.add_package(p)
 
         pkg: cportage.Package = self.portage.get_package(p.package_id)
-        ebuild = cportage.Ebuild("data/test-repo", "sys-devel", "gcc-9.3.0-r1")
+        ebuild = cportage.Ebuild(
+            None, "data/test-repo/metadata", "sys-devel", "gcc-9.3.0-r1"
+        )
         pkg.add_ebuild(ebuild)
 
         # Can't add the same ebuild twice
@@ -113,6 +119,23 @@ class CPortageUnitTests(unittest.TestCase):
             pkg.add_ebuild(ebuild)
 
         self.assertEqual(p, pkg)
+
+    def test_required_use_double(self):
+        r_use = cportage.RequiredUse("|| ( sna uxa )")
+        self.assertEqual(UseOperatorT.LEAST_ONE, UseOperatorT(r_use.operator))
+        self.assertEqual("sna", r_use.depend.name)
+        self.assertEqual("uxa", r_use.depend.next.name)
+        self.assertEqual(None, r_use.depend.next.next)
+
+    def test_required_use_single(self):
+        r_use = cportage.RequiredUse("|| ( sna )")
+        self.assertEqual(UseOperatorT.LEAST_ONE, UseOperatorT(r_use.operator))
+        self.assertEqual("sna", r_use.depend.name)
+        self.assertEqual(None, r_use.depend.next)
+
+    def test_required_use_simple(self):
+        r_use = cportage.RequiredUse("sna")
+        self.assertEqual("sna", r_use.name)
 
 
 if __name__ == "__main__":
