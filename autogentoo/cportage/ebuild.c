@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include "ebuild.h"
+#include "package.h"
 #include "language.h"
 #include <structmember.h>
 
@@ -15,12 +16,12 @@ PyNewFunc(PyEbuild_new)
 }
 
 int ebuild_init(Ebuild* self,
-                const char* repository_path,
+                const char* ebuild_repo_path,
+                const char* cache_repo_path,
                 const char* category,
                 const char* name_and_version)
 {
     asprintf(&self->key, "%s/%s", category, name_and_version);
-    self->repository_path = strdup(repository_path);
 
     Atom* atom = atom_parse(self->key);
     if (!atom)
@@ -43,18 +44,25 @@ int ebuild_init(Ebuild* self,
     assert(self->version);
 
     char cache_file_raw[PATH_MAX];
-    sprintf(cache_file_raw, "%s/%s/%s-%s.ebuild",
-            self->repository_path, self->package_key, self->name,
-            self->version->full_version);
-
-    self->ebuild = realpath(cache_file_raw, NULL);
-    if (!self->ebuild)
+    if (ebuild_repo_path)
     {
-        PyErr_Format(PyExc_FileNotFoundError, "Ebuild file not found '%s'", cache_file_raw);
-        return -1;
+        snprintf(cache_file_raw,  PATH_MAX,"%s/%s/%s-%s.ebuild",
+                ebuild_repo_path, self->package_key, self->name,
+                self->version->full_version);
+
+        self->ebuild = realpath(cache_file_raw, NULL);
+        if (!self->ebuild)
+        {
+            PyErr_Format(PyExc_FileNotFoundError, "Ebuild file not found '%s'", cache_file_raw);
+            return -1;
+        }
+    }
+    else
+    {
+        self->ebuild = NULL;
     }
 
-    sprintf(cache_file_raw, "%s/metadata/md5-cache/%s",self->repository_path, self->key);
+    snprintf(cache_file_raw, PATH_MAX,"%s/%s", cache_repo_path, self->key);
     self->cache_file = realpath(cache_file_raw, NULL);
     if (!self->cache_file)
     {
@@ -177,13 +185,18 @@ int ebuild_metadata_init(Ebuild* self)
     char* name = NULL, * value = NULL;
     U64 name_size_n = 0, value_size_n = 0;
 
+    U32 line_n = 0;
     while (!feof(fp))
     {
+        line_n++;
         ssize_t name_size = getdelim(&name, &name_size_n, '=', fp);
         ssize_t value_size = getdelim(&value, &value_size_n, '\n', fp);
 
         if (!name || name_size == -1 || !value || value_size == -1)
+        {
+            errno = 0;
             break;
+        }
 
         if (name_size > 0)
             name[name_size - 1] = 0;
@@ -203,6 +216,13 @@ int ebuild_metadata_init(Ebuild* self)
                 }
 
                 *target = depend_parse(value);
+
+                if (!*target)
+                {
+                    lerror("Failed to parse '%s' in %s", depend_setup[i].name_match, self->key);
+                    return 2;
+                }
+
                 is_dep = 1;
                 break;
             }
@@ -220,7 +240,14 @@ int ebuild_metadata_init(Ebuild* self)
             if (tok)
                 self->sub_slot = strdup(tok);
         } else if (strcmp(name, "REQUIRED_USE") == 0)
+        {
             self->required_use = required_use_parse(value);
+            if (!self->required_use)
+            {
+                lerror("Failed to parse 'REQUIRED_USE' in %s", self->key);
+                return 3;
+            }
+        }
         else if (strcmp(name, "KEYWORDS") == 0)
             ebuild_keyword_init(self, value);
         else if (strcmp(name, "IUSE") == 0)
@@ -231,7 +258,11 @@ int ebuild_metadata_init(Ebuild* self)
     free(name);
 
     self->metadata_init = 1;
-    fclose(fp);
+    if (fclose(fp) != 0)
+    {
+        lerror("Failed to close file '%s'", self->cache_file);
+        return 4;
+    }
 
     return 0;
 }
@@ -247,6 +278,7 @@ static PyFastMethod(PyEbuild_metadata_init, Ebuild)
     if (ebuild_metadata_init(self) != 0)
     {
         PyErr_Format(PyExc_RuntimeError, "Failed to initialize metadata for %s", self->key);
+        return NULL;
     }
 
     Py_RETURN_NONE;
@@ -254,17 +286,19 @@ static PyFastMethod(PyEbuild_metadata_init, Ebuild)
 
 PyInitFunc(PyEbuild_init, Ebuild)
 {
-    static char* kwlist[] = {"repository_path", "category", "name_and_version", NULL};
-    const char* repository_path = NULL;
+    static char* kwlist[] = {"ebuild_repo", "cache_repo", "category", "name_and_version", NULL};
+    const char* ebuild_repo = NULL;
+    const char* cache_repo = NULL;
     const char* category = NULL;
     const char* name_and_version = NULL;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "sss", kwlist,
-                                     &repository_path,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "zsss", kwlist,
+                                     &ebuild_repo,
+                                     &cache_repo,
                                      &category,
                                      &name_and_version))
         return -1;
-    return ebuild_init(self, repository_path, category, name_and_version);
+    return ebuild_init(self, ebuild_repo, cache_repo, category, name_and_version);
 }
 
 PyMethod(PyEbuild_dealloc, Ebuild)
@@ -274,7 +308,6 @@ PyMethod(PyEbuild_dealloc, Ebuild)
 
     SAFE_FREE(self->name);
     SAFE_FREE(self->category);
-    SAFE_FREE(self->repository_path);
     SAFE_FREE(self->key);
     SAFE_FREE(self->package_key);
     SAFE_FREE(self->path);
@@ -289,7 +322,7 @@ PyMethod(PyEbuild_dealloc, Ebuild)
     Py_XDECREF(self->pdepend);
 
     Py_XDECREF(self->iuse);
-    OBJECT_FREE(self->feature_restrict);
+    //OBJECT_FREE(self->feature_restrict);
 
     Py_XDECREF(self->required_use);
     Py_XDECREF(self->src_uri);

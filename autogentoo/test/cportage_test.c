@@ -6,6 +6,7 @@
 #include <cportage/atom.h>
 #include <cportage/language.h>
 #include <cportage/module.h>
+#include <cportage/package.h>
 #include <setjmp.h>
 #include <cmocka.h>
 #include <ebuild.h>
@@ -129,7 +130,9 @@ CTEST(test_ebuild_init)
 {
     Ebuild* self = (Ebuild*) PyEbuild_new(&PyEbuildType, NULL, NULL);
     assert_non_null(self);
-    assert_int_equal(ebuild_init(self, "data/test-repo", "sys-devel", "gcc-9.3.0-r1"), 0);
+    assert_int_equal(ebuild_init(self, "data/test-repo",
+                                 "data/test-repo/metadata",
+                                 "sys-devel", "gcc-9.3.0-r1"), 0);
     assert_int_equal(ebuild_metadata_init(self), 0);
 
     assert_non_null(self->pdepend);
@@ -180,8 +183,8 @@ CTEST(test_parse_all_metadata)
     DIR* dfd2;
     DIR* dfd3;
 
-    char* repository_path = "/var/db/repos/gentoo/";
-    assert_non_null(dfd = opendir(repository_path));
+    const char* cache_path = "data/cportage-repo";
+    assert_non_null(dfd = opendir(cache_path));
 
     char path1[PATH_MAX];
     char path2[PATH_MAX];
@@ -189,7 +192,7 @@ CTEST(test_parse_all_metadata)
     while ((dp = readdir(dfd)) != NULL)
     {
         struct stat stbuf;
-        sprintf(path1, "%s/%s", repository_path, dp->d_name);
+        sprintf(path1, "%s/%s", cache_path, dp->d_name);
         assert_int_not_equal(stat(path1, &stbuf), -1);
 
         if (*dp->d_name == '.')
@@ -197,41 +200,24 @@ CTEST(test_parse_all_metadata)
 
         if (S_ISDIR(stbuf.st_mode))
         {
-            /* Skip directories without '-' */
-            if (!strchr(dp->d_name, '-'))
-                continue;
-
             const char* category = dp->d_name;
             assert_non_null(dfd2 = opendir(path1));
 
             while ((dp2 = readdir(dfd2)) != NULL)
             {
-                if (*dp2->d_name == '.')
-                    continue;
-                sprintf(path2, "%s/%s/%s", repository_path, category, dp2->d_name);
-                assert_int_not_equal(stat(path2, &stbuf), -1);
-                if (!S_ISDIR(stbuf.st_mode))
+                if (*dp2->d_name == '.' || strcmp(dp2->d_name, "Manifest.gz") == 0)
                     continue;
 
-                assert_non_null(dfd3 = opendir(path2));
+                const char* name_and_value = dp2->d_name;
 
-                while ((dp3 = readdir(dfd3)) != NULL)
-                {
-                    if (*dp3->d_name == '.')
-                        continue;
-                    char* name_and_value = dp3->d_name;
-                    char* match = strstr(name_and_value, ".ebuild");
-                    if (!match)
-                        continue;
-                    *match = 0;
+                Ebuild* self = (Ebuild*) PyEbuild_new(&PyEbuildType, NULL, NULL);
 
-                    Ebuild* self = (Ebuild*) PyEbuild_new(&PyEbuildType, NULL, NULL);
-                    assert_int_equal(ebuild_init(self, repository_path, category, name_and_value), 0);
-                    assert_int_equal(ebuild_metadata_init(self), 0);
-                    Py_DECREF(self);
-                }
-
-                closedir(dfd3);
+                /* Don't search for ebuild file, just initialize the metadata */
+                errno = 0;
+                assert_int_equal(ebuild_init(self, NULL, cache_path, category, name_and_value), 0);
+                assert_int_equal(ebuild_metadata_init(self), 0);
+                assert_int_equal(errno, 0);
+                Py_DECREF(self);
             }
 
             closedir(dfd2);
@@ -283,7 +269,7 @@ const static struct CMUnitTest cportage_tests[] = {
         cmocka_unit_test(test_depend),
         cmocka_unit_test(test_atom_full),
         cmocka_unit_test(test_ebuild_init),
-        //cmocka_unit_test(test_parse_all_metadata),
+        cmocka_unit_test(test_parse_all_metadata),
         cmocka_unit_test(test_parse_invalid),
         cmocka_unit_test(test_package_key),
 };

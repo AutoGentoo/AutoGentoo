@@ -25,47 +25,46 @@ identifier      ({letter}|{digit}|_|\+|\*|\-)+
 
 %%
 [\x01]                  {
-                            language_begin_token(yytext, "delim");
+                            language_begin_token(requiredusetext, "delim");
                             switch(language_get_type_delim())
                             {
-                                case LANGUAGE_DEPEND: return DEPEND;
                                 case LANGUAGE_REQUIRED_USE: return REQUIRED_USE;
-                                case LANGUAGE_CMDLINE: return COMMAND_LINE;
                                 case LANGUAGE_IGNORE:
                                 default:
                                     break;
                             }
                         }
 [\n]                    {
-                            language_begin_token(yytext, "newline");
+                            language_begin_token(requiredusetext, "newline");
                             language_increment_line();
                         }
-[ \t\r\\]+              {language_begin_token(yytext, "tab");};
-"??"                    {requireduselval.use_select.target = NULL; language_begin_token(yytext, NULL); requireduselval.use_select.operator = USE_OP_MOST_ONE; return USESELECT;}
-"||"                    {requireduselval.use_select.target = NULL; language_begin_token(yytext, NULL); requireduselval.use_select.operator = USE_OP_LEAST_ONE; return USESELECT;}
-"^^"                    {requireduselval.use_select.target = NULL; language_begin_token(yytext, NULL); requireduselval.use_select.operator = USE_OP_EXACT_ONE; return USESELECT;}
-"(+)"                   {requireduselval.use_default = ATOM_DEFAULT_ON; language_begin_token(yytext, NULL); return USE_DEFAULT;}
-"(-)"                   {requireduselval.use_default = ATOM_DEFAULT_OFF; language_begin_token(yytext, NULL); return USE_DEFAULT;}
-"-"                     {language_begin_token(yytext, NULL); return '-';}
-"<"                     {language_begin_token(yytext, NULL); return '<';}
-">"                     {language_begin_token(yytext, NULL); return '>';}
-"="                     {language_begin_token(yytext, NULL); return '=';}
-"!"                     {language_begin_token(yytext, NULL); return '!';}
-[\[]                    {language_begin_token(yytext, NULL); return '[';}
-[\]]                    {language_begin_token(yytext, NULL); return ']';}
-[\?]                    {language_begin_token(yytext, NULL); return '?';}
-[\(]                    {language_begin_token(yytext, NULL); return '(';}
-[\)]                    {language_begin_token(yytext, NULL); return ')';}
-[\^]                    {language_begin_token(yytext, NULL); return '^';}
-[\|]                    {language_begin_token(yytext, NULL); return '|';}
-[\,]                    {language_begin_token(yytext, NULL); return ',';}
-[\~]                    {language_begin_token(yytext, NULL); return '~';}
+[ \t\r\\]+              {language_begin_token(requiredusetext, "tab");};
+"??"                    {requireduselval.use_select.target = NULL; language_begin_token(requiredusetext, NULL); requireduselval.use_select.operator = USE_OP_MOST_ONE; return USESELECT;}
+"||"                    {requireduselval.use_select.target = NULL; language_begin_token(requiredusetext, NULL); requireduselval.use_select.operator = USE_OP_LEAST_ONE; return USESELECT;}
+"^^"                    {requireduselval.use_select.target = NULL; language_begin_token(requiredusetext, NULL); requireduselval.use_select.operator = USE_OP_EXACT_ONE; return USESELECT;}
+"(+)"                   {requireduselval.use_default = ATOM_DEFAULT_ON; language_begin_token(requiredusetext, NULL); return USE_DEFAULT;}
+"(-)"                   {requireduselval.use_default = ATOM_DEFAULT_OFF; language_begin_token(requiredusetext, NULL); return USE_DEFAULT;}
+"-"                     {language_begin_token(requiredusetext, NULL); return '-';}
+"<"                     {language_begin_token(requiredusetext, NULL); return '<';}
+">"                     {language_begin_token(requiredusetext, NULL); return '>';}
+"="                     {language_begin_token(requiredusetext, NULL); return '=';}
+"!"                     {language_begin_token(requiredusetext, NULL); return '!';}
+[\[]                    {language_begin_token(requiredusetext, NULL); return '[';}
+[\]]                    {language_begin_token(requiredusetext, NULL); return ']';}
+[\?]                    {language_begin_token(requiredusetext, NULL); return '?';}
+[\(]                    {language_begin_token(requiredusetext, NULL); return '(';}
+[\)]                    {language_begin_token(requiredusetext, NULL); return ')';}
+[\^]                    {language_begin_token(requiredusetext, NULL); return '^';}
+[\|]                    {language_begin_token(requiredusetext, NULL); return '|';}
+[\,]                    {language_begin_token(requiredusetext, NULL); return ',';}
+[\~]                    {language_begin_token(requiredusetext, NULL); return '~';}
 {identifier}            {
-                            requireduselval.identifier = strdup(yytext);
-                            language_begin_token(yytext, "identifier");
+                            char* ref = strdup(requiredusetext);
+                            requireduselval.identifier = ref;
+                            language_begin_token(ref, "identifier");
                             return IDENTIFIER;
                         }
-[<<EOF>>|'']            {language_begin_token(yytext, "eof"); return END_OF_FILE;}
-.                       {language_begin_token(yytext, "invalid"); language_print_error("Unknown character: %s", yytext);}
+[<<EOF>>|'']            {language_begin_token(requiredusetext, "eof"); return END_OF_FILE;}
+.                       {language_begin_token(requiredusetext, "invalid"); language_print_error("Unknown character: %s", requiredusetext);}
 
 %%

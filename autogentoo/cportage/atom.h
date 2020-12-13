@@ -5,12 +5,9 @@
 #ifndef AUTOGENTOO_ATOM_H
 #define AUTOGENTOO_ATOM_H
 
+#include "Python.h"
 #include "portage.h"
 #include "python_util.h"
-
-typedef struct Atom_prv Atom;
-typedef struct AtomVersion_prv AtomVersion;
-typedef struct AtomFlag_prv AtomFlag;
 
 struct AtomVersion_prv {
     PyObject_HEAD
@@ -57,9 +54,5 @@ PyNewFunc(PyAtom_new);
 int atom_init(Atom* self, const char* input);
 Atom* cmdline_atom_new(char* name);
 I32 atom_version_compare(const AtomVersion* first, const AtomVersion* second);
-
-extern PyTypeObject PyAtomFlagType;
-extern PyTypeObject PyAtomVersionType;
-extern PyTypeObject PyAtomType;
 
 #endif //AUTOGENTOO_ATOM_H

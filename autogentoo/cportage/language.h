@@ -8,7 +8,6 @@ typedef enum {
     LANGUAGE_IGNORE,
     LANGUAGE_DEPEND,
     LANGUAGE_REQUIRED_USE,
-    LANGUAGE_CMDLINE
 } type_delim_t;
 
 typedef struct

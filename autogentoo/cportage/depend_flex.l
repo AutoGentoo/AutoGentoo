@@ -38,7 +38,6 @@ use_select      [!]?{identifier}\?
                             switch(language_get_type_delim())
                             {
                                 case LANGUAGE_DEPEND: return DEPEND;
-                                case LANGUAGE_CMDLINE: return COMMAND_LINE;
                                 case LANGUAGE_IGNORE:
                                 default:
                                     break;

@@ -365,6 +365,7 @@ class SelectedEbuild(ResolveDependency):
         self.flags = Queue()
 
         self.generators = DependencyContainer[ResolveDependency]()
+        self.resolved_deps = DependencyContainer[ResolveDependency]()
 
         self._is_dirty = True
         self.add_selected_by(parent, atom)

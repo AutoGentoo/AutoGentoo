@@ -8,7 +8,6 @@
 #include "Python.h"
 #include "atom.h"
 
-typedef struct Dependency_prv Dependency;
 
 /**
  * selector? ( child child child ) next_target? ( ... ) depend
@@ -29,6 +28,5 @@ Dependency* dependency_build_use(const char* use_flag, use_operator_t type, Depe
 Dependency* dependency_build_grouping(Dependency* children);
 Dependency* dependency_build_atom(Atom* atom);
 
-extern PyTypeObject PyDependencyType;
 
 #endif //AUTOGENTOO_DEPENDENCY_H

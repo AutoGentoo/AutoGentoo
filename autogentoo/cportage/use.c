@@ -85,6 +85,7 @@ static PyNewFunc(PyRequiredUse_new)
 
 static PyMethod(PyRequiredUse_dealloc, RequiredUse)
 {
+    SAFE_FREE(self->name);
     Py_XDECREF(self->next);
     Py_XDECREF(self->depend);
     Py_TYPE(self)->tp_free((PyObject*) self);
@@ -100,19 +101,21 @@ static PyInitFunc(PyRequiredUse_init, RequiredUse)
 
     RequiredUse* duped = required_use_parse(required_use_string);
     if (!duped)
+    {
+        PyErr_Format(PyExc_RuntimeError, "Failed to parse required use '%s'", required_use_string);
         return -1;
+    }
 
-    memcpy(&self->global_flag, &duped->global_flag, sizeof(RequiredUse) - offsetof(RequiredUse, global_flag));
+    memcpy(&self->name, &duped->name, sizeof(RequiredUse) - offsetof(RequiredUse, global_flag));
     Py_TYPE(duped)->tp_free((PyObject*) duped);
     return 0;
 }
 
-RequiredUse* use_build_required_use(const char* target, use_operator_t option)
+RequiredUse* use_build_required_use(char* target, use_operator_t option)
 {
     RequiredUse* out = (RequiredUse*) PyRequiredUse_new(&PyRequiredUseType, NULL, NULL);
 
-    if (target)
-        out->name = strdup(target);
+    out->name = target;
     out->global_flag = use_get_global(global_portage, target);
 
     out->option = option;

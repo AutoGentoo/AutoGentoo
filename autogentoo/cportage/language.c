@@ -38,10 +38,7 @@ extern YYLTYPE requireduselloc;
 void requireduselex_destroy();
 void dependlex_destroy();
 
-__thread enum {
-    PARSER_LANGUAGE_DEPEND,
-    PARSER_LANGUAGE_REQUIRED_USE
-} current_parser_type;
+__thread type_delim_t current_parser_type;
 
 
 void language_print_error(const char* errorstring, ...)
@@ -85,6 +82,7 @@ void language_init_new(YYBUFFERPOS* buffer, type_delim_t delim)
     buffer_pos = buffer;
     memset(buffer_pos, 0, sizeof(YYBUFFERPOS));
     buffer_pos->delim = delim;
+    current_parser_type = delim;
 }
 
 static
@@ -126,31 +124,27 @@ void language_begin_token(const char* t, const char* token_name)
 
     /*================================================================*/
     /* location for bison --------------------------------------------*/
-    if (current_parser_type == PARSER_LANGUAGE_DEPEND)
-    {
-        dependlloc.first_line = buffer_pos->nRow;
-        dependlloc.first_column = buffer_pos->nTokenStart;
-        dependlloc.last_line = buffer_pos->nRow;
-        dependlloc.last_column = buffer_pos->nTokenStart + buffer_pos->nTokenLength - 1;
-    }
+    YYLTYPE* pos = NULL;
+    if (current_parser_type == LANGUAGE_DEPEND)
+        pos = &dependlloc;
     else
-    {
-        requireduselloc.first_line = buffer_pos->nRow;
-        requireduselloc.first_column = buffer_pos->nTokenStart;
-        requireduselloc.last_line = buffer_pos->nRow;
-        requireduselloc.last_column = buffer_pos->nTokenStart + buffer_pos->nTokenLength - 1;
-    }
+        pos = &requireduselloc;
+
+    pos->first_line = buffer_pos->nRow;
+    pos->first_column = buffer_pos->nTokenStart;
+    pos->last_line = buffer_pos->nRow;
+    pos->last_column = buffer_pos->nTokenStart + buffer_pos->nTokenLength - 1;
 
 #if LANGUAGE_DEBUG
     if (!token_name)
-        printf("Token '%s' at %d:%d next at %d\n", dumpString(t),
-                dependlloc.first_column,
-                dependlloc.last_column, buffer_pos->nTokenNextStart);
+        printf("Token '%s' at %d:%d next at %d  # %d\n", dumpString(t),
+                pos->first_column,
+               pos->last_column, buffer_pos->nTokenNextStart, current_parser_type);
     else
-        printf("Token '%s' at %d:%d next at %d (%s)\n", dumpString(t),
-               dependlloc.first_column,
-               dependlloc.last_column, buffer_pos->nTokenNextStart,
-               token_name);
+        printf("Token '%s' at %d:%d next at %d (%s)  # %d\n", dumpString(t),
+               pos->first_column,
+               pos->last_column, buffer_pos->nTokenNextStart,
+               token_name, current_parser_type);
     fflush(stdout);
 #endif
 }
@@ -221,10 +215,11 @@ Dependency* depend_parse(const char* buffer)
 
 Dependency* cmdline_parse(const char* buffer)
 {
+    return NULL;
     yy_error_ag_0_ = 0;
     dependout = NULL;
     YYBUFFERPOS pos;
-    language_init_new(&pos, LANGUAGE_CMDLINE);
+    //language_init_new(&pos, LANGUAGE_CMDLINE);
     language_feed_string(buffer);
     dependparse();
 
@@ -267,7 +262,6 @@ RequiredUse* required_use_parse(const char* buffer)
     language_init_new(&pos, LANGUAGE_REQUIRED_USE);
     language_feed_string(buffer);
     requireduseparse();
-    requireduselex_destroy();
 
     if (yy_error_ag_0_)
     {
