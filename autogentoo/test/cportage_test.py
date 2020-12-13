@@ -5,7 +5,7 @@ from typing import List
 from autogentoo import cportage
 
 
-class TestStringMethods(unittest.TestCase):
+class CPortageUnitTests(unittest.TestCase):
     portage: cportage.Portage
 
     def setUp(self) -> None:

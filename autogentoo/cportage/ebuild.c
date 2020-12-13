@@ -301,8 +301,14 @@ PyMethod(PyEbuild_dealloc, Ebuild)
 static PyObject* PyEbuild_next(Ebuild* self)
 {
     Py_XINCREF(self->older);
-    return self->older;
+    return (PyObject*) self->older;
 }
+
+
+static PyMethodDef PyEbuild_methods[] = {
+        {"initialize_metadata", (PyCFunction) PyEbuild_metadata_init, METH_FASTCALL},
+        {NULL, NULL, 0, NULL}        /* Sentinel */
+};
 
 
 static PyMemberDef PyEbuild_members[] = {
@@ -340,5 +346,7 @@ PyTypeObject PyEbuildType = {
         .tp_new = PyEbuild_new,
         .tp_init = (initproc) PyEbuild_init,
         .tp_dealloc = (destructor) PyEbuild_dealloc,
+        .tp_iternext = (iternextfunc) PyEbuild_next,
         .tp_members = PyEbuild_members,
+        .tp_methods = PyEbuild_methods,
 };

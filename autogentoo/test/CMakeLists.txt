@@ -19,5 +19,7 @@ macro(CUnitTest name)
 endmacro()
 
 CUnitTest(cportage)
+CUnitTest(hacksaw)
 PythonUnitTest(cportage)
 PythonUnitTest(network)
+PythonUnitTest(portage)

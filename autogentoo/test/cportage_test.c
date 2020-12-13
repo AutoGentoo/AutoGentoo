@@ -249,12 +249,43 @@ CTEST(test_parse_invalid)
     assert_null(depend_parse("use? "));
 }
 
+CTEST(test_package_key)
+{
+    PyObject* args = PyTuple_New(1);
+    PyObject* pkg_key = PyUnicode_FromString("sys-devel/gcc");
+    Py_INCREF(pkg_key);
+    PyTuple_SetItem(args, 0, pkg_key);
+    PyObject* pkg = PyObject_CallObject((PyObject*) &PyPackageType, args);
+
+    assert_non_null(pkg);
+
+    assert_int_equal(Py_REFCNT(pkg), 1);
+    PyPortage_add_package(global_portage, &pkg, 1);
+    assert_int_equal(Py_REFCNT(pkg), 2);
+
+    PyObject* pkg_id = PyLong_FromUnsignedLongLong(((Package*)pkg)->package_id);
+    PyObject* pkg_2 = PyPortage_get_package(global_portage, &pkg_id, 1);
+    assert_int_equal(Py_REFCNT(pkg), 3);
+
+    assert_ptr_equal(pkg, pkg_2);
+
+    Py_DECREF(pkg_id);
+    Py_DECREF(args);
+    Py_DECREF(pkg_key);
+    Py_DECREF(pkg_2);
+    Py_DECREF(pkg);
+
+    // Still held by the LUT
+    assert_int_equal(Py_REFCNT(pkg), 1);
+}
+
 const static struct CMUnitTest cportage_tests[] = {
         cmocka_unit_test(test_depend),
         cmocka_unit_test(test_atom_full),
         cmocka_unit_test(test_ebuild_init),
         //cmocka_unit_test(test_parse_all_metadata),
         cmocka_unit_test(test_parse_invalid),
+        cmocka_unit_test(test_package_key),
 };
 
 int main(void)

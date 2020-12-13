@@ -108,6 +108,9 @@ struct Portage_prv {
 
 PyNewFunc(PyPortage_new);
 PyInitFunc(PyPortage_init, Portage);
+PyFastMethod(PyPortage_match_atom, Portage);
+PyFastMethod(PyPortage_add_package, Portage);
+PyFastMethod(PyPortage_get_package, Portage);
 
 extern PyTypeObject PyPortageType;
 extern Portage* global_portage;

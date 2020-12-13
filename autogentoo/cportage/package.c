@@ -97,6 +97,7 @@ PyFastMethod(PyPackage_add_ebuild, Package)
         /* This package is the head */
         ebuild->newer = NULL;
         Py_XDECREF(self->ebuilds);
+        Py_INCREF(ebuild);
         self->ebuilds = ebuild;
     }
     else
@@ -122,7 +123,7 @@ PyFastMethod(PyPackage_match_atom, Package)
     Atom* atom = (Atom*) args[0];
     for (Ebuild* current = self->ebuilds; current; current = current->older)
     {
-        int compare = atom_version_compare(atom->version, current->version);
+        int compare = atom_version_compare(current->version, atom->version);
         if (compare == 0 && atom->range & ATOM_VERSION_E
             || compare > 0 && atom->range & ATOM_VERSION_G
             || compare < 0 && atom->range & ATOM_VERSION_L)
