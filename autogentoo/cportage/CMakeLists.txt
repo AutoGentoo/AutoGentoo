@@ -53,5 +53,5 @@ PythonModule(autogentoo_cportage
         ${requireduse_SOURCES}
 
         INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-        LINK_LIBRARIES hacksaw
+        LINK_LIBRARIES autogentoo_hacksaw
         )

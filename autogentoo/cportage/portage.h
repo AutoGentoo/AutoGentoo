@@ -15,7 +15,6 @@ typedef lut_id Use_t;
 typedef lut_id Package_t;
 
 typedef enum {
-    USE_OP_NONE,
     USE_OP_DISABLE, //!< !
     USE_OP_ENABLE, //!< ?
     USE_OP_LEAST_ONE, //!< ||
@@ -108,6 +107,9 @@ struct Portage_prv {
 
 PyNewFunc(PyPortage_new);
 PyInitFunc(PyPortage_init, Portage);
+PyFastMethod(PyPortage_match_atom, Portage);
+PyFastMethod(PyPortage_add_package, Portage);
+PyFastMethod(PyPortage_get_package, Portage);
 
 extern PyTypeObject PyPortageType;
 extern Portage* global_portage;

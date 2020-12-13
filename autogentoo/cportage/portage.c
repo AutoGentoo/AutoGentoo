@@ -78,6 +78,12 @@ PyFastMethod(PyPortage_match_atom, Portage)
 
     Atom* atom = (Atom*) args[0];
     Package* pkg  = (Package*) lut_get(self->packages, atom->id);
+    if (!pkg)
+    {
+        PyErr_Format(PyExc_KeyError, "Failed to find package with key '%s'", atom->key);
+        return NULL;
+    }
+
     return PyPackage_match_atom(pkg, args, nargs);
 }
 

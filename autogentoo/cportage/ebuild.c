@@ -298,6 +298,19 @@ PyMethod(PyEbuild_dealloc, Ebuild)
     Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
+static PyObject* PyEbuild_next(Ebuild* self)
+{
+    Py_XINCREF(self->older);
+    return (PyObject*) self->older;
+}
+
+
+static PyMethodDef PyEbuild_methods[] = {
+        {"initialize_metadata", (PyCFunction) PyEbuild_metadata_init, METH_FASTCALL},
+        {NULL, NULL, 0, NULL}        /* Sentinel */
+};
+
+
 static PyMemberDef PyEbuild_members[] = {
         {"name",          T_STRING, offsetof(Ebuild, name),          READONLY},
         {"category",      T_STRING, offsetof(Ebuild, category),      READONLY},
@@ -317,6 +330,7 @@ static PyMemberDef PyEbuild_members[] = {
         {"version",       T_OBJECT, offsetof(Ebuild, version),       READONLY},
         {"iuse",          T_OBJECT, offsetof(Ebuild, iuse),          READONLY},
         {"metadata_init", T_BOOL,   offsetof(Ebuild, metadata_init), READONLY},
+        {"package",       T_OBJECT, offsetof(Ebuild, package),       READONLY},
         {"older",         T_OBJECT, offsetof(Ebuild, older),         READONLY},
         {"newer",         T_OBJECT, offsetof(Ebuild, newer),         READONLY},
         {NULL, 0, 0, 0, NULL}
@@ -332,5 +346,7 @@ PyTypeObject PyEbuildType = {
         .tp_new = PyEbuild_new,
         .tp_init = (initproc) PyEbuild_init,
         .tp_dealloc = (destructor) PyEbuild_dealloc,
+        .tp_iternext = (iternextfunc) PyEbuild_next,
         .tp_members = PyEbuild_members,
+        .tp_methods = PyEbuild_methods,
 };

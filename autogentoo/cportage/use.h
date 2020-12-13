@@ -12,10 +12,13 @@ typedef struct UseFlag_prv UseFlag;
 
 struct RequiredUse_prv {
     PyObject_HEAD
+    char* name;
     Use_t global_flag;
     use_operator_t option;
     RequiredUse* depend; /* Use this if we have a child expression for this operator */
     RequiredUse* next;
+
+    RequiredUse* PyIterator_self__;
 };
 
 struct UseFlag_prv {

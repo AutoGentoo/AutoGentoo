@@ -1,4 +1,4 @@
-add_library(hacksaw SHARED
+add_library(autogentoo_hacksaw SHARED
         hacksaw.h
         log.c log.h
         map.c map.h
@@ -15,4 +15,4 @@ add_library(hacksaw SHARED
         global.h
         lut.c lut.h)
 
-LinkPythonLib(hacksaw)
+LinkPythonLib(autogentoo_hacksaw)

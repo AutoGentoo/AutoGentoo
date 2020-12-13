@@ -11,7 +11,7 @@ endmacro()
 macro(CUnitTest name)
     add_mocked_test(${name}_C
             SOURCES ${name}_test.c
-            LINK_LIBRARIES hacksaw Python3::Python autogentoo_${name}
+            LINK_LIBRARIES autogentoo_hacksaw Python3::Python autogentoo_${name}
             INCLUDE_DIRECTORIES ${Python_INCLUDE_DIRS}
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             ENVIRONMENT ${EXEC_ENV}
@@ -19,5 +19,7 @@ macro(CUnitTest name)
 endmacro()
 
 CUnitTest(cportage)
+CUnitTest(hacksaw)
 PythonUnitTest(cportage)
 PythonUnitTest(network)
+PythonUnitTest(portage)

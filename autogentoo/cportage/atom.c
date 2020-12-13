@@ -9,6 +9,8 @@
 #include "language.h"
 #include "ebuild.h"
 
+static Py_hash_t PyAtom_hash(Atom* self);
+
 static PyObject*
 PyAtom_repr(Atom* self)
 {
@@ -319,6 +321,7 @@ int atom_init(Atom* self, const char* input)
     self->slot_opts = ATOM_SLOT_IGNORE;
     self->range = ATOM_VERSION_ALL;
     self->blocks = ATOM_BLOCK_NONE;
+    self->cached_hash = -1; /* Invalidate the cache to regenerate */
 
     char* d_input = strdup(input);
     char* cat_splt = strchr(d_input, '/');
@@ -381,6 +384,9 @@ int atom_init(Atom* self, const char* input)
     }
 
     free(d_input);
+
+    self->cached_hash = PyAtom_hash(self);
+
     return 0;
 }
 
@@ -513,6 +519,45 @@ static PyObject* PyAtom_matches(Atom* self, const PyObject* args[], const int na
     Py_RETURN_FALSE;
 }
 
+
+static Py_hash_t PyAtom_hash(Atom* self)
+{
+#define PyATOM_STRING_HASH(str) str ? map_get_hash(str, strlen(str)) : 0
+
+    if (self->cached_hash != -1)
+        return self->cached_hash;
+
+    U64 flag_hash = 0;
+    for (AtomFlag* flag = self->useflags; flag; flag = flag->next)
+    {
+        flag_hash += map_get_hash(flag->name, strlen(flag->name));
+    }
+
+    struct {
+        U64 key_hash;
+        U64 version_hash;
+        U64 repo_hash;
+        U64 slot_hash;
+        U64 sub_slot_hash;
+        U64 flag_hash;
+        U32 slot_opts;
+        U32 range;
+        U32 blocks;
+    } hash_data = {
+            self->id,
+            self->version ? map_get_hash(self->version->full_version, strlen(self->version->full_version)) : 0,
+            PyATOM_STRING_HASH(self->repository),
+            PyATOM_STRING_HASH(self->slot),
+            PyATOM_STRING_HASH(self->sub_slot),
+            flag_hash,
+            self->slot_opts,
+            self->range,
+            self->blocks,
+    };
+
+    return map_get_hash(&hash_data, 8*6 + 4*3);
+}
+
 static PyMethodDef PyAtom_methods[] = {
         {"matches", (PyCFunction) PyAtom_matches, METH_FASTCALL},
         {NULL, NULL, 0}
@@ -592,4 +637,5 @@ PyTypeObject PyAtomType = {
         .tp_members = PyAtom_members,
         .tp_methods = PyAtom_methods,
         .tp_richcompare = (richcmpfunc) PyAtom_richcompare,
+        .tp_hash = (hashfunc) PyAtom_hash
 };

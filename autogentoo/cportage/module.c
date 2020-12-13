@@ -132,7 +132,6 @@ PyInit_autogentoo_cportage(void)
     }
     
     /* use_operator_t */
-    PyModule_AddIntMacro(m, USE_OP_NONE);
     PyModule_AddIntMacro(m, USE_OP_DISABLE);
     PyModule_AddIntMacro(m, USE_OP_ENABLE);
     PyModule_AddIntMacro(m, USE_OP_LEAST_ONE);

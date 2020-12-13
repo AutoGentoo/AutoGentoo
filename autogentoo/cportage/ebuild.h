@@ -5,11 +5,13 @@
 #ifndef AUTOGENTOO_EBUILD_H
 #define AUTOGENTOO_EBUILD_H
 
+typedef struct Ebuild_prv Ebuild;
+
 #include <stdio.h>
 #include "dependency.h"
 #include "use.h"
+#include "package.h"
 
-typedef struct Ebuild_prv Ebuild;
 
 struct Ebuild_prv {
     PyObject_HEAD
@@ -44,6 +46,7 @@ struct Ebuild_prv {
     U64 md5[2];         /* Checksum of the metadata file */
     U8 metadata_init;   /* Metadata has been parsed */
 
+    Package* package;
     Ebuild* older;
     Ebuild* newer;
 };
