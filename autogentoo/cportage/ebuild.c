@@ -298,6 +298,13 @@ PyMethod(PyEbuild_dealloc, Ebuild)
     Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
+static PyObject* PyEbuild_next(Ebuild* self)
+{
+    Py_XINCREF(self->older);
+    return self->older;
+}
+
+
 static PyMemberDef PyEbuild_members[] = {
         {"name",          T_STRING, offsetof(Ebuild, name),          READONLY},
         {"category",      T_STRING, offsetof(Ebuild, category),      READONLY},
@@ -317,6 +324,7 @@ static PyMemberDef PyEbuild_members[] = {
         {"version",       T_OBJECT, offsetof(Ebuild, version),       READONLY},
         {"iuse",          T_OBJECT, offsetof(Ebuild, iuse),          READONLY},
         {"metadata_init", T_BOOL,   offsetof(Ebuild, metadata_init), READONLY},
+        {"package",       T_OBJECT, offsetof(Ebuild, package),       READONLY},
         {"older",         T_OBJECT, offsetof(Ebuild, older),         READONLY},
         {"newer",         T_OBJECT, offsetof(Ebuild, newer),         READONLY},
         {NULL, 0, 0, 0, NULL}

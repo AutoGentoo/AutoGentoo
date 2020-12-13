@@ -54,6 +54,7 @@ PyFastMethod(PyPortage_get_package, Portage)
     return (PyObject*) package;
 }
 
+static
 PyFastMethod(PyPortage_add_package, Portage)
 {
     if (nargs != 1 || !PyObject_TypeCheck(args[0], &PyPackageType))
@@ -68,6 +69,7 @@ PyFastMethod(PyPortage_add_package, Portage)
     Py_RETURN_NONE;
 }
 
+static
 PyFastMethod(PyPortage_match_atom, Portage)
 {
     if (nargs != 1 || !PyObject_TypeCheck(args[0], &PyAtomType))

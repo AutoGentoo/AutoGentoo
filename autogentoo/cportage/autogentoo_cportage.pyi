@@ -36,6 +36,8 @@ class Package:
     def add_ebuild(self, ebuild: Ebuild): ...
     def match_atom(self, atom: Atom): ...
 
+    def __iter__(self) -> Ebuild: ...
+
 
 class Portage:
     def __init__(self): ...
@@ -111,6 +113,8 @@ class Ebuild:
 
     version: AtomVersion
     metadata_init: bool
+
+    package: Package
     older: Optional[Ebuild]
     newer: Optional[Ebuild]
 
@@ -118,6 +122,8 @@ class Ebuild:
                  repository_path: str,
                  category: str,
                  name_and_version: str): ...
+
+    def __next__(self) -> "Ebuild": ...
 
 def init(portage: Optional[Portage]): ...
 def get_portage() -> Portage: ...

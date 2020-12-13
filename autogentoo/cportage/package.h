@@ -5,11 +5,12 @@
 #ifndef AUTOGENTOO_PACKAGE_H
 #define AUTOGENTOO_PACKAGE_H
 
+typedef struct Package_prv Package;
+
 #include <Python.h>
 #include <hacksaw/lut.h>
 #include "ebuild.h"
 
-typedef struct Package_prv Package;
 
 struct Package_prv {
     PyObject_HEAD

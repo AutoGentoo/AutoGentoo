@@ -107,6 +107,7 @@ PyFastMethod(PyPackage_add_ebuild, Package)
         last->older = ebuild;
     }
 
+    ebuild->package = self;
     Py_RETURN_NONE;
 }
 
@@ -138,6 +139,12 @@ PyFastMethod(PyPackage_match_atom, Package)
     Py_RETURN_NONE;
 }
 
+static PyObject* PyPackage_iter(Package* self)
+{
+    Py_XINCREF(self->ebuilds);
+    return (PyObject*) self->ebuilds;
+}
+
 static PyMethodDef PyPackage_methods[] = {
         {"add_ebuild", (PyCFunction) PyPackage_add_ebuild, METH_FASTCALL},
         {"match_atom", (PyCFunction) PyPackage_match_atom, METH_FASTCALL},
@@ -165,4 +172,5 @@ PyTypeObject PyPackageType = {
         .tp_dealloc = (destructor) PyPackage_dealloc,
         .tp_members = PyPackage_members,
         .tp_methods = PyPackage_methods,
+        .tp_iter = (getiterfunc) PyPackage_iter,
 };

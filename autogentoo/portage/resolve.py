@@ -1,100 +1,64 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, TypeVar, Generic, Tuple
+from typing import List, Optional, Dict, Generator
 
 from autogentoo.cportage import Dependency, Atom, Ebuild, UseFlag, UseOperatorT
 from autogentoo.cportage.autogentoo_cportage import get_portage
-
-T = TypeVar("T")
-
-
-class DependencyContainer(Generic[T]):
-    depend: List[T]
-    run_depend: List[T]
-    build_depend: List[T]
-    post_depend: List[T]
-
-    def __init__(self):
-        self.depend = []
-        self.run_depend = []
-        self.build_depend = []
-        self.post_depend = []
-
-    def __iter__(self) -> Tuple[List[T], List[T], List[T], List[T]]:
-        return self.depend, self.run_depend, self.build_depend, self.post_depend
+from autogentoo.portage import RequiredUseException, DependencyContainer, ResolutionException
+from autogentoo.portage.emerge import emerge_session
 
 
-class RequiredUseException(Exception):
-    pass
-
-
-class ChangedUseException(Exception):
-    useflag: UseFlag
-    atom: Atom
-
-    def __init__(self, atom: Atom, useflag: UseFlag):
-        self.useflag = useflag
-        self.atom = atom
-
-
-class ResolutionException(Exception):
-    pass
-
-
-def resolve_atom(atom: Atom) -> "SelectedEbuild":
-    ebuild = get_portage().match_atom(atom)
-    if ebuild is None:
-        raise ResolutionException("No ebuild to match '%s' could be found" % atom)
-
-    selected_ebuild = SelectedEbuild(ebuild)
-    return selected_ebuild
-
-
-def resolve_dependency(
-    parent: Optional["SelectedEbuild"], depend: Dependency
-) -> List["SelectedEbuild"]:
-    def resolve_single(depend_expr: Dependency) -> "SelectedEbuild":
-        if parent is None and depend_expr.atom is not None:
-            raise ResolutionException(
+def resolve_single(parent: Optional["SelectedEbuild"], depend_expr: Dependency) -> "ResolveDependency":
+    if parent is None and depend_expr.atom is not None:
+        raise ResolutionException(
                 "Use condition expressions are not valid a global scope"
-            )
+        )
 
-        if depend_expr.atom is not None:  # Simple atom selection
-            return resolve_atom(depend_expr.atom)
-        else:
-            if depend_expr.use_condition != 0:
-                # Simple use condition
-                use_flag = get_portage().get_use_flag(depend_expr.use_condition)
-                use_flag = UseFlag(
+    if depend_expr.atom is not None:  # Simple atom selection
+        return emerge_session().select_atom(depend_expr.atom)
+    else:
+        assert depend_expr.use_condition == 0 and depend_expr.use_operator in (
+            UseOperatorT.ENABLE, UseOperatorT.DISABLE)
+
+        if depend_expr.use_condition != 0:
+            # Simple use condition
+            use_flag = get_portage().get_use_flag(depend_expr.use_condition)
+            use_flag = UseFlag(
                     use_flag.name,
                     True if depend_expr.use_condition == UseOperatorT.ENABLE else False,
-                )
+            )
 
-                assert depend_expr.children is not None, "Invalid dependency expression"
-                parent.add_use_hook(use_flag, depend_expr.children)
-            else:
-                raise NotImplementedError(
+            assert depend_expr.children is not None, "Invalid dependency expression"
+            parent.add_use_hook(use_flag, depend_expr.children)
+        else:
+            raise NotImplementedError(
                     "Complex use selection is not implemented yet"
-                )
+            )
 
-    deps = []
+
+def resolve_all(parent: Optional["SelectedEbuild"],
+                depend: Dependency) -> Generator["ResolveDependency", None, None]:
     for dep in depend:
-        deps.append(resolve_single(dep))
-    return deps
+        yield resolve_single(parent, dep)
 
 
-class Conditional(ABC):
+class ResolveDependency(ABC):
+    _is_dirty: bool
+
+    def is_dirty(self) -> bool:
+        return self._is_dirty
+
     @abstractmethod
-    def get_resolved(self) -> Optional[List["SelectedEbuild"]]:
+    def get_resolved(self) -> Optional["ResolveDependency"]:
         ...
 
+
+class Conditional(ResolveDependency, ABC):
     @abstractmethod
     def run_hook(self, arg):
         ...
 
 
 class UseConditional(Conditional):
-    is_dirty: bool
-
     parent: "SelectedEbuild"
 
     # Should we raise an error if this condition is ever false?
@@ -106,28 +70,28 @@ class UseConditional(Conditional):
     # The guarded dependency used to re-calculated
     dependency: Optional[Dependency]
 
-    current_evaluation: Optional[List["SelectedEbuild"]]
+    current_evaluation: Optional["ResolveDependency"]
 
     def __init__(
-        self,
-        parent: "SelectedEbuild",
-        useflag: UseFlag,
-        expression: Optional[Dependency],
-        required=False,
+            self,
+            parent: "SelectedEbuild",
+            useflag: UseFlag,
+            expression: Optional[Dependency],
+            required=False,
     ):
         self.parent = parent
         self.useflag = useflag
         self.required = required
         self.dependency = expression
         self.current_evaluation = None
-        self.is_dirty = False
+        self._is_dirty = False
 
-    def get_resolved(self) -> Optional[List["SelectedEbuild"]]:
+    def get_resolved(self) -> Optional["ResolveDependency"]:
         if self.dependency is None:
             return None
 
-        if self.is_dirty or self.current_evaluation is None:
-            self.current_evaluation = resolve_dependency(self.parent, self.dependency)
+        if self._is_dirty or self.current_evaluation is None:
+            self.current_evaluation = resolve_single(self.parent, self.dependency)
 
         return self.current_evaluation
 
@@ -138,27 +102,16 @@ class UseConditional(Conditional):
                 raise RequiredUseException()
 
             # Mark this expression to re-evaluate the dependencies
-            self.is_dirty = True
+            self._is_dirty = True
             self.current_evaluation = None
             return
 
-        self.is_dirty = False
+        self._is_dirty = False
 
 
-class InstallSlot:
-    def __init__(self):
-        self.selected_ebuild_slots = set()
+class SelectedEbuild(ResolveDependency):
+    selected_by: List[Atom]
 
-    def select_ebuild(self, ebuild: Ebuild):
-        pass
-
-    def select_ebuild_with_use_condition(
-        self, ebuild: Ebuild, dependency_select: Dependency
-    ):
-        pass
-
-
-class SelectedEbuild:
     # The original ebuild
     ebuild: Ebuild
 
@@ -168,36 +121,79 @@ class SelectedEbuild:
     # Expressions that depend on use flags from this ebuild
     use_conditions: Dict[str, List[UseConditional]]
 
-    non_conditional: DependencyContainer["SelectedEbuild"]
-    conditional: DependencyContainer[Conditional]
+    generators: DependencyContainer[ResolveDependency]
+    resolved_deps: DependencyContainer[ResolveDependency]
 
-    def __init__(self, ebuild: Ebuild):
+    def __init__(self, atom: Atom, ebuild: Ebuild):
+        self.selected_by = []
         self.ebuild = ebuild
         self.useflags = {}
         self.use_conditions = {}
-        self.non_conditional = DependencyContainer["SelectedEbuild"]()
-        self.conditional = DependencyContainer[Conditional]()
+
+        self.generators = DependencyContainer[ResolveDependency]()
+        self.add_selected_by(atom)
+
+    def get_resolved(self) -> Optional[ResolveDependency]:
+        self.regenerate()
+        return self
+
+    def add_selected_by(self, atom: Atom):
+        self.selected_by.append(atom)
+
+    def change_within_slot(self, atom: Atom) -> bool:
+        """
+        Change the currently selected ebuild
+        to another ebuild within the same slot
+        :param atom: try to match an ebuild to every dependency+this
+        :return: True it can be done
+        """
+
+        ebuild_match: Optional[Ebuild] = None
+        for ebuild in self.ebuild.package:
+            all_match = atom.matches(ebuild)
+            for prev_atom in self.selected_by:
+                all_match = prev_atom.matches(ebuild)
+                if not all_match:
+                    break
+
+            if all_match:
+                ebuild_match = ebuild
+                break
+
+        if ebuild_match is None:
+            return False
+
+        self._is_dirty = True
+        self.ebuild = ebuild_match
+        return True
 
     def regenerate(self):
         """
-        Called from general IPC loop.
-        This will cause
+        Refresh all children
         :return:
         """
 
-        # Remove expressions that need to be regenerated
-        for dep_type in self.conditional:
-            to_regen = []
+        if self._is_dirty:
+            # A new ebuild was selected
+            # We need to regenerate the generators
+            self.generators.clear()
 
-            n = len(dep_type)
-            i = 0
-            while i < n:
-                if dep_type[i].get_resolved() is None:
-                    n -= 1
-                    to_regen.append(dep_type[i])
-                    del dep_type[i]
-                else:
-                    i += 1
+            for i, dep_type in enumerate((self.ebuild.bdepend, self.ebuild.depend, self.ebuild.rdepend, self.ebuild.pdepend)):
+                for dep in resolve_all(self, dep_type):
+                    self.generators[i].append(dep)
+
+            self._is_dirty = False
+
+        # All non-dirty expressions are already cached
+        # We can just remove everyone and re-append
+        self.resolved_deps.clear()
+
+        # Regenerate the dependency with the dirty flag enabled
+        i = 0
+        for dep_type in self.generators:
+            for generator in dep_type:
+                self.resolved_deps[i].append(generator.get_resolved())
+            i += 1
 
     def get_use(self, name: str) -> UseFlag:
         if name not in self.useflags:
