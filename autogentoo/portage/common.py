@@ -29,7 +29,12 @@ class DependencyContainer(Generic[T]):
         return (self.depend, self.run_depend, self.build_depend, self.post_depend)[idx]
 
     def __iter__(self) -> Iterable[List[T]]:
-        return (self.depend, self.run_depend, self.build_depend, self.post_depend).__iter__()
+        return (
+            self.depend,
+            self.run_depend,
+            self.build_depend,
+            self.post_depend,
+        ).__iter__()
 
 
 class Suggestion:

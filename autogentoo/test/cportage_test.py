@@ -85,7 +85,9 @@ class CPortageUnitTests(unittest.TestCase):
         self.assertGreater(atom2.version, atom1.version)
 
     def test_ebuild_1(self):
-        ebuild = cportage.Ebuild(None, "data/test-repo/metadata", "sys-devel", "gcc-9.3.0-r1")
+        ebuild = cportage.Ebuild(
+            None, "data/test-repo/metadata", "sys-devel", "gcc-9.3.0-r1"
+        )
         self.assertEqual(ebuild.category, "sys-devel")
         self.assertEqual(ebuild.name, "gcc")
         self.assertEqual(ebuild.package_key, "sys-devel/gcc")
@@ -107,7 +109,9 @@ class CPortageUnitTests(unittest.TestCase):
         self.portage.add_package(p)
 
         pkg: cportage.Package = self.portage.get_package(p.package_id)
-        ebuild = cportage.Ebuild(None, "data/test-repo/metadata", "sys-devel", "gcc-9.3.0-r1")
+        ebuild = cportage.Ebuild(
+            None, "data/test-repo/metadata", "sys-devel", "gcc-9.3.0-r1"
+        )
         pkg.add_ebuild(ebuild)
 
         # Can't add the same ebuild twice
