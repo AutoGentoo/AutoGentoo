@@ -44,10 +44,10 @@ class UseSuggestion(Suggestion):
 
 class SuggestionExpression(Suggestion):
     class Operator(enum.IntEnum):
-        LEAST_ONE = 0   # or
-        EXACT_ONE = 1   # xor
-        MOST_ONE = 2    # not x or (xor)
-        AND = 3         # all
+        LEAST_ONE = 0  # or
+        EXACT_ONE = 1  # xor
+        MOST_ONE = 2  # not x or (xor)
+        AND = 3  # all
 
     operator: Operator
     suggestions: List[Suggestion]

@@ -10,12 +10,16 @@ from autogentoo.cportage import (
     UseOperatorT,
     Portage,
     AtomUseT,
-    AtomUseDefaultT, RequiredUse,
+    AtomUseDefaultT,
+    RequiredUse,
 )
 from autogentoo.portage import (
     RequiredUseException,
     DependencyContainer,
-    ResolutionException, UseSuggestion, SuggestionExpression, InvalidExpressionException,
+    ResolutionException,
+    UseSuggestion,
+    SuggestionExpression,
+    InvalidExpressionException,
 )
 
 __emerge_session__: Optional["Emerge"] = None
@@ -166,7 +170,9 @@ class UseSelection(Hookable):
 
         if self.enforcing:
             if arg != self.target_value:
-                raise RequiredUseException(UseSuggestion(self.use_flag.name, self.target_value))
+                raise RequiredUseException(
+                    UseSuggestion(self.use_flag.name, self.target_value)
+                )
 
     def get_resolved(self) -> Optional["ResolveDependency"]:
         # This hook does not run any
@@ -190,7 +196,9 @@ class RequiredUseHook(Hookable):
         :return: None
         """
 
-        def evaluate_required_use(operator: SuggestionExpression.Operator, expr: RequiredUse) -> Tuple[SuggestionExpression, int, int]:
+        def evaluate_required_use(
+            operator: SuggestionExpression.Operator, expr: RequiredUse
+        ) -> Tuple[SuggestionExpression, int, int]:
             """
             Count the number of expressions
             that evaluate to True.
@@ -216,42 +224,54 @@ class RequiredUseHook(Hookable):
                     elif req_use.depend is not None:
                         # This is a conditional expression
                         if val:
-                            child_suggestion, k_c, n_c = evaluate_required_use(SuggestionExpression.Operator.AND, req_use.depend)
+                            child_suggestion, k_c, n_c = evaluate_required_use(
+                                SuggestionExpression.Operator.AND, req_use.depend
+                            )
                             if k_c == n_c:
                                 k += 1
                             else:
-                                s = SuggestionExpression(SuggestionExpression.Operator.LEAST_ONE)
+                                s = SuggestionExpression(
+                                    SuggestionExpression.Operator.LEAST_ONE
+                                )
                                 s.append(UseSuggestion(req_use.name, not val))
                                 s.append(child_suggestion)
                                 suggestion.append(s)
                     else:
                         suggestion.append(UseSuggestion(req_use.name, val))
                 elif op == UseOperatorT.LEAST_ONE:
-                    child_suggestion, k_c, n_c = evaluate_required_use(SuggestionExpression.Operator.LEAST_ONE, req_use.depend)
+                    child_suggestion, k_c, n_c = evaluate_required_use(
+                        SuggestionExpression.Operator.LEAST_ONE, req_use.depend
+                    )
                     if k_c >= 1:
                         k += 1
                     else:
                         suggestion.append(child_suggestion)
                 elif op == UseOperatorT.EXACT_ONE:
-                    child_suggestion, k_c, n_c = evaluate_required_use(SuggestionExpression.Operator.EXACT_ONE,
-                                                                       req_use.depend)
+                    child_suggestion, k_c, n_c = evaluate_required_use(
+                        SuggestionExpression.Operator.EXACT_ONE, req_use.depend
+                    )
                     if k_c == 1:
                         k += 1
                     else:
                         suggestion.append(child_suggestion)
                 elif op == UseOperatorT.MOST_ONE:
-                    child_suggestion, k_c, n_c = evaluate_required_use(SuggestionExpression.Operator.MOST_ONE,
-                                                                       req_use.depend)
+                    child_suggestion, k_c, n_c = evaluate_required_use(
+                        SuggestionExpression.Operator.MOST_ONE, req_use.depend
+                    )
                     if k_c <= 1:
                         k += 1
                     else:
                         suggestion.append(child_suggestion)
                 else:
-                    raise InvalidExpressionException("Required use operator '%s' is not valid" % op)
+                    raise InvalidExpressionException(
+                        "Required use operator '%s' is not valid" % op
+                    )
 
             return suggestion, k, n
 
-        suggestions, g_k, g_n = evaluate_required_use(SuggestionExpression.Operator.AND, self.expression)
+        suggestions, g_k, g_n = evaluate_required_use(
+            SuggestionExpression.Operator.AND, self.expression
+        )
         if g_k != g_n:
             raise RequiredUseException(suggestions)
 
@@ -300,7 +320,9 @@ class UseConditional(Hookable):
         # Only evaluate the expression if our condition is met
         if self.useflag.state != flag_state:
             if self.required:
-                raise RequiredUseException(UseSuggestion(self.useflag.name, self.useflag.state))
+                raise RequiredUseException(
+                    UseSuggestion(self.useflag.name, self.useflag.state)
+                )
 
             # Mark this expression to re-evaluate the dependencies
             self._is_dirty = True
