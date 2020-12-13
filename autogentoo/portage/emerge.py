@@ -82,6 +82,8 @@ def emerge_init(emerge: Emerge):
 def emerge_session() -> Emerge:
     global __emerge_session__
     if __emerge_session__ is None:
-        raise RuntimeError("emerge_init() must be called before emerge_session() is called")
+        raise RuntimeError(
+            "emerge_init() must be called before emerge_session() is called"
+        )
 
     return __emerge_session__

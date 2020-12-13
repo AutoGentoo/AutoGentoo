@@ -3,40 +3,47 @@ from typing import List, Optional, Dict, Generator
 
 from autogentoo.cportage import Dependency, Atom, Ebuild, UseFlag, UseOperatorT
 from autogentoo.cportage.autogentoo_cportage import get_portage
-from autogentoo.portage import RequiredUseException, DependencyContainer, ResolutionException
+from autogentoo.portage import (
+    RequiredUseException,
+    DependencyContainer,
+    ResolutionException,
+)
 from autogentoo.portage.emerge import emerge_session
 
 
-def resolve_single(parent: Optional["SelectedEbuild"], depend_expr: Dependency) -> "ResolveDependency":
+def resolve_single(
+    parent: Optional["SelectedEbuild"], depend_expr: Dependency
+) -> "ResolveDependency":
     if parent is None and depend_expr.atom is not None:
         raise ResolutionException(
-                "Use condition expressions are not valid a global scope"
+            "Use condition expressions are not valid a global scope"
         )
 
     if depend_expr.atom is not None:  # Simple atom selection
         return emerge_session().select_atom(depend_expr.atom)
     else:
         assert depend_expr.use_condition == 0 and depend_expr.use_operator in (
-            UseOperatorT.ENABLE, UseOperatorT.DISABLE)
+            UseOperatorT.ENABLE,
+            UseOperatorT.DISABLE,
+        )
 
         if depend_expr.use_condition != 0:
             # Simple use condition
             use_flag = get_portage().get_use_flag(depend_expr.use_condition)
             use_flag = UseFlag(
-                    use_flag.name,
-                    True if depend_expr.use_condition == UseOperatorT.ENABLE else False,
+                use_flag.name,
+                True if depend_expr.use_condition == UseOperatorT.ENABLE else False,
             )
 
             assert depend_expr.children is not None, "Invalid dependency expression"
             parent.add_use_hook(use_flag, depend_expr.children)
         else:
-            raise NotImplementedError(
-                    "Complex use selection is not implemented yet"
-            )
+            raise NotImplementedError("Complex use selection is not implemented yet")
 
 
-def resolve_all(parent: Optional["SelectedEbuild"],
-                depend: Dependency) -> Generator["ResolveDependency", None, None]:
+def resolve_all(
+    parent: Optional["SelectedEbuild"], depend: Dependency
+) -> Generator["ResolveDependency", None, None]:
     for dep in depend:
         yield resolve_single(parent, dep)
 
@@ -73,11 +80,11 @@ class UseConditional(Conditional):
     current_evaluation: Optional["ResolveDependency"]
 
     def __init__(
-            self,
-            parent: "SelectedEbuild",
-            useflag: UseFlag,
-            expression: Optional[Dependency],
-            required=False,
+        self,
+        parent: "SelectedEbuild",
+        useflag: UseFlag,
+        expression: Optional[Dependency],
+        required=False,
     ):
         self.parent = parent
         self.useflag = useflag
@@ -178,7 +185,14 @@ class SelectedEbuild(ResolveDependency):
             # We need to regenerate the generators
             self.generators.clear()
 
-            for i, dep_type in enumerate((self.ebuild.bdepend, self.ebuild.depend, self.ebuild.rdepend, self.ebuild.pdepend)):
+            for i, dep_type in enumerate(
+                (
+                    self.ebuild.bdepend,
+                    self.ebuild.depend,
+                    self.ebuild.rdepend,
+                    self.ebuild.pdepend,
+                )
+            ):
                 for dep in resolve_all(self, dep_type):
                     self.generators[i].append(dep)
 
