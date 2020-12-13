@@ -78,7 +78,7 @@ program_depend : DEPEND depend_expr                {dependout = (void*)$2;}
                ;
 
 depend_expr  : depend_expr_single               {$$ = $1;}
-             | depend_expr depend_expr          {$$ = $1; $$->next = $2;}
+             | depend_expr_single depend_expr   {$$ = $1; $$->next = $2;}
 
 depend_expr_single  : atom                          {$$ = dependency_build_atom($1);}
                     | USESELECT '(' depend_expr ')' {$$ = dependency_build_use($1.target, $1.operator, $3); free($1.target);}
