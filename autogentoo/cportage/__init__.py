@@ -5,7 +5,6 @@ from . import autogentoo_cportage
 
 
 class UseOperatorT(enum.IntEnum):
-    NONE = autogentoo_cportage.USE_OP_NONE
     DISABLE = autogentoo_cportage.USE_OP_DISABLE
     ENABLE = autogentoo_cportage.USE_OP_ENABLE
     LEAST_ONE = autogentoo_cportage.USE_OP_LEAST_ONE

@@ -1,4 +1,6 @@
-from typing import TypeVar, List, Tuple, Generic
+import enum
+from dataclasses import dataclass
+from typing import TypeVar, List, Tuple, Generic, Iterable, Union, Optional
 
 from autogentoo.cportage import Atom, UseFlag
 
@@ -30,8 +32,45 @@ class DependencyContainer(Generic[T]):
         return self.depend, self.run_depend, self.build_depend, self.post_depend
 
 
-class RequiredUseException(Exception):
+class Suggestion:
     pass
+
+
+@dataclass(frozen=True)
+class UseSuggestion(Suggestion):
+    use_name: str
+    value: bool
+
+
+class SuggestionExpression(Suggestion):
+    class Operator(enum.IntEnum):
+        LEAST_ONE = 0   # or
+        EXACT_ONE = 1   # xor
+        MOST_ONE = 2    # not x or (xor)
+        AND = 3         # all
+
+    operator: Operator
+    suggestions: List[Suggestion]
+
+    def __init__(self, operator: Operator):
+        self.operator = operator
+        self.suggestions = []
+
+    def append(self, suggestion: Suggestion):
+        self.suggestions.append(suggestion)
+
+    def __iter__(self) -> Iterable[Suggestion]:
+        return self.suggestions.__iter__()
+
+
+class RequiredUseException(Exception):
+    suggestion: Union[None, Suggestion]
+
+    def __init__(self, suggestion: Optional[Suggestion] = None):
+        self.suggestion = suggestion
+
+    def has_suggestion(self) -> bool:
+        return self.suggestion is not None
 
 
 class ChangedUseException(Exception):
@@ -44,4 +83,8 @@ class ChangedUseException(Exception):
 
 
 class ResolutionException(Exception):
+    pass
+
+
+class InvalidExpressionException(Exception):
     pass

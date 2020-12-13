@@ -74,8 +74,10 @@ Use_t use_get_global(Portage* parent, const char* useflag)
 static PyNewFunc(PyRequiredUse_new)
 {
     RequiredUse* self = (RequiredUse*) type->tp_alloc(type, 0);
+    self->name = NULL;
     self->depend = NULL;
     self->next = NULL;
+    self->PyIterator_self__ = NULL;
     self->global_flag = 0;
     self->option = 0;
     return (PyObject*) self;
@@ -108,12 +110,34 @@ static PyInitFunc(PyRequiredUse_init, RequiredUse)
 RequiredUse* use_build_required_use(const char* target, use_operator_t option)
 {
     RequiredUse* out = (RequiredUse*) PyRequiredUse_new(&PyRequiredUseType, NULL, NULL);
+
+    if (target)
+        out->name = strdup(target);
     out->global_flag = use_get_global(global_portage, target);
 
     out->option = option;
     out->depend = NULL;
     out->next = NULL;
     return out;
+}
+
+static PyObject* PyRequiredUse_iter(RequiredUse* self)
+{
+    Py_INCREF(self);
+    self->PyIterator_self__ = self;
+    return (PyObject*) self;
+}
+static PyObject* PyRequiredUse_next(RequiredUse* self)
+{
+    if (self->PyIterator_self__)
+    {
+        RequiredUse* out = self->PyIterator_self__;
+        Py_INCREF(out);
+        self->PyIterator_self__ = self->PyIterator_self__->next;
+        return (PyObject*) out;
+    }
+
+    return NULL;
 }
 
 static PyMemberDef PyUseFlag_members[] = {
@@ -124,6 +148,7 @@ static PyMemberDef PyUseFlag_members[] = {
 
 
 static PyMemberDef PyRequiredUse_members[] = {
+        {"name", T_STRING, offsetof(RequiredUse, name), READONLY},
         {"depend", T_OBJECT, offsetof(RequiredUse, depend), READONLY},
         {"next", T_OBJECT, offsetof(RequiredUse, next), READONLY},
         {"id", T_ULONGLONG, offsetof(RequiredUse, global_flag), READONLY},
@@ -154,5 +179,7 @@ PyTypeObject PyRequiredUseType = {
         .tp_new = PyRequiredUse_new,
         .tp_init = (initproc) PyRequiredUse_init,
         .tp_dealloc = (destructor) PyRequiredUse_dealloc,
-        .tp_members = PyRequiredUse_members
+        .tp_members = PyRequiredUse_members,
+        .tp_iter = (getiterfunc) PyRequiredUse_iter,
+        .tp_iternext = (iternextfunc) PyRequiredUse_next
 };

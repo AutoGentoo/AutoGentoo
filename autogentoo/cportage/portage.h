@@ -15,7 +15,6 @@ typedef lut_id Use_t;
 typedef lut_id Package_t;
 
 typedef enum {
-    USE_OP_NONE,
     USE_OP_DISABLE, //!< !
     USE_OP_ENABLE, //!< ?
     USE_OP_LEAST_ONE, //!< ||

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Generator
+from typing import List, Optional, Dict, Generator, Tuple
 
 from autogentoo.cportage import (
     get_portage,
@@ -10,12 +10,12 @@ from autogentoo.cportage import (
     UseOperatorT,
     Portage,
     AtomUseT,
-    AtomUseDefaultT,
+    AtomUseDefaultT, RequiredUse,
 )
 from autogentoo.portage import (
     RequiredUseException,
     DependencyContainer,
-    ResolutionException,
+    ResolutionException, UseSuggestion, SuggestionExpression, InvalidExpressionException,
 )
 
 __emerge_session__: Optional["Emerge"] = None
@@ -72,6 +72,8 @@ def resolve_single(
                 sel_ebuild.add_use_requirement(use.name, atom_flag)
             else:
                 sel_ebuild.add_use_requirement(use.name, AtomUseT(use.option))
+
+            # TODO Schedule use flag setting
 
         return sel_ebuild
     else:
@@ -132,7 +134,7 @@ class UseSelection(Hookable):
         self.parent = parent
         self.use_flag = use_flag
         self.flag = flag
-        self.target_value = parent.get_use(use_flag.name).state
+        self.target_value = use_flag.state
         self.enforcing = False
 
         if self.flag == AtomUseT.ENABLE:
@@ -164,11 +166,96 @@ class UseSelection(Hookable):
 
         if self.enforcing:
             if arg != self.target_value:
-                raise RequiredUseException()
+                raise RequiredUseException(UseSuggestion(self.use_flag.name, self.target_value))
 
     def get_resolved(self) -> Optional["ResolveDependency"]:
         # This hook does not run any
         # dependency resolution
+        return None
+
+
+class RequiredUseHook(Hookable):
+    expression: RequiredUse
+    ebuild: "SelectedEbuild"
+
+    def __init__(self, selected_ebuild: "SelectedEbuild", required_use: RequiredUse):
+        self.expression = required_use
+        self.ebuild = selected_ebuild
+
+    def run_hook(self, arg: bool):
+        """
+        Evaluate the flags in the required use
+        expression to make sure we have a match
+        :param arg: flag state that changed (unused)
+        :return: None
+        """
+
+        def evaluate_required_use(operator: SuggestionExpression.Operator, expr: RequiredUse) -> Tuple[SuggestionExpression, int, int]:
+            """
+            Count the number of expressions
+            that evaluate to True.
+            :param operator: operator for suggestion
+            :param expr: expression to verify
+            :return: (suggestions, num_true, total)
+            """
+
+            n = 0
+            k = 0
+            suggestion = SuggestionExpression(operator)
+
+            for req_use in expr:
+                n += 1
+                op = UseOperatorT(req_use.operator)
+                if op == UseOperatorT.ENABLE or op == UseOperatorT.DISABLE:
+                    val = self.ebuild.get_use(req_use.name).state
+                    if op == UseOperatorT.DISABLE:
+                        val = not val
+
+                    if val and req_use.depend is None:
+                        k += 1
+                    elif req_use.depend is not None:
+                        # This is a conditional expression
+                        if val:
+                            child_suggestion, k_c, n_c = evaluate_required_use(SuggestionExpression.Operator.AND, req_use.depend)
+                            if k_c == n_c:
+                                k += 1
+                            else:
+                                s = SuggestionExpression(SuggestionExpression.Operator.LEAST_ONE)
+                                s.append(UseSuggestion(req_use.name, not val))
+                                s.append(child_suggestion)
+                                suggestion.append(s)
+                    else:
+                        suggestion.append(UseSuggestion(req_use.name, val))
+                elif op == UseOperatorT.LEAST_ONE:
+                    child_suggestion, k_c, n_c = evaluate_required_use(SuggestionExpression.Operator.LEAST_ONE, req_use.depend)
+                    if k_c >= 1:
+                        k += 1
+                    else:
+                        suggestion.append(child_suggestion)
+                elif op == UseOperatorT.EXACT_ONE:
+                    child_suggestion, k_c, n_c = evaluate_required_use(SuggestionExpression.Operator.EXACT_ONE,
+                                                                       req_use.depend)
+                    if k_c == 1:
+                        k += 1
+                    else:
+                        suggestion.append(child_suggestion)
+                elif op == UseOperatorT.MOST_ONE:
+                    child_suggestion, k_c, n_c = evaluate_required_use(SuggestionExpression.Operator.MOST_ONE,
+                                                                       req_use.depend)
+                    if k_c <= 1:
+                        k += 1
+                    else:
+                        suggestion.append(child_suggestion)
+                else:
+                    raise InvalidExpressionException("Required use operator '%s' is not valid" % op)
+
+            return suggestion, k, n
+
+        suggestions, g_k, g_n = evaluate_required_use(SuggestionExpression.Operator.AND, self.expression)
+        if g_k != g_n:
+            raise RequiredUseException(suggestions)
+
+    def get_resolved(self) -> Optional["ResolveDependency"]:
         return None
 
 
@@ -213,7 +300,7 @@ class UseConditional(Hookable):
         # Only evaluate the expression if our condition is met
         if self.useflag.state != flag_state:
             if self.required:
-                raise RequiredUseException()
+                raise RequiredUseException(UseSuggestion(self.useflag.name, self.useflag.state))
 
             # Mark this expression to re-evaluate the dependencies
             self._is_dirty = True
@@ -237,6 +324,7 @@ class SelectedEbuild(ResolveDependency):
 
     # Triggers that run when a use flag is changes
     use_flag_hooks: Dict[str, List[Hookable]]
+    global_flag_hooks: List[Hookable]  # Trigger when any use flag is changed
 
     generators: DependencyContainer[ResolveDependency]
     resolved_deps: DependencyContainer[ResolveDependency]
@@ -246,6 +334,7 @@ class SelectedEbuild(ResolveDependency):
         self.ebuild = ebuild
         self.useflags = {}
         self.use_flag_hooks = {}
+        self.global_flag_hooks = []
 
         self.generators = DependencyContainer[ResolveDependency]()
 
@@ -299,6 +388,10 @@ class SelectedEbuild(ResolveDependency):
             if not self.ebuild.metadata_init:
                 self.ebuild.initialize_metadata()
 
+            # Make sure all use-flags conform to requirements
+            if self.ebuild.required_use is not None:
+                self.add_use_hook(None, RequiredUseHook(self, self.ebuild.required_use))
+
             for i, dep_type in enumerate(
                 (
                     self.ebuild.bdepend,
@@ -343,15 +436,23 @@ class SelectedEbuild(ResolveDependency):
         :param flag:
         :return:
         """
-        pass
 
-    def add_use_hook(self, useflag: UseFlag, hook: Hookable):
+        use = self.get_use(name)
+        self.add_use_hook(use, UseSelection(self, use, flag))
+
+    def add_use_hook(self, useflag: Optional[UseFlag], hook: Hookable):
         """
         Associate an action with a flag changing
         :param useflag:
         :param hook:
         :return:
         """
+
+        if useflag is None:
+            self.global_flag_hooks.append(hook)
+            hook.run_hook(None)
+            return
+
         if useflag.name not in self.use_flag_hooks:
             self.use_flag_hooks[useflag.name] = []
 
@@ -369,12 +470,16 @@ class SelectedEbuild(ResolveDependency):
 
         # Only run the hooks if there is a change in state
         if self.get_use(useflag.name).state != useflag.state:
+            self.useflags[useflag.name] = useflag
+
             # Run all of the use-hooks for this flag
             if useflag.name in self.use_flag_hooks:
                 for hook in self.use_flag_hooks[useflag.name]:
                     hook.run_hook(useflag.state)
 
-            self.useflags[useflag.name] = useflag
+            # Run global use-hooks
+            for hook in self.global_flag_hooks:
+                hook.run_hook(None)
 
 
 class InstallPackage:
