@@ -1,23 +1,32 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator
 
-from autogentoo.cportage import get_portage, Dependency, Atom, Ebuild, UseFlag, UseOperatorT, Portage, \
-    AtomUseT, AtomUseDefaultT
+from autogentoo.cportage import (
+    get_portage,
+    Dependency,
+    Atom,
+    Ebuild,
+    UseFlag,
+    UseOperatorT,
+    Portage,
+    AtomUseT,
+    AtomUseDefaultT,
+)
 from autogentoo.portage import (
     RequiredUseException,
     DependencyContainer,
     ResolutionException,
 )
 
-__emerge_session__: Optional['Emerge'] = None
+__emerge_session__: Optional["Emerge"] = None
 
 
-def emerge_init(emerge: 'Emerge'):
+def emerge_init(emerge: "Emerge"):
     global __emerge_session__
     __emerge_session__ = emerge
 
 
-def emerge_session() -> 'Emerge':
+def emerge_session() -> "Emerge":
     global __emerge_session__
     if __emerge_session__ is None:
         raise RuntimeError(
@@ -50,9 +59,16 @@ def resolve_single(
                 if default == AtomUseDefaultT.NONE:
                     # We have no fallback when this useflag doesn't exist
                     # This is an error
-                    raise KeyError("Invalid use flag '%s' for atom '%s'" % (use.name, depend_expr.atom))
+                    raise KeyError(
+                        "Invalid use flag '%s' for atom '%s'"
+                        % (use.name, depend_expr.atom)
+                    )
 
-                atom_flag = AtomUseT.ENABLE if default == AtomUseDefaultT.ON else AtomUseT.DISABLE
+                atom_flag = (
+                    AtomUseT.ENABLE
+                    if default == AtomUseDefaultT.ON
+                    else AtomUseT.DISABLE
+                )
                 sel_ebuild.add_use_requirement(use.name, atom_flag)
             else:
                 sel_ebuild.add_use_requirement(use.name, AtomUseT(use.option))
@@ -108,11 +124,11 @@ class UseSelection(Hookable):
 
     enforcing: bool
     target_value: bool
-    parent: 'SelectedEbuild'
+    parent: "SelectedEbuild"
     use_flag: UseFlag
     flag: AtomUseT
 
-    def __init__(self, parent: 'SelectedEbuild', use_flag: UseFlag, flag: AtomUseT):
+    def __init__(self, parent: "SelectedEbuild", use_flag: UseFlag, flag: AtomUseT):
         self.parent = parent
         self.use_flag = use_flag
         self.flag = flag
@@ -329,9 +345,7 @@ class SelectedEbuild(ResolveDependency):
         """
         pass
 
-    def add_use_hook(
-        self, useflag: UseFlag, hook: Hookable
-    ):
+    def add_use_hook(self, useflag: UseFlag, hook: Hookable):
         """
         Associate an action with a flag changing
         :param useflag:
