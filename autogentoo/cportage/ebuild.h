@@ -15,6 +15,8 @@ struct Ebuild_prv {
     PyObject_HEAD
     char* name;
     char* category;
+    lut_id package_id;
+    lut_flag_t package_lut_flags;
 
     char* slot;
     char* sub_slot;
@@ -45,7 +47,6 @@ struct Ebuild_prv {
 
     Package* package;
     Ebuild* older;
-    Ebuild* newer;
 };
 
 PyNewFunc(PyEbuild_new);

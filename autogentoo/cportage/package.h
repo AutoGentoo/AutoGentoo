@@ -25,5 +25,6 @@ struct Package_prv {
 
 PyFastMethod(PyPackage_add_ebuild, Package);
 PyFastMethod(PyPackage_match_atom, Package);
+PyNewFunc(PyPackage_new);
 
 #endif //AUTOGENTOO_PACKAGE_H

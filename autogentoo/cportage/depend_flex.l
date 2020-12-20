@@ -5,12 +5,8 @@
 #include "language.h"
 #include <string.h>
 #include "depend.tab.h"
-#include <assert.h>
 
-#include <signal.h>
-
-int asprintf(char** strp, const char* fmt, ...);
-
+#undef YY_INPUT
 #define YY_INPUT(buf,result,max_size)  {\
     result = language_get_next(buf, max_size); \
     if (  result <= 0  ) \

@@ -3,7 +3,7 @@ import unittest
 from typing import List
 
 from autogentoo import cportage
-from autogentoo.cportage import UseOperatorT
+from autogentoo.cportage import UseOperatorT, Atom
 
 
 class CPortageUnitTests(unittest.TestCase):
@@ -125,17 +125,31 @@ class CPortageUnitTests(unittest.TestCase):
         self.assertEqual(UseOperatorT.LEAST_ONE, UseOperatorT(r_use.operator))
         self.assertEqual("sna", r_use.depend.name)
         self.assertEqual("uxa", r_use.depend.next.name)
-        self.assertEqual(None, r_use.depend.next.next)
+        self.assertIsNone(r_use.depend.next.next)
 
     def test_required_use_single(self):
         r_use = cportage.RequiredUse("|| ( sna )")
         self.assertEqual(UseOperatorT.LEAST_ONE, UseOperatorT(r_use.operator))
         self.assertEqual("sna", r_use.depend.name)
-        self.assertEqual(None, r_use.depend.next)
+        self.assertIsNone(r_use.depend.next)
 
     def test_required_use_simple(self):
         r_use = cportage.RequiredUse("sna")
         self.assertEqual("sna", r_use.name)
+
+    def test_required_use_error(self):
+        with self.assertRaises(RuntimeError):
+            cportage.RequiredUse(" ?? ")
+
+    def test_repository_init(self):
+        ebuild_n = self.portage.initialize_repository(None, "data/cportage-repo")
+        self.assertEqual(ebuild_n, 30260)
+
+        self.assertIsNotNone(self.portage.match_atom(Atom("dev-vcs/cvs")))
+        self.assertIsNotNone(self.portage.match_atom(Atom("sys-libs/zlib")))
+
+        self.assertIsNotNone(self.portage.match_atom(Atom("dev-vcs/git-9.9.2")))
+        self.assertIsNotNone(self.portage.match_atom(Atom("dev-vcs/git-merge-changelog")))
 
 
 if __name__ == "__main__":

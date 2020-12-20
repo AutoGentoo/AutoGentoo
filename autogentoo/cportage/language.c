@@ -13,7 +13,7 @@
 extern void* dependout;
 extern void* requireduseout;
 
-static __thread YYBUFFERPOS* buffer_pos;
+static __thread lang_YYBUFFERPOS* buffer_pos;
 static int yy_error_ag_0_ = 0;
 
 void dependparse(void);
@@ -34,9 +34,6 @@ struct YYLTYPE
 
 extern YYLTYPE dependlloc;
 extern YYLTYPE requireduselloc;
-
-void requireduselex_destroy();
-void dependlex_destroy();
 
 __thread type_delim_t current_parser_type;
 
@@ -71,16 +68,16 @@ void language_print_error(const char* errorstring, ...)
     }
 
     va_start(args, errorstring);
-    vsprintf(errmsg, errorstring, args);
+    vprintf(errorstring, args);
     va_end(args);
 
     fprintf(stdout, "Error: %s\n", errmsg);
 }
 
-void language_init_new(YYBUFFERPOS* buffer, type_delim_t delim)
+void language_init_new(lang_YYBUFFERPOS* buffer, type_delim_t delim)
 {
     buffer_pos = buffer;
-    memset(buffer_pos, 0, sizeof(YYBUFFERPOS));
+    memset(buffer_pos, 0, sizeof(lang_YYBUFFERPOS));
     buffer_pos->delim = delim;
     current_parser_type = delim;
 }
@@ -184,42 +181,21 @@ inline int language_get_next(char* b, int maxBuffer)
     return b[0] != 0;
 }
 
-int requireduseerror(const char* s)
+void requireduseerror(char const *msg)
 {
-    language_print_error(s);
-    return yy_error_ag_0_;
+    language_print_error(msg);
 }
 
-int dependerror(const char* s)
+void dependerror(const char* s)
 {
     language_print_error(s);
-    return yy_error_ag_0_;
 }
 
 Dependency* depend_parse(const char* buffer)
 {
-    YYBUFFERPOS pos;
+    lang_YYBUFFERPOS pos;
     dependout = NULL;
     language_init_new(&pos, LANGUAGE_DEPEND);
-    language_feed_string(buffer);
-    dependparse();
-
-    if (yy_error_ag_0_)
-    {
-        Py_XDECREF(dependout);
-        return NULL;
-    }
-
-    return (Dependency*) dependout;
-}
-
-Dependency* cmdline_parse(const char* buffer)
-{
-    return NULL;
-    yy_error_ag_0_ = 0;
-    dependout = NULL;
-    YYBUFFERPOS pos;
-    //language_init_new(&pos, LANGUAGE_CMDLINE);
     language_feed_string(buffer);
     dependparse();
 
@@ -236,7 +212,7 @@ Atom* atom_parse(const char* buffer)
 {
     yy_error_ag_0_ = 0;
     dependout = NULL;
-    YYBUFFERPOS pos;
+    lang_YYBUFFERPOS pos;
     language_init_new(&pos, LANGUAGE_DEPEND);
     language_feed_string(buffer);
     dependparse();
@@ -258,7 +234,7 @@ RequiredUse* required_use_parse(const char* buffer)
 {
     yy_error_ag_0_ = 0;
     requireduseout = NULL;
-    YYBUFFERPOS pos;
+    lang_YYBUFFERPOS pos;
     language_init_new(&pos, LANGUAGE_REQUIRED_USE);
     language_feed_string(buffer);
     requireduseparse();

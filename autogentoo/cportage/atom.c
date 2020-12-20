@@ -14,10 +14,36 @@ static Py_hash_t PyAtom_hash(Atom* self);
 static PyObject*
 PyAtom_repr(Atom* self)
 {
-    PyObject* obj = PyUnicode_FromFormat(
-            "Atom<category=%s, name=%s>",
-            self->category,
-            self->name);
+    char prefix[3] = {0, 0, 0};
+
+    if (self->range == ATOM_VERSION_ALL) {}
+    else if (self->range & ATOM_VERSION_G)
+        prefix[0] = '>';
+    else if (self->range & ATOM_VERSION_L)
+        prefix[0] = '<';
+    else if (self->range & ATOM_VERSION_E)
+        prefix[1] = '=';
+
+    PyObject* obj;
+    if (self->version)
+    {
+        obj = PyUnicode_FromFormat(
+                "%s%s/%s-%s",
+                prefix,
+                self->category,
+                self->name,
+                self->version->full_version
+        );
+    }
+    else
+    {
+        obj = PyUnicode_FromFormat(
+                "%s%s/%s",
+                prefix,
+                self->category,
+                self->name
+        );
+    }
 
     Py_XINCREF(obj);
     return obj;
@@ -375,13 +401,7 @@ int atom_init(Atom* self, const char* input)
     self->repository = NULL;
     asprintf(&self->key, "%s/%s", self->category, self->name);
 
-    lut_flag_t flag = 0;
-    self->id = lut_get_id(global_portage->packages, self->key, &flag);
-    if (flag == LUT_FLAG_NOT_FOUND)
-    {
-        /* Add the package to the LUT */
-        lut_insert_id(global_portage->packages, self->key, 0, self->id, flag);
-    }
+    self->id = lut_get_id(global_portage->packages, self->key, &self->id_flag);
 
     free(d_input);
 

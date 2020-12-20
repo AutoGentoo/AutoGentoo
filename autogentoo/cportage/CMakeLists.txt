@@ -36,7 +36,7 @@ set(depend_SOURCES
         ${FLEX_FLEX_DEPEND_OUTPUTS}
         )
 set(requireduse_SOURCES
-        ${depend_PARSER}
+        ${requireduse_PARSER}
         ${BISON_LANG_REQUIREDUSE_OUTPUTS}
         ${FLEX_FLEX_REQUIREDUSE_OUTPUTS}
         )

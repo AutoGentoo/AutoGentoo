@@ -27,14 +27,11 @@ static PyInitFunc(PyUseFlag_init, UseFlag)
     static char* kwlist[] = {"name", "state", NULL};
 
     const char* name = NULL;
-    U8 state = 0;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "sp", kwlist, &name, &state))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "sp", kwlist, &name, &self->state))
         return -1;
 
-    self->state = state;
     self->name = strdup(name);
-
     return 0;
 }
 
@@ -52,7 +49,7 @@ Use_t use_get_global(Portage* parent, const char* useflag)
         Use_t out = lut_get_id(parent->global_flags, useflag, &flag);
 
         /* This use flag has not been initialized at the global state yet */
-        if (flag == LUT_FLAG_NOT_FOUND)
+        if (flag & LUT_FLAG_NOT_FOUND)
         {
             UseFlag* new_flag = (UseFlag*) PyUseFlag_new(&PyUseFlagType, NULL, NULL);
             use_flag_init(new_flag, useflag, USE_STATE_DISABLED);

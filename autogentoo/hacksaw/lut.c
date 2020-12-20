@@ -6,6 +6,7 @@
 #include <string.h>
 #include <assert.h>
 #include <Python.h>
+#include <execinfo.h>
 #include "lut.h"
 #include "map.h"
 
@@ -54,37 +55,12 @@ static inline LUTNode** lut_get_bucket(LUT* self, U32 hash)
     return &self->table[hash % self->size];
 }
 
-static void lut_realloc_bucket(LUT* self, LUTNode* bucket)
-{
-    if (bucket->next)
-        lut_realloc_bucket(self, bucket->next);
-
-    bucket->next = NULL;
-
-    /* Place this node into the new table */
-    LUTNode** new_bucket = lut_get_bucket(self, bucket->id);
-    if (*new_bucket)
-    {
-        /* Traverse the last node */
-        LUTNode* current_node = *new_bucket;
-        for (; current_node->next; current_node = current_node->next);
-        current_node->next = bucket;
-    }
-    else
-    {
-        /* No items in this bucket yet */
-        *new_bucket = bucket;
-    }
-
-    self->n++;
-}
-
 static inline void lut_realloc(LUT* self, U64 size)
 {
     U64 old_size = self->size;
     LUTNode** old_table = self->table;
 
-    self->table = calloc(size, sizeof(MapItem*));
+    self->table = calloc(size, sizeof(LUTNode*));
     self->size = size;
     self->realloc_at = self->size * LUT_THRESHOLD;
 
@@ -93,8 +69,35 @@ static inline void lut_realloc(LUT* self, U64 size)
 
     for (U64 i = 0; i < old_size && self->n < old_count; i++)
     {
-        if (old_table[i])
-            lut_realloc_bucket(self, old_table[i]);
+        LUTNode* current = old_table[i];
+        LUTNode* next;
+        while (current)
+        {
+            next = current->next;
+
+            /* Break the chain so we can add
+             * to the new table */
+            current->next = NULL;
+
+            /* Place this node into the new table */
+            LUTNode** new_bucket = lut_get_bucket(self, LUT_ID_GET_HASH(current->id));
+            if (*new_bucket)
+            {
+                /* Traverse to the last node in the new table */
+                LUTNode* current_node = *new_bucket;
+                for (; current_node->next; current_node = current_node->next);
+                current_node->next = current;
+            }
+            else
+            {
+                /* No items in this bucket yet */
+                *new_bucket = current;
+            }
+
+            self->n++;
+
+            current = next;
+        }
     }
 
     assert(self->n == old_count);
@@ -124,7 +127,7 @@ lut_id lut_insert(LUT* self, const char* key, U64 data, lut_flag_t flags)
 void lut_insert_id(LUT* self, const char* key, U64 data, lut_id id, lut_flag_t flag)
 {
     if (self->n + 1 >= self->realloc_at)
-        lut_realloc(self, self->size * 2);
+        lut_realloc(self, self->size * 4);
 
     LUTNode* node = lut_node_new();
 
@@ -133,7 +136,7 @@ void lut_insert_id(LUT* self, const char* key, U64 data, lut_id id, lut_flag_t f
         Py_XINCREF(data);
     else if (flag & LUT_FLAG_REFERENCE)
         OBJECT_INCREF(((RefObject*)data));
-    node->data = (U64)data;
+    node->data = data;
     node->id = id;
     node->flags = flag;
     node->key = strdup(key);
@@ -158,6 +161,7 @@ void lut_insert_id(LUT* self, const char* key, U64 data, lut_id id, lut_flag_t f
     else if (node->flags & LUT_FLAG_EXISTS)
     {
         /* This should always be non-NULL */
+        /* We've already initialized this bucket (exists) */
         assert(*bucket);
 
         /* Find the correct node */
@@ -238,6 +242,7 @@ lut_id lut_get_id(LUT* self, const char* key, lut_flag_t* flag)
 
     if (flag)
         *flag = LUT_FLAG_NOT_FOUND;
+
     return (((lut_id)hash << LUT_HASH_SHIFT) & LUT_HASH_MASK)
             | (((lut_id)hash_overlap << LUT_OVERLAP_SHIFT) & LUT_OVERLAP_MASK);
 
