@@ -16,7 +16,7 @@ int requireduselineno;
 int requireduselloc;
 void* requireduseout;
 
-#define REQUIREDUSEERROR_VERBOSE 1
+#define YYERROR_VERBOSE 1
 
 extern Portage* global_portage;
 

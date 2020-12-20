@@ -62,8 +62,6 @@ void dependerror(const char *message);
 %type <atom_type> atom
 %type <depend_type> depend_expr
 %type <depend_type> depend_expr_single
-//%type <depend_type> command_line
-//%type <atom_type> command_atom
 
 %destructor { if ($$.target) free($$.target); } <depend_expr_select>
 %destructor { Py_DECREF($$); } <atom_type>;

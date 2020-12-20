@@ -21,6 +21,7 @@ struct AtomVersion_prv {
 struct Atom_prv {
     PyObject_HEAD
     Package_t id;
+    lut_flag_t id_flag;
     Py_hash_t cached_hash;
 
     char* category;

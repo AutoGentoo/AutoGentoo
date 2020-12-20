@@ -23,13 +23,17 @@ int ebuild_init(Ebuild* self,
 {
     asprintf(&self->key, "%s/%s", category, name_and_version);
 
-    Atom* atom = atom_parse(self->key);
+    Atom* atom = (Atom*) PyAtom_new(&PyAtomType, NULL, NULL);
+    atom_init(atom, self->key);
+
     if (!atom)
     {
         PyErr_Format(PyExc_RuntimeError, "Failed to parse atom '%s'", self->key);
         return -1;
     }
 
+    self->package_id = atom->id;
+    self->package_lut_flags = atom->id_flag;
     /* Take all of the atom's references away */
     SAFE_REF_TAKE(self->package_key, atom->key)
     SAFE_REF_TAKE(self->version, atom->version)
@@ -37,6 +41,9 @@ int ebuild_init(Ebuild* self,
     SAFE_REF_TAKE(self->category, atom->category)
     SAFE_REF_TAKE(self->slot, atom->slot)
     SAFE_REF_TAKE(self->sub_slot, atom->sub_slot)
+
+    Py_XDECREF(self->iuse);
+    self->iuse = PyDict_New();
 
     /* Free the atom (no longer needed) */
     Py_DECREF(atom);
@@ -135,9 +142,6 @@ static void ebuild_keyword_init(Ebuild* self, char* line)
 
 static void ebuild_iuse_init(Ebuild* self, char* line)
 {
-    Py_XDECREF(self->iuse);
-    self->iuse = PyDict_New();
-
     for (char* token = strtok(line, " "); token; token = strtok(NULL, " "))
     {
         UseFlag* flag = (UseFlag*) PyUseFlag_new(&PyUseFlagType, NULL, NULL);
@@ -304,7 +308,6 @@ PyInitFunc(PyEbuild_init, Ebuild)
 PyMethod(PyEbuild_dealloc, Ebuild)
 {
     Py_XDECREF(self->older);
-    Py_XDECREF(self->newer);
 
     SAFE_FREE(self->name);
     SAFE_FREE(self->category);
@@ -365,7 +368,6 @@ static PyMemberDef PyEbuild_members[] = {
         {"metadata_init", T_BOOL,   offsetof(Ebuild, metadata_init), READONLY},
         {"package",       T_OBJECT, offsetof(Ebuild, package),       READONLY},
         {"older",         T_OBJECT, offsetof(Ebuild, older),         READONLY},
-        {"newer",         T_OBJECT, offsetof(Ebuild, newer),         READONLY},
         {NULL, 0, 0, 0, NULL}
 };
 

@@ -4,18 +4,15 @@
 #include <stdio.h>
 #include "language.h"
 #include <string.h>
-#include "requireduse.tab.h"
-#include <assert.h>
 
-#include <signal.h>
-
-int asprintf(char** strp, const char* fmt, ...);
-
+#undef YY_INPUT
 #define YY_INPUT(buf,result,max_size)  {\
     result = language_get_next(buf, max_size); \
     if (  result <= 0  ) \
       result = YY_NULL; \
 }
+
+#include "requireduse.tab.h"
 
 %}
 

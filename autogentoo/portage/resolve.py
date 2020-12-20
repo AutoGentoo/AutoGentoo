@@ -1,6 +1,7 @@
+import warnings
 from abc import ABC, abstractmethod
 from queue import Queue
-from typing import List, Optional, Dict, Generator, Tuple
+from typing import List, Optional, Dict, Generator, Tuple, Set
 
 from autogentoo.cportage import (
     get_portage,
@@ -13,6 +14,7 @@ from autogentoo.cportage import (
     AtomUseT,
     AtomUseDefaultT,
     RequiredUse,
+    AtomBlockT,
 )
 from autogentoo.portage import (
     RequiredUseException,
@@ -43,13 +45,18 @@ def emerge_session() -> "Emerge":
 
 def resolve_single(
     parent: Optional["SelectedEbuild"], depend_expr: Dependency
-) -> "ResolveDependency":
+) -> Optional["ResolveDependency"]:
     if parent is None and depend_expr.atom is None:
         raise ResolutionException(
             "Use condition expressions are not valid at global scope"
         )
 
     if depend_expr.atom is not None:  # Simple atom selection
+        # Check if this is a blocker
+        if depend_expr.atom.blocks != AtomBlockT.NONE:
+            emerge_session().add_block(parent, depend_expr.atom)
+            return None
+
         sel_ebuild = emerge_session().select_atom(parent, depend_expr.atom)
 
         if depend_expr.atom.useflags is None:
@@ -74,18 +81,20 @@ def resolve_single(
                     if default == AtomUseDefaultT.ON
                     else AtomUseT.DISABLE
                 )
+
+                sel_ebuild.add_use(use.name, atom_flag == AtomUseT.ENABLE)
                 sel_ebuild.add_use_requirement(use.name, atom_flag)
             else:
                 sel_ebuild.add_use_requirement(use.name, AtomUseT(use.option))
 
         return sel_ebuild
     else:
-        assert depend_expr.use_condition == 0 and depend_expr.use_operator in (
-            UseOperatorT.ENABLE,
-            UseOperatorT.DISABLE,
-        )
-
         if depend_expr.use_condition != 0:
+            assert depend_expr.use_operator in (
+                UseOperatorT.ENABLE,
+                UseOperatorT.DISABLE,
+            )
+
             # Simple use condition
             use_flag = get_portage().get_use_flag(depend_expr.use_condition)
             use_flag = UseFlag(
@@ -98,14 +107,18 @@ def resolve_single(
             conditional = UseConditional(parent, use_flag, depend_expr.children)
             parent.add_use_hook(use_flag, conditional)
         else:
-            raise NotImplementedError("Complex use selection is not implemented yet")
+            warnings.warn(
+                "Complex use selection is not implemented yet (%s)" % parent.ebuild.key
+            )
 
 
 def resolve_all(
     parent: Optional["SelectedEbuild"], depend: Dependency
 ) -> Generator["ResolveDependency", None, None]:
     for dep in depend:
-        yield resolve_single(parent, dep)
+        resolved = resolve_single(parent, dep)
+        if resolved is not None:
+            yield resolved
 
 
 class ResolveDependency(ABC):
@@ -216,29 +229,32 @@ class RequiredUseHook(Hookable):
                 n += 1
                 op = UseOperatorT(req_use.operator)
                 if op == UseOperatorT.ENABLE or op == UseOperatorT.DISABLE:
-                    val = self.ebuild.get_use(req_use.name).state
-                    if op == UseOperatorT.DISABLE:
-                        val = not val
+                    target = op == UseOperatorT.ENABLE
+                    state = self.ebuild.get_use(req_use.name).state
 
-                    if val and req_use.depend is None:
+                    if req_use.depend is None and state == target:
                         k += 1
-                    elif req_use.depend is not None:
+                    elif state == target:
                         # This is a conditional expression
-                        if val:
-                            child_suggestion, k_c, n_c = evaluate_required_use(
-                                SuggestionExpression.Operator.AND, req_use.depend
+                        child_suggestion, k_c, n_c = evaluate_required_use(
+                            SuggestionExpression.Operator.AND, req_use.depend
+                        )
+                        if k_c == n_c:
+                            k += 1
+                        else:
+                            # There are two different options here
+                            # Either disable this useflag
+                            # or try to meet its requirements
+                            s = SuggestionExpression(
+                                SuggestionExpression.Operator.LEAST_ONE
                             )
-                            if k_c == n_c:
-                                k += 1
-                            else:
-                                s = SuggestionExpression(
-                                    SuggestionExpression.Operator.LEAST_ONE
-                                )
-                                s.append(UseSuggestion(req_use.name, not val))
-                                s.append(child_suggestion)
-                                suggestion.append(s)
+                            s.append(UseSuggestion(req_use.name, not state))
+                            s.append(child_suggestion)
+                            suggestion.append(s)
+                    elif req_use.depend is not None and state == target:
+                        k += 1
                     else:
-                        suggestion.append(UseSuggestion(req_use.name, val))
+                        suggestion.append(UseSuggestion(req_use.name, not state))
                 elif op == UseOperatorT.LEAST_ONE:
                     child_suggestion, k_c, n_c = evaluate_required_use(
                         SuggestionExpression.Operator.LEAST_ONE, req_use.depend
@@ -274,6 +290,12 @@ class RequiredUseHook(Hookable):
             SuggestionExpression.Operator.AND, self.expression
         )
         if g_k != g_n:
+            print(
+                UseOperatorT(self.expression.operator),
+                self.expression.name,
+                self.ebuild,
+            )
+            print("%d %d" % (g_k, g_n), flush=True)
             raise RequiredUseException(suggestions)
 
     def get_resolved(self) -> Optional["ResolveDependency"]:
@@ -354,8 +376,15 @@ class SelectedEbuild(ResolveDependency):
 
     generators: DependencyContainer[ResolveDependency]
     resolved_deps: DependencyContainer[ResolveDependency]
+    resolve_session: "PackageResolutionSession"
 
-    def __init__(self, parent: Optional["SelectedEbuild"], atom: Atom, ebuild: Ebuild):
+    def __init__(
+        self,
+        parent: Optional["SelectedEbuild"],
+        atom: Atom,
+        ebuild: Ebuild,
+        resolve_session: "PackageResolutionSession",
+    ):
         self.selected_by = {}
 
         self.ebuild = ebuild
@@ -363,6 +392,7 @@ class SelectedEbuild(ResolveDependency):
         self.use_flag_hooks = {}
         self.global_flag_hooks = []
         self.flags = Queue()
+        self.resolve_session = resolve_session
 
         self.generators = DependencyContainer[ResolveDependency]()
         self.resolved_deps = DependencyContainer[ResolveDependency]()
@@ -371,6 +401,10 @@ class SelectedEbuild(ResolveDependency):
         self.add_selected_by(parent, atom)
 
     def get_resolved(self) -> Optional[ResolveDependency]:
+        if self.resolve_session.check_resolved(self):
+            return self
+
+        self.resolve_session.add_to_session(self)
         self.regenerate()
         return self
 
@@ -448,6 +482,9 @@ class SelectedEbuild(ResolveDependency):
         i = 0
         for dep_type in self.generators:
             for generator in dep_type:
+                if generator is None:
+                    continue
+
                 resolved = generator.get_resolved()
                 if resolved is None:
                     continue
@@ -461,6 +498,16 @@ class SelectedEbuild(ResolveDependency):
         if name not in self.useflags:
             return self.ebuild.iuse[name]
         return self.useflags[name]
+
+    def add_use(self, name: str, value: bool):
+        """
+        Add a non-existent useflag
+        :param name: name of useflag
+        :param value: default value
+        :return:
+        """
+
+        self.useflags[name] = UseFlag(name, value)
 
     def add_use_requirement(self, name: str, flag: AtomUseT):
         """
@@ -525,20 +572,32 @@ class SelectedEbuild(ResolveDependency):
                 for hook in self.global_flag_hooks:
                     hook.run_hook(None)
 
+    def __hash__(self):
+        return id(self)
+
+    def __repr__(self):
+        return "SelectedEbuild<%s %s>" % (self.ebuild.key, id(self))
+
 
 class InstallPackage:
     key: str
     selected_ebuild_slots: Dict[str, SelectedEbuild]
+    resolve_session: "PackageResolutionSession"
 
-    def __init__(self, key: str):
+    def __init__(self, key: str, resolve_session: "PackageResolutionSession"):
         self.key = key
         self.selected_ebuild_slots = {}
+        self.resolve_session = resolve_session
 
     def match_atom(
         self, parent: Optional["SelectedEbuild"], atom: Atom, ebuild: Ebuild
     ) -> SelectedEbuild:
+        for slot in self.selected_ebuild_slots:
+            if atom.matches(self.selected_ebuild_slots[slot].ebuild):
+                return self.selected_ebuild_slots[slot]
+
         # Check if slot has already been selected
-        if ebuild.slot in self.selected_ebuild_slots:
+        if ebuild.slot is not None and ebuild.slot in self.selected_ebuild_slots:
             # See if this atom matches the selected ebuild
             sel_ebuild = self.selected_ebuild_slots[ebuild.slot]
             if atom.matches(sel_ebuild.ebuild):
@@ -549,7 +608,7 @@ class InstallPackage:
                 return sel_ebuild  # Works!
             else:
                 raise NotImplementedError("Cannot split a slot into multi-slot yet!")
-        else:
+        elif ebuild.slot is not None:
             # See if this atom matches any of the currently scheduled slots
             for key, sel_ebuild in self.selected_ebuild_slots.items():
                 if atom.matches(sel_ebuild.ebuild):
@@ -569,7 +628,7 @@ class InstallPackage:
         :return: SelectedEbuild generated from the atom+ebuild
         """
 
-        sel_ebuild = SelectedEbuild(parent, atom, ebuild)
+        sel_ebuild = SelectedEbuild(parent, atom, ebuild, self.resolve_session)
         self.selected_ebuild_slots[sel_ebuild.ebuild.slot] = sel_ebuild
         return sel_ebuild
 
@@ -577,10 +636,27 @@ class InstallPackage:
 class Emerge:
     portage: Portage
     selected_packages: Dict[str, InstallPackage]
+    blocks: Dict[str, List[Atom]]
+    resolve_session: "PackageResolutionSession"
 
-    def __init__(self):
+    def __init__(self, resolve_session: "PackageResolutionSession"):
         self.portage = get_portage()
         self.selected_packages = {}
+        self.blocks = {}
+        self.resolve_session = resolve_session
+
+    def add_block(self, parent: Optional["SelectedEbuild"], atom: Atom):
+        """
+        Block ebuilds match this atom from being selected
+        :param parent: ebuild that selected this block
+        :param atom: atom to block
+        :return:
+        """
+
+        if atom.key not in self.blocks:
+            self.blocks[atom.key] = []
+
+        self.blocks[atom.key].append(atom)
 
     def select_atom(
         self, parent: Optional["SelectedEbuild"], atom: Atom
@@ -589,12 +665,28 @@ class Emerge:
         if ebuild is None:
             raise ResolutionException("No ebuild to match '%s' could be found" % atom)
 
-        if ebuild.key in self.selected_packages:
+        if ebuild.package_key in self.selected_packages:
             # Ebuild with this key has already been selected
             # See if we can match this to an existing slot
-            install_pkg = self.selected_packages[ebuild.key]
+            install_pkg = self.selected_packages[ebuild.package_key]
             return install_pkg.match_atom(parent, atom, ebuild)
         else:
-            pkg = InstallPackage(atom.key)
+            pkg = InstallPackage(atom.key, self.resolve_session)
             self.selected_packages[pkg.key] = pkg
             return pkg.add_atom(parent, atom, ebuild)
+
+
+class PackageResolutionSession:
+    current_resolution: Set[SelectedEbuild]
+
+    def __init__(self):
+        self.current_resolution = set()
+
+    def check_resolved(self, ebuild: SelectedEbuild) -> bool:
+        return ebuild in self.current_resolution
+
+    def add_to_session(self, ebuild):
+        self.current_resolution.add(ebuild)
+
+    def clear(self):
+        self.current_resolution.clear()

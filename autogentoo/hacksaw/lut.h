@@ -40,12 +40,12 @@ typedef struct LUTNode_prv LUTNode;
 typedef U64 lut_id;
 
 typedef enum {
-    LUT_FLAG_NONE,
-    LUT_FLAG_NOT_FOUND = 0x1,   //!< This key does not yet exist in the map
-    LUT_FLAG_EXISTS = 0x2,      //!< This key already exists in the map
-    LUT_FLAG_REFERENCE = 0x4,   //!< This is a normal Object*
-    LUT_FLAG_PYTHON = 0x8,      //!< PyObject*
-    LUT_FLAG_ARBITRARY = 0x10   //!< Don't perform
+    LUT_FLAG_NONE = 0,
+    LUT_FLAG_NOT_FOUND = 1 << 0,   //!< This key does not yet exist in the map
+    LUT_FLAG_EXISTS = 1 << 1,      //!< This key already exists in the map
+    LUT_FLAG_REFERENCE = 1 << 2,   //!< This is a normal Object*
+    LUT_FLAG_PYTHON = 1 << 3,      //!< PyObject*
+    LUT_FLAG_ARBITRARY = 1 << 4    //!< Don't perform
 } lut_flag_t;
 
 struct LUTNode_prv {

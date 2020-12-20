@@ -46,6 +46,12 @@ class UseSuggestion(Suggestion):
     use_name: str
     value: bool
 
+    def __repr__(self):
+        if self.value:
+            return self.use_name
+        else:
+            return "!%s" % self.use_name
+
 
 class SuggestionExpression(Suggestion):
     class Operator(enum.IntEnum):
@@ -66,6 +72,13 @@ class SuggestionExpression(Suggestion):
 
     def __iter__(self) -> Iterable[Suggestion]:
         return self.suggestions.__iter__()
+
+    def __repr__(self) -> str:
+        token_names = ["least-one", "one-of", "most-one", "all"]
+        return "%s ( %s )" % (
+            token_names[self.operator],
+            " ".join(repr(x) for x in self.suggestions),
+        )
 
 
 class RequiredUseException(Exception):

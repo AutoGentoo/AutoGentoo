@@ -54,7 +54,7 @@ PyFastMethod(PyPackage_add_ebuild, Package)
     }
 
     Ebuild* ebuild = (Ebuild*) args[0];
-    if (ebuild->older || ebuild->newer)
+    if (ebuild->package)
     {
         PyErr_SetString(PyExc_RuntimeError, "This ebuild has already been added to a package");
         return NULL;
@@ -81,32 +81,16 @@ PyFastMethod(PyPackage_add_ebuild, Package)
         last = current;
     }
 
-    if (!current)
-    {
-        /* This package is the tail */
-        ebuild->older = NULL;
-    }
-    else
-    {
-        Py_INCREF(current);
-        Py_INCREF(ebuild);
-        ebuild->older = current;
-        current->newer = ebuild;
-    }
-
+    Py_INCREF(ebuild);
     if (!last)
     {
-        /* This package is the head */
-        ebuild->newer = NULL;
-        Py_XDECREF(self->ebuilds);
-        Py_INCREF(ebuild);
+        /* HEAD */
         self->ebuilds = ebuild;
+        ebuild->older = current;
     }
     else
     {
-        Py_INCREF(last);
-        Py_INCREF(ebuild);
-        ebuild->newer = last;
+        ebuild->older = current;
         last->older = ebuild;
     }
 
