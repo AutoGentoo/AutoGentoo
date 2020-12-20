@@ -149,7 +149,9 @@ class CPortageUnitTests(unittest.TestCase):
         self.assertIsNotNone(self.portage.match_atom(Atom("sys-libs/zlib")))
 
         self.assertIsNotNone(self.portage.match_atom(Atom("dev-vcs/git-9.9.2")))
-        self.assertIsNotNone(self.portage.match_atom(Atom("dev-vcs/git-merge-changelog")))
+        self.assertIsNotNone(
+            self.portage.match_atom(Atom("dev-vcs/git-merge-changelog"))
+        )
 
 
 if __name__ == "__main__":

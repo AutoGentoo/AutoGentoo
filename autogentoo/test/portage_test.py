@@ -3,7 +3,13 @@ import unittest
 
 from autogentoo import cportage
 from autogentoo.cportage import Package, Ebuild, Dependency
-from autogentoo.portage import resolve_all, Emerge, emerge_init, RequiredUseException, PackageResolutionSession
+from autogentoo.portage import (
+    resolve_all,
+    Emerge,
+    emerge_init,
+    RequiredUseException,
+    PackageResolutionSession,
+)
 
 
 class PortageUnitTests(unittest.TestCase):

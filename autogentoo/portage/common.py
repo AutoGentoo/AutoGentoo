@@ -74,8 +74,11 @@ class SuggestionExpression(Suggestion):
         return self.suggestions.__iter__()
 
     def __repr__(self) -> str:
-        token_names = ['least-one', 'one-of', 'most-one', 'all']
-        return "%s ( %s )" % (token_names[self.operator], " ".join(repr(x) for x in self.suggestions))
+        token_names = ["least-one", "one-of", "most-one", "all"]
+        return "%s ( %s )" % (
+            token_names[self.operator],
+            " ".join(repr(x) for x in self.suggestions),
+        )
 
 
 class RequiredUseException(Exception):

@@ -13,7 +13,8 @@ from autogentoo.cportage import (
     Portage,
     AtomUseT,
     AtomUseDefaultT,
-    RequiredUse, AtomBlockT,
+    RequiredUse,
+    AtomBlockT,
 )
 from autogentoo.portage import (
     RequiredUseException,
@@ -106,7 +107,9 @@ def resolve_single(
             conditional = UseConditional(parent, use_flag, depend_expr.children)
             parent.add_use_hook(use_flag, conditional)
         else:
-            warnings.warn("Complex use selection is not implemented yet (%s)" % parent.ebuild.key)
+            warnings.warn(
+                "Complex use selection is not implemented yet (%s)" % parent.ebuild.key
+            )
 
 
 def resolve_all(
@@ -287,8 +290,12 @@ class RequiredUseHook(Hookable):
             SuggestionExpression.Operator.AND, self.expression
         )
         if g_k != g_n:
-            print(UseOperatorT(self.expression.operator), self.expression.name, self.ebuild)
-            print('%d %d' % (g_k, g_n), flush=True)
+            print(
+                UseOperatorT(self.expression.operator),
+                self.expression.name,
+                self.ebuild,
+            )
+            print("%d %d" % (g_k, g_n), flush=True)
             raise RequiredUseException(suggestions)
 
     def get_resolved(self) -> Optional["ResolveDependency"]:
@@ -371,11 +378,13 @@ class SelectedEbuild(ResolveDependency):
     resolved_deps: DependencyContainer[ResolveDependency]
     resolve_session: "PackageResolutionSession"
 
-    def __init__(self,
-                 parent: Optional["SelectedEbuild"],
-                 atom: Atom,
-                 ebuild: Ebuild,
-                 resolve_session: "PackageResolutionSession"):
+    def __init__(
+        self,
+        parent: Optional["SelectedEbuild"],
+        atom: Atom,
+        ebuild: Ebuild,
+        resolve_session: "PackageResolutionSession",
+    ):
         self.selected_by = {}
 
         self.ebuild = ebuild
