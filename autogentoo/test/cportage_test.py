@@ -22,7 +22,7 @@ class CPortageUnitTests(unittest.TestCase):
 
     def test_atom_2(self):
         atom = cportage.Atom("cat2/pkg3-2.2.34")
-        self.assertEqual(repr(atom), "Atom<category=cat2, name=pkg3>")
+        self.assertEqual(repr(atom), "cat2/pkg3-2.2.34")
         self.assertEqual(atom.category, "cat2")
         self.assertEqual(atom.name, "pkg3")
         self.assertEqual(atom.version.raw, "2.2.34")
