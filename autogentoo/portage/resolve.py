@@ -682,7 +682,7 @@ class PackageResolutionSession:
     def __init__(self):
         self.current_resolution = set()
 
-    def check_resolved(self, ebuild: SelectedEbuild):
+    def check_resolved(self, ebuild: SelectedEbuild) -> bool:
         return ebuild in self.current_resolution
 
     def add_to_session(self, ebuild):
