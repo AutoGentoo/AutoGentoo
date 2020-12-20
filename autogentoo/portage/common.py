@@ -1,10 +1,18 @@
 import enum
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TypeVar, List, Tuple, Generic, Iterable, Union, Optional
+from typing import TypeVar, List, Generic, Iterable
 
 from autogentoo.cportage import Atom, UseFlag
 
 T = TypeVar("T")
+
+
+class FlagType(enum.IntEnum):
+    NORMAL = enum.auto()
+    TEMP = enum.auto()
+    # PRI_LOW = enum.auto()
+    # PRI_HIGH = enum.auto()
 
 
 class DependencyContainer(Generic[T]):
@@ -37,8 +45,9 @@ class DependencyContainer(Generic[T]):
         ).__iter__()
 
 
-class Suggestion:
-    pass
+class Suggestion(ABC):
+    @abstractmethod
+    def __hash__(self): ...
 
 
 @dataclass(frozen=True)
@@ -51,6 +60,9 @@ class UseSuggestion(Suggestion):
             return self.use_name
         else:
             return "!%s" % self.use_name
+
+    def __hash__(self):
+        return hash(self.use_name) + hash(self.value)
 
 
 class SuggestionExpression(Suggestion):
@@ -80,15 +92,8 @@ class SuggestionExpression(Suggestion):
             " ".join(repr(x) for x in self.suggestions),
         )
 
-
-class RequiredUseException(Exception):
-    suggestion: Union[None, Suggestion]
-
-    def __init__(self, suggestion: Optional[Suggestion] = None):
-        self.suggestion = suggestion
-
-    def has_suggestion(self) -> bool:
-        return self.suggestion is not None
+    def __hash__(self):
+        return self.operator + sum([hash(x) for x in self.suggestions])
 
 
 class ChangedUseException(Exception):

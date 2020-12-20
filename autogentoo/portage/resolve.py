@@ -17,12 +17,11 @@ from autogentoo.cportage import (
     AtomBlockT,
 )
 from autogentoo.portage import (
-    RequiredUseException,
     DependencyContainer,
     ResolutionException,
     UseSuggestion,
     SuggestionExpression,
-    InvalidExpressionException,
+    InvalidExpressionException, Suggestion, FlagType,
 )
 
 __emerge_session__: Optional["Emerge"] = None
@@ -41,6 +40,18 @@ def emerge_session() -> "Emerge":
         )
 
     return __emerge_session__
+
+
+class RequiredUseException(Exception):
+    selected_by: "SelectedEbuild"
+    suggestion: Optional[Suggestion]
+
+    def __init__(self, selected_by: "SelectedEbuild", suggestion: Optional[Suggestion] = None):
+        self.suggestion = suggestion
+        self.selected_by = selected_by
+
+    def has_suggestion(self) -> bool:
+        return self.suggestion is not None
 
 
 def resolve_single(
@@ -185,6 +196,7 @@ class UseSelection(Hookable):
         if self.enforcing:
             if arg != self.target_value:
                 raise RequiredUseException(
+                    self.parent,
                     UseSuggestion(self.use_flag.name, self.target_value)
                 )
 
@@ -296,7 +308,7 @@ class RequiredUseHook(Hookable):
                 self.ebuild,
             )
             print("%d %d" % (g_k, g_n), flush=True)
-            raise RequiredUseException(suggestions)
+            raise RequiredUseException(self.ebuild, suggestions)
 
     def get_resolved(self) -> Optional["ResolveDependency"]:
         return None
@@ -344,6 +356,7 @@ class UseConditional(Hookable):
         if self.useflag.state != flag_state:
             if self.required:
                 raise RequiredUseException(
+                    self.parent,
                     UseSuggestion(self.useflag.name, self.useflag.state)
                 )
 
@@ -357,12 +370,15 @@ class UseConditional(Hookable):
 
 class SelectedEbuild(ResolveDependency):
     selected_by: Dict[Atom, Optional["SelectedEbuild"]]
+    attempted_suggestions: Set[Suggestion]
+    queued_suggestions: Set[Suggestion]
 
     # The original ebuild
     ebuild: Ebuild
 
     # The useflag delta from IUSE of the original ebuild
     useflags: Dict[str, UseFlag]
+    temp_useflags: Dict[str, UseFlag]
 
     # Use requirements
     use_requirements: Dict[str, AtomUseT]
@@ -372,7 +388,8 @@ class SelectedEbuild(ResolveDependency):
     global_flag_hooks: List[Hookable]  # Trigger when any use flag is changed
 
     # Flags to set next time we regenerate
-    flags: Queue[UseFlag]
+    normal_flag_queue: Queue[UseFlag]
+    temp_flag_queue: Queue[UseFlag]
 
     generators: DependencyContainer[ResolveDependency]
     resolved_deps: DependencyContainer[ResolveDependency]
@@ -389,10 +406,13 @@ class SelectedEbuild(ResolveDependency):
 
         self.ebuild = ebuild
         self.useflags = {}
+        self.temp_useflags = {}
         self.use_flag_hooks = {}
         self.global_flag_hooks = []
-        self.flags = Queue()
+        self.normal_flag_queue = Queue()
+        self.temp_flag_queue = Queue()
         self.resolve_session = resolve_session
+        self.attempted_suggestions = set()
 
         self.generators = DependencyContainer[ResolveDependency]()
         self.resolved_deps = DependencyContainer[ResolveDependency]()
@@ -492,12 +512,16 @@ class SelectedEbuild(ResolveDependency):
             i += 1
 
     def has_use(self, name: str) -> bool:
-        return name in self.useflags or name in self.ebuild.iuse
+        return name in self.temp_useflags or name in self.useflags or name in self.ebuild.iuse
 
     def get_use(self, name: str) -> UseFlag:
-        if name not in self.useflags:
-            return self.ebuild.iuse[name]
-        return self.useflags[name]
+        if name in self.temp_useflags:
+            return self.temp_useflags[name]
+
+        if name in self.useflags:
+            return self.useflags[name]
+
+        return self.ebuild.iuse[name]
 
     def add_use(self, name: str, value: bool):
         """
@@ -539,14 +563,18 @@ class SelectedEbuild(ResolveDependency):
         self.use_flag_hooks[useflag.name].append(hook)
         hook.run_hook(self.get_use(useflag.name).state)
 
-    def schedule_use(self, useflag: UseFlag):
+    def schedule_use(self, useflag: UseFlag, _type: FlagType = FlagType.NORMAL):
         """
         Update a useflag upon regeneration
         :param useflag: useflag to update
+        :param _type: useflag to update
         :return: None
         """
 
-        self.flags.put(useflag)
+        if _type == FlagType.NORMAL:
+            self.normal_flag_queue.put(useflag)
+        elif _type == FlagType.TEMP:
+            self.temp_flag_queue.put(useflag)
         self._is_dirty = True
 
     def flush_use(self):
@@ -556,21 +584,81 @@ class SelectedEbuild(ResolveDependency):
         :return: None
         """
 
-        while not self.flags.empty():
-            useflag = self.flags.get()
+        to_update = (
+            (self.normal_flag_queue, self.useflags),
+            (self.temp_flag_queue, self.temp_useflags)
+        )
 
-            # Only run the hooks if there is a change in state
-            if self.get_use(useflag.name).state != useflag.state:
-                self.useflags[useflag.name] = useflag
+        for tup in to_update:
+            queue = tup[0]
+            dictionary = tup[1]
 
-                # Run all of the use-hooks for this flag
-                if useflag.name in self.use_flag_hooks:
-                    for hook in self.use_flag_hooks[useflag.name]:
-                        hook.run_hook(useflag.state)
+            while not queue.empty():
+                useflag = queue.get()
 
-                # Run global use-hooks
-                for hook in self.global_flag_hooks:
-                    hook.run_hook(None)
+                # Only run the hooks if there is a change in state
+                if self.get_use(useflag.name).state != useflag.state:
+                    dictionary[useflag.name] = useflag
+
+                    # Run all of the use-hooks for this flag
+                    if useflag.name in self.use_flag_hooks:
+                        for hook in self.use_flag_hooks[useflag.name]:
+                            hook.run_hook(useflag.state)
+
+                    # Run global use-hooks
+                    for hook in self.global_flag_hooks:
+                        hook.run_hook(None)
+
+    def undo_suggestion(self, suggestion: Suggestion):
+        if isinstance(suggestion, UseSuggestion):
+            if suggestion in self.attempted_suggestions:
+                del self.temp_useflags[suggestion.use_name]
+        elif isinstance(suggestion, SuggestionExpression):
+            # TODO
+            pass
+
+    def apply_suggestion(self, suggestion: Suggestion) -> bool:
+        if isinstance(suggestion, UseSuggestion):
+            if suggestion in self.attempted_suggestions:
+                return False
+
+            self.schedule_use(UseFlag(suggestion.use_name, suggestion.value), FlagType.TEMP)
+            return True
+        elif isinstance(suggestion, SuggestionExpression):
+            if suggestion.operator == SuggestionExpression.Operator.AND:
+                # Apply all suggestions
+                # Check if any suggestions have been tried
+                we_tried_one = False
+                for expr in suggestion:
+                    if expr in suggestion:
+                        we_tried_one = True
+                        break
+
+                if we_tried_one:
+                    # We can't meet the AND condition
+                    self.attempted_suggestions.add(suggestion)
+                    return False
+
+                for expr in suggestion:
+                    if not self.apply_suggestion(expr):
+                        self.attempted_suggestions.add(suggestion)
+                        return False
+
+                return True
+            elif suggestion.operator == SuggestionExpression.Operator.EXACT_ONE:
+                # TODO Find a way to try all of them
+                # For now, try the first one
+                self.apply_suggestion(suggestion.suggestions[0])
+            elif suggestion.operator == SuggestionExpression.Operator.MOST_ONE:
+                self.apply_suggestion(suggestion.suggestions[0])
+            elif suggestion.operator == SuggestionExpression.Operator.LEAST_ONE:
+                for expr in suggestion:
+                    if expr in self.attempted_suggestions:
+                        continue
+                    if not self.apply_suggestion(expr):
+                        continue
+                    return True
+                return False
 
     def __hash__(self):
         return id(self)
@@ -617,6 +705,9 @@ class InstallPackage:
             # We need to create a new selected ebuild and add it here
             return self.add_atom(parent, atom, ebuild)
 
+    def __len__(self) -> int:
+        return len(self.selected_ebuild_slots)
+
     def add_atom(
         self, parent: Optional["SelectedEbuild"], atom: Atom, ebuild: Ebuild
     ) -> SelectedEbuild:
@@ -636,7 +727,7 @@ class InstallPackage:
 class Emerge:
     portage: Portage
     selected_packages: Dict[str, InstallPackage]
-    blocks: Dict[str, List[Atom]]
+    blocks: Dict[str, List[Tuple[Atom, Optional[SelectedEbuild]]]]
     resolve_session: "PackageResolutionSession"
 
     def __init__(self, resolve_session: "PackageResolutionSession"):
@@ -656,7 +747,7 @@ class Emerge:
         if atom.key not in self.blocks:
             self.blocks[atom.key] = []
 
-        self.blocks[atom.key].append(atom)
+        self.blocks[atom.key].append((atom, parent))
 
     def select_atom(
         self, parent: Optional["SelectedEbuild"], atom: Atom
@@ -675,6 +766,15 @@ class Emerge:
             self.selected_packages[pkg.key] = pkg
             return pkg.add_atom(parent, atom, ebuild)
 
+    def __len__(self) -> int:
+        i = 0
+        for pkg_key in self.selected_packages:
+            i += len(self.selected_packages[pkg_key])
+        return i
+
+    def finished(self) -> bool:
+        return len(self.resolve_session) == len(self) and len(self) != 0
+
 
 class PackageResolutionSession:
     current_resolution: Set[SelectedEbuild]
@@ -687,6 +787,9 @@ class PackageResolutionSession:
 
     def add_to_session(self, ebuild):
         self.current_resolution.add(ebuild)
+
+    def __len__(self) -> int:
+        return len(self.current_resolution)
 
     def clear(self):
         self.current_resolution.clear()
