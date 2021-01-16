@@ -187,7 +187,7 @@ int ebuild_metadata_init(Ebuild* self)
     };
 
     char* name = NULL, * value = NULL;
-    U64 name_size_n = 0, value_size_n = 0;
+    size_t name_size_n = 0, value_size_n = 0;
 
     U32 line_n = 0;
     while (!feof(fp))
@@ -305,7 +305,7 @@ PyInitFunc(PyEbuild_init, Ebuild)
     return ebuild_init(self, ebuild_repo, cache_repo, category, name_and_version);
 }
 
-PyMethod(PyEbuild_dealloc, Ebuild)
+PyDealloc(PyEbuild_dealloc, Ebuild)
 {
     Py_XDECREF(self->older);
 

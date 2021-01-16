@@ -4,6 +4,13 @@
 #include "dependency.h"
 #include "use.h"
 
+#undef YY_INPUT
+#define YY_INPUT(buf,result,max_size)  {\
+    result = language_get_next(buf, max_size); \
+    if (  result <= 0  ) \
+      result = YY_NULL; \
+}
+
 typedef enum {
     LANGUAGE_IGNORE,
     LANGUAGE_DEPEND,

@@ -5,6 +5,7 @@
 *.pyc
 *.gch
 *.so
+*.dylib
 
 #.idea/*
 .idea/workspace.*

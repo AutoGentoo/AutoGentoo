@@ -24,6 +24,8 @@ function(LinkPythonLib target)
     else()
         add_dependencies(${target} ${PYTHON_LIB_DEPEND})
     endif()
+
+    set_target_properties(${target} PROPERTIES SUFFIX .so)
 endfunction()
 
 function(PythonModule target)

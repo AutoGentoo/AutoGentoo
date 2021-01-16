@@ -36,7 +36,7 @@ PyInitFunc(PyPackage_init, Package)
     return 0;
 }
 
-PyMethod(PyPackage_dealloc, Package)
+PyDealloc(PyPackage_dealloc, Package)
 {
     Py_XDECREF(self->ebuilds);
     SAFE_FREE(self->key);

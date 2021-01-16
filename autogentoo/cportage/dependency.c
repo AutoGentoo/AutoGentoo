@@ -9,7 +9,7 @@
 #include "language.h"
 #include <structmember.h>
 
-static PyMethod(PyDependency_dealloc, Dependency)
+static PyDealloc(PyDependency_dealloc, Dependency)
 {
     Py_XDECREF(self->atom);
     Py_XDECREF(self->next);

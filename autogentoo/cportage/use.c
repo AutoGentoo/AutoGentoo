@@ -35,7 +35,7 @@ static PyInitFunc(PyUseFlag_init, UseFlag)
     return 0;
 }
 
-static PyMethod(PyUseFlag_dealloc, UseFlag)
+static PyDealloc(PyUseFlag_dealloc, UseFlag)
 {
     SAFE_FREE(self->name);
     Py_TYPE(self)->tp_free((PyObject*) self);
@@ -80,7 +80,7 @@ static PyNewFunc(PyRequiredUse_new)
     return (PyObject*) self;
 }
 
-static PyMethod(PyRequiredUse_dealloc, RequiredUse)
+static PyDealloc(PyRequiredUse_dealloc, RequiredUse)
 {
     SAFE_FREE(self->name);
     Py_XDECREF(self->next);

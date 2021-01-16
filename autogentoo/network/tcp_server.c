@@ -367,6 +367,7 @@ static PyMethod(TCPServer_dealloc, TCPServer)
     Py_XDECREF(self->callback);
     OBJECT_FREE(self->request_queue);
     Py_TYPE(self)->tp_free((PyObject*) self);
+    Py_RETURN_NONE;
 }
 
 static PyMethodDef TCPServer_methods[] = {
