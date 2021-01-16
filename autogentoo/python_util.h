@@ -11,6 +11,7 @@
 #define PyNewFunc(name) PyObject* name(PyTypeObject* type, PyObject* args, PyObject* kwds)
 #define PyMethod(name, type) PyObject* name(type* self, PyObject* args, PyObject* kwds)
 #define PyFastMethod(name, type) PyObject* name(type* self, PyObject *const *args, Py_ssize_t nargs)
+#define PyDealloc(name, type) void name(type* self)
 
 #define SAFE_FREE(__s) if (__s) free(__s)
 #define SAFE_REF_TAKE(dest, src) dest = src; src = NULL;

@@ -110,7 +110,7 @@ static PyInitFunc(PyAtom_init, Atom)
     return 0;
 }
 
-static PyMethod(PyAtom_dealloc, Atom)
+static PyDealloc(PyAtom_dealloc, Atom)
 {
     Py_XDECREF(self->useflags);
     Py_XDECREF(self->version);
@@ -164,7 +164,7 @@ static PyInitFunc(PyAtomFlag_init, AtomFlag)
     return 0;
 }
 
-static PyMethod(PyAtomFlag_dealloc, AtomFlag)
+static PyDealloc(PyAtomFlag_dealloc, AtomFlag)
 {
     Py_XDECREF(self->next);
     SAFE_FREE(self->name);
@@ -324,7 +324,7 @@ static PyInitFunc(PyAtomVersion_init, AtomVersion)
     return 0;
 }
 
-PyMethod(PyAtomVersion_dealloc, AtomVersion)
+PyDealloc(PyAtomVersion_dealloc, AtomVersion)
 {
     Py_XDECREF(self->next);
     SAFE_FREE(self->v);
@@ -522,8 +522,8 @@ int atom_matches(Atom* self, Ebuild* target)
         return (int)(self->range & ATOM_VERSION_E);
     else if (version_compare > 0)                     /* atom version is greater than ebuild's */
         return (int)(self->range & ATOM_VERSION_L);
-    else if (version_compare < 0)
-        return (int)(self->range & ATOM_VERSION_G);
+
+    return (int)(self->range & ATOM_VERSION_G);
 }
 
 static PyObject* PyAtom_matches(Atom* self, const PyObject* args[], const int nargs)

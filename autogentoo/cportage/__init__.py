@@ -1,83 +1,82 @@
 import enum
 
 from .autogentoo_cportage import *
-from . import autogentoo_cportage
 
 
 class UseOperatorT(enum.IntEnum):
-    DISABLE = autogentoo_cportage.USE_OP_DISABLE
-    ENABLE = autogentoo_cportage.USE_OP_ENABLE
-    LEAST_ONE = autogentoo_cportage.USE_OP_LEAST_ONE
-    EXACT_ONE = autogentoo_cportage.USE_OP_EXACT_ONE
-    MOST_ONE = autogentoo_cportage.USE_OP_MOST_ONE
+    DISABLE = USE_OP_DISABLE
+    ENABLE = USE_OP_ENABLE
+    LEAST_ONE = USE_OP_LEAST_ONE
+    EXACT_ONE = USE_OP_EXACT_ONE
+    MOST_ONE = USE_OP_MOST_ONE
 
 
 class UseStateT(enum.IntEnum):
-    DISABLED = autogentoo_cportage.USE_STATE_DISABLED
-    ENABLED = autogentoo_cportage.USE_STATE_ENABLED
+    DISABLED = USE_STATE_DISABLED
+    ENABLED = USE_STATE_ENABLED
 
 
 class AtomUseT(enum.IntEnum):
-    DISABLE = autogentoo_cportage.ATOM_USE_DISABLE
-    ENABLE = autogentoo_cportage.ATOM_USE_ENABLE
-    ENABLE_IF_ON = autogentoo_cportage.ATOM_USE_ENABLE_IF_ON
-    DISABLE_IF_OFF = autogentoo_cportage.ATOM_USE_DISABLE_IF_OFF
-    EQUAL = autogentoo_cportage.ATOM_USE_EQUAL
-    OPPOSITE = autogentoo_cportage.ATOM_USE_OPPOSITE
+    DISABLE = ATOM_USE_DISABLE
+    ENABLE = ATOM_USE_ENABLE
+    ENABLE_IF_ON = ATOM_USE_ENABLE_IF_ON
+    DISABLE_IF_OFF = ATOM_USE_DISABLE_IF_OFF
+    EQUAL = ATOM_USE_EQUAL
+    OPPOSITE = ATOM_USE_OPPOSITE
 
 
 class AtomUseDefaultT(enum.IntEnum):
-    NONE = autogentoo_cportage.ATOM_DEFAULT_NONE
-    ON = autogentoo_cportage.ATOM_DEFAULT_ON
-    OFF = autogentoo_cportage.ATOM_DEFAULT_OFF
+    NONE = ATOM_DEFAULT_NONE
+    ON = ATOM_DEFAULT_ON
+    OFF = ATOM_DEFAULT_OFF
 
 
 class AtomVersionT(enum.IntFlag):
-    NONE = autogentoo_cportage.ATOM_VERSION_NONE
-    E = autogentoo_cportage.ATOM_VERSION_E
-    L = autogentoo_cportage.ATOM_VERSION_L
-    G = autogentoo_cportage.ATOM_VERSION_G
-    REV = autogentoo_cportage.ATOM_VERSION_REV
-    ALL = autogentoo_cportage.ATOM_VERSION_ALL
-    GE = autogentoo_cportage.ATOM_VERSION_GE
-    LE = autogentoo_cportage.ATOM_VERSION_LE
+    NONE = ATOM_VERSION_NONE
+    E = ATOM_VERSION_E
+    L = ATOM_VERSION_L
+    G = ATOM_VERSION_G
+    REV = ATOM_VERSION_REV
+    ALL = ATOM_VERSION_ALL
+    GE = ATOM_VERSION_GE
+    LE = ATOM_VERSION_LE
 
 
 class AtomBlockT(enum.IntEnum):
-    NONE = autogentoo_cportage.ATOM_BLOCK_NONE
-    SOFT = autogentoo_cportage.ATOM_BLOCK_SOFT
-    HARD = autogentoo_cportage.ATOM_BLOCK_HARD
+    NONE = ATOM_BLOCK_NONE
+    SOFT = ATOM_BLOCK_SOFT
+    HARD = ATOM_BLOCK_HARD
 
 
 class AtomSlotT(enum.IntEnum):
-    IGNORE = autogentoo_cportage.ATOM_SLOT_IGNORE
-    REBUILD = autogentoo_cportage.ATOM_SLOT_REBUILD
+    IGNORE = ATOM_SLOT_IGNORE
+    REBUILD = ATOM_SLOT_REBUILD
 
 
 class AtomVersionPreT(enum.IntEnum):
-    ALPHA = autogentoo_cportage.ATOM_PREFIX_ALPHA
-    BETA = autogentoo_cportage.ATOM_PREFIX_ALPHA
-    PRE = autogentoo_cportage.ATOM_PREFIX_ALPHA
-    RC = autogentoo_cportage.ATOM_PREFIX_ALPHA
-    NONE = autogentoo_cportage.ATOM_PREFIX_ALPHA
-    P = autogentoo_cportage.ATOM_PREFIX_ALPHA
+    ALPHA = ATOM_PREFIX_ALPHA
+    BETA = ATOM_PREFIX_ALPHA
+    PRE = ATOM_PREFIX_ALPHA
+    RC = ATOM_PREFIX_ALPHA
+    NONE = ATOM_PREFIX_ALPHA
+    P = ATOM_PREFIX_ALPHA
 
 
 class ArchT(enum.IntEnum):
-    ARCH_AMD64 = autogentoo_cportage.ARCH_AMD64
-    ARCH_X86 = autogentoo_cportage.ARCH_X86
-    ARCH_ARM = autogentoo_cportage.ARCH_ARM
-    ARCH_ARM64 = autogentoo_cportage.ARCH_ARM64
-    ARCH_HPPA = autogentoo_cportage.ARCH_HPPA
-    ARCH_IA64 = autogentoo_cportage.ARCH_IA64
-    ARCH_PPC = autogentoo_cportage.ARCH_PPC
-    ARCH_PPC64 = autogentoo_cportage.ARCH_PPC64
-    ARCH_SPARC = autogentoo_cportage.ARCH_SPARC
-    ARCH_END = autogentoo_cportage.ARCH_END
+    ARCH_AMD64 = ARCH_AMD64
+    ARCH_X86 = ARCH_X86
+    ARCH_ARM = ARCH_ARM
+    ARCH_ARM64 = ARCH_ARM64
+    ARCH_HPPA = ARCH_HPPA
+    ARCH_IA64 = ARCH_IA64
+    ARCH_PPC = ARCH_PPC
+    ARCH_PPC64 = ARCH_PPC64
+    ARCH_SPARC = ARCH_SPARC
+    ARCH_END = ARCH_END
 
 
 class KeywordT(enum.IntEnum):
-    KEYWORD_BROKEN = autogentoo_cportage.KEYWORD_BROKEN
-    KEYWORD_NONE = autogentoo_cportage.KEYWORD_NONE
-    KEYWORD_UNSTABLE = autogentoo_cportage.KEYWORD_UNSTABLE
-    KEYWORD_STABLE = autogentoo_cportage.KEYWORD_STABLE
+    KEYWORD_BROKEN = KEYWORD_BROKEN
+    KEYWORD_NONE = KEYWORD_NONE
+    KEYWORD_UNSTABLE = KEYWORD_UNSTABLE
+    KEYWORD_STABLE = KEYWORD_STABLE

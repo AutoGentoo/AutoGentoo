@@ -24,7 +24,7 @@ static void map_free(Map* map)
     free(map);
 }
 
-Map* map_new(size_t new_size, F64 threshold)
+Map* map_new(U64 new_size, F64 threshold)
 {
     Map* out = malloc(sizeof(Map));
 

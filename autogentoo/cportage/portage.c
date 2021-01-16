@@ -32,7 +32,7 @@ PyInitFunc(PyPortage_init, Portage)
 }
 
 static
-PyMethod(PyPortage_dealloc, Portage)
+PyDealloc(PyPortage_dealloc, Portage)
 {
     OBJECT_FREE(self->global_flags);
     OBJECT_FREE(self->packages);
