@@ -50,5 +50,5 @@ include(cmake/pymodule.cmake)  # Python module macros
 # Unit and integration testing
 include(cmake/test.cmake)
 
-add_subdirectory(autogentoo)
 add_subdirectory(third_party)
+add_subdirectory(autogentoo)

@@ -101,7 +101,9 @@ static PyInitFunc(PyAtom_init, Atom)
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &atom_string))
         return -1;
 
-    Atom* duped = atom_parse(atom_string);
+    void* buffer = depend_allocate_buffers();
+    Atom* duped = atom_parse(buffer, atom_string);
+    depend_free_buffers(buffer);
     if (!duped)
         return -1;
 
@@ -353,7 +355,7 @@ int atom_init(Atom* self, const char* input)
     char* cat_splt = strchr(d_input, '/');
     if (!cat_splt)
     {
-        language_print_error("Invalid atom: '%s'", d_input);
+        fprintf(stderr, "Invalid atom: '%s'", d_input);
         free(d_input);
         return 1;
     }

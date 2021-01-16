@@ -189,6 +189,7 @@ int ebuild_metadata_init(Ebuild* self)
     char* name = NULL, * value = NULL;
     size_t name_size_n = 0, value_size_n = 0;
 
+    void* buffers = depend_allocate_buffers();
     U32 line_n = 0;
     while (!feof(fp))
     {
@@ -219,7 +220,7 @@ int ebuild_metadata_init(Ebuild* self)
                     return 1;
                 }
 
-                *target = depend_parse(value);
+                *target = depend_parse(buffers, value);
 
                 if (!*target)
                 {
@@ -245,7 +246,7 @@ int ebuild_metadata_init(Ebuild* self)
                 self->sub_slot = strdup(tok);
         } else if (strcmp(name, "REQUIRED_USE") == 0)
         {
-            self->required_use = required_use_parse(value);
+            self->required_use = required_use_parse(buffers, value);
             if (!self->required_use)
             {
                 lerror("Failed to parse 'REQUIRED_USE' in %s", self->key);

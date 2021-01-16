@@ -38,7 +38,9 @@ static PyInitFunc(PyDependency_init, Dependency)
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &depend_string))
         return -1;
 
-    Dependency * duped = depend_parse(depend_string);
+    void* buffers = depend_allocate_buffers();
+    Dependency * duped = depend_parse(buffers, depend_string);
+    depend_free_buffers(buffers);
     if (!duped)
         return -1;
 

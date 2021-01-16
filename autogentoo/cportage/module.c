@@ -9,6 +9,7 @@
 #include "structmember.h"
 #include "ebuild.h"
 #include "package.h"
+#include "language.h"
 
 PyFastMethod(PyCportage_Init, PyObject*)
 {
@@ -50,6 +51,9 @@ PyFastMethod(PyCportage_get_portage, PyObject*)
 
 void PyCportage_free()
 {
+    depend_free();
+    required_use_free();
+
     Py_XDECREF(global_portage);
     global_portage = NULL;
 }
@@ -199,6 +203,10 @@ PyInit_autogentoo_cportage(void)
     PyModule_AddIntMacro(m, KEYWORD_NONE);
     PyModule_AddIntMacro(m, KEYWORD_UNSTABLE);
     PyModule_AddIntMacro(m, KEYWORD_STABLE);
+
+    // Initialize the grammar parsers
+    depend_init();
+    required_use_init();
 
     return m;
 }

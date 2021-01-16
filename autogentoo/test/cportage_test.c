@@ -67,10 +67,13 @@ static Dependency* dependency_verify_use(Dependency* current, U32 count, struct 
 
 CTEST(test_atom_full)
 {
-    Atom* atom = atom_parse("!!>=cat2/pkg3-2.2.34-r6:3/32::repository"
+    void* buffers = depend_allocate_buffers();
+    Atom* atom = atom_parse(buffers,
+                      "!!>=cat2/pkg3-2.2.34-r6:3/32::repository"
                             "[use_enable, -use_disable,"
                             "use_equal=, !use_opposite=,"
                             "!disable_if_off?, enable_if_on?]");
+    depend_free_buffers(buffers);
     assert_non_null(atom);
     assert_string_equal(atom->category, "cat2");
     assert_string_equal(atom->name, "pkg3");
@@ -116,7 +119,9 @@ CTEST(test_atom_full)
 
 CTEST(test_depend)
 {
-    Dependency* deps = depend_parse("use1? ( >=cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )");
+    void* buffers = depend_allocate_buffers();
+    Dependency* deps = depend_parse(buffers, "use1? ( >=cat2/pkg3-2.2.34 cat1/pkg2-2.2.34 )");
+    depend_free_buffers(buffers);
     assert_non_null(deps);
 
     assert_string_equal(lut_get_key(global_portage->global_flags, deps->use_condition), "use1");
@@ -228,10 +233,12 @@ CTEST(test_parse_all_metadata)
 
 CTEST(test_parse_invalid)
 {
-    assert_null(atom_parse("package-name-not-atom"));
+    void* buffers = depend_allocate_buffers();
+    assert_null(atom_parse(buffers, "package-name-not-atom"));
     //assert_null(cmdline_parse("33"));
-    assert_null(required_use_parse(" ?? ( useflag "));
-    assert_null(depend_parse("use? "));
+    assert_null(required_use_parse(buffers, " ?? ( useflag "));
+    assert_null(depend_parse(buffers, "use? "));
+    depend_free_buffers(buffers);
 }
 
 CTEST(test_package_key)
