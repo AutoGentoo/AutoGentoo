@@ -54,36 +54,31 @@
 //%destructor { Py_DECREF($$); } <required_use>
 
 
-/*
-TODO
-+letter          "[a-zA-Z]"
-+digit           "[0-9]"
-+identifier      "({letter}|{digit}|_|\+|\*|\-)+"
-*/
++identifier      [A-Za-z_0-9][A-Za-z_0-9]\-\+]*
 
 ==
 
 "[\n]"                  {}
 "[ \t\r\\]+"            {/* skip */}
-"\\?\\?"                    {yyval->use_select.target = NULL; yyval->use_select.operator = USE_OP_MOST_ONE; return USESELECT;}
-"\\|\\|"                    {yyval->use_select.target = NULL; yyval->use_select.operator = USE_OP_LEAST_ONE; return USESELECT;}
-"\\^\\^"                    {yyval->use_select.target = NULL; yyval->use_select.operator = USE_OP_EXACT_ONE; return USESELECT;}
-"\\(\\+\\)"                   {yyval->use_default = ATOM_DEFAULT_ON; return USE_DEFAULT;}
-"\\(\\-\\)"                   {yyval->use_default = ATOM_DEFAULT_OFF; return USE_DEFAULT;}
+"\?\?"                  {yyval->use_select.target = NULL; yyval->use_select.operator = USE_OP_MOST_ONE; return USESELECT;}
+"\|\|"                  {yyval->use_select.target = NULL; yyval->use_select.operator = USE_OP_LEAST_ONE; return USESELECT;}
+"\^\^"                  {yyval->use_select.target = NULL; yyval->use_select.operator = USE_OP_EXACT_ONE; return USESELECT;}
+"\(\+\)"                {yyval->use_default = ATOM_DEFAULT_ON; return USE_DEFAULT;}
+"\(\-\)"                {yyval->use_default = ATOM_DEFAULT_OFF; return USE_DEFAULT;}
 "-"                     {return '-';}
 "<"                     {return '<';}
 ">"                     {return '>';}
 "="                     {return '=';}
 "!"                     {return '!';}
-"[\\[]"                 {return '[';}
-"[\\]]"                 {return ']';}
-"[\\?]"                 {return '?';}
-"[\\(]"                 {return '(';}
-"[\\)]"                 {return ')';}
-"[\\^]"                 {return '^';}
-"[\\|]"                 {return '|';}
-"[\\,]"                 {return ',';}
-"[\\~]"                 {return '~';}
+"[\[]"                  {return '[';}
+"[\]]"                  {return ']';}
+"[\?]"                  {return '?';}
+"[\(]"                  {return '(';}
+"[\)]"                  {return ')';}
+"[\^]"                  {return '^';}
+"[\|]"                  {return '|';}
+"[\,]"                  {return ',';}
+"[\~]"                  {return '~';}
 "{identifier}"          {
                             yyval->identifier = strdup(yytext);
                             return IDENTIFIER;

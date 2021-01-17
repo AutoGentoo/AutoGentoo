@@ -5,6 +5,7 @@
 }
 
 %option prefix="depend"
+%option debug_table="TRUE"
 
 %union {
     char* identifier;
@@ -40,10 +41,8 @@
 %token '^'
 %token ','
 %token '~'
-%token <identifier> IDENTIFIER
 %token <identifier> REPOSITORY
 %token <atom_type> ATOM
-%token END_OF_FILE
 %token <atom_flags> ATOM_FLAGS
 %token <slot> SLOT
 %token <depend_expr_select> USESELECT
@@ -57,6 +56,8 @@
 %type <depend_type> depend_expr_single
 %type <depend_type> program_depend
 %start<depend_type> program_depend
+
+%option debug_ids="$-<>=![]?()|^,~rafsuVBSRADSP"
 
 //%destructor { if ($$.target) free($$.target); } <depend_expr_select>
 //%destructor { Py_DECREF($$); } <atom_type>;
@@ -82,14 +83,27 @@ Atom* atom_parse(void* buffers, const char* input)
 }
 }
 
++letter          A-Za-z
++version_suf     (?:(?:_alpha|_beta|_pre|_rc|_p)[0-9]*)
++revision        (?:-r[0-9]+)
++version         [0-9]+(?:\.[0-9]+)*[{letter}]?]?{version_suf}*{revision}?[\*]?
++ident_word      [{letter}_][{letter}0-9_]*
++identifier      {ident_word}(?:-{ident_word})*
++atom            {identifier}\/{identifier}(?:-{version})?
++slotname        [A-Za-z0-9][A-Za-z0-9+_.-]*
++slot            [\:]({slotname}(?:\/{slotname})?)?[\*|\=]?
++repo            [\:][\:]{identifier}
++atomflag        [!-]?{identifier}(?:\([\+|\-]\))?[\?|=]?
++atomflags       [\[][ ]*{atomflag}(?:[ ]*,[ ]*{atomflag})*[ ]*[\]]
++use_select      [!]?{identifier}\?
+
 ==
 
 "[\n]"                  {}
 "[ \t\r\\]+"            {/* skip */}
-"{repo}"                  {yyval->identifier = strdup(yytext + 2); return REPOSITORY;}
-"{slot}"                  {
+"{repo}"                {yyval->identifier = strdup(yytext + 2); return REPOSITORY;}
+"{slot}"                {
                             char* ref = strdup(yytext);
-                            int len = strlen(ref);
                             yyval->slot.slot_opts = ATOM_SLOT_IGNORE;
                             if (ref[len - 1] == '*') {
                                 yyval->slot.slot_opts = ATOM_SLOT_IGNORE;
@@ -193,36 +207,35 @@ Atom* atom_parse(void* buffers, const char* input)
                                 yyval->depend_expr_select.operator = USE_OP_ENABLE;
                             }
 
-                            size_t len = strlen(ref);
                             ref[len - 1] = 0;
                             yyval->depend_expr_select.target = strndup(ref, len - 1);
                             free(ref);
                             return USESELECT;
                         }
-"\\?\\?"                    {yyval->depend_expr_select.target = NULL; yyval->depend_expr_select.operator = USE_OP_MOST_ONE; return USESELECT;}
-"\\|\\|"                    {yyval->depend_expr_select.target = NULL; yyval->depend_expr_select.operator = USE_OP_LEAST_ONE; return USESELECT;}
-"\\^\\^"                    {yyval->depend_expr_select.target = NULL; yyval->depend_expr_select.operator = USE_OP_EXACT_ONE; return USESELECT;}
+"\?\?"                  {yyval->depend_expr_select.target = NULL; yyval->depend_expr_select.operator = USE_OP_MOST_ONE; return USESELECT;}
+"\|\|"                  {yyval->depend_expr_select.target = NULL; yyval->depend_expr_select.operator = USE_OP_LEAST_ONE; return USESELECT;}
+"\^\^"                  {yyval->depend_expr_select.target = NULL; yyval->depend_expr_select.operator = USE_OP_EXACT_ONE; return USESELECT;}
 "-"                     {return '-';}
 "<"                     {return '<';}
 ">"                     {return '>';}
 "="                     {return '=';}
 "!"                     {return '!';}
-"[\\[]"                  {return '[';}
-"[\\]]"                  {return ']';}
-"[\\?]"                  {return '?';}
-"[\\(]"                  {return '(';}
-"[\\)]"                  {return ')';}
-"[\\^]"                  {return '^';}
-"[\\|]"                  {return '|';}
-"[\\,]"                  {return ',';}
-"[\\~]"                  {return '~';}
+"[\[]"                  {return '[';}
+"[\]]"                  {return ']';}
+"[\?]"                  {return '?';}
+"[\(]"                  {return '(';}
+"[\)]"                  {return ')';}
+"[\^]"                  {return '^';}
+"[\|]"                  {return '|';}
+"[\,]"                  {return ',';}
+"[\~]"                  {return '~';}
 "{atom}"                {
                             yyval->atom_type = (Atom*)PyAtom_new(&PyAtomType, NULL, NULL);
                             atom_init(yyval->atom_type, yytext);
                             return ATOM;
                         }
 
-"[\\*]"                  {return '*';}
+"[\*]"                  {return '*';}
 
 ==
 
@@ -279,20 +292,4 @@ atom_version   : '>' '=' ATOM           {$$ = $3; $$->range = ATOM_VERSION_GE;}
                |         ATOM           {$$ = $1; $$->range = ATOM_VERSION_ALL;}
                ;
 
-/*
-command_atom   : atom_repo              {$$ = $1;}
-               | '>' '=' IDENTIFIER     {$$ = cmdline_atom_new($3); if ($$) $$->range = ATOM_VERSION_GE;}
-               | '<' '=' IDENTIFIER     {$$ = cmdline_atom_new($3); if ($$) $$->range = ATOM_VERSION_LE;}
-               |     '=' IDENTIFIER     {$$ = cmdline_atom_new($2); if ($$) $$->range = ATOM_VERSION_E;}
-               |     '>' IDENTIFIER     {$$ = cmdline_atom_new($2); if ($$) $$->range = ATOM_VERSION_G;}
-               |     '~' IDENTIFIER     {$$ = cmdline_atom_new($2); if ($$) $$->range = ATOM_VERSION_REV;}
-               |     '<' IDENTIFIER     {$$ = cmdline_atom_new($2); if ($$) $$->range = ATOM_VERSION_L;}
-               |         IDENTIFIER     {$$ = cmdline_atom_new($1); if ($$) $$->range = ATOM_VERSION_ALL;}
-               ;
-
-command_line   : command_atom ATOM_FLAGS         {$1->useflags = $2; $$ = dependency_build_atom($1);}
-               | command_atom                    {$$ = dependency_build_atom($1);}
-               | command_line command_line       {$$ = $1; $$->next = $2;}
-               ;
-*/
 %%

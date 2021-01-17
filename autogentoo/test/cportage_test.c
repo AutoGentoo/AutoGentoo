@@ -7,7 +7,6 @@
 #include <cportage/atom.h>
 #include <cportage/module.h>
 #include <cportage/package.h>
-#include <setjmp.h>
 #include <cmocka.h>
 #include <ebuild.h>
 #include <dirent.h>
@@ -236,7 +235,7 @@ CTEST(test_parse_invalid)
     void* buffers = depend_allocate_buffers();
     assert_null(atom_parse(buffers, "package-name-not-atom"));
     //assert_null(cmdline_parse("33"));
-    assert_null(required_use_parse(buffers, " ?? ( useflag "));
+    assert_null(required_use_parse(buffers, " ?? ( use_flag "));
     assert_null(depend_parse(buffers, "use? "));
     depend_free_buffers(buffers);
 }
