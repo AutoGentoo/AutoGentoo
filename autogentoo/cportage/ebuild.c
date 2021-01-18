@@ -192,6 +192,7 @@ int ebuild_metadata_init(Ebuild* self)
     DependencyBuffers* d_buffers = depend_allocate_buffers();
     RequiredUseBuffers* ru_buffers = required_use_allocate_buffers();
     U32 line_n = 0;
+    int error = 0;
     while (!feof(fp))
     {
         line_n++;
@@ -218,7 +219,8 @@ int ebuild_metadata_init(Ebuild* self)
                 if (*target)
                 {
                     lerror("%s cannot be defined twice in the same file", name);
-                    return 1;
+                    error = 1;
+                    break;
                 }
 
                 *target = depend_parse(d_buffers, value);
@@ -226,7 +228,8 @@ int ebuild_metadata_init(Ebuild* self)
                 if (!*target)
                 {
                     lerror("Failed to parse '%s' in %s", depend_setup[i].name_match, self->key);
-                    return 2;
+                    error = 2;
+                    break;
                 }
 
                 is_dep = 1;
@@ -251,7 +254,8 @@ int ebuild_metadata_init(Ebuild* self)
             if (!self->required_use)
             {
                 lerror("Failed to parse 'REQUIRED_USE' in %s", self->key);
-                return 3;
+                error = 3;
+                break;
             }
         }
         else if (strcmp(name, "KEYWORDS") == 0)
@@ -262,15 +266,22 @@ int ebuild_metadata_init(Ebuild* self)
 
     free(value);
     free(name);
+    depend_free_buffers(d_buffers);
+    required_use_free_buffers(ru_buffers);
 
-    self->metadata_init = 1;
+    if (!error)
+    {
+        self->metadata_init = 1;
+    }
+
     if (fclose(fp) != 0)
     {
         lerror("Failed to close file '%s'", self->cache_file);
         return 4;
     }
 
-    return 0;
+    errno = 0;
+    return error;
 }
 
 static PyFastMethod(PyEbuild_metadata_init, Ebuild)
