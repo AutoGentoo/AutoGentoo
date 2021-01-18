@@ -1,7 +1,8 @@
 %top {
 #include <stdlib.h>
 #include <string.h>
-#include "language.h"
+#include "dependency.h"
+#include "use.h"
 }
 
 %option prefix="depend"
@@ -86,16 +87,16 @@ Atom* atom_parse(void* buffers, const char* input)
 +letter          A-Za-z
 +version_suf     (?:(?:_alpha|_beta|_pre|_rc|_p)[0-9]*)
 +revision        (?:-r[0-9]+)
-+version         [0-9]+(?:\.[0-9]+)*[{letter}]?]?{version_suf}*{revision}?[\*]?
-+ident_word      [{letter}_][{letter}0-9_]*
++version         [0-9]+(?:\.[0-9]+)*[{letter}]?{version_suf}*{revision}?
++ident_word      [{letter}_0-9][{letter}0-9\+_]*
 +identifier      {ident_word}(?:-{ident_word})*
-+atom            {identifier}\/{identifier}(?:-{version})?
++atom            {identifier}\/{identifier}(?:[-\.]?(?:{version}))?[\*]?
 +slotname        [A-Za-z0-9][A-Za-z0-9+_.-]*
 +slot            [\:]({slotname}(?:\/{slotname})?)?[\*|\=]?
 +repo            [\:][\:]{identifier}
 +atomflag        [!-]?{identifier}(?:\([\+|\-]\))?[\?|=]?
 +atomflags       [\[][ ]*{atomflag}(?:[ ]*,[ ]*{atomflag})*[ ]*[\]]
-+use_select      [!]?{identifier}\?
++use_select      [!]?[A-Za-z0-9_-]+\?
 
 ==
 
@@ -103,33 +104,30 @@ Atom* atom_parse(void* buffers, const char* input)
 "[ \t\r\\]+"            {/* skip */}
 "{repo}"                {yyval->identifier = strdup(yytext + 2); return REPOSITORY;}
 "{slot}"                {
-                            char* ref = strdup(yytext);
                             yyval->slot.slot_opts = ATOM_SLOT_IGNORE;
-                            if (ref[len - 1] == '*') {
+                            if (yytext[len - 1] == '*') {
                                 yyval->slot.slot_opts = ATOM_SLOT_IGNORE;
-                                ref[--len] = 0;
+                                len--;
                             }
-                            else if (ref[len - 1] == '=') {
+                            else if (yytext[len - 1] == '=') {
                                 yyval->slot.slot_opts = ATOM_SLOT_REBUILD;
-                                ref[--len] = 0;
+                                len--;
                             }
 
-                            char* name_splt = strchr(ref + 1, '/');
-                            if (name_splt)
-                                *name_splt = 0;
-                            if (ref[1] == 0) {
+                            const char* name_splt = strchr(yytext + 1, '/');
+                            if (!name_splt)
+                                name_splt = yytext + len;
+                            if (len <= 1 || yytext[1] == 0) {
                                 yyval->slot.name = NULL;
                                 yyval->slot.sub_name = NULL;
-                                free(ref);
                                 return SLOT;
                             }
-                            yyval->slot.name = strdup(ref + 1);
-                            if (name_splt)
+                            yyval->slot.name = strndup(yytext + 1, name_splt - yytext - 1);
+                            if (*name_splt)
                                 yyval->slot.sub_name = strdup(name_splt + 1);
                             else
                                 yyval->slot.sub_name = NULL;
 
-                            free(ref);
                             return SLOT;
                         }
 "{atomflags}"           {
@@ -195,21 +193,17 @@ Atom* atom_parse(void* buffers, const char* input)
                             return ATOM_FLAGS;
                         }
 "{use_select}"          {
-                            char* ref = strdup(yytext);
-
-                            if (*ref == '!')
+                            if (*yytext == '!')
                             {
                                 yyval->depend_expr_select.operator = USE_OP_DISABLE;
-                                ref++;
+                                yytext++;
                             }
                             else
                             {
                                 yyval->depend_expr_select.operator = USE_OP_ENABLE;
                             }
 
-                            ref[len - 1] = 0;
-                            yyval->depend_expr_select.target = strndup(ref, len - 1);
-                            free(ref);
+                            yyval->depend_expr_select.target = strndup(yytext, len - 1);
                             return USESELECT;
                         }
 "\?\?"                  {yyval->depend_expr_select.target = NULL; yyval->depend_expr_select.operator = USE_OP_MOST_ONE; return USESELECT;}
@@ -234,8 +228,6 @@ Atom* atom_parse(void* buffers, const char* input)
                             atom_init(yyval->atom_type, yytext);
                             return ATOM;
                         }
-
-"[\*]"                  {return '*';}
 
 ==
 

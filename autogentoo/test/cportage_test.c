@@ -216,9 +216,9 @@ CTEST(test_parse_all_metadata)
                 /* Don't search for ebuild file, just initialize the metadata */
                 errno = 0;
                 assert_int_equal(ebuild_init(self, NULL, cache_path, category, name_and_value), 0);
-                //assert_int_equal(ebuild_metadata_init(self), 0);
+                assert_int_equal(ebuild_metadata_init(self), 0);
                 assert_int_equal(errno, 0);
-                Py_DECREF(self);
+                Py_XDECREF(self);
                 i++;
             }
 
@@ -234,7 +234,6 @@ CTEST(test_parse_invalid)
 {
     void* buffers = depend_allocate_buffers();
     assert_null(atom_parse(buffers, "package-name-not-atom"));
-    //assert_null(cmdline_parse("33"));
     assert_null(required_use_parse(buffers, " ?? ( use_flag "));
     assert_null(depend_parse(buffers, "use? "));
     depend_free_buffers(buffers);
@@ -270,7 +269,26 @@ CTEST(test_package_key)
     assert_int_equal(Py_REFCNT(pkg), 1);
 }
 
+CTEST(test_misc_required_use)
+{
+    const char* test_strings[] = {
+            "emacs? ( gtk ) !curl? ( !gtk )",
+            "libunwind? ( libcxxabi )",
+            "libfuzzer? ( || ( sanitize xray ) )",
+    };
+
+    void* buffers = required_use_allocate_buffers();
+    for (int i = 0; i < sizeof(test_strings) / sizeof(test_strings[0]); i++)
+    {
+        RequiredUse* parsed = required_use_parse(buffers, test_strings[i]);
+        assert_non_null(parsed);
+        Py_XDECREF(parsed);
+    }
+    required_use_free_buffers(buffers);
+}
+
 const static struct CMUnitTest cportage_tests[] = {
+        cmocka_unit_test(test_misc_required_use),
         cmocka_unit_test(test_depend),
         cmocka_unit_test(test_atom_full),
         cmocka_unit_test(test_ebuild_init),
