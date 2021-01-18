@@ -16,9 +16,10 @@ attributes from Python will raise a `AttributeError`.
 
 ### Portage language
 Portage ebuild rely on a special syntax for their dependency expressions.
-A Bison/Flex module is included to parse these expressions and generate a
-Python friendly object. `depend_bison.y` and `depend_flex.l` use Python module
-function to allocate and initialize their data. This means the parser cannot
+A [neoast](https://github.com/AutoGentoo/neoast) module is included to parse
+these expressions and generate a  Python friendly object. `Dependency` (`depend.y`)
+and `RequiredUse` (`required_use.y`) parsers are Python dependent as they use CPython
+functions to allocate and initialize their data. This means the parser cannot
 be stripped from the rest of the module without running into linking issues.
 
 Because there are multiple different types of expressions used in portage,
