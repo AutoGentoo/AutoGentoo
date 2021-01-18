@@ -60,11 +60,11 @@
 
 %option debug_ids="$-<>=![]?()|^,~rafsuVBSRADSP"
 
-//%destructor { if ($$.target) free($$.target); } <depend_expr_select>
-//%destructor { Py_DECREF($$); } <atom_type>;
-//%destructor { Py_DECREF($$); } <atom_flags>;
-//%destructor { free($$.name); if($$.sub_name) free($$.sub_name); } <slot>;
-//%destructor { free($$); } <identifier>;
+%destructor <depend_expr_select> { if ($$.target) free($$.target); }
+%destructor <atom_type>          { Py_DECREF($$); }
+%destructor <atom_flags>         { Py_DECREF($$); }
+%destructor <slot>               { free($$.name); if($$.sub_name) free($$.sub_name); }
+%destructor <identifier>         { free($$); }
 
 %bottom {
 Atom* atom_parse(void* buffers, const char* input)

@@ -39,9 +39,9 @@
 
 %option debug_ids="$ids!?()ESDRP"
 
-//%destructor { free($$); } <identifier>
-//%destructor { if($$.target) free($$.target); } <use_select>
-//%destructor { Py_DECREF($$); } <required_use>
+%destructor <identifier> { free($$); }
+%destructor <use_select> { if($$.target) free($$.target); } 
+%destructor <required_use> { Py_DECREF($$); }
 
 
 +identifier      [A-Za-z_0-9][A-Za-z_0-9\-\+]*

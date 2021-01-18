@@ -15,4 +15,5 @@ venv/*
 build-debug/*
 *workspace.xml
 .idea/dataSources/*
+.cache/*
 compile_commands.json
