@@ -96,7 +96,9 @@ static PyInitFunc(PyRequiredUse_init, RequiredUse)
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &required_use_string))
         return -1;
 
-    RequiredUse* duped = required_use_parse(required_use_string);
+    void* buffers = required_use_allocate_buffers();
+    RequiredUse* duped = required_use_parse(buffers, required_use_string);
+    required_use_free_buffers(buffers);
     if (!duped)
     {
         PyErr_Format(PyExc_RuntimeError, "Failed to parse required use '%s'", required_use_string);
