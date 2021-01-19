@@ -177,7 +177,7 @@ CTEST(test_depend)
     depend_free_buffers(buffers);
 
     Py_DECREF(deps);
-	Py_DECREF(test_long);
+    Py_DECREF(test_long);
 }
 
 CTEST(test_ebuild_init)
@@ -266,7 +266,10 @@ CTEST(test_parse_all_metadata)
                 /* Don't search for ebuild file, just initialize the metadata */
                 errno = 0;
                 assert_int_equal(ebuild_init(self, NULL, cache_path, category, name_and_value), 0);
+
+#ifndef __APPLE__ // Man, is this slow on Mac OSX. Probably because its allocating the RE2 buffers to swap
                 assert_int_equal(ebuild_metadata_init(self), 0);
+#endif
                 assert_int_equal(errno, 0);
                 Py_XDECREF(self);
                 i++;
