@@ -1,4 +1,5 @@
-from typing import Optional, Dict
+from pathlib import Path
+from typing import Optional, Dict, Union
 
 
 class AtomVersion:
@@ -45,7 +46,9 @@ class Portage:
     def get_package(self, package_id: int) -> 'Package': ...
     def match_atom(self, atom: Atom) -> Ebuild: ...
     def get_use_flag(self, use_flag: int) -> UseFlag: ...
-    def initialize_repository(self, ebuild_path: Optional[str], cache_path: str) -> int: ...
+    def initialize_repository(self,
+                              ebuild_path: Optional[str],
+                              cache_path: str) -> int: ...
 
 
 class RequiredUse:

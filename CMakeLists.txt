@@ -26,7 +26,7 @@ if (CUSTOM_PYTHON)
 endif()
 
 set(Python3_FIND_VIRTUALENV "ONLY")
-find_package(Python3 COMPONENTS Development)
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 add_compile_definitions(_GNU_SOURCE)
 add_compile_options(-Wno-unused-result -g -fno-omit-frame-pointer)

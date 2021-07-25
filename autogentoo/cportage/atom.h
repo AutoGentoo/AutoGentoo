@@ -53,7 +53,6 @@ AtomFlag* atomflag_build(const char* name);
 void atomflag_init(AtomFlag* self, const char* name);
 PyNewFunc(PyAtom_new);
 int atom_init(Atom* self, const char* input);
-Atom* cmdline_atom_new(char* name);
 I32 atom_version_compare(const AtomVersion* first, const AtomVersion* second);
 
 #endif //AUTOGENTOO_ATOM_H

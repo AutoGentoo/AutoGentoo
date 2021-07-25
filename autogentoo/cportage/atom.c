@@ -126,23 +126,6 @@ static PyDealloc(PyAtom_dealloc, Atom)
     Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
-Atom* cmdline_atom_new(char* name)
-{
-    char* cmd_temp = NULL;
-    asprintf(&cmd_temp, "SEARCH/%s", name);
-
-    Atom* out = (Atom*) PyAtom_new(&PyAtomType, NULL, NULL);
-    if (atom_init(out, name) != 0)
-    {
-        Py_DECREF(out);
-        out = NULL;
-    }
-
-    free(cmd_temp);
-    free(name);
-    return out;
-}
-
 static PyNewFunc(PyAtomFlag_new)
 {
     AtomFlag* self = (AtomFlag*) type->tp_alloc(type, 0);
@@ -472,9 +455,9 @@ I32 atom_version_compare(const AtomVersion* first, const AtomVersion* second)
             strncpy(r1, scf, scf_l);
             strncpy(r2, scs, scs_l);
 
-            for (int i1 = scf_l; i1 < maxlength; i1++)
+            for (uint32_t i1 = scf_l; i1 < maxlength; i1++)
                 r1[i1] = '0';
-            for (int i2 = scs_l; i2 < maxlength; i2++)
+            for (uint32_t i2 = scs_l; i2 < maxlength; i2++)
                 r2[i2] = '0';
 
             cmp_1 = (I32) strtol(r1, NULL, 10);

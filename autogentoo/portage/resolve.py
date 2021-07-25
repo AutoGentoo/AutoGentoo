@@ -645,10 +645,10 @@ class Emerge:
         self.blocks = {}
         self.resolve_session = resolve_session
 
-    def add_block(self, parent: Optional["SelectedEbuild"], atom: Atom):
+    def add_block(self, _: Optional["SelectedEbuild"], atom: Atom):
         """
         Block ebuilds match this atom from being selected
-        :param parent: ebuild that selected this block
+        :param _: ebuild that selected this block
         :param atom: atom to block
         :return:
         """

@@ -2,7 +2,12 @@
 import unittest
 
 from autogentoo import cportage
-from autogentoo.cportage import Package, Ebuild, Dependency
+from autogentoo.cportage import (
+    Package,
+    Ebuild,
+    Dependency,
+)
+
 from autogentoo.portage import (
     resolve_all,
     Emerge,

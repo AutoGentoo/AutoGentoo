@@ -8,6 +8,16 @@
 #include "language.h"
 #include <structmember.h>
 
+static PyObject*
+PyUseFlag_repr(UseFlag* self)
+{
+    return PyUnicode_FromFormat(
+            "%s%s",
+            self->state ? "" : "-",
+            self->name
+    );
+}
+
 PyNewFunc(PyUseFlag_new)
 {
     UseFlag* self = (UseFlag*) type->tp_alloc(type, 0);
@@ -145,7 +155,7 @@ static PyObject* PyRequiredUse_next(RequiredUse* self)
 static PyMemberDef PyUseFlag_members[] = {
         {"name", T_STRING, offsetof(UseFlag, name), READONLY},
         {"state", T_BOOL, offsetof(UseFlag, state), 0},
-        {NULL }
+        {NULL}
 };
 
 
@@ -155,7 +165,7 @@ static PyMemberDef PyRequiredUse_members[] = {
         {"next", T_OBJECT, offsetof(RequiredUse, next), READONLY},
         {"id", T_ULONGLONG, offsetof(RequiredUse, global_flag), READONLY},
         {"operator", T_INT, offsetof(RequiredUse, option), READONLY},
-        {NULL }
+        {NULL}
 };
 
 PyTypeObject PyUseFlagType = {
@@ -169,6 +179,7 @@ PyTypeObject PyUseFlagType = {
         .tp_init = (initproc) PyUseFlag_init,
         .tp_dealloc = (destructor) PyUseFlag_dealloc,
         .tp_members = PyUseFlag_members,
+        .tp_repr = (reprfunc) PyUseFlag_repr
 };
 
 PyTypeObject PyRequiredUseType = {
@@ -183,5 +194,5 @@ PyTypeObject PyRequiredUseType = {
         .tp_dealloc = (destructor) PyRequiredUse_dealloc,
         .tp_members = PyRequiredUse_members,
         .tp_iter = (getiterfunc) PyRequiredUse_iter,
-        .tp_iternext = (iternextfunc) PyRequiredUse_next
+        .tp_iternext = (iternextfunc) PyRequiredUse_next,
 };

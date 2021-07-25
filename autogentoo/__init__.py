@@ -1,2 +1,1 @@
-from . import cportage
-from . import network
+from . import *
