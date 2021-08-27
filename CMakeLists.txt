@@ -10,7 +10,7 @@ set(CMAKE_C_STANDARD_REQUIRED YES)
 # Setup the Python development environment
 option(CUSTOM_PYTHON "Enable a custom path to a python library" OFF)
 option(SANITIZER_BUILD "Build with AddressSanitizer" OFF)
-set(ASAN_LIB "libasan.so" CACHE STRING "Path to address santizer library")
+set(ASAN_LIB "libasan.so" CACHE STRING "Path to address sanitizer library")
 
 if (CUSTOM_PYTHON)
     if (Python3_USE_STATIC_LIBS)
@@ -29,7 +29,7 @@ set(Python3_FIND_VIRTUALENV "ONLY")
 find_package(Python3 COMPONENTS Development)
 
 add_compile_definitions(_GNU_SOURCE)
-add_compile_options(-Wno-unused-result -g -fno-omit-frame-pointer)
+add_compile_options(-Wno-unused-result -g -fno-omit-frame-pointer -fPIC)
 add_link_options(-fno-omit-frame-pointer)
 
 set(EXEC_ENV "PYTHONPATH=${CMAKE_SOURCE_DIR}")
@@ -49,6 +49,8 @@ include(cmake/pymodule.cmake)  # Python module macros
 
 # Unit and integration testing
 include(cmake/test.cmake)
-
 add_subdirectory(third_party)
+
+include_directories(${PROJECT_SOURCE_DIR})
+
 add_subdirectory(autogentoo)

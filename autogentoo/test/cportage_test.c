@@ -8,7 +8,7 @@
 #include <cportage/module.h>
 #include <cportage/package.h>
 #include <cmocka.h>
-#include <ebuild.h>
+#include <cportage/ebuild.h>
 #include <dirent.h>
 
 struct atom_verify_proto {

@@ -1,12 +1,15 @@
+%include {
+    #include <autogentoo/cportage/dependency.h>
+    #include <autogentoo/cportage/use.h>
+}
+
 %top {
 #include <assert.h>
-#include "dependency.h"
-#include "use.h"
 }
 
 // This is default, just want to test the parser
 %option parser_type="LALR(1)"
-//%option disable_locks="TRUE"
+%option annotate_line="FALSE"
 %option debug_table="TRUE"
 %option prefix="required_use"
 

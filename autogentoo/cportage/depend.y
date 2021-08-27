@@ -1,12 +1,16 @@
+%include {
+    #include <autogentoo/cportage/dependency.h>
+    #include <autogentoo/cportage/use.h>
+}
+
 %top {
 #include <stdlib.h>
 #include <string.h>
-#include "dependency.h"
-#include "use.h"
 }
 
 %option prefix="depend"
 %option debug_table="TRUE"
+%option annotate_line="FALSE"
 
 %union {
     char* identifier;

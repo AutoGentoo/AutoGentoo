@@ -13,6 +13,6 @@ PythonModule(autogentoo_cportage
         ${depend_parser_OUTPUT}
         ${requireduse_parser_OUTPUT}
 
-        INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+        INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}
         LINK_LIBRARIES autogentoo_hacksaw neoast
         )
