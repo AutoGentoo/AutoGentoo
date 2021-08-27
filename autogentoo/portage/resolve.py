@@ -372,7 +372,7 @@ class SelectedEbuild(ResolveDependency):
     global_flag_hooks: List[Hookable]  # Trigger when any use flag is changed
 
     # Flags to set next time we regenerate
-    flags: Queue[UseFlag]
+    flags: Queue
 
     generators: DependencyContainer[ResolveDependency]
     resolved_deps: DependencyContainer[ResolveDependency]
