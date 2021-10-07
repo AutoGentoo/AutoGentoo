@@ -21,15 +21,17 @@ class Mirror:
     protocol: Protocol
     url: str
 
+    def get_url(self, path: str):
+        return self.url + path
+
     def download(self, url_path: str, output_path: Path):
-        file_path = self.url + url_path
         # urllib.request supports FTP, HTTP, HTTPS
         if self.protocol in (
             Mirror.Protocol.HTTP,
             Mirror.Protocol.HTTPS,
             Mirror.Protocol.FTP,
         ):
-            urllib.request.urlretrieve(file_path, str(output_path))
+            urllib.request.urlretrieve(self.get_url(url_path), str(output_path))
         else:
             raise NotImplementedError("%s is not implemented yet" % self.protocol)
 

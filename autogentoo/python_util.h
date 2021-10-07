@@ -9,7 +9,8 @@
 
 #define PyInitFunc(name, type) int name(type* self, PyObject* args, PyObject* kwds)
 #define PyNewFunc(name) PyObject* name(PyTypeObject* type, PyObject* args, PyObject* kwds)
-#define PyMethod(name, type) PyObject* name(type* self, PyObject* args, PyObject* kwds)
+#define PyKwMethod(name, type) PyObject* name(type* self, PyObject* args, PyObject* kwds)
+#define PyMethod(name, type) PyObject* name(type* self, PyObject* args)
 #define PyFastMethod(name, type) PyObject* name(type* self, PyObject *const *args, Py_ssize_t nargs)
 #define PyDealloc(name, type) void name(type* self)
 

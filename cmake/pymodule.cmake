@@ -35,6 +35,7 @@ function(PythonModule target)
     cmake_parse_arguments(PYTHON_MODULE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     add_library(${target} SHARED ${PYTHON_MODULE_SOURCES})
+    # add_compile_definitions(${target} Py_LIMITED_API)
 
     LinkPythonLib(${target}
             COMPILE_OPTIONS ${PYTHON_MODULE_COMPILE_OPTIONS}

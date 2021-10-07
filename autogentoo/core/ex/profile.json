@@ -1,0 +1,27 @@
+{
+  "name": "example",
+  "author": "andreitumbar@gmail.com",
+  "revision": 1,
+  "description": "Intel/AMD 64-bit Gentoo build for Sandy Bridge and later",
+  "architecture": "amd64",
+  "instruction_sets": [
+    "mmx",
+    "popcnt",
+    "sse",
+    "sse2",
+    "sse3",
+    "sse4.1",
+    "sse4.2",
+    "avx",
+    "avx2"
+  ],
+  "world": [
+    "gcc",
+    "firefox",
+    "i3-gaps",
+    "rofi"
+  ],
+  "files": {
+    "/etc/portage/make.conf": "make.conf"
+  }
+}

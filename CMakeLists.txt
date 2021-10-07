@@ -10,7 +10,7 @@ set(CMAKE_C_STANDARD_REQUIRED YES)
 # Setup the Python development environment
 option(CUSTOM_PYTHON "Enable a custom path to a python library" OFF)
 option(SANITIZER_BUILD "Build with AddressSanitizer" OFF)
-set(ASAN_LIB "libasan.so" CACHE STRING "Path to address santizer library")
+set(ASAN_LIB "libasan.so" CACHE STRING "Path to address sanitizer library")
 
 if (CUSTOM_PYTHON)
     if (Python3_USE_STATIC_LIBS)
@@ -48,7 +48,7 @@ endif()
 include(cmake/pymodule.cmake)  # Python module macros
 
 # Unit and integration testing
-include(cmake/test.cmake)
+enable_testing()
 
 add_subdirectory(third_party)
 add_subdirectory(autogentoo)

@@ -91,8 +91,6 @@ PyAtomFlag_repr(AtomFlag* self)
     return obj;
 }
 
-PyNewFunc(PyAtom_new) {return type->tp_alloc(type, 0);}
-
 static PyInitFunc(PyAtom_init, Atom)
 {
     static char* kwlist[] = {"atom_string", NULL};
@@ -108,7 +106,7 @@ static PyInitFunc(PyAtom_init, Atom)
         return -1;
 
     memcpy(&self->id, &duped->id, sizeof(Atom) - offsetof(Atom, id));
-    Py_TYPE(duped)->tp_free((PyObject*) duped);
+    Py_DECREF(duped);
     return 0;
 }
 
@@ -123,7 +121,6 @@ static PyDealloc(PyAtom_dealloc, Atom)
     SAFE_FREE(self->repository);
     SAFE_FREE(self->category);
     SAFE_FREE(self->name);
-    Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
 Atom* cmdline_atom_new(char* name)
@@ -143,21 +140,15 @@ Atom* cmdline_atom_new(char* name)
     return out;
 }
 
-static PyNewFunc(PyAtomFlag_new)
+static PyInitFunc(PyAtomFlag_init, AtomFlag)
 {
-    AtomFlag* self = (AtomFlag*) type->tp_alloc(type, 0);
+    static char* kwlist[] = {"expr", NULL};
+    const char* expr = NULL;
     self->def = 0;
     self->name = NULL;
     self->option = 0;
     self->next = NULL;
     self->PyIterator_self__ = NULL;
-    return (PyObject*) self;
-}
-
-static PyInitFunc(PyAtomFlag_init, AtomFlag)
-{
-    static char* kwlist[] = {"expr", NULL};
-    const char* expr = NULL;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &expr))
         return -1;
@@ -170,7 +161,6 @@ static PyDealloc(PyAtomFlag_dealloc, AtomFlag)
 {
     Py_XDECREF(self->next);
     SAFE_FREE(self->name);
-    Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
 static PyObject* PyAtomFlag_iter(AtomFlag* self)
@@ -212,18 +202,6 @@ void atomflag_init(AtomFlag* self, const char* name)
     self->name = strdup(name);
     self->def = 0;
     self->next = NULL;
-}
-
-static PyNewFunc(PyAtomVersion_new)
-{
-    AtomVersion* self = (AtomVersion*) type->tp_alloc(type, 0);
-    self->v = NULL;
-    self->full_version = NULL;
-    self->next = NULL;
-    self->prefix = 0;
-    self->revision = 0;
-
-    return (PyObject*) self;
 }
 
 static void atom_version_init(AtomVersion* self, const char* input)
@@ -621,7 +599,6 @@ PyTypeObject PyAtomFlagType = {
         .tp_basicsize = sizeof(AtomFlag),
         .tp_itemsize = 0,
         .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-        .tp_new = PyAtomFlag_new,
         .tp_init = (initproc) PyAtomFlag_init,
         .tp_dealloc = (destructor) PyAtomFlag_dealloc,
         .tp_repr = (reprfunc) PyAtomFlag_repr,
@@ -637,7 +614,6 @@ PyTypeObject PyAtomVersionType = {
         .tp_basicsize = sizeof(AtomVersion),
         .tp_itemsize = 0,
         .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-        .tp_new = PyAtomVersion_new,
         .tp_init = (initproc) PyAtomVersion_init,
         .tp_dealloc = (destructor) PyAtomVersion_dealloc,
         .tp_repr = (reprfunc) PyAtomVersion_repr,

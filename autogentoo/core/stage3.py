@@ -34,10 +34,7 @@ class Stage3:
         self.modifiers.discard('')  # discard any empty tokens
 
     def full_url(self) -> str:
-        return f"/releases/{self.architecture}/autobuilds/{str(self.url)}"
-
-    def download(self, output_path: Path):
-        self.mirror.download(self.full_url(), output_path)
+        return self.mirror.get_url(f"/releases/{self.architecture}/autobuilds/{str(self.url)}")
 
 
 class Stage3Request:
