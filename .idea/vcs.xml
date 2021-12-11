@@ -6,7 +6,5 @@
     <mapping directory="$PROJECT_DIR$/third_party/cmocka" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/third_party/neoast" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/third_party/neoast/third_party/cmocka" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/third_party/neoast/third_party/cre2" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/third_party/neoast/third_party/re2" vcs="Git" />
   </component>
 </project>

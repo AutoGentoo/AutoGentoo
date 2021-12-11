@@ -1,8 +1,10 @@
-%top {
-#include <stdlib.h>
-#include <string.h>
-#include "dependency.h"
-#include "use.h"
+%include {
+    #include <stdlib.h>
+    #include <string.h>
+    #include "dependency.h"
+    #include "use.h"
+    #include "atom.h"
+    #include "common.h"
 }
 
 %option prefix="depend"
@@ -104,6 +106,7 @@ Atom* atom_parse(void* buffers, const char* input)
 "[ \t\r\\]+"            {/* skip */}
 "{repo}"                {yyval->identifier = strdup(yytext + 2); return REPOSITORY;}
 "{slot}"                {
+                            size_t len = yylen;
                             yyval->slot.slot_opts = ATOM_SLOT_IGNORE;
                             if (yytext[len - 1] == '*') {
                                 yyval->slot.slot_opts = ATOM_SLOT_IGNORE;
@@ -203,7 +206,7 @@ Atom* atom_parse(void* buffers, const char* input)
                                 yyval->depend_expr_select.operator = USE_OP_ENABLE;
                             }
 
-                            yyval->depend_expr_select.target = strndup(yytext, len - 1);
+                            yyval->depend_expr_select.target = strndup(yytext, yylen - 1);
                             return USESELECT;
                         }
 "\?\?"                  {yyval->depend_expr_select.target = NULL; yyval->depend_expr_select.operator = USE_OP_MOST_ONE; return USESELECT;}

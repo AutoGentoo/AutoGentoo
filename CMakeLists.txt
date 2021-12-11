@@ -29,7 +29,7 @@ set(Python3_FIND_VIRTUALENV "ONLY")
 find_package(Python3 COMPONENTS Development)
 
 add_compile_definitions(_GNU_SOURCE)
-add_compile_options(-Wno-unused-result -g -fno-omit-frame-pointer)
+add_compile_options(-Wno-unused-result -g -fno-omit-frame-pointer -fPIC)
 add_link_options(-fno-omit-frame-pointer)
 
 set(EXEC_ENV "PYTHONPATH=${CMAKE_SOURCE_DIR}")
