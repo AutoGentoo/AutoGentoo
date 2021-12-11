@@ -39,6 +39,7 @@ if (SANITIZER_BUILD)
     add_link_options(-fsanitize=address)
 
     set(LD_PRELOAD "LD_PRELOAD=${ASAN_LIB}")
+    set(EXEC_ENV ${EXEC_ENV} LSAN_OPTIONS=suppressions=data/leak.supp)
 
     message(STATUS "Building with AddressSanitizer")
 endif()
