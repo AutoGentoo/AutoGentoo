@@ -1,7 +1,9 @@
-%top {
-#include <assert.h>
-#include "dependency.h"
-#include "use.h"
+%include {
+    #include <assert.h>
+    #include "dependency.h"
+    #include "use.h"
+    #include "atom.h"
+    #include "common.h"
 }
 
 // This is default, just want to test the parser

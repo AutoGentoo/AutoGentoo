@@ -1,7 +1,0 @@
-# Python memory leaks!!
-leak:libpython*
-
-# Caused by a bug (maybe from me) in Flex/Bison error handling
-# Somehow the issue is not seen from calling in Python
-# Probably just going to leave this as is
-# leak:_IO_file_doallocate
