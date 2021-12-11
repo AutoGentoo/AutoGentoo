@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import unittest
+from typing import List, Optional
 
 from autogentoo import network
 
@@ -19,7 +20,7 @@ class TestStringMethods(unittest.TestCase):
     def test_simple_message(self):
         s_message = network.build_message(0, 2, 3, 4, 5, 6)
 
-        d = [None]
+        d: List[Optional[network.Message]] = [None]
 
         def cb(message: network.Message):
             d[0] = message

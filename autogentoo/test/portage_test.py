@@ -41,22 +41,17 @@ class PortageUnitTests(unittest.TestCase):
             for x in resolve_all(None, Dependency(">=sys-devel/gcc-9.3.0")):
                 layer_one.append(x.get_resolved())
 
-    @unittest.expectedFailure
     def test_resolve_gcc(self):
         ebuild_n = self.portage.initialize_repository(None, "data/cportage-repo")
         self.assertEqual(ebuild_n, 30260)
 
         request_atom = Dependency("sys-devel/gcc")
 
-        for x in resolve_all(None, request_atom):
-            resolved = x.get_resolved()
-            print(resolved, flush=True)
-
-            try:
+        # TODO(tumbar) Fix portage resolution algorithm
+        with self.assertRaises(RequiredUseException):
+            for x in resolve_all(None, request_atom):
                 resolved = x.get_resolved()
                 print(resolved, flush=True)
-            except RequiredUseException as r_use:
-                print(r_use.suggestion, flush=True)
 
 
 if __name__ == "__main__":
