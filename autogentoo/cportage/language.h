@@ -19,4 +19,4 @@ uint32_t required_use_init();
 void depend_free();
 void required_use_free();
 
-#endif // HACKSAW_COMPILER_SHARE_H
+#endif // CPORTAGE_COMPILER_SHARE_H
